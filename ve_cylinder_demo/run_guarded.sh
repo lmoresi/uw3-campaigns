@@ -3,8 +3,8 @@
 # kills it (and returns) on a blow-up, a hung solve (no forces.csv write for 15 min)
 # or three SNES failures; the queue behind it then proceeds.
 W=${UW3_WORKTREE:-/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lagrangian-inflow}
-# pixi environment: UW3_PIXI_ENV, else the checkout's .pixi-env (./uw setup), else amr-dev
-E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo amr-dev)}
+# pixi environment: UW3_PIXI_ENV, else the checkout's .pixi-env (./uw setup), else runtime
+E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo runtime)}
 mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null; }   # GNU, then BSD/macOS
 D=$(cd "$(dirname "$0")" && pwd); np=$1; l=$2; shift 2
 cd $D; rm -rf runs/$l

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # render_movie.sh <run> <title...>: chunked frames (a fresh process per 60), then the mp4
 W=${UW3_WORKTREE:-/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lagrangian-inflow}
-E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo amr-dev)}
+E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo runtime)}
 D=$(cd "$(dirname "$0")" && pwd)
 run=$1; shift; title="$*"
 cd $D

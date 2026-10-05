@@ -6,7 +6,8 @@ Driver scripts, guards and post-processing for Underworld3 simulation campaigns,
 
 ```bash
 git clone https://github.com/lmoresi/uw3-campaigns.git ~/+Simulations/uw3-campaigns
-export UW3_WORKTREE=/path/to/underworld3-pixi       # the checkout whose pixi environment runs the jobs (env amr-dev)
+export UW3_WORKTREE=/path/to/underworld3-pixi       # the checkout whose pixi environment runs the jobs
+export UW3_PIXI_ENV=runtime                          # pixi environment (default runtime: standard PETSc + pyvista)
 cd ~/+Simulations/uw3-campaigns/ve_cylinder_demo
 ./run_guarded.sh 4 my_run -uw_Re 100 -uw_Wi 0.5 -uw_velocity_transport forward_nodes -uw_stress_transport forward_nodes -uw_reconstruction global -uw_resolution 40 -uw_circle_ratio 0.5 -uw_t_end 8
 ```

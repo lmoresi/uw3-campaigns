@@ -14,11 +14,12 @@ gh auth login -h github.com -s project,read:project        # needs repo access t
 git clone https://github.com/underworldcode/underworld3.git ~/+Underworld/underworld3-pixi
 cd ~/+Underworld/underworld3-pixi
 git switch feature/forward-from-nodes                      # PR #800: forward histories, global projection, FENE-P log(f c) record (020b02f1 or later)
-./uw setup                                                  # follow it; the runs use the pixi environment amr-dev (custom PETSc with AMR)
-./uw build
-pixi run -e amr-dev python -m pytest tests/test_1068_fene_p.py -q      # 8 pass; ~40 min, the shear-box tests are slow
+./uw setup                                                  # the standard (conda) PETSc; no custom AMR build is needed
+./uw build                                                   # installs into the environment the runs use: runtime (default + pyvista)
+pixi run -e runtime python -m pytest tests/test_1068_fene_p.py -q      # 8 pass; ~40 min, the shear-box tests are slow
 git clone https://github.com/lmoresi/uw3-campaigns.git ~/+Simulations/uw3-campaigns
-export UW3_WORKTREE=~/+Underworld/underworld3-pixi         # the checkout whose amr-dev environment runs the jobs
+export UW3_WORKTREE=~/+Underworld/underworld3-pixi         # the checkout whose pixi environment runs the jobs
+# the pixi environment: UW3_PIXI_ENV, else the checkout's .pixi-env (written by ./uw setup), else runtime
 ```
 
 The driver also needs `pygmsh` (meshes are built on first use and cached in `ve_cylinder_demo/runs/`).
@@ -53,8 +54,8 @@ In priority order:
 ## 3. Read the results
 
 ```bash
-pixi run --manifest-path $UW3_WORKTREE/pixi.toml -e amr-dev python forces_summary.py 6 8 re100_grid_Wi05_r80 re100_ob_Wi05_r80
-pixi run --manifest-path $UW3_WORKTREE/pixi.toml -e amr-dev python night_report.py > runs/REPORT.md
+pixi run --manifest-path $UW3_WORKTREE/pixi.toml -e runtime python forces_summary.py 6 8 re100_grid_Wi05_r80 re100_ob_Wi05_r80
+pixi run --manifest-path $UW3_WORKTREE/pixi.toml -e runtime python night_report.py > runs/REPORT.md
 ./render_movie.sh <label>                                   # frames and a movie of a run
 ```
 
