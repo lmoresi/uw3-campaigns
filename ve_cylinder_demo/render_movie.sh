@@ -10,8 +10,8 @@ for chunk in $(seq 1 40); do
   echo "$run chunk $chunk: $n frames"
   [ "$n" -eq 0 ] && break
 done
-# ffmpeg from the pixi environment when the system has none
-FF=$(command -v ffmpeg || echo "pixi run --manifest-path $W/pixi.toml -e $E ffmpeg")
+# ffmpeg: the system one, else a throwaway conda-forge build (the env ffmpeg can lack its libs)
+FF=$(command -v ffmpeg || echo "pixi exec ffmpeg")
 $FF -y -loglevel error -framerate ${FPS:-12} -pattern_type glob -i "runs/$run/frames/frame_*.png" \
   -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "$D/ve_cylinder_$run.mp4" \
   && echo "wrote $D/ve_cylinder_$run.mp4"
