@@ -45,8 +45,10 @@ In priority order:
    with the forward global histories, Wi 1 and 2 at res 40, then Wi 0.5 and 1 at res 80. Wi 2 at res 20 was unresolved
    (stopped at t 7.1). Add `-uw_debug_fene 40` to the first one: it prints the spring factor and the record's trace every
    tenth step and every step from 40 to 65, which is how the last FENE-P failure was diagnosed.
-3. **Newtonian at res 80** (`-uw_Wi 0`, or the Newtonian label the driver uses) to put the DFG validation at the same
-   resolution as the pair.
+3. **Newtonian at res 80**, to put the DFG validation at the same resolution as the pair:
+   ```bash
+   ./run_guarded.sh 24 re100_newt_r80 -uw_Re 100 -uw_Wi 0 -uw_resolution 80 -uw_circle_ratio 1 -uw_t_end 8
+   ```
 
 ## 3. Read the results
 
