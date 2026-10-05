@@ -83,15 +83,23 @@ ref = forces(REF)
 cd_ref = at(ref, REF_T)
 
 # figure 1: the comparison runs to t 2 against the reference
-fig, ax = plt.subplots(2, 1, figsize=(11, 7.2), sharex=True)
+fig, ax = plt.subplots(2, 1, figsize=(14, 7.2), sharex=True)
 if ref is not None:
     k = ref["t"] <= 2.05
     ax[0].plot(ref["t"][k], ref["cd"][k], color="#c0392b", lw=2.2, alpha=0.35, label="SUPG res 80 (reference)")
     ax[1].plot(ref["t"][k], ref["cl"][k], color="#c0392b", lw=2.2, alpha=0.35)
+cd_seen, cl_seen, dropped = [], [], []
+if ref is not None:
+    k = ref["t"] <= 2.05
+    cd_seen.append(ref["cd"][k & (ref["t"] >= 0.5)]); cl_seen.append(ref["cl"][k])
 for l in labels:
     p, d = parse(l), forces(l)
     if p is None or d is None:
         continue
+    if status(l)[0] in ("killed", "failed"):
+        dropped.append(l)          # off the plot: a blow-up would set the scale
+        continue
+    cd_seen.append(d["cd"][d["t"] >= 0.5]); cl_seen.append(d["cl"])
     res, key, C = p
     desc, col = SCHEMES.get(key, (key, "#17becf"))
     kw = dict(color=col, ls=DASH.get(C, "-."), lw=1.6 if res == 40 else 1.0)
@@ -100,22 +108,38 @@ for l in labels:
     ax[0].plot(d["t"], d["cd"], label=f"res {res}, C {C}: {desc}", **kw)
     ax[1].plot(d["t"], d["cl"], **kw)
 ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
-ax[0].set_ylim(3.4, 5.0); ax[0].set_xlim(0, 2.05)
+
+
+def span(arrays, pad=0.06):
+    v = np.concatenate([a[np.isfinite(a)] for a in arrays if len(a)]) if arrays else np.array([0.0, 1.0])
+    lo, hi = float(v.min()), float(v.max())
+    return lo - pad * (hi - lo), hi + pad * (hi - lo)
+
+
+# every valid run fits: cd from the end of the inflow ramp (t 0.5, shaded), cl everywhere
+ax[0].set_ylim(*span(cd_seen)); ax[1].set_ylim(*span(cl_seen)); ax[0].set_xlim(0, 2.05)
 for a in ax:
     a.grid(alpha=0.3)
-ax[0].legend(fontsize=7.5, ncol=2, loc="lower right")
+    a.axvspan(0, 0.5, color="0.93", zorder=0)
+ax[0].text(0.02, 0.04, "inflow ramp", transform=ax[0].transAxes, fontsize=8, color="0.45")
+ax[0].legend(fontsize=7.5, ncol=1, loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0,
+             title=("not plotted (killed / failed):\n" + "\n".join(dropped)) if dropped else None, title_fontsize=7.5)
 ax[0].set_title("Re 100, Wi 0.5 Oldroyd-B: stress schemes and Courant number to t 2 "
                 "(solid C 1, dashed C 2, dotted C 4)", fontsize=10, loc="left")
 fig1 = png(fig)
 
 # figure 2: the reference to t 8 (and the stopped global-projection run)
 fig, ax = plt.subplots(2, 1, figsize=(11, 4.6), sharex=True)
+f2_cd, f2_cl = [], []
 for lab, col, name in ((REF, "#c0392b", "SUPG res 80"), ("re100_ob_Wi05_r80", "#2471a3", "forward + global projection res 80 (stopped)")):
     d = forces(lab)
     if d is not None:
         ax[0].plot(d["t"], d["cd"], color=col, lw=1, label=name); ax[1].plot(d["t"], d["cl"], color=col, lw=1)
-ax[0].set_ylim(3, 4.6); ax[0].set_xlim(0, 8); ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
+        f2_cd.append(d["cd"][d["t"] >= 0.5]); f2_cl.append(d["cl"])
+ax[0].set_xlim(0, 8); ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
 ax[1].axvspan(6, 8, color="0.92")
+if f2_cd:
+    ax[0].set_ylim(*span(f2_cd)); ax[1].set_ylim(*span(f2_cl))
 for a in ax:
     a.grid(alpha=0.3)
 ax[0].legend(fontsize=8, loc="lower right")
