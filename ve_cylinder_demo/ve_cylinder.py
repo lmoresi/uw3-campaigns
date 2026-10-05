@@ -23,7 +23,7 @@ import underworld3 as uw
 params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_transport="eulerian",
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
-                   uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.065,
+                   uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
                    uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0)
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
@@ -160,15 +160,16 @@ traction = stress * sympy.Matrix([mesh.Gamma[0], mesh.Gamma[1]])
 F_x = uw.maths.BdIntegral(mesh, -traction[0], "inclusion")
 F_y = uw.maths.BdIntegral(mesh, -traction[1], "inclusion")
 
-# passive tracers, released each step near the inlet. Not aimed at the cylinder
-# (radius 0.05): a tracer that lingers at the wall in a closed recirculation bubble
-# crosses the facet under RK2 on the extrapolated velocity and is deleted as outside
-# the domain (res 40 forward runs kept 15% of their tracers when seeded on the
-# centreline)
+# passive tracers, released each step near the inlet, as two smoke trails close to
+# the centreline. They are aimed at the cylinder (radius 0.05): a tracer that lingers
+# at the wall in a closed recirculation bubble can cross the facet under RK2 on the
+# extrapolated velocity and is deleted as outside the domain (res 40 forward runs kept
+# 15% of their tracers when seeded on the centreline), so expect thinner trails
 tracers = uw.swarm.Swarm(mesh=mesh)
 # two smoke sources, one a little above and one a little below the midline (each
 # `tracer_offset` from the cylinder's centreline, bunched within `tracer_halfwidth`),
-# so each shear layer is seeded by its own streak
+# so each shear layer is seeded by its own streak; the default offset of twice the
+# halfwidth leaves a gap between the trails about as wide as one source
 u_ = np.linspace(-1.0, 1.0, max(int(params.uw_tracers) // 2, 2))
 bunch = np.arctanh(u_ * np.tanh(2.0)) / 2.0 * float(params.uw_tracer_halfwidth)
 seed_y = np.concatenate([centre[1] - float(params.uw_tracer_offset) + bunch,
