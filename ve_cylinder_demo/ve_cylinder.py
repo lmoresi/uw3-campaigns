@@ -24,7 +24,7 @@ params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
                    uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
-                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0)
+                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd")
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
 ckdir = os.path.join(outdir, "checkpoints")
@@ -72,6 +72,12 @@ def snap_to_circle(dm):
 mesh = uw.discretisation.Mesh(mesh_file, markVertices=True, useMultipleTags=True, useRegions=True,
                               boundaries=boundaries, qdegree=3, refinement=refinement,
                               refinement_callback=snap_to_circle if refinement else None)
+if int(params.uw_relax):
+    # reshape the cells the refinement left around the cylinder (mesh.relax: MMPDE in
+    # the ideal frame, sizes and topology kept, named boundaries pinned so the snapped
+    # circle stays exact); res 20 near-cylinder min angle 22 -> 29 deg, 99th-percentile
+    # max angle 105 -> 91 deg
+    mesh.relax()
 csize_circle = csize_circle / 2 ** refinement          # the cylinder cell after refinement
 x, y = mesh.X
 v = uw.discretisation.MeshVariable("U", mesh, 2, degree=2)
@@ -86,7 +92,7 @@ if Wi > 0:
     eta_p, eta_s = (1 - beta) * eta, beta * eta
     ns.stress_transport = st
     ns.constitutive_model = uw.constitutive_models.ViscoElasticPlasticFlowModel(
-        ns.Unknowns, order=1, integrator="etd", objective_rate="upper_convected",
+        ns.Unknowns, order=1, integrator=str(params.uw_integrator), objective_rate="upper_convected",
         stress_history=str(params.uw_store), element="jeffreys" if beta > 0 else "maxwell",
         relaxation=str(params.uw_relaxation))
     cm = ns.constitutive_model
