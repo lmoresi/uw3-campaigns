@@ -9,6 +9,7 @@ extremes after the ramp, so nothing clips and the runs compare). Resumable: fram
 already written are kept; -uw_max_frames bounds one process (a macOS plotter leaks).
 """
 import os, glob, re, time
+from enum import Enum
 # never lock a checkpoint a live run may be writing (a lock clash kills the run)
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 import numpy as np, pyvista as pv, h5py
@@ -88,8 +89,14 @@ def snap_to_circle(dm):
 
 
 refinement = int(params.uw_refinement)
+class boundaries(Enum):
+    bottom = 1; right = 2; top = 3; left = 4; inclusion = 5; All_Boundaries = 1001
+
+
+# the named boundaries matter for -uw_relax: relax() pins named boundaries only, so
+# without them it moves the walls and the cylinder (a scrambled frame)
 mesh = uw.discretisation.Mesh(os.path.join(HERE, "runs", str(params.uw_mesh_file)), markVertices=True,
-                              useMultipleTags=True, useRegions=True, qdegree=3, refinement=refinement,
+                              useMultipleTags=True, useRegions=True, boundaries=boundaries, qdegree=3, refinement=refinement,
                               refinement_callback=snap_to_circle if refinement else None)
 if int(params.uw_relax):
     mesh.relax()          # as the run did (-uw_relax 1)
