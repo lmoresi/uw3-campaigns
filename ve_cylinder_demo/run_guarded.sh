@@ -1,8 +1,11 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # run_guarded.sh <np> <label> <args...>: one run of ve_cylinder.py under a guard that
 # kills it (and returns) on a blow-up, a hung solve (no forces.csv write for 15 min)
 # or three SNES failures; the queue behind it then proceeds.
 W=${UW3_WORKTREE:-/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lagrangian-inflow}
+# pixi environment: UW3_PIXI_ENV, else the checkout's .pixi-env (./uw setup), else amr-dev
+E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo amr-dev)}
+mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null; }   # GNU, then BSD/macOS
 D=$(cd "$(dirname "$0")" && pwd); np=$1; l=$2; shift 2
 cd $D; rm -rf runs/$l
 # a hold file defers runs of the named kind until a rebuild lands (FENE-P: the
@@ -17,11 +20,11 @@ fi
 if [ -f $D/.skip_fene ] && echo "$@" | grep -q fene_p; then
   echo "$(date '+%H:%M') $l SKIPPED (FENE-P Wi 1 and 2 at res 20 hung at step ~50; Wi 4 would too)" >> runs/night_queue.log; exit 2
 fi
-pixi run --manifest-path $W/pixi.toml -e amr-dev mpirun -n $np python -u ve_cylinder.py -uw_label $l -uw_ksp_max_it 300 -uw_snapshot_every 50 -uw_keep_snapshots 2 "$@" > runs/$l.log 2>&1 &
+pixi run --manifest-path $W/pixi.toml -e $E mpirun -n $np python -u ve_cylinder.py -uw_label $l -uw_ksp_max_it 300 -uw_snapshot_every 50 -uw_keep_snapshots 2 "$@" > runs/$l.log 2>&1 &
 pid=$!; f=runs/$l/forces.csv; sleep 120
 while kill -0 $pid 2>/dev/null; do
   if grep -q "DONE\|STOPPED\|Traceback" runs/$l.log 2>/dev/null; then break; fi
-  age=$(( $(date +%s) - $(stat -f %m $f 2>/dev/null || date +%s) ))
+  age=$(( $(date +%s) - $(mtime $f || date +%s) ))
   row=$(tail -1 $f 2>/dev/null); nd=$(grep -c diverged runs/$l.log)
   bad=$(echo "$row" | awk -F, -v nd=$nd 'NF>5{o=$6+0; c=$3+0; tm=$5+0; if (o>0.3 || c>20 || c<-20 || $3 ~ /nan|inf/ || tm>500 || nd>=3) print "bad"}')
   if [ "$bad" = "bad" ] || [ $age -gt 900 ]; then
