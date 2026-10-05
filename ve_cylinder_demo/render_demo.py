@@ -20,7 +20,7 @@ pv.OFF_SCREEN = True
 
 params = uw.Params(uw_run="grid", uw_title="", uw_every=1, uw_max_frames=60, uw_asinh=20.0,
                    uw_tau_asinh=0.0, uw_from_step=120, uw_top="auto", uw_mesh_file="dfg_5_c0.25.msh", uw_refinement=2,
-                   uw_omega_max=0.0)
+                   uw_omega_max=0.0, uw_latest=0)
 HERE = os.path.dirname(os.path.abspath(__file__))
 run = str(params.uw_run)
 cdir = os.path.join(HERE, "runs", run, "checkpoints")
@@ -127,6 +127,9 @@ def panel(scalars, cmap, clim, title, lines=None, cloud=None):
 indices = sorted(step_of(f, "U") for f in glob.glob(os.path.join(cdir, "checkpoint.mesh.U.*.h5"))
                  if all(settled(g) for g in glob.glob(os.path.join(cdir, f"checkpoint.*{step_of(f, 'U'):05d}*"))))
 indices = indices[::max(int(params.uw_every), 1)]
+# -uw_latest 1: only the newest settled checkpoint (a status frame of a live run)
+if int(params.uw_latest):
+    indices = indices[-1:]
 dt_line = open(os.path.join(HERE, "runs", run, "forces.csv")).read().splitlines()
 times = {int(l.split(",")[0]): float(l.split(",")[1]) for l in dt_line[1:]}
 title = str(params.uw_title) or run
