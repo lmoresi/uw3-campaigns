@@ -1,0 +1,9 @@
+runs/
+*.mp4
+*.png
+*.h5
+*.xdmf
+*.msh
+*.bak*
+__pycache__/
+.meshes/
