@@ -136,6 +136,39 @@ ax[0].set_title("Re 100, Wi 0.5 Oldroyd-B: stress schemes and Courant number to 
                 "(solid C 1, dashed C 2, dotted C 4)", fontsize=10, loc="left")
 fig1 = png(fig)
 
+# figure 0: only the runs still going, against the reference and the two SUPG res-40 baselines
+running = [l for l in labels if parse(l) and status(l)[0] in ("running", "starting") and forces(l) is not None]
+fig, ax = plt.subplots(2, 1, figsize=(14, 6.4), sharex=True)
+r_cd, r_cl = [], []
+if ref is not None:
+    k = ref["t"] <= 2.05
+    ax[0].plot(ref["t"][k], ref["cd"][k], color="#c0392b", lw=2.4, alpha=0.4, label="SUPG res 80 (reference)")
+    ax[1].plot(ref["t"][k], ref["cl"][k], color="#c0392b", lw=2.4, alpha=0.4)
+    r_cd.append(ref["cd"][k & (ref["t"] >= 0.5)]); r_cl.append(ref["cl"][k])
+for l, name, col in (("c40_grid_C1", "SUPG res 40, relaxed (baseline)", "#222222"),
+                     ("c40_grid_norelax_C1", "SUPG res 40, unrelaxed", "#999999")):
+    d = forces(l)
+    if d is not None:
+        ax[0].plot(d["t"], d["cd"], color=col, lw=1.2, ls="--", label=name)
+        ax[1].plot(d["t"], d["cl"], color=col, lw=1.2, ls="--")
+        r_cd.append(d["cd"][d["t"] >= 0.5]); r_cl.append(d["cl"])
+for l in running:
+    res, key, C = parse(l); d = forces(l)
+    desc, col = SCHEMES.get(key, (key, "#17becf"))
+    ax[0].plot(d["t"], d["cd"], color=col, lw=1.8, ls=DASH.get(C, "-."),
+               label=f"RUNNING {l}: {desc}, C {C} (t {d['t'][-1]:.2f}, cd {d['cd'][-1]:.3f})")
+    ax[1].plot(d["t"], d["cl"], color=col, lw=1.8, ls=DASH.get(C, "-."))
+    ax[0].plot(d["t"][-1], d["cd"][-1], "o", color=col, ms=6)
+    ax[1].plot(d["t"][-1], d["cl"][-1], "o", color=col, ms=6)
+    r_cd.append(d["cd"][d["t"] >= 0.5]); r_cl.append(d["cl"])
+ax[0].set_ylim(*span(r_cd)); ax[1].set_ylim(*span(r_cl)); ax[0].set_xlim(0, 2.05)
+for a in ax:
+    a.grid(alpha=0.3); a.axvspan(0, 0.5, color="0.93", zorder=0)
+ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
+ax[0].legend(fontsize=7.5, loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+ax[0].set_title(f"Running now ({len(running)}): the dot is the latest step", fontsize=10, loc="left")
+fig0 = png(fig)
+
 # figure 2: the reference to t 8 (and the stopped global-projection run)
 fig, ax = plt.subplots(2, 1, figsize=(11, 4.6), sharex=True)
 f2_cd, f2_cl = [], []
@@ -228,7 +261,9 @@ pre {{ font-family:var(--mono); font-size:.76rem; overflow-x:auto; margin:0; col
 <tr><th>Run</th><th>Scheme</th><th>Res</th><th>C</th><th>Status</th><th>Latest cd</th><th>cd at t 2</th><th>Error</th><th>Ratio</th></tr>
 {tr}
 </table></div>
-<h2>Drag and lift to t 2</h2>
+<h2>Running now</h2>
+<figure><img alt="cd and cl of the runs still going, against the reference and the SUPG res-40 baselines" src="data:image/png;base64,{fig0}"></figure>
+<h2>All runs to t 2</h2>
 <figure><img alt="cd and cl against t for every comparison run and the res-80 reference" src="data:image/png;base64,{fig1}"></figure>
 <h2>Res-80 runs to t 8</h2>
 <figure><img alt="cd and cl of the SUPG res-80 reference and the stopped global-projection run" src="data:image/png;base64,{fig2}"></figure>
