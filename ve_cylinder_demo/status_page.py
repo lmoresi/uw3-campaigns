@@ -29,6 +29,11 @@ SCHEMES = {  # label key -> (description, colour)
     "sl-bip": ("SL momentum + backward-IP stress", "#17becf"),
     "sl-fip": ("SL momentum + forward-IP stress", "#e377c2"),
     "sl-lag": ("SL momentum + Lagrangian stress (BDF)", "#bcbd22"),
+    "p3-grid": ("P3: SUPG + Eulerian stress + DEVSS", "#000000"),
+    "p3-bn": ("P3: SUPG + backward-nodes stress", "#1f77b4"),
+    "p3-slbn": ("P3: SL momentum + backward-nodes stress", "#ff7f0e"),
+    "p3-slbip": ("P3: SL momentum + backward-IP stress", "#17becf"),
+    "p3-lag": ("P3: SUPG + Lagrangian stress (BDF)", "#9467bd"),
 }
 DASH = {1: "-", 2: "--", 4: ":"}
 

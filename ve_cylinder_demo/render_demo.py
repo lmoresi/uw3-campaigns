@@ -21,7 +21,7 @@ pv.OFF_SCREEN = True
 
 params = uw.Params(uw_run="grid", uw_title="", uw_every=1, uw_max_frames=60, uw_asinh=20.0,
                    uw_tau_asinh=0.0, uw_from_step=120, uw_top="auto", uw_mesh_file="dfg_5_c0.25.msh", uw_refinement=2,
-                   uw_omega_max=0.0, uw_latest=0, uw_relax=0)
+                   uw_omega_max=0.0, uw_latest=0, uw_relax=0, uw_vdegree=2)
 HERE = os.path.dirname(os.path.abspath(__file__))
 run = str(params.uw_run)
 cdir = os.path.join(HERE, "runs", run, "checkpoints")
@@ -96,11 +96,11 @@ class boundaries(Enum):
 # the named boundaries matter for -uw_relax: relax() pins named boundaries only, so
 # without them it moves the walls and the cylinder (a scrambled frame)
 mesh = uw.discretisation.Mesh(os.path.join(HERE, "runs", str(params.uw_mesh_file)), markVertices=True,
-                              useMultipleTags=True, useRegions=True, boundaries=boundaries, qdegree=3, refinement=refinement,
+                              useMultipleTags=True, useRegions=True, boundaries=boundaries, qdegree=2 * int(params.uw_vdegree) - 1, refinement=refinement,
                               refinement_callback=snap_to_circle if refinement else None)
 if int(params.uw_relax):
     mesh.relax()          # as the run did (-uw_relax 1)
-V = uw.discretisation.MeshVariable("U", mesh, 2, degree=2)
+V = uw.discretisation.MeshVariable("U", mesh, 2, degree=int(params.uw_vdegree))
 OMEGA = uw.discretisation.MeshVariable("omega", mesh, 1, degree=1)
 TAU = uw.discretisation.MeshVariable("tauII", mesh, 1, degree=1)
 pvmesh = vis.mesh_to_pv_mesh(mesh)
