@@ -14,7 +14,10 @@ history, the solver state) every N steps into runs/<label>/snapshots, keeping th
 `keep_snapshots`; `-uw_restart <snapshot.h5> -uw_restart_step <N>` loads one and continues
 from step N (use a new label so the first run's record is kept).
 """
-import os, time
+import os, time, faulthandler, signal
+# `kill -USR1 <rank pid>` prints that rank's Python stack to the log: where a
+# silent hang is stuck (ptrace is restricted, so py-spy cannot attach)
+faulthandler.register(signal.SIGUSR1, all_threads=True)
 import numpy as np, sympy
 from enum import Enum
 from mpi4py import MPI
@@ -24,7 +27,7 @@ params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
                    uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
-                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1)
+                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0)
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
 ckdir = os.path.join(outdir, "checkpoints")
@@ -145,6 +148,22 @@ if Wi > 0:
     # 2 Wi_wall^2 / L^2, below 1% at L^2 = 100
     ns.DFDt.inflow_value = sympy.Matrix([[2 * lam * eta_p * gd ** 2, eta_p * gd], [eta_p * gd, 0.0]])
 ns.tolerance = 1.0e-6
+if int(params.uw_inner_max_it):
+    # the Schur (pressure) solve applies an inner velocity solve per iteration, each
+    # capped at 200 by default and neither raising on failure: a stalled block costs
+    # up to 200 x 200 velocity cycles per outer iteration, silently (a "hang"). Cap
+    # both lower and make a stalled block an error, so the step fails visibly
+    n_in = int(params.uw_inner_max_it)
+    for b in ("velocity", "pressure"):
+        ns.petsc_options[f"fieldsplit_{b}_ksp_max_it"] = n_in
+        ns.petsc_options[f"fieldsplit_{b}_ksp_error_if_not_converged"] = None
+if int(params.uw_monitor):
+    # diagnosis: every nonlinear residual and every Krylov outcome, the inner blocks too
+    ns.petsc_options["snes_monitor"] = None
+    ns.petsc_options["ksp_converged_reason"] = None
+    ns.petsc_options["snes_converged_reason"] = None
+    for b in ("velocity", "pressure"):
+        ns.petsc_options[f"fieldsplit_{b}_ksp_converged_reason"] = None
 if int(params.uw_ksp_max_it):
     # a stalled Krylov solve fails the step (and is reported) instead of spinning
     ns.petsc_options["ksp_max_it"] = int(params.uw_ksp_max_it)
