@@ -97,8 +97,9 @@ for l in labels:
     p, d = parse(l), forces(l)
     if p is None or d is None:
         continue
-    if status(l)[0] in ("killed", "failed"):
-        dropped.append(l)          # off the plot: a blow-up would set the scale
+    stopped = status(l)[0] in ("killed", "failed")
+    if stopped and d["t"].max() < 1.0:
+        dropped.append(l)          # off the plot: an early blow-up would set the scale
         continue
     cd_seen.append(d["cd"][d["t"] >= 0.5]); cl_seen.append(d["cl"])
     res, key, C = p
@@ -106,8 +107,11 @@ for l in labels:
     kw = dict(color=col, ls=DASH.get(C, "-."), lw=1.6 if res == 40 else 1.0)
     if res == 20:
         kw.update(color="#bbbbbb", lw=1.4)
-    ax[0].plot(d["t"], d["cd"], label=f"res {res}, C {C}: {desc}", **kw)
+    ax[0].plot(d["t"], d["cd"], label=f"res {res}, C {C}: {desc}" + (" (stopped)" if stopped else ""), **kw)
     ax[1].plot(d["t"], d["cl"], **kw)
+    if stopped:                    # an x where the guard stopped it
+        ax[0].plot(d["t"][-1], d["cd"][-1], "x", color=kw["color"], ms=8, mew=2)
+        ax[1].plot(d["t"][-1], d["cl"][-1], "x", color=kw["color"], ms=8, mew=2)
 ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
 
 
@@ -124,7 +128,7 @@ for a in ax:
     a.axvspan(0, 0.5, color="0.93", zorder=0)
 ax[0].text(0.02, 0.04, "inflow ramp", transform=ax[0].transAxes, fontsize=8, color="0.45")
 ax[0].legend(fontsize=7.5, ncol=1, loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0,
-             title=("not plotted (killed / failed):\n" + "\n".join(dropped)) if dropped else None, title_fontsize=7.5)
+             title=("not plotted (stopped before t 1):\n" + "\n".join(dropped)) if dropped else None, title_fontsize=7.5)
 ax[0].set_title("Re 100, Wi 0.5 Oldroyd-B: stress schemes and Courant number to t 2 "
                 "(solid C 1, dashed C 2, dotted C 4)", fontsize=10, loc="left")
 fig1 = png(fig)
