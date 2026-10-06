@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # run_guarded.sh <np> <label> <args...>: one run of ve_cylinder.py under a guard that
-# kills it (and returns) on a blow-up, a hung solve (no forces.csv write for 15 min)
-# or three SNES failures; the queue behind it then proceeds.
+# kills on blow-up, hang, 3 SNES fails; overshoot cap runs/L.overshoot 
 W=${UW3_WORKTREE:-/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lagrangian-inflow}
 # pixi environment: UW3_PIXI_ENV, else the checkout's .pixi-env (./uw setup), else runtime
 E=${UW3_PIXI_ENV:-$(cat $W/.pixi-env 2>/dev/null || echo runtime)}
@@ -26,7 +25,7 @@ while kill -0 $pid 2>/dev/null; do
   if grep -q "DONE\|STOPPED\|Traceback" runs/$l.log 2>/dev/null; then break; fi
   age=$(( $(date +%s) - $(mtime $f || date +%s) ))
   row=$(tail -1 $f 2>/dev/null); nd=$(grep -c diverged runs/$l.log)
-  bad=$(echo "$row" | awk -F, -v nd=$nd 'NF>5{o=$6+0; c=$3+0; tm=$5+0; if (o>0.3 || c>20 || c<-20 || $3 ~ /nan|inf/ || tm>500 || nd>=3) print "bad"}')
+  bad=$(echo "$row" | awk -F, -v nd=$nd -v om=${GUARD_OVERSHOOT:-$(cat runs/$l.overshoot 2>/dev/null || echo 0.3)} 'NF>5{o=$6+0; c=$3+0; tm=$5+0; if (o>om || c>20 || c<-20 || $3 ~ /nan|inf/ || tm>500 || nd>=3) print "bad"}')
   if [ "$bad" = "bad" ] || [ $age -gt 900 ]; then
     pkill -f "uw_label $l "; echo "$(date '+%H:%M') $l KILLED ($([ $age -gt 900 ] && echo "hung ${age}s" || echo "blow-up / $nd SNES failures")): $(echo $row | cut -d, -f1-6)" >> runs/night_queue.log; wait $pid 2>/dev/null; exit 1
   fi
