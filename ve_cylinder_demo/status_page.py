@@ -24,6 +24,7 @@ SCHEMES = {  # label key -> (description, colour)
     "fip": ("SUPG + forward-IP stress", "#d62728"),
     "fip-rs": ("SUPG + forward-IP stress (restart at step 60, overshoot guard 0.6)", "#d62728"),
     "lag": ("SUPG + Lagrangian stress (BDF)", "#9467bd"),
+    "lag-rs": ("SUPG + Lagrangian stress (BDF), restart at step 120", "#9467bd"),
     "slbn": ("backward-nodes momentum + stress", "#ff7f0e"),
     "sl-bip": ("SL momentum + backward-IP stress", "#17becf"),
     "sl-fip": ("SL momentum + forward-IP stress", "#e377c2"),
