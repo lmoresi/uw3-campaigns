@@ -27,7 +27,7 @@ params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
                    uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
-                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0)
+                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0, uw_kick=0.0, uw_kick_x=0.35, uw_kick_y=0.2, uw_kick_w=0.025)
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
 ckdir = os.path.join(outdir, "checkpoints")
@@ -258,6 +258,21 @@ if str(params.uw_restart):
     choose_reconstruction()
     uw.get_default_model().load_state(str(params.uw_restart))
     uw.pprint(f"restarted from {params.uw_restart} at step {start}")
+    if float(params.uw_kick) != 0.0:
+        # an impulsive, one-signed transverse velocity: a Gaussian blob of v_y
+        # (amplitude kick x U_mean, centre (kick_x, kick_y), width kick_w) added to
+        # the velocity and to every carried velocity history (a semi-Lagrangian
+        # momentum history would otherwise hand the next step the unkicked field)
+        A, xk, yk, wk = (float(params.uw_kick) * U_mean, float(params.uw_kick_x),
+                         float(params.uw_kick_y), float(params.uw_kick_w))
+        hist = [ps for ps in getattr(ns.DuDt, "psi_star", []) or []
+                if hasattr(ps, "coords") and np.asarray(ps.data).shape[-1] == 2]
+        for var in [v] + hist:
+            X = np.asarray(var.coords)
+            arr = np.array(var.data)
+            arr[:, 1] += A * np.exp(-((X[:, 0] - xk) ** 2 + (X[:, 1] - yk) ** 2) / wk ** 2)
+            var.data[...] = arr
+        uw.pprint(f"kicked v_y by {A:g} at ({xk:g}, {yk:g}), width {wk:g}: velocity + {len(hist)} history level(s)")
 else:
     checkpoint(0)
     choose_reconstruction()
