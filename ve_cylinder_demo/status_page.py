@@ -181,6 +181,7 @@ f2_cd, f2_cl = [], []
 for lab, col, name, ls in ((REF, "#c0392b", "SUPG res 80", "-"),
                            ("re100_ob_Wi05_r80", "#2471a3", "forward + global projection res 80 (stopped)", "-"),
                            ("c80_sl-bip_C2", "#17becf", "SL momentum + backward-IP stress, res 80, C 2", "-"),
+                           ("re100_ob_Wi05_cell_r80", "#8e44ad", "forward nodes + cell-fit stress, res 80", "-"),
                            ("c40_sl-bip_C2", "#17becf", "SL momentum + backward-IP stress, res 40, C 2", ":"),
                            ("c40_sl-bip-t8_C2", "#17becf", None, ":")):
     d = forces(lab)
