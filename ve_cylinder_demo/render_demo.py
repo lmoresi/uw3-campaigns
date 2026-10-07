@@ -21,7 +21,7 @@ pv.OFF_SCREEN = True
 
 params = uw.Params(uw_run="grid", uw_title="", uw_every=1, uw_max_frames=60, uw_asinh=20.0,
                    uw_tau_asinh=0.0, uw_from_step=120, uw_top="auto", uw_mesh_file="dfg_5_c0.25.msh", uw_refinement=2,
-                   uw_omega_max=0.0, uw_latest=0, uw_relax=0, uw_vdegree=2, uw_index=-1)
+                   uw_omega_max=0.0, uw_latest=0, uw_relax=0, uw_vdegree=2, uw_index=-1, uw_index_min=-1, uw_index_max=-1)
 HERE = os.path.dirname(os.path.abspath(__file__))
 run = str(params.uw_run)
 cdir = os.path.join(HERE, "runs", run, "checkpoints")
@@ -142,6 +142,11 @@ if int(params.uw_latest):
 # -uw_index N: only the checkpoint of step N (a frame to set beside another run's)
 if int(params.uw_index) >= 0:
     indices = [i for i in indices if i == int(params.uw_index)]
+# -uw_index_min / -uw_index_max: only the checkpoints of steps in that range
+if int(params.uw_index_min) >= 0:
+    indices = [i for i in indices if i >= int(params.uw_index_min)]
+if int(params.uw_index_max) >= 0:
+    indices = [i for i in indices if i <= int(params.uw_index_max)]
 dt_line = open(os.path.join(HERE, "runs", run, "forces.csv")).read().splitlines()
 times = {int(l.split(",")[0]): float(l.split(",")[1]) for l in dt_line[1:]}
 title = str(params.uw_title) or run
