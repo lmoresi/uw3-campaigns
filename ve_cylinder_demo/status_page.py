@@ -6,7 +6,7 @@ drag error at t = 2, and the queue log.
 
 Reads runs/*/forces.csv and runs/*.log only; safe to run while jobs write.
 """
-import os, sys, glob, re, io, base64, html, datetime
+import os, sys, glob, re, io, base64, html, datetime, time
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -178,10 +178,20 @@ fig0 = png(fig)
 # figure 2: the reference to t 8 (and the stopped global-projection run)
 fig, ax = plt.subplots(2, 1, figsize=(11, 4.6), sharex=True)
 f2_cd, f2_cl = [], []
-for lab, col, name in ((REF, "#c0392b", "SUPG res 80"), ("re100_ob_Wi05_r80", "#2471a3", "forward + global projection res 80 (stopped)")):
+for lab, col, name, ls in ((REF, "#c0392b", "SUPG res 80", "-"),
+                           ("re100_ob_Wi05_r80", "#2471a3", "forward + global projection res 80 (stopped)", "-"),
+                           ("c80_sl-bip_C2", "#17becf", "SL momentum + backward-IP stress, res 80, C 2", "-"),
+                           ("c40_sl-bip_C2", "#17becf", "SL momentum + backward-IP stress, res 40, C 2", ":"),
+                           ("c40_sl-bip-t8_C2", "#17becf", None, ":")):
     d = forces(lab)
     if d is not None:
-        ax[0].plot(d["t"], d["cd"], color=col, lw=1, label=name); ax[1].plot(d["t"], d["cl"], color=col, lw=1)
+        # live = still writing (a stop logged without a reason reads as running otherwise)
+        live = time.time() - os.path.getmtime(os.path.join(RUNS, lab, "forces.csv")) < 1200
+        if name is not None:
+            name = name + (f" (t {d['t'][-1]:.2f})" if live else "")
+        ax[0].plot(d["t"], d["cd"], color=col, lw=1, ls=ls, label=name); ax[1].plot(d["t"], d["cl"], color=col, lw=1, ls=ls)
+        if live:
+            ax[0].plot(d["t"][-1], d["cd"][-1], "o", color=col, ms=5); ax[1].plot(d["t"][-1], d["cl"][-1], "o", color=col, ms=5)
         f2_cd.append(d["cd"][d["t"] >= 0.5]); f2_cl.append(d["cl"])
 ax[0].set_xlim(0, 8); ax[0].set_ylabel("cd"); ax[1].set_ylabel("cl"); ax[1].set_xlabel("t")
 ax[1].axvspan(6, 8, color="0.92")
@@ -271,7 +281,7 @@ pre {{ font-family:var(--mono); font-size:.76rem; overflow-x:auto; margin:0; col
 <figure><img alt="cd and cl of the runs still going, against the reference and the SUPG res-40 baselines" src="data:image/png;base64,{fig0}"></figure>
 <h2>All runs to t 2</h2>
 <figure><img alt="cd and cl against t for every comparison run and the res-80 reference" src="data:image/png;base64,{fig1}"></figure>
-<h2>Res-80 runs to t 8</h2>
+<h2>Res-80 runs to t 8 (with the res-40 SL backward-IP run for comparison)</h2>
 <figure><img alt="cd and cl of the SUPG res-80 reference and the stopped global-projection run" src="data:image/png;base64,{fig2}"></figure>
 <h2>Queue log</h2>
 <pre>{html.escape(chr(10).join(qlog))}</pre>
