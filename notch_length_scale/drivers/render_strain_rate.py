@@ -21,6 +21,10 @@ pv.OFF_SCREEN = True
 params = uw.Params(
     uw_refs=uw.Param("1,2,3", description="refinements (columns)"),
     uw_half_width_km=uw.Param(32.0, description="half width of the cropped view (km)"),
+    uw_view=uw.Param("full", description="full = the whole 30 km depth, shared percentile "
+                                         "colour range; bands = the strong layer above the "
+                                         "notch, colour range clipped to show only the bands"),
+    uw_out=uw.Param("strain_rate_maps.png", description="output file name in results/"),
 )
 RES = os.path.join(_here, "..", "results")
 ROWS = [
@@ -58,21 +62,26 @@ for row, (label, pattern) in enumerate(ROWS):
             uw.pprint(f"loaded {os.path.basename(path)}")
 
 values = np.concatenate([m.point_data["log10 edot_II"] for _, _, m in panels.values()])
-clim = (float(np.percentile(values, 2)), float(np.percentile(values, 99.9)))
+if str(params.uw_view) == "bands":
+    clim, (y_lo, y_hi) = (-0.3, 0.8), (-22.0, 0.0)
+else:
+    clim = (float(np.percentile(values, 2)), float(np.percentile(values, 99.9)))
+    y_lo, y_hi = -30.0, 0.0
 
 
 
-def panel_image(pvm, half_width, size=(1240, 660)):
+def panel_image(pvm, half_width):
     """One cropped, unlit, white-background render of a strain-rate mesh."""
+    size = (1240, int(1240 * (y_hi - y_lo) / (2 * half_width)))
     pl = pv.Plotter(off_screen=True, window_size=size)
     pl.set_background("white")
     pl.add_mesh(pvm, scalars="log10 edot_II", cmap="inferno", clim=clim,
                 show_edges=False, lighting=False, show_scalar_bar=False)
     pl.view_xy()
     pl.camera.parallel_projection = True
-    pl.camera.focal_point = (0.0, -15.0, 0.0)
-    pl.camera.position = (0.0, -15.0, 100.0)
-    pl.camera.parallel_scale = half_width * size[1] / size[0]
+    pl.camera.focal_point = (0.0, (y_lo + y_hi) / 2, 0.0)
+    pl.camera.position = (0.0, (y_lo + y_hi) / 2, 100.0)
+    pl.camera.parallel_scale = (y_hi - y_lo) / 2
     image = pl.screenshot(return_img=True)
     pl.close()
     return image
@@ -84,7 +93,8 @@ if uw.mpi.rank == 0:
     import matplotlib.pyplot as plt
 
     half = float(params.uw_half_width_km)
-    fig, axes = plt.subplots(len(ROWS), len(refs), figsize=(6.2 * len(refs), 3.6 * len(ROWS)),
+    panel_h = 6.2 * (y_hi - y_lo) / (2 * half) + 0.5
+    fig, axes = plt.subplots(len(ROWS), len(refs), figsize=(6.2 * len(refs), panel_h * len(ROWS)),
                              squeeze=False)
     for row, (label, _) in enumerate(ROWS):
         for col, ref in enumerate(refs):
@@ -103,8 +113,8 @@ if uw.mpi.rank == 0:
     cbar = fig.colorbar(mappable, ax=axes, orientation="horizontal", fraction=0.025,
                         pad=0.02, aspect=50)
     cbar.set_label(r"$\log_{10}\,\dot\varepsilon_{II}\,/\,(V/H)$,  "
-                   r"$V/H$ = 5 mm/yr / 30 km = 5.3e-15 s$^{-1}$;  "
-                   f"view {2 * half:.0f} km wide, full depth 30 km")
-    out = os.path.join(RES, "strain_rate_maps.png")
+                   r"$V/H$ = 5.3e-15 s$^{-1}$" + "\n"
+                   + f"view {2 * half:.0f} km wide, y from {y_lo:g} to {y_hi:g} km")
+    out = os.path.join(RES, str(params.uw_out))
     fig.savefig(out, dpi=130, bbox_inches="tight")
     print(out, "clim", clim)

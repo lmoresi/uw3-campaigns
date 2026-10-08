@@ -44,6 +44,11 @@ runs only) against mesh size, with the no-length-scale fit W = 31√(ξh). Middl
 Newton steps per run; × marks the plain solves that fail. Right: ε̇_II across the left
 band at y = −15 km, refs 1-3. Made by `drivers/plot_length_scale.py`.
 
+![The shear bands at ref 3](figures/shear_bands_ref3.png)
+
+The bands alone: ref 3, ξ = 0, the strong layer above the notch, colour range clipped
+so only the localised zones show (`render_strain_rate.py -uw_refs 3 -uw_view bands`).
+
 ![Strain-rate maps of the converged runs](figures/strain_rate_maps.png)
 
 ε̇_II (log scale, shared across panels) for the ξ = 0 runs: models down, refinement
