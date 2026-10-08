@@ -198,13 +198,20 @@ couple-stress condition on all walls):
 | 2 | 0.01 | 1 | 1 | converged | 4 | 107 s | 4.85 / 4.79 |
 | 1 | 0 | 1 | 1 | converged | 4 | 231 s | 3.70 / 2.81 |
 | 2 | 0 | 1 | 1 | converged | 4 | 99 s | 4.10 / 4.74 |
+| 3 | 0.01 | 1 | 1 | converged | 4 | 308 s | 4.76 / 3.52 |
+| 3 | 0 | 1 | 1 | **converged** | 4 | 277 s | 4.69 / 3.50 |
+| 2 | 0.01 | 0.5 | 1 | converged | 4 | 186 s | 4.45 / 4.65 |
+| 2 | 0.01 | 1 (P2 ω) | 1 | converged | 4 | 131 s | 4.83 / 4.78 |
 | 1 | 0.01 | 0.01 | 1 | converged | 6 | 216 s | 1.67 / 1.81 |
 
-- The Cosserat coupling converges easily, in 4 exact Newton steps at refs 1 and 2, ξ = 0
-  included. But at c = 1 the band is 3-5 km wide and **wider at ref 2 than at ref 1**.
-  That is the opposite of collapse, so it is either a band still being resolved (W not
-  yet converged in h) or a diffuse zone that is not a localised band. Ref 3 is running
-  and will tell.
+- **The Cosserat coupling converges at every refinement, ξ = 0 included, in 4 exact
+  Newton steps** (ref 3, ξ = 0: 277 s). At c = 1, l = 1 km the mean width is 3.26, 4.42,
+  4.10 km at refs 1-3 (ξ = 0) and 3.53, 4.82, 4.14 km (ξ = 0.01). So ξ does not matter,
+  ref 1 under-resolves the band, and W settles near 4 km ≈ 4 l. The band is wider than
+  the micromorphic one at the same l (about 2 km): the two lengths are not the same
+  parameter.
+- P2 ω gives the same width as P1 at ref 2 (4.83 / 4.78 vs 4.85 / 4.79). c = 0.5 changes
+  W by under 10% (4.45 / 4.65), so the width is set by l, not by η_c.
 - c → 0 recovers the plain problem continuously: at c = 0.01 the width (1.67 / 1.81)
   moves toward the plain 1.42 / 1.18. The strong layer yields (η_eff from 7.3e21 to
   1.3e23 Pa s against η_bg = 1e23).
