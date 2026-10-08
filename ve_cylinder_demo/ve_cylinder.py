@@ -27,7 +27,7 @@ params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
                    uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
-                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0, uw_kick=0.0, uw_kick_x=0.35, uw_kick_y=0.2, uw_kick_w=0.025)
+                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0, uw_kick=0.0, uw_kick_x=0.35, uw_kick_y=0.2, uw_kick_w=0.025, uw_reaction=0)
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
 ckdir = os.path.join(outdir, "checkpoints")
@@ -232,6 +232,46 @@ n_steps = int(np.ceil(float(params.uw_t_end) / dt))
 csv = open(os.path.join(outdir, "forces.csv"), "w") if uw.mpi.rank == 0 else None
 if csv:
     csv.write("step,t,cd,cl,tau_max,fit_overshoot,fit_cells\n")
+# -uw_reaction 1: also the CONSISTENT drag and lift, the momentum residual summed over
+# the cylinder's velocity nodes (the volume / weak-form force, inertia included),
+# beside the boundary-traction measure, in forces_reaction.csv
+rcsv, cyl_nodes = None, None
+if int(params.uw_reaction):
+    from underworld3.utilities.boundary_flux import _boundary_field_nodes
+    rcsv = open(os.path.join(outdir, "forces_reaction.csv"), "w") if uw.mpi.rank == 0 else None
+    if rcsv:
+        rcsv.write("step,t,cd_traction,cl_traction,cd_reaction,cl_reaction,cd_theta,cl_theta,"
+                   "cd_devss,cl_devss,cd_stab,cl_stab\n")
+    # the traction of the stress the momentum equation actually assembles: the theta-rule
+    # blend of the new stress and the carried history level (minus the pressure)
+    sig_theta = ns._viscous_flux() - sympy.eye(2) * p.sym[0]
+    tr_theta = sig_theta * sympy.Matrix([mesh.Gamma[0], mesh.Gamma[1]])
+    Fth_x = uw.maths.BdIntegral(mesh, -tr_theta[0], "inclusion")
+    Fth_y = uw.maths.BdIntegral(mesh, -tr_theta[1], "inclusion")
+    uw.pprint(f"momentum time-scheme weights of the spatial operator: {ns.DuDt.spatial_weights()}")
+    # the other terms of F1, each as a wall traction: whatever the reaction holds beyond
+    # theta + devss + stabilisation is the volume (inertia) part
+    nvec = sympy.Matrix([mesh.Gamma[0], mesh.Gamma[1]])
+    def _bd_pair(flux):
+        tr = sympy.Matrix(flux) * nvec
+        return (uw.maths.BdIntegral(mesh, -tr[0], "inclusion"), uw.maths.BdIntegral(mesh, -tr[1], "inclusion"))
+    F_devss = _bd_pair(ns._devss_flux())
+    F_stab = _bd_pair(ns._stabilisation_flux())
+
+
+def reaction_force():
+    """Total force on the cylinder from the assembled volume residual at its nodes:
+    each rank's partial at a node shared across a cut sums to the whole."""
+    global cyl_nodes
+    if cyl_nodes is None:
+        nodes, lsec, *_ = _boundary_field_nodes(ns, "inclusion", field_id=0)
+        nc = lsec.getFieldComponents(0)
+        cyl_nodes = [(lsec.getFieldOffset(q, 0) + s * nc, nc) for q, s, _c in nodes]
+    ra = np.asarray(ns._assemble_volume_reaction()).ravel()
+    f = np.zeros(2)
+    for off, nc in cyl_nodes:
+        f += ra[off:off + 2]
+    return comm.allreduce(f, op=MPI.SUM)
 def choose_reconstruction():
     """The forward histories: one global L2 projection of the arrivals in place of
     the per-cell fit. Done at the same point of the sequence as the run that wrote
@@ -349,6 +389,17 @@ for step in range(start, n_steps):
     n_over = comm.allreduce(int(getattr(hist, "_fit_overshoot_cells", -1)), op=MPI.SUM)
     if csv:
         csv.write(f"{step + 1},{t:.5f},{cd:.6f},{cl:.6f},{tmax:.6e},{over:.4e},{n_over}\n"); csv.flush()
+    if int(params.uw_reaction):
+        fr = reaction_force()
+        cdr, clr = 2 * fr[0] / (U_mean ** 2 * D), 2 * fr[1] / (U_mean ** 2 * D)
+        cdt = 2 * float(Fth_x.evaluate()) / (U_mean ** 2 * D)
+        clt = 2 * float(Fth_y.evaluate()) / (U_mean ** 2 * D)
+        sc = 2 / (U_mean ** 2 * D)
+        cdd, cld = sc * float(F_devss[0].evaluate()), sc * float(F_devss[1].evaluate())
+        cds, cls = sc * float(F_stab[0].evaluate()), sc * float(F_stab[1].evaluate())
+        if rcsv:
+            rcsv.write(f"{step + 1},{t:.5f},{cd:.6f},{cl:.6f},{cdr:.6f},{clr:.6f},{cdt:.6f},{clt:.6f},"
+                       f"{cdd:.6f},{cld:.6f},{cds:.6f},{cls:.6f}\n"); rcsv.flush()
     dbg = int(params.uw_debug_fene)
     if dbg and str(params.uw_relaxation) == "fene_p" and ((step + 1) % 10 == 0 or dbg <= step + 1 <= dbg + 25):
         # every tenth step, and every step for 25 steps from the one uw_debug_fene names
