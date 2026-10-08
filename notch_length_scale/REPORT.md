@@ -37,6 +37,13 @@ machine (load average ~48).
 5. Not done: FMG / fieldsplit on the coupled system (only exact LU was exercised), and
    parallel runs (everything was serial).
 
+![Band width, Newton steps and band profiles against refinement](figures/length_scale_summary.png)
+
+Left: band width (mean of the left and right bands; the bar spans the two; converged
+runs only) against mesh size, with the no-length-scale fit W = 31√(ξh). Middle: exact
+Newton steps per run; × marks the plain solves that fail. Right: ε̇_II across the left
+band at y = −15 km, refs 1-3. Made by `drivers/plot_length_scale.py`.
+
 ## Step 1: plumbing
 
 `SNES_Stokes_SaddlePt.add_coupled_field(field, F0, F1=None, momentum_flux=None)`
