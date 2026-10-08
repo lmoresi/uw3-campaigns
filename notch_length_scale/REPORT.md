@@ -57,6 +57,15 @@ Guarding, proved two ways:
      slopes 1.01 and 1.00 and fails, so it detects a wrong block;
   3. an ordinary Stokes solver has 2 DM fields and compiles only its own three residuals.
 
+Handoff test subset on the branch: `test_1066_stokes_jacobian_layout`, `test_1061`/
+`1062`/`1063` constrained, `test_1067_newton_cold_start`, `test_1010*`, `test_1011*`
+and the new `test_1070`: **40 passed**. `test_1064` (constrained spherical shell; tier_c,
+level_3, ~2 h on the loaded machine): 3 passed. `test_lu_subsolve_fieldsplit_constrained_
+matches_default_nitsche_response` **failed**, and the run was cut off during the last
+(xfail) test. For a block-constrained solver the change leaves the split options and the
+generated C unchanged (md5 above), so this is probably pre-existing. It is being re-run
+on the branch and on the base `f57c2a27` to settle it.
+
 ## Step 2: micromorphic coupling on the notch
 
 Driver `drivers/micromorphic_notch.py`: notch mesh1, 5e23, softmin/sqrt/onset, δ = 0.1,
@@ -88,6 +97,9 @@ Runs (l = 1 km throughout unless stated):
 | B'' | 1 | 0 | 0.1 | converged | 5 | 180 s | 2.33 / 2.64 |
 | B'' | 2 | 0 | 0.1 | converged | 6 | 263 s | 2.50 / 1.89 |
 | B'' | 3 | 0 | **0.1** | **converged** | 6 | 347 s | 1.81 / 2.52 |
+| C'' | 1 | 0 | 0.1, l = 0.5 km | converged | 6 | 104 s | 2.00 / 2.28 |
+| C'' | 2 | 0 | 0.1, l = 0.5 km | converged | 8 | 173 s | 2.16 / 2.12 |
+| C'' | 3 | 0 | 0.1, l = 0.5 km | converged | 9 | 486 s | 1.19 / 2.09 |
 
 Controls without χ (`newton_exact_linear.py`, same law and solver):
 
@@ -124,6 +136,13 @@ Reading so far:
 - **β = 0.1 needs no ξ at all.** At ξ = 0 it converges at refs 1, 2, 3 in 5, 6, 6
   steps. Mean widths are 2.49, 2.19, 2.16 km (ratios 1.13, 1.01). The micromorphic
   length alone regularises the notch.
+- At ξ = 0, β = 0.1, l = 0.5 km also converges at every refinement (6, 8, 9 steps).
+  The widths barely depend on l: mean 2.14, 2.14, 1.64 km against 2.49, 2.19, 2.16 at
+  l = 1 km. Ref 3 at l = 0.5 has a large L/R asymmetry (1.19 vs 2.09). Two readings
+  remain open: either W is set by β and the yield law more than by l, or the
+  horizontal-cut estimator cannot resolve the difference. The saved profiles
+  (`results/micromorphic/profiles_*.npz`) and fields allow re-measuring with vertical
+  cuts without re-solving.
 - At ξ = 0 the coupling converges at refs 1 and 2 (the plain solve fails at ref 1), but
   not at ref 3. ξ = 0.01 is therefore still needed at ref 3 at this β; the question is
   whether a stiffer coupling (larger β) removes that need.
