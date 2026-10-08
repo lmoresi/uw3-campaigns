@@ -86,6 +86,7 @@ record = dict(
     chi_range=[float(chi_values.min()), float(chi_values.max())],
     min_yield_stress_strong=cn.strong_layer_range(S, sigma_y)[0],
     shift_range_strong=cn.strong_layer_range(S, shift),
+    viscosity_range_strong_Pas=cn.strong_layer_range(S, S["cm"].viscosity),
     taylor=taylor,
 )
 uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km: {report.reason_str} "

@@ -112,6 +112,7 @@ Controls without χ (`newton_exact_linear.py`, same law and solver):
 | ref | ξ | result | its | W_L / W_R (km) |
 |---|---|---|---|---|
 | 1 | 0 | DIVERGED_LINE_SEARCH at \|F\| = 2.41e-2 | 23 | (3.09 / 3.93) |
+| 1 | 0.01 | converged | 8 | 1.42 / 1.18 |
 | 2 | 0.01 | DIVERGED_LINE_SEARCH at \|F\| = 2.34e-3 | 38 | (0.87 / 1.11) |
 
 Reading so far:
@@ -187,3 +188,23 @@ The docstring just says "traction". Passing +σ·n gave a non-1D flow (u_y ~ 0.0
 
 Notch driver `drivers/cosserat_notch.py` (P1 ω first, η_c = c·visc_lin, the
 generalised invariant replaces the model's ε̇_II). Runs below.
+
+Notch runs (exact Newton, warm from the viscous seed, ω = 0 initially, natural
+couple-stress condition on all walls):
+
+| ref | ξ | c = η_c/visc_lin | l (km) | result | its | time | W_L / W_R (km) |
+|---|---|---|---|---|---|---|---|
+| 1 | 0.01 | 1 | 1 | converged | 4 | 230 s | 3.64 / 3.43 |
+| 2 | 0.01 | 1 | 1 | converged | 4 | 107 s | 4.85 / 4.79 |
+| 1 | 0 | 1 | 1 | converged | 4 | 231 s | 3.70 / 2.81 |
+| 2 | 0 | 1 | 1 | converged | 4 | 99 s | 4.10 / 4.74 |
+| 1 | 0.01 | 0.01 | 1 | converged | 6 | 216 s | 1.67 / 1.81 |
+
+- The Cosserat coupling converges easily, in 4 exact Newton steps at refs 1 and 2, ξ = 0
+  included. But at c = 1 the band is 3-5 km wide and **wider at ref 2 than at ref 1**.
+  That is the opposite of collapse, so it is either a band still being resolved (W not
+  yet converged in h) or a diffuse zone that is not a localised band. Ref 3 is running
+  and will tell.
+- c → 0 recovers the plain problem continuously: at c = 0.01 the width (1.67 / 1.81)
+  moves toward the plain 1.42 / 1.18. The strong layer yields (η_eff from 7.3e21 to
+  1.3e23 Pa s against η_bg = 1e23).

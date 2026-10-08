@@ -90,8 +90,10 @@ record = dict(
     bands=bands, W_equiv_km=W,
     omega_range=[float(omega_values.min()), float(omega_values.max())],
     relative_rotation_range_strong=cn.strong_layer_range(S, spin - omega.sym[0]),
+    viscosity_range_strong_Pas=cn.strong_layer_range(S, cm.viscosity),
     taylor=taylor,
 )
 uw.pprint(f"[cosserat] ref {ref} xi {xi} c {c} l {l_km} km P{degree}: {report.reason_str} "
-          f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  omega {record['omega_range']}")
+          f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  omega {record['omega_range']}  "
+          f"eta_eff strong {record['viscosity_range_strong_Pas']}")
 cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], omega=omega))
