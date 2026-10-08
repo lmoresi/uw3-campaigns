@@ -10,8 +10,32 @@ machine (load average ~48).
 | Step | State |
 |---|---|
 | 1. Coupled volume fields in `SNES_Stokes_SaddlePt` | done: tests pass, ordinary Stokes byte-identical |
-| 2. Micromorphic coupling on the notch | in progress: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
-| 3. 2-D Cosserat | plumbing verified (shear layer at order 3); notch runs started |
+| 2. Micromorphic coupling on the notch | done for the first matrix: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
+| 3. 2-D Cosserat | done for the first matrix: converges at ref 3 with ξ = 0 in 4-5 steps; W converged in h (3.5 km at l = 0.5, ~4.1 km at l = 1) |
+
+## Summary (end of the overnight run)
+
+1. **Plumbing works and is guarded.** `add_coupled_field` / `add_coupled_dirichlet_bc`
+   on `SNES_Stokes_SaddlePt`, pushed to `feature/shear-band-length-scale` (`003d3b95`,
+   `6f0627ce`). Ordinary Stokes C is byte-identical to the base. The handoff test subset
+   passes (41), plus the new `test_1070` (projection identity, Taylor slope 2 with a
+   failing negative control, Cosserat shear layer at order 3). `test_1064`'s one red is a
+   stale strict xfail (XPASS) that is also red on the base. It is flagged, not changed.
+2. **Both continua regularise the notch, and both converge at ref 3 with ξ = 0**, where
+   the handoff records that no route converged at ref 3, ξ ≤ 0.01. Every linear solve
+   is exact LU, so the step count is the Newton count.
+   - Micromorphic, β = H/η_bg = 0.1, l = 1 km: 5 / 6 / 6 steps at refs 1-3; W ≈ 2.5,
+     2.2, 2.2 km. β = 0.01 (the handoff's value) is too weak to matter, and β = 0.05
+     still needs ξ = 0.01 at ref 3. The handoff's β = 0.005 (D) was not run.
+   - Cosserat, c = 1: 4-5 steps at every refinement; W converged at about 4.1 km
+     (l = 1 km) and 3.5 km (l = 0.5 km), insensitive to ξ, c and the ω degree.
+3. **The width is not simply proportional to l** in either model, at the two lengths
+   tried. Next: l = 0.25 and 2 km, and re-measure the saved profiles with vertical
+   cuts. The horizontal-cut estimator shows L/R spreads up to 0.9 km.
+4. **Coarse → fine prolongation is not a speed-up**: the same solution in about 3× the
+   Newton steps of a cold start from the viscous seed.
+5. Not done: FMG / fieldsplit on the coupled system (only exact LU was exercised), and
+   parallel runs (everything was serial).
 
 ## Step 1: plumbing
 
@@ -203,6 +227,8 @@ couple-stress condition on all walls):
 | 2 | 0.01 | 0.5 | 1 | converged | 4 | 186 s | 4.45 / 4.65 |
 | 2 | 0.01 | 1 (P2 ω) | 1 | converged | 4 | 131 s | 4.83 / 4.78 |
 | 1 | 0.01 | 0.01 | 1 | converged | 6 | 216 s | 1.67 / 1.81 |
+| 2 | 0 | 1 | 0.5 | converged | 5 | 121 s | 3.39 / 3.54 |
+| 3 | 0 | 1 | 0.5 | **converged** | 5 | 428 s | 3.49 / 3.43 |
 
 - **The Cosserat coupling converges at every refinement, ξ = 0 included, in 4 exact
   Newton steps** (ref 3, ξ = 0: 277 s). At c = 1, l = 1 km the mean width is 3.26, 4.42,
@@ -210,6 +236,10 @@ couple-stress condition on all walls):
   ref 1 under-resolves the band, and W settles near 4 km ≈ 4 l. The band is wider than
   the micromorphic one at the same l (about 2 km): the two lengths are not the same
   parameter.
+- At l = 0.5 km the width is converged in h: mean 3.46 km at ref 2 and at ref 3. Halving
+  l narrows the band only from about 4.1 to 3.5 km, so W is not proportional to l. It
+  looks like W ≈ W₀ + O(l), with W₀ set by the notch geometry and the yield law. Two
+  points cannot separate these; l = 0.25 and 2 km would.
 - P2 ω gives the same width as P1 at ref 2 (4.83 / 4.78 vs 4.85 / 4.79). c = 0.5 changes
   W by under 10% (4.45 / 4.65), so the width is set by l, not by η_c.
 - c → 0 recovers the plain problem continuously: at c = 0.01 the width (1.67 / 1.81)
