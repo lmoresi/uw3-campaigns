@@ -10,7 +10,7 @@ machine (load average ~48).
 | Step | State |
 |---|---|
 | 1. Coupled volume fields in `SNES_Stokes_SaddlePt` | done: tests pass, ordinary Stokes byte-identical |
-| 2. Micromorphic coupling on the notch | in progress |
+| 2. Micromorphic coupling on the notch | in progress: at β = 0.05, l = 1 km, ref 3 converges at ξ = 0.01 and W stops shrinking with h |
 | 3. 2-D Cosserat | not started |
 
 ## Step 1: plumbing
@@ -77,12 +77,18 @@ Runs (l = 1 km throughout unless stated):
 | A | 3 | 0.01 | 0.01 | stalled at \|F\| = 9.2e-3 after 7 its; stopped | — | — | — |
 | B | 1 | 0 | 0.01 | DIVERGED_LINE_SEARCH at \|F\| = 2.43e-2 | 35 | 429 s | (3.75 / 2.05) |
 | A' | 1 | 0.01 | 0.05 | converged | 5 | 204 s | 2.07 / 2.34 |
+| A' | 2 | 0.01 | 0.05 | converged | 6 | 255 s | 1.79 / 2.19 |
+| A' | 3 | 0.01 | 0.05 | **converged** | 7 | 534 s | 2.20 / 1.60 |
+| B' | 1 | 0 | 0.05 | converged | 7 | 114 s | 1.78 / 2.05 |
+| B' | 2 | 0 | 0.05 | converged | 12 | 212 s | 1.89 / 1.43 |
+| B' | 3 | 0 | 0.05 | DIVERGED_LINE_SEARCH at \|F\| = 2.18e-3 | 33 | 1861 s | (1.03 / 1.94) |
 
 Controls without χ (`newton_exact_linear.py`, same law and solver):
 
 | ref | ξ | result | its | W_L / W_R (km) |
 |---|---|---|---|---|
 | 1 | 0 | DIVERGED_LINE_SEARCH at \|F\| = 2.41e-2 | 23 | (3.09 / 3.93) |
+| 2 | 0.01 | DIVERGED_LINE_SEARCH at \|F\| = 2.34e-3 | 38 | (0.87 / 1.11) |
 
 Reading so far:
 
@@ -91,5 +97,15 @@ Reading so far:
   solves stall at the same residual (2.43e-2 vs 2.41e-2). The ref-2 widths are half the
   ref-1 ones, i.e. still tracking h.
 - β = 0.05 (outside the handoff matrix; added because β = 0.01 does nothing measurable)
-  converges faster at ref 1 and widens the band by about 40%. The shift peaks at
-  5.7e7 Pa. Refs 2 and 3 at β = 0.05 are running.
+  is the working coupling. At ξ = 0.01 it **converges at every refinement, including
+  ref 3**, in 5-7 exact Newton steps. The handoff records that no route converged at
+  ref 3, ξ ≤ 0.01. The plain solve already fails at ref 2 in this configuration (the
+  control above).
+- The width stops tracking h. At ξ = 0.01, the mean of L and R is 2.20, 1.99, 1.90 km at
+  refs 1, 2, 3: successive ratios 1.11 and 1.05, against √2 = 1.41 for the h-controlled
+  W ≈ 31√(ξh) measured before (1.29, 0.91, 0.64 km). The L/R spread at ref 3 is 0.6 km,
+  so the estimator is the limit on how well "constant" is established. The profiles are
+  saved for re-measurement.
+- At ξ = 0 the coupling converges at refs 1 and 2 (the plain solve fails at ref 1), but
+  not at ref 3. ξ = 0.01 is therefore still needed at ref 3 at this β; the question is
+  whether a stiffer coupling (larger β) removes that need.
