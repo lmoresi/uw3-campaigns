@@ -11,7 +11,7 @@ machine (load average ~48).
 |---|---|
 | 1. Coupled volume fields in `SNES_Stokes_SaddlePt` | done: tests pass, ordinary Stokes byte-identical |
 | 2. Micromorphic coupling on the notch | in progress: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
-| 3. 2-D Cosserat | not started |
+| 3. 2-D Cosserat | plumbing verified (shear layer at order 3); notch runs started |
 
 ## Step 1: plumbing
 
@@ -65,6 +65,10 @@ matches_default_nitsche_response` **failed**, and the run was cut off during the
 (xfail) test. For a block-constrained solver the change leaves the split options and the
 generated C unchanged (md5 above), so this is probably pre-existing. It is being re-run
 on the branch and on the base `f57c2a27` to settle it.
+**Settled:** the failure is `XPASS(strict)`: the test is marked as a known failure and
+now passes, on the branch AND on the base `f57c2a27` alike. So it predates this
+work: the xfail marker is stale. Flagged with a `TODO(BUG)` at the marker; it needs
+a maintainer decision.
 
 ## Step 2: micromorphic coupling on the notch
 
@@ -100,6 +104,8 @@ Runs (l = 1 km throughout unless stated):
 | C'' | 1 | 0 | 0.1, l = 0.5 km | converged | 6 | 104 s | 2.00 / 2.28 |
 | C'' | 2 | 0 | 0.1, l = 0.5 km | converged | 8 | 173 s | 2.16 / 2.12 |
 | C'' | 3 | 0 | 0.1, l = 0.5 km | converged | 9 | 486 s | 1.19 / 2.09 |
+| E | 3, from ref 2 | 0.01 | 0.05 | converged | 20 | 1209 s | 2.20 / 1.60 |
+| E | 3, from ref 2 | 0 | 0.1 | converged | 22 | 1082 s | 1.81 / 2.52 |
 
 Controls without χ (`newton_exact_linear.py`, same law and solver):
 
@@ -143,6 +149,41 @@ Reading so far:
   horizontal-cut estimator cannot resolve the difference. The saved profiles
   (`results/micromorphic/profiles_*.npz`) and fields allow re-measuring with vertical
   cuts without re-solving.
+- Coarse → fine (case E): v, p and χ were prolonged from the converged ref-2 run with
+  the local polyharmonic RBF (`uw.kdtree.KDTree.rbf_interpolator_local`, order 1, 6
+  neighbours). Both runs reach the same solution as the cold start (widths agree to 6
+  digits), but in 20 and 22 steps against 7 and 6. The prolonged band is a worse start
+  than the viscous seed: the first coupled residual is 0.25, against 0.08 from the seed.
+  A coarse band sits where the fine yield law is stiffest. So the cold start from the
+  viscous seed is the better route; the solution is the same branch either way.
 - At ξ = 0 the coupling converges at refs 1 and 2 (the plain solve fails at ref 1), but
   not at ref 3. ξ = 0.01 is therefore still needed at ref 3 at this β; the question is
   whether a stiffer coupling (larger β) removes that need.
+
+## Step 3: 2-D Cosserat
+
+Added `add_coupled_dirichlet_bc(conds, boundary, field)` (needed to hold ω = 0 on a
+wall). Velocity and coupled-field essential BCs now share one registration helper.
+Ordinary Stokes C is still byte-identical (the three md5s above, re-checked after
+this change).
+
+**Linear verification** (`test_1070`, `test_cosserat_shear_layer_converges_to_the_closed_form`):
+a layer 0 < y < 1, η = η_c = 1, B = 2η l² = 0.02 (k = 10), u_x(1) = 1, ω = 0 on both
+walls, the closed form imposed on the left wall and as a traction on the right. P2 ω,
+P2 u:
+
+| h | ‖ω − ω_exact‖ | ‖u_x − u_exact‖ |
+|---|---|---|
+| 1/8 | 1.094e-3 | 1.161e-4 |
+| 1/16 | 1.504e-4 | 1.528e-5 |
+| 1/32 | 1.931e-5 | 1.942e-6 |
+
+Orders 2.86 → 2.96 (ω) and 2.93 → 2.98 (u): the skew stress, the moment balance and
+their coupling are assembled correctly. ‖ω‖ = 0.465.
+
+A trap found on the way, worth a docs fix: `add_natural_bc`'s value enters the
+boundary residual as is (PETSc's f0), so for Stokes it is **minus** the traction σ·n.
+The docstring just says "traction". Passing +σ·n gave a non-1D flow (u_y ~ 0.02).
+
+Notch driver `drivers/cosserat_notch.py` (P1 ω first, η_c = c·visc_lin, the
+generalised invariant replaces the model's ε̇_II). Runs below.
