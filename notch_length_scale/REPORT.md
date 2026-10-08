@@ -44,6 +44,14 @@ runs only) against mesh size, with the no-length-scale fit W = 31√(ξh). Middl
 Newton steps per run; × marks the plain solves that fail. Right: ε̇_II across the left
 band at y = −15 km, refs 1-3. Made by `drivers/plot_length_scale.py`.
 
+![Strain-rate maps of the converged runs](figures/strain_rate_maps.png)
+
+ε̇_II (log scale, shared across panels) for the ξ = 0 runs: models down, refinement
+across, 64 km wide around the notch, full 30 km depth. The micromorphic bands are sharp
+and keep their shape from ref 1 to ref 3; the Cosserat bands are wider and more diffuse.
+At ref 1 the band edges are visibly mesh-faceted. Made by `drivers/render_strain_rate.py`
+from the saved velocity fields (no re-solve).
+
 ## Step 1: plumbing
 
 `SNES_Stokes_SaddlePt.add_coupled_field(field, F0, F1=None, momentum_flux=None)`

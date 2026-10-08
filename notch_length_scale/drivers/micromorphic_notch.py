@@ -36,6 +36,8 @@ params = uw.Params(
     uw_l_km=uw.Param(1.0, description="micromorphic length l in km"),
     uw_budget=uw.Param(60, description="Newton iteration cap"),
     uw_tag=uw.Param("", description="suffix for the output files"),
+    uw_linear=uw.Param("exact", description="exact (LU of J) | production (Schur "
+                                            "fieldsplit with FMG velocity block)"),
     uw_init=uw.Param("", description="fields npz of a coarser run to start from "
                                      "(empty = the viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
@@ -47,6 +49,7 @@ OUT = os.path.join(_here, "..", "results", "micromorphic")
 ref, xi = int(params.uw_ref), float(params.uw_xi)
 beta, l_km = float(params.uw_beta), float(params.uw_l_km)
 name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
+    ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 S = cn.build_notch(ref, xi)
@@ -67,7 +70,8 @@ sigma_y = cn.yield_stress_with_shift(S, shift)
 if str(params.uw_init):
     cn.prolong(str(params.uw_init), dict(v=S["v"], p=S["p"], chi=chi))
 
-seconds = cn.solve_exact_newton(stokes, params.uw_budget, int(params.uw_monitor))
+seconds = cn.solve_newton(stokes, params.uw_budget, int(params.uw_monitor),
+                          str(params.uw_linear))
 report = stokes.solve_report
 taylor = cn.taylor_slopes(stokes) if int(params.uw_taylor) else None
 if taylor:
@@ -80,7 +84,8 @@ record = dict(
     ref=ref, xi=xi, beta=beta, l_km=l_km,
     init=os.path.basename(str(params.uw_init)) or "seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
-    nl_its=report.nl_its, seconds=seconds,
+    nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
+    seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     bands=bands, W_equiv_km=W,
     chi_range=[float(chi_values.min()), float(chi_values.max())],

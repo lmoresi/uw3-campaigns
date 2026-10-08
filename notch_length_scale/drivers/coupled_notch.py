@@ -25,10 +25,11 @@ DONE = ("CONVERGED_FNORM_ABS", "CONVERGED_FNORM_RELATIVE", "CONVERGED_SNORM_RELA
 LEVELS = [-0.7, -0.6, -0.5, -0.4]
 
 
-def build_notch(ref, xi):
+def build_notch(ref, xi, seed=True):
     """The notch at refinement ``ref`` with the shipped yield law and xi as
-    plastic_rate_strengthening; returns notch_model.build's dict."""
-    S = nm.build(MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=True,
+    plastic_rate_strengthening; returns notch_model.build's dict. ``seed=False``
+    skips the viscous seed solve (for loading saved fields)."""
+    S = nm.build(MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=seed,
                  p_degree=1, p_continuous=True)
     cm = S["cm"]
     cm.yield_mode = "softmin"
@@ -51,15 +52,24 @@ def yield_stress_with_shift(S, shift):
     return sigma_y
 
 
-def solve_exact_newton(stokes, budget, monitor):
-    """Consistent Newton, every linear solve an LU factorisation of J; returns the
-    wall time of the solve."""
+def solve_newton(stokes, budget, monitor, linear="exact"):
+    """Consistent Newton; returns the wall time of the solve.
+
+    ``linear="exact"``: every linear solve an LU factorisation of J.
+    ``linear="production"``: the notch's own solver (Schur fieldsplit, FMG on the
+    velocity block, Eisenstat-Walker), with the coupled fields grouped into the
+    velocity split by the solver."""
     stokes.consistent_jacobian = True
-    stokes.saddle_preconditioner = 0
     stokes.petsc_options["snes_max_it"] = int(budget)
     if monitor:
         stokes.petsc_options["snes_monitor_short"] = None
         stokes.petsc_options["snes_linesearch_monitor"] = None
+        stokes.petsc_options["ksp_converged_reason"] = None
+    if linear == "production":
+        t0 = time.time()
+        stokes.solve(zero_init_guess=False)
+        return time.time() - t0
+    stokes.saddle_preconditioner = 0
 
     solve = uw.systems.Stokes._snes_solve_with_retries
 

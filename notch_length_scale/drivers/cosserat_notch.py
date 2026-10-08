@@ -37,6 +37,8 @@ params = uw.Params(
     uw_degree=uw.Param(1, description="degree of the omega field"),
     uw_budget=uw.Param(60, description="Newton iteration cap"),
     uw_tag=uw.Param("", description="suffix for the output files"),
+    uw_linear=uw.Param("exact", description="exact (LU of J) | production (Schur "
+                                            "fieldsplit with FMG velocity block)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
@@ -46,6 +48,7 @@ OUT = os.path.join(_here, "..", "results", "cosserat")
 ref, xi = int(params.uw_ref), float(params.uw_xi)
 c, l_km, degree = float(params.uw_c), float(params.uw_l_km), int(params.uw_degree)
 name = f"cosserat_ref{ref}_xi{xi:g}_c{c:g}_l{l_km:g}_P{degree}" + \
+    ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 S = cn.build_notch(ref, xi)
@@ -73,7 +76,8 @@ stokes.add_coupled_field(
     momentum_flux=2 * eta_c * (spin - omega.sym[0]) * sympy.Matrix([[0, -1], [1, 0]]),
 )
 
-seconds = cn.solve_exact_newton(stokes, params.uw_budget, int(params.uw_monitor))
+seconds = cn.solve_newton(stokes, params.uw_budget, int(params.uw_monitor),
+                          str(params.uw_linear))
 report = stokes.solve_report
 taylor = cn.taylor_slopes(stokes) if int(params.uw_taylor) else None
 if taylor:
@@ -85,7 +89,8 @@ omega_values = np.asarray(omega.array).ravel()
 record = dict(
     ref=ref, xi=xi, c=c, l_km=l_km, omega_degree=degree, init="seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
-    nl_its=report.nl_its, seconds=seconds,
+    nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
+    seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     bands=bands, W_equiv_km=W,
     omega_range=[float(omega_values.min()), float(omega_values.max())],
