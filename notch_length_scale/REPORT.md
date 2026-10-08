@@ -82,6 +82,9 @@ Runs (l = 1 km throughout unless stated):
 | B' | 1 | 0 | 0.05 | converged | 7 | 114 s | 1.78 / 2.05 |
 | B' | 2 | 0 | 0.05 | converged | 12 | 212 s | 1.89 / 1.43 |
 | B' | 3 | 0 | 0.05 | DIVERGED_LINE_SEARCH at \|F\| = 2.18e-3 | 33 | 1861 s | (1.03 / 1.94) |
+| C | 1 | 0.01 | 0.05, l = 0.5 km | converged | 6 | 223 s | 1.83 / 2.14 |
+| C | 2 | 0.01 | 0.05, l = 0.5 km | converged | 8 | 416 s | 1.91 / 1.51 |
+| C | 3 | 0.01 | 0.05, l = 0.5 km | converged | 10 | 686 s | 1.40 / 1.49 |
 
 Controls without χ (`newton_exact_linear.py`, same law and solver):
 
@@ -106,6 +109,15 @@ Reading so far:
   W ≈ 31√(ξh) measured before (1.29, 0.91, 0.64 km). The L/R spread at ref 3 is 0.6 km,
   so the estimator is the limit on how well "constant" is established. The profiles are
   saved for re-measurement.
+- The coupled tangent is exact on the notch: a Taylor test at the converged ref-2 state
+  (ξ = 0.01, β = 0.05, l = 1 km) gives remainder slopes 1.26, 1.64, 2.02 over steps
+  1e-2 to 1e-5. The direction is scaled to max|x|, so the first steps are outside the
+  asymptotic range.
+- l = 0.5 km (case C) also converges at every refinement, in 6-10 steps. Mean widths are
+  1.99, 1.71, 1.45 km at refs 1-3 (ratios 1.16, 1.18), against 2.20, 1.99, 1.90 at
+  l = 1 km (ratios 1.11, 1.05). The shorter length still converges in h, but not yet
+  by ref 3: at l = 0.5 km the band spans fewer cells, which is the expected direction.
+  W at ref 3 is still decreasing, so W(l) cannot be quoted as converged yet.
 - At ξ = 0 the coupling converges at refs 1 and 2 (the plain solve fails at ref 1), but
   not at ref 3. ξ = 0.01 is therefore still needed at ref 3 at this β; the question is
   whether a stiffer coupling (larger β) removes that need.
