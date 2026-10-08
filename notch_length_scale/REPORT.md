@@ -10,7 +10,7 @@ machine (load average ~48).
 | Step | State |
 |---|---|
 | 1. Coupled volume fields in `SNES_Stokes_SaddlePt` | done: tests pass, ordinary Stokes byte-identical |
-| 2. Micromorphic coupling on the notch | in progress: at β = 0.05, l = 1 km, ref 3 converges at ξ = 0.01 and W stops shrinking with h |
+| 2. Micromorphic coupling on the notch | in progress: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
 | 3. 2-D Cosserat | not started |
 
 ## Step 1: plumbing
@@ -85,6 +85,9 @@ Runs (l = 1 km throughout unless stated):
 | C | 1 | 0.01 | 0.05, l = 0.5 km | converged | 6 | 223 s | 1.83 / 2.14 |
 | C | 2 | 0.01 | 0.05, l = 0.5 km | converged | 8 | 416 s | 1.91 / 1.51 |
 | C | 3 | 0.01 | 0.05, l = 0.5 km | converged | 10 | 686 s | 1.40 / 1.49 |
+| B'' | 1 | 0 | 0.1 | converged | 5 | 180 s | 2.33 / 2.64 |
+| B'' | 2 | 0 | 0.1 | converged | 6 | 263 s | 2.50 / 1.89 |
+| B'' | 3 | 0 | **0.1** | **converged** | 6 | 347 s | 1.81 / 2.52 |
 
 Controls without χ (`newton_exact_linear.py`, same law and solver):
 
@@ -118,6 +121,9 @@ Reading so far:
   l = 1 km (ratios 1.11, 1.05). The shorter length still converges in h, but not yet
   by ref 3: at l = 0.5 km the band spans fewer cells, which is the expected direction.
   W at ref 3 is still decreasing, so W(l) cannot be quoted as converged yet.
+- **β = 0.1 needs no ξ at all.** At ξ = 0 it converges at refs 1, 2, 3 in 5, 6, 6
+  steps. Mean widths are 2.49, 2.19, 2.16 km (ratios 1.13, 1.01). The micromorphic
+  length alone regularises the notch.
 - At ξ = 0 the coupling converges at refs 1 and 2 (the plain solve fails at ref 1), but
   not at ref 3. ξ = 0.01 is therefore still needed at ref 3 at this β; the question is
   whether a stiffer coupling (larger β) removes that need.
