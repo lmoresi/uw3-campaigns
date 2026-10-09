@@ -12,6 +12,9 @@ The jobs file holds one JSON object per line::
      "driver": "notch_length_scale/drivers/micromorphic_notch.py",
      "args": "-uw_ref 4 -uw_xi 0 -uw_beta 0.1 -uw_l_km 1 -uw_linear production_tight"}
 
+``-uw_cap_file`` names a file holding the cap, re-read on every poll, so the cap
+follows the machine's load (other people's runs) without restarting the runner.
+
 ``silence`` is the supervisor's budget in seconds of no output (a Newton step at fine
 resolution can be quiet for a long time). Each job logs to ``<logs>/<name>.log``, and
 every change of state is appended to ``<status>`` as one JSON line
@@ -34,6 +37,9 @@ import underworld3 as uw
 params = uw.Params(
     uw_jobs=uw.Param("", description="jobs file (JSON lines)"),
     uw_cap=uw.Param(4, description="most ranks running at once"),
+    uw_cap_file=uw.Param("", description="file holding the cap as one integer, re-read every "
+                                         "poll (raise or lower it without restarting); "
+                                         "overrides -uw_cap while it exists"),
     uw_status=uw.Param("", description="status file (default: <jobs>.status.jsonl)"),
     uw_logs=uw.Param("", description="log directory (default: <jobs dir>/logs)"),
     uw_supervisor=uw.Param("", description="mpi_supervisor.py (default: the one shipped "
@@ -74,6 +80,14 @@ def record(name, state, **extra):
     print(f"[runner] {event['time']} {name}: {state} {extra if extra else ''}", flush=True)
 
 
+def current_cap():
+    path = str(params.uw_cap_file)
+    if path and os.path.exists(path):
+        with open(path) as fh:
+            return int(fh.read().strip())
+    return int(params.uw_cap)
+
+
 def last_line(path, marker="SNES Function norm"):
     if not os.path.exists(path):
         return ""
@@ -107,7 +121,7 @@ def run():
                 record(name, state, rc=rc)
                 del running[name]
         in_use = sum(job["np"] for _, job, _ in running.values())
-        while queue and in_use + queue[0]["np"] <= int(params.uw_cap):
+        while queue and in_use + queue[0]["np"] <= current_cap():
             job = queue.pop(0)
             command = [sys.executable, supervisor, "--silence", str(job.get("silence", 3600)),
                        "--", "mpirun", "-n", str(job["np"]), sys.executable, "-u",
