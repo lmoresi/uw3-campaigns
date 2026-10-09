@@ -155,8 +155,9 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     cS, cE = mesh.dm.getHeightStratum(0)
 
     def _cells(label, value):
-        # empty-safe (#589): a rank holding no point of the stratum gets a null IS,
-        # and getIndices() on it segfaults -- at np 16 some ranks own no weak cell
+        # empty-safe (#589): on a rank whose local label lacks the value, getStratumIS
+        # returns a NULL-handle IS (falsy, but not None) and getIndices() on it
+        # segfaults -- at np 16 some ranks own no weak cell
         q = label_stratum_indices(mesh.dm.getLabel(label), value)
         return q[(q >= cS) & (q < cE)] - cS
 
