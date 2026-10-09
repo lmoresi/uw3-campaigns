@@ -12,7 +12,8 @@ The jobs file holds one JSON object per line::
      "driver": "notch_length_scale/drivers/micromorphic_notch.py",
      "args": "-uw_ref 4 -uw_xi 0 -uw_beta 0.1 -uw_l_km 1 -uw_linear production_tight"}
 
-``-uw_cap_file`` names a file holding the cap, re-read on every poll, so the cap
+Jobs appended to the jobs file while the runner is running are picked up on the next
+poll. ``-uw_cap_file`` names a file holding the cap, re-read on every poll, so the cap
 follows the machine's load (other people's runs) without restarting the runner.
 
 ``silence`` is the supervisor's budget in seconds of no output (a Newton step at fine
@@ -105,14 +106,47 @@ def report():
               f"{s.get('time', ''):19s}  {last_line(os.path.join(logs, job['name'] + '.log'))}")
 
 
+class _Adopted:
+    """A job a previous runner started that is still alive: polled by pid. Its exit
+    code is not recoverable (it is not our child), so it ends as "done"; the job's own
+    log and record say how it went."""
+
+    def __init__(self, pid):
+        self.pid = pid
+
+    def poll(self):
+        try:
+            os.kill(self.pid, 0)
+            return None
+        except ProcessLookupError:
+            return 0
+
+
 def run():
     os.makedirs(logs, exist_ok=True)
-    finished = {n for n, s in last_states().items() if s["state"] in ("done", "failed", "killed")}
-    queue = [job for job in read_jobs() if job["name"] not in finished]
+    states = last_states()
+    finished = {n for n, s in states.items() if s["state"] in ("done", "failed", "killed")}
     running = {}
+    jobs = {job["name"]: job for job in read_jobs()}
+    for name, state in states.items():
+        if state["state"] == "running" and name in jobs:
+            adopted = _Adopted(state["pid"])
+            if adopted.poll() is None:
+                running[name] = (adopted, jobs[name], open(os.devnull, "w"))
+                print(f"[runner] adopted {name} (pid {state['pid']})", flush=True)
+    queue = [job for job in jobs.values() if job["name"] not in finished and job["name"] not in running]
     for job in queue:
         record(job["name"], "queued", np=job["np"])
-    while queue or running:
+    known = {job["name"] for job in queue} | finished | set(running)
+    while True:
+        # jobs appended to the file while the runner is running join the queue
+        for job in read_jobs():
+            if job["name"] not in known:
+                known.add(job["name"])
+                queue.append(job)
+                record(job["name"], "queued", np=job["np"])
+        if not (queue or running):
+            break
         for name, (proc, job, log) in list(running.items()):
             rc = proc.poll()
             if rc is not None:
