@@ -298,6 +298,7 @@ def write(out_dir, name, record, fields, mesh):
     os.makedirs(os.path.join(out_dir, "checkpoints"), exist_ok=True)
     mesh.write_timestep(name, 0, outputPath=os.path.join(out_dir, "checkpoints"),
                         meshVars=list(fields.values()), create_xdmf=False)
-    with uw.selective_ranks(0):
-        with open(os.path.join(out_dir, name + ".json"), "w") as fh:
-            json.dump(record, fh, indent=1, default=float)
+    with uw.selective_ranks(0) as rank0:  # the body runs on every rank: test the flag
+        if rank0:
+            with open(os.path.join(out_dir, name + ".json"), "w") as fh:
+                json.dump(record, fh, indent=1, default=float)

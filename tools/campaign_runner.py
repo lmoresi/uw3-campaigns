@@ -52,6 +52,8 @@ params = uw.Params(
                                            "with the underworld3 checkout of this env)"),
     uw_poll=uw.Param(30.0, description="seconds between checks"),
     uw_report=uw.Param(0, description="1 = print the jobs' states and stop"),
+    uw_linger=uw.Param(0.0, description="seconds to keep polling for appended jobs once "
+                                        "the queue is empty, before exiting"),
 )
 jobs_path = os.path.abspath(str(params.uw_jobs))
 status_path = str(params.uw_status) or jobs_path.replace(".jsonl", "") + ".status.jsonl"
@@ -148,6 +150,7 @@ def run():
     for job in queue:
         record(job["name"], "queued", np=job["np"])
     known = {job["name"] for job in queue} | finished | set(running)
+    idle_since = None
     while True:
         # jobs appended to the file while the runner is running join the queue
         for job in read_jobs():
@@ -156,7 +159,11 @@ def run():
                 queue.append(job)
                 record(job["name"], "queued", np=job["np"])
         if not (queue or running):
-            break
+            idle_since = idle_since or time.time()
+            if time.time() - idle_since >= float(params.uw_linger):
+                break
+        else:
+            idle_since = None
         for name, (proc, job, log) in list(running.items()):
             rc = proc.poll()
             if rc is not None:

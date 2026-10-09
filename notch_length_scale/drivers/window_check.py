@@ -50,5 +50,6 @@ for ref, name in RUNS:
     rows.append(row)
     uw.pprint(name, {k: round(v, 3) for k, v in row["W"].items()})
     del S
-with uw.selective_ranks(0):
-    json.dump(rows, open(os.path.join(RES, str(params.uw_out)), "w"), indent=1)
+with uw.selective_ranks(0) as rank0:      # the body runs on every rank: test the flag
+    if rank0:
+        json.dump(rows, open(os.path.join(RES, str(params.uw_out)), "w"), indent=1)

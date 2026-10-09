@@ -81,6 +81,7 @@ for name in names:
               f"peak {rows[-1]['relative_peak']}")
     del S
 
-with uw.selective_ranks(0):
-    with open(os.path.join(RES, str(params.uw_out)), "w") as fh:
-        json.dump(rows, fh, indent=1)
+with uw.selective_ranks(0) as rank0:      # the body runs on every rank: test the flag
+    if rank0:
+        with open(os.path.join(RES, str(params.uw_out)), "w") as fh:
+            json.dump(rows, fh, indent=1)

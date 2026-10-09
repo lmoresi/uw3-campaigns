@@ -28,25 +28,31 @@ sys.path.insert(0, _here)
 import coupled_notch as cn   # noqa: E402
 
 pv.OFF_SCREEN = True
+params = uw.Params(
+    uw_model=uw.Param("micromorphic", description="micromorphic (beta 0.1) | cosserat "
+                                                  "(c = 1, P1); xi = 0 either way"),
+)
+MODEL = str(params.uw_model)
+SUFFIX = "" if MODEL == "micromorphic" else "_" + MODEL
 if uw.mpi.size > 1:
     raise RuntimeError("render_refinement.py draws on one process: run it without mpirun")
 
 RES = os.path.join(_here, "..", "results")
 FIG = os.path.join(_here, "..", "figures")
-CHECKPOINTS = os.path.join(RES, "micromorphic", "checkpoints")
+CHECKPOINTS = os.path.join(RES, MODEL, "checkpoints")
 L_ROWS = [1.0, 0.5]
 REFS = [3, 4, 5]
 MAP_BOX = (-32.0, 32.0, -22.0, 0.0)            # x0, x1, y0, y1 in km
 ZOOM_HALF = 4.0                                # km: an 8 km x 8 km window (the band is ~6 km tall here)
 CUT_X = -15.0                                  # km, the profile cut
 widths = {(r["ref"], r["l_km"]): r["W_km"]
-          for r in json.load(open(os.path.join(RES, "current_widths.json")))}
+          for r in json.load(open(os.path.join(RES, f"current_widths{SUFFIX}.json")))}
 
 
 def load(ref, l_km):
     """The run's mesh as pyvista (km) with log10 edot_II / (V/H) at its vertices, and
     the y (km) of the band's peak on the cut x = -15 km."""
-    name = cn.canonical_run(ref, l_km)
+    name = cn.canonical_run(ref, l_km, model=MODEL)
     S = cn.build_notch(ref, 0.0, seed=False)
     S["v"].read_timestep(name, S["v"].name, 0, outputPath=CHECKPOINTS)
     pvm = vis.mesh_to_pv_mesh(S["mesh"])
@@ -152,9 +158,11 @@ def figure(boxes, with_mesh, out, title, annotate):
     print(path, "clim", clim)
 
 
-figure({k: MAP_BOX for k in panels}, False, "refinement_maps.png",
-       "Micromorphic notch, beta = 0.1, xi = 0: edot_II across refinement (refs 3, 4, 5)",
+LABEL = ("Micromorphic notch, beta = 0.1" if MODEL == "micromorphic"
+         else "Cosserat notch, c = 1, omega P1")
+figure({k: MAP_BOX for k in panels}, False, f"refinement_maps{SUFFIX}.png",
+       f"{LABEL}, xi = 0: edot_II across refinement (refs 3, 4, 5)",
        annotate=False)
-figure(zoom_boxes, True, "refinement_zoom.png",
-       f"The left band where it crosses x = {CUT_X:g} km, with the mesh "
+figure(zoom_boxes, True, f"refinement_zoom{SUFFIX}.png",
+       f"{LABEL}: the left band where it crosses x = {CUT_X:g} km, with the mesh "
        f"({2 * ZOOM_HALF:g} km window centred on the band's peak)", annotate=True)

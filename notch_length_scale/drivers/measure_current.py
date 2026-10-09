@@ -61,5 +61,6 @@ for ref in [int(r) for r in str(params.uw_refs).split(",")]:
         uw.pprint(f"{name}: W {width['median']:.3f} km  peak {width['peak_over_background']:.3f}")
         del S
 
-with uw.selective_ranks(0):
-    json.dump(rows, open(os.path.join(RES, str(params.uw_out)), "w"), indent=1)
+with uw.selective_ranks(0) as rank0:      # the body runs on every rank: test the flag
+    if rank0:
+        json.dump(rows, open(os.path.join(RES, str(params.uw_out)), "w"), indent=1)

@@ -11,7 +11,7 @@ machine (load average ~48).
 |---|---|
 | 1. Coupled volume fields in `SNES_Stokes_SaddlePt` | done: tests pass, ordinary Stokes byte-identical |
 | 2. Micromorphic coupling on the notch | done for the first matrix: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
-| 3. 2-D Cosserat | done for the first matrix: converges at ref 3 with ξ = 0 in 4-5 steps; W converged in h (3.5 km at l = 0.5, ~4.1 km at l = 1) |
+| 3. 2-D Cosserat | done through ref 5 (2026-10-10): converges with ξ = 0 in 3-5 steps; W mesh-independent, 5.34 km at l = 0.5 and 6.69 km at l = 1 (current estimator), about 45% wider and 2-2.7× weaker in peak than micromorphic at the same l |
 
 ## Read this first (2026-10-10, refs 1-5)
 
@@ -103,12 +103,15 @@ to the run's refinement.
 | model | ref | h in band (m) | W (km) | W / h | coarsest level with W ≥ 2h | Krylov per Newton step | median / max | outcome |
 |---|---|---|---|---|---|---|---|---|
 | Cosserat, l = 0.5 km | 1 | 2120 | — | — | — | 35, 37, 36, 35, 29* | 35 / 37 | CONVERGED_FNORM_ABS (5) |
-| Cosserat, l = 0.5 km | 2 | 1060 | — | — | — | 34, 37, 36, 36, 30* | 36 / 37 | CONVERGED_FNORM_ABS (5) |
-| Cosserat, l = 0.5 km | 3 | 530 | — | — | — | 31, 36, 36, 35, 25* | 35 / 36 | CONVERGED_FNORM_ABS (5) |
-| Cosserat, l = 1 km | 1 | 2120 | — | — | — | 34, 36, 36, 35* | 36 / 36 | CONVERGED_FNORM_ABS (4) |
-| Cosserat, l = 1 km | 2 | 1060 | — | — | — | 33, 35, 36, 34* | 34 / 36 | CONVERGED_FNORM_ABS (4) |
-| Cosserat, l = 1 km | 3 | 530 | — | — | — | 33, 35, 35, 33* | 34 / 35 | CONVERGED_FNORM_ABS (4) |
-| Cosserat, l = 1 km | 4 | 265 | — | — | — | 39 | 39 / 39 | running (None) |
+| Cosserat, l = 0.5 km | 2 | 1060 | 5.33 | 5 | 1 (2120 m) | 34, 37, 36, 36, 30* | 36 / 37 | CONVERGED_FNORM_ABS (5) |
+| Cosserat, l = 0.5 km | 3 | 530 | 5.33 | 10 | 1 (2120 m) | 31, 36, 36, 35, 25* | 35 / 36 | CONVERGED_FNORM_ABS (5) |
+| Cosserat, l = 0.5 km | 4 | 265 | 5.34 | 20 | 1 (2120 m) | 38, 31, 32 | 32 / 38 | CONVERGED_FNORM_ABS (3) |
+| Cosserat, l = 0.5 km | 5 | 132 | 5.34 | 40 | 1 (2120 m) | 38, 28, 26, 18* | 27 / 38 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 1 | 2120 | 6.61 | 3 | 1 (2120 m) | 34, 36, 36, 35* | 36 / 36 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 2 | 1060 | 6.63 | 6 | 1 (2120 m) | 33, 35, 36, 34* | 34 / 36 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 3 | 530 | 6.65 | 13 | 1 (2120 m) | 33, 35, 35, 33* | 34 / 35 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 4 | 265 | 6.68 | 25 | 1 (2120 m) | 39, 32, 30* | 32 / 39 | CONVERGED_FNORM_ABS (3) |
+| Cosserat, l = 1 km | 5 | 132 | 6.69 | 50 | 1 (2120 m) | 39, 49, 47 | 47 / 49 | CONVERGED_FNORM_ABS (3) |
 | micromorphic, l = 0.25 km | 1 | 2120 | 3.69 | 2 | none | 37, 52, 52, 48, 42, 43, 43, 39* | 43 / 52 | CONVERGED_FNORM_ABS (8) |
 | micromorphic, l = 0.25 km | 2 | 1060 | 2.83 | 3 | 2 (1060 m) | 38, 188, 138, 99, 84, 63, 60, 63, 61, 58* | 63 / 188 | CONVERGED_FNORM_ABS (10) |
 | micromorphic, l = 0.25 km | 3 | 530 | 2.66 | 5 | 2 (1060 m) | 37 | 37 / 37 | killed: the next linear solve gave no output for 1 h (None) |
@@ -134,7 +137,10 @@ What it shows:
 - **A length scale keeps FMG flat when W is resolved on the coarse levels.**
   - Micromorphic at l = 1 and 2 km: 34-36 iterations per step at refs 1-3 (cold),
     and 27-32 at refs 4-5 (sequenced), with W ≥ 2h from FMG level 1 up.
-  - Cosserat: 34-36 at both l.
+  - Cosserat: 34-36 at refs 1-3 at both l, and 27-32 at refs 4-5, except l = 1 km
+    at ref 5 with 39, 49, 47. That run was at np 16 against np 8 at ref 4, and the
+    parallel FMG ran slightly weaker before (np 4: 227 against 216 Krylov in
+    total at ref 3). One point, not a trend yet.
 - **Where W approaches the coarse levels' h, the count grows.**
   - Micromorphic l = 0.5 km, cold: medians 39, 49, 54 at refs 1-3, with step maxima
     of 43, 64, 88.
@@ -215,15 +221,34 @@ near threshold and changes W by under 10%, but it already lowers the peak by
 (β = 0.05, l = 1 km: 3.91 → 3.26 km at refs 1 → 2), so the low-β cells need a ref-4
 check before W is quoted from them.
 
-**Cosserat, same integral width:**
-- c = 1, l = 1 km: W = 4.89, 4.91, 4.93 km at refs 1-3; peak 0.27, 0.29, 0.30.
-- c = 1, l = 0.5 km: W = 4.42, 4.45 km at refs 2-3.
+**Cosserat (2-D, c = 1, ω in P1, ξ = 0), refs 1-5** (2026-10-10; current estimator:
+integral width, background outside ±9 km; `results/current_widths_cosserat.json`).
+- l = 1 km: W = 6.61, 6.63, 6.65, 6.68, 6.69 km at refs 1-5; peak 0.41, 0.44, 0.45,
+  0.45, 0.46.
+- l = 0.5 km: W = 5.33, 5.33, 5.34, 5.34 km at refs 2-5; peak 0.88, 0.90, 0.91, 0.92.
+- Refs 4 and 5 are tight FMG, grid-sequenced from the ref below (np 8 and np 16):
+  3 Newton steps at l = 1 km and 3-4 at l = 0.5 km, 25 and 75 minutes. The
+  driver's -uw_init path is new for this.
 
-So the Cosserat width is mesh-independent too. At the same l it is only about 15%
-wider than the micromorphic band, but about 4× weaker in peak: diffuse zones rather than
-sharp bands. W is insensitive to c (0.5 or 1), to the degree of ω, and to ξ, which again
-lowers only the peak. The "Cosserat about twice as wide" stated further down came from
-the horizontal-cut estimator and is withdrawn.
+So the Cosserat band is mesh-independent through ref 5, like the micromorphic one.
+By the current estimator it is **about 45% wider at the same l** (6.69 against
+4.64 km at l = 1; 5.34 against 3.64 km at l = 0.5) and **2-2.7× weaker in peak**
+(0.46 against 1.24; 0.92 against 1.88).
+- This replaces the earlier "about 15% wider, about 4× weaker", which used the
+  whole-cut background. That background biases broad bands the most (see the window
+  check above).
+- The "twice as wide" stated further down came from the horizontal-cut estimator
+  and stays withdrawn.
+- W is insensitive to c (0.5 or 1), to the degree of ω, and to ξ, which again lowers
+  only the peak (refs 1-3, whole-cut background).
+
+Figures:
+[`refinement_maps_cosserat.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_maps_cosserat.png),
+[`refinement_zoom_cosserat.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_zoom_cosserat.png),
+[`refinement_profiles_cosserat.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_profiles_cosserat.png). Cosserat is
+also overlaid (dashed) on [`width_peak_vs_h.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/width_peak_vs_h.png).
+
+![Cosserat profiles across the left band, refs 2-5](figures/refinement_profiles_cosserat.png)
 
 The older widths in this report (horizontal cuts, then the 10%-support vertical
 "equivalent width") jitter by ±0.5 km on these tailed profiles and are superseded by
