@@ -87,7 +87,6 @@ if taylor:
 
 measured = cn.measure(S, OUT, name)
 bands, W = measured["bands_horizontal"], measured["W_horizontal_km"]
-omega_values = np.asarray(omega.array).ravel()
 record = dict(
     ref=ref, xi=xi, c=c, l_km=l_km, omega_degree=degree, init="seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
@@ -95,7 +94,7 @@ record = dict(
     seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     bands=bands, W_equiv_km=W,
-    omega_range=[float(omega_values.min()), float(omega_values.max())],
+    omega_range=[float(np.asarray(omega.min())), float(np.asarray(omega.max()))],
     relative_rotation_range_strong=cn.strong_layer_range(S, spin - omega.sym[0]),
     viscosity_range_strong_Pas=cn.strong_layer_range(S, cm.viscosity),
     taylor=taylor,

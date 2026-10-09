@@ -85,7 +85,6 @@ if taylor:
     uw.pprint(f"[taylor] remainders {taylor[0]}  slopes {taylor[1]}")
 
 measured = cn.measure(S, OUT, name)
-chi_values = np.asarray(chi.array).ravel()
 record = dict(
     ref=ref, xi=xi, beta=beta, l_km=l_km,
     init=os.path.basename(str(params.uw_init)) or "seed",
