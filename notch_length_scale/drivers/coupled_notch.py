@@ -58,14 +58,22 @@ def solve_newton(stokes, budget, monitor, linear="exact"):
     ``linear="exact"``: every linear solve an LU factorisation of J.
     ``linear="production"``: the notch's own solver (Schur fieldsplit, FMG on the
     velocity block, Eisenstat-Walker), with the coupled fields grouped into the
-    velocity split by the solver."""
+    velocity split by the solver. ``linear="production_tight"``: the same
+    preconditioner, every linear solve to rtol 1e-8."""
     stokes.consistent_jacobian = True
     stokes.petsc_options["snes_max_it"] = int(budget)
     if monitor:
         stokes.petsc_options["snes_monitor_short"] = None
         stokes.petsc_options["snes_linesearch_monitor"] = None
         stokes.petsc_options["ksp_converged_reason"] = None
-    if linear == "production":
+    if linear in ("production", "production_tight"):
+        if linear == "production_tight":
+            # every Newton direction solved to a fixed, tight tolerance (no
+            # Eisenstat-Walker): isolates the preconditioner from the inexact-Newton
+            # forcing, so the Krylov count per step measures the preconditioner alone
+            stokes.petsc_options.delValue("snes_ksp_ew")
+            stokes.petsc_options.delValue("snes_ksp_ew_version")
+            stokes.petsc_options["ksp_rtol"] = 1.0e-8
         t0 = time.time()
         stokes.solve(zero_init_guess=False)
         return time.time() - t0
@@ -136,19 +144,42 @@ def strong_layer_range(S, expression):
     return [float(np.nanmin(values)), float(np.nanmax(values))]
 
 
-def prolong(path, fields):
-    """Set each field from a coarser run's saved values (``write``'s npz), with the
-    local polyharmonic RBF interpolant (affine-exact, 6 neighbours)."""
-    coarse = np.load(path)
+def load_coarse(path, coarse_ref, xi, extra=None):
+    """A coarser run's saved fields (``write``'s npz) on a rebuilt coarse notch, for
+    ``prolong``. ``extra`` maps the names of coupled fields to their
+    (components, degree, continuous, units).
+
+    Call this BEFORE building the fine notch: named expressions are shared between
+    builds in one process (#767), so a coarse build made after the fine one rebinds
+    the fine solver's strain-rate invariant to the coarse velocity."""
+    coarse = build_notch(coarse_ref, xi, seed=False)
+    saved = np.load(path)
+    fields = dict(v=coarse["v"], p=coarse["p"])
+    for key, (components, degree, continuous, units) in (extra or {}).items():
+        fields[key] = uw.discretisation.MeshVariable(
+            f"{key}_coarse", coarse["mesh"], components, degree=degree,
+            continuous=continuous, units=units)
     for key, var in fields.items():
-        source = np.asarray(coarse[f"{key}_coords"])
-        values = np.asarray(coarse[key]).reshape(source.shape[0], -1)
-        tree = uw.kdtree.KDTree(source)
-        fine = tree.rbf_interpolator_local(np.asarray(var.coords), values, nnn=6, order=1)
-        fine = np.asarray(fine).reshape(var.array.shape)
+        if not np.allclose(np.asarray(var.coords), saved[f"{key}_coords"]):
+            raise ValueError(f"{path}: saved {key} nodes do not match the rebuilt ref "
+                             f"{coarse_ref} mesh")
+        values = saved[key].reshape(var.array.shape)
         if var.units is not None:
-            fine = uw.utilities.UnitAwareArray(fine, units=var.units)
-        var.array[...] = fine
+            values = uw.utilities.UnitAwareArray(values, units=var.units)
+        var.array[...] = values
+    return fields
+
+
+def prolong(coarse_fields, fine_fields):
+    """Set each fine field from its coarse counterpart. The notch meshes are nested
+    (each refinement splits the previous one), so the coarse P2 velocity and P1
+    pressure / coupled fields are exactly representable on the fine mesh: evaluating
+    the coarse finite-element interpolant at the fine nodes is an exact transfer."""
+    for key, fine in fine_fields.items():
+        # fine.coords is unit-aware (metres); evaluate converts it to model units.
+        # A plain np.asarray would be read as model coordinates and miss the domain.
+        values = uw.function.evaluate(coarse_fields[key].sym, fine.coords)
+        fine.array[...] = values.reshape(fine.array.shape)
 
 
 def write(out_dir, name, record, fields):

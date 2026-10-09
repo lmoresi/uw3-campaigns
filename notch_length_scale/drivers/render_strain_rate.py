@@ -25,14 +25,22 @@ params = uw.Params(
                                          "colour range; bands = the strong layer above the "
                                          "notch, colour range clipped to show only the bands"),
     uw_out=uw.Param("strain_rate_maps.png", description="output file name in results/"),
+    uw_rows=uw.Param("models", description="models = micromorphic and Cosserat at two l; "
+                                           "l_sweep = micromorphic beta 0.1 at l = 0.25..2 km"),
 )
 RES = os.path.join(_here, "..", "results")
-ROWS = [
-    ("micromorphic  beta = 0.1, l = 1 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l1.npz"),
-    ("micromorphic  beta = 0.1, l = 0.5 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l0.5.npz"),
-    ("Cosserat  c = 1, l = 1 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l1_P1.npz"),
-    ("Cosserat  c = 1, l = 0.5 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l0.5_P1.npz"),
-]
+ROW_SETS = dict(
+    models=[
+        ("micromorphic  beta = 0.1, l = 1 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l1.npz"),
+        ("micromorphic  beta = 0.1, l = 0.5 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l0.5.npz"),
+        ("Cosserat  c = 1, l = 1 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l1_P1.npz"),
+        ("Cosserat  c = 1, l = 0.5 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l0.5_P1.npz"),
+    ],
+    l_sweep=[(f"micromorphic  beta = 0.1, l = {l} km",
+              f"micromorphic/fields_micro_ref{{r}}_xi0_beta0.1_l{l}.npz")
+             for l in ("0.25", "0.5", "1", "2")],
+)
+ROWS = ROW_SETS[str(params.uw_rows)]
 refs = [int(v) for v in str(params.uw_refs).split(",")]
 
 

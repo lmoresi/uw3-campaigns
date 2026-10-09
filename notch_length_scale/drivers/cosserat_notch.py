@@ -38,7 +38,9 @@ params = uw.Params(
     uw_budget=uw.Param(60, description="Newton iteration cap"),
     uw_tag=uw.Param("", description="suffix for the output files"),
     uw_linear=uw.Param("exact", description="exact (LU of J) | production (Schur "
-                                            "fieldsplit with FMG velocity block)"),
+                                            "fieldsplit with FMG velocity block, "
+                                            "Eisenstat-Walker) | production_tight "
+                                            "(the same, every linear solve to 1e-8)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),

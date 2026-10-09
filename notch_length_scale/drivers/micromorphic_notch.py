@@ -37,8 +37,10 @@ params = uw.Params(
     uw_budget=uw.Param(60, description="Newton iteration cap"),
     uw_tag=uw.Param("", description="suffix for the output files"),
     uw_linear=uw.Param("exact", description="exact (LU of J) | production (Schur "
-                                            "fieldsplit with FMG velocity block)"),
-    uw_init=uw.Param("", description="fields npz of a coarser run to start from "
+                                            "fieldsplit with FMG velocity block, "
+                                            "Eisenstat-Walker) | production_tight "
+                                            "(the same, every linear solve to 1e-8)"),
+    uw_init=uw.Param("", description="fields npz of the ref - 1 run to start from "
                                      "(empty = the viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
@@ -52,6 +54,9 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
+coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
+                         dict(chi=(1, 1, True, "1/s")))
+          if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi)
 mesh, stokes = S["mesh"], S["stokes"]
 
@@ -67,8 +72,8 @@ stokes.add_coupled_field(
 )
 shift = m * H * (e - chi.sym[0])
 sigma_y = cn.yield_stress_with_shift(S, shift)
-if str(params.uw_init):
-    cn.prolong(str(params.uw_init), dict(v=S["v"], p=S["p"], chi=chi))
+if coarse is not None:
+    cn.prolong(coarse, dict(v=S["v"], p=S["p"], chi=chi))
 
 seconds = cn.solve_newton(stokes, params.uw_budget, int(params.uw_monitor),
                           str(params.uw_linear))

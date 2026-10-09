@@ -265,3 +265,128 @@ couple-stress condition on all walls):
 - c → 0 recovers the plain problem continuously: at c = 0.01 the width (1.67 / 1.81)
   moves toward the plain 1.42 / 1.18. The strong layer yields (η_eff from 7.3e21 to
   1.3e23 Pa s against η_bg = 1e23).
+
+## The micromorphic sweep (2026-10-09): how l sets the band, and is it mesh-independent?
+
+Louis chose the micromorphic model as the default regularisation. Sweep at ξ = 0:
+l ∈ {0.25, 0.5, 1, 2} km at β = H/η_bg = 0.1, and β ∈ {0.05, 0.1, 0.2} at l = 1 and
+0.5 km, refs 1-3 with exact LU (ref 4 on tight FMG is running). Every row below converged.
+
+![Profiles across a band, peak and width against h](figures/band_profiles.png)
+
+![The bands against l and h](figures/shear_bands_l_sweep.png)
+
+**Measurement.** Widths now come from vertical cuts at |x| = 12, 15, 18, 21 km, the
+campaign's settled estimator (`measure_sweep.py`, from the saved fields). Two
+corrections made on the way:
+- `band_width_vs_h.measure_bands_vertical` searched y > 0 for the right limb. The cut lies
+  entirely at y < 0, so the right limb was never measured. Fixed.
+- The equivalent width depends on where the estimator stops its support (10% of the peak).
+  Each band has a long tail on its upper side, so W jitters by about ±0.5 km between
+  limbs and refinements; see (d). The peak strain rate over the far-field background on
+  the same cut (`peak/background − 1`) has no such cut-off, and it is the robust measure.
+
+| β | l (km) | ref | Newton its | W vertical (km), mean (L / R) | ratio W(ref-1)/W | peak/background − 1 | ratio | floor bound / s_min |
+|---|---|---|---|---|---|---|---|---|
+| 0.05 | 0.5 | 1 | 8 | 2.57 (2.27 / 2.88) | — | 1.75 | — | 63 |
+| 0.05 | 1 | 1 | 7 | 2.81 (2.38 / 3.24) | — | 1.40 | — | 64 |
+| 0.05 | 1 | 2 | 12 | 2.49 (2.36 / 2.63) | 1.13 | 1.80 | 0.78 | 66 |
+| 0.1 | 0.25 | 1 | 8 | 2.65 (2.41 / 2.89) | — | 1.77 | — | 51 |
+| 0.1 | 0.25 | 2 | 10 | 1.91 (2.04 / 1.78) | 1.39 | 2.66 | 0.67 | 49 |
+| 0.1 | 0.25 | 3 | 12 | 2.19 (2.20 / 2.18) | 0.87 | 2.72 | 0.98 | 44 |
+| 0.1 | 0.5 | 1 | 6 | 2.86 (2.61 / 3.12) | — | 1.39 | — | 53 |
+| 0.1 | 0.5 | 2 | 8 | 3.12 (3.10 / 3.14) | 0.92 | 1.74 | 0.80 | 52 |
+| 0.1 | 0.5 | 3 | 9 | 2.95 (2.98 / 2.93) | 1.06 | 1.80 | 0.97 | 50 |
+| 0.1 | 1 | 1 | 5 | 3.19 (2.83 / 3.56) | — | 0.97 | — | 55 |
+| 0.1 | 1 | 2 | 6 | 3.68 (3.58 / 3.79) | 0.87 | 1.13 | 0.86 | 57 |
+| 0.1 | 1 | 3 | 6 | 3.19 (3.77 / 2.61) | 1.16 | 1.17 | 0.97 | 59 |
+| 0.1 | 2 | 1 | 5 | 3.37 (3.23 / 3.52) | — | 0.72 | — | 58 |
+| 0.1 | 2 | 2 | 5 | 3.94 (4.05 / 3.82) | 0.86 | 0.75 | 0.95 | 62 |
+| 0.1 | 2 | 3 | 6 | 4.04 (4.01 / 4.07) | 0.97 | 0.76 | 1.00 | 68 |
+| 0.2 | 0.5 | 1 | 5 | 3.15 (2.93 / 3.38) | — | 1.05 | — | 32 |
+| 0.2 | 0.5 | 2 | 6 | 3.42 (3.43 / 3.41) | 0.92 | 1.25 | 0.84 | 29 |
+| 0.2 | 0.5 | 3 | 6 | 3.07 (3.56 / 2.58) | 1.11 | 1.29 | 0.97 | 24 |
+| 0.2 | 1 | 1 | 5 | 3.37 (3.14 / 3.60) | — | 0.63 | — | 37 |
+| 0.2 | 1 | 2 | 5 | 4.09 (4.15 / 4.03) | 0.83 | 0.69 | 0.92 | 38 |
+| 0.2 | 1 | 3 | 5 | 3.33 (3.16 / 3.49) | 1.23 | 0.71 | 0.98 | 40 |
+
+
+Ratios are successive (ref − 1 over ref): with no length scale the peak ratio would be
+about 0.5 (the peak grows like 1/h) and the width ratio about 2.
+
+- **The band is mesh-independent.** From ref 2 to ref 3 the peak changes by 0-3% in
+  every (β, l) pair (ratio 0.97-1.00). The profile shape converges too (figure (a)). Ref 1
+  is under-resolved: its peak is 15-35% low, and its bands are faceted by the mesh in the
+  maps.
+- **l sets the band; the grid does not.** At β = 0.1 the converged peak falls 1.51-1.54×
+  per doubling of l (2.72, 1.80, 1.17, 0.76 at l = 0.25-2 km): peak ∝ l^−0.62. The width
+  grows with l (2.2, 3.0, 3.2, 4.0 km at ref 3), within the estimator noise.
+- **β matters too.** At l = 1 km the peak falls 1.54-1.65× per doubling of β:
+  peak ∝ β^−0.7. The gradient-plasticity estimate W ~ l √(H/|h_w|) would give
+  peak ∝ l^−1 β^−0.5. The measured exponents are of that kind but not those values.
+  H and l are not interchangeable: doubling β (×2 in A = H l²) and halving l (×¼ in A)
+  move the band differently.
+- **The residual-strength floor never engages.** The argument C_eff + sin φ p + H(ε̇ − χ)
+  is at least C + sin φ p − Hχ, since ε̇ ≥ 0 and C_eff ≥ C. That lower bound, from the
+  saved nodal p and χ, stays 24-68× above s_min = 0.02 C in every run
+  (`floor_bound.py`). Hχ reaches 0.4-1.7 C, so the micromorphic shift is a first-order
+  change to the yield stress, but it never pushes the argument to the floor.
+- β = 0.05 at l = 0.5 km, ref 2 did not converge (the ref-3 run is still going); at ξ = 0,
+  β = 0.05 is at the edge of what regularises the notch (see the earlier ref-3 failure at
+  l = 1 km).
+
+### FMG and grid sequencing on the coupled system
+
+The notch's production solver (Schur fieldsplit, split 0 = velocity + χ under geometric
+FMG with Galerkin coarse operators and SOR smoothing, split 1 = pressure) works with the
+coupled field. Micromorphic β = 0.1, l = 1 km, ξ = 0:
+
+| linear solves | ref | Newton steps | Krylov per step | same solution as exact LU |
+|---|---|---|---|---|
+| Eisenstat-Walker (default) | 1 / 2 / 3 | 15 / 57 / (> 40, stopped) | 1-5 | yes |
+| every solve to 1e-8 | 1 / 2 / 3 | 5 / 6 / 6 | 32-37 / 33-44 / 29-43 | yes, to 9 digits |
+| every solve to 1e-8, grid-sequenced from ref − 1 | 3 | 5 | 26-40 | yes |
+
+- **The coupled multigrid is mesh-independent** (Krylov counts flat over refs 1-3).
+- **The slow default comes from the forcing, not FMG.** Under Eisenstat-Walker the early
+  directions are loose, and across the band the line search then takes λ = 0.01-0.1 for
+  about 45 steps. Tight linear solves recover the exact-Newton step count.
+- **Grid sequencing works and saves about a quarter of the linear work** at ref 3
+  (5 Newton steps / 163 Krylov against 6 / 216 cold). With exact LU it saves one step
+  (5 against 6), starting from |F| = 0.034 against 0.078 from the viscous seed.
+  - The transfer is exact: the meshes are nested, and the coarse P2/P1 interpolant is
+    evaluated at the fine nodes (`coupled_notch.prolong`).
+  - Two traps: build the coarse notch before the fine one (named expressions are shared
+    between builds, #767), and pass the unit-aware `var.coords` to `evaluate` (a bare
+    `np.asarray` strips the metres and misses the domain).
+
+### The np = 3 hang (task 2): fixed
+
+`3181baa8` on `feature/shear-band-length-scale`.
+
+- **Cause.** With no mesh hierarchy, the velocity block runs GAMG with
+  `mat_block_size 2`, and the grouped fieldsplit mirrored that onto split 0 (u + coupled
+  field). That split is not node-blocked. PETSc refused the block size
+  ("Local size 215 not compatible with block size 2") only on the ranks whose split-0
+  share was odd, and the others then waited in a collective.
+- **Fix.** The block size is no longer mirrored when coupled fields share split 0.
+- **Regression test.** χ held on one wall makes split 0 odd (705) serially; the test
+  fails before the fix with the same PETSc error.
+- **Also fixed in test_1070.**
+  - The default-solver test's χ bound was rank-local; it now uses the global `chi.max()`.
+  - The closed-box Taylor fixture still drifted at np = 3 in one run of five, so the box
+    now has a traction-free wall.
+- **Result.** test_1070: 9/9 serially, and at np = 3 on every rank, 5 runs out of 5.
+- **Flagged.** With multipliers only, the mirrored `fieldsplit_0_mat_block_size` survives
+  the block-size withdrawal, which deletes only the `fieldsplit_velocity_` key (TODO(BUG)
+  in `_setup_block_fieldsplit_options`).
+
+### Found on the way, not fixed
+
+`uw.function.evaluate` on a rebuilt notch mixes non-dimensional and dimensional terms:
+- ε̇_II comes back negative at some mesh nodes;
+- `C_eff` comes back with units Pa/s;
+- the ratio (C_eff + sin φ p)/(0.02 C) comes back with units 1/s.
+
+The floor check therefore uses saved nodal arrays only (above). Worth an issue in the
+units system.

@@ -259,7 +259,10 @@ def measure_bands_vertical(S, stations, nsample, yspan, H_km, profile_out=None):
         # _peak_width takes (coordinate, field, side); on a vertical cut the coordinate
         # is y and there is a single peak, so the side argument only selects which half
         # of the profile to search — pass the whole line by asking for the dominant peak.
-        got = _peak_width(y, f, side)
+        # The whole cut lies at y < 0, so search it all ("L" selects y < 0). Passing the
+        # station's side here searched y > 0 for the right limb, i.e. nothing, and the
+        # right limb was never measured (found 2026-10-09).
+        got = _peak_width(y, f, "L")
         if got is not None:
             out_rows[side].append((xs,) + got)
 
