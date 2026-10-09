@@ -36,6 +36,7 @@ import numpy as np
 import sympy
 
 import underworld3 as uw
+from underworld3.utilities.dm_labels import label_stratum_indices
 
 
 class boundaries(Enum):
@@ -154,12 +155,9 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     cS, cE = mesh.dm.getHeightStratum(0)
 
     def _cells(label, value):
-        # a rank holding no point of the stratum gets an IS wrapping a NULL handle
-        # (not None), and getIndices() on it segfaults: at np 16 some ranks own no
-        # weak-inclusion cell. Ask for the stratum's size first.
-        if mesh.dm.getStratumSize(label, value) == 0:
-            return np.empty(0, np.int32)
-        q = mesh.dm.getStratumIS(label, value).getIndices()
+        # empty-safe (#589): a rank holding no point of the stratum gets a null IS,
+        # and getIndices() on it segfaults -- at np 16 some ranks own no weak cell
+        q = label_stratum_indices(mesh.dm.getLabel(label), value)
         return q[(q >= cS) & (q < cE)] - cS
 
     mat.data[...] = 1
