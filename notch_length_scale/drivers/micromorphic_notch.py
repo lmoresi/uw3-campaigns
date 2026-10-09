@@ -44,6 +44,9 @@ params = uw.Params(
                                      "results/micromorphic/checkpoints/<run> (empty = the "
                                      "viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the outer Krylov residual"),
+    uw_ksp_max_it=uw.Param(0, description="cap on Krylov iterations per linear solve "
+                                          "(0 = PETSc's default); a capped solve that misses "
+                                          "rtol ends the Newton solve, reported as such"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
 )
@@ -77,6 +80,8 @@ sigma_y = cn.yield_stress_with_shift(S, shift)
 if coarse is not None:
     cn.prolong(coarse, dict(v=S["v"], p=S["p"], chi=chi))
 
+if int(params.uw_ksp_max_it):
+    stokes.petsc_options["ksp_max_it"] = int(params.uw_ksp_max_it)
 seconds = cn.solve_newton(S, name, OUT, params.uw_budget, int(params.uw_monitor),
                           str(params.uw_linear))
 report = stokes.solve_report

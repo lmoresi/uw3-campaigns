@@ -80,6 +80,77 @@ The width cuts at |x| = 12-21 km never touch them.
 
 ![W and peak against h, refs 1-5](figures/width_peak_vs_h.png)
 
+**FMG cost against refinement: is the band physically scaled?** (`drivers/fmg_table.py`,
+`results/fmg_table.json`)
+
+Krylov iterations per Newton step, with every linear solve to rtol 1e-8 (no
+Eisenstat–Walker) under the production preconditioner: Schur fieldsplit, with
+geometric FMG on [u, coupled field] over the whole hierarchy, level 0 (the base mesh)
+to the run's refinement.
+- h is the band-crossing element at x = −15 km; on FMG level k it is about
+  4.24 km / 2^k.
+- W is the integral width (background outside ±9 km).
+- \* marks a step that stopped on the absolute tolerance (late, small residual);
+  "(cap)" marks a solve that hit the 500-iteration cap.
+- Refs 1-3 start cold from the viscous seed. Refs 4-5 are grid-sequenced from the
+  ref below, so they have fewer and easier steps. Compare the medians within a
+  start type.
+- The plain law is the notch law with no micromorphic field, regularised by
+  ξ = 0.03 alone.
+- Runs at np 4 (refs 1-3), np 1 (micromorphic ref 4), np 8 (Cosserat ref 4) and
+  np 16 (ref 5).
+
+| model | ref | h in band (m) | W (km) | W / h | coarsest level with W ≥ 2h | Krylov per Newton step | median / max | outcome |
+|---|---|---|---|---|---|---|---|---|
+| Cosserat, l = 0.5 km | 1 | 2120 | — | — | — | 35, 37, 36, 35, 29* | 35 / 37 | CONVERGED_FNORM_ABS (5) |
+| Cosserat, l = 0.5 km | 2 | 1060 | — | — | — | 34, 37, 36, 36, 30* | 36 / 37 | CONVERGED_FNORM_ABS (5) |
+| Cosserat, l = 0.5 km | 3 | 530 | — | — | — | 31, 36, 36, 35, 25* | 35 / 36 | CONVERGED_FNORM_ABS (5) |
+| Cosserat, l = 1 km | 1 | 2120 | — | — | — | 34, 36, 36, 35* | 36 / 36 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 2 | 1060 | — | — | — | 33, 35, 36, 34* | 34 / 36 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 3 | 530 | — | — | — | 33, 35, 35, 33* | 34 / 35 | CONVERGED_FNORM_ABS (4) |
+| Cosserat, l = 1 km | 4 | 265 | — | — | — | 39 | 39 / 39 | running (None) |
+| micromorphic, l = 0.25 km | 1 | 2120 | 3.69 | 2 | none | 37, 52, 52, 48, 42, 43, 43, 39* | 43 / 52 | CONVERGED_FNORM_ABS (8) |
+| micromorphic, l = 0.25 km | 2 | 1060 | 2.83 | 3 | 2 (1060 m) | 38, 188, 138, 99, 84, 63, 60, 63, 61, 58* | 63 / 188 | CONVERGED_FNORM_ABS (10) |
+| micromorphic, l = 0.25 km | 3 | 530 | 2.66 | 5 | 2 (1060 m) | 37 | 37 / 37 | killed: the next linear solve gave no output for 1 h (None) |
+| micromorphic, l = 0.5 km | 1 | 2120 | 4.12 | 2 | none | 36, 43, 43, 38, 40, 35* | 39 / 43 | CONVERGED_FNORM_ABS (6) |
+| micromorphic, l = 0.5 km | 2 | 1060 | 3.64 | 3 | 2 (1060 m) | 37, 63, 64, 60, 47, 48, 50, 44* | 49 / 64 | CONVERGED_FNORM_ABS (8) |
+| micromorphic, l = 0.5 km | 3 | 530 | 3.63 | 7 | 2 (1060 m) | 35, 88, 87, 80, 70, 49, 53, 54, 51* | 54 / 88 | CONVERGED_FNORM_ABS (9) |
+| micromorphic, l = 0.5 km | 4 | 265 | 3.63 | 14 | 2 (1060 m) | 51, 34, 33, 33*, 27* | 33 / 51 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 0.5 km | 5 | 132 | 3.64 | 27 | 2 (1060 m) | 47, 43, 37, 36*, 28* | 37 / 47 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 1 km | 1 | 2120 | 5.00 | 2 | 1 (2120 m) | 32, 37, 35, 36, 36* | 36 / 37 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 1 km | 2 | 1060 | 4.61 | 4 | 1 (2120 m) | 33, 44, 36, 37, 38, 34* | 36 / 44 | CONVERGED_FNORM_ABS (6) |
+| micromorphic, l = 1 km | 3 | 530 | 4.62 | 9 | 1 (2120 m) | 29, 43, 43, 36, 36, 29* | 36 / 43 | CONVERGED_FNORM_ABS (6) |
+| micromorphic, l = 1 km | 4 | 265 | 4.64 | 17 | 1 (2120 m) | 39, 27, 27, 31*, 25* | 27 / 39 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 1 km | 5 | 132 | 4.64 | 35 | 1 (2120 m) | 38, 35, 29, 32*, 24* | 32 / 38 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 2 km | 1 | 2120 | 5.18 | 2 | 1 (2120 m) | 34, 36, 34, 34, 31* | 34 / 36 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 2 km | 2 | 1060 | 5.33 | 5 | 1 (2120 m) | 35, 37, 36, 36, 32* | 36 / 37 | CONVERGED_FNORM_ABS (5) |
+| micromorphic, l = 2 km | 3 | 530 | 5.42 | 10 | 1 (2120 m) | 34, 38, 36, 33, 32*, 19* | 34 / 38 | CONVERGED_FNORM_ABS (6) |
+| micromorphic, l = 2 km | 4 | 265 | 5.44 | 21 | 1 (2120 m) | 37, 27, 25, 30*, 21* | 27 / 37 | CONVERGED_FNORM_ABS (5) |
+| plain, ξ = 0.03 | 1 | 2120 | 4.43 | 2 | 1 (2120 m) | 35, 38, 36, 35, 30* | 35 / 38 | CONVERGED_FNORM_ABS (5) |
+| plain, ξ = 0.03 | 2 | 1060 | 3.92 | 4 | 2 (1060 m) | 37, 50, 50, 48, 46, 33* | 47 / 50 | CONVERGED_FNORM_ABS (6) |
+| plain, ξ = 0.03 | 3 | 530 | — | — | — | 36, 226, 500(cap) | 226 / 500 | DIVERGED_LINEAR_SOLVE (2) |
+
+What it shows:
+- **A length scale keeps FMG flat when W is resolved on the coarse levels.**
+  - Micromorphic at l = 1 and 2 km: 34-36 iterations per step at refs 1-3 (cold),
+    and 27-32 at refs 4-5 (sequenced), with W ≥ 2h from FMG level 1 up.
+  - Cosserat: 34-36 at both l.
+- **Where W approaches the coarse levels' h, the count grows.**
+  - Micromorphic l = 0.5 km, cold: medians 39, 49, 54 at refs 1-3, with step maxima
+    of 43, 64, 88.
+  - Micromorphic l = 0.25 km: 43, then 63 (one step at 188). At ref 3 the second
+    step's linear solve did not finish in an hour. The earlier probe of this case
+    shows the outer Krylov stagnating near 2e-8 past 130 iterations.
+- **The plain law is the control.** Its count grows with h and then fails: 35 and 47
+  at refs 1-2, then 226 at step 2 and the 500 cap at step 3 at ref 3, so the
+  linear solve fails (DIVERGED_LINEAR_SOLVE). Its band narrows with h (W 4.43 →
+  3.92 km at refs 1 → 2) instead of converging.
+
+So FMG performance is itself evidence that the micromorphic and Cosserat bands are
+physically scaled: the solver's work per Newton step is h-independent exactly where
+W is resolved on the coarse levels, and grows without bound for the law with no
+length.
+
 **Window and background dependence** (`drivers/window_check.py`, `results/window_check.json`).
 - The window does not cap W. Widening it from ±6 km to the whole 20 km cut changes W
   by at most 1% (4.49 → 4.54 km at l = 2 km).

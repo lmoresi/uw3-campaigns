@@ -179,10 +179,16 @@ DIP_DEG = 37.5      # the limbs' measured dip; perpendicular width = cut width *
 WINDOW_KM = 6.0
 
 
-def canonical_run(ref, l_km, beta=0.1, xi=0):
+def canonical_run(ref, l_km, beta=0.1, xi=0, model="micromorphic"):
     """The checkpoint name of the run that stands for (ref, l) in the tables: exact
-    Newton at refs 1-3, tight FMG grid-sequenced at ref 4 (inexact Newton at
-    l = 0.25 km), tight FMG at np 16 at ref 5. None if there is no such run."""
+    Newton at refs 1-3, tight FMG grid-sequenced at ref 4 (micromorphic: serial, and
+    inexact Newton at l = 0.25 km; Cosserat: np 8) and at ref 5 (np 16). Cosserat is
+    c = 1, omega in P1 (``beta`` is ignored)."""
+    if model == "cosserat":
+        base = f"cosserat_ref{ref}_xi{xi:g}_c1_l{l_km:g}_P1"
+        suffix = {1: "", 2: "", 3: "", 4: "_production_tight_np8",
+                  5: "_production_tight_np16"}[ref]
+        return base + suffix
     base = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}"
     suffix = {1: "", 2: "", 3: "", 4: "_production_tight", 5: "_production_tight_np16"}[ref]
     if ref == 4 and l_km == 0.25:

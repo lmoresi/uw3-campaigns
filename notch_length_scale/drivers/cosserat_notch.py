@@ -41,7 +41,13 @@ params = uw.Params(
                                             "fieldsplit with FMG velocity block, "
                                             "Eisenstat-Walker) | production_tight "
                                             "(the same, every linear solve to 1e-8)"),
-    uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
+    uw_init=uw.Param("", description="checkpoint of the ref - 1 run to start from, "
+                                     "results/cosserat/checkpoints/<run> (empty = the "
+                                     "viscous seed with omega = 0)"),
+    uw_ksp_max_it=uw.Param(0, description="cap on Krylov iterations per linear solve "
+                                          "(0 = PETSc's default)"),
+    uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the "
+                                       "outer Krylov residual"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
 )
@@ -51,8 +57,14 @@ ref, xi = int(params.uw_ref), float(params.uw_xi)
 c, l_km, degree = float(params.uw_c), float(params.uw_l_km), int(params.uw_degree)
 name = f"cosserat_ref{ref}_xi{xi:g}_c{c:g}_l{l_km:g}_P{degree}" + \
     ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
+    ("" if uw.mpi.size == 1 else f"_np{uw.mpi.size}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
+# the coarse run is read BEFORE the fine notch is built (named expressions are shared
+# between builds, #767)
+coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
+                         dict(omega=(1, degree, True, "1/s")))
+          if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi)
 mesh, stokes, cm = S["mesh"], S["stokes"], S["cm"]
 m = S["mat"].sym[0]
@@ -78,6 +90,10 @@ stokes.add_coupled_field(
     momentum_flux=2 * eta_c * (spin - omega.sym[0]) * sympy.Matrix([[0, -1], [1, 0]]),
 )
 
+if coarse is not None:
+    cn.prolong(coarse, dict(v=S["v"], p=S["p"], omega=omega))
+if int(params.uw_ksp_max_it):
+    stokes.petsc_options["ksp_max_it"] = int(params.uw_ksp_max_it)
 seconds = cn.solve_newton(S, name, OUT, params.uw_budget, int(params.uw_monitor),
                           str(params.uw_linear))
 report = stokes.solve_report
@@ -88,7 +104,8 @@ if taylor:
 measured = cn.measure(S, OUT, name)
 bands, W = measured["bands_horizontal"], measured["W_horizontal_km"]
 record = dict(
-    ref=ref, xi=xi, c=c, l_km=l_km, omega_degree=degree, init="seed",
+    ref=ref, xi=xi, c=c, l_km=l_km, omega_degree=degree,
+    init=os.path.basename(str(params.uw_init)) or "seed", nprocs=uw.mpi.size,
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
     nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
     seconds=seconds,
@@ -102,5 +119,6 @@ record = dict(
 uw.pprint(f"[cosserat] ref {ref} xi {xi} c {c} l {l_km} km P{degree}: {report.reason_str} "
           f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  omega {record['omega_range']}  "
           f"eta_eff strong {record['viscosity_range_strong_Pas']}")
-record.update(W_vertical_km=measured["W_vertical_km"], relative_peak=measured["relative_peak"])
+record.update(W_vertical_km=measured["W_vertical_km"], relative_peak=measured["relative_peak"],
+              W_integral_km=measured["W_integral_km"])
 cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], omega=omega), mesh)

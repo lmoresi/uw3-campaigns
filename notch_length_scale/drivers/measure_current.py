@@ -1,5 +1,6 @@
 """Band width and peak with the CURRENT estimator, for every (ref, l) of the
-micromorphic beta = 0.1, xi = 0 runs, from checkpoints (no re-solve):
+micromorphic beta = 0.1, xi = 0 runs (or, with -uw_model cosserat, the Cosserat
+c = 1, xi = 0 runs), from checkpoints (no re-solve):
 
 * W: the integral width, background = median of each cut outside +-9 km of its peak
   (``coupled_notch.integral_width(S, 9, "outside")``), median over the 8 cuts;
@@ -26,15 +27,17 @@ params = uw.Params(
     uw_refs=uw.Param("1,2,3,4,5", description="refinements, comma-separated"),
     uw_profile_x=uw.Param(-0.5, description="x / H of the profile cut (-0.5: x = -15 km)"),
     uw_out=uw.Param("current_widths.json", description="output file in results/"),
+    uw_model=uw.Param("micromorphic", description="micromorphic | cosserat (c = 1, P1)"),
 )
 RES = os.path.join(_here, "..", "results")
-CHECKPOINTS = os.path.join(RES, "micromorphic", "checkpoints")
+MODEL = str(params.uw_model)
+CHECKPOINTS = os.path.join(RES, MODEL, "checkpoints")
 WINDOW_KM, BACKGROUND = 9.0, "outside"
 
 rows = []
 for ref in [int(r) for r in str(params.uw_refs).split(",")]:
     for l_km in [float(l) for l in str(params.uw_l).split(",")]:
-        name = cn.canonical_run(ref, l_km)
+        name = cn.canonical_run(ref, l_km, model=MODEL)
         if not os.path.exists(os.path.join(CHECKPOINTS, name + ".mesh.U.00000.h5")):
             continue
         S = cn.build_notch(ref, 0.0, seed=False)
@@ -49,7 +52,7 @@ for ref in [int(r) for r in str(params.uw_refs).split(",")]:
         i = int(np.argmax(f - np.median(f)))
         background = float(np.median(f[np.abs(y_km - y_km[i]) >= WINDOW_KM]))
 
-        rows.append(dict(run=name, ref=ref, l_km=l_km,
+        rows.append(dict(run=name, model=MODEL, ref=ref, l_km=l_km,
                          h_min_km=float(S["mesh"].get_min_radius()) * cn.H_KM,
                          W_km=width["median"], W_spread_km=width["spread"],
                          peak=width["peak_over_background"],
