@@ -43,7 +43,7 @@ params = uw.Params(
     uw_init=uw.Param("", description="checkpoint of the ref - 1 run to start from, "
                                      "results/micromorphic/checkpoints/<run> (empty = the "
                                      "viscous seed with chi = 0)"),
-    uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
+    uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the outer Krylov residual"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
 )

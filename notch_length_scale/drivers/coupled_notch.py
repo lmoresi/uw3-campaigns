@@ -72,6 +72,10 @@ def solve_newton(S, name, out_dir, budget, monitor, linear="exact"):
         stokes.petsc_options["snes_monitor_short"] = None
         stokes.petsc_options["snes_linesearch_monitor"] = None
         stokes.petsc_options["ksp_converged_reason"] = None
+    if monitor > 1:
+        # the outer Krylov residual every iteration: tells a slow linear solve
+        # from a stuck one when a Newton step goes quiet
+        stokes.petsc_options["ksp_monitor_short"] = None
     if linear in ("production", "production_tight"):
         if linear == "production_tight":
             # every Newton direction solved to a fixed, tight tolerance (no

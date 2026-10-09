@@ -16,6 +16,11 @@ Jobs appended to the jobs file while the runner is running are picked up on the 
 poll. ``-uw_cap_file`` names a file holding the cap, re-read on every poll, so the cap
 follows the machine's load (other people's runs) without restarting the runner.
 
+An optional ``"priority"`` (default 0) orders the queue: while a job of a higher
+priority is waiting, no lower-priority job starts, so the ranks it needs drain to it.
+Jobs already queued take a new priority from the jobs file when the runner restarts
+(restart is safe: running jobs are adopted, not relaunched).
+
 ``silence`` is the supervisor's budget in seconds of no output (a Newton step at fine
 resolution can be quiet for a long time). Each job logs to ``<logs>/<name>.log``, and
 every change of state is appended to ``<status>`` as one JSON line
@@ -56,6 +61,11 @@ supervisor = str(params.uw_supervisor) or os.path.join(
     os.path.abspath(uw.__file__).split(os.sep + ".pixi" + os.sep)[0], "scripts", "mpi_supervisor.py")
 if not os.path.exists(supervisor):
     raise FileNotFoundError(f"no mpi_supervisor.py at {supervisor}; pass -uw_supervisor")
+# the env's own launcher, beside its python: a runner started outside ``pixi run`` would
+# otherwise find the system mpirun, which cannot start the env's MPI
+MPIRUN = os.path.join(os.path.dirname(sys.executable), "mpirun")
+if not os.path.exists(MPIRUN):
+    raise FileNotFoundError(f"no mpirun beside {sys.executable}")
 EXIT_KILLED = 124
 
 
@@ -155,20 +165,28 @@ def run():
                 record(name, state, rc=rc)
                 del running[name]
         in_use = sum(job["np"] for _, job, _ in running.values())
-        # first fit: the first queued job that fits starts, so a wide job waiting for
-        # ranks does not leave narrow ones idle behind it
-        while True:
-            fits = [j for j in queue if in_use + j["np"] <= current_cap()]
+        # first fit within the highest waiting priority: the first queued job of that
+        # priority that fits starts, so a wide job waiting for ranks does not leave
+        # narrow ones of its own priority idle behind it; lower priorities wait, so
+        # they cannot keep taking the ranks a higher-priority wide job is waiting for
+        while queue:
+            top = max(j.get("priority", 0) for j in queue)
+            fits = [j for j in queue
+                    if j.get("priority", 0) == top and in_use + j["np"] <= current_cap()]
             if not fits:
                 break
             job = fits[0]
             queue.remove(job)
             command = [sys.executable, supervisor, "--silence", str(job.get("silence", 3600)),
-                       "--", "mpirun", "-n", str(job["np"]), sys.executable, "-u",
+                       "--", MPIRUN, "-n", str(job["np"]), sys.executable, "-u",
                        job["driver"], *shlex.split(job.get("args", ""))]
             log = open(os.path.join(logs, job["name"] + ".log"), "w")
             proc = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
-                                    env=dict(os.environ, UW_NO_USAGE_METRICS="1"))
+                                    env=dict(os.environ, UW_NO_USAGE_METRICS="1",
+                                             # one thread per rank: an unset OpenMP /
+                                             # BLAS pool takes every core per rank
+                                             OMP_NUM_THREADS=os.environ.get("OMP_NUM_THREADS", "1"),
+                                             OPENBLAS_NUM_THREADS=os.environ.get("OPENBLAS_NUM_THREADS", "1")))
             running[job["name"]] = (proc, job, log)
             record(job["name"], "running", np=job["np"], pid=proc.pid)
             in_use += job["np"]
