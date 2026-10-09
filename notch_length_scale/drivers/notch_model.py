@@ -153,14 +153,17 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
 
     cS, cE = mesh.dm.getHeightStratum(0)
 
-    def _cells(IS):
-        if IS is None:
+    def _cells(label, value):
+        # a rank holding no point of the stratum gets an IS wrapping a NULL handle
+        # (not None), and getIndices() on it segfaults: at np 16 some ranks own no
+        # weak-inclusion cell. Ask for the stratum's size first.
+        if mesh.dm.getStratumSize(label, value) == 0:
             return np.empty(0, np.int32)
-        q = IS.getIndices()
+        q = mesh.dm.getStratumIS(label, value).getIndices()
         return q[(q >= cS) & (q < cE)] - cS
 
     mat.data[...] = 1
-    mat.data[_cells(mesh.dm.getStratumIS("Weak", 100))] = 0
+    mat.data[_cells("Weak", 100)] = 0
     xi_var.data[...] = float(xi)
     rate_var.data[...] = 0.0
 
