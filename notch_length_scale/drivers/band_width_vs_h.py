@@ -252,7 +252,9 @@ def measure_bands_vertical(S, stations, nsample, yspan, H_km, profile_out=None):
     prof = []
     for xs in stations:
         coords = np.column_stack([np.full_like(y, xs), y])
-        f = np.asarray(uw.function.evaluate(einv2, coords)).ravel()
+        # global_evaluate: the cut crosses every rank's part of the mesh (evaluate is
+        # rank-local and extrapolates points owned elsewhere)
+        f = np.asarray(uw.function.global_evaluate(einv2, coords)).ravel()
         f = np.nan_to_num(f, nan=0.0, posinf=0.0, neginf=0.0)
         prof.append(f)
         side = "L" if xs < 0 else "R"
@@ -326,7 +328,9 @@ def measure_bands(S, levels, nsample, xspan, H_km, profile_out=None):
     prof = []
     for y in levels:
         coords = np.column_stack([x, np.full_like(x, y)])
-        f = np.asarray(uw.function.evaluate(einv2, coords)).ravel()
+        # global_evaluate: the cut crosses every rank's part of the mesh (evaluate is
+        # rank-local and extrapolates points owned elsewhere)
+        f = np.asarray(uw.function.global_evaluate(einv2, coords)).ravel()
         f = np.nan_to_num(f, nan=0.0, posinf=0.0, neginf=0.0)
         prof.append(f)
         for side in ("L", "R"):

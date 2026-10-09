@@ -52,14 +52,20 @@ def yield_stress_with_shift(S, shift):
     return sigma_y
 
 
-def solve_newton(stokes, budget, monitor, linear="exact"):
-    """Consistent Newton; returns the wall time of the solve.
+def solve_newton(S, name, out_dir, budget, monitor, linear="exact"):
+    """Consistent Newton; returns the wall time of the solve. The solve runs inside a
+    model step, so the model's transcript (``<out_dir>/transcripts/<name>.jsonl``)
+    records it, with its solve report, as the run's account.
 
     ``linear="exact"``: every linear solve an LU factorisation of J.
     ``linear="production"``: the notch's own solver (Schur fieldsplit, FMG on the
     velocity block, Eisenstat-Walker), with the coupled fields grouped into the
     velocity split by the solver. ``linear="production_tight"``: the same
     preconditioner, every linear solve to rtol 1e-8."""
+    stokes = S["stokes"]
+    model = S["model"]
+    os.makedirs(os.path.join(out_dir, "transcripts"), exist_ok=True)
+    model.transcript_file = os.path.join(out_dir, "transcripts", name + ".jsonl")
     stokes.consistent_jacobian = True
     stokes.petsc_options["snes_max_it"] = int(budget)
     if monitor:
@@ -75,7 +81,8 @@ def solve_newton(stokes, budget, monitor, linear="exact"):
             stokes.petsc_options.delValue("snes_ksp_ew_version")
             stokes.petsc_options["ksp_rtol"] = 1.0e-8
         t0 = time.time()
-        stokes.solve(zero_init_guess=False)
+        with model.step(0, label=name):
+            stokes.solve(zero_init_guess=False)
         return time.time() - t0
     stokes.saddle_preconditioner = 0
 
@@ -93,7 +100,8 @@ def solve_newton(stokes, budget, monitor, linear="exact"):
 
     uw.systems.Stokes._snes_solve_with_retries = exact_linear
     t0 = time.time()
-    stokes.solve(zero_init_guess=False)
+    with model.step(0, label=name):
+        stokes.solve(zero_init_guess=False)
     return time.time() - t0
 
 
@@ -123,50 +131,96 @@ def taylor_slopes(solver, steps=(1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5)):
     return remainders, list(np.diff(np.log(remainders)) / np.diff(np.log(steps)))
 
 
-def measure(S, out_dir, name):
-    """Band widths per side (km) from horizontal cuts; the raw profiles are saved."""
+STATIONS = [-0.7, -0.6, -0.5, -0.4, 0.4, 0.5, 0.6, 0.7]     # x / H, i.e. +-12..21 km
+
+
+def _band_module():
     spec = importlib.util.spec_from_file_location(
         "bw", os.path.join(_here, "band_width_vs_h.py"))
     argv, sys.argv = sys.argv, [sys.argv[0]]
     bw = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(bw)
     sys.argv = argv
+    return bw
+
+
+def measure(S, out_dir, name):
+    """Band widths per side (km) from horizontal cuts (the campaign's older estimator)
+    and from vertical cuts at |x| = 12..21 km (the settled one, one limb per cut), and
+    the peak of edot_II over the far-field background on the vertical cuts (a ratio,
+    free of the units edot_II comes back in). The raw profiles are saved."""
+    bw = _band_module()
     os.makedirs(out_dir, exist_ok=True)
-    return bw.measure_bands(S, LEVELS, 4001, 1.85, H_KM,
-                            profile_out=os.path.join(out_dir, f"profiles_{name}.npz"))
+    horizontal = bw.measure_bands(S, LEVELS, 4001, 1.85, H_KM,
+                                  profile_out=os.path.join(out_dir, f"profiles_{name}.npz"))
+    vertical = bw.measure_bands_vertical(S, STATIONS, 4001, 0.68, H_KM,
+                                         profile_out=os.path.join(out_dir, f"vprofiles_{name}.npz"))
+    y = np.linspace(-0.68, -0.02, 4001)
+    peaks = {}
+    for side, stations in (("L", STATIONS[:4]), ("R", STATIONS[4:])):
+        ratios = []
+        for xs in stations:
+            coords = np.column_stack([np.full_like(y, xs), y])
+            f = np.asarray(uw.function.global_evaluate(S["stokes"].Unknowns.Einv2, coords)).ravel()
+            base = np.median(f)
+            ratios.append((f.max() - base) / base)
+        peaks[side] = float(np.mean(ratios))
+    width = lambda bands: {k: (None if v is None else v["W_equiv_km"]) for k, v in bands.items()}
+    return dict(W_horizontal_km=width(horizontal), W_vertical_km=width(vertical),
+                relative_peak=peaks, bands_horizontal=horizontal, bands_vertical=vertical)
+
+
+def floor_bound_over_floor(S, chi, beta):
+    """Lower bound of the micromorphic yield argument over the residual-strength floor,
+    min over the strong layer of (C + sin(phi) p - H chi) / (0.02 C), non-dimensional
+    (stress by eta_bg V/H, rate by V/H). The argument C_eff + sin(phi) p + H (e - chi)
+    is at least this, since e >= 0 and C_eff >= C. Collective: the minimum is a P1
+    variable's global min. A value above 1 means the floor cannot engage anywhere."""
+    rate = U_MMYR * 1.0e-3 / (365.25 * 24 * 3600) / (H_KM * 1.0e3)
+    stress = ETA_BG * rate
+    mesh = S["mesh"]
+    bound = uw.discretisation.MeshVariable("floor_bound", mesh, 1, degree=1)
+    p = np.asarray(S["p"].array).ravel()
+    chi_nd = np.asarray(chi.array).ravel() / rate
+    strong = np.asarray(bound.coords)[:, 1] > -0.7 * H_KM * 1.0e3
+    values = (1.0e8 / stress + np.sin(np.deg2rad(PHI)) * p - beta * chi_nd) / (0.02 * 1.0e8 / stress)
+    bound.array[:, 0, 0] = np.where(strong, values, np.inf)
+    return float(bound.min())
 
 
 def strong_layer_range(S, expression):
-    """Min and max of ``expression`` at the mesh nodes of the strong layer."""
-    nodes = S["mesh"].X.coords
+    """Min and max of ``expression`` over the strong layer, at the P1 nodes. Each rank
+    evaluates at its own nodes (exact there, so the rank-local evaluate is right), and
+    the extremes are the collective min / max of a scratch P1 variable."""
+    scratch = uw.discretisation.MeshVariable("range_scratch", S["mesh"], 1, degree=1)
+    nodes = scratch.coords
     strong = np.asarray(uw.function.evaluate(S["mat"].sym[0], nodes)).ravel() > 0.5
-    values = np.asarray(uw.function.evaluate(expression, nodes)).ravel()[strong]
-    return [float(np.nanmin(values)), float(np.nanmax(values))]
+    values = np.asarray(uw.function.evaluate(expression, nodes)).ravel()
+    scratch.array[:, 0, 0] = np.where(strong, values, np.inf)
+    lowest = float(scratch.min())
+    scratch.array[:, 0, 0] = np.where(strong, values, -np.inf)
+    return [lowest, float(scratch.max())]
 
 
 def load_coarse(path, coarse_ref, xi, extra=None):
-    """A coarser run's saved fields (``write``'s npz) on a rebuilt coarse notch, for
-    ``prolong``. ``extra`` maps the names of coupled fields to their
-    (components, degree, continuous, units).
+    """A coarser run's checkpoint (``write``'s ``write_timestep`` output, path without
+    the ``.mesh...`` suffix) on a rebuilt coarse notch, for ``prolong``. The checkpoint
+    is remapped by coordinates, so any decomposition, serial or parallel, reads it.
+    ``extra`` maps the names of coupled fields to (components, degree, continuous, units).
 
     Call this BEFORE building the fine notch: named expressions are shared between
     builds in one process (#767), so a coarse build made after the fine one rebinds
     the fine solver's strain-rate invariant to the coarse velocity."""
     coarse = build_notch(coarse_ref, xi, seed=False)
-    saved = np.load(path)
     fields = dict(v=coarse["v"], p=coarse["p"])
     for key, (components, degree, continuous, units) in (extra or {}).items():
         fields[key] = uw.discretisation.MeshVariable(
             f"{key}_coarse", coarse["mesh"], components, degree=degree,
             continuous=continuous, units=units)
+    directory, name = os.path.split(path)
+    names = dict(v=coarse["v"].name, p=coarse["p"].name)
     for key, var in fields.items():
-        if not np.allclose(np.asarray(var.coords), saved[f"{key}_coords"]):
-            raise ValueError(f"{path}: saved {key} nodes do not match the rebuilt ref "
-                             f"{coarse_ref} mesh")
-        values = saved[key].reshape(var.array.shape)
-        if var.units is not None:
-            values = uw.utilities.UnitAwareArray(values, units=var.units)
-        var.array[...] = values
+        var.read_timestep(name, names.get(key, key), 0, outputPath=directory)
     return fields
 
 
@@ -178,16 +232,17 @@ def prolong(coarse_fields, fine_fields):
     for key, fine in fine_fields.items():
         # fine.coords is unit-aware (metres); evaluate converts it to model units.
         # A plain np.asarray would be read as model coordinates and miss the domain.
-        values = uw.function.evaluate(coarse_fields[key].sym, fine.coords)
+        values = uw.function.global_evaluate(coarse_fields[key].sym, fine.coords)
         fine.array[...] = values.reshape(fine.array.shape)
 
 
-def write(out_dir, name, record, fields):
-    """The run's record as json and its fields (values and coordinates) as npz."""
-    if uw.mpi.rank == 0:
+def write(out_dir, name, record, fields, mesh):
+    """The run's record as json and its fields as a checkpoint
+    (``<out_dir>/checkpoints/<name>``, ``write_timestep``): collective, and readable on
+    any decomposition by ``load_coarse`` and the measuring and rendering scripts."""
+    os.makedirs(os.path.join(out_dir, "checkpoints"), exist_ok=True)
+    mesh.write_timestep(name, 0, outputPath=os.path.join(out_dir, "checkpoints"),
+                        meshVars=list(fields.values()), create_xdmf=False)
+    with uw.selective_ranks(0):
         with open(os.path.join(out_dir, name + ".json"), "w") as fh:
             json.dump(record, fh, indent=1, default=float)
-        np.savez_compressed(
-            os.path.join(out_dir, f"fields_{name}.npz"),
-            **{key: np.asarray(var.array) for key, var in fields.items()},
-            **{f"{key}_coords": np.asarray(var.coords) for key, var in fields.items()})

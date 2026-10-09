@@ -40,8 +40,9 @@ params = uw.Params(
                                             "fieldsplit with FMG velocity block, "
                                             "Eisenstat-Walker) | production_tight "
                                             "(the same, every linear solve to 1e-8)"),
-    uw_init=uw.Param("", description="fields npz of the ref - 1 run to start from "
-                                     "(empty = the viscous seed with chi = 0)"),
+    uw_init=uw.Param("", description="checkpoint of the ref - 1 run to start from, "
+                                     "results/micromorphic/checkpoints/<run> (empty = the "
+                                     "viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
@@ -52,6 +53,7 @@ ref, xi = int(params.uw_ref), float(params.uw_xi)
 beta, l_km = float(params.uw_beta), float(params.uw_l_km)
 name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
+    ("" if uw.mpi.size == 1 else f"_np{uw.mpi.size}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
@@ -75,31 +77,31 @@ sigma_y = cn.yield_stress_with_shift(S, shift)
 if coarse is not None:
     cn.prolong(coarse, dict(v=S["v"], p=S["p"], chi=chi))
 
-seconds = cn.solve_newton(stokes, params.uw_budget, int(params.uw_monitor),
+seconds = cn.solve_newton(S, name, OUT, params.uw_budget, int(params.uw_monitor),
                           str(params.uw_linear))
 report = stokes.solve_report
 taylor = cn.taylor_slopes(stokes) if int(params.uw_taylor) else None
 if taylor:
     uw.pprint(f"[taylor] remainders {taylor[0]}  slopes {taylor[1]}")
 
-bands = cn.measure(S, OUT, name)
-W = {k: (None if v is None else v.get("W_equiv_km")) for k, v in bands.items()}
+measured = cn.measure(S, OUT, name)
 chi_values = np.asarray(chi.array).ravel()
 record = dict(
     ref=ref, xi=xi, beta=beta, l_km=l_km,
     init=os.path.basename(str(params.uw_init)) or "seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
     nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
-    seconds=seconds,
+    nprocs=uw.mpi.size, seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
-    bands=bands, W_equiv_km=W,
-    chi_range=[float(chi_values.min()), float(chi_values.max())],
-    min_yield_stress_strong=cn.strong_layer_range(S, sigma_y)[0],
-    shift_range_strong=cn.strong_layer_range(S, shift),
-    viscosity_range_strong_Pas=cn.strong_layer_range(S, S["cm"].viscosity),
+    W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
+    relative_peak=measured["relative_peak"],
+    bands_horizontal=measured["bands_horizontal"], bands_vertical=measured["bands_vertical"],
+    floor_bound_over_floor=cn.floor_bound_over_floor(S, chi, beta),
+    chi_max=float(np.asarray(chi.max())),
     taylor=taylor,
 )
-uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km: {report.reason_str} "
-          f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  chi {record['chi_range']}  "
-          f"min sigma_y {record['min_yield_stress_strong']:.3g}")
-cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], chi=chi))
+uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km np {uw.mpi.size}: "
+          f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  "
+          f"W_h {record['W_horizontal_km']}  W_v {record['W_vertical_km']}  "
+          f"peak {record['relative_peak']}  floor bound {record['floor_bound_over_floor']:.1f}")
+cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], chi=chi), mesh)

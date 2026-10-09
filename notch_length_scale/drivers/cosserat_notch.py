@@ -78,15 +78,15 @@ stokes.add_coupled_field(
     momentum_flux=2 * eta_c * (spin - omega.sym[0]) * sympy.Matrix([[0, -1], [1, 0]]),
 )
 
-seconds = cn.solve_newton(stokes, params.uw_budget, int(params.uw_monitor),
+seconds = cn.solve_newton(S, name, OUT, params.uw_budget, int(params.uw_monitor),
                           str(params.uw_linear))
 report = stokes.solve_report
 taylor = cn.taylor_slopes(stokes) if int(params.uw_taylor) else None
 if taylor:
     uw.pprint(f"[taylor] remainders {taylor[0]}  slopes {taylor[1]}")
 
-bands = cn.measure(S, OUT, name)
-W = {k: (None if v is None else v.get("W_equiv_km")) for k, v in bands.items()}
+measured = cn.measure(S, OUT, name)
+bands, W = measured["bands_horizontal"], measured["W_horizontal_km"]
 omega_values = np.asarray(omega.array).ravel()
 record = dict(
     ref=ref, xi=xi, c=c, l_km=l_km, omega_degree=degree, init="seed",
@@ -103,4 +103,5 @@ record = dict(
 uw.pprint(f"[cosserat] ref {ref} xi {xi} c {c} l {l_km} km P{degree}: {report.reason_str} "
           f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  omega {record['omega_range']}  "
           f"eta_eff strong {record['viscosity_range_strong_Pas']}")
-cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], omega=omega))
+record.update(W_vertical_km=measured["W_vertical_km"], relative_peak=measured["relative_peak"])
+cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], omega=omega), mesh)

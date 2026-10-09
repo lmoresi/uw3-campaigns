@@ -92,23 +92,9 @@ def mean_side(values):
     return (np.mean(v), min(v), max(v)) if v else None
 
 
-def relative_peaks(name):
-    """Peak over the far-field background on each vertical cut, as {side: (mean, min,
-    max)} over that side's stations. Dimensionless, so the profiles' unit cancels."""
-    p = np.load(os.path.join(M, f"vprofiles_{name}.npz"))
-    out = {}
-    for side, sel in (("L", p["stations"] < 0), ("R", p["stations"] > 0)):
-        f = p["edot_II"][sel]
-        base = np.median(f, axis=1)
-        out[side] = float(np.mean((f.max(axis=1) - base) / base))
-    return out
-
-
 for l_km, colour in L_COLOURS.items():
     sel = sorted((r for r in rows if r["beta"] == 0.1 and r["l_km"] == l_km and r["tag"] == ""),
                  key=lambda r: r["ref"])
-    for r in sel:
-        r["relative_peak"] = relative_peaks(r["run"][7:-4])
     for ax, key in ((ax_c, "relative_peak"), (ax_d, "W_vertical_km")):
         pts = [(r["h_min_km"],) + mean_side(r[key]) for r in sel if mean_side(r[key])]
         if not pts:

@@ -1,7 +1,7 @@
 """Strain-rate maps of the converged notch runs: models down, refinement across.
 
-Each run's saved velocity (``fields_<run>.npz``) is loaded back onto a rebuilt notch
-mesh (same mesh file and refinement, so the nodes coincide), and edot_II is evaluated
+Each run's velocity is read from its checkpoint (``read_timestep``, written by any
+decomposition) onto a rebuilt notch mesh, and edot_II is evaluated
 at the mesh vertices and drawn on the mesh's own triangles. All panels share one
 log10 colour scale. Writes ../results/strain_rate_maps.png (and ../figures/).
 """
@@ -31,13 +31,13 @@ params = uw.Params(
 RES = os.path.join(_here, "..", "results")
 ROW_SETS = dict(
     models=[
-        ("micromorphic  beta = 0.1, l = 1 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l1.npz"),
-        ("micromorphic  beta = 0.1, l = 0.5 km", "micromorphic/fields_micro_ref{r}_xi0_beta0.1_l0.5.npz"),
-        ("Cosserat  c = 1, l = 1 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l1_P1.npz"),
-        ("Cosserat  c = 1, l = 0.5 km", "cosserat/fields_cosserat_ref{r}_xi0_c1_l0.5_P1.npz"),
+        ("micromorphic  beta = 0.1, l = 1 km", "micromorphic/checkpoints/micro_ref{r}_xi0_beta0.1_l1"),
+        ("micromorphic  beta = 0.1, l = 0.5 km", "micromorphic/checkpoints/micro_ref{r}_xi0_beta0.1_l0.5"),
+        ("Cosserat  c = 1, l = 1 km", "cosserat/checkpoints/cosserat_ref{r}_xi0_c1_l1_P1"),
+        ("Cosserat  c = 1, l = 0.5 km", "cosserat/checkpoints/cosserat_ref{r}_xi0_c1_l0.5_P1"),
     ],
     l_sweep=[(f"micromorphic  beta = 0.1, l = {l} km",
-              f"micromorphic/fields_micro_ref{{r}}_xi0_beta0.1_l{l}.npz")
+              f"micromorphic/checkpoints/micro_ref{{r}}_xi0_beta0.1_l{l}")
              for l in ("0.25", "0.5", "1", "2")],
 )
 ROWS = ROW_SETS[str(params.uw_rows)]
@@ -48,11 +48,8 @@ def strain_rate_mesh(ref, path):
     """The notch mesh at ``ref`` as a pyvista mesh carrying log10 edot_II, with
     edot_II non-dimensional (scaled by V/H = 5 mm/yr / 30 km = 5.3e-15 1/s)."""
     S = cn.build_notch(ref, 0.0, seed=False)
-    saved = np.load(path)
-    v = S["v"]
-    if not np.allclose(np.asarray(v.coords), saved["v_coords"]):
-        raise ValueError(f"{path}: saved velocity nodes do not match the rebuilt mesh")
-    v.array[...] = saved["v"].reshape(v.array.shape)
+    directory, name = os.path.split(path)
+    S["v"].read_timestep(name, S["v"].name, 0, outputPath=directory)
     pvm = vis.mesh_to_pv_mesh(S["mesh"])
     model_xy = np.asarray(pvm.points)[:, :2] / (cn.H_KM * 1.0e3)
     edot = np.asarray(uw.function.evaluate(S["stokes"].Unknowns.Einv2, model_xy)).ravel()
@@ -61,11 +58,16 @@ def strain_rate_mesh(ref, path):
     return pvm
 
 
+if uw.mpi.size > 1:
+    # pyvista draws one rank's mesh; the maps need the whole of it on one process
+    raise RuntimeError("render_strain_rate.py draws on one process: run it without mpirun "
+                       "(the checkpoints it reads were written by any decomposition)")
+
 panels = {}
 for row, (label, pattern) in enumerate(ROWS):
     for col, ref in enumerate(refs):
         path = os.path.join(RES, pattern.format(r=ref))
-        if os.path.exists(path):
+        if os.path.exists(path + ".mesh.U.00000.h5"):
             panels[(row, col)] = (label, ref, strain_rate_mesh(ref, path))
             uw.pprint(f"loaded {os.path.basename(path)}")
 
