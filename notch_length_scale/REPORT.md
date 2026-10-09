@@ -43,10 +43,25 @@ at refs 1-4.
 | 0.01 | 0.1 | 1 | — | 4.28 / 0.77 (5) | 4.28 / 0.78 (5) | — | 1.00 / 0.99 (ref 2→3) | 59 |
 | 0.05 | 0.1 | 1 | — | 4.18 / 0.23 (4) | 4.18 / 0.23 (4) | — | 1.00 / 0.98 (ref 2→3) | 70 |
 
+**Window and background dependence** (`drivers/window_check.py`, `results/window_check.json`).
+- The window does not cap W. Widening it from ±6 km to the whole 20 km cut changes W
+  by at most 1% (4.49 → 4.54 km at l = 2 km).
+- The background does matter at large l. The whole-cut median sits inside the band's
+  broad tails: at l = 2 km the cut ends lie 11–14% of the peak below it, against
+  3–4% at l = 1 km.
+- With the background taken outside a ±9 km window, W = 3.63, 4.62, 5.42 km at
+  l = 0.5, 1, 2 km (ref 3), against 3.40, 4.26, 4.49 km in the table: +7%, +8%, +19%.
+- The ref 3 → 4 ratios are unchanged under every variant (3.63 / 3.63, 4.62 / 4.64,
+  5.42 / 5.44 km), so mesh independence stands.
+
 What sets the band:
 - **l sets the width.** At ref 3, β = 0.1, ξ = 0: W = 2.45, 3.40, 4.26, 4.49 km at
-  l = 0.25, 0.5, 1, 2 km. W rises steeply up to l ≈ 1 km, then nearly saturates: at
-  large l the notch geometry caps the band.
+  l = 0.25, 0.5, 1, 2 km. W rises steeply up to l ≈ 1 km and flattens beyond. Part
+  of that flattening is the estimator: with the background taken from outside the
+  band, W grows by ×1.27 and ×1.17 per doubling of l from 0.5 to 2 km, not ×1.25 and
+  ×1.05. W(l) is sublinear, but it does not saturate by l = 2 km. A whole-domain
+  cut, or a background fixed in the far field, is needed before the plateau is
+  attributed to the notch.
 - **β widens it a little.** At l = 1 km, W = 4.26 → 4.67 km for β = 0.1 → 0.2. β must
   exceed a threshold to regularise at all: β = 0.05 fails at ref 3 with ξ = 0.
 - **ξ sets the intensity, not the width.** At β = 0.1, l = 1 km, ξ = 0, 0.01, 0.05 give

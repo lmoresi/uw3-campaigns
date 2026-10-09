@@ -179,10 +179,14 @@ DIP_DEG = 37.5      # the limbs' measured dip; perpendicular width = cut width *
 WINDOW_KM = 6.0
 
 
-def integral_width(S):
+def integral_width(S, window_km=WINDOW_KM, background="cut"):
     """The band width with no support cut-off: on each vertical cut, the area of
-    edot_II above the far-field background within +-WINDOW_KM of the peak, over the
+    edot_II above the far-field background within +-``window_km`` of the peak, over the
     peak height, times cos(dip) for the band-normal width; the median over the cuts.
+    ``background="cut"``: the median over the whole cut; ``"outside"``: the median over
+    the part of the cut outside the window (falls back to the whole cut where the
+    window covers it). The cut spans y = -20.4 .. -0.6 km, so a window much wider than
+    +-6 km reaches the cut's ends.
     The equivalent width stops its support at 10% of the peak, and on these profiles
     (a long tail on the upper side) that cut-off moves by +-0.5 km between limbs and
     refinements; this measure does not. The spread between cuts is real: the limb
@@ -193,9 +197,10 @@ def integral_width(S):
     for xs in STATIONS:
         coords = np.column_stack([np.full_like(y, xs), y])
         f = np.asarray(uw.function.global_evaluate(S["stokes"].Unknowns.Einv2, coords)).ravel()
-        g = f - np.median(f)
-        i = int(np.argmax(g))
-        window = np.abs(y_km - y_km[i]) < WINDOW_KM
+        i = int(np.argmax(f - np.median(f)))
+        window = np.abs(y_km - y_km[i]) < window_km
+        outside = f[~window] if (background == "outside" and (~window).sum() > 20) else f
+        g = f - np.median(outside)
         widths.append(np.trapezoid(np.clip(g[window], 0, None), y_km[window]) / g[i])
     widths = np.asarray(widths) * np.cos(np.deg2rad(DIP_DEG))
     return dict(median=float(np.median(widths)), spread=float(widths.max() - widths.min()))
