@@ -13,35 +13,39 @@ machine (load average ~48).
 | 2. Micromorphic coupling on the notch | done for the first matrix: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
 | 3. 2-D Cosserat | done for the first matrix: converges at ref 3 with ξ = 0 in 4-5 steps; W converged in h (3.5 km at l = 0.5, ~4.1 km at l = 1) |
 
-## Read this first (2026-10-09, refs 1-4)
+## Read this first (2026-10-10, refs 1-5)
 
-**Micromorphic: the band width is mesh-independent at refinement 4.**
+**Micromorphic: the band width is mesh-independent through refinement 5 (h_min = 11 m).**
 - W is the integral width: the area of ε̇_II above background within ±6 km of the
   peak, over the peak height, perpendicular to a 37.5° dip, as the median of 8
   vertical cuts.
-- At β = 0.1, ξ = 0, refinement 3 → 4 changes W by under 1%: 4.26 → 4.26 km at
-  l = 1 km, 4.49 → 4.52 km at l = 2 km. The peak changes by 1%. Newton takes 5 steps
-  at ref 4 (tight FMG, grid-sequenced).
+- At β = 0.1, ξ = 0, W at refs 3, 4, 5 is 4.26, 4.26, 4.26 km at l = 1 km and
+  3.40, 3.39, 3.39 km at l = 0.5 km. The peak changes by under 1% from ref 4 to 5.
+  Ref 3 → 4 also holds at l = 0.25 km (2.45 → 2.44) and l = 2 km (4.49 → 4.52).
+- Newton takes 5 steps at refs 4 and 5 (tight FMG, grid-sequenced). The Krylov count
+  per step does not grow with h: 37-39 at ref 4 and 24-47 at ref 5 on 16 ranks.
 - The residual-strength floor never engages: the bound is ≥ 24× the floor in every run.
 
-Cells are **W (km) / peak over background (Newton steps)**; h_min = 172, 86, 43, 21 m
-at refs 1-4.
+Cells are **W (km) / peak over background (Newton steps)**; h_min = 172, 86, 43, 21, 11 m
+at refs 1-5. Ref 5 ran on 16 ranks, grid-sequenced from ref 4 (tight FMG, 24-47 Krylov
+iterations per Newton step). † inexact Newton (Eisenstat–Walker): at l = 0.25 km the
+tight linear solve stagnates near 3e-8 relative, with more than 100 Krylov iterations.
 
-| ξ | β | l (km) | ref 1 | ref 2 | ref 3 | ref 4 | last ratio W / peak | floor bound / s_min |
-|---|---|---|---|---|---|---|---|---|
-| 0 | 0.05 | 0.5 | 3.57 / 1.75 (8) | — | — | — | — | 63 |
-| 0 | 0.05 | 1 | 3.91 / 1.40 (7) | 3.26 / 1.80 (12) | — | — | 1.20 / 0.78 (ref 1→2) | 64 |
-| 0 | 0.1 | 0.25 | 3.55 / 1.77 (8) | 2.59 / 2.66 (10) | 2.45 / 2.72 (12) | — | 1.06 / 0.98 (ref 2→3) | 44 |
-| 0 | 0.1 | 0.5 | 3.82 / 1.39 (6) | 3.45 / 1.74 (8) | 3.40 / 1.80 (9) | 3.39 / 1.82 (5) | 1.00 / 1.01 (ref 3→4) | 50 |
-| 0 | 0.1 | 1 | 4.28 / 0.97 (5) | 4.27 / 1.13 (6) | 4.26 / 1.17 (6) | 4.26 / 1.18 (5) | 1.00 / 0.99 (ref 3→4) | 55 |
-| 0 | 0.1 | 2 | 4.10 / 0.72 (5) | 4.36 / 0.75 (5) | 4.49 / 0.76 (6) | 4.52 / 0.76 (5) | 1.00 / 0.99 (ref 3→4) | 58 |
-| 0 | 0.2 | 0.5 | 4.05 / 1.05 (5) | 4.07 / 1.25 (6) | 4.03 / 1.29 (6) | — | 1.01 / 0.97 (ref 2→3) | 24 |
-| 0 | 0.2 | 1 | 4.58 / 0.63 (5) | 4.64 / 0.69 (5) | 4.67 / 0.71 (5) | — | 0.99 / 0.98 (ref 2→3) | 37 |
-| 0.01 | 0.01 | 1 | 3.38 / 1.37 (7) | — | — | — | — | 74 |
-| 0.01 | 0.05 | 0.5 | 3.81 / 1.13 (6) | 3.11 / 1.47 (8) | 3.02 / 1.52 (10) | — | 1.03 / 0.96 (ref 2→3) | 65 |
-| 0.01 | 0.05 | 1 | 3.86 / 0.94 (5) | 3.46 / 1.13 (6) | 3.60 / 1.14 (7) | — | 0.96 / 0.99 (ref 2→3) | 66 |
-| 0.01 | 0.1 | 1 | — | 4.28 / 0.77 (5) | 4.28 / 0.78 (5) | — | 1.00 / 0.99 (ref 2→3) | 59 |
-| 0.05 | 0.1 | 1 | — | 4.18 / 0.23 (4) | 4.18 / 0.23 (4) | — | 1.00 / 0.98 (ref 2→3) | 70 |
+| ξ | β | l (km) | ref 1 | ref 2 | ref 3 | ref 4 | ref 5 | last ratio W / peak | floor bound / s_min |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 0.05 | 0.5 | 3.57 / 1.75 (8) | — | — | — | — | — | 63 |
+| 0 | 0.05 | 1 | 3.91 / 1.40 (7) | 3.26 / 1.80 (12) | — | — | — | 1.20 / 0.78 (ref 1→2) | 64 |
+| 0 | 0.1 | 0.25 | 3.55 / 1.77 (8) | 2.59 / 2.66 (10) | 2.45 / 2.72 (12) | 2.44 / 2.77 (13)† | — | 1.00 / 1.02 (ref 3→4) | 41 |
+| 0 | 0.1 | 0.5 | 3.82 / 1.39 (6) | 3.45 / 1.74 (8) | 3.40 / 1.80 (9) | 3.39 / 1.82 (5) | 3.39 / 1.83 (5) | 1.00 / 1.00 (ref 4→5) | 50 |
+| 0 | 0.1 | 1 | 4.28 / 0.97 (5) | 4.27 / 1.13 (6) | 4.26 / 1.17 (6) | 4.26 / 1.18 (5) | 4.26 / 1.18 (5) | 1.00 / 1.00 (ref 4→5) | 55 |
+| 0 | 0.1 | 2 | 4.10 / 0.72 (5) | 4.36 / 0.75 (5) | 4.49 / 0.76 (6) | 4.52 / 0.76 (5) | — | 1.00 / 0.99 (ref 3→4) | 58 |
+| 0 | 0.2 | 0.5 | 4.05 / 1.05 (5) | 4.07 / 1.25 (6) | 4.03 / 1.29 (6) | — | — | 1.01 / 0.97 (ref 2→3) | 24 |
+| 0 | 0.2 | 1 | 4.58 / 0.63 (5) | 4.64 / 0.69 (5) | 4.67 / 0.71 (5) | — | — | 0.99 / 0.98 (ref 2→3) | 37 |
+| 0.01 | 0.01 | 1 | 3.38 / 1.37 (7) | — | — | — | — | — | 74 |
+| 0.01 | 0.05 | 0.5 | 3.81 / 1.13 (6) | 3.11 / 1.47 (8) | 3.02 / 1.52 (10) | — | — | 1.03 / 0.96 (ref 2→3) | 65 |
+| 0.01 | 0.05 | 1 | 3.86 / 0.94 (5) | 3.46 / 1.13 (6) | 3.60 / 1.14 (7) | — | — | 0.96 / 0.99 (ref 2→3) | 66 |
+| 0.01 | 0.1 | 1 | — | 4.28 / 0.77 (5) | 4.28 / 0.78 (5) | — | — | 1.00 / 0.99 (ref 2→3) | 59 |
+| 0.05 | 0.1 | 1 | — | 4.18 / 0.23 (4) | 4.18 / 0.23 (4) | — | — | 1.00 / 0.98 (ref 2→3) | 70 |
 
 **Window and background dependence** (`drivers/window_check.py`, `results/window_check.json`).
 - The window does not cap W. Widening it from ±6 km to the whole 20 km cut changes W
@@ -51,8 +55,9 @@ at refs 1-4.
   3–4% at l = 1 km.
 - With the background taken outside a ±9 km window, W = 3.63, 4.62, 5.42 km at
   l = 0.5, 1, 2 km (ref 3), against 3.40, 4.26, 4.49 km in the table: +7%, +8%, +19%.
-- The ref 3 → 4 ratios are unchanged under every variant (3.63 / 3.63, 4.62 / 4.64,
-  5.42 / 5.44 km), so mesh independence stands.
+- Mesh independence holds under every variant. With the outside background, W at
+  refs 3, 4, 5 is 3.63, 3.63, 3.64 km at l = 0.5 km and 4.62, 4.64, 4.64 km at
+  l = 1 km. At l = 2 km, refs 3 and 4 give 5.42 and 5.44 km.
 
 What sets the band:
 - **l sets the width.** At ref 3, β = 0.1, ξ = 0: W = 2.45, 3.40, 4.26, 4.49 km at

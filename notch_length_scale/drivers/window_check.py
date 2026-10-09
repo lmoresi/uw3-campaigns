@@ -2,7 +2,7 @@
 W for windows of +-6, 9, 12 km and the background from the whole cut or from outside
 the window, plus each cut's profile at its ends relative to the peak (a tail still
 raised there is outside what any window on this cut can see). Collective (global
-evaluate), so serial or mpirun. Writes ../results/window_check.json."""
+evaluate), so serial or mpirun. Writes ../results/<uw_out>."""
 import json
 import os
 import sys
@@ -16,9 +16,17 @@ import coupled_notch as cn   # noqa: E402
 
 RES = os.path.join(_here, "..", "results")
 CHECKPOINTS = os.path.join(RES, "micromorphic", "checkpoints")
+params = uw.Params(
+    uw_refs=uw.Param("3,4", description="refinements to check, comma-separated"),
+    uw_out=uw.Param("window_check.json", description="output file in results/"),
+)
 RUNS = [(3, "micro_ref3_xi0_beta0.1_l1"), (4, "micro_ref4_xi0_beta0.1_l1_production_tight"),
         (3, "micro_ref3_xi0_beta0.1_l2"), (4, "micro_ref4_xi0_beta0.1_l2_production_tight"),
-        (3, "micro_ref3_xi0_beta0.1_l0.5"), (4, "micro_ref4_xi0_beta0.1_l0.5_production_tight")]
+        (3, "micro_ref3_xi0_beta0.1_l0.5"), (4, "micro_ref4_xi0_beta0.1_l0.5_production_tight"),
+        (5, "micro_ref5_xi0_beta0.1_l1_production_tight_np16"),
+        (5, "micro_ref5_xi0_beta0.1_l0.5_production_tight_np16")]
+REFS = {int(r) for r in str(params.uw_refs).split(",")}
+RUNS = [run for run in RUNS if run[0] in REFS]
 rows = []
 for ref, name in RUNS:
     S = cn.build_notch(ref, 0.0, seed=False)
@@ -43,4 +51,4 @@ for ref, name in RUNS:
     uw.pprint(name, {k: round(v, 3) for k, v in row["W"].items()})
     del S
 with uw.selective_ranks(0):
-    json.dump(rows, open(os.path.join(RES, "window_check.json"), "w"), indent=1)
+    json.dump(rows, open(os.path.join(RES, str(params.uw_out)), "w"), indent=1)
