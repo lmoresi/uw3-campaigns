@@ -179,6 +179,17 @@ DIP_DEG = 37.5      # the limbs' measured dip; perpendicular width = cut width *
 WINDOW_KM = 6.0
 
 
+def canonical_run(ref, l_km, beta=0.1, xi=0):
+    """The checkpoint name of the run that stands for (ref, l) in the tables: exact
+    Newton at refs 1-3, tight FMG grid-sequenced at ref 4 (inexact Newton at
+    l = 0.25 km), tight FMG at np 16 at ref 5. None if there is no such run."""
+    base = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}"
+    suffix = {1: "", 2: "", 3: "", 4: "_production_tight", 5: "_production_tight_np16"}[ref]
+    if ref == 4 and l_km == 0.25:
+        suffix = "_production_np2"
+    return base + suffix
+
+
 def integral_width(S, window_km=WINDOW_KM, background="cut"):
     """The band width with no support cut-off: on each vertical cut, the area of
     edot_II above the far-field background within +-``window_km`` of the peak, over the
@@ -193,7 +204,7 @@ def integral_width(S, window_km=WINDOW_KM, background="cut"):
     widens toward the surface."""
     y = np.linspace(-0.68, -0.02, 4001)
     y_km = y * H_KM
-    widths = []
+    widths, peaks = [], []
     for xs in STATIONS:
         coords = np.column_stack([np.full_like(y, xs), y])
         f = np.asarray(uw.function.global_evaluate(S["stokes"].Unknowns.Einv2, coords)).ravel()
@@ -202,8 +213,10 @@ def integral_width(S, window_km=WINDOW_KM, background="cut"):
         outside = f[~window] if (background == "outside" and (~window).sum() > 20) else f
         g = f - np.median(outside)
         widths.append(np.trapezoid(np.clip(g[window], 0, None), y_km[window]) / g[i])
+        peaks.append(g[i] / (f[i] - g[i]))           # (max - background) / background
     widths = np.asarray(widths) * np.cos(np.deg2rad(DIP_DEG))
-    return dict(median=float(np.median(widths)), spread=float(widths.max() - widths.min()))
+    return dict(median=float(np.median(widths)), spread=float(widths.max() - widths.min()),
+                peak_over_background=float(np.median(peaks)))
 
 
 def floor_bound_over_floor(S, chi, beta):

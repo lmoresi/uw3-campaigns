@@ -47,6 +47,39 @@ tight linear solve stagnates near 3e-8 relative, with more than 100 Krylov itera
 | 0.01 | 0.1 | 1 | — | 4.28 / 0.77 (5) | 4.28 / 0.78 (5) | — | — | 1.00 / 0.99 (ref 2→3) | 59 |
 | 0.05 | 0.1 | 1 | — | 4.18 / 0.23 (4) | 4.18 / 0.23 (4) | — | — | 1.00 / 0.98 (ref 2→3) | 70 |
 
+**Figures for refs 1-5** (from checkpoints, no re-solve; β = 0.1, ξ = 0):
+
+- **Strain-rate maps**, refs 3 / 4 / 5, l = 1 and 0.5 km, one log colour scale:
+  [`refinement_maps.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_maps.png).
+- **Mesh zoom**: a 4 km window on the left band at x = −15 km, with the mesh drawn and
+  the cells across the band counted:
+  [`refinement_zoom.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_zoom.png).
+- **Profiles across the left band**, x = −15 km, refs 1-5 overlaid, over the outside
+  background: [`refinement_profiles.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_profiles.png).
+  Ref 1 is under-resolved; refs 2-5 lie on one curve.
+- **W and peak against h**, every l, with the current estimator (integral width,
+  background = median outside ±9 km): [`width_peak_vs_h.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/width_peak_vs_h.png).
+  Numbers are in `results/current_widths.json` (`drivers/measure_current.py`). W at
+  refs 3 / 4 / 5 is 2.66 / 2.67 / — km at l = 0.25, 3.63 / 3.63 / 3.64 at l = 0.5,
+  4.62 / 4.64 / 4.64 at l = 1, and 5.42 / 5.44 / — at l = 2. At l = 2 km the peak by
+  this background is noisy (0.94, 0.88, 0.95 at refs 2-4): only a few km of the cut
+  lie outside the window. The whole-cut background gives 0.75, 0.76, 0.76.
+
+![Strain-rate maps, refs 3-5](figures/refinement_maps.png)
+
+![The left band with the mesh, refs 3-5](figures/refinement_zoom.png)
+
+In the zoom, the band at x = −15 km is crossed by elements of 530, 265 and 132 m at
+refs 3, 4 and 5: 9, 18 and 35 cells across W at l = 1 km, and 7, 14 and 27 at
+l = 0.5 km. h_min (43, 21, 11 m) is reached only at the notch tip. In the maps, a few
+vertices at the weak inclusion's corners evaluate to ε̇_II ≤ 0 on the rebuilt model
+(40 at ref 3, 2 at ref 4, none at ref 5). They are drawn grey and kept out of the colour range.
+The width cuts at |x| = 12-21 km never touch them.
+
+![Profiles across the left band, refs 1-5](figures/refinement_profiles.png)
+
+![W and peak against h, refs 1-5](figures/width_peak_vs_h.png)
+
 **Window and background dependence** (`drivers/window_check.py`, `results/window_check.json`).
 - The window does not cap W. Widening it from ±6 km to the whole 20 km cut changes W
   by at most 1% (4.49 → 4.54 km at l = 2 km).
@@ -387,6 +420,11 @@ l ∈ {0.25, 0.5, 1, 2} km at β = H/η_bg = 0.1, and β ∈ {0.05, 0.1, 0.2} at
 0.5 km, refs 1-3 with exact LU (ref 4 on tight FMG is running). Every row below converged.
 
 ![Profiles across a band, peak and width against h](figures/band_profiles.png)
+
+*Superseded (2026-10-10):* panel (d) of this figure uses the old 10%-cut-off width
+(W ≈ 3.2 km with large bars), which no longer matches the tables. Use
+[`width_peak_vs_h.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/width_peak_vs_h.png) and
+[`refinement_profiles.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/refinement_profiles.png) (refs 1-5, current estimator).
 
 ![The bands against l and h](figures/shear_bands_l_sweep.png)
 
