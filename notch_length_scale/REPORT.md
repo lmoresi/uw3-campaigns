@@ -32,7 +32,7 @@ at refs 1-4.
 | 0 | 0.05 | 0.5 | 3.57 / 1.75 (8) | — | — | — | — | 63 |
 | 0 | 0.05 | 1 | 3.91 / 1.40 (7) | 3.26 / 1.80 (12) | — | — | 1.20 / 0.78 (ref 1→2) | 64 |
 | 0 | 0.1 | 0.25 | 3.55 / 1.77 (8) | 2.59 / 2.66 (10) | 2.45 / 2.72 (12) | — | 1.06 / 0.98 (ref 2→3) | 44 |
-| 0 | 0.1 | 0.5 | 3.82 / 1.39 (6) | 3.45 / 1.74 (8) | 3.40 / 1.80 (9) | — | 1.02 / 0.97 (ref 2→3) | 50 |
+| 0 | 0.1 | 0.5 | 3.82 / 1.39 (6) | 3.45 / 1.74 (8) | 3.40 / 1.80 (9) | 3.39 / 1.82 (5) | 1.00 / 1.01 (ref 3→4) | 50 |
 | 0 | 0.1 | 1 | 4.28 / 0.97 (5) | 4.27 / 1.13 (6) | 4.26 / 1.17 (6) | 4.26 / 1.18 (5) | 1.00 / 0.99 (ref 3→4) | 55 |
 | 0 | 0.1 | 2 | 4.10 / 0.72 (5) | 4.36 / 0.75 (5) | 4.49 / 0.76 (6) | 4.52 / 0.76 (5) | 1.00 / 0.99 (ref 3→4) | 58 |
 | 0 | 0.2 | 0.5 | 4.05 / 1.05 (5) | 4.07 / 1.25 (6) | 4.03 / 1.29 (6) | — | 1.01 / 0.97 (ref 2→3) | 24 |
@@ -52,8 +52,44 @@ What sets the band:
 - **ξ sets the intensity, not the width.** At β = 0.1, l = 1 km, ξ = 0, 0.01, 0.05 give
   W = 4.26, 4.28, 4.18 km but peaks of 1.17, 0.78, 0.23: rate strengthening flattens
   the contrast across a band whose width l has already fixed.
-- **ξ and β add below threshold.** β = 0.05 with ξ = 0.01 converges at ref 3, where
-  β = 0.05 alone does not: the short-wave modulus is (β + 2ξ) η_bg.
+- **ξ and β add below threshold, but ξ counts for more.** β = 0.05 with ξ = 0.01
+  converges at ref 3, where β = 0.05 alone does not. The β–ξ map below shows that
+  (β + 2ξ) is not the controlling combination: ξ also stiffens the long wavelengths,
+  where the micromorphic coupling vanishes.
+
+### Which parameters are needed: the β–ξ map at ref 3 (2026-10-09)
+
+32 runs, β ∈ {0.06, 0.07, 0.08, 0.1} × ξ ∈ {0, 0.005, 0.01, 0.02} × l ∈ {1, 0.5} km,
+exact Newton (LU linear solves), ref 3. Figure:
+[`figures/beta_xi_map.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/beta_xi_map.png);
+numbers in `results/beta_xi_map.json` (`drivers/plot_beta_xi_map.py`).
+
+- **ξ is not needed for convergence.** With ξ = 0, every β ≥ 0.06 converges at
+  l = 1 km and every β ≥ 0.08 at l = 0.5 km. The threshold in β rises as l falls:
+  0.05–0.06 at l = 1 km, 0.07–0.08 at l = 0.5 km. A smaller band needs a stiffer
+  micro-continuum.
+- **A little ξ removes the threshold.** ξ = 0.005 makes every β ≥ 0.06 converge at
+  l = 0.5 km. ξ = 0.02 gives 5 Newton steps in every cell.
+- **ξ buys more convergence than its share of β + 2ξ.** At l = 0.5 km, β = 0.06,
+  ξ = 0.005 (β + 2ξ = 0.07) converges in 12 steps, while β = 0.07, ξ = 0 diverges.
+- **Near threshold, Newton steps fall fast with ξ.** At β = 0.06, l = 1 km:
+  13, 8, 6, 5 steps for ξ = 0, 0.005, 0.01, 0.02.
+- **Width: l first, then β, then ξ.**
+  - At l = 1 km, β = 0.1, ξ = 0 → 0.02 changes W by 1% (4.26 → 4.31 km).
+  - At β = 0.06, ξ widens the band more: +11% at l = 1 km (3.61 → 4.00 km) and +16% at
+    l = 0.5 km (3.02 → 3.50 km).
+  - β = 0.06 → 0.1 widens it by 18% at l = 1 km.
+- **ξ lowers the peak.** ξ = 0 → 0.02 lowers the peak over background by a factor of
+  2–3 in every row, for example 1.61 → 0.68 at β = 0.06, l = 1 km.
+- **Strength shift.** The largest H χ is at most 1.01 C, and the floor bound is
+  ≥ 47 s_min. The microstructure never drives the yield stress to the floor.
+
+So the cheapest regularisation that leaves the band intensity alone is ξ = 0 with β
+just above threshold for the chosen l. Adding ξ ≈ 0.005–0.01 halves the Newton steps
+near threshold and changes W by under 10%, but it already lowers the peak by
+20–40%. Caveat: ref 3 only. Near threshold the width still moved between refs
+(β = 0.05, l = 1 km: 3.91 → 3.26 km at refs 1 → 2), so the low-β cells need a ref-4
+check before W is quoted from them.
 
 **Cosserat, same integral width:**
 - c = 1, l = 1 km: W = 4.89, 4.91, 4.93 km at refs 1-3; peak 0.27, 0.29, 0.30.
