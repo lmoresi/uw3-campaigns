@@ -13,6 +13,54 @@ machine (load average ~48).
 | 2. Micromorphic coupling on the notch | done for the first matrix: ref 3 converges with NO rate strengthening (ξ = 0) at β = 0.1, l = 1 km, in 6 exact Newton steps; W stops shrinking with h |
 | 3. 2-D Cosserat | done for the first matrix: converges at ref 3 with ξ = 0 in 4-5 steps; W converged in h (3.5 km at l = 0.5, ~4.1 km at l = 1) |
 
+## Read this first (2026-10-09, refs 1-4)
+
+**Micromorphic: the band width is mesh-independent at refinement 4.**
+- W is the integral width: the area of ε̇_II above background within ±6 km of the
+  peak, over the peak height, perpendicular to a 37.5° dip, as the median of 8
+  vertical cuts.
+- At β = 0.1, ξ = 0, refinement 3 → 4 changes W by under 1%: 4.26 → 4.26 km at
+  l = 1 km, 4.49 → 4.52 km at l = 2 km. The peak changes by 1%. Newton takes 5 steps
+  at ref 4 (tight FMG, grid-sequenced).
+- The residual-strength floor never engages: the bound is ≥ 24× the floor in every run.
+
+Cells are **W (km) / peak over background (Newton steps)**; h_min = 172, 86, 43, 21 m
+at refs 1-4.
+
+| ξ | β | l (km) | ref 1 | ref 2 | ref 3 | ref 4 | last ratio W / peak | floor bound / s_min |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 0.05 | 0.5 | 3.57 / 1.75 (8) | — | — | — | — | 63 |
+| 0 | 0.05 | 1 | 3.91 / 1.40 (7) | 3.26 / 1.80 (12) | — | — | 1.20 / 0.78 (ref 1→2) | 64 |
+| 0 | 0.1 | 0.25 | 3.55 / 1.77 (8) | 2.59 / 2.66 (10) | 2.45 / 2.72 (12) | — | 1.06 / 0.98 (ref 2→3) | 44 |
+| 0 | 0.1 | 0.5 | 3.82 / 1.39 (6) | 3.45 / 1.74 (8) | 3.40 / 1.80 (9) | — | 1.02 / 0.97 (ref 2→3) | 50 |
+| 0 | 0.1 | 1 | 4.28 / 0.97 (5) | 4.27 / 1.13 (6) | 4.26 / 1.17 (6) | 4.26 / 1.18 (5) | 1.00 / 0.99 (ref 3→4) | 55 |
+| 0 | 0.1 | 2 | 4.10 / 0.72 (5) | 4.36 / 0.75 (5) | 4.49 / 0.76 (6) | 4.52 / 0.76 (5) | 1.00 / 0.99 (ref 3→4) | 58 |
+| 0 | 0.2 | 0.5 | 4.05 / 1.05 (5) | 4.07 / 1.25 (6) | 4.03 / 1.29 (6) | — | 1.01 / 0.97 (ref 2→3) | 24 |
+| 0 | 0.2 | 1 | 4.58 / 0.63 (5) | 4.64 / 0.69 (5) | 4.67 / 0.71 (5) | — | 0.99 / 0.98 (ref 2→3) | 37 |
+| 0.01 | 0.01 | 1 | 3.38 / 1.37 (7) | — | — | — | — | 74 |
+| 0.01 | 0.05 | 0.5 | 3.81 / 1.13 (6) | 3.11 / 1.47 (8) | 3.02 / 1.52 (10) | — | 1.03 / 0.96 (ref 2→3) | 65 |
+| 0.01 | 0.05 | 1 | 3.86 / 0.94 (5) | 3.46 / 1.13 (6) | 3.60 / 1.14 (7) | — | 0.96 / 0.99 (ref 2→3) | 66 |
+| 0.01 | 0.1 | 1 | — | 4.28 / 0.77 (5) | 4.28 / 0.78 (5) | — | 1.00 / 0.99 (ref 2→3) | 59 |
+| 0.05 | 0.1 | 1 | — | 4.18 / 0.23 (4) | 4.18 / 0.23 (4) | — | 1.00 / 0.98 (ref 2→3) | 70 |
+
+What sets the band:
+- **l sets the width.** At ref 3, β = 0.1, ξ = 0: W = 2.45, 3.40, 4.26, 4.49 km at
+  l = 0.25, 0.5, 1, 2 km. W rises steeply up to l ≈ 1 km, then nearly saturates: at
+  large l the notch geometry caps the band.
+- **β widens it a little.** At l = 1 km, W = 4.26 → 4.67 km for β = 0.1 → 0.2. β must
+  exceed a threshold to regularise at all: β = 0.05 fails at ref 3 with ξ = 0.
+- **ξ sets the intensity, not the width.** At β = 0.1, l = 1 km, ξ = 0, 0.01, 0.05 give
+  W = 4.26, 4.28, 4.18 km but peaks of 1.17, 0.78, 0.23: rate strengthening flattens
+  the contrast across a band whose width l has already fixed.
+- **ξ and β add below threshold.** β = 0.05 with ξ = 0.01 converges at ref 3, where
+  β = 0.05 alone does not: the short-wave modulus is (β + 2ξ) η_bg.
+
+The older widths in this report (horizontal cuts, then the 10%-support vertical
+"equivalent width") jitter by ±0.5 km on these tailed profiles and are superseded by
+the integral width. The parallel path agrees with serial at np = 2 (same Newton count,
+widths to 9 digits). The np = 4 check at ref 3 is queued, and ref 5 (np ≤ 16) waits for
+the machine.
+
 ## Summary (end of the overnight run)
 
 1. **Plumbing works and is guarded.** `add_coupled_field` / `add_coupled_dirichlet_bc`

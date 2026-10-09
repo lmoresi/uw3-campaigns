@@ -93,7 +93,7 @@ record = dict(
     nprocs=uw.mpi.size, seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
-    relative_peak=measured["relative_peak"],
+    W_integral_km=measured["W_integral_km"], relative_peak=measured["relative_peak"],
     bands_horizontal=measured["bands_horizontal"], bands_vertical=measured["bands_vertical"],
     floor_bound_over_floor=cn.floor_bound_over_floor(S, chi, beta),
     chi_max=float(np.asarray(chi.max())),
@@ -101,6 +101,6 @@ record = dict(
 )
 uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km np {uw.mpi.size}: "
           f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  "
-          f"W_h {record['W_horizontal_km']}  W_v {record['W_vertical_km']}  "
+          f"W_int {record['W_integral_km']['median']:.2f}  W_v {record['W_vertical_km']}  "
           f"peak {record['relative_peak']}  floor bound {record['floor_bound_over_floor']:.1f}")
 cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], chi=chi), mesh)

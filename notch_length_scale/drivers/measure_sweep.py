@@ -60,7 +60,7 @@ for name in names:
         h_min_km=float(S["mesh"].get_min_radius()) * cn.H_KM,
         nl_its=record.get("nl_its"), linear=record.get("linear", "exact"),
         W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
-        relative_peak=measured["relative_peak"],
+        W_integral_km=measured["W_integral_km"], relative_peak=measured["relative_peak"],
         dip_vertical_deg={s: (None if b is None else b["dip_deg"])
                           for s, b in measured["bands_vertical"].items()},
         floor_bound_over_floor=cn.floor_bound_over_floor(S, chi, beta),

@@ -167,7 +167,34 @@ def measure(S, out_dir, name):
         peaks[side] = float(np.mean(ratios))
     width = lambda bands: {k: (None if v is None else v["W_equiv_km"]) for k, v in bands.items()}
     return dict(W_horizontal_km=width(horizontal), W_vertical_km=width(vertical),
-                relative_peak=peaks, bands_horizontal=horizontal, bands_vertical=vertical)
+                W_integral_km=integral_width(S), relative_peak=peaks,
+                bands_horizontal=horizontal, bands_vertical=vertical)
+
+
+DIP_DEG = 37.5      # the limbs' measured dip; perpendicular width = cut width * cos(dip)
+WINDOW_KM = 6.0
+
+
+def integral_width(S):
+    """The band width with no support cut-off: on each vertical cut, the area of
+    edot_II above the far-field background within +-WINDOW_KM of the peak, over the
+    peak height, times cos(dip) for the band-normal width; the median over the cuts.
+    The equivalent width stops its support at 10% of the peak, and on these profiles
+    (a long tail on the upper side) that cut-off moves by +-0.5 km between limbs and
+    refinements; this measure does not. The spread between cuts is real: the limb
+    widens toward the surface."""
+    y = np.linspace(-0.68, -0.02, 4001)
+    y_km = y * H_KM
+    widths = []
+    for xs in STATIONS:
+        coords = np.column_stack([np.full_like(y, xs), y])
+        f = np.asarray(uw.function.global_evaluate(S["stokes"].Unknowns.Einv2, coords)).ravel()
+        g = f - np.median(f)
+        i = int(np.argmax(g))
+        window = np.abs(y_km - y_km[i]) < WINDOW_KM
+        widths.append(np.trapezoid(np.clip(g[window], 0, None), y_km[window]) / g[i])
+    widths = np.asarray(widths) * np.cos(np.deg2rad(DIP_DEG))
+    return dict(median=float(np.median(widths)), spread=float(widths.max() - widths.min()))
 
 
 def floor_bound_over_floor(S, chi, beta):
