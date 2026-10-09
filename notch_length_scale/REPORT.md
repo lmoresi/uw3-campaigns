@@ -55,6 +55,16 @@ What sets the band:
 - **ξ and β add below threshold.** β = 0.05 with ξ = 0.01 converges at ref 3, where
   β = 0.05 alone does not: the short-wave modulus is (β + 2ξ) η_bg.
 
+**Cosserat, same integral width:**
+- c = 1, l = 1 km: W = 4.89, 4.91, 4.93 km at refs 1-3; peak 0.27, 0.29, 0.30.
+- c = 1, l = 0.5 km: W = 4.42, 4.45 km at refs 2-3.
+
+So the Cosserat width is mesh-independent too. At the same l it is only about 15%
+wider than the micromorphic band, but about 4× weaker in peak: diffuse zones rather than
+sharp bands. W is insensitive to c (0.5 or 1), to the degree of ω, and to ξ, which again
+lowers only the peak. The "Cosserat about twice as wide" stated further down came from
+the horizontal-cut estimator and is withdrawn.
+
 The older widths in this report (horizontal cuts, then the 10%-support vertical
 "equivalent width") jitter by ±0.5 km on these tailed profiles and are superseded by
 the integral width. The parallel path agrees with serial at np = 2 (same Newton count,
