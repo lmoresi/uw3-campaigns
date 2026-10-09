@@ -3,8 +3,8 @@
 Every job, serial ones included, runs as ``mpirun -n <np> python -u <driver> <args>``
 under underworld3's ``scripts/mpi_supervisor.py``: one code path for serial and
 parallel, and a hung collective is diagnosed (every rank's stack, the odd rank named)
-and killed instead of holding cores. Jobs start in file order whenever the running
-total of ranks plus the job's own stays within the cap.
+and killed instead of holding cores. Jobs start in file order, first fit: whenever a
+queued job's ranks fit under the cap with those running, the first such job starts.
 
 The jobs file holds one JSON object per line::
 
@@ -121,8 +121,14 @@ def run():
                 record(name, state, rc=rc)
                 del running[name]
         in_use = sum(job["np"] for _, job, _ in running.values())
-        while queue and in_use + queue[0]["np"] <= current_cap():
-            job = queue.pop(0)
+        # first fit: the first queued job that fits starts, so a wide job waiting for
+        # ranks does not leave narrow ones idle behind it
+        while True:
+            fits = [j for j in queue if in_use + j["np"] <= current_cap()]
+            if not fits:
+                break
+            job = fits[0]
+            queue.remove(job)
             command = [sys.executable, supervisor, "--silence", str(job.get("silence", 3600)),
                        "--", "mpirun", "-n", str(job["np"]), sys.executable, "-u",
                        job["driver"], *shlex.split(job.get("args", ""))]
