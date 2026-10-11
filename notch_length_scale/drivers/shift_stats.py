@@ -62,15 +62,21 @@ for name in names:
     shift = beta * STRESS_OVER_C * (e - chi_nd)
     floor = beta * STRESS_OVER_C * chi_nd
     scratch = uw.discretisation.MeshVariable("shift_scratch", S["mesh"], 1, degree=1)
+    # the band region: the stretch of the limbs the width cuts sample (9 <= |x| <= 24
+    # km), away from the notch tip, where e (and so s) is largest but not band-like
+    band = keep & (np.abs(nodes[:, 0]) * cn.H_KM >= 9.0) & (np.abs(nodes[:, 0]) * cn.H_KM <= 24.0)
     out = {}
-    for key, values in (("s", shift), ("Hchi", floor)):
-        scratch.array[:, 0, 0] = np.where(keep, values, -np.inf)
+    for key, values, where in (("s", shift, keep), ("Hchi", floor, keep), ("s_band", shift, band)):
+        scratch.array[:, 0, 0] = np.where(where, values, -np.inf)
         out[key + "_max"] = float(scratch.max())
-        scratch.array[:, 0, 0] = np.where(keep, values, np.inf)
+        scratch.array[:, 0, 0] = np.where(where, values, np.inf)
         out[key + "_min"] = float(scratch.min())
     rows.append(dict(run=name, ref=ref, beta=beta, l_km=l_km, max_s_over_C=out["s_max"],
-                     min_s_over_C=out["s_min"], floor_bound_max_Hchi_over_C=out["Hchi_max"]))
+                     min_s_over_C=out["s_min"], band_max_s_over_C=out["s_band_max"],
+                     band_min_s_over_C=out["s_band_min"],
+                     floor_bound_max_Hchi_over_C=out["Hchi_max"]))
     uw.pprint(f"{name}: s/C max {out['s_max']:.3f} min {out['s_min']:.3f}  "
+              f"band max {out['s_band_max']:.3f} min {out['s_band_min']:.3f}  "
               f"max H chi/C {out['Hchi_max']:.3f}")
     del S
 

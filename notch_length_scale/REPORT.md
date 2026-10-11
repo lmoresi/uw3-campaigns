@@ -293,6 +293,57 @@ W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
     4.16 km for c = 1, 0.1, 0.03.
 - **Newton steps (exact LU):** 4-8 wherever c ≥ 0.1, and 11-12 at c = 0.03.
 
+### The yield-stress shift the micromorphic law applies (ref 3, 2026-10-12)
+
+The shift is s = m H (e − χ). It is positive at the band centre (strengthening) and
+negative on the flanks. It is computed from the saved u and χ, with e L2-projected onto
+χ's P1 space, over the strong layer (`drivers/shift_stats.py`,
+`results/shift_stats_ref3.json`).
+- **Band:** 9 ≤ |x| ≤ 24 km, the stretch of the limbs that the width cuts sample.
+- **Global:** the whole strong layer. Its maximum sits at the notch tip, where e peaks.
+- **Floor bound:** max H χ / C, a different quantity. It bounds how far s can lower σ_y
+  (s ≥ −H χ), and is kept for the floor check.
+
+| β | l (km) | band max s/C | band min s/C | global max s/C (notch tip) | floor bound max Hχ/C |
+|---|---|---|---|---|---|
+| 0.05 | 0.5 | 0.19 | -0.11 | 2.08 | 0.51 |
+| 0.05 | 1 | 0.18 | -0.09 | 2.19 | 0.36 |
+| 0.06 | 0.5 | 0.29 | -0.11 | 2.04 | 0.46 |
+| 0.06 | 1 | 0.21 | -0.11 | 2.47 | 0.45 |
+| 0.07 | 0.5 | 0.27 | -0.14 | 2.19 | 0.66 |
+| 0.07 | 1 | 0.25 | -0.11 | 2.72 | 0.51 |
+| 0.08 | 0.5 | 0.28 | -0.12 | 2.99 | 0.85 |
+| 0.08 | 1 | 0.29 | -0.11 | 2.95 | 0.57 |
+| 0.1 | 0.25 | 0.36 | -0.10 | 3.57 | 1.56 |
+| 0.1 | 0.5 | 0.36 | -0.12 | 3.49 | 1.01 |
+| 0.1 | 1 | 0.37 | -0.11 | 3.40 | 0.68 |
+| 0.1 | 2 | 0.38 | -0.07 | 3.35 | 0.48 |
+| 0.2 | 0.125 | 0.74 | -0.15 | 6.54 | 3.99 |
+| 0.2 | 0.25 | 0.72 | -0.11 | 6.04 | 2.68 |
+| 0.2 | 0.5 | 0.74 | -0.13 | 5.70 | 1.74 |
+| 0.2 | 1 | 0.76 | -0.12 | 5.50 | 1.22 |
+| 0.3 | 0.125 | 1.11 | -0.23 | 8.86 | 5.52 |
+| 0.3 | 0.138 | 1.11 | -0.22 | 8.72 | 5.23 |
+| 0.3 | 0.25 | 1.10 | -0.14 | 8.21 | 3.64 |
+| 0.3 | 0.272 | 1.10 | -0.13 | 8.14 | 3.46 |
+| 0.3 | 0.5 | 1.13 | -0.14 | 7.70 | 2.39 |
+| 1 | 0.125 | 3.84 | -0.79 | 25.05 | 13.73 |
+| 1 | 0.148 | 3.86 | -0.74 | 24.80 | 12.39 |
+| 1 | 0.25 | 3.92 | -0.51 | 23.75 | 8.90 |
+| 1 | 0.5 | 4.08 | -0.16 | 21.74 | 6.28 |
+
+- **In the band the strengthening grows linearly with β and hardly depends on l:**
+  max s ≈ 3.7 β C. That is 0.37 C at β = 0.1, 0.75 C at β = 0.2, 1.1 C at β = 0.3 and
+  3.9 C at β = 1.
+- **Weakening on the band's flanks is small:** −0.1 to −0.2 C for β ≤ 0.3.
+- **This is the number for the choice of β.** β 0.2-0.3 cuts the Newton steps at
+  l = 0.5 km from 9 to 6, at the price of raising the band's yield stress by 0.75-1.1 C
+  instead of 0.37 C.
+- (An earlier version of this point used max H χ, which is the floor bound and not the
+  shift. A point evaluate of `Unknowns.Einv2` cannot be used here: on a model with
+  another unit-ful variable it returns e rescaled to the borrowed units, underworld3
+  #843. The widths and peaks are ratios and unaffected.)
+
 ### Matched-width comparison: micromorphic against Cosserat
 
 Cosserat (l, c) settings chosen from the map to give the micromorphic (β = 0.1) widths
