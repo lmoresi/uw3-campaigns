@@ -98,3 +98,58 @@ for r in rows:
     W = f"{r['W_km']:.2f}" if r["W_km"] and r["converged"] else "—"
     pk = f"{r['peak']:.2f}" if r["peak"] and r["converged"] else "—"
     print(f"| {r['pair']} | {model} | {r['ref']} ({r['np']}) | {r['nl_its']} | {kry} | {t} | {W} | {pk} | {r['reason']} |")
+
+
+# Cold starts (no viscous seed): the automatic Picard warm-up arms. The solve report
+# folds it into nl_its and records its steps as config.tangent.picard_warmup_its,
+# which the transcript keeps; reported as "warm-up + Newton".
+def cold_record(model, l_km, c, ref):
+    if model == "micromorphic":
+        base = f"results/micromorphic/micro_ref{ref}_xi0_beta0.1_l{l_km:g}_production_tight_np4_cold"
+        trans = base.replace("micromorphic/", "micromorphic/transcripts/") + ".jsonl"
+    else:
+        base = f"results/cosserat/cosserat_ref{ref}_xi0_c{c:g}_l{l_km:g}_P1_production_tight_np4_cold"
+        trans = base.replace("cosserat/", "cosserat/transcripts/") + ".jsonl"
+    path = os.path.join(NLS, base + ".json")
+    if not os.path.exists(path):
+        return None
+    r = json.load(open(path))
+    warm = 0
+    tp = os.path.join(NLS, trans)
+    if os.path.exists(tp):
+        found = re.findall(r'"picard_warmup_its": (\d+)', open(tp).read())
+        warm = int(found[-1]) if found else 0
+    return r, warm
+
+
+cold = []
+for pair, model, l_km, c in PAIRS:
+    for ref in (1, 2, 3):
+        got = cold_record(model, l_km, c, ref)
+        log = f"jobs/logs/cold_{'micro' if model == 'micromorphic' else 'coss'}_l{l_km:g}" + \
+              ("" if model == "micromorphic" else f"_c{c:g}") + f"_ref{ref}.log"
+        k = parse(log)
+        if got is None:
+            if k and k["killed"]:
+                cold.append(dict(pair=pair, model=model, l_km=l_km, c=c, ref=ref, killed=True))
+            continue
+        r, warm = got
+        its = [n for _, n in (k["solves"] if k else [])]
+        cold.append(dict(pair=pair, model=model, l_km=l_km, c=c, ref=ref, killed=False,
+                         warmup=warm, newton=r["nl_its"] - warm, reason=r["reason"],
+                         converged=r["converged"], median=float(np.median(its)) if its else None,
+                         max=max(its) if its else None, seconds=r["seconds"],
+                         W_km=r.get("W_outside9_km")))
+json.dump(cold, open(os.path.join(NLS, "results", "eff_table_cold.json"), "w"), indent=1)
+print()
+print("| pair | model | ref | warm-up + Newton | Krylov / step median / max | s | outcome |")
+print("|---|---|---|---|---|---|---|")
+for r in cold:
+    model = (f"micromorphic l = {r['l_km']:g}" if r["model"] == "micromorphic"
+             else f"Cosserat l = {r['l_km']:g}, c = {r['c']:g}")
+    if r["killed"]:
+        print(f"| {r['pair']} | {model} | {r['ref']} | — | — | — | killed (no output for 1 h) |")
+        continue
+    kry = f"{r['median']:.0f} / {r['max']}" if r["median"] else "—"
+    print(f"| {r['pair']} | {model} | {r['ref']} | {r['warmup']} + {r['newton']} | {kry} | "
+          f"{r['seconds']:.0f} | {r['reason']} |")

@@ -112,7 +112,9 @@ record = dict(
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
     nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
     seed=bool(int(params.uw_seed)),
-    warmup_its=(stokes._picard_warmup_record or {}).get("nl_its", 0),
+    # the solve report folds a Picard warm-up into nl_its and records its steps here
+    warmup_its=int((getattr(report, "config", None) or {}).get("tangent", {})
+                   .get("picard_warmup_its", 0)),
     seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     bands=bands, W_equiv_km=W,
