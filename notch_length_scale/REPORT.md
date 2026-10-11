@@ -267,6 +267,155 @@ also overlaid (dashed) on [`width_peak_vs_h.png`](https://github.com/lmoresi/uw3
 
 ![Cosserat profiles across the left band, refs 2-5](figures/refinement_profiles_cosserat.png)
 
+### Cosserat parameter space (ref 3, 2026-10-11)
+
+W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
+(`drivers/plot_cosserat_map.py`, `results/cosserat_width_map.json`):
+
+![Cosserat width map](figures/cosserat_width_map.png)
+
+- **Cosserat has its own convergence threshold, in c = η_c/η_lin.**
+  - c = 0.01 never converges.
+  - c = 0.03 converges only at l ≥ 0.5 km.
+  - c ≥ 0.1 converges everywhere.
+  - The minimum c rises as l falls, as β's threshold does for micromorphic.
+- **W is set by l first, then by c.**
+  - At c = 1, W = 2.50, 3.77, 5.33, 6.65 km for l = 0.125, 0.25, 0.5, 1 km.
+  - Small c narrows the band, steeply near the threshold: at l = 1 km, W = 6.65, 5.88,
+    4.16 km for c = 1, 0.1, 0.03.
+- **Newton steps (exact LU):** 4-8 wherever c ≥ 0.1, and 11-12 at c = 0.03.
+
+### Matched-width comparison: micromorphic against Cosserat
+
+Cosserat (l, c) settings chosen from the map to give the micromorphic (β = 0.1) widths
+at ref 3, then confirmed by exact runs (W at ref 3):
+
+| pair | micromorphic | W | Cosserat | W | peak micro / Cosserat |
+|---|---|---|---|---|---|
+| P1 | l = 0.25 km | 2.655 | l = 0.14 km, c = 1 | 2.658 | 2.82 / 2.71 |
+| P2 | l = 0.5 km | 3.625 | l = 0.236 km, c = 1 | 3.633 | 1.85 / 1.75 |
+| P2 | | | l = 0.25 km, c = 0.1 | 3.598 | 1.85 / 1.78 |
+| P3 | l = 1 km | 4.617 | l = 0.37 km, c = 1 | 4.669 | 1.22 / 1.18 |
+| P3 | | | l = 0.5 km, c = 0.054 | 4.702 | 1.22 / 1.15 |
+
+(l = 1 km, c = 0.041 missed, at 5.15 km: W is steep in c near the threshold.)
+
+- **At matched width the bands are nearly the same.** Peaks agree within 3-6%, and the
+  profiles overlie each other: the micromorphic lower flank is slightly steeper.
+  So a Cosserat band is the micromorphic band at a shorter length (l_C ≈ 0.4-0.55
+  l_M at c = 1), not a different structure.
+  [`matched_profiles_ref3.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref3.png),
+  [`matched_profiles_ref4.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref4.png).
+- **Mesh independence of the matched Cosserat runs**, W at refs 3 → 4:
+  - 2.658 → 2.600 (P1);
+  - 3.633 → 3.622 and 3.598 → 3.607 (P2);
+  - 4.669 → 4.674 and 4.702 → 4.696 (P3).
+  - At ref 4, micromorphic l = 0.5 and 1 km give 3.632 and 4.635.
+  - P1 moves 2%, the rest under 0.3%.
+
+![Matched profiles, ref 3](figures/matched_profiles_ref3.png)
+
+**Solver efficiency on the pairs.** Tight FMG (rtol 1e-8, no Eisenstat–Walker).
+- Refs 1-3 at np 4 start from the viscous seed, so they take no Picard warm-up
+  ("0 + N"; the seed solve is not counted, and it is the same for both models).
+- Ref 4 at np 8 is grid-sequenced from the exact ref-3 run.
+- s per Newton step is wall time under a shared machine (load about 40), so it
+  compares within a row's np only roughly.
+- (`drivers/eff_table.py`, `results/eff_table.json`)
+
+| pair | model | ref (np) | Newton | Krylov / step median / max | s per Newton step | W (km) | peak | outcome |
+|---|---|---|---|---|---|---|---|---|
+| P1 | micromorphic l = 0.25 | 1 (4) | 9 | 43 / 52 | 22 | 3.69 | 1.85 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 2 (4) | 11 | 63 / 188 | 114 | 2.83 | 2.67 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 3 (None) | None | 37 / 37 | — | — | — | killed |
+| P1 | micromorphic l = 0.25 | 4 (None) | None | — | — | — | — | killed |
+| P1 | Cosserat l = 0.14, c = 1 | 1 (4) | 7 | 43 / 46 | 29 | 4.41 | 1.58 | CONVERGED_FNORM_ABS |
+| P1 | Cosserat l = 0.14, c = 1 | 2 (4) | 10 | 51 / 67 | 195 | 3.06 | 2.41 | CONVERGED_FNORM_ABS |
+| P1 | Cosserat l = 0.14, c = 1 | 3 (4) | 9 | 63 / 84 | 1068 | 2.66 | 2.71 | CONVERGED_FNORM_ABS |
+| P1 | Cosserat l = 0.14, c = 1 | 4 (8) | 4 | 57 / 61 | 1651 | 2.60 | 2.76 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 1 (4) | 8 | 39 / 43 | 21 | 4.12 | 1.44 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 2 (4) | 8 | 49 / 64 | 70 | 3.64 | 1.80 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 3 (4) | 10 | 54 / 88 | 422 | 3.63 | 1.85 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 4 (8) | 5 | 35 / 51 | 768 | 3.63 | 1.88 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 1 (4) | 6 | 38 / 41 | 25 | 4.68 | 1.32 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 2 (4) | 6 | 44 / 48 | 126 | 3.77 | 1.66 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 3 (4) | 5 | 45 / 48 | 473 | 3.63 | 1.75 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 4 (8) | 3 | 38 / 41 | 781 | 3.62 | 1.77 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.25, c = 0.1 | 1 (4) | 6 | 39 / 42 | 43 | 4.35 | 1.40 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.25, c = 0.1 | 2 (4) | 7 | 44 / 53 | 83 | 3.72 | 1.67 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.25, c = 0.1 | 3 (4) | 8 | 46 / 54 | 326 | 3.60 | 1.78 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.25, c = 0.1 | 4 (8) | 4 | 42 / 47 | 660 | 3.61 | 1.80 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 1 (4) | 5 | 37 / 38 | 62 | 5.00 | 1.15 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 2 (4) | 6 | 38 / 46 | 73 | 4.61 | 1.20 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 3 (4) | 6 | 36 / 45 | 324 | 4.62 | 1.22 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 4 (8) | 5 | 28 / 39 | 594 | 4.64 | 1.23 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 1 (4) | 5 | 37 / 39 | 23 | 5.12 | 1.01 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 2 (4) | 5 | 38 / 39 | 89 | 4.69 | 1.15 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 3 (4) | 5 | 37 / 38 | 294 | 4.67 | 1.18 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 4 (8) | 3 | 33 / 38 | 532 | 4.67 | 1.19 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.5, c = 0.054 | 1 (4) | 6 | 36 / 38 | 40 | 5.05 | 1.00 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.5, c = 0.054 | 2 (4) | 6 | 38 / 45 | 64 | 4.69 | 1.14 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.5, c = 0.054 | 3 (4) | 6 | 38 / 44 | 323 | 4.70 | 1.15 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.5, c = 0.054 | 4 (8) | 4 | 37 / 45 | 698 | 4.70 | 1.16 | CONVERGED_FNORM_ABS |
+
+- **Newton:** Cosserat c = 1 takes the same number of Newton steps or fewer, at every
+  pair and refinement: at P2, ref 3, 5 against 9, and at ref 4, 3 against 5 (residual
+  histories: [`matched_residuals.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_residuals.png)).
+- **Krylov:** the counts per step are close, and Cosserat is slightly lower at P2.
+- **P1, the narrow band:** this separates the models. Micromorphic l = 0.25 km stalls
+  under tight FMG at refs 3 and 4: a linear solve gives no output for an hour and the
+  supervisor kills it. The matched Cosserat (0.14, 1) converges at refs 3 and 4, with
+  Krylov rising to 57-63 per step.
+- **Small-c Cosserat:** (0.25, 0.1) and (0.5, 0.054) are as cheap as c = 1 from the
+  seed, but see the cold starts below.
+
+![Residual histories, P2](figures/matched_residuals.png)
+
+**Cold starts** (no viscous seed, refs 1-3, np 4). The automatic Picard warm-up arms,
+so these exercise the frozen-tangent fix 0f882cc8 on the notch. Reported as
+"warm-up + Newton"; the solve report folds the warm-up into nl_its and records it
+as `picard_warmup_its`. (`results/eff_table_cold.json`; the ref-3 Cosserat cold runs are
+still finishing.)
+
+| pair | model | ref | warm-up + Newton | Krylov / step median / max | s | outcome |
+|---|---|---|---|---|---|---|
+| P1 | micromorphic l = 0.25 | 1 | 1 + 8 | 42 / 46 | 198 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 2 | 1 + 10 | 60 / 90 | 1252 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 3 | — | — | — | killed (no output for 1 h) |
+| P1 | Cosserat l = 0.14, c = 1 | 1 | 1 + 7 | 42 / 43 | 219 | CONVERGED_FNORM_ABS |
+| P1 | Cosserat l = 0.14, c = 1 | 2 | 1 + 9 | 49 / 63 | 2133 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 1 | 1 + 7 | 38 / 40 | 166 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 2 | 1 + 7 | 44 / 53 | 564 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 3 | 1 + 9 | 51 / 67 | 4216 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 1 | 1 + 6 | 40 / 41 | 185 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.236, c = 1 | 2 | 1 + 7 | 42 / 46 | 1191 | CONVERGED_FNORM_ABS |
+| P2 | Cosserat l = 0.25, c = 0.1 | 1 | 1 + 40 | 44 / 46 | 710 | DIVERGED_MAX_IT |
+| P2 | Cosserat l = 0.25, c = 0.1 | 2 | 1 + 40 | 51 / 54 | 4978 | DIVERGED_MAX_IT |
+| P2 | Cosserat l = 0.25, c = 0.1 | 3 | 1 + 12 | 40 / 51 | 6104 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 1 | 1 + 7 | 35 / 36 | 153 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 2 | 1 + 7 | 35 / 40 | 485 | CONVERGED_FNORM_ABS |
+| P3 | micromorphic l = 1 | 3 | 1 + 7 | 35 / 41 | 2392 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 1 | 1 + 6 | 38 / 39 | 164 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 2 | 1 + 6 | 38 / 39 | 820 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.37, c = 1 | 3 | 1 + 6 | 36 / 37 | 4444 | CONVERGED_FNORM_ABS |
+| P3 | Cosserat l = 0.5, c = 0.054 | 1 | 1 + 40 | 43 / 44 | 602 | DIVERGED_MAX_IT |
+| P3 | Cosserat l = 0.5, c = 0.054 | 2 | 1 + 40 | 46 / 49 | 4347 | DIVERGED_MAX_IT |
+
+- **Micromorphic and Cosserat c = 1** converge from cold in 1 + 6-10 steps: the
+  warm-up path works on the real notch. The exception is micromorphic l = 0.25 km at
+  ref 3, which stalls as it does seeded.
+- **Small-c Cosserat does not converge from cold.** (0.25, 0.1) and (0.5, 0.054) reach
+  the 40-step budget even at ref 1, though seeded they converge in 6-8 steps. Near
+  the c threshold, Cosserat needs a good initial state.
+
+**Summary.**
+- At the same band width the two models make nearly the same band.
+- Cosserat c = 1 is somewhat more robust and faster in Newton, and it reaches the
+  narrow-band case (P1) that stalls micromorphic's FMG. It needs l about 0.4-0.55 of
+  the micromorphic l, and three fields per node instead of one extra scalar in 3-D.
+- Small c buys a narrower band per unit l, at the cost of a cold-start failure.
+
+
 The older widths in this report (horizontal cuts, then the 10%-support vertical
 "equivalent width") jitter by ±0.5 km on these tailed profiles and are superseded by
 the integral width. The parallel path agrees with serial at np = 2 (same Newton count,
