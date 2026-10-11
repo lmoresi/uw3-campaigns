@@ -293,6 +293,47 @@ W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
     4.16 km for c = 1, 0.1, 0.03.
 - **Newton steps (exact LU):** 4-8 wherever c ≥ 0.1, and 11-12 at c = 0.03.
 
+### 3-D: the extruded notch (2026-10-12)
+
+**Setup.**
+- The notch is extruded along strike: `drivers/make_notch_mesh_3d.py`, tetrahedra, with a
+  Box size field grading the band region.
+- Boundary conditions: the 2-D ones with u_z = 0 on the side walls, and u_z = 0 alone on
+  the strike-normal faces (symmetry planes).
+- Not rotated free-slip, which refuses a coupled field.
+- Micromorphic β = 0.1, ξ = 0, l = 1 km, tight FMG, seeded, on the merged branch build
+  (graph JIT route).
+
+**Two blockers removed on the way.**
+- **Expanded JIT route: 22 MB of C.** gcc -O1 took 39 min and 8.2 GB, and -O0 timed out at
+  40 min. The graph route (tier 2, merged as a96de5b6) gives headers of at most 54 KB.
+- **The first base mesh (h_band 2.4 km) had a 37k-dof coarse level.** Its redundant LU took
+  about 6.5 min of every Newton step. The base is now h_band 4.8 km (1.8k tets), refined
+  twice to the same 1.2 km band element, and setup takes about 75 s.
+
+**Cost.** About 50-60 s per outer Krylov iteration at roughly 0.5M dofs on 8 ranks, about
+4× 2-D per dof for P2 tets.
+- A 1.2 km band element is feasible: about 2 h per run at np 8.
+- 0.6 km would take most of a day at np 16.
+- 0.3 km is out of reach.
+
+**β = 0.1, band element 1.2 km** (Lz = 6 km):
+
+| quantity | 3-D | 2-D at the same band element |
+|---|---|---|
+| Newton steps (seeded) | 6 | 6 (refs 2-3) |
+| Krylov per Newton step | 39, 46, 40, 39, 36, 29 | 35-43 |
+| W at mid-strike (km) | 4.586 | about 4.65 (interpolated: 5.00 at 2.1 km, 4.61 at 1.06 km); converged 4.62-4.64 |
+| W(z), 11 planes (km) | 4.54-4.60 | — |
+| peak / background | 1.18 | 1.20-1.22 |
+| wall time | 1 h 53 min at np 8 | — |
+
+- The 3-D code path reproduces 2-D: same Newton count, same W to about 1.5%, and W uniform
+  along strike to ±0.7%, as the symmetry planes imply.
+- FMG stays flat in 3-D: 29-46 Krylov per step against 35-43 in 2-D.
+- β = 0.3 at the same resolution is running.
+- Next is the tanh along-strike weak zone, log10 η_b = 22 − tanh((z0 − z)/w), with a longer Lz.
+
 ### The yield-stress shift the micromorphic law applies (ref 3, 2026-10-12)
 
 The shift is s = m H (e − χ). It is positive at the band centre (strengthening) and
