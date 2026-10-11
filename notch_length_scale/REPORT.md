@@ -228,8 +228,16 @@ numbers in `results/beta_xi_map.json` (`drivers/plot_beta_xi_map.py`).
   - β = 0.06 → 0.1 widens it by 18% at l = 1 km.
 - **ξ lowers the peak.** ξ = 0 → 0.02 lowers the peak over background by a factor of
   2–3 in every row, for example 1.61 → 0.68 at β = 0.06, l = 1 km.
-- **Strength shift.** The largest H χ is at most 1.01 C, and the floor bound is
-  ≥ 47 s_min. The microstructure never drives the yield stress to the floor.
+- **Floor bound, not the strength shift.** The largest H χ is at most 1.01 C, and the
+  floor bound is ≥ 47 s_min, so the microstructure never drives the yield stress to
+  the floor.
+  - H χ bounds how far the micromorphic term can LOWER σ_y: since e ≥ 0, the shift
+    s ≥ −H χ.
+  - It is not the strengthening. The shift the yield law feels is s = m H (e − χ):
+    positive at the band centre, negative on the flanks.
+  - Its max and min over the strong layer are tabulated separately
+    (`drivers/shift_stats.py`).
+  - (Corrected 2026-10-12: an earlier note called max H χ "the strength shift".)
 
 So the cheapest regularisation that leaves the band intensity alone is ξ = 0 with β
 just above threshold for the chosen l. Adding ξ ≈ 0.005–0.01 halves the Newton steps
