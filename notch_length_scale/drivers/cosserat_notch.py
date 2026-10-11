@@ -119,6 +119,10 @@ record = dict(
 uw.pprint(f"[cosserat] ref {ref} xi {xi} c {c} l {l_km} km P{degree}: {report.reason_str} "
           f"its {report.nl_its} ({seconds:.0f} s)  W_L/W_R {W}  omega {record['omega_range']}  "
           f"eta_eff strong {record['viscosity_range_strong_Pas']}")
+width9 = cn.integral_width(S, 9.0, "outside")      # the current estimator
 record.update(W_vertical_km=measured["W_vertical_km"], relative_peak=measured["relative_peak"],
-              W_integral_km=measured["W_integral_km"])
+              W_integral_km=measured["W_integral_km"], W_outside9_km=width9["median"],
+              W_outside9_spread_km=width9["spread"], peak_outside9=width9["peak_over_background"])
+uw.pprint(f"[cosserat] current estimator: W {width9['median']:.3f} km  peak "
+          f"{width9['peak_over_background']:.3f}")
 cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], omega=omega), mesh)

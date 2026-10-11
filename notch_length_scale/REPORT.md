@@ -157,6 +157,23 @@ physically scaled: the solver's work per Newton step is h-independent exactly wh
 W is resolved on the coarse levels, and grows without bound for the law with no
 length.
 
+**3-D unit-cube damping and a NaN in the blended tangent** (2026-10-11, test_1070 setup).
+- **Damping:** the 3-D default-solver case takes 20 Newton steps against 7 in 2-D, with an
+  identical residual history under exact LU, tight fieldsplit (rtol 1e-8, no
+  Eisenstat–Walker) and the default. It is nonlinear globalization, not loose
+  linear directions: the bt line search sits at its floor λ = 0.1 for about 12 steps
+  because the full step overshoots, and 2-D does the same for 4 steps. Tight linear
+  solves will not remove it on the 3-D notch.
+- **Bug (branch, not yet fixed):** any explicit Picard warm-up (`solve(picard=n)`) or
+  `consistent_jacobian = "continuation"` fails its first linear solve when a coupled
+  field's source contains the raw invariant ε̇_II = √(…). The blended tangent
+  J_P + α(J_N − J_P) evaluates J_N, whose ∂ε̇_II/∂∇u is 0/0 at ∇u = 0, and α·NaN is
+  NaN at α = 0. Result: GAMG sub-PC failure, or LU failure. Plain Stokes with
+  η = 1 + 0.5 ε̇_II² is unaffected (no square root). With the source regularised as
+  √(ε̇_II² + 1e-12), picard = 1 and picard = 3 both converge in 7 steps. The default
+  path works only because it skips the warm-up here. The campaign's notch runs start
+  from a viscous seed with ∇u ≠ 0 and are unaffected.
+
 **Window and background dependence** (`drivers/window_check.py`, `results/window_check.json`).
 - The window does not cap W. Widening it from ±6 km to the whole 20 km cut changes W
   by at most 1% (4.49 → 4.54 km at l = 2 km).

@@ -104,6 +104,11 @@ record = dict(
     chi_max=float(np.asarray(chi.max())),
     taylor=taylor,
 )
+width9 = cn.integral_width(S, 9.0, "outside")      # the current estimator
+record.update(W_outside9_km=width9["median"], W_outside9_spread_km=width9["spread"],
+              peak_outside9=width9["peak_over_background"])
+uw.pprint(f"[micromorphic] current estimator: W {width9['median']:.3f} km  peak "
+          f"{width9['peak_over_background']:.3f}")
 uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km np {uw.mpi.size}: "
           f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  "
           f"W_int {record['W_integral_km']['median']:.2f}  W_v {record['W_vertical_km']}  "
