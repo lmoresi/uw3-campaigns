@@ -305,9 +305,16 @@ at ref 3, then confirmed by exact runs (W at ref 3):
   - The peak's y on each of the 8 cuts (`drivers/peak_positions.py`,
     `results/peak_positions.json`) gives the same dip for both models: 43-45° for the peak
     trace, against 45.0 / 45.1° micromorphic at P3.
-  - But the Cosserat c = 1 trace is shifted upward on every cut: by about 1 km at P3
+  - But the Cosserat c = 1 trace is shifted upward on every cut at P3: by about 1 km
     (y = −9.17 against −10.06 km at x = −15 km; intercept at x = 0, −23.9 against
-    −25.1 km) and by about 0.5 km at P2.
+    −25.1 km).
+  - At P2 there is no systematic offset. Micromorphic l = 0.5 km is itself 1 km
+    left/right asymmetric (intercepts −24.5 / −23.5 km). The Cosserat differences
+    (c = 1: +0.6 / −0.5; c = 0.1: +1.2 / +0.1) have no consistent sign and lie within
+    that scatter.
+  - The left/right asymmetry of a symmetric notch is itself an open point. The peak y
+    is quantised to the nodes on each cut (steps of about 0.1-0.5 km), which is part of
+    it. Whether the rest is a genuinely one-sided solution has not been checked.
   - The small-c Cosserat bands, (0.25, 0.1) and (0.5, 0.054), follow the micromorphic
     trace to within about 0.3 km.
   - So at c = 1 the band is the same width and dip but rooted about 1 km higher on the
