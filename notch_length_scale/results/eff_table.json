@@ -1,0 +1,1657 @@
+[
+ {
+  "pair": "P1",
+  "model": "micromorphic",
+  "l_km": 0.25,
+  "c": null,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    52
+   ],
+   [
+    "CONVERGED_RTOL",
+    52
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    42
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_ATOL",
+    39
+   ]
+  ],
+  "residuals": [
+   0.145043,
+   0.0284599,
+   0.0256018,
+   0.0207446,
+   0.0157865,
+   0.00199644,
+   0.000282593,
+   1.39423e-05,
+   3.60051e-08
+  ],
+  "median": 43.0,
+  "max": 52,
+  "capped": false,
+  "seconds": 190.05838871002197,
+  "per_step_s": 23.757298588752747,
+  "W_km": 3.6864861109334974,
+  "peak": 1.8502637125285604
+ },
+ {
+  "pair": "P1",
+  "model": "micromorphic",
+  "l_km": 0.25,
+  "c": null,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 10,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    188
+   ],
+   [
+    "CONVERGED_RTOL",
+    138
+   ],
+   [
+    "CONVERGED_RTOL",
+    99
+   ],
+   [
+    "CONVERGED_RTOL",
+    84
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    60
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    61
+   ],
+   [
+    "CONVERGED_ATOL",
+    58
+   ]
+  ],
+  "residuals": [
+   0.1068,
+   0.0190614,
+   0.0181398,
+   0.0163146,
+   0.011687,
+   0.0071201,
+   0.002418,
+   0.000820379,
+   0.000272676,
+   3.21164e-05,
+   4.51516e-07
+  ],
+  "median": 63.0,
+  "max": 188,
+  "capped": false,
+  "seconds": 1733.2533683776855,
+  "per_step_s": 173.32533683776856,
+  "W_km": 2.8312323082018223,
+  "peak": 2.6674497173979566
+ },
+ {
+  "pair": "P1",
+  "model": "micromorphic",
+  "l_km": 0.25,
+  "c": null,
+  "ref": 3,
+  "np": null,
+  "converged": null,
+  "reason": "killed",
+  "nl_its": null,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ]
+  ],
+  "residuals": [
+   0.0776757,
+   0.0115893
+  ],
+  "median": 37.0,
+  "max": 37,
+  "capped": false,
+  "seconds": null,
+  "per_step_s": null,
+  "W_km": 2.655344657220156,
+  "peak": 2.8197890602531923
+ },
+ {
+  "pair": "P1",
+  "model": "micromorphic",
+  "l_km": 0.25,
+  "c": null,
+  "ref": 4,
+  "np": null,
+  "converged": null,
+  "reason": "killed",
+  "nl_its": null,
+  "krylov": [],
+  "residuals": [
+   0.0200079
+  ],
+  "median": null,
+  "max": null,
+  "capped": false,
+  "seconds": null,
+  "per_step_s": null,
+  "W_km": 2.6677416988081375,
+  "peak": 2.8547363022373426
+ },
+ {
+  "pair": "P1",
+  "model": "cosserat",
+  "l_km": 0.14,
+  "c": 1,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 7,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_RTOL",
+    41
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_ATOL",
+    36
+   ]
+  ],
+  "residuals": [
+   0.533125,
+   0.0277907,
+   0.0221356,
+   0.0175465,
+   0.00199295,
+   0.000192079,
+   2.41343e-06,
+   4.947e-10
+  ],
+  "median": 43.0,
+  "max": 46,
+  "capped": false,
+  "seconds": 199.90834283828735,
+  "per_step_s": 28.55833469118391,
+  "W_km": 4.413935022067633,
+  "peak": 1.5784905314291566
+ },
+ {
+  "pair": "P1",
+  "model": "cosserat",
+  "l_km": 0.14,
+  "c": 1,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 10,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    67
+   ],
+   [
+    "CONVERGED_RTOL",
+    66
+   ],
+   [
+    "CONVERGED_RTOL",
+    64
+   ],
+   [
+    "CONVERGED_RTOL",
+    62
+   ],
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_RTOL",
+    51
+   ],
+   [
+    "CONVERGED_RTOL",
+    51
+   ],
+   [
+    "CONVERGED_ATOL",
+    46
+   ]
+  ],
+  "residuals": [
+   0.388751,
+   0.0221753,
+   0.0199257,
+   0.0179249,
+   0.0152465,
+   0.0148527,
+   0.00260592,
+   0.000794418,
+   0.000159479,
+   7.99314e-06,
+   1.89305e-08
+  ],
+  "median": 51.0,
+  "max": 67,
+  "capped": false,
+  "seconds": 1948.3986065387726,
+  "per_step_s": 194.83986065387725,
+  "W_km": 3.0630416904579576,
+  "peak": 2.413382590685054
+ },
+ {
+  "pair": "P1",
+  "model": "cosserat",
+  "l_km": 0.14,
+  "c": 1,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 9,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    32
+   ],
+   [
+    "CONVERGED_RTOL",
+    84
+   ],
+   [
+    "CONVERGED_RTOL",
+    78
+   ],
+   [
+    "CONVERGED_RTOL",
+    78
+   ],
+   [
+    "CONVERGED_RTOL",
+    56
+   ],
+   [
+    "CONVERGED_RTOL",
+    57
+   ],
+   [
+    "CONVERGED_RTOL",
+    64
+   ],
+   [
+    "CONVERGED_ATOL",
+    63
+   ],
+   [
+    "CONVERGED_ATOL",
+    54
+   ]
+  ],
+  "residuals": [
+   0.283354,
+   0.0166038,
+   0.0149384,
+   0.0125216,
+   0.010526,
+   0.00189052,
+   0.000475242,
+   7.61161e-05,
+   2.92684e-06,
+   5.2846e-09
+  ],
+  "median": 63.0,
+  "max": 84,
+  "capped": false,
+  "seconds": 9609.143450260162,
+  "per_step_s": 1067.6826055844624,
+  "W_km": 2.657881853938636,
+  "peak": 2.711806506488809
+ },
+ {
+  "pair": "P1",
+  "model": "cosserat",
+  "l_km": 0.14,
+  "c": 1,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    61
+   ],
+   [
+    "CONVERGED_RTOL",
+    54
+   ],
+   [
+    "CONVERGED_RTOL",
+    60
+   ],
+   [
+    "CONVERGED_ATOL",
+    43
+   ]
+  ],
+  "residuals": [
+   0.0260564,
+   0.0133277,
+   0.000314615,
+   1.46558e-06,
+   6.766e-11
+  ],
+  "median": 57.0,
+  "max": 61,
+  "capped": false,
+  "seconds": 6605.353889226913,
+  "per_step_s": 1651.3384723067284,
+  "W_km": 2.599976561081114,
+  "peak": 2.7557711669860856
+ },
+ {
+  "pair": "P2",
+  "model": "micromorphic",
+  "l_km": 0.5,
+  "c": null,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    40
+   ],
+   [
+    "CONVERGED_ATOL",
+    35
+   ]
+  ],
+  "residuals": [
+   0.145043,
+   0.027797,
+   0.0178973,
+   0.00758843,
+   0.0005034,
+   6.92043e-06,
+   2.54283e-09
+  ],
+  "median": 39.0,
+  "max": 43,
+  "capped": false,
+  "seconds": 147.02161169052124,
+  "per_step_s": 24.503601948420208,
+  "W_km": 4.118721273328306,
+  "peak": 1.4398331717069726
+ },
+ {
+  "pair": "P2",
+  "model": "micromorphic",
+  "l_km": 0.5,
+  "c": null,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    64
+   ],
+   [
+    "CONVERGED_RTOL",
+    60
+   ],
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_ATOL",
+    44
+   ]
+  ],
+  "residuals": [
+   0.1068,
+   0.0185217,
+   0.0161821,
+   0.0116846,
+   0.00591997,
+   0.000917974,
+   0.000156573,
+   9.11865e-06,
+   3.1194e-08
+  ],
+  "median": 49.0,
+  "max": 64,
+  "capped": false,
+  "seconds": 760.0820660591125,
+  "per_step_s": 95.01025825738907,
+  "W_km": 3.642330946935801,
+  "peak": 1.7964212775496837
+ },
+ {
+  "pair": "P2",
+  "model": "micromorphic",
+  "l_km": 0.5,
+  "c": null,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 9,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    88
+   ],
+   [
+    "CONVERGED_RTOL",
+    87
+   ],
+   [
+    "CONVERGED_RTOL",
+    80
+   ],
+   [
+    "CONVERGED_RTOL",
+    70
+   ],
+   [
+    "CONVERGED_RTOL",
+    49
+   ],
+   [
+    "CONVERGED_RTOL",
+    53
+   ],
+   [
+    "CONVERGED_RTOL",
+    54
+   ],
+   [
+    "CONVERGED_ATOL",
+    51
+   ]
+  ],
+  "residuals": [
+   0.0776757,
+   0.011149,
+   0.00995522,
+   0.0073184,
+   0.00579288,
+   0.00420423,
+   0.00069056,
+   0.000168773,
+   2.07983e-05,
+   3.55745e-07
+  ],
+  "median": 54.0,
+  "max": 88,
+  "capped": false,
+  "seconds": 5041.407422780991,
+  "per_step_s": 560.1563803089989,
+  "W_km": 3.625031203893567,
+  "peak": 1.8471680864590558
+ },
+ {
+  "pair": "P2",
+  "model": "micromorphic",
+  "l_km": 0.5,
+  "c": null,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    51
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_ATOL",
+    28
+   ]
+  ],
+  "residuals": [
+   0.0196285,
+   0.0183525,
+   0.00245288,
+   0.000123738,
+   1.11354e-05,
+   1.36691e-07
+  ],
+  "median": 35.0,
+  "max": 51,
+  "capped": false,
+  "seconds": 3838.0880587100983,
+  "per_step_s": 767.6176117420197,
+  "W_km": 3.631856686811761,
+  "peak": 1.8761838710683758
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.236,
+  "c": 1,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    40
+   ],
+   [
+    "CONVERGED_RTOL",
+    41
+   ],
+   [
+    "CONVERGED_ATOL",
+    38
+   ]
+  ],
+  "residuals": [
+   0.533125,
+   0.0273271,
+   0.0250561,
+   0.00320152,
+   0.000441054,
+   1.36037e-05,
+   1.46261e-08
+  ],
+  "median": 38.0,
+  "max": 41,
+  "capped": false,
+  "seconds": 151.33183240890503,
+  "per_step_s": 25.221972068150837,
+  "W_km": 4.678149667872567,
+  "peak": 1.3214224868837063
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.236,
+  "c": 1,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    44
+   ],
+   [
+    "CONVERGED_ATOL",
+    40
+   ]
+  ],
+  "residuals": [
+   0.388751,
+   0.0221851,
+   0.0151274,
+   0.00412117,
+   0.0003726,
+   8.63736e-06,
+   9.1436e-09
+  ],
+  "median": 43.5,
+  "max": 48,
+  "capped": false,
+  "seconds": 754.2880127429962,
+  "per_step_s": 125.71466879049937,
+  "W_km": 3.7687330940105324,
+  "peak": 1.6580889235279397
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.236,
+  "c": 1,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    30
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    45
+   ],
+   [
+    "CONVERGED_ATOL",
+    43
+   ]
+  ],
+  "residuals": [
+   0.283354,
+   0.0173994,
+   0.010329,
+   0.00170335,
+   8.78216e-05,
+   2.27038e-07
+  ],
+  "median": 45.0,
+  "max": 48,
+  "capped": false,
+  "seconds": 2363.6631450653076,
+  "per_step_s": 472.7326290130615,
+  "W_km": 3.6328648407372404,
+  "peak": 1.750296737656048
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.236,
+  "c": 1,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 3,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    41
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ]
+  ],
+  "residuals": [
+   0.0243861,
+   0.0121959,
+   0.000247092,
+   8.1936e-07
+  ],
+  "median": 38.0,
+  "max": 41,
+  "capped": false,
+  "seconds": 2343.867057800293,
+  "per_step_s": 781.2890192667643,
+  "W_km": 3.6221243889708328,
+  "peak": 1.7660238797265189
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.25,
+  "c": 0.1,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    42
+   ],
+   [
+    "CONVERGED_RTOL",
+    41
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_ATOL",
+    34
+   ]
+  ],
+  "residuals": [
+   0.17666,
+   0.0250482,
+   0.0162372,
+   0.00498789,
+   0.000413499,
+   1.16113e-05,
+   3.50423e-08
+  ],
+  "median": 39.0,
+  "max": 42,
+  "capped": false,
+  "seconds": 255.49452018737793,
+  "per_step_s": 42.58242003122965,
+  "W_km": 4.350727154293475,
+  "peak": 1.403414263103707
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.25,
+  "c": 0.1,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 7,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    53
+   ],
+   [
+    "CONVERGED_RTOL",
+    52
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_RTOL",
+    44
+   ],
+   [
+    "CONVERGED_RTOL",
+    44
+   ],
+   [
+    "CONVERGED_ATOL",
+    44
+   ]
+  ],
+  "residuals": [
+   0.128988,
+   0.0173706,
+   0.0154871,
+   0.0115676,
+   0.00490808,
+   0.000697907,
+   4.68976e-05,
+   3.28783e-07
+  ],
+  "median": 44.0,
+  "max": 53,
+  "capped": false,
+  "seconds": 583.3962631225586,
+  "per_step_s": 83.34232330322266,
+  "W_km": 3.7223827036578245,
+  "peak": 1.6741604881317702
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.25,
+  "c": 0.1,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    53
+   ],
+   [
+    "CONVERGED_RTOL",
+    53
+   ],
+   [
+    "CONVERGED_RTOL",
+    54
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_ATOL",
+    46
+   ],
+   [
+    "CONVERGED_ATOL",
+    34
+   ]
+  ],
+  "residuals": [
+   0.0931974,
+   0.0117518,
+   0.0104976,
+   0.00786187,
+   0.00329329,
+   0.00055594,
+   5.73731e-05,
+   9.14132e-07,
+   2.651e-10
+  ],
+  "median": 46.0,
+  "max": 54,
+  "capped": false,
+  "seconds": 2604.1883265972137,
+  "per_step_s": 325.5235408246517,
+  "W_km": 3.598416327963001,
+  "peak": 1.7820999850979944
+ },
+ {
+  "pair": "P2",
+  "model": "cosserat",
+  "l_km": 0.25,
+  "c": 0.1,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    42
+   ],
+   [
+    "CONVERGED_RTOL",
+    41
+   ],
+   [
+    "CONVERGED_ATOL",
+    33
+   ]
+  ],
+  "residuals": [
+   0.0182433,
+   0.00978125,
+   0.0011624,
+   2.22485e-05,
+   2.72757e-08
+  ],
+  "median": 41.5,
+  "max": 47,
+  "capped": false,
+  "seconds": 2639.0514528751373,
+  "per_step_s": 659.7628632187843,
+  "W_km": 3.6068676889952753,
+  "peak": 1.7989635453277617
+ },
+ {
+  "pair": "P3",
+  "model": "micromorphic",
+  "l_km": 1.0,
+  "c": null,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_ATOL",
+    37
+   ]
+  ],
+  "residuals": [
+   0.145043,
+   0.0266774,
+   0.0172054,
+   0.00201088,
+   0.000128209,
+   1.0902e-06
+  ],
+  "median": 37.0,
+  "max": 38,
+  "capped": false,
+  "seconds": 312.2590367794037,
+  "per_step_s": 62.45180735588074,
+  "W_km": 4.998334791050677,
+  "peak": 1.1487110052009868
+ },
+ {
+  "pair": "P3",
+  "model": "micromorphic",
+  "l_km": 1.0,
+  "c": null,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_ATOL",
+    35
+   ]
+  ],
+  "residuals": [
+   0.1068,
+   0.0176491,
+   0.0162566,
+   0.00224352,
+   0.000303847,
+   1.32674e-05,
+   3.0242e-08
+  ],
+  "median": 37.5,
+  "max": 46,
+  "capped": false,
+  "seconds": 439.33540320396423,
+  "per_step_s": 73.2225672006607,
+  "W_km": 4.613478909114316,
+  "peak": 1.2040451872721003
+ },
+ {
+  "pair": "P3",
+  "model": "micromorphic",
+  "l_km": 1.0,
+  "c": null,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    45
+   ],
+   [
+    "CONVERGED_RTOL",
+    45
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "residuals": [
+   0.0776757,
+   0.0105403,
+   0.00618109,
+   0.00313775,
+   0.000455559,
+   1.57557e-05,
+   1.00452e-07
+  ],
+  "median": 36.5,
+  "max": 45,
+  "capped": false,
+  "seconds": 1946.5763654708862,
+  "per_step_s": 324.4293942451477,
+  "W_km": 4.617304556424958,
+  "peak": 1.2220936118307013
+ },
+ {
+  "pair": "P3",
+  "model": "micromorphic",
+  "l_km": 1.0,
+  "c": null,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    28
+   ],
+   [
+    "CONVERGED_RTOL",
+    28
+   ],
+   [
+    "CONVERGED_ATOL",
+    32
+   ],
+   [
+    "CONVERGED_ATOL",
+    26
+   ]
+  ],
+  "residuals": [
+   0.0197655,
+   0.0191342,
+   0.00273498,
+   0.000101907,
+   7.28464e-06,
+   6.66978e-08
+  ],
+  "median": 28.0,
+  "max": 39,
+  "capped": false,
+  "seconds": 2969.283333301544,
+  "per_step_s": 593.8566666603089,
+  "W_km": 4.635234203736181,
+  "peak": 1.2311045738703743
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.37,
+  "c": 1,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    35
+   ]
+  ],
+  "residuals": [
+   0.533125,
+   0.0271088,
+   0.0110897,
+   0.00095619,
+   2.69814e-05,
+   2.97226e-08
+  ],
+  "median": 37.0,
+  "max": 39,
+  "capped": false,
+  "seconds": 116.36462330818176,
+  "per_step_s": 23.272924661636353,
+  "W_km": 5.124331542773117,
+  "peak": 1.0085510972847134
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.37,
+  "c": 1,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    38
+   ]
+  ],
+  "residuals": [
+   0.388751,
+   0.0225949,
+   0.00883052,
+   0.00113243,
+   8.3776e-05,
+   6.09339e-07
+  ],
+  "median": 38.0,
+  "max": 39,
+  "capped": false,
+  "seconds": 444.92062520980835,
+  "per_step_s": 88.98412504196168,
+  "W_km": 4.6948006433775955,
+  "peak": 1.146527303885431
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.37,
+  "c": 1,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    30
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    36
+   ]
+  ],
+  "residuals": [
+   0.283354,
+   0.018536,
+   0.00539702,
+   0.000733715,
+   6.54335e-05,
+   7.66602e-07
+  ],
+  "median": 37.0,
+  "max": 38,
+  "capped": false,
+  "seconds": 1472.3349068164825,
+  "per_step_s": 294.4669813632965,
+  "W_km": 4.669094243135753,
+  "peak": 1.1780563921267793
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.37,
+  "c": 1,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 3,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    32
+   ],
+   [
+    "CONVERGED_RTOL",
+    33
+   ]
+  ],
+  "residuals": [
+   0.0226964,
+   0.0102633,
+   0.000165684,
+   3.49397e-07
+  ],
+  "median": 33.0,
+  "max": 38,
+  "capped": false,
+  "seconds": 1595.3885231018066,
+  "per_step_s": 531.7961743672689,
+  "W_km": 4.673517395494013,
+  "peak": 1.1871357834702587
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.5,
+  "c": 0.054,
+  "ref": 1,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_ATOL",
+    29
+   ]
+  ],
+  "residuals": [
+   0.172513,
+   0.0246383,
+   0.0151733,
+   0.00205247,
+   0.000172803,
+   1.88721e-06,
+   2.598e-10
+  ],
+  "median": 36.5,
+  "max": 38,
+  "capped": false,
+  "seconds": 242.11625719070435,
+  "per_step_s": 40.35270953178406,
+  "W_km": 5.053540234190172,
+  "peak": 1.0048701427290958
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.5,
+  "c": 0.054,
+  "ref": 2,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    45
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_ATOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    29
+   ]
+  ],
+  "residuals": [
+   0.126031,
+   0.0170505,
+   0.00990694,
+   0.00229304,
+   0.000154239,
+   2.26861e-06,
+   9.921e-10
+  ],
+  "median": 38.5,
+  "max": 45,
+  "capped": false,
+  "seconds": 384.3637557029724,
+  "per_step_s": 64.0606259504954,
+  "W_km": 4.687744984191868,
+  "peak": 1.135255387526259
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.5,
+  "c": 0.054,
+  "ref": 3,
+  "np": 4,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_RTOL",
+    44
+   ],
+   [
+    "CONVERGED_RTOL",
+    42
+   ],
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "residuals": [
+   0.0910327,
+   0.0113475,
+   0.00689055,
+   0.00168502,
+   0.000165839,
+   6.94261e-06,
+   8.59069e-08
+  ],
+  "median": 38.5,
+  "max": 44,
+  "capped": false,
+  "seconds": 1939.2309350967407,
+  "per_step_s": 323.2051558494568,
+  "W_km": 4.7021230991838046,
+  "peak": 1.1498551188722659
+ },
+ {
+  "pair": "P3",
+  "model": "cosserat",
+  "l_km": 0.5,
+  "c": 0.054,
+  "ref": 4,
+  "np": 8,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    45
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "residuals": [
+   0.0178359,
+   0.00982768,
+   0.00144271,
+   4.19537e-05,
+   3.21406e-07
+  ],
+  "median": 37.0,
+  "max": 45,
+  "capped": false,
+  "seconds": 2793.102034330368,
+  "per_step_s": 698.275508582592,
+  "W_km": 4.696371663759042,
+  "peak": 1.162751304418588
+ }
+]

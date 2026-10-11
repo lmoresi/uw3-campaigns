@@ -37,8 +37,10 @@ def log_path(model, l_km, c, ref):
 def record(model, l_km, c, ref):
     if model == "micromorphic":
         pattern = f"results/micromorphic/micro_ref{ref}_xi0_beta0.1_l{l_km:g}_production_tight_np*.json"
+        # the seeded runs only: the cold-start records (*_cold.json) sort first and
+        # were picked up here by mistake (their nl_its include the warm-up)
         found = [f for f in glob.glob(os.path.join(NLS, pattern))
-                 if ("_eff" in f) == (ref == 4 or l_km == 1.0)]
+                 if ("_eff" in f) == (ref == 4 or l_km == 1.0) and "_cold" not in f]
     else:
         pattern = f"results/cosserat/cosserat_ref{ref}_xi0_c{c:g}_l{l_km:g}_P1_production_tight_np*_eff.json"
         found = glob.glob(os.path.join(NLS, pattern))

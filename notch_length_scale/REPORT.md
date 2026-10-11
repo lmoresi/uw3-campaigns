@@ -325,17 +325,17 @@ at ref 3, then confirmed by exact runs (W at ref 3):
 
 | pair | model | ref (np) | Newton | Krylov / step median / max | s per Newton step | W (km) | peak | outcome |
 |---|---|---|---|---|---|---|---|---|
-| P1 | micromorphic l = 0.25 | 1 (4) | 9 | 43 / 52 | 22 | 3.69 | 1.85 | CONVERGED_FNORM_ABS |
-| P1 | micromorphic l = 0.25 | 2 (4) | 11 | 63 / 188 | 114 | 2.83 | 2.67 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 1 (4) | 8 | 43 / 52 | 24 | 3.69 | 1.85 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic l = 0.25 | 2 (4) | 10 | 63 / 188 | 173 | 2.83 | 2.67 | CONVERGED_FNORM_ABS |
 | P1 | micromorphic l = 0.25 | 3 (None) | None | 37 / 37 | — | — | — | killed |
 | P1 | micromorphic l = 0.25 | 4 (None) | None | — | — | — | — | killed |
 | P1 | Cosserat l = 0.14, c = 1 | 1 (4) | 7 | 43 / 46 | 29 | 4.41 | 1.58 | CONVERGED_FNORM_ABS |
 | P1 | Cosserat l = 0.14, c = 1 | 2 (4) | 10 | 51 / 67 | 195 | 3.06 | 2.41 | CONVERGED_FNORM_ABS |
 | P1 | Cosserat l = 0.14, c = 1 | 3 (4) | 9 | 63 / 84 | 1068 | 2.66 | 2.71 | CONVERGED_FNORM_ABS |
 | P1 | Cosserat l = 0.14, c = 1 | 4 (8) | 4 | 57 / 61 | 1651 | 2.60 | 2.76 | CONVERGED_FNORM_ABS |
-| P2 | micromorphic l = 0.5 | 1 (4) | 8 | 39 / 43 | 21 | 4.12 | 1.44 | CONVERGED_FNORM_ABS |
-| P2 | micromorphic l = 0.5 | 2 (4) | 8 | 49 / 64 | 70 | 3.64 | 1.80 | CONVERGED_FNORM_ABS |
-| P2 | micromorphic l = 0.5 | 3 (4) | 10 | 54 / 88 | 422 | 3.63 | 1.85 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 1 (4) | 6 | 39 / 43 | 25 | 4.12 | 1.44 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 2 (4) | 8 | 49 / 64 | 95 | 3.64 | 1.80 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic l = 0.5 | 3 (4) | 9 | 54 / 88 | 560 | 3.63 | 1.85 | CONVERGED_FNORM_ABS |
 | P2 | micromorphic l = 0.5 | 4 (8) | 5 | 35 / 51 | 768 | 3.63 | 1.88 | CONVERGED_FNORM_ABS |
 | P2 | Cosserat l = 0.236, c = 1 | 1 (4) | 6 | 38 / 41 | 25 | 4.68 | 1.32 | CONVERGED_FNORM_ABS |
 | P2 | Cosserat l = 0.236, c = 1 | 2 (4) | 6 | 44 / 48 | 126 | 3.77 | 1.66 | CONVERGED_FNORM_ABS |
@@ -371,11 +371,15 @@ at ref 3, then confirmed by exact runs (W at ref 3):
 
 ![Residual histories, P2](figures/matched_residuals.png)
 
+*Correction (2026-10-12):* the first version of the table above took the micromorphic
+l = 0.25 and 0.5 km rows at refs 1-3 from the cold-start records, which sort first by
+name. Their Newton counts included the warm-up: P2 read 8/8/10 for the seeded 6/8/9.
+Fixed in `eff_table.py`; the Krylov columns were right throughout.
+
 **Cold starts** (no viscous seed, refs 1-3, np 4). The automatic Picard warm-up arms,
 so these exercise the frozen-tangent fix 0f882cc8 on the notch. Reported as
 "warm-up + Newton"; the solve report folds the warm-up into nl_its and records it
-as `picard_warmup_its`. (`results/eff_table_cold.json`; the ref-3 Cosserat cold runs are
-still finishing.)
+as `picard_warmup_its`. (`results/eff_table_cold.json`.)
 
 | pair | model | ref | warm-up + Newton | Krylov / step median / max | s | outcome |
 |---|---|---|---|---|---|---|

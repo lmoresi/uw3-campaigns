@@ -1,0 +1,202 @@
+[
+ {
+  "l_km": 0.125,
+  "c": 0.01,
+  "converged": false,
+  "reason": "DIVERGED_MAX_IT",
+  "nl_its": 40,
+  "W_km": 2.967397047661441,
+  "peak": 1.0066319031442303,
+  "seconds": 1448.459588766098
+ },
+ {
+  "l_km": 0.125,
+  "c": 0.03,
+  "converged": false,
+  "reason": "DIVERGED_LINE_SEARCH",
+  "nl_its": 32,
+  "W_km": 3.144715043882333,
+  "peak": 1.7574335781149033,
+  "seconds": 1325.2239391803741
+ },
+ {
+  "l_km": 0.125,
+  "c": 0.1,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "W_km": 2.427237512356161,
+  "peak": 3.0436077794888625,
+  "seconds": 529.1230607032776
+ },
+ {
+  "l_km": 0.125,
+  "c": 0.3,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "W_km": 2.474474089393737,
+  "peak": 2.9541542905757714,
+  "seconds": 393.2476487159729
+ },
+ {
+  "l_km": 0.125,
+  "c": 1.0,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "W_km": 2.496919782634339,
+  "peak": 2.9357245475199827,
+  "seconds": 154.5974895954132
+ },
+ {
+  "l_km": 0.25,
+  "c": 0.01,
+  "converged": false,
+  "reason": "DIVERGED_MAX_IT",
+  "nl_its": 40,
+  "W_km": 2.4765670189457074,
+  "peak": 1.6664033129203113,
+  "seconds": 1346.166600227356
+ },
+ {
+  "l_km": 0.25,
+  "c": 0.03,
+  "converged": false,
+  "reason": "DIVERGED_MAX_IT",
+  "nl_its": 40,
+  "W_km": 3.495635945128316,
+  "peak": 1.7704596796983332,
+  "seconds": 1324.770192861557
+ },
+ {
+  "l_km": 0.25,
+  "c": 0.1,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "W_km": 3.598416327448613,
+  "peak": 1.7820999854911053,
+  "seconds": 295.60264706611633
+ },
+ {
+  "l_km": 0.25,
+  "c": 0.3,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "W_km": 3.7153269874267627,
+  "peak": 1.6927211000568554,
+  "seconds": 223.9467113018036
+ },
+ {
+  "l_km": 0.25,
+  "c": 1.0,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 7,
+  "W_km": 3.7656415637929053,
+  "peak": 1.6623283058918656,
+  "seconds": 137.48012590408325
+ },
+ {
+  "l_km": 0.5,
+  "c": 0.01,
+  "converged": false,
+  "reason": "DIVERGED_MAX_IT",
+  "nl_its": 40,
+  "W_km": 2.1095200178969056,
+  "peak": 1.8204836730801954,
+  "seconds": 1381.9638373851776
+ },
+ {
+  "l_km": 0.5,
+  "c": 0.03,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 12,
+  "W_km": 4.26239398252746,
+  "peak": 1.6386626750887772,
+  "seconds": 415.2921187877655
+ },
+ {
+  "l_km": 0.5,
+  "c": 0.1,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "W_km": 4.9969628450434325,
+  "peak": 1.0309702804463148,
+  "seconds": 221.6981041431427
+ },
+ {
+  "l_km": 0.5,
+  "c": 0.3,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "W_km": 5.238382061217958,
+  "peak": 0.9424643660661556,
+  "seconds": 200.44275856018066
+ },
+ {
+  "l_km": 0.5,
+  "c": 1.0,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "W_km": 5.328638066829643,
+  "peak": 0.903934836027827,
+  "seconds": 117.38478064537048
+ },
+ {
+  "l_km": 1.0,
+  "c": 0.01,
+  "converged": false,
+  "reason": "DIVERGED_MAX_IT",
+  "nl_its": 40,
+  "W_km": 2.4496303952624063,
+  "peak": 1.3357056752996825,
+  "seconds": 1279.1764543056488
+ },
+ {
+  "l_km": 1.0,
+  "c": 0.03,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 11,
+  "W_km": 4.160701812023127,
+  "peak": 1.4140098132164303,
+  "seconds": 384.50996828079224
+ },
+ {
+  "l_km": 1.0,
+  "c": 0.1,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "W_km": 5.882683591034141,
+  "peak": 0.6406979690629631,
+  "seconds": 192.59324073791504
+ },
+ {
+  "l_km": 1.0,
+  "c": 0.3,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "W_km": 6.454147306620903,
+  "peak": 0.5074327087472578,
+  "seconds": 160.06419825553894
+ },
+ {
+  "l_km": 1.0,
+  "c": 1.0,
+  "converged": true,
+  "reason": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "W_km": 6.6482942131187475,
+  "peak": 0.44859718079280936,
+  "seconds": 97.3795018196106
+ }
+]

@@ -1,0 +1,1128 @@
+[
+ {
+  "kind": "coss",
+  "l_km": 0.5,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_coss_ref1_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_ATOL",
+    29
+   ]
+  ],
+  "median": 35.0,
+  "max": 37,
+  "median_rtol": 35.5,
+  "capped": false,
+  "W_km": null,
+  "h_fine_m": 2120.0,
+  "resolving_level": null
+ },
+ {
+  "kind": "coss",
+  "l_km": 0.5,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_coss_ref2_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "median": 36.0,
+  "max": 37,
+  "median_rtol": 36.0,
+  "capped": false,
+  "W_km": 5.326267791581058,
+  "h_fine_m": 1060.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 0.5,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_coss_ref3_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    31
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_ATOL",
+    25
+   ]
+  ],
+  "median": 35.0,
+  "max": 36,
+  "median_rtol": 35.5,
+  "capped": false,
+  "W_km": 5.328638066766831,
+  "h_fine_m": 530.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 0.5,
+  "ref": 4,
+  "log": "jobs/logs/coss_ref4_l0.5_np8.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 3,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    31
+   ],
+   [
+    "CONVERGED_RTOL",
+    32
+   ]
+  ],
+  "median": 32.0,
+  "max": 38,
+  "median_rtol": 32.0,
+  "capped": false,
+  "W_km": 5.3388790517226115,
+  "h_fine_m": 265.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 0.5,
+  "ref": 5,
+  "log": "jobs/logs/coss_ref5_l0.5_np16.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    28
+   ],
+   [
+    "CONVERGED_RTOL",
+    26
+   ],
+   [
+    "CONVERGED_ATOL",
+    18
+   ]
+  ],
+  "median": 27.0,
+  "max": 38,
+  "median_rtol": 28.0,
+  "capped": false,
+  "W_km": 5.342271006495297,
+  "h_fine_m": 132.5,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 1.0,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_coss_ref1_l1.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    35
+   ]
+  ],
+  "median": 35.5,
+  "max": 36,
+  "median_rtol": 36.0,
+  "capped": false,
+  "W_km": 6.609915084484404,
+  "h_fine_m": 2120.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 1.0,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_coss_ref2_l1.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    34
+   ]
+  ],
+  "median": 34.5,
+  "max": 36,
+  "median_rtol": 35.0,
+  "capped": false,
+  "W_km": 6.628974783040676,
+  "h_fine_m": 1060.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 1.0,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_coss_ref3_l1.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 4,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_ATOL",
+    33
+   ]
+  ],
+  "median": 34.0,
+  "max": 35,
+  "median_rtol": 35.0,
+  "capped": false,
+  "W_km": 6.64829425148938,
+  "h_fine_m": 530.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 1.0,
+  "ref": 4,
+  "log": "jobs/logs/coss_ref4_l1_np8.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 3,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    32
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "median": 32.0,
+  "max": 39,
+  "median_rtol": 35.5,
+  "capped": false,
+  "W_km": 6.676317970278537,
+  "h_fine_m": 265.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "coss",
+  "l_km": 1.0,
+  "ref": 5,
+  "log": "jobs/logs/coss_ref5_l1_np16.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 3,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    49
+   ],
+   [
+    "CONVERGED_RTOL",
+    47
+   ]
+  ],
+  "median": 47.0,
+  "max": 49,
+  "median_rtol": 47.0,
+  "capped": false,
+  "W_km": 6.68501636840912,
+  "h_fine_m": 132.5,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.25,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_micro_ref1_l0.25.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    52
+   ],
+   [
+    "CONVERGED_RTOL",
+    52
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    42
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_ATOL",
+    39
+   ]
+  ],
+  "median": 43.0,
+  "max": 52,
+  "median_rtol": 43.0,
+  "capped": false,
+  "W_km": 3.6864861109334974,
+  "h_fine_m": 2120.0,
+  "resolving_level": null
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.25,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_micro_ref2_l0.25.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 10,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    188
+   ],
+   [
+    "CONVERGED_RTOL",
+    138
+   ],
+   [
+    "CONVERGED_RTOL",
+    99
+   ],
+   [
+    "CONVERGED_RTOL",
+    84
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    60
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    61
+   ],
+   [
+    "CONVERGED_ATOL",
+    58
+   ]
+  ],
+  "median": 63.0,
+  "max": 188,
+  "median_rtol": 63.0,
+  "capped": false,
+  "W_km": 2.8312323082018223,
+  "h_fine_m": 1060.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.25,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_micro_ref3_l0.25.log",
+  "outcome": "killed: the next linear solve gave no output for 1 h",
+  "nl_its": null,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ]
+  ],
+  "median": 37.0,
+  "max": 37,
+  "median_rtol": 37.0,
+  "capped": false,
+  "W_km": 2.655344657220156,
+  "h_fine_m": 530.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.5,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_micro_ref1_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    40
+   ],
+   [
+    "CONVERGED_ATOL",
+    35
+   ]
+  ],
+  "median": 39.0,
+  "max": 43,
+  "median_rtol": 40.0,
+  "capped": false,
+  "W_km": 4.118721273328306,
+  "h_fine_m": 2120.0,
+  "resolving_level": null
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.5,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_micro_ref2_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 8,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    63
+   ],
+   [
+    "CONVERGED_RTOL",
+    64
+   ],
+   [
+    "CONVERGED_RTOL",
+    60
+   ],
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_ATOL",
+    44
+   ]
+  ],
+  "median": 49.0,
+  "max": 64,
+  "median_rtol": 50.0,
+  "capped": false,
+  "W_km": 3.642330946935801,
+  "h_fine_m": 1060.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.5,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_micro_ref3_l0.5.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 9,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    88
+   ],
+   [
+    "CONVERGED_RTOL",
+    87
+   ],
+   [
+    "CONVERGED_RTOL",
+    80
+   ],
+   [
+    "CONVERGED_RTOL",
+    70
+   ],
+   [
+    "CONVERGED_RTOL",
+    49
+   ],
+   [
+    "CONVERGED_RTOL",
+    53
+   ],
+   [
+    "CONVERGED_RTOL",
+    54
+   ],
+   [
+    "CONVERGED_ATOL",
+    51
+   ]
+  ],
+  "median": 54.0,
+  "max": 88,
+  "median_rtol": 62.0,
+  "capped": false,
+  "W_km": 3.625031203893567,
+  "h_fine_m": 530.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.5,
+  "ref": 4,
+  "log": "results/fmg/micro_ref4_l0.5_tight_gridseq.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    51
+   ],
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_ATOL",
+    33
+   ],
+   [
+    "CONVERGED_ATOL",
+    27
+   ]
+  ],
+  "median": 33.0,
+  "max": 51,
+  "median_rtol": 34.0,
+  "capped": false,
+  "W_km": 3.631856686873056,
+  "h_fine_m": 265.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 0.5,
+  "ref": 5,
+  "log": "jobs/logs/micro_ref5_l0.5_tight_np16.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    47
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_ATOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    28
+   ]
+  ],
+  "median": 37.0,
+  "max": 47,
+  "median_rtol": 43.0,
+  "capped": false,
+  "W_km": 3.635145093225397,
+  "h_fine_m": 132.5,
+  "resolving_level": 2
+ },
+ {
+  "kind": "micro",
+  "l_km": 1.0,
+  "ref": 1,
+  "log": "results/fmg/micro_ref1_tight.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    32
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    36
+   ]
+  ],
+  "median": 36.0,
+  "max": 37,
+  "median_rtol": 35.5,
+  "capped": false,
+  "W_km": 4.998334780172609,
+  "h_fine_m": 2120.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 1.0,
+  "ref": 2,
+  "log": "results/fmg/micro_ref2_tight.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_RTOL",
+    44
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_ATOL",
+    34
+   ]
+  ],
+  "median": 36.5,
+  "max": 44,
+  "median_rtol": 37.0,
+  "capped": false,
+  "W_km": 4.613478574743532,
+  "h_fine_m": 1060.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 1.0,
+  "ref": 3,
+  "log": "results/fmg/micro_ref3_tight.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    29
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    43
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    29
+   ]
+  ],
+  "median": 36.0,
+  "max": 43,
+  "median_rtol": 36.0,
+  "capped": false,
+  "W_km": 4.617304676403699,
+  "h_fine_m": 530.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 1.0,
+  "ref": 4,
+  "log": "results/fmg/micro_ref4_l1_tight_gridseq.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    39
+   ],
+   [
+    "CONVERGED_RTOL",
+    27
+   ],
+   [
+    "CONVERGED_RTOL",
+    27
+   ],
+   [
+    "CONVERGED_ATOL",
+    31
+   ],
+   [
+    "CONVERGED_ATOL",
+    25
+   ]
+  ],
+  "median": 27.0,
+  "max": 39,
+  "median_rtol": 27.0,
+  "capped": false,
+  "W_km": 4.635234203715296,
+  "h_fine_m": 265.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 1.0,
+  "ref": 5,
+  "log": "jobs/logs/micro_ref5_l1_tight_np16.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    29
+   ],
+   [
+    "CONVERGED_ATOL",
+    32
+   ],
+   [
+    "CONVERGED_ATOL",
+    24
+   ]
+  ],
+  "median": 32.0,
+  "max": 38,
+  "median_rtol": 35.0,
+  "capped": false,
+  "W_km": 4.639669176228923,
+  "h_fine_m": 132.5,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 2.0,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_micro_ref1_l2.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_ATOL",
+    31
+   ]
+  ],
+  "median": 34.0,
+  "max": 36,
+  "median_rtol": 34.0,
+  "capped": false,
+  "W_km": 5.182598218969971,
+  "h_fine_m": 2120.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 2.0,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_micro_ref2_l2.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_ATOL",
+    32
+   ]
+  ],
+  "median": 36.0,
+  "max": 37,
+  "median_rtol": 36.0,
+  "capped": false,
+  "W_km": 5.330661041852265,
+  "h_fine_m": 1060.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 2.0,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_micro_ref3_l2.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    34
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    33
+   ],
+   [
+    "CONVERGED_ATOL",
+    32
+   ],
+   [
+    "CONVERGED_ATOL",
+    19
+   ]
+  ],
+  "median": 33.5,
+  "max": 38,
+  "median_rtol": 35.0,
+  "capped": false,
+  "W_km": 5.417244046647827,
+  "h_fine_m": 530.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "micro",
+  "l_km": 2.0,
+  "ref": 4,
+  "log": "results/fmg/micro_ref4_l2_tight_gridseq.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    27
+   ],
+   [
+    "CONVERGED_RTOL",
+    25
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ],
+   [
+    "CONVERGED_ATOL",
+    21
+   ]
+  ],
+  "median": 27.0,
+  "max": 37,
+  "median_rtol": 27.0,
+  "capped": false,
+  "W_km": 5.439081170930606,
+  "h_fine_m": 265.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "plain",
+  "l_km": 0.0,
+  "ref": 1,
+  "log": "jobs/logs/fmgtable_plain_ref1.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 5,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_RTOL",
+    38
+   ],
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    35
+   ],
+   [
+    "CONVERGED_ATOL",
+    30
+   ]
+  ],
+  "median": 35.0,
+  "max": 38,
+  "median_rtol": 35.5,
+  "capped": false,
+  "W_km": 4.430802943539787,
+  "h_fine_m": 2120.0,
+  "resolving_level": 1
+ },
+ {
+  "kind": "plain",
+  "l_km": 0.0,
+  "ref": 2,
+  "log": "jobs/logs/fmgtable_plain_ref2.log",
+  "outcome": "CONVERGED_FNORM_ABS",
+  "nl_its": 6,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    37
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_RTOL",
+    50
+   ],
+   [
+    "CONVERGED_RTOL",
+    48
+   ],
+   [
+    "CONVERGED_RTOL",
+    46
+   ],
+   [
+    "CONVERGED_ATOL",
+    33
+   ]
+  ],
+  "median": 47.0,
+  "max": 50,
+  "median_rtol": 48.0,
+  "capped": false,
+  "W_km": 3.9194368286867887,
+  "h_fine_m": 1060.0,
+  "resolving_level": 2
+ },
+ {
+  "kind": "plain",
+  "l_km": 0.0,
+  "ref": 3,
+  "log": "jobs/logs/fmgtable_plain_ref3.log",
+  "outcome": "DIVERGED_LINEAR_SOLVE",
+  "nl_its": 2,
+  "krylov": [
+   [
+    "CONVERGED_RTOL",
+    36
+   ],
+   [
+    "CONVERGED_RTOL",
+    226
+   ],
+   [
+    "DIVERGED_ITS",
+    500
+   ]
+  ],
+  "median": 226.0,
+  "max": 500,
+  "median_rtol": 131.0,
+  "capped": true,
+  "W_km": 5.891632210882193,
+  "h_fine_m": 530.0,
+  "resolving_level": 1
+ }
+]
