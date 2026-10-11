@@ -44,6 +44,8 @@ params = uw.Params(
                                      "results/micromorphic/checkpoints/<run> (empty = the "
                                      "viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the outer Krylov residual"),
+    uw_mesh=uw.Param("", description="gmsh file of the notch (empty = the 2-D mesh1); a 3-D "
+                                     "extruded notch from make_notch_mesh_3d.py"),
     uw_seed=uw.Param(1, description="1 = start from the viscous seed (warm: no Picard "
                                      "warm-up); 0 = cold from rest (the automatic warm-up "
                                      "step arms)"),
@@ -65,7 +67,7 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
                          dict(chi=(1, 1, True, "1/s")))
           if str(params.uw_init) else None)
-S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)))
+S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None)
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]
@@ -92,9 +94,8 @@ taylor = cn.taylor_slopes(stokes) if int(params.uw_taylor) else None
 if taylor:
     uw.pprint(f"[taylor] remainders {taylor[0]}  slopes {taylor[1]}")
 
-measured = cn.measure(S, OUT, name)
-record = dict(
-    ref=ref, xi=xi, beta=beta, l_km=l_km,
+base_record = dict(
+    ref=ref, xi=xi, beta=beta, l_km=l_km, dim=mesh.dim,
     init=os.path.basename(str(params.uw_init)) or "seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
     nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
@@ -104,20 +105,54 @@ record = dict(
                    .get("picard_warmup_its", 0)),
     nprocs=uw.mpi.size, seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
-    W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
-    W_integral_km=measured["W_integral_km"], relative_peak=measured["relative_peak"],
-    bands_horizontal=measured["bands_horizontal"], bands_vertical=measured["bands_vertical"],
     floor_bound_over_floor=cn.floor_bound_over_floor(S, chi, beta),
     chi_max=float(np.asarray(chi.max())),
     taylor=taylor,
 )
-width9 = cn.integral_width(S, 9.0, "outside")      # the current estimator
-record.update(W_outside9_km=width9["median"], W_outside9_spread_km=width9["spread"],
-              peak_outside9=width9["peak_over_background"])
-uw.pprint(f"[micromorphic] current estimator: W {width9['median']:.3f} km  peak "
-          f"{width9['peak_over_background']:.3f}")
-uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km np {uw.mpi.size}: "
-          f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  "
-          f"W_int {record['W_integral_km']['median']:.2f}  W_v {record['W_vertical_km']}  "
-          f"peak {record['relative_peak']}  floor bound {record['floor_bound_over_floor']:.1f}")
+if mesh.dim == 2:
+    measured = cn.measure(S, OUT, name)
+    record = dict(
+        base_record,
+        init=os.path.basename(str(params.uw_init)) or "seed",
+        reason=report.reason_str, converged=report.reason_str in cn.DONE,
+        nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
+        seed=bool(int(params.uw_seed)),
+        # the solve report folds a Picard warm-up into nl_its and records its steps here
+        warmup_its=int((getattr(report, "config", None) or {}).get("tangent", {})
+                       .get("picard_warmup_its", 0)),
+        nprocs=uw.mpi.size, seconds=seconds,
+        h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
+        W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
+        W_integral_km=measured["W_integral_km"], relative_peak=measured["relative_peak"],
+        bands_horizontal=measured["bands_horizontal"], bands_vertical=measured["bands_vertical"],
+        floor_bound_over_floor=cn.floor_bound_over_floor(S, chi, beta),
+        chi_max=float(np.asarray(chi.max())),
+        taylor=taylor,
+    )
+    width9 = cn.integral_width(S, 9.0, "outside")      # the current estimator
+    record.update(W_outside9_km=width9["median"], W_outside9_spread_km=width9["spread"],
+                  peak_outside9=width9["peak_over_background"])
+    uw.pprint(f"[micromorphic] current estimator: W {width9['median']:.3f} km  peak "
+              f"{width9['peak_over_background']:.3f}")
+    uw.pprint(f"[micromorphic] ref {ref} xi {xi} beta {beta} l {l_km} km np {uw.mpi.size}: "
+              f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  "
+              f"W_int {record['W_integral_km']['median']:.2f}  W_v {record['W_vertical_km']}  "
+              f"peak {record['relative_peak']}  floor bound {record['floor_bound_over_floor']:.1f}")
+else:
+    # The extruded notch: the current estimator on cut planes along strike. The
+    # 2-D horizontal / vertical-equivalent measures are not carried over.
+    # the global extent, collectively (PETSc), in the mesh's non-dimensional units
+    Lz_km = float(S["mesh"].dm.getBoundingBox()[2][1]) * cn.H_KM
+    along = {}
+    for fz in (0.02, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.98):
+        w = cn.integral_width(S, 9.0, "outside", z_km=fz * Lz_km)
+        along[f"{fz * Lz_km:.2f}"] = dict(W_km=w["median"], spread_km=w["spread"],
+                                          peak=w["peak_over_background"])
+    mid = along[f"{0.5 * Lz_km:.2f}"]
+    record = dict(base_record, Lz_km=Lz_km, along_strike=along,
+                  W_outside9_km=mid["W_km"], peak_outside9=mid["peak"])
+    uw.pprint(f"[micromorphic 3-D] ref {ref} beta {beta} l {l_km} km np {uw.mpi.size}: "
+              f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  mid-strike W "
+              f"{mid['W_km']:.3f} km, peak {mid['peak']:.3f}; W(z) " +
+              " ".join(f"{v['W_km']:.2f}" for v in along.values()))
 cn.write(OUT, name, record, dict(v=S["v"], p=S["p"], chi=chi), mesh)

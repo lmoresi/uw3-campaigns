@@ -43,6 +43,12 @@ class boundaries(Enum):
     Bottom = 3; Top = 4; Right = 2; Left = 1; Inner = 5
 
 
+class boundaries3d(Enum):
+    """The extruded notch (make_notch_mesh_3d.py): the 2-D groups plus the
+    strike-normal faces."""
+    Bottom = 3; Top = 4; Right = 2; Left = 1; Inner = 5; Front = 6; Back = 7
+
+
 # The weak inclusion carries no load once the strong layer yields, so it is purely
 # viscous: a yield stress it can never reach, rather than a special case in the law.
 #
@@ -122,8 +128,10 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     _cv = plex[1].getCoordinates()
     _cv.scale(1.0 / H_km)
     plex[1].setCoordinates(_cv)
+    dim = plex[1].getDimension()
     mesh = uw.discretisation.Mesh(
-        plex[1], boundaries=boundaries, useMultipleTags=True, useRegions=True,
+        plex[1], boundaries=boundaries if dim == 2 else boundaries3d,
+        useMultipleTags=True, useRegions=True,
         coordinate_system_type=uw.coordinates.CoordinateSystemType.CARTESIAN,
         qdegree=3, refinement=refinement)
 
@@ -321,10 +329,20 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
         stokes.bodyforce = sympy.Matrix(
             [tau_var.sym[0], -rho_0 * g + tau_var.sym[1]])
     else:
-        stokes.bodyforce = sympy.Matrix([0, -rho_0 * g])
-    stokes.add_dirichlet_bc((sympy.oo, 0.0), "Bottom")
-    stokes.add_dirichlet_bc((V_conv, 0.0), "Left")
-    stokes.add_dirichlet_bc((-V_conv, 0.0), "Right")
+        stokes.bodyforce = sympy.Matrix([0, -rho_0 * g] + [0] * (mesh.dim - 2))
+    if mesh.dim == 2:
+        stokes.add_dirichlet_bc((sympy.oo, 0.0), "Bottom")
+        stokes.add_dirichlet_bc((V_conv, 0.0), "Left")
+        stokes.add_dirichlet_bc((-V_conv, 0.0), "Right")
+    else:
+        # The extruded notch: the 2-D conditions with u_z = 0 on the side walls (the
+        # plane-strain extrusion), and u_z = 0 alone on the strike-normal faces, which
+        # are symmetry planes. Not rotated free-slip: it refuses a coupled field.
+        stokes.add_dirichlet_bc((sympy.oo, 0.0, sympy.oo), "Bottom")
+        stokes.add_dirichlet_bc((V_conv, 0.0, 0.0), "Left")
+        stokes.add_dirichlet_bc((-V_conv, 0.0, 0.0), "Right")
+        stokes.add_dirichlet_bc((sympy.oo, sympy.oo, 0.0), "Front")
+        stokes.add_dirichlet_bc((sympy.oo, sympy.oo, 0.0), "Back")
     # The 1/mu mass matrix IS the Schur preconditioner for variable-viscosity Stokes, and
     # the mu that belongs there is the viscosity the momentum operator actually has --
     # the EFFECTIVE one, including yielding. Using the linear viscosity is right only for

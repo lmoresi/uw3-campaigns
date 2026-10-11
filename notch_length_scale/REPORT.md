@@ -300,12 +300,21 @@ at ref 3, then confirmed by exact runs (W at ref 3):
 
 (l = 1 km, c = 0.041 missed, at 5.15 km: W is steep in c near the threshold.)
 
-- **At matched width the bands are nearly the same.** Peaks agree within 3-6%, and the
-  profiles overlie each other: the micromorphic lower flank is slightly steeper.
-  So a Cosserat band is the micromorphic band at a shorter length (l_C ≈ 0.4-0.55
-  l_M at c = 1), not a different structure.
-  [`matched_profiles_ref3.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref3.png),
-  [`matched_profiles_ref4.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref4.png).
+- **At matched width the band shapes and peaks agree, but the c = 1 band sits higher.**
+  - Peaks agree within 3-6%, and the micromorphic lower flank is slightly steeper.
+  - The peak's y on each of the 8 cuts (`drivers/peak_positions.py`,
+    `results/peak_positions.json`) gives the same dip for both models: 43-45° for the peak
+    trace, against 45.0 / 45.1° micromorphic at P3.
+  - But the Cosserat c = 1 trace is shifted upward on every cut: by about 1 km at P3
+    (y = −9.17 against −10.06 km at x = −15 km; intercept at x = 0, −23.9 against
+    −25.1 km) and by about 0.5 km at P2.
+  - The small-c Cosserat bands, (0.25, 0.1) and (0.5, 0.054), follow the micromorphic
+    trace to within about 0.3 km.
+  - So at c = 1 the band is the same width and dip but rooted about 1 km higher on the
+    notch. Near the threshold in c, Cosserat reproduces the micromorphic band, position
+    included.
+  - Profiles: [`matched_profiles_ref3.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref3.png),
+    [`matched_profiles_ref4.png`](https://github.com/lmoresi/uw3-campaigns/blob/main/notch_length_scale/figures/matched_profiles_ref4.png).
 - **Mesh independence of the matched Cosserat runs**, W at refs 3 → 4:
   - 2.658 → 2.600 (P1);
   - 3.633 → 3.622 and 3.598 → 3.607 (P2);
@@ -413,7 +422,8 @@ as `picard_warmup_its`. (`results/eff_table_cold.json`.)
   the c threshold, Cosserat needs a good initial state.
 
 **Summary.**
-- At the same band width the two models make nearly the same band.
+- At the same band width the two models make bands of the same width, dip and peak.
+  Cosserat c = 1 roots its band about 1 km higher on the notch; small c does not.
 - Cosserat c = 1 is somewhat more robust and faster in Newton, and it reaches the
   narrow-band case (P1) that stalls micromorphic's FMG. It needs l about 0.4-0.55 of
   the micromorphic l, and three fields per node instead of one extra scalar in 3-D.

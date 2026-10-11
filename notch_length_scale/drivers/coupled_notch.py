@@ -25,11 +25,11 @@ DONE = ("CONVERGED_FNORM_ABS", "CONVERGED_FNORM_RELATIVE", "CONVERGED_SNORM_RELA
 LEVELS = [-0.7, -0.6, -0.5, -0.4]
 
 
-def build_notch(ref, xi, seed=True):
+def build_notch(ref, xi, seed=True, msh=None):
     """The notch at refinement ``ref`` with the shipped yield law and xi as
     plastic_rate_strengthening; returns notch_model.build's dict. ``seed=False``
     skips the viscous seed solve (for loading saved fields)."""
-    S = nm.build(MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=seed,
+    S = nm.build(msh or MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=seed,
                  p_degree=1, p_continuous=True)
     cm = S["cm"]
     cm.yield_mode = "softmin"
@@ -196,14 +196,15 @@ def canonical_run(ref, l_km, beta=0.1, xi=0, model="micromorphic"):
     return base + suffix
 
 
-def integral_width(S, window_km=WINDOW_KM, background="cut"):
+def integral_width(S, window_km=WINDOW_KM, background="cut", z_km=None):
     """The band width with no support cut-off: on each vertical cut, the area of
     edot_II above the far-field background within +-``window_km`` of the peak, over the
     peak height, times cos(dip) for the band-normal width; the median over the cuts.
     ``background="cut"``: the median over the whole cut; ``"outside"``: the median over
     the part of the cut outside the window (falls back to the whole cut where the
     window covers it). The cut spans y = -20.4 .. -0.6 km, so a window much wider than
-    +-6 km reaches the cut's ends.
+    +-6 km reaches the cut's ends. On the extruded (3-D) notch the cuts lie in the
+    plane z = ``z_km``.
     The equivalent width stops its support at 10% of the peak, and on these profiles
     (a long tail on the upper side) that cut-off moves by +-0.5 km between limbs and
     refinements; this measure does not. The spread between cuts is real: the limb
@@ -213,6 +214,8 @@ def integral_width(S, window_km=WINDOW_KM, background="cut"):
     widths, peaks = [], []
     for xs in STATIONS:
         coords = np.column_stack([np.full_like(y, xs), y])
+        if z_km is not None:
+            coords = np.column_stack([coords, np.full_like(y, z_km / H_KM)])
         f = np.asarray(uw.function.global_evaluate(S["stokes"].Unknowns.Einv2, coords)).ravel()
         i = int(np.argmax(f - np.median(f)))
         window = np.abs(y_km - y_km[i]) < window_km
