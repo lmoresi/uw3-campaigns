@@ -3,10 +3,9 @@ over the strong layer (m = 1), from checkpoints: max s / C (strengthening, at th
 band centre) and min s / C (weakening, on the flanks), with max H chi / C (the floor
 bound, a different quantity: since e >= 0, s >= -H chi) beside them.
 
-e = edot_II(u) is evaluated at chi's own P1 nodes (each rank its own nodes, exact
-there) and chi is read at the same nodes; in model units s / C = beta (eta_bg V/H / C)
-(e - chi). Nodes where e evaluates <= 0 on the rebuilt model (the weak inclusion's
-corners) are left out. The extremes are global (a scratch P1 variable's collective
+e = edot_II(u) is L2-projected onto chi's own P1 space and compared node by node; in model units s / C = beta (eta_bg V/H / C)
+(e - chi). Nodes where the projected e is <= 0 (the projection's overshoot at the notch)
+are left out. The extremes are global (a scratch P1 variable's collective
 min / max). Writes ../results/<uw_out>."""
 import glob
 import json
@@ -43,10 +42,22 @@ for name in names:
     chi = uw.discretisation.MeshVariable("chi", S["mesh"], 1, degree=1, units="1/s")
     for var in (S["v"], chi):
         var.read_timestep(name, var.name, 0, outputPath=CK)
-    nodes = chi.coords
-    e = np.asarray(uw.function.evaluate(S["stokes"].Unknowns.Einv2, nodes)).ravel()
+    # e by L2 projection onto chi's P1 space, in the same units as chi (1/s). A
+    # point evaluate of Unknowns.Einv2 on the rebuilt model comes back in 1/s^0.5
+    # (the units mix of evaluate on a rebuilt model), so e and chi could not be
+    # compared: the first versions of this script read e as ~0 (max s < 0
+    # everywhere, min s = -max H chi exactly). The projection goes through the
+    # solver's compiled, consistently scaled path, as chi itself did.
+    e_var = uw.discretisation.MeshVariable("e_proj", S["mesh"], 1, degree=1, units="1/s")
+    projection = uw.systems.Projection(S["mesh"], e_var)
+    projection.uw_function = S["stokes"].Unknowns.Einv2
+    projection.smoothing = 0.0
+    projection.solve()
+    e_nd = np.asarray(e_var.array).ravel() / RATE
+    nodes = np.asarray(chi.coords) / (cn.H_KM * 1.0e3)
     strong = np.asarray(uw.function.evaluate(S["mat"].sym[0], nodes)).ravel() > 0.5
     chi_nd = np.asarray(chi.array).ravel() / RATE
+    e = e_nd
     keep = strong & (e > 0)
     shift = beta * STRESS_OVER_C * (e - chi_nd)
     floor = beta * STRESS_OVER_C * chi_nd
