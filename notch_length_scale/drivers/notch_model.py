@@ -80,7 +80,8 @@ def set_floor(S, value):
 def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
           unique_params=False,
           rate_source="live", fas_source=False, p_degree=1, p_continuous=True,
-          strategy=None, floor_scalar=None, residual_strength=0.02):
+          strategy=None, floor_scalar=None, residual_strength=0.02,
+          weak_ramp=None):
     """The notch benchmark on ViscoPlasticFlowModel with the power-mean soft-min.
 
     Returns a dict with the solver, the fields, the live xi variable and the viscous
@@ -187,7 +188,18 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     # parameter outside them differentiated cleanly.
     m_strong = mat.sym[0]
     strong = mat.sym[0] > 0.5          # kept: some callers still read it
-    visc_lin = m_strong * eta_bg_e + (1 - m_strong) * eta_b
+    # The weak inclusion's viscosity, optionally ramped along strike (3-D):
+    # weak_ramp = (z0_km, w_km) gives log10 eta_b(z) = 22 - tanh((z0 - z) / w), i.e.
+    # 1e21 (as above) well below z0 and 1e23 (the strong layer) well above it, a
+    # smoothed, restricted notch whose weak segment z < z0 is half of a notch of
+    # length 2 z0 mirrored in the u_z = 0 face. Built on the raw (non-dimensional)
+    # coordinate, so z0 and w are divided by H.
+    eta_b_eff = eta_b
+    if weak_ramp is not None:
+        z0_nd, w_nd = weak_ramp[0] / H_km, weak_ramp[1] / H_km
+        z = mesh.CoordinateSystem.N.z
+        eta_b_eff = eta_b * 10 ** (1 - sympy.tanh((z0_nd - z) / w_nd))
+    visc_lin = m_strong * eta_bg_e + (1 - m_strong) * eta_b_eff
     cm.Parameters.shear_viscosity_0 = visc_lin
 
     # Drucker-Prager: pressure-dependent cohesion, floored at zero so tension cannot

@@ -46,6 +46,9 @@ params = uw.Params(
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the outer Krylov residual"),
     uw_mesh=uw.Param("", description="gmsh file of the notch (empty = the 2-D mesh1); a 3-D "
                                      "extruded notch from make_notch_mesh_3d.py"),
+    uw_weak_ramp=uw.Param("", description="3-D only: 'z0,w' in km, the weak inclusion's "
+                                          "viscosity ramped along strike, log10 eta_b = 22 - "
+                                          "tanh((z0 - z)/w) (empty = uniform)"),
     uw_seed=uw.Param(1, description="1 = start from the viscous seed (warm: no Picard "
                                      "warm-up); 0 = cold from rest (the automatic warm-up "
                                      "step arms)"),
@@ -58,18 +61,23 @@ params = uw.Params(
 OUT = os.path.join(_here, "..", "results", "micromorphic")
 
 ref, xi = int(params.uw_ref), float(params.uw_xi)
+weak_ramp = (tuple(float(v) for v in str(params.uw_weak_ramp).split(","))
+             if str(params.uw_weak_ramp) else None)
 beta, l_km = float(params.uw_beta), float(params.uw_l_km)
 name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
     ("" if uw.mpi.size == 1 else f"_np{uw.mpi.size}") + \
     (f"_{os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]}" if str(params.uw_mesh)
      else "") + \
+    (f"_ramp{weak_ramp[0]:g}w{weak_ramp[1]:g}" if weak_ramp else "") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
-                         dict(chi=(1, 1, True, "1/s")), msh=str(params.uw_mesh) or None)
+                         dict(chi=(1, 1, True, "1/s")), msh=str(params.uw_mesh) or None,
+                         weak_ramp=weak_ramp)
           if str(params.uw_init) else None)
-S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None)
+S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None,
+                   weak_ramp=weak_ramp)
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]
@@ -151,7 +159,7 @@ else:
         along[f"{fz * Lz_km:.2f}"] = dict(W_km=w["median"], spread_km=w["spread"],
                                           peak=w["peak_over_background"])
     mid = along[f"{0.5 * Lz_km:.2f}"]
-    record = dict(base_record, Lz_km=Lz_km, along_strike=along,
+    record = dict(base_record, Lz_km=Lz_km, along_strike=along, weak_ramp=weak_ramp,
                   W_outside9_km=mid["W_km"], peak_outside9=mid["peak"])
     uw.pprint(f"[micromorphic 3-D] ref {ref} beta {beta} l {l_km} km np {uw.mpi.size}: "
               f"{report.reason_str} its {report.nl_its} ({seconds:.0f} s)  mid-strike W "

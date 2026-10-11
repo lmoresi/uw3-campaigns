@@ -25,12 +25,12 @@ DONE = ("CONVERGED_FNORM_ABS", "CONVERGED_FNORM_RELATIVE", "CONVERGED_SNORM_RELA
 LEVELS = [-0.7, -0.6, -0.5, -0.4]
 
 
-def build_notch(ref, xi, seed=True, msh=None):
+def build_notch(ref, xi, seed=True, msh=None, weak_ramp=None):
     """The notch at refinement ``ref`` with the shipped yield law and xi as
     plastic_rate_strengthening; returns notch_model.build's dict. ``seed=False``
     skips the viscous seed solve (for loading saved fields)."""
     S = nm.build(msh or MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=seed,
-                 p_degree=1, p_continuous=True)
+                 p_degree=1, p_continuous=True, weak_ramp=weak_ramp)
     cm = S["cm"]
     cm.yield_mode = "softmin"
     cm.yield_smoother = "sqrt"
@@ -76,6 +76,14 @@ def solve_newton(S, name, out_dir, budget, monitor, linear="exact"):
         # the outer Krylov residual every iteration: tells a slow linear solve
         # from a stuck one when a Newton step goes quiet
         stokes.petsc_options["ksp_monitor_short"] = None
+    if S["mesh"].dim == 3 and linear in ("production", "production_tight"):
+        # 3-D: the multigrid coarse level is a redundant direct solve, and PETSc's
+        # native LU of a 3-D P2 coarse problem takes minutes (6.5 min per Newton step
+        # at 37k coarse dofs, 2026-10-12); MUMPS takes seconds (the same Newton step
+        # 2.5 min against 21). 2-D left as it was.
+        for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
+                       "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
+            stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
     if linear in ("production", "production_tight"):
         if linear == "production_tight":
             # every Newton direction solved to a fixed, tight tolerance (no
@@ -260,7 +268,7 @@ def strong_layer_range(S, expression):
     return [lowest, float(scratch.max())]
 
 
-def load_coarse(path, coarse_ref, xi, extra=None, msh=None):
+def load_coarse(path, coarse_ref, xi, extra=None, msh=None, weak_ramp=None):
     """A coarser run's checkpoint (``write``'s ``write_timestep`` output, path without
     the ``.mesh...`` suffix) on a rebuilt coarse notch, for ``prolong``. The checkpoint
     is remapped by coordinates, so any decomposition, serial or parallel, reads it.
@@ -269,7 +277,7 @@ def load_coarse(path, coarse_ref, xi, extra=None, msh=None):
     Call this BEFORE building the fine notch: named expressions are shared between
     builds in one process (#767), so a coarse build made after the fine one rebinds
     the fine solver's strain-rate invariant to the coarse velocity."""
-    coarse = build_notch(coarse_ref, xi, seed=False, msh=msh)
+    coarse = build_notch(coarse_ref, xi, seed=False, msh=msh, weak_ramp=weak_ramp)
     fields = dict(v=coarse["v"], p=coarse["p"])
     for key, (components, degree, continuous, units) in (extra or {}).items():
         fields[key] = uw.discretisation.MeshVariable(

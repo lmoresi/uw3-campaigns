@@ -11,8 +11,11 @@ Physical groups, as the 2-D mesh where they exist: volumes Weak (100) and Strong
 (101); surfaces Left (1), Right (2), Bottom (3), Top (4), Inner (5), and the
 strike-normal faces Front (6, z = 0) and Back (7, z = Lz), classified by bounding box.
 
-Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir]
-Writes: <out_dir>/notch3d_hb<h_band>_Lz<Lz>.msh
+Optional along-strike window (for the tanh weak-zone ramp): a second Box, the band
+region over |z - z0| <= zhalf, at size h_z; the field is the min of the two.
+
+Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir] [z0 zhalf h_z]
+Writes: <out_dir>/notch3d_hb<h_band>_Lz<Lz>[_z<z0>h<h_z>].msh
 """
 import os
 import sys
@@ -21,8 +24,9 @@ import gmsh
 
 h_band = float(sys.argv[1]) if len(sys.argv) > 1 else 1.2
 Lz = float(sys.argv[2]) if len(sys.argv) > 2 else 20.0
-out_dir = sys.argv[3] if len(sys.argv) > 3 else os.path.expanduser(
+out_dir = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "-" else os.path.expanduser(
     "~/+Simulations/spiegelman_hardcase/meshes")
+z_window = tuple(float(v) for v in sys.argv[4:7]) if len(sys.argv) > 6 else None
 os.makedirs(out_dir, exist_ok=True)
 
 S = 30.0
@@ -94,13 +98,30 @@ gmsh.model.mesh.field.setNumber(box, "YMax", 0.0)
 gmsh.model.mesh.field.setNumber(box, "ZMin", -1.0)
 gmsh.model.mesh.field.setNumber(box, "ZMax", Lz + 1.0)
 gmsh.model.mesh.field.setNumber(box, "Thickness", 0.3 * S)
-gmsh.model.mesh.field.setAsBackgroundMesh(box)
+background = box
+if z_window is not None:
+    z0, zhalf, h_z = z_window
+    zbox = gmsh.model.mesh.field.add("Box")
+    gmsh.model.mesh.field.setNumber(zbox, "VIn", h_z)
+    gmsh.model.mesh.field.setNumber(zbox, "VOut", cl_1)
+    gmsh.model.mesh.field.setNumber(zbox, "XMin", -1.05 * S)
+    gmsh.model.mesh.field.setNumber(zbox, "XMax", 1.05 * S)
+    gmsh.model.mesh.field.setNumber(zbox, "YMin", -0.8 * S)
+    gmsh.model.mesh.field.setNumber(zbox, "YMax", 0.0)
+    gmsh.model.mesh.field.setNumber(zbox, "ZMin", z0 - zhalf)
+    gmsh.model.mesh.field.setNumber(zbox, "ZMax", z0 + zhalf)
+    gmsh.model.mesh.field.setNumber(zbox, "Thickness", zhalf)
+    both = gmsh.model.mesh.field.add("Min")
+    gmsh.model.mesh.field.setNumbers(both, "FieldsList", [box, zbox])
+    background = both
+gmsh.model.mesh.field.setAsBackgroundMesh(background)
 gmsh.option.setNumber("Mesh.MeshSizeExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.MeshSizeFromPoints", 0)
 gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 0)
 gmsh.option.setNumber("Mesh.Algorithm3D", 10)       # HXT, parallel
 gmsh.model.mesh.generate(3)
-out = f"{out_dir}/notch3d_hb{h_band:g}_Lz{Lz:g}.msh"
+out = f"{out_dir}/notch3d_hb{h_band:g}_Lz{Lz:g}" + \
+    (f"_z{z_window[0]:g}h{z_window[2]:g}" if z_window else "") + ".msh"
 gmsh.write(out)
 types, tags, _ = gmsh.model.mesh.getElements(3)
 n_tet = sum(len(t) for t in tags)
