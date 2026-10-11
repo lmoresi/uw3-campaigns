@@ -331,7 +331,12 @@ W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
 - The 3-D code path reproduces 2-D: same Newton count, same W to about 1.5%, and W uniform
   along strike to ±0.7%, as the symmetry planes imply.
 - FMG stays flat in 3-D: 29-46 Krylov per step against 35-43 in 2-D.
-- β = 0.3 at the same resolution is running.
+- β = 0.3 at the same resolution: 5 Newton steps (Krylov 36, 37, 37, 34, 25), W at
+  mid-strike 5.684 km (5.60-5.76 along strike), peak 0.65, 1 h 17 min at np 8.
+  - Against β = 0.1: one Newton step fewer, a 24% wider and weaker band, as in 2-D.
+    In 2-D, β 0.1 → 0.2 at l = 1 widens W by 10% and cuts one step.
+  - The strengthening it buys in the band is about 1.1 C, against 0.37 C (see the shift
+    table).
 - Next is the tanh along-strike weak zone, log10 η_b = 22 − tanh((z0 − z)/w), with a longer Lz.
 
 ### The yield-stress shift the micromorphic law applies (ref 3, 2026-10-12)
