@@ -260,7 +260,7 @@ def strong_layer_range(S, expression):
     return [lowest, float(scratch.max())]
 
 
-def load_coarse(path, coarse_ref, xi, extra=None):
+def load_coarse(path, coarse_ref, xi, extra=None, msh=None):
     """A coarser run's checkpoint (``write``'s ``write_timestep`` output, path without
     the ``.mesh...`` suffix) on a rebuilt coarse notch, for ``prolong``. The checkpoint
     is remapped by coordinates, so any decomposition, serial or parallel, reads it.
@@ -269,7 +269,7 @@ def load_coarse(path, coarse_ref, xi, extra=None):
     Call this BEFORE building the fine notch: named expressions are shared between
     builds in one process (#767), so a coarse build made after the fine one rebinds
     the fine solver's strain-rate invariant to the coarse velocity."""
-    coarse = build_notch(coarse_ref, xi, seed=False)
+    coarse = build_notch(coarse_ref, xi, seed=False, msh=msh)
     fields = dict(v=coarse["v"], p=coarse["p"])
     for key, (components, degree, continuous, units) in (extra or {}).items():
         fields[key] = uw.discretisation.MeshVariable(

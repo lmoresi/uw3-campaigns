@@ -62,10 +62,12 @@ beta, l_km = float(params.uw_beta), float(params.uw_l_km)
 name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     ("" if str(params.uw_linear) == "exact" else f"_{params.uw_linear}") + \
     ("" if uw.mpi.size == 1 else f"_np{uw.mpi.size}") + \
+    (f"_{os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]}" if str(params.uw_mesh)
+     else "") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
-                         dict(chi=(1, 1, True, "1/s")))
+                         dict(chi=(1, 1, True, "1/s")), msh=str(params.uw_mesh) or None)
           if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None)
 mesh, stokes = S["mesh"], S["stokes"]
