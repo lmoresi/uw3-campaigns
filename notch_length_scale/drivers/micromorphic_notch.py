@@ -44,6 +44,9 @@ params = uw.Params(
                                      "results/micromorphic/checkpoints/<run> (empty = the "
                                      "viscous seed with chi = 0)"),
     uw_monitor=uw.Param(1, description="1 = SNES and line-search monitors, 2 = and the outer Krylov residual"),
+    uw_seed=uw.Param(1, description="1 = start from the viscous seed (warm: no Picard "
+                                     "warm-up); 0 = cold from rest (the automatic warm-up "
+                                     "step arms)"),
     uw_ksp_max_it=uw.Param(0, description="cap on Krylov iterations per linear solve "
                                           "(0 = PETSc's default); a capped solve that misses "
                                           "rtol ends the Newton solve, reported as such"),
@@ -62,7 +65,7 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
                          dict(chi=(1, 1, True, "1/s")))
           if str(params.uw_init) else None)
-S = cn.build_notch(ref, xi)
+S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)))
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]
@@ -95,6 +98,8 @@ record = dict(
     init=os.path.basename(str(params.uw_init)) or "seed",
     reason=report.reason_str, converged=report.reason_str in cn.DONE,
     nl_its=report.nl_its, ksp_its=report.ksp_its, linear=str(params.uw_linear),
+    seed=bool(int(params.uw_seed)),
+    warmup_its=(stokes._picard_warmup_record or {}).get("nl_its", 0),
     nprocs=uw.mpi.size, seconds=seconds,
     h_min_km=float(mesh.get_min_radius()) * cn.H_KM,
     W_horizontal_km=measured["W_horizontal_km"], W_vertical_km=measured["W_vertical_km"],
