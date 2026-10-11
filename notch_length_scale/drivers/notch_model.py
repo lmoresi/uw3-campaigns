@@ -197,7 +197,7 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     eta_b_eff = eta_b
     if weak_ramp is not None:
         z0_nd, w_nd = weak_ramp[0] / H_km, weak_ramp[1] / H_km
-        z = mesh.CoordinateSystem.N.z
+        z = mesh.CoordinateSystem.N[2]      # the raw (non-dimensional) z coordinate symbol
         eta_b_eff = eta_b * 10 ** (1 - sympy.tanh((z0_nd - z) / w_nd))
     visc_lin = m_strong * eta_bg_e + (1 - m_strong) * eta_b_eff
     cm.Parameters.shear_viscosity_0 = visc_lin
