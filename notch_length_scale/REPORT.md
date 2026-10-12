@@ -547,7 +547,8 @@ l = 0.25 (P1) and l = 0.5 (P2).
 | P2 | micromorphic β = 1, l = 0.148 | 3 (4) | 27 | 41 / 53 | 227 | 3.68 | 1.61 | CONVERGED_FNORM_ABS |
 | P2 | micromorphic β = 1, l = 0.148 | 4 (8) | 3 | 35 / 36 | 443 | 3.68 | 1.62 | CONVERGED_FNORM_ABS |
 
-- **A stiffer β costs Newton steps from a cold start, and does not save them.**
+- **Without grid sequencing, a stiffer β costs Newton steps and saves none.** Refs 1-3
+  start from the viscous seed, as the β = 0.1 baseline does.
   - At P2, refs 1-3 take 7 / 8 / 10 steps at β = 0.3 and 14 / 22 / 27 at β = 1, against
     6 / 8 / 9 at β = 0.1.
   - At P1, β = 0.3 takes 17 steps at refs 2 and 3, against 10 at β = 0.1 ref 2 (ref 3 was
@@ -555,7 +556,7 @@ l = 0.25 (P1) and l = 0.5 (P2).
 - **FMG stays flat at P2 for every β:** 35-45 Krylov per step. At P1 with β = 0.3 it does
   not: 42 → 72 → 155 (median) over refs 1-3, and 126 at ref 4. That is the thinnest band
   (2.65 km) with the stiffest coupling.
-- Grid sequencing removes most of the cold-start cost at ref 4 for every β: 3-5 Newton
+- Grid sequencing removes most of that cost at ref 4 for every β: 3-5 Newton
   steps.
 - The widths match by construction (P2: 3.63 / 3.67 / 3.68 km at ref 4). The peak is a
   little lower as β grows (1.88 / 1.73 / 1.62).
@@ -1034,6 +1035,83 @@ the solve logs, and times from the run transcripts.
   widths are being re-measured with `production_ew1e-2` reruns (jobs `fmgW_*`).
 - For 3-D a coarser base is still worth having, but only to make the coarse direct solve
   cheap, not to cut iterations.
+
+### The coarse-level solve in 3-D: native LU, MUMPS, GAMG (2026-10-13)
+
+Louis ruled MUMPS out of the production path, because it misbehaves on some machines.
+Native LU on the multigrid coarse level is now the default, and MUMPS is opt-in
+(`-uw_coarse mumps`) for measurements only. Also available: `-uw_coarse gamg`, an
+inexact coarse solve (GMRES to 1e-3, at most 50 iterations, preconditioned by GAMG with
+Richardson + SOR smoothing). The velocity block's FGMRES tolerates a varying coarse
+solve.
+
+Micromorphic β = 0.1, l = 1 km, `production_ew1e-2`:
+
+| mesh (base tets) | ref (np) | coarse solve | Newton | outer Krylov | Newton solve time | per Krylov iteration | W (km) |
+|---|---|---|---|---|---|---|---|
+| 3-D hb4.8 Lz6 (1387) | 2 (8) | native LU | 6 | 51 | 1830 s | 36 s | 4.58627 |
+| 3-D hb4.8 Lz6 (1387) | 2 (8) | MUMPS | 6 | 51 | 1625 s | 32 s | 4.58627 |
+| 3-D hb4.8 Lz6 (1387) | 2 (8) | MUMPS, every solve to 1e-8 (earlier run) | 6 | 229 | 6803 s | 30 s | 4.58629 |
+| 2-D mesh1 (492 tri) | 3 (4) | native LU | 7 | 43 | 221 s | 5.1 s | 4.617272 |
+| 2-D mesh1 (492 tri) | 3 (4) | GAMG | 7 | 43 | 431 s | 10 s | 4.617272 |
+
+- **On a 1.4k-tet base, native LU costs 13% more than MUMPS.** The coarse base alone is
+  the fix at this size.
+- **Capped Eisenstat-Walker in 3-D saves 4.5× in Krylov and 3.7× in time** against
+  tight solves, with W the same to 5 digits.
+- **GAMG on the coarse level leaves the multigrid's convergence unchanged** (the same 43
+  outer iterations, the same W). In 2-D it is 2× slower, because a 492-triangle LU is
+  trivially cheap.
+  - On the coupled block it is weak: 53 of its coarse solves hit the 50-iteration cap.
+    It treats u and χ as one scalar system, with no block structure or near-nullspace.
+  - The first attempt used GMRES smoothers inside GAMG. That made the preconditioner
+    nonlinear under a plain GMRES, and the coupled block broke down (PC_FAILED). The
+    smoothers must be linear.
+- Pending:
+  - GAMG on the 3-D Lz6 base;
+  - the crossover pair, native against GAMG, on the 6067-tet Lz16 base at ref 1, where
+    LU should start to hurt.
+- The other route Louis raised is independent gmsh meshes per level, through the
+  non-nested transfer in `utilities/custom_mg.py` (`set_custom_fmg`). It targets one
+  field, and the coupled split holds u and χ, so it needs a block (u ⊕ χ) prolongation.
+
+### Arc snapping verified geometrically (2026-10-13)
+
+`drivers/snap_check.py` builds the hierarchy with and without the snap callback (no
+solve), serial and np 4, and checks every level. Results are in `results/snap_check/`.
+
+- **Every campaign result so far ran unsnapped** (`snap_arcs` defaults to False).
+  - gmsh gives each fillet arc 2 segments in mesh1, mesh1c2 and mesh1c4, and on the
+    z = 0 face of the 3-D bases. Uniform refinement keeps that chord polygon at every
+    level.
+  - The maximum deviation from the arc is 1.52e-3 H (46 m) in 2-D.
+  - In 3-D the cylindrical surfaces are tessellated with edges spanning a whole quarter
+    arc. The deviation there is 5.86e-3 H (176 m, a single chord), so the 2-D and 3-D
+    corners are not the same geometry.
+- **2-D snapping is correct.**
+  - Snapped Inner vertices lie within 3e-16 of the arcs at every level.
+  - The callback runs on every level: once at creation and again in the hierarchy's
+    trailing pass.
+  - The per-arc chord deficit falls 4× per level, from 1.25e-4 to 1.3e-7 at c4 ref 5.
+    Unsnapped it stays at 1.25e-4.
+  - Labels are complete, serial and np 4 are identical, and no cells are inverted.
+  - The minimum mean-ratio quality falls from 0.50 to 0.39 (mesh1, ref 3).
+  - The total Weak area cannot tell snapped from unsnapped: the two convex and two
+    concave fillets of equal radius cancel exactly.
+- **3-D snapping is unusable.**
+  - It inverts tets, serial too: 2 at level 1 and 11 at level 2. A surface-only move of
+    a one-chord sagitta outruns the volume neighbours.
+  - It was also inconsistent across ranks: a rank lacking the Inner face through a
+    shared vertex left it unsnapped, and shared vertices then differed by 1.4e-3 at
+    np 4. Fixed by OR-ing the Inner flag over ranks through the coordinate DM before
+    moving anything. The mismatch is now 0, and the np-4 Weak volume equals serial.
+  - Decision (peer and Louis): no snapping in 3-D.
+- **The library's shell callbacks are not affected.** Annulus and SphericalShell at
+  np 4, refinement 2 show zero cross-rank mismatch and exact radii at every level
+  (`drivers/library_snap_probe.py`). They label vertices directly (`markVertices=True`);
+  the notch mesh labels only faces.
+- Whether corner detail matters is decided by the 2-D snapped-vs-unsnapped W at ref 3,
+  below once the reruns finish.
 
 ### The np = 3 hang (task 2): fixed
 

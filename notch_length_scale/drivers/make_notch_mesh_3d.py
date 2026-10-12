@@ -14,14 +14,22 @@ strike-normal faces Front (6, z = 0) and Back (7, z = Lz), classified by boundin
 Optional along-strike window (for the tanh weak-zone ramp): a second Box, the band
 region over |z - z0| <= zhalf, at size h_z; the field is the min of the two.
 
-Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir] [z0 zhalf h_z]
-Writes: <out_dir>/notch3d_hb<h_band>_Lz<Lz>[_z<z0>h<h_z>].msh
+Optional --split (the along-strike ramp meshes only): an internal surface at
+y = -0.75 H between the two lower arc ends splits Weak into the notch bump and the
+lower layer. Weak (100) stays the union; the bump is also the volume group Notch (102),
+so a notch-only ramp is exact at every refinement level. The split face carries no
+boundary group. Without --split the mesh is built exactly as before.
+
+Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir] [z0 zhalf h_z] [--split]
+Writes: <out_dir>/notch3d_hb<h_band>_Lz<Lz>[_z<z0>h<h_z>][_split].msh
 """
 import os
 import sys
 
 import gmsh
 
+split = "--split" in sys.argv
+sys.argv = [a for a in sys.argv if a != "--split"]
 h_band = float(sys.argv[1]) if len(sys.argv) > 1 else 1.2
 Lz = float(sys.argv[2]) if len(sys.argv) > 2 else 20.0
 out_dir = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "-" else os.path.expanduser(
@@ -55,14 +63,25 @@ C22, C23 = g.addCircleArc(p12, p20, p13), g.addCircleArc(p14, p21, p15)
 C24, C25 = g.addCircleArc(p16, p22, p17), g.addCircleArc(p18, p24, p19)
 L26, L27, L28 = g.addLine(p7, p12), g.addLine(p13, p14), g.addLine(p15, p16)
 L29, L30 = g.addLine(p17, p18), g.addLine(p19, p4)
-loop_weak = g.addCurveLoop([L1, L2, -L30, -C25, -L29, -C24, -L28, -C23, -L27, -C22, -L26, L7])
 loop_strong = g.addCurveLoop([L6, L26, C22, L27, C23, L28, C24, L29, C25, L30, L3, L4, L8, L9, L10])
-s_weak, s_strong = g.addPlaneSurface([loop_weak]), g.addPlaneSurface([loop_strong])
-out_weak = g.extrude([(2, s_weak)], 0, 0, Lz)
-out_strong = g.extrude([(2, s_strong)], 0, 0, Lz)
-g.synchronize()
-v_weak = [t for d, t in out_weak if d == 3]
-v_strong = [t for d, t in out_strong if d == 3]
+s_strong = g.addPlaneSurface([loop_strong])
+v_notch = []
+if not split:
+    loop_weak = g.addCurveLoop([L1, L2, -L30, -C25, -L29, -C24, -L28, -C23, -L27, -C22, -L26, L7])
+    s_weak = g.addPlaneSurface([loop_weak])
+    out_weak = g.extrude([(2, s_weak)], 0, 0, Lz)
+    out_strong = g.extrude([(2, s_strong)], 0, 0, Lz)
+    g.synchronize()
+    v_weak = [t for d, t in out_weak if d == 3]
+    v_strong = [t for d, t in out_strong if d == 3]
+else:
+    Ls = g.addLine(p19, p12)                    # y = -0.75 H, lower arc end to lower arc end
+    s_layer = g.addPlaneSurface([g.addCurveLoop([L1, L2, -L30, Ls, -L26, L7])])
+    s_bump = g.addPlaneSurface([g.addCurveLoop([-C25, -L29, -C24, -L28, -C23, -L27, -C22, -Ls])])
+    out = g.extrude([(2, s_layer), (2, s_bump), (2, s_strong)], 0, 0, Lz)
+    g.synchronize()
+    v_layer, v_notch, v_strong = ([t] for d, t in out if d == 3)
+    v_weak = v_layer + v_notch
 
 eps = 1e-6
 groups = {"Left": [], "Right": [], "Bottom": [], "Top": [], "Inner": [], "Front": [], "Back": []}
@@ -80,6 +99,9 @@ for _, tag in gmsh.model.getEntities(2):
         groups["Bottom"].append(tag)
     elif abs(y0) < eps and abs(y1) < eps:
         groups["Top"].append(tag)
+    elif split and abs(y0 + 0.75 * S) < eps and abs(y1 + 0.75 * S) < eps and \
+            x0 > -(1 / 12 + rc) * S - eps and x1 < (1 / 12 + rc) * S + eps:
+        pass                            # the internal notch / layer face: no group
     else:
         groups["Inner"].append(tag)     # the weak / strong interface
 for name, tag in (("Left", 1), ("Right", 2), ("Bottom", 3), ("Top", 4), ("Inner", 5),
@@ -87,6 +109,8 @@ for name, tag in (("Left", 1), ("Right", 2), ("Bottom", 3), ("Top", 4), ("Inner"
     gmsh.model.addPhysicalGroup(2, groups[name], tag=tag, name=name)
 gmsh.model.addPhysicalGroup(3, v_weak, tag=100, name="Weak")
 gmsh.model.addPhysicalGroup(3, v_strong, tag=101, name="Strong")
+if split:
+    gmsh.model.addPhysicalGroup(3, v_notch, tag=102, name="Notch")
 
 box = gmsh.model.mesh.field.add("Box")
 gmsh.model.mesh.field.setNumber(box, "VIn", h_band)
@@ -121,7 +145,7 @@ gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 0)
 gmsh.option.setNumber("Mesh.Algorithm3D", 10)       # HXT, parallel
 gmsh.model.mesh.generate(3)
 out = f"{out_dir}/notch3d_hb{h_band:g}_Lz{Lz:g}" + \
-    (f"_z{z_window[0]:g}h{z_window[2]:g}" if z_window else "") + ".msh"
+    (f"_z{z_window[0]:g}h{z_window[2]:g}" if z_window else "") + ("_split" if split else "") + ".msh"
 gmsh.write(out)
 types, tags, _ = gmsh.model.mesh.getElements(3)
 n_tet = sum(len(t) for t in tags)

@@ -67,15 +67,38 @@ _A, _B = 1.0 / 12.0, 0.75
 ARCS = ((-(_A + RC), -(_B - RC), +1, -1), (-(_A - RC), -(2 / 3 + RC), -1, +1),
         ((_A - RC), -(2 / 3 + RC), +1, +1), ((_A + RC), -(_B - RC), -1, -1))
 
-# The direct solver of the multigrid coarse level (PCREDUNDANT). None = PETSc's native
-# LU, the production path (Louis, 2026-10-13: MUMPS misbehaves on some machines, the Mac
-# among them). "mumps" only for measurements; drivers set it from -uw_coarse.
+# The solver of the velocity block's multigrid coarse level. None = PCREDUNDANT with
+# PETSc's native LU, the production path (Louis, 2026-10-13: MUMPS misbehaves on some
+# machines, the Mac among them). "mumps" = the same with MUMPS, for measurements only.
+# "gamg" = an inexact coarse solve: GMRES preconditioned by GAMG (Louis: "GAMG plus
+# FMG"); the velocity block's Krylov is FGMRES, so a varying coarse solve is allowed.
+# Drivers set it from -uw_coarse.
 COARSE_FACTOR = None
 
 
 def set_coarse_factor(stokes):
-    """Apply COARSE_FACTOR to the velocity block's multigrid coarse solve."""
+    """Apply COARSE_FACTOR to the velocity block's multigrid coarse solve. Call after
+    the block's own mg options are written (they set the redundant LU)."""
     if COARSE_FACTOR is None:
+        return
+    if COARSE_FACTOR == "gamg":
+        for vp in ("fieldsplit_velocity_", "fieldsplit_0_"):
+            c = vp + "mg_coarse_"
+            stokes.petsc_options[c + "ksp_type"] = "gmres"
+            stokes.petsc_options[c + "ksp_rtol"] = 1.0e-3
+            stokes.petsc_options[c + "ksp_max_it"] = 50
+            stokes.petsc_options[c + "pc_type"] = "gamg"
+            stokes.petsc_options[c + "pc_gamg_threshold"] = 0.01
+            # a LINEAR preconditioner under the coarse GMRES: Richardson + SOR smoothing
+            # (gmres smoothers made GAMG nonlinear; the coupled block then broke down)
+            stokes.petsc_options[c + "mg_levels_ksp_type"] = "richardson"
+            stokes.petsc_options[c + "mg_levels_ksp_max_it"] = 3
+            stokes.petsc_options[c + "mg_levels_pc_type"] = "sor"
+            # the coupled coarse block has zero pivots (the redundant LU it replaces
+            # needs shift_type nonzero too): GAMG's own coarsest direct solve
+            stokes.petsc_options[c + "mg_coarse_sub_pc_factor_shift_type"] = "nonzero"
+            stokes.petsc_options[c + "mg_coarse_pc_factor_shift_type"] = "nonzero"
+            stokes.petsc_options[c + "ksp_converged_reason"] = None
         return
     for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
                    "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
@@ -245,26 +268,22 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
 
     mat.data[...] = 1
     mat.data[_cells("Weak", 100)] = 0
-    # The notch bump alone (ramp_scope="notch"): Weak cells whose centroid lies above
-    # the lower layer's top, y > -3/4 (non-dimensional). The fillets meet that line, so
-    # cells there go by centroid.
+    # The notch bump alone (ramp_scope="notch"): the Notch volume group (102) of a
+    # make_notch_mesh_3d.py --split mesh, whose internal face at y = -3/4 makes the
+    # bump exact at every refinement level. Weak (100) is still the union.
     bump = None
     if weak_ramp is not None and ramp_scope == "notch":
+        if not mesh.dm.hasLabel("Notch"):
+            raise ValueError("ramp_scope='notch' needs a mesh with the Notch volume group "
+                             "(make_notch_mesh_3d.py --split)")
         bump = uw.discretisation.MeshVariable("bump", mesh, 1, degree=0, continuous=False)
         bump.data[...] = 0
-        weak = _cells("Weak", 100)
-        if len(weak):
-            yc = np.array([mesh.dm.computeCellGeometryFVM(int(c) + cS)[1][1] for c in weak])
-            bump.data[weak[yc > -0.75]] = 1
+        bump.data[_cells("Notch", 102)] = 1
     xi_var.data[...] = float(xi)
     rate_var.data[...] = 0.0
 
     stokes = uw.systems.Stokes(mesh, velocityField=v, pressureField=p)
     if mesh.dim == 3:
-        # The 3-D multigrid coarse level is the whole gmsh base. Its direct solver is
-        # COARSE_FACTOR (native LU unless a measurement asks for MUMPS), set here so the
-        # viscous SEED solve gets it too, not only the Newton solve.
-        set_coarse_factor(stokes)
         # the seed solve is otherwise silent for its whole length, which the hang
         # supervisor cannot tell from a hang: print the outer Krylov residual
         stokes.petsc_options["ksp_monitor_short"] = None
@@ -590,6 +609,9 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
         stokes.petsc_options[vp + "mg_coarse_pc_type"] = "redundant"
         stokes.petsc_options[vp + "mg_coarse_redundant_pc_type"] = "lu"
         stokes.petsc_options[vp + "mg_coarse_redundant_pc_factor_shift_type"] = "nonzero"
+        # the coarse solver (COARSE_FACTOR): here, after the block's own keys and before
+        # the viscous seed solve, so the seed gets it too
+        set_coarse_factor(stokes)
 
     # PRESSURE: `preonly` makes the whole fieldsplit a block PRECONDITIONER and puts the
     # coupling work in the outer loop (Elman/Silvester/Wathen). Giving this block a real

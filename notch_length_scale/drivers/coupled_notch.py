@@ -171,7 +171,7 @@ def _band_module():
     # driver's -uw_mesh (a path) from its own -uw_mesh (an integer index)
     from petsc4py import PETSc
     opts = PETSc.Options()
-    mesh_opt = opts.getString("uw_mesh", None)
+    mesh_opt = opts.getString("uw_mesh") if opts.hasName("uw_mesh") else None
     if mesh_opt is not None:
         opts.delValue("uw_mesh")
     bw = importlib.util.module_from_spec(spec)
