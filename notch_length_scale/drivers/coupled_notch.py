@@ -84,6 +84,28 @@ def solve_newton(S, name, out_dir, budget, monitor, linear="exact"):
         for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
                        "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
             stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
+    if linear.startswith("production_rtol") or linear.startswith("production_ew"):
+        # inexact Newton, for time to solution. production_rtol<X>: every linear solve
+        # to a fixed rtol X, no Eisenstat-Walker. production_ew<X>: Eisenstat-Walker
+        # with its forcing capped at X (rtol0 = rtolmax = X); the uncapped default
+        # (0.1-0.3) gave 15 / 57 / > 40 Newton steps at refs 1 / 2 / 3 (REPORT).
+        x = float(linear.split("_rtol" if "_rtol" in linear else "_ew")[1])
+        if S["mesh"].dim == 3:
+            for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
+                           "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
+                stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
+        if "_rtol" in linear:
+            stokes.petsc_options.delValue("snes_ksp_ew")
+            stokes.petsc_options.delValue("snes_ksp_ew_version")
+            stokes.petsc_options["ksp_rtol"] = x
+        else:
+            stokes.petsc_options["snes_ksp_ew"] = None
+            stokes.petsc_options["snes_ksp_ew_rtol0"] = x
+            stokes.petsc_options["snes_ksp_ew_rtolmax"] = x
+        t0 = time.time()
+        with model.step(0, label=name):
+            stokes.solve(zero_init_guess=False)
+        return time.time() - t0
     if linear in ("production", "production_tight"):
         if linear == "production_tight":
             # every Newton direction solved to a fixed, tight tolerance (no
