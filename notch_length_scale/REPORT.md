@@ -337,7 +337,47 @@ W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
     In 2-D, β 0.1 → 0.2 at l = 1 widens W by 10% and cuts one step.
   - The strengthening it buys in the band is about 1.1 C, against 0.37 C (see the shift
     table).
-- Next is the tanh along-strike weak zone, log10 η_b = 22 − tanh((z0 − z)/w), with a longer Lz.
+**Along-strike ramp, w = 2 km** (2026-10-13).
+- Setup: log10 η_b(z) = 22 − tanh((z0 − z)/w), with z0 = 8 km, w = 2 km and Lz = 16 km.
+  - The z = 0 face is a symmetry plane, so the weak segment is half of a 16 km notch.
+  - The z = 16 km face is also a symmetry plane, so the model is a row of 16 km notches
+    separated by 16 km gaps with no inclusion (η_b = 10²³, the strong layer).
+- Mesh: `notch3d_hb4.8_Lz16_z8h2.4.msh` (z-window 8 ± 4 km at 2.4 km), ref 2, so the band
+  element is 1.2 km and the z-element 0.6 km in the window.
+- Solver: β = 0.1, l = 1 km, tight FMG, np 16.
+
+| z (km) | log10 η_b | W (km) | peak / background |
+|---|---|---|---|
+| 0.3 | 21.00 | 5.84 | 0.326 |
+| 1.6 | 21.00 | 5.87 | 0.323 |
+| 3.2 | 21.02 | 5.91 | 0.324 |
+| 4.8 | 21.08 | 5.73 | 0.321 |
+| 6.4 | 21.34 | 5.44 | 0.308 |
+| 8.0 | 22.00 | 4.86 | 0.275 |
+| 9.6 | 22.66 | 4.20 | 0.239 |
+| 11.2 | 22.92 | 3.65 | 0.210 |
+| 12.8 | 22.98 | 3.37 | 0.195 |
+| 14.4 | 23.00 | 3.29 | 0.192 |
+| 15.7 | 23.00 | 3.25 | 0.185 |
+
+- **The band does not die in this domain.** Where there is no inclusion at all (z ≥ 12 km),
+  the band keeps about 60% of the weak end's peak. It is narrower there: 3.3 km against
+  5.9 km.
+  - The gap between mirrored notches is only 16 km, comparable with the band's along-strike
+    reach, so the two neighbouring notches carry it across.
+  - Finding where it dies needs a longer Lz (32-48 km with z0 = 8).
+- **A finite notch localises much less than an infinite one.** At the weak end the peak is
+  0.33 against 1.18 for the uniform extrusion, and W is 5.9 km against 4.6 km.
+- **Solver.**
+  - 4 Newton steps from the seed: |F| 0.0118 → 2.3e-3 → 6.0e-4 → 5.0e-5 → 4.0e-7, all full
+    steps, linear until the last.
+  - Krylov per step: 55, 81, 78, 71, nearly twice the uniform extrusion's 29-46. The 100×
+    along-strike viscosity contrast over 2 km is resolved on the fine levels only (the
+    base z-element is 2.4 km), so FMG loses some of its grip.
+  - Time: 8 h 13 min at np 16. Each linear solve went to rtol 1e-8, about 1.7 h per step.
+    A rerun with capped Eisenstat-Walker (next section) is under way for the comparison.
+- Figures: `figures/<run>_sections.png`, `_map.png` and `_alongstrike.png` once
+  `drivers/render_3d_ramp.py` has run.
 
 ### The yield-stress shift the micromorphic law applies (ref 3, 2026-10-12)
 
@@ -899,6 +939,59 @@ coupled field. Micromorphic β = 0.1, l = 1 km, ξ = 0:
   - Two traps: build the coarse notch before the fine one (named expressions are shared
     between builds, #767), and pass the unit-aware `var.coords` to `evaluate` (a bare
     `np.asarray` strips the metres and misses the domain).
+
+### Inexact Newton for time to solution (2026-10-13)
+
+The default Eisenstat-Walker forcing (PETSc version 3, rtol up to 0.1-0.3) took 15 / 57 /
+more than 40 Newton steps at refs 1 / 2 / 3 (table above). Capping the forcing fixes that.
+Micromorphic β = 0.1, l = 1 km, seeded, np 4, against the tight runs (`_eff` records):
+
+| linear solves | ref 2: Newton / Krylov / time | ref 3: Newton / Krylov / time | W at ref 3 (km) |
+|---|---|---|---|
+| every solve to rtol 1e-8 | 6 / 231 / 439 s | 6 / 227 / 1947 s | 4.617305 |
+| fixed rtol 1e-4 | 6 / 97 / 94 s | 6 / 91 / 466 s | 4.617304 |
+| Eisenstat-Walker capped at 1e-3 | 6 / 69 / 69 s | 7 / 68 / 353 s | 4.617305 |
+| Eisenstat-Walker capped at 1e-2 | 7 / 54 / 58 s | 7 / 43 / 221 s | 4.617272 |
+
+- Modes: `-uw_linear production_ew<X>` (rtol0 = rtolmax = X) and `production_rtol<X>`.
+- **Capped Eisenstat-Walker at 1e-2 cuts the Krylov work 4-5× for at most one extra Newton
+  step.** The answer is the same: W agrees to 1e-5 relative and the peak to 1e-4.
+- Wall time falls 7-9×. Part of that is load: the tight runs shared the machine and ran
+  at about 1.9 s per Krylov iteration at ref 2, against about 1.1 s here. On equal load the
+  saving is about the Krylov ratio, 4-5×.
+- The uncapped default failed because the early directions were loose enough that the line
+  search fell to λ = 0.01-0.1 across the band. A cap of 1e-2 keeps every step full.
+- `production_ew1e-2` is now the campaign's choice for production runs. The tight mode
+  stays for preconditioner measurements, where the Krylov count per step must measure the
+  preconditioner alone.
+
+### A coarser FMG base, with the arc-snapping callback (2026-10-13)
+
+The same problem on three base meshes, refined to put the notch-tip h near the ref-3 value
+of the shipped mesh. Micromorphic β = 0.1, l = 1 km, tight FMG, np 4. Krylov counts are from
+the solve logs, and times from the run transcripts.
+
+| base (triangles) | refs (levels) | fine triangles | Newton | Krylov per step | total Krylov | time |
+|---|---|---|---|---|---|---|
+| mesh1 (492) | 3 (4) | 31.5k | 6 | 34, 45, 45, 36, 37, 30 | 227 | 1073 s |
+| mesh1c2 (204), snapped arcs | 4 (5) | 52k | 6 | 35, 48, 46, 40, 37, 32 | 238 | 2704 s |
+| mesh1c4 (90), snapped arcs | 5 (6) | 92k | 6 | 36, 47, 44, 38, 37, 30 | 232 | 10454 s |
+| mesh1c4 (90), not snapped | 5 (6) | 92k | 6 | 36, 47, 44, 40, 38, 31 | 236 | 10967 s |
+
+- **A deeper hierarchy buys nothing in iterations.** Krylov per step is 30-48 on every
+  base. The shipped base's coarse level is not what limits FMG; the counts were already
+  flat in h.
+- The coarse bases are uniform, while mesh1 is graded at the notch. Reaching the same tip
+  resolution from them costs 1.7-2.9× more fine cells, and the run time grows faster than
+  that (2.5-10×). So a coarse uniform base is a net loss here.
+- **Snapping the fillet arcs changes the iterations by at most 2 per step**, and the run
+  time by 5% (snapped faster).
+- The four runs crashed after the solve, in the width measurement. The driver's
+  `-uw_mesh` (a path) was read by `band_width_vs_h.py`'s own integer `-uw_mesh` through
+  the shared PETSc options database. This is fixed in `coupled_notch._band_module`. The
+  widths are being re-measured with `production_ew1e-2` reruns (jobs `fmgW_*`).
+- For 3-D a coarser base is still worth having, but only to make the coarse direct solve
+  cheap, not to cut iterations.
 
 ### The np = 3 hang (task 2): fixed
 

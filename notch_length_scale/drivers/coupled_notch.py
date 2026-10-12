@@ -172,9 +172,20 @@ def _band_module():
     spec = importlib.util.spec_from_file_location(
         "bw", os.path.join(_here, "band_width_vs_h.py"))
     argv, sys.argv = sys.argv, [sys.argv[0]]
+    # its uw.Params read the PETSc options database, not sys.argv: hide the
+    # driver's -uw_mesh (a path) from its own -uw_mesh (an integer index)
+    from petsc4py import PETSc
+    opts = PETSc.Options()
+    mesh_opt = opts.getString("uw_mesh", None)
+    if mesh_opt is not None:
+        opts.delValue("uw_mesh")
     bw = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(bw)
-    sys.argv = argv
+    try:
+        spec.loader.exec_module(bw)
+    finally:
+        sys.argv = argv
+        if mesh_opt is not None:
+            opts.setValue("uw_mesh", mesh_opt)
     return bw
 
 
