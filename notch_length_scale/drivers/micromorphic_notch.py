@@ -49,6 +49,9 @@ params = uw.Params(
     uw_weak_ramp=uw.Param("", description="3-D only: 'z0,w' in km, the weak inclusion's "
                                           "viscosity ramped along strike, log10 eta_b = 22 - "
                                           "tanh((z0 - z)/w) (empty = uniform)"),
+    uw_snap=uw.Param(0, description="1 = snap refined vertices of the notch's fillet arcs "
+                                     "back onto the arcs (for a coarse base mesh, refined "
+                                     "several times: a deeper FMG hierarchy)"),
     uw_seed=uw.Param(1, description="1 = start from the viscous seed (warm: no Picard "
                                      "warm-up); 0 = cold from rest (the automatic warm-up "
                                      "step arms)"),
@@ -70,14 +73,15 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     (f"_{os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]}" if str(params.uw_mesh)
      else "") + \
     (f"_ramp{weak_ramp[0]:g}w{weak_ramp[1]:g}" if weak_ramp else "") + \
+    ("_snap" if int(params.uw_snap) else "") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
                          dict(chi=(1, 1, True, "1/s")), msh=str(params.uw_mesh) or None,
-                         weak_ramp=weak_ramp)
+                         weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)))
           if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None,
-                   weak_ramp=weak_ramp)
+                   weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)))
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]

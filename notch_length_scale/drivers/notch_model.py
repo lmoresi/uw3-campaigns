@@ -81,7 +81,7 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
           unique_params=False,
           rate_source="live", fas_source=False, p_degree=1, p_continuous=True,
           strategy=None, floor_scalar=None, residual_strength=0.02,
-          weak_ramp=None):
+          weak_ramp=None, snap_arcs=False):
     """The notch benchmark on ViscoPlasticFlowModel with the power-mean soft-min.
 
     Returns a dict with the solver, the fields, the live xi variable and the viscous
@@ -130,11 +130,45 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     _cv.scale(1.0 / H_km)
     plex[1].setCoordinates(_cv)
     dim = plex[1].getDimension()
+
+    def notch_arc_snap(dm):
+        """Refinement callback: put the refined vertices of the notch's four fillet
+        arcs back on the arcs. Uniform refinement places edge midpoints on the
+        coarse CHORDS, so a coarse base (arcs meshed as one chord) would otherwise
+        keep the coarse base's corners at every level. Only the arcs need it: the
+        straight parts of the Inner boundary are exact under midpoint refinement.
+        Each arc spans one quadrant about its centre (make_notch_mesh.py), so a
+        point of the Inner label that lies strictly inside that quadrant and within
+        2 rc of the centre is moved radially to radius rc. Non-dimensional (the
+        mesh is divided by H); in 3-D only (x, y) move, the interface is extruded."""
+        rc = 0.02
+        a, b = 1.0 / 12.0, 0.75
+        # (centre x, centre y, sign of dx, sign of dy) for arcs C22, C23, C24, C25
+        arcs = ((-(a + rc), -(b - rc), +1, -1), (-(a - rc), -(2 / 3 + rc), -1, +1),
+                ((a - rc), -(2 / 3 + rc), +1, +1), ((a + rc), -(b - rc), -1, -1))
+        coords_vec = dm.getCoordinatesLocal()
+        coords = coords_vec.array.reshape(-1, dm.getCoordinateDim())
+        idx = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
+        if idx is None or len(idx) == 0:
+            return
+        pts = coords[idx, :2]
+        for cx, cy, sx, sy in arcs:
+            dx, dy = pts[:, 0] - cx, pts[:, 1] - cy
+            r = np.sqrt(dx * dx + dy * dy)
+            on = (np.sign(dx) == sx) & (np.sign(dy) == sy) & (r < 2 * rc) & (r > 0)
+            if on.any():
+                pts[on, 0] = cx + rc * dx[on] / r[on]
+                pts[on, 1] = cy + rc * dy[on] / r[on]
+        coords[idx, :2] = pts
+        coords_vec.array[...] = coords.reshape(-1)
+        dm.setCoordinatesLocal(coords_vec)
+
     mesh = uw.discretisation.Mesh(
         plex[1], boundaries=boundaries if dim == 2 else boundaries3d,
         useMultipleTags=True, useRegions=True,
         coordinate_system_type=uw.coordinates.CoordinateSystemType.CARTESIAN,
-        qdegree=3, refinement=refinement)
+        qdegree=3, refinement=refinement,
+        refinement_callback=notch_arc_snap if snap_arcs else None)
 
     v = uw.discretisation.MeshVariable("U", mesh, mesh.dim, degree=2, continuous=True)
     # PRESSURE SPACE. Default P1 continuous (Taylor-Hood). `p_degree=0,
