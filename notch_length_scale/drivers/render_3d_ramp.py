@@ -63,7 +63,7 @@ sections = [with_edot(volume.slice(normal="z", origin=(0.0, -15.0e3, z * 1.0e3))
 depth_map = with_edot(volume.slice(normal="y", origin=(0.0, -float(params.uw_depth_km) * 1.0e3,
                                                        Lz * 0.5e3)))
 values = np.concatenate([s.point_data["log10 edot"] for s in sections])
-clim = (-0.3, 0.8)          # the 2-D figures' "bands" range: only the bands saturate
+clim = (-0.4, 0.4)          # the 3-D bands are weaker than 2-D: this range resolves them
 
 
 def image(surface, view, focal, scale, size):
@@ -87,7 +87,7 @@ import matplotlib.pyplot as plt   # noqa: E402
 
 def colourbar(fig, axes):
     m = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(*clim))
-    cb = fig.colorbar(m, ax=axes, orientation="horizontal", fraction=0.04, pad=0.04, aspect=50)
+    cb = fig.colorbar(m, ax=axes, orientation="horizontal", fraction=0.04, pad=0.2, aspect=50)
     cb.set_label(r"$\log_{10}\,\dot\varepsilon_{II}\,/\,(V/H)$")
 
 

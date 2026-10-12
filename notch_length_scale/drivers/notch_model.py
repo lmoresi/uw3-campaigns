@@ -93,11 +93,30 @@ def notch_arc_snap(dm):
     2 rc of the centre is moved radially to radius rc. Non-dimensional (the
     mesh is divided by H); in 3-D only (x, y) move, the interface is extruded."""
     rc, arcs = RC, ARCS
+    from petsc4py import PETSc
     coords_vec = dm.getCoordinatesLocal()
-    coords = coords_vec.array.reshape(-1, dm.getCoordinateDim())
-    idx = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
-    if idx is None or len(idx) == 0:
-        return
+    cdim = dm.getCoordinateDim()
+    coords = coords_vec.array.reshape(-1, cdim)
+    # Which vertices are Inner. A rank sees a vertex's Inner label only if it holds an
+    # Inner edge / face through it; in 3-D a shared vertex can lack that on one rank,
+    # which then left it unsnapped while the other rank moved it (snap_check, np 4:
+    # 1.4e-3 between ranks). So OR the flag over all ranks through the coordinate
+    # DM's global vector before moving anything. Collective: no early return.
+    idx = (uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
+           if dm.getLabel("Inner") else np.array([], int))
+    cdm = dm.getCoordinateDM()
+    flag_local = cdm.createLocalVec()
+    flag_local.set(0.0)
+    fl = flag_local.array.reshape(-1, cdim)
+    if len(idx):
+        fl[np.asarray(idx, int), 0] = 1.0
+    flag_global = cdm.createGlobalVec()
+    flag_global.set(0.0)
+    cdm.localToGlobal(flag_local, flag_global, addv=PETSc.InsertMode.ADD_VALUES)
+    cdm.globalToLocal(flag_global, flag_local, addv=PETSc.InsertMode.INSERT_VALUES)
+    idx = np.flatnonzero(flag_local.array.reshape(-1, cdim)[:, 0] > 0.5)
+    flag_local.destroy()
+    flag_global.destroy()
     pts = coords[idx, :2]
     for cx, cy, sx, sy in arcs:
         dx, dy = pts[:, 0] - cx, pts[:, 1] - cy
@@ -133,7 +152,7 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
           unique_params=False,
           rate_source="live", fas_source=False, p_degree=1, p_continuous=True,
           strategy=None, floor_scalar=None, residual_strength=0.02,
-          weak_ramp=None, snap_arcs=False):
+          weak_ramp=None, snap_arcs=False, ramp_scope="weak"):
     """The notch benchmark on ViscoPlasticFlowModel with the power-mean soft-min.
 
     Returns a dict with the solver, the fields, the live xi variable and the viscous
@@ -226,6 +245,17 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
 
     mat.data[...] = 1
     mat.data[_cells("Weak", 100)] = 0
+    # The notch bump alone (ramp_scope="notch"): Weak cells whose centroid lies above
+    # the lower layer's top, y > -3/4 (non-dimensional). The fillets meet that line, so
+    # cells there go by centroid.
+    bump = None
+    if weak_ramp is not None and ramp_scope == "notch":
+        bump = uw.discretisation.MeshVariable("bump", mesh, 1, degree=0, continuous=False)
+        bump.data[...] = 0
+        weak = _cells("Weak", 100)
+        if len(weak):
+            yc = np.array([mesh.dm.computeCellGeometryFVM(int(c) + cS)[1][1] for c in weak])
+            bump.data[weak[yc > -0.75]] = 1
     xi_var.data[...] = float(xi)
     rate_var.data[...] = 0.0
 
@@ -251,7 +281,9 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     m_strong = mat.sym[0]
     strong = mat.sym[0] > 0.5          # kept: some callers still read it
     # The weak inclusion's viscosity, optionally ramped along strike (3-D):
-    # weak_ramp = (z0_km, w_km) gives log10 eta_b(z) = 22 - tanh((z0 - z) / w), i.e.
+    # weak_ramp = (z0_km, w_km) gives log10 eta_b(z) = 22 - tanh((z0 - z) / w), applied
+    # to the whole Weak region (ramp_scope="weak": lower layer too, so the far end has no
+    # weak substrate) or to the notch bump only (ramp_scope="notch"), i.e.
     # 1e21 (as above) well below z0 and 1e23 (the strong layer) well above it, a
     # smoothed, restricted notch whose weak segment z < z0 is half of a notch of
     # length 2 z0 mirrored in the u_z = 0 face. Built on the raw (non-dimensional)
@@ -261,6 +293,13 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
         z0_nd, w_nd = weak_ramp[0] / H_km, weak_ramp[1] / H_km
         z = mesh.CoordinateSystem.N[2]      # the raw (non-dimensional) z coordinate symbol
         eta_b_eff = eta_b * 10 ** (1 - sympy.tanh((z0_nd - z) / w_nd))
+    if bump is not None:
+        # ramp the notch only; the lower layer keeps eta_b along the whole strike
+        m_bump = bump.sym[0]
+        eta_b_eff = m_bump * eta_b_eff + (1 - m_bump) * eta_b
+    elif weak_ramp is not None and ramp_scope != "weak":
+        raise ValueError(f"ramp_scope {ramp_scope!r}: 'weak' (the whole Weak region, the "
+                         "first 3-D runs) or 'notch' (the bump above y = -3/4 only)")
     visc_lin = m_strong * eta_bg_e + (1 - m_strong) * eta_b_eff
     cm.Parameters.shear_viscosity_0 = visc_lin
 
@@ -589,7 +628,7 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     # yield_none / yield_full are returned so a caller can re-run the VISCOUS problem on
     # the already-built solver -- the linear control for any velocity-block diagnosis,
     # and the one arm that must be instrumented the same way as the plastic one.
-    return dict(model=model, mesh=mesh, stokes=stokes, cm=cm, v=v, p=p,
+    return dict(model=model, mesh=mesh, stokes=stokes, cm=cm, v=v, p=p, bump=bump,
                 mat=mat, xi_var=xi_var, eta_bg=eta_bg_e,
                 # Exposed for ADJOINT SENSITIVITY: a parameter must be handed to
                 # `solver.sensitivity` as the uw.expression the residual carries,

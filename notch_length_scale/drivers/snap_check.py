@@ -144,6 +144,46 @@ def arc_deficit(Xin):
     return out
 
 
+def inner_edges(dm, dim):
+    """Local Inner edges as (n, 2) vertex indices (offset to the coordinate array):
+    the labelled edges in 2-D, the edges of labelled faces in 3-D."""
+    vs, _ = dm.getDepthStratum(0)
+    es, ee = dm.getDepthStratum(1)
+    pts = label_points(dm, "Inner", 1) if dim == 2 else np.unique(np.concatenate(
+        [dm.getCone(f) for f in label_points(dm, "Inner", 2)] or [np.array([], int)]))
+    pts = pts[(pts >= es) & (pts < ee)]
+    return np.array([dm.getCone(e) for e in pts], int).reshape(-1, 2) - vs
+
+
+def arc_deficit_edges(segs):
+    """Per arc: quarter-disc area minus the fan (centre + each Inner edge inside the arc's
+    closed quadrant): the chord deficit, 0 for a polyline on the arc in the limit."""
+    out = []
+    tol = 1.0e-12
+    for cx, cy, sx, sy in nm.ARCS:
+        d = segs - np.array([cx, cy])[None, None, :]
+        inq = np.all((sx * d[..., 0] >= -tol) & (sy * d[..., 1] >= -tol)
+                     & (np.hypot(d[..., 0], d[..., 1]) < 1.5 * RC), axis=1)
+        e = d[inq]
+        fan = 0.5 * np.abs(e[:, 0, 0] * e[:, 1, 1] - e[:, 0, 1] * e[:, 1, 0]).sum()
+        out.append(np.pi * RC ** 2 / 4 - fan)
+    return out
+
+
+def coordinate_mismatch(dm):
+    """Max difference between a rank's local coordinates and the owner's value: a
+    shared vertex moved on one rank and not another."""
+    cdm = dm.getCoordinateDM()
+    loc = dm.getCoordinatesLocal()
+    g = cdm.createGlobalVec()
+    cdm.localToGlobal(loc, g)                 # INSERT: the owner's value
+    back = cdm.createLocalVec()
+    cdm.globalToLocal(g, back)
+    diff = float(np.max(np.abs(back.array - loc.array))) if loc.getLocalSize() else 0.0
+    g.destroy(); back.destroy()
+    return comm.allreduce(diff, op=MPI.MAX)
+
+
 def gather_unique(X):
     """All ranks' points on rank 0 (deduplicated by rounded coordinates)."""
     allx = comm.gather(X, root=0)
@@ -180,12 +220,19 @@ def check(snap):
     for level, dm in enumerate(mesh.dm_hierarchy):
         X = dm.getCoordinatesLocal().array.reshape(-1, dm.getCoordinateDim())
         vs, _ = dm.getDepthStratum(0)
-        inner = label_points(dm, "Inner", 0) - vs
+        # the callback's own extraction: vertices in the closure of Inner edges / faces
+        # (refined midpoints inherit the label on the edge, not on the vertex)
+        inner = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
+        inner = np.unique(np.asarray(inner, int)) if dm.getLabel("Inner") else np.array([], int)
+        inner0 = label_points(dm, "Inner", 0) - vs
         Xin = X[inner]
         d = interface_dist(Xin[:, :2]) if len(Xin) else np.zeros(0)
         arcm = on_arc(Xin[:, :2]) if len(Xin) else np.zeros(0, bool)
         cells = cell_vertices(dm)
         size, q = measures(X, cells)
+        P = X[cells]
+        E = P[:, 1:] - P[:, :1]
+        signed = (E[:, 0, 0] * E[:, 1, 1] - E[:, 0, 1] * E[:, 1, 0]) if dim == 2 else np.linalg.det(E)
         cs, _ = dm.getHeightStratum(0)
         weak = label_points(dm, "Weak", dim) - cs
         # (e) interface vertices by cell adjacency must all carry Inner
@@ -200,6 +247,11 @@ def check(snap):
         # (d) chord deficit on the arcs, from the Inner vertices on z = 0 (3-D) / all (2-D)
         face = Xin if dim == 2 else Xin[np.abs(Xin[:, 2]) < 1.0e-9]
         allface = gather_unique(np.ascontiguousarray(face))
+        ed = inner_edges(dm, dim)
+        segs = X[ed][:, :, :2]
+        if dim == 3:
+            segs = segs[np.all(np.abs(X[ed][:, :, 2]) < 1.0e-9, axis=1)]
+        allsegs = comm.gather(segs.reshape(-1, 4), root=0)
         row = dict(
             level=level,
             cells=int(comm.allreduce(int(dm.getHeightStratum(0)[1] - cs))),
@@ -211,9 +263,19 @@ def check(snap):
             min_quality=float(comm.allreduce(float(q.min()), op=MPI.MIN)),
             weak_measure=float(comm.allreduce(float(size[is_weak].sum()))),
             interface_missing_inner=int(comm.allreduce(missing)),
+            inner_vertex_labels=int(comm.allreduce(int(inner0.size))),
+            inner_closure_vertices=int(comm.allreduce(int(inner.size))),
         )
+        row["_signed"] = np.sign(signed)
+        row["coord_mismatch"] = coordinate_mismatch(dm)
         if uw.mpi.rank == 0:
-            deficit = arc_deficit(allface)
+            S4 = np.vstack(allsegs)
+            # dedupe edges shared between ranks (either orientation)
+            a, b = np.round(S4[:, :2], 12), np.round(S4[:, 2:], 12)
+            key = np.where((a[:, :1] < b[:, :1]) | ((a[:, :1] == b[:, :1]) & (a[:, 1:] < b[:, 1:])),
+                           np.hstack([a, b]), np.hstack([b, a]))
+            _, keep = np.unique(key, axis=0, return_index=True)
+            deficit = arc_deficit_edges(S4[keep].reshape(-1, 2, 2))
             row["arc_deficit_sum"] = float(np.sum(deficit))
             row["arc_deficit"] = [float(v) for v in deficit]
             if level == 0:
@@ -234,6 +296,11 @@ def check(snap):
 
 
 results = {"snapped": check(True), "unsnapped": check(False)}
+# inverted cells: same refinement of the same base, same partition, so the same local
+# cell order; a cell whose orientation differs between the two has been turned inside out
+for rs, ru in zip(results["snapped"], results["unsnapped"]):
+    flips = int(np.sum(rs.pop("_signed") != ru.pop("_signed")))
+    rs["inverted_by_snap"] = int(comm.allreduce(flips))
 # analytic Weak measure: the filleted notch's fillets cancel in area (two convex, two
 # concave, the same radius), so Weak = slab + rectangle in 2-D, times Lz in 3-D
 with uw.selective_ranks(0) as rank0:
@@ -245,13 +312,14 @@ with uw.selective_ranks(0) as rank0:
         json.dump(results, open(out, "w"), indent=1)
         print(f"{name}  np {uw.mpi.size}   (analytic Weak area 2-D: {1 + 1 / 72:.9f} x Lz in 3-D)")
         print("variant   lvl  cells     max d(all)  max d(arc)  calls max move   min size    "
-              "min q   Weak measure    arc deficit  missing Inner")
+              "min q   Weak measure    arc deficit  missing Inner  inverted  rank mismatch")
         for k, rows in results.items():
             for r in rows:
                 print(f"{k:9s} {r['level']:3d} {r['cells']:8d}  {r['dist_max']:.3e}  "
                       f"{r['dist_max_arc']:.3e}  {r['callback_calls']:3d}  "
                       f"{r['callback_max_move']:.3e}  {r['min_size']:.3e}  {r['min_quality']:.4f}  "
                       f"{r['weak_measure']:.9f}  {r.get('arc_deficit_sum', float('nan')):.3e}  "
-                      f"{r['interface_missing_inner']}")
+                      f"{r['interface_missing_inner']:6d}  {r.get('inverted_by_snap', ''):>4}  "
+                      f"{r['coord_mismatch']:.2e}")
         print("arc vertices (interior, level 0):", results["unsnapped"][0].get("arc_vertices_interior"))
         print(out)

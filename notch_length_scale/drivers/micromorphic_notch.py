@@ -60,6 +60,9 @@ params = uw.Params(
                                           "rtol ends the Newton solve, reported as such"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
+    uw_ramp_scope=uw.Param("weak", description="what the along-strike ramp stiffens: weak "
+                                                "(the whole Weak region, lower layer too) | "
+                                                "notch (the bump above y = -3/4 H only)"),
     uw_coarse=uw.Param("native", description="direct solver of the multigrid coarse level: "
                                              "native (PETSc LU, production) | mumps "
                                              "(measurements only)"),
@@ -77,16 +80,19 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     (f"_{os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]}" if str(params.uw_mesh)
      else "") + \
     (f"_ramp{weak_ramp[0]:g}w{weak_ramp[1]:g}" if weak_ramp else "") + \
+    ("_notchonly" if weak_ramp and str(params.uw_ramp_scope) == "notch" else "") + \
     ("_snap" if int(params.uw_snap) else "") + \
     ("" if str(params.uw_coarse) == "native" else f"_{params.uw_coarse}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
                          dict(chi=(1, 1, True, "1/s")), msh=str(params.uw_mesh) or None,
-                         weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)))
+                         weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)),
+                   ramp_scope=str(params.uw_ramp_scope))
           if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None,
-                   weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)))
+                   weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)),
+                   ramp_scope=str(params.uw_ramp_scope))
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]

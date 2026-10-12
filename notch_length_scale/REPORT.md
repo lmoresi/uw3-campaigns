@@ -360,6 +360,15 @@ W(l, c) at ref 3 with exact LU, ξ = 0, ω in P1, current estimator
 | 14.4 | 23.00 | 3.29 | 0.192 |
 | 15.7 | 23.00 | 3.25 | 0.185 |
 
+- ⚠️ **Confounded (2026-10-13): the ramp scales the whole Weak region, not only the
+  notch.** The ramp multiplies `(1 − m_strong)`, which is the entire Weak volume: the lower
+  viscous layer (y < −0.75 H) as well as the notch bump. So at the far end the whole
+  substrate stiffens to 10²³. The far end is "no weak layer", not "no notch", and the
+  loading changes along strike with the substrate.
+  - The brief ("η_b(z)") was ambiguous, and the restricted notch Louis asked for is
+    notch-only. Which was meant is with Louis.
+  - Until he answers, the numbers below describe the wider reading only, the w = 4 and
+    w = 1 runs are held, and the capped-EW rerun of w = 2 was stopped.
 - **The band does not die in this domain.** Where there is no inclusion at all (z ≥ 12 km),
   the band keeps about 60% of the weak end's peak. It is narrower there: 3.3 km against
   5.9 km.
@@ -518,6 +527,39 @@ at ref 3, then confirmed by exact runs (W at ref 3):
 | P3 | Cosserat l = 0.5, c = 0.054 | 2 (4) | 6 | 38 / 45 | 64 | 4.69 | 1.14 | CONVERGED_FNORM_ABS |
 | P3 | Cosserat l = 0.5, c = 0.054 | 3 (4) | 6 | 38 / 44 | 323 | 4.70 | 1.15 | CONVERGED_FNORM_ABS |
 | P3 | Cosserat l = 0.5, c = 0.054 | 4 (8) | 4 | 37 / 45 | 698 | 4.70 | 1.16 | CONVERGED_FNORM_ABS |
+
+**Stiffer β at matched width** (2026-10-13; rows added below the pairs above, same
+settings). β = 0.3 and β = 1 have l chosen to give the W of micromorphic β = 0.1 at
+l = 0.25 (P1) and l = 0.5 (P2).
+
+| pair | model | ref (np) | Newton | Krylov / step median / max | s per Newton step | W (km) | peak | outcome |
+|---|---|---|---|---|---|---|---|---|
+| P1 | micromorphic β = 0.3, l = 0.138 | 1 (4) | 8 | 42 / 51 | 32 | 3.94 | 1.70 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic β = 0.3, l = 0.138 | 2 (4) | 17 | 72 / 84 | 109 | 2.85 | 2.55 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic β = 0.3, l = 0.138 | 3 (4) | 17 | 155 / 254 | 973 | 2.66 | 2.69 | CONVERGED_FNORM_ABS |
+| P1 | micromorphic β = 0.3, l = 0.138 | 4 (8) | 5 | 126 / 133 | 1480 | 2.65 | 2.71 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 0.3, l = 0.272 | 1 (4) | 7 | 38 / 41 | 18 | 4.29 | 1.35 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 0.3, l = 0.272 | 2 (4) | 8 | 45 / 53 | 61 | 3.71 | 1.63 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 0.3, l = 0.272 | 3 (4) | 10 | 43 / 56 | 235 | 3.66 | 1.72 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 0.3, l = 0.272 | 4 (8) | 4 | 30 / 38 | 414 | 3.67 | 1.73 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 1, l = 0.148 | 1 (4) | 14 | 35 / 43 | 12 | 4.48 | 1.25 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 1, l = 0.148 | 2 (4) | 22 | 40 / 50 | 56 | 3.73 | 1.54 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 1, l = 0.148 | 3 (4) | 27 | 41 / 53 | 227 | 3.68 | 1.61 | CONVERGED_FNORM_ABS |
+| P2 | micromorphic β = 1, l = 0.148 | 4 (8) | 3 | 35 / 36 | 443 | 3.68 | 1.62 | CONVERGED_FNORM_ABS |
+
+- **A stiffer β costs Newton steps from a cold start, and does not save them.**
+  - At P2, refs 1-3 take 7 / 8 / 10 steps at β = 0.3 and 14 / 22 / 27 at β = 1, against
+    6 / 8 / 9 at β = 0.1.
+  - At P1, β = 0.3 takes 17 steps at refs 2 and 3, against 10 at β = 0.1 ref 2 (ref 3 was
+    not run).
+- **FMG stays flat at P2 for every β:** 35-45 Krylov per step. At P1 with β = 0.3 it does
+  not: 42 → 72 → 155 (median) over refs 1-3, and 126 at ref 4. That is the thinnest band
+  (2.65 km) with the stiffest coupling.
+- Grid sequencing removes most of the cold-start cost at ref 4 for every β: 3-5 Newton
+  steps.
+- The widths match by construction (P2: 3.63 / 3.67 / 3.68 km at ref 4). The peak is a
+  little lower as β grows (1.88 / 1.73 / 1.62).
+
 
 - **Newton:** Cosserat c = 1 takes the same number of Newton steps or fewer, at every
   pair and refinement: at P2, ref 3, 5 against 9, and at ref 4, 3 against 5 (residual
