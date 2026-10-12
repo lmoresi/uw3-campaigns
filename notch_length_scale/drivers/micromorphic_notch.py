@@ -60,10 +60,14 @@ params = uw.Params(
                                           "rtol ends the Newton solve, reported as such"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
+    uw_coarse=uw.Param("native", description="direct solver of the multigrid coarse level: "
+                                             "native (PETSc LU, production) | mumps "
+                                             "(measurements only)"),
 )
 OUT = os.path.join(_here, "..", "results", "micromorphic")
 
 ref, xi = int(params.uw_ref), float(params.uw_xi)
+cn.nm.COARSE_FACTOR = None if str(params.uw_coarse) == "native" else str(params.uw_coarse)
 weak_ramp = (tuple(float(v) for v in str(params.uw_weak_ramp).split(","))
              if str(params.uw_weak_ramp) else None)
 beta, l_km = float(params.uw_beta), float(params.uw_l_km)
@@ -74,6 +78,7 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
      else "") + \
     (f"_ramp{weak_ramp[0]:g}w{weak_ramp[1]:g}" if weak_ramp else "") + \
     ("_snap" if int(params.uw_snap) else "") + \
+    ("" if str(params.uw_coarse) == "native" else f"_{params.uw_coarse}") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,

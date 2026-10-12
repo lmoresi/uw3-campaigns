@@ -76,24 +76,18 @@ def solve_newton(S, name, out_dir, budget, monitor, linear="exact"):
         # the outer Krylov residual every iteration: tells a slow linear solve
         # from a stuck one when a Newton step goes quiet
         stokes.petsc_options["ksp_monitor_short"] = None
-    if S["mesh"].dim == 3 and linear in ("production", "production_tight"):
-        # 3-D: the multigrid coarse level is a redundant direct solve, and PETSc's
-        # native LU of a 3-D P2 coarse problem takes minutes (6.5 min per Newton step
-        # at 37k coarse dofs, 2026-10-12); MUMPS takes seconds (the same Newton step
-        # 2.5 min against 21). 2-D left as it was.
-        for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
-                       "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
-            stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
+    if linear.startswith("production"):
+        # the multigrid coarse level's direct solver: native LU unless the driver set
+        # nm.COARSE_FACTOR (-uw_coarse mumps, measurements only). Native LU of a 3-D P2
+        # coarse problem took 6.5 min per Newton step at 37k coarse dofs (2026-10-12),
+        # so the 3-D answer is a genuinely coarse base.
+        nm.set_coarse_factor(stokes)
     if linear.startswith("production_rtol") or linear.startswith("production_ew"):
         # inexact Newton, for time to solution. production_rtol<X>: every linear solve
         # to a fixed rtol X, no Eisenstat-Walker. production_ew<X>: Eisenstat-Walker
         # with its forcing capped at X (rtol0 = rtolmax = X); the uncapped default
         # (0.1-0.3) gave 15 / 57 / > 40 Newton steps at refs 1 / 2 / 3 (REPORT).
         x = float(linear.split("_rtol" if "_rtol" in linear else "_ew")[1])
-        if S["mesh"].dim == 3:
-            for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
-                           "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
-                stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
         if "_rtol" in linear:
             stokes.petsc_options.delValue("snes_ksp_ew")
             stokes.petsc_options.delValue("snes_ksp_ew_version")

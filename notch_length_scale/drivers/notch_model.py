@@ -59,6 +59,58 @@ class boundaries3d(Enum):
 NO_YIELD_FACTOR = 1.0e3
 
 
+# The notch's four fillet arcs, non-dimensional (make_notch_mesh.py with S = H): radius
+# RC; (centre x, centre y, sign of dx, sign of dy) for arcs C22, C23, C24, C25. Each
+# arc spans one quadrant about its centre.
+RC = 0.02
+_A, _B = 1.0 / 12.0, 0.75
+ARCS = ((-(_A + RC), -(_B - RC), +1, -1), (-(_A - RC), -(2 / 3 + RC), -1, +1),
+        ((_A - RC), -(2 / 3 + RC), +1, +1), ((_A + RC), -(_B - RC), -1, -1))
+
+# The direct solver of the multigrid coarse level (PCREDUNDANT). None = PETSc's native
+# LU, the production path (Louis, 2026-10-13: MUMPS misbehaves on some machines, the Mac
+# among them). "mumps" only for measurements; drivers set it from -uw_coarse.
+COARSE_FACTOR = None
+
+
+def set_coarse_factor(stokes):
+    """Apply COARSE_FACTOR to the velocity block's multigrid coarse solve."""
+    if COARSE_FACTOR is None:
+        return
+    for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
+                   "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
+        stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = COARSE_FACTOR
+
+
+def notch_arc_snap(dm):
+    """Refinement callback: put the refined vertices of the notch's four fillet
+    arcs back on the arcs. Uniform refinement places edge midpoints on the
+    coarse CHORDS, so a coarse base (arcs meshed as one chord) would otherwise
+    keep the coarse base's corners at every level. Only the arcs need it: the
+    straight parts of the Inner boundary are exact under midpoint refinement.
+    Each arc spans one quadrant about its centre (make_notch_mesh.py), so a
+    point of the Inner label that lies strictly inside that quadrant and within
+    2 rc of the centre is moved radially to radius rc. Non-dimensional (the
+    mesh is divided by H); in 3-D only (x, y) move, the interface is extruded."""
+    rc, arcs = RC, ARCS
+    coords_vec = dm.getCoordinatesLocal()
+    coords = coords_vec.array.reshape(-1, dm.getCoordinateDim())
+    idx = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
+    if idx is None or len(idx) == 0:
+        return
+    pts = coords[idx, :2]
+    for cx, cy, sx, sy in arcs:
+        dx, dy = pts[:, 0] - cx, pts[:, 1] - cy
+        r = np.sqrt(dx * dx + dy * dy)
+        on = (np.sign(dx) == sx) & (np.sign(dy) == sy) & (r < 2 * rc) & (r > 0)
+        if on.any():
+            pts[on, 0] = cx + rc * dx[on] / r[on]
+            pts[on, 1] = cy + rc * dy[on] / r[on]
+    coords[idx, :2] = pts
+    coords_vec.array[...] = coords.reshape(-1)
+    dm.setCoordinatesLocal(coords_vec)
+
+
 def _stress_scale(eta_bg, v_mmyr, H_km):
     """eta * V / L in Pa -- the scale the non-dimensionalisation divides stresses by."""
     v_ms = v_mmyr * 1.0e-3 / 3.15576e7          # mm/yr -> m/s
@@ -131,38 +183,6 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     plex[1].setCoordinates(_cv)
     dim = plex[1].getDimension()
 
-    def notch_arc_snap(dm):
-        """Refinement callback: put the refined vertices of the notch's four fillet
-        arcs back on the arcs. Uniform refinement places edge midpoints on the
-        coarse CHORDS, so a coarse base (arcs meshed as one chord) would otherwise
-        keep the coarse base's corners at every level. Only the arcs need it: the
-        straight parts of the Inner boundary are exact under midpoint refinement.
-        Each arc spans one quadrant about its centre (make_notch_mesh.py), so a
-        point of the Inner label that lies strictly inside that quadrant and within
-        2 rc of the centre is moved radially to radius rc. Non-dimensional (the
-        mesh is divided by H); in 3-D only (x, y) move, the interface is extruded."""
-        rc = 0.02
-        a, b = 1.0 / 12.0, 0.75
-        # (centre x, centre y, sign of dx, sign of dy) for arcs C22, C23, C24, C25
-        arcs = ((-(a + rc), -(b - rc), +1, -1), (-(a - rc), -(2 / 3 + rc), -1, +1),
-                ((a - rc), -(2 / 3 + rc), +1, +1), ((a + rc), -(b - rc), -1, -1))
-        coords_vec = dm.getCoordinatesLocal()
-        coords = coords_vec.array.reshape(-1, dm.getCoordinateDim())
-        idx = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
-        if idx is None or len(idx) == 0:
-            return
-        pts = coords[idx, :2]
-        for cx, cy, sx, sy in arcs:
-            dx, dy = pts[:, 0] - cx, pts[:, 1] - cy
-            r = np.sqrt(dx * dx + dy * dy)
-            on = (np.sign(dx) == sx) & (np.sign(dy) == sy) & (r < 2 * rc) & (r > 0)
-            if on.any():
-                pts[on, 0] = cx + rc * dx[on] / r[on]
-                pts[on, 1] = cy + rc * dy[on] / r[on]
-        coords[idx, :2] = pts
-        coords_vec.array[...] = coords.reshape(-1)
-        dm.setCoordinatesLocal(coords_vec)
-
     mesh = uw.discretisation.Mesh(
         plex[1], boundaries=boundaries if dim == 2 else boundaries3d,
         useMultipleTags=True, useRegions=True,
@@ -211,13 +231,10 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
 
     stokes = uw.systems.Stokes(mesh, velocityField=v, pressureField=p)
     if mesh.dim == 3:
-        # The 3-D multigrid coarse level is the whole gmsh base (30-40k P2 dofs): PETSc's
-        # native LU inside PCREDUNDANT takes minutes per factorisation, MUMPS seconds.
-        # Set here so the viscous SEED solve gets it too, not only the Newton solve
-        # (a seed on a 6k-tet base sat silent for 2 h without it, 2026-10-12).
-        for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
-                       "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
-            stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
+        # The 3-D multigrid coarse level is the whole gmsh base. Its direct solver is
+        # COARSE_FACTOR (native LU unless a measurement asks for MUMPS), set here so the
+        # viscous SEED solve gets it too, not only the Newton solve.
+        set_coarse_factor(stokes)
         # the seed solve is otherwise silent for its whole length, which the hang
         # supervisor cannot tell from a hang: print the outer Krylov residual
         stokes.petsc_options["ksp_monitor_short"] = None
