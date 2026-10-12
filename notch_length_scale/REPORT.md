@@ -1004,6 +1004,23 @@ Micromorphic β = 0.1, l = 1 km, seeded, np 4, against the tight runs (`_eff` re
   saving is about the Krylov ratio, 4-5×.
 - The uncapped default failed because the early directions were loose enough that the line
   search fell to λ = 0.01-0.1 across the band. A cap of 1e-2 keeps every step full.
+- **The plain law under capped Eisenstat-Walker (the contrast row; ξ = 0.03, no length
+  scale, np 4):**
+
+| linear solves | ref 2: Newton / Krylov / time / W | ref 3: Newton / Krylov / time / W |
+|---|---|---|
+| every solve to 1e-8 | 6 / 264 / 414 s / 3.919 km | DIVERGED_LINEAR_SOLVE (Krylov cap 500 at step 2) |
+| Eisenstat-Walker capped at 1e-2 | 7 / 56 / 42 s / 3.919 km | 12 / 152 / 544 s / 3.489 km |
+
+  - **Capped EW rescues the plain law's solve at ref 3**, where every tight solve failed.
+    So the solver's success does not tell regularised from unregularised.
+  - What does tell them apart is the answer. The plain band narrows with h (W 4.43 →
+    3.92 → 3.49 km at refs 1-3), while the micromorphic band converges (4.61, 4.62,
+    4.64 km). The plain law also needs more Newton steps (12 against 7 at ref 3).
+  - So Louis's reading needs one refinement: FMG and capped EW both converge on the
+    regularised problem. The tight linear solve fails on the unregularised one at
+    ref 3, which is the sensitivity to small fluctuations he describes, but the inexact
+    solve hides it. The mesh-dependence of W remains the discriminating test.
 - `production_ew1e-2` is now the campaign's choice for production runs. The tight mode
   stays for preconditioner measurements, where the Krylov count per step must measure the
   preconditioner alone.
@@ -1112,8 +1129,34 @@ solve), serial and np 4, and checks every level. Results are in `results/snap_ch
   np 4, refinement 2 show zero cross-rank mismatch and exact radii at every level
   (`drivers/library_snap_probe.py`). They label vertices directly (`markVertices=True`);
   the notch mesh labels only faces.
-- Whether corner detail matters is decided by the 2-D snapped-vs-unsnapped W at ref 3,
-  below once the reruns finish.
+- **Corner detail does not matter at the 0.5% level.** On the same base (mesh1c4) at the
+  same ref 5, W is 4.63614 km snapped against 4.63014 km unsnapped, a difference of
+  0.13%, with peak 1.2349 against 1.2272 (`production_ew1e-2`, np 4).
+  - The unsnapped chord polygon is therefore the notch's definition, and 3-D stays
+    unsnapped. The 2-D and 3-D corner difference (46 m against 176 m chords) is
+    immaterial at this level.
+  - The base mesh moves W by about as much: 4.6173 (mesh1, ref 3), 4.6279 (mesh1c2
+    snapped, ref 4) and 4.6301 (mesh1c4, ref 5).
+
+| base, ref | snapped | Newton | Krylov | time | W (km) | peak |
+|---|---|---|---|---|---|---|
+| mesh1, 3 | no | 7 | 43 | 236 s | 4.61727 | 1.2221 |
+| mesh1c2, 4 | yes | 15 | 61 | 808 s | 4.62792 | 1.2326 |
+| mesh1c4, 5 | yes | 21 | 75 | 3882 s | 4.63614 | 1.2349 |
+| mesh1c4, 5 | no | 23 | 122 | 6062 s | 4.63014 | 1.2272 |
+
+- Capped Eisenstat-Walker needs many more Newton steps on the finer uniform bases (15-23
+  against 6 tight), though it still finishes faster than the tight runs (808 s against
+  2704 s, and 3882-6062 s against 10454-10967 s). The cap of 1e-2 is not uniformly
+  safe: the deep hierarchies want a tighter one.
+
+**The notch-only mask is exact on the split mesh.** `make_notch_mesh_3d.py --split`
+(hb4.8 Lz6: 1412 tets) carries the Notch group, and at refs 0 and 2 the ramped bump
+ends on y = -0.75 at z = 0, mid-strike and z = Lz
+(`results/mask_check_notch3d_hb4.8_Lz6_split_ref{0,2}.png`). The corner chords show
+the 3-D tessellation directly: two per arc on the end faces, a single chamfer
+mid-strike.
+
 
 ### The np = 3 hang (task 2): fixed
 
