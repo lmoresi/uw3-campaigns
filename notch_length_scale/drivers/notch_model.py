@@ -176,6 +176,17 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     rate_var.data[...] = 0.0
 
     stokes = uw.systems.Stokes(mesh, velocityField=v, pressureField=p)
+    if mesh.dim == 3:
+        # The 3-D multigrid coarse level is the whole gmsh base (30-40k P2 dofs): PETSc's
+        # native LU inside PCREDUNDANT takes minutes per factorisation, MUMPS seconds.
+        # Set here so the viscous SEED solve gets it too, not only the Newton solve
+        # (a seed on a 6k-tet base sat silent for 2 h without it, 2026-10-12).
+        for prefix in ("fieldsplit_velocity_mg_coarse_redundant_", "fieldsplit_velocity_mg_coarse_sub_",
+                       "fieldsplit_0_mg_coarse_redundant_", "fieldsplit_0_mg_coarse_sub_"):
+            stokes.petsc_options[prefix + "pc_factor_mat_solver_type"] = "mumps"
+        # the seed solve is otherwise silent for its whole length, which the hang
+        # supervisor cannot tell from a hang: print the outer Krylov residual
+        stokes.petsc_options["ksp_monitor_short"] = None
     stokes.constitutive_model = uw.constitutive_models.ViscoPlasticFlowModel
     cm = stokes.constitutive_model
 
