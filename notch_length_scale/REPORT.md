@@ -1040,8 +1040,8 @@ the solve logs, and times from the run transcripts.
 
 Louis ruled MUMPS out of the production path, because it misbehaves on some machines.
 Native LU on the multigrid coarse level is now the default, and MUMPS is opt-in
-(`-uw_coarse mumps`) for measurements only. Also available: `-uw_coarse gamg`, an
-inexact coarse solve (GMRES to 1e-3, at most 50 iterations, preconditioned by GAMG with
+(`-uw_coarse mumps`) for measurements only. Also available: `-uw_coarse gamg` (Louis, to this
+session directly: "GAMG plus FMG"), an inexact coarse solve (GMRES to 1e-3, at most 50 iterations, preconditioned by GAMG with
 Richardson + SOR smoothing). The velocity block's FGMRES tolerates a varying coarse
 solve.
 
@@ -1057,8 +1057,9 @@ Micromorphic β = 0.1, l = 1 km, `production_ew1e-2`:
 
 - **On a 1.4k-tet base, native LU costs 13% more than MUMPS.** The coarse base alone is
   the fix at this size.
-- **Capped Eisenstat-Walker in 3-D saves 4.5× in Krylov and 3.7× in time** against
-  tight solves, with W the same to 5 digits.
+- **Capped Eisenstat-Walker in 3-D saves 4.5× in Krylov and 4.2× in time** against
+  tight solves with the same coarse solver (MUMPS: 6803 s against 1625 s), with W the
+  same to 5 digits. Against capped native LU (1830 s) the mixed ratio is 3.7×.
 - **GAMG on the coarse level leaves the multigrid's convergence unchanged** (the same 43
   outer iterations, the same W). In 2-D it is 2× slower, because a 492-triangle LU is
   trivially cheap.
@@ -1105,7 +1106,8 @@ solve), serial and np 4, and checks every level. Results are in `results/snap_ch
     shared vertex left it unsnapped, and shared vertices then differed by 1.4e-3 at
     np 4. Fixed by OR-ing the Inner flag over ranks through the coordinate DM before
     moving anything. The mismatch is now 0, and the np-4 Weak volume equals serial.
-  - Decision (peer and Louis): no snapping in 3-D.
+  - Provisional decision (the peer's; Louis raised the question but has not ruled): no
+    snapping in 3-D, pending the 2-D snapped-vs-unsnapped W at ref 3.
 - **The library's shell callbacks are not affected.** Annulus and SphericalShell at
   np 4, refinement 2 show zero cross-rank mismatch and exact radii at every level
   (`drivers/library_snap_probe.py`). They label vertices directly (`markVertices=True`);
