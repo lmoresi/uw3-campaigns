@@ -26,12 +26,13 @@ LEVELS = [-0.7, -0.6, -0.5, -0.4]
 
 
 def build_notch(ref, xi, seed=True, msh=None, weak_ramp=None, snap_arcs=False,
-                ramp_scope="weak"):
+                ramp_scope="weak", fmg_tail=None):
     """The notch at refinement ``ref`` with the shipped yield law and xi as
     plastic_rate_strengthening; returns notch_model.build's dict. ``seed=False``
     skips the viscous seed solve (for loading saved fields)."""
     S = nm.build(msh or MESH, ETA_BG, U_MMYR, PHI, ref, xi=0.0, seed=seed,
-                 p_degree=1, p_continuous=True, weak_ramp=weak_ramp, snap_arcs=snap_arcs, ramp_scope=ramp_scope)
+                 p_degree=1, p_continuous=True, weak_ramp=weak_ramp, snap_arcs=snap_arcs, ramp_scope=ramp_scope,
+                 fmg_tail=fmg_tail)
     cm = S["cm"]
     cm.yield_mode = "softmin"
     cm.yield_smoother = "sqrt"

@@ -26,14 +26,20 @@ params = uw.Params(
     uw_monitor=uw.Param(1, description="1 = SNES, line-search and KSP-reason monitors, "
                                        "2 = and the outer Krylov residual"),
     uw_tag=uw.Param("", description="suffix for the output files"),
+    uw_mesh=uw.Param("", description="gmsh file of the notch (empty = mesh1)"),
+    uw_fmg_tail=uw.Param("", description="comma-separated gmsh files, coarsest first: a "
+                                         "non-nested FMG tail below the mesh's nested levels"),
 )
 OUT = os.path.join(_here, "..", "results", "plain")
 ref, xi = int(params.uw_ref), float(params.uw_xi)
 name = f"plain_ref{ref}_xi{xi:g}_{params.uw_linear}" + \
     ("" if uw.mpi.size == 1 else f"_np{uw.mpi.size}") + \
+    (f"_{os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]}" if str(params.uw_mesh) else "") + \
+    ("_tail" + str(len(str(params.uw_fmg_tail).split(","))) if str(params.uw_fmg_tail) else "") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
-S = cn.build_notch(ref, xi)
+S = cn.build_notch(ref, xi, msh=str(params.uw_mesh) or None,
+                   fmg_tail=[m for m in str(params.uw_fmg_tail).split(",") if m] or None)
 cn.yield_stress_with_shift(S, 0)              # the same yield law, no micromorphic shift
 if int(params.uw_ksp_max_it):
     S["stokes"].petsc_options["ksp_max_it"] = int(params.uw_ksp_max_it)

@@ -35,7 +35,10 @@ import notch_model as nm   # noqa: E402
 params = uw.Params(
     uw_mesh=uw.Param("", description="gmsh file of the notch (2-D or 3-D)"),
     uw_ref=uw.Param(3, description="refinement levels"),
+    uw_mode=uw.Param("surface", description="surface = notch_arc_snap (Inner vertices only); "
+                                            "volume = notch_arc_snap_volume (the volume follows)"),
 )
+SNAP = nm.notch_arc_snap_volume if str(params.uw_mode) == "volume" else nm.notch_arc_snap
 H_KM = 30.0
 A, B, RC = 1.0 / 12.0, 0.75, nm.RC
 comm = uw.mpi.comm
@@ -199,7 +202,7 @@ def check(snap):
 
     def wrapped(dm):
         X0 = dm.getCoordinatesLocal().array.copy()
-        nm.notch_arc_snap(dm)
+        SNAP(dm)
         X1 = dm.getCoordinatesLocal().array
         moves.setdefault(id(dm), []).append(float(np.max(np.abs(X1 - X0))) if len(X0) else 0.0)
 
@@ -308,7 +311,8 @@ with uw.selective_ranks(0) as rank0:
         name = os.path.splitext(os.path.basename(str(params.uw_mesh)))[0]
         out_dir = os.path.join(_here, "..", "results", "snap_check")
         os.makedirs(out_dir, exist_ok=True)
-        out = os.path.join(out_dir, f"{name}_ref{int(params.uw_ref)}_np{uw.mpi.size}.json")
+        out = os.path.join(out_dir, f"{name}_ref{int(params.uw_ref)}_np{uw.mpi.size}"
+                           f"{'' if str(params.uw_mode) == 'surface' else '_' + str(params.uw_mode)}.json")
         json.dump(results, open(out, "w"), indent=1)
         print(f"{name}  np {uw.mpi.size}   (analytic Weak area 2-D: {1 + 1 / 72:.9f} x Lz in 3-D)")
         print("variant   lvl  cells     max d(all)  max d(arc)  calls max move   min size    "

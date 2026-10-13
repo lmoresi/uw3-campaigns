@@ -20,7 +20,12 @@ lower layer. Weak (100) stays the union; the bump is also the volume group Notch
 so a notch-only ramp is exact at every refinement level. The split face carries no
 boundary group. Without --split the mesh is built exactly as before.
 
-Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir] [z0 zhalf h_z] [--split]
+Optional --coarsen f scales every size (a crude bottom level of a non-nested FMG
+tail); --fillet h puts size h (km) on the four fillet surfaces, so the arcs are
+meshed finely along the whole strike (the top gmsh level of such a tail).
+
+Usage:  python make_notch_mesh_3d.py <h_band_km> <Lz_km> [out_dir] [z0 zhalf h_z]
+                                     [--split] [--coarsen f] [--fillet h]
 Writes: <out_dir>/notch3d_hb<h_band>_Lz<Lz>[_z<z0>h<h_z>][_split].msh
 """
 import os
@@ -30,6 +35,20 @@ import gmsh
 
 split = "--split" in sys.argv
 sys.argv = [a for a in sys.argv if a != "--split"]
+
+
+def _flag_value(name, default):
+    """``--name value`` anywhere in argv (removed from it), else ``default``."""
+    if name in sys.argv:
+        i = sys.argv.index(name)
+        v = float(sys.argv[i + 1])
+        del sys.argv[i:i + 2]
+        return v
+    return default
+
+
+coarsen = _flag_value("--coarsen", 1.0)     # every size (background, band, window) x this
+h_fillet = _flag_value("--fillet", 0.0)     # km; > 0: a size field on the four fillet surfaces
 h_band = float(sys.argv[1]) if len(sys.argv) > 1 else 1.2
 Lz = float(sys.argv[2]) if len(sys.argv) > 2 else 20.0
 out_dir = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "-" else os.path.expanduser(
@@ -38,7 +57,9 @@ z_window = tuple(float(v) for v in sys.argv[4:7]) if len(sys.argv) > 6 else None
 os.makedirs(out_dir, exist_ok=True)
 
 S = 30.0
-cl_1, cl_2, cl_2a, cl_3, cl_4 = 0.25 * S, 0.15 * S, 0.1 * S, 0.25 * S, 0.15 * S
+cl_1, cl_2, cl_2a, cl_3, cl_4 = (coarsen * c for c in
+                                  (0.25 * S, 0.15 * S, 0.1 * S, 0.25 * S, 0.15 * S))
+h_band *= coarsen
 
 gmsh.initialize()
 gmsh.option.setNumber("General.Verbosity", 0)
@@ -125,6 +146,7 @@ gmsh.model.mesh.field.setNumber(box, "Thickness", 0.3 * S)
 background = box
 if z_window is not None:
     z0, zhalf, h_z = z_window
+    h_z *= coarsen
     zbox = gmsh.model.mesh.field.add("Box")
     gmsh.model.mesh.field.setNumber(zbox, "VIn", h_z)
     gmsh.model.mesh.field.setNumber(zbox, "VOut", cl_1)
@@ -138,6 +160,30 @@ if z_window is not None:
     both = gmsh.model.mesh.field.add("Min")
     gmsh.model.mesh.field.setNumbers(both, "FieldsList", [box, zbox])
     background = both
+if h_fillet > 0:
+    # the four fillet surfaces (the extruded arcs): the band-region sizes are far
+    # larger than the 0.6 km fillet radius, and the cylindrical surfaces were then
+    # tessellated with edges spanning a whole quarter arc (snap_check: 176 m chords)
+    arc_surfaces = []
+    for _, tag in gmsh.model.getEntities(2):
+        # a fillet surface spans rc x rc in (x, y) and the whole strike; no other
+        # surface is that small in both x and y and long in z
+        x0, y0, z0_, x1, y1, z1 = gmsh.model.getBoundingBox(2, tag)
+        if (0 < x1 - x0 < 1.5 * rc * S and 0 < y1 - y0 < 1.5 * rc * S
+                and z1 - z0_ > 0.5 * Lz):
+            arc_surfaces.append(tag)
+    dist = gmsh.model.mesh.field.add("Distance")
+    gmsh.model.mesh.field.setNumbers(dist, "SurfacesList", arc_surfaces)
+    thr = gmsh.model.mesh.field.add("Threshold")
+    gmsh.model.mesh.field.setNumber(thr, "InField", dist)
+    gmsh.model.mesh.field.setNumber(thr, "SizeMin", h_fillet)
+    gmsh.model.mesh.field.setNumber(thr, "SizeMax", cl_1)
+    gmsh.model.mesh.field.setNumber(thr, "DistMin", 0.0)
+    gmsh.model.mesh.field.setNumber(thr, "DistMax", 4 * rc * S)
+    allf = gmsh.model.mesh.field.add("Min")
+    gmsh.model.mesh.field.setNumbers(allf, "FieldsList", [background, thr])
+    background = allf
+    print(f"fillet size field on surfaces {arc_surfaces}")
 gmsh.model.mesh.field.setAsBackgroundMesh(background)
 gmsh.option.setNumber("Mesh.MeshSizeExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.MeshSizeFromPoints", 0)
@@ -145,7 +191,8 @@ gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 0)
 gmsh.option.setNumber("Mesh.Algorithm3D", 10)       # HXT, parallel
 gmsh.model.mesh.generate(3)
 out = f"{out_dir}/notch3d_hb{h_band:g}_Lz{Lz:g}" + \
-    (f"_z{z_window[0]:g}h{z_window[2]:g}" if z_window else "") + ("_split" if split else "") + ".msh"
+    (f"_z{z_window[0]:g}h{z_window[2]:g}" if z_window else "") + ("_split" if split else "") + \
+    (f"_c{coarsen:g}" if coarsen != 1 else "") + (f"_f{h_fillet:g}" if h_fillet > 0 else "") + ".msh"
 gmsh.write(out)
 types, tags, _ = gmsh.model.mesh.getElements(3)
 n_tet = sum(len(t) for t in tags)

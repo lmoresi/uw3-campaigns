@@ -1093,7 +1093,70 @@ Micromorphic β = 0.1, l = 1 km, `production_ew1e-2`:
   non-nested transfer in `utilities/custom_mg.py` (`set_custom_fmg`). It targets one
   field, and the coupled split holds u and χ, so it needs a block (u ⊕ χ) prolongation.
 
+### Independent gmsh meshes as multigrid levels (2026-10-13)
+
+Louis's direction: weave independent gmsh meshes into the FMG hierarchy, as the fault
+stack-on adaptation does. Nested refinement goes only on top of the largest gmsh mesh,
+because gmsh is slow for large 3-D meshes.
+- The coarsest level barely resolves the notch, and every level meshes the true
+  geometry, so the crude bottom does not reach the fine grid.
+- The transfers come from `utilities/custom_mg.py`: barycentric between non-nested
+  levels, and the nested embedding between refined ones (serial).
+
+**Library change** (feature/shear-band-length-scale, 8c3ab455).
+- A coupled field shares fieldsplit 0 with velocity, so `set_custom_fmg(field_id=0)`
+  built a velocity-only transfer, and PETSc's Galerkin product then failed (MatPtAP
+  size mismatch).
+- `CustomMGHierarchy` now builds one transfer per field of the split, each at its own
+  degree and BC-reduced per level, and scatters them into the split's numbering.
+- `test_1075` covers it serially and at np 4. It failed before the change and passes
+  after. test_1016, test_1017 (serial and parallel), test_1022 and test_1070 still
+  pass.
+
+**Driver.** `-uw_fmg_tail a.msh,b.msh` (micromorphic and plain drivers) puts the listed
+gmsh meshes, coarsest first, under the solver mesh's nested levels. Two more options:
+- `make_notch_mesh.py ... 8` (2-D) and `make_notch_mesh_3d.py --coarsen f` make the
+  crude bottoms;
+- `--fillet h` meshes the four fillet surfaces at size h along the whole strike. That
+  fixes the single-chord tessellation found by the snap check.
+
+**3-D: the same fine mesh, two hierarchies.** The fine mesh is `notch3d_hb4.8_Lz6_f0.15`
+(5116 tets, fillets at 0.15 km) refined once. Micromorphic β = 0.1, l = 1 km,
+`production_ew1e-2`, np 8:
+
+| hierarchy | coarse direct solve | Newton | Krylov | Newton solve | whole run | W (km) | peak |
+|---|---|---|---|---|---|---|---|
+| nested only | LU on the 5116-tet gmsh mesh | 6 | 55 | 5513 s | 3 h 17 min | 4.87442 | 1.0487 |
+| gmsh tail (230 → 619 tets) + nested | LU on 230 tets | 6 | 55 | 3814 s | 1 h 37 min | 4.87442 | 1.0487 |
+
+- **The same solution and iteration counts, 31% faster in the Newton solve and 2×
+  faster overall** (the viscous seed gains too). The crude bottom costs the multigrid
+  nothing in convergence, and it removes the coarse-LU bottleneck that native LU hits
+  on fine-geometry bases. (Native LU on a 6067-tet base cost 57 s per Krylov
+  iteration, against 36 s on a 1387-tet base with twice the fine mesh.)
+- This is now the 3-D path: fine gmsh geometry at the top, crude gmsh levels below,
+  native LU at the bottom, and no MUMPS.
+
+**2-D: no gain, and an unexplained slowdown.**
+- Micromorphic at ref 3 (np 4) on mesh1 with a tail of mesh1c4 + mesh1c2 gives the
+  same Newton steps, Krylov count and W as nested only (7 / 43 / 4.61727 km with
+  capped EW; 6 / 227 / 4.6173 tight). It is slower, though: 540 s against 221 s, and
+  2708 s against 1947 s.
+- A rank-0 profile puts all of custom_mg (building and installing the transfers) at
+  19 s of 963 s, so the time is inside PETSc's solve.
+- The tail's Galerkin operators are much LIGHTER than the nested ones. ksp_view at
+  ref 3 gives nested levels of 1.27M / 1.60M / 2.94M nonzeros above a 2.89M fine
+  operator, against 0.05M to 0.72M for the tail levels.
+- A `-log_view` comparison is queued. In 2-D the coarse LU is trivially cheap, so the
+  tail has nothing to win there.
+
 ### Arc snapping verified geometrically (2026-10-13)
+
+**What snapping is for** (Louis, 2026-10-13). It is not about solver robustness. It
+lets different coarse grids reach (almost) the same fine-grid problem. The ideal coarse
+grid barely resolves the notch, and that crudeness must not propagate to the finest
+grid. Snapping puts the refined boundary back on the true geometry level by level, so
+the fine problem does not depend on how coarse the base was.
 
 `drivers/snap_check.py` builds the hierarchy with and without the snap callback (no
 solve), serial and np 4, and checks every level. Results are in `results/snap_check/`.
@@ -1129,12 +1192,23 @@ solve), serial and np 4, and checks every level. Results are in `results/snap_ch
   np 4, refinement 2 show zero cross-rank mismatch and exact radii at every level
   (`drivers/library_snap_probe.py`). They label vertices directly (`markVertices=True`);
   the notch mesh labels only faces.
-- **Corner detail does not matter at the 0.5% level.** On the same base (mesh1c4) at the
+- **At this fillet size, corner detail moves W by 0.13%.** On the same base (mesh1c4) at the
   same ref 5, W is 4.63614 km snapped against 4.63014 km unsnapped, a difference of
   0.13%, with peak 1.2349 against 1.2272 (`production_ew1e-2`, np 4).
-  - The unsnapped chord polygon is therefore the notch's definition, and 3-D stays
-    unsnapped. The 2-D and 3-D corner difference (46 m against 176 m chords) is
-    immaterial at this level.
+  - So with these bases (two chords per arc) the unsnapped corners cost little. The
+    point of snapping is a base far coarser than these, where the arcs and perhaps the
+    notch itself are a few chords. There the fine grid must still see the true
+    geometry. That needs snapping that works in 3-D: the volume must follow the surface.
+  - **A volume-following snap does not rescue 3-D.** `nm.notch_arc_snap_volume` carries
+    the radial correction to every vertex near the arc. The correction is interpolated
+    in arc angle and z, and fades linearly over a band four times the largest move.
+    It still inverts tets: 2 at level 1 and 17 at level 2, against 2 and 11 for the
+    surface-only snap. It does raise the worst quality from 0.0019 to 0.0104. In 2-D it
+    changes nothing measurable.
+  - So in 3-D the true geometry has to come from gmsh at each level, not from moving
+    vertices. Louis: "use multiple gmsh meshes and weave them into FMG as we do with
+    the fault stack-on adaptation". Nested refinement then goes only on top of the
+    largest gmsh mesh, because gmsh is slow for large 3-D meshes.
   - The base mesh moves W by about as much: 4.6173 (mesh1, ref 3), 4.6279 (mesh1c2
     snapped, ref 4) and 4.6301 (mesh1c4, ref 5).
 

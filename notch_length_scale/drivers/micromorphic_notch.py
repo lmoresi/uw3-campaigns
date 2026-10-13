@@ -60,6 +60,8 @@ params = uw.Params(
                                           "rtol ends the Newton solve, reported as such"),
     uw_taylor=uw.Param(0, description="1 = Taylor test of the coupled Jacobian at the "
                                       "final iterate (slope 2 = exact tangent)"),
+    uw_fmg_tail=uw.Param("", description="comma-separated gmsh files, coarsest first: a "
+                                         "non-nested FMG tail below the mesh's nested levels"),
     uw_ramp_scope=uw.Param("weak", description="what the along-strike ramp stiffens: weak "
                                                 "(the whole Weak region, lower layer too) | "
                                                 "notch (the bump above y = -3/4 H only)"),
@@ -83,6 +85,7 @@ name = f"micro_ref{ref}_xi{xi:g}_beta{beta:g}_l{l_km:g}" + \
     ("_notchonly" if weak_ramp and str(params.uw_ramp_scope) == "notch" else "") + \
     ("_snap" if int(params.uw_snap) else "") + \
     ("" if str(params.uw_coarse) == "native" else f"_{params.uw_coarse}") + \
+    ("_tail" + str(len(str(params.uw_fmg_tail).split(","))) if str(params.uw_fmg_tail) else "") + \
     (f"_{params.uw_tag}" if str(params.uw_tag) else "")
 
 coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
@@ -92,7 +95,8 @@ coarse = (cn.load_coarse(str(params.uw_init), ref - 1, xi,
           if str(params.uw_init) else None)
 S = cn.build_notch(ref, xi, seed=bool(int(params.uw_seed)), msh=str(params.uw_mesh) or None,
                    weak_ramp=weak_ramp, snap_arcs=bool(int(params.uw_snap)),
-                   ramp_scope=str(params.uw_ramp_scope))
+                   ramp_scope=str(params.uw_ramp_scope),
+                   fmg_tail=[m for m in str(params.uw_fmg_tail).split(",") if m] or None)
 mesh, stokes = S["mesh"], S["stokes"]
 
 m = S["mat"].sym[0]

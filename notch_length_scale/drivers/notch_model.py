@@ -153,6 +153,115 @@ def notch_arc_snap(dm):
     dm.setCoordinatesLocal(coords_vec)
 
 
+
+def _inner_vertices_synced(dm):
+    """Local vertex indices that carry Inner on ANY rank (the flag OR-ed through the
+    coordinate DM's global vector). Collective."""
+    from petsc4py import PETSc
+    cdim = dm.getCoordinateDim()
+    idx = (uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, "Inner")
+           if dm.getLabel("Inner") else np.array([], int))
+    cdm = dm.getCoordinateDM()
+    fl = cdm.createLocalVec()
+    fl.set(0.0)
+    if len(idx):
+        fl.array.reshape(-1, cdim)[np.asarray(idx, int), 0] = 1.0
+    fg = cdm.createGlobalVec()
+    fg.set(0.0)
+    cdm.localToGlobal(fl, fg, addv=PETSc.InsertMode.ADD_VALUES)
+    cdm.globalToLocal(fg, fl, addv=PETSc.InsertMode.INSERT_VALUES)
+    out = np.flatnonzero(fl.array.reshape(-1, cdim)[:, 0] > 0.5)
+    fl.destroy()
+    fg.destroy()
+    return out
+
+
+def notch_arc_snap_volume(dm):
+    """Refinement callback: snap the fillet arcs AND carry the volume with them.
+
+    Moving only the Inner vertices (notch_arc_snap) inverts tetrahedra in 3-D: a
+    one-chord sagitta outruns the vertices behind it. Here every vertex in an arc's
+    quadrant gets the radial correction dr(phi, z) of the Inner vertices, interpolated
+    in angle (and in z along strike in 3-D), scaled by a weight falling linearly from 1
+    on the boundary to 0 at distance D on either side. The map r -> r + w dr is
+    monotone in r while |dr| < D, so D is 4 max|dr|, capped at rc / 2 (no reach to the
+    arc centre). Inner vertices land on the arc exactly (w = 1, dr their own).
+    Collective: the arc vertices are gathered from every rank."""
+    rc, arcs = RC, ARCS
+    comm = uw.mpi.comm
+    coords_vec = dm.getCoordinatesLocal()
+    cdim = dm.getCoordinateDim()
+    X = coords_vec.array.reshape(-1, cdim)
+    idx = _inner_vertices_synced(dm)
+    zall = X[:, 2] if cdim == 3 else np.zeros(len(X))
+    for cx, cy, sx, sy in arcs:
+        dx, dy = X[:, 0] - cx, X[:, 1] - cy
+        r = np.hypot(dx, dy)
+        phi = np.arctan2(sy * dy, sx * dx)          # 0 .. pi/2 inside the quadrant
+        inq = (sx * dx >= 0) & (sy * dy >= 0) & (r > 0)
+        b = idx[inq[idx] & (r[idx] < 2 * rc)]
+        pts = comm.allgather(np.column_stack([phi[b] * rc, zall[b], rc - r[b]]))
+        P = np.vstack([q for q in pts if len(q)]) if any(len(q) for q in pts) else np.zeros((0, 3))
+        dmax = float(np.max(np.abs(P[:, 2]))) if len(P) else 0.0
+        if dmax < 1.0e-14:
+            continue
+        D = min(4.0 * dmax, 0.5 * rc)
+        cand = np.flatnonzero(inq & (np.abs(r - rc) < D + dmax))
+        if cdim == 2:
+            order = np.argsort(P[:, 0])
+            s = np.concatenate([[0.0], P[order, 0], [0.5 * np.pi * rc]])
+            v = np.concatenate([[0.0], P[order, 2], [0.0]])
+            dr = np.interp(phi[cand] * rc, s, v)
+        else:
+            from scipy.interpolate import LinearNDInterpolator
+            zlo = comm.allreduce(float(zall.min()) if len(zall) else np.inf, op=_MPI_MIN())
+            zhi = comm.allreduce(float(zall.max()) if len(zall) else -np.inf, op=_MPI_MAX())
+            zz = np.linspace(zlo, zhi, 64)
+            ends = np.vstack([np.column_stack([np.zeros_like(zz), zz, np.zeros_like(zz)]),
+                              np.column_stack([np.full_like(zz, 0.5 * np.pi * rc), zz, np.zeros_like(zz)])])
+            Q = np.vstack([P, ends])
+            f = LinearNDInterpolator(Q[:, :2], Q[:, 2], fill_value=0.0)
+            dr = f(np.column_stack([phi[cand] * rc, zall[cand]])) if len(cand) else np.zeros(0)
+        rb = rc - dr
+        w = np.clip(1.0 - np.abs(r[cand] - rb) / D, 0.0, 1.0)
+        rn = r[cand] + w * dr
+        X[cand, 0] = cx + rn * dx[cand] / r[cand]
+        X[cand, 1] = cy + rn * dy[cand] / r[cand]
+        # the Inner vertices themselves: exactly onto the arc
+        ex, ey = X[b, 0] - cx, X[b, 1] - cy
+        eb = np.hypot(ex, ey)
+        X[b, 0] = cx + rc * ex / eb
+        X[b, 1] = cy + rc * ey / eb
+    coords_vec.array[...] = X.reshape(-1)
+    dm.setCoordinatesLocal(coords_vec)
+
+
+def _MPI_MIN():
+    from mpi4py import MPI
+    return MPI.MIN
+
+
+def _MPI_MAX():
+    from mpi4py import MPI
+    return MPI.MAX
+
+
+def load_notch_mesh(msh, refinement=0, H_km=30.0, snap_arcs=False):
+    """A notch gmsh file as a UW3 mesh: coordinates divided by H (see build), the
+    notch's boundary and region labels, ``refinement`` nested levels. Used for the
+    solver mesh and for the independent coarse levels of a non-nested FMG tail."""
+    plex = uw.discretisation._from_gmsh(msh, useMultipleTags=True, useRegions=True)
+    _cv = plex[1].getCoordinates()
+    _cv.scale(1.0 / H_km)
+    plex[1].setCoordinates(_cv)
+    dim = plex[1].getDimension()
+    return uw.discretisation.Mesh(
+        plex[1], boundaries=boundaries if dim == 2 else boundaries3d,
+        useMultipleTags=True, useRegions=True,
+        coordinate_system_type=uw.coordinates.CoordinateSystemType.CARTESIAN,
+        qdegree=3, refinement=refinement,
+        refinement_callback=notch_arc_snap if snap_arcs else None)
+
 def _stress_scale(eta_bg, v_mmyr, H_km):
     """eta * V / L in Pa -- the scale the non-dimensionalisation divides stresses by."""
     v_ms = v_mmyr * 1.0e-3 / 3.15576e7          # mm/yr -> m/s
@@ -175,7 +284,8 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
           unique_params=False,
           rate_source="live", fas_source=False, p_degree=1, p_continuous=True,
           strategy=None, floor_scalar=None, residual_strength=0.02,
-          weak_ramp=None, snap_arcs=False, ramp_scope="weak"):
+          weak_ramp=None, snap_arcs=False, ramp_scope="weak",
+          fmg_tail=None):
     """The notch benchmark on ViscoPlasticFlowModel with the power-mean soft-min.
 
     Returns a dict with the solver, the fields, the live xi variable and the viscous
@@ -627,6 +737,17 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     pp = "fieldsplit_pressure_"
     stokes.petsc_options[pp + "ksp_type"] = "preonly"
     stokes.petsc_options[pp + "pc_type"] = "bjacobi"
+
+    # A NON-NESTED FMG TAIL (Louis, 2026-10-13): independent gmsh meshes of the notch,
+    # coarsest first, below this mesh's own nested levels. Each tail level meshes the
+    # true geometry, so the coarsest can barely resolve the notch without its chords
+    # reaching the fine grid; nested refine() on top keeps gmsh out of the large meshes.
+    # Transfers: barycentric between the gmsh levels and onto the base, exact nested
+    # between the refined levels (custom_mg). Velocity block only (field 0): a coupled
+    # field in that split needs the multi-field transfer.
+    if fmg_tail:
+        tail = [load_notch_mesh(m, 0, H_km) for m in fmg_tail]
+        stokes.set_custom_fmg(tail + mesh._coarse_level_meshes()[:-1], field_id=0)
 
     # Viscous seed: the DP viscosity and its tangent are singular at edot = 0, so the
     # first plastic Jacobian needs an everywhere-nonzero strain rate to be evaluable at
