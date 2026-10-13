@@ -1126,10 +1126,15 @@ gmsh meshes, coarsest first, under the solver mesh's nested levels. Two more opt
 
 | hierarchy | coarse direct solve | Newton | Krylov | Newton solve | whole run | W (km) | peak |
 |---|---|---|---|---|---|---|---|
-| nested only | LU on the 5116-tet gmsh mesh | 6 | 55 | 5513 s | 3 h 17 min | 4.87442 | 1.0487 |
-| gmsh tail (230 → 619 tets) + nested | LU on 230 tets | 6 | 55 | 3814 s | 1 h 37 min | 4.87442 | 1.0487 |
+| nested only | LU on the 5116-tet gmsh mesh | 6 | 55 | 4514 s | 2 h 26 min | 4.87442 | 1.0487 |
+| gmsh tail (230 → 619 tets) + nested | LU on 230 tets | 6 | 55 | 2477 s | 1 h 05 min | 4.87442 | 1.0487 |
 
-- **The same solution and iteration counts, 31% faster in the Newton solve and 2×
+These are the concurrent `-log_view` pair (lv3d_*), started in the same runner poll. An
+earlier, non-concurrent pair gave 5513 against 3814 s, read under different loads. In
+the nested run the coarse LU takes 3941 s of factorisation and 3335 s of solves, against
+7 s and 227 s in the gmsh run. Preconditioner apply is 7955 against 3012 s.
+
+- **The same solution and iteration counts, 1.8× faster in the Newton solve and 2.2×
   faster overall** (the viscous seed gains too). The crude bottom costs the multigrid
   nothing in convergence, and it removes the coarse-LU bottleneck that native LU hits
   on fine-geometry bases. (Native LU on a 6067-tet base cost 57 s per Krylov
@@ -1137,7 +1142,14 @@ gmsh meshes, coarsest first, under the solver mesh's nested levels. Two more opt
 - This is now the 3-D path: fine gmsh geometry at the top, crude gmsh levels below,
   native LU at the bottom, and no MUMPS.
 
-**2-D: no gain, and an unexplained slowdown.**
+**2-D: no gain, and no real slowdown.** The 2.4× below was a timing artefact. Run side by
+side with `-log_view`, nested only took 371 s and the gmsh tail 405 s (+9%). The same
+nested run had taken 221 s the night before, so load alone moved it 1.7×. Hyperion runs
+over its physical cores (load 72 on 48; another campaign holds 48 ranks), so wall times
+from runs started apart are not comparable. Timing claims in this report that rest on
+separate runs are indicative only: the inexact-Newton wall ratios, and the per-step
+seconds in the efficiency tables. Iteration counts are unaffected. The earlier reading
+follows, kept for the record:
 - Micromorphic at ref 3 (np 4) on mesh1 with a tail of mesh1c4 + mesh1c2 gives the
   same Newton steps, Krylov count and W as nested only (7 / 43 / 4.61727 km with
   capped EW; 6 / 227 / 4.6173 tight). It is slower, though: 540 s against 221 s, and
