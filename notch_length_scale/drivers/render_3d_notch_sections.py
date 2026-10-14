@@ -37,6 +37,10 @@ params = uw.Params(
     uw_ramp_scope=uw.Param("weak", description="the run's ramp scope"),
     uw_zs=uw.Param("2,14", description="z positions of the sections (km): live notch, faded"),
     uw_half_width=uw.Param(32.0, description="half width in x of the view (km)"),
+    uw_field=uw.Param("edot", description="edot = strain rate / (V/H); yield = tau_II / "
+                                           "tau_y with the micromorphic shift (1 = at yield)"),
+    uw_beta=uw.Param(0.1, description="the run's beta (for the yield field)"),
+    uw_l_km=uw.Param(1.0, description="the run's l in km (for the yield field)"),
     uw_clim=uw.Param("", description="edot_II/(V/H) colour range 'lo,hi' (empty = the "
                                       "2nd-99.5th percentile over the sections above y = -20 km)"),
 )
@@ -53,9 +57,30 @@ if uw.mpi.size > 1:
 
 S = cn.build_notch(int(params.uw_ref), 0.0, seed=False, msh=str(params.uw_mesh),
                    weak_ramp=ramp, ramp_scope=str(params.uw_ramp_scope))
-S["v"].read_timestep(run, S["v"].name, 0,
-                     outputPath=os.path.join(RES, "micromorphic", "checkpoints"))
+CK = os.path.join(RES, "micromorphic", "checkpoints")
+S["v"].read_timestep(run, S["v"].name, 0, outputPath=CK)
 L = cn.H_KM * 1.0e3
+FIELD = str(params.uw_field)
+if FIELD == "yield":
+    # the run's own yield law: Drucker-Prager in the checkpointed pressure, plus the
+    # micromorphic shift H (e - chi) with chi from the checkpoint; tau_II from the
+    # model's effective viscosity
+    S["p"].read_timestep(run, S["p"].name, 0, outputPath=CK)
+    chi = uw.discretisation.MeshVariable("chi", S["mesh"], 1, degree=1, units="1/s")
+    chi.read_timestep(run, "chi", 0, outputPath=CK)
+    m = S["mat"].sym[0]
+    e = S["stokes"].Unknowns.Einv2
+    H = uw.expression(r"H_{\chi}", uw.quantity(float(params.uw_beta) * cn.ETA_BG, "Pa*s"),
+                      "micromorphic modulus")
+    sigma_y = cn.yield_stress_with_shift(S, m * H * (e - chi.sym[0]))
+    # eta_eff / eta_lin: two viscosities, the same units by construction (a stress /
+    # yield-stress ratio built from evaluate() mixed unit systems, #843: eta and tau_y
+    # came back dimensional, edot scaled). 1 = below yield, < 1 = yielding.
+    VALUE = (S["cm"].viscosity, S["cm"].Parameters.shear_viscosity_0)
+else:
+    VALUE = S["stokes"].Unknowns.Einv2
+LABEL = (r"$\eta_{eff}\,/\,\eta_{lin}$ (1 = below yield)" if FIELD == "yield"
+         else r"$\dot\varepsilon_{II}\,/\,(V/H)$")
 
 grid = vis.mesh_to_pv_mesh(S["mesh"])                       # metres
 strong_cell = np.asarray(S["mat"].data).ravel() > 0.5       # P0, plex cell order
@@ -68,14 +93,28 @@ strong = grid.extract_cells(np.flatnonzero(strong_cell))
 
 def with_edot(surface):
     pts = np.asarray(surface.points) * 1.0e3 / L
-    surface.point_data["edot"] = np.asarray(
-        uw.function.evaluate(S["stokes"].Unknowns.Einv2, pts)).ravel()
+    if isinstance(VALUE, tuple):
+        num, den = (np.asarray(uw.function.evaluate(v, pts), dtype=float).ravel() for v in VALUE)
+        surface.point_data["edot"] = num / den
+    else:
+        surface.point_data["edot"] = np.asarray(uw.function.evaluate(VALUE, pts)).ravel()
     return surface
 
 
 sections = [with_edot(strong.slice(normal="z", origin=(0.0, -15.0, z))
                       .clip_box((-half, half, -31, 1, -1, Lz + 1), invert=False))
             for z in zs]
+for z, s in zip(zs, sections):
+    v = s.point_data["edot"]
+    uw.pprint(f"[{FIELD}] z = {z:g}: min {np.min(v):.4g}  p50 {np.median(v):.4g}  max {np.max(v):.4g}")
+if FIELD == "yield":
+    # the pieces of the ratio at one point mid-layer, far from the block
+    probe = np.array([[0.0, -10.0e3 / L, 15.0e3 / L]])
+    for nm_, ex in (("eta_eff", S["cm"].viscosity), ("edot", S["stokes"].Unknowns.Einv2),
+                    ("tau_y", sigma_y)):
+        uw.pprint(f"  probe {nm_}: {np.asarray(uw.function.evaluate(ex, probe)).ravel()}")
+if clim is None and FIELD == "yield":
+    clim = (0.0, 1.0)
 if clim is None:
     # the range from the BAND region only (y above -20 km): the strip along the top of
     # the weak layer and the notch-top hot spot would otherwise take the range, and
@@ -100,13 +139,15 @@ for k, s in enumerate(sections):          # plane but the farthest is see-throug
     pl.add_mesh(s, scalars="edot", cmap="inferno", clim=clim, lighting=False,
                 opacity=(1.0 if k == far or len(zs) == 1 else 0.55),
                 show_scalar_bar=(k == 0),
-                scalar_bar_args=dict(title="edot_II / (V/H), strong layer", color="black",
+                scalar_bar_args=dict(title=("eta_eff / eta_lin" if FIELD == "yield" else "edot_II / (V/H)")
+                                     + ", strong layer", color="black",
                                      vertical=False, position_x=0.3, position_y=0.04,
                                      width=0.4))
 pl.add_mesh(pv.Box(bounds=(-half, half, -30, 0, 0, Lz)).extract_all_edges(), color="grey",
             line_width=1)
 pl.camera_position = [(55.0, 28.0, -55.0), (0.0, -14.0, Lz / 2), (0.0, 1.0, 0.0)]
-outs = [os.path.join(RES, f"{run}_notchsections3d.png")]
+tag = "" if FIELD == "edot" else "_yield"
+outs = [os.path.join(RES, f"{run}_notchsections3d{tag}.png")]
 pl.screenshot(outs[-1])
 pl.close()
 
@@ -132,8 +173,8 @@ for ax, z, s in zip(axes[:, 0], zs, sections):
 axes[-1, 0].set_xlabel("x (km)")
 cb = fig.colorbar(im, ax=axes[:, 0], orientation="horizontal", fraction=0.05, pad=0.1,
                   aspect=40, shrink=0.75, extend="max")
-cb.set_label(r"$\dot\varepsilon_{II}\,/\,(V/H)$, strong layer only (tan: the weak region)")
-outs.append(os.path.join(RES, f"{run}_notchsections.png"))
+cb.set_label(LABEL + ", strong layer only (tan: the weak region)")
+outs.append(os.path.join(RES, f"{run}_notchsections{tag}.png"))
 fig.savefig(outs[-1], dpi=120, bbox_inches="tight")
 plt.close(fig)
 
