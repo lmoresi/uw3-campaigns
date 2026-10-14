@@ -38,7 +38,7 @@ params = uw.Params(
     uw_zs=uw.Param("2,14", description="z positions of the sections (km): live notch, faded"),
     uw_half_width=uw.Param(32.0, description="half width in x of the view (km)"),
     uw_clim=uw.Param("", description="edot_II/(V/H) colour range 'lo,hi' (empty = the "
-                                      "2nd-98th percentile over the sections)"),
+                                      "2nd-99.5th percentile over the sections above y = -20 km)"),
 )
 RES = os.path.join(_here, "..", "results")
 FIG = os.path.join(_here, "..", "figures")
@@ -77,9 +77,12 @@ sections = [with_edot(strong.slice(normal="z", origin=(0.0, -15.0, z))
                       .clip_box((-half, half, -31, 1, -1, Lz + 1), invert=False))
             for z in zs]
 if clim is None:
-    allv = np.concatenate([s.point_data["edot"] for s in sections])
-    # 98th percentile: the notch-top hot spot would otherwise take half the range
-    clim = (float(np.percentile(allv, 2)), float(np.percentile(allv, 98)))
+    # the range from the BAND region only (y above -20 km): the strip along the top of
+    # the weak layer and the notch-top hot spot would otherwise take the range, and
+    # they saturate instead
+    allv = np.concatenate([s.point_data["edot"][np.asarray(s.points)[:, 1] > -20.0]
+                           for s in sections])
+    clim = (float(np.percentile(allv, 2)), float(np.percentile(allv, 99.5)))
 
 
 def eta_label(z):
@@ -92,10 +95,10 @@ def eta_label(z):
 pl = pv.Plotter(off_screen=True, window_size=(1800, 1100))
 pl.set_background("white")
 pl.add_mesh(weak_body, color="#c9b48a", smooth_shading=True)
-near = int(np.argmin(zs))                 # the camera sits on the low-z side
-for k, s in enumerate(sections):
+far = int(np.argmax(zs))                  # the camera sits on the low-z side: every
+for k, s in enumerate(sections):          # plane but the farthest is see-through
     pl.add_mesh(s, scalars="edot", cmap="inferno", clim=clim, lighting=False,
-                opacity=(0.55 if k == near and len(zs) > 1 else 1.0),
+                opacity=(1.0 if k == far or len(zs) == 1 else 0.55),
                 show_scalar_bar=(k == 0),
                 scalar_bar_args=dict(title="edot_II / (V/H), strong layer", color="black",
                                      vertical=False, position_x=0.3, position_y=0.04,

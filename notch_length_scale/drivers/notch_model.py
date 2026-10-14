@@ -747,6 +747,14 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
     # field in that split needs the multi-field transfer.
     if fmg_tail:
         tail = [load_notch_mesh(m, 0, H_km) for m in fmg_tail]
+        if uw.mpi.size > 1:
+            # each gmsh level is partitioned on its own, so a fine node and the
+            # coarse cell over it sit on different ranks: at np 12 the transfers
+            # left 918 / 2221 coarse DOFs with no fine image and the solve went NaN
+            # (2026-10-14). Co-locate every gmsh level with this mesh first, as
+            # adopt_hierarchy does for the fault stacks.
+            from underworld3.utilities.custom_mg import _colocate_level
+            tail = [_colocate_level(m, mesh) for m in tail]
         stokes.set_custom_fmg(tail + mesh._coarse_level_meshes()[:-1], field_id=0)
 
     # Viscous seed: the DP viscosity and its tangent are singular at edot = 0, so the
