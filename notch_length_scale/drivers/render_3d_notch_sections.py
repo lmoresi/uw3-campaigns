@@ -92,12 +92,17 @@ strong = grid.extract_cells(np.flatnonzero(strong_cell))
 
 
 def with_edot(surface):
-    pts = np.asarray(surface.points) * 1.0e3 / L
+    """The field at the CENTROID of each slice polygon, as cell data. Each polygon is
+    the cut through one tetrahedron, so its centroid lies strictly inside that cell:
+    no point sits on a weak/strong face, where point location picks either side and
+    the field jumps by the viscosity contrast (the speckle along the layer top)."""
+    surface = surface.extract_surface() if not isinstance(surface, pv.PolyData) else surface
+    pts = np.asarray(surface.cell_centers().points) * 1.0e3 / L
     if isinstance(VALUE, tuple):
         num, den = (np.asarray(uw.function.evaluate(v, pts), dtype=float).ravel() for v in VALUE)
-        surface.point_data["edot"] = num / den
+        surface.cell_data["edot"] = num / den
     else:
-        surface.point_data["edot"] = np.asarray(uw.function.evaluate(VALUE, pts)).ravel()
+        surface.cell_data["edot"] = np.asarray(uw.function.evaluate(VALUE, pts)).ravel()
     return surface
 
 
@@ -105,7 +110,7 @@ sections = [with_edot(strong.slice(normal="z", origin=(0.0, -15.0, z))
                       .clip_box((-half, half, -31, 1, -1, Lz + 1), invert=False))
             for z in zs]
 for z, s in zip(zs, sections):
-    v = s.point_data["edot"]
+    v = s.cell_data["edot"]
     uw.pprint(f"[{FIELD}] z = {z:g}: min {np.min(v):.4g}  p50 {np.median(v):.4g}  max {np.max(v):.4g}")
 if FIELD == "yield":
     # the pieces of the ratio at one point mid-layer, far from the block
@@ -119,7 +124,7 @@ if clim is None:
     # the range from the BAND region only (y above -20 km): the strip along the top of
     # the weak layer and the notch-top hot spot would otherwise take the range, and
     # they saturate instead
-    allv = np.concatenate([s.point_data["edot"][np.asarray(s.points)[:, 1] > -20.0]
+    allv = np.concatenate([s.cell_data["edot"][np.asarray(s.cell_centers().points)[:, 1] > -20.0]
                            for s in sections])
     clim = (float(np.percentile(allv, 2)), float(np.percentile(allv, 99.5)))
 
@@ -136,7 +141,7 @@ pl.set_background("white")
 pl.add_mesh(weak_body, color="#c9b48a", smooth_shading=True)
 far = int(np.argmax(zs))                  # the camera sits on the low-z side: every
 for k, s in enumerate(sections):          # plane but the farthest is see-through
-    pl.add_mesh(s, scalars="edot", cmap="inferno", clim=clim, lighting=False,
+    pl.add_mesh(s, scalars="edot", preference="cell", cmap="inferno", clim=clim, lighting=False,
                 opacity=(1.0 if k == far or len(zs) == 1 else 0.55),
                 show_scalar_bar=(k == 0),
                 scalar_bar_args=dict(title=("eta_eff / eta_lin" if FIELD == "yield" else "edot_II / (V/H)")
@@ -159,11 +164,11 @@ import matplotlib.pyplot as plt   # noqa: E402
 fig, axes = plt.subplots(len(zs), 1, figsize=(11, 3.4 * len(zs)), sharex=True,
                          squeeze=False)
 for ax, z, s in zip(axes[:, 0], zs, sections):
-    tri = s.extract_surface().triangulate()
+    tri = s.triangulate()                  # cell data carried onto the triangles
     faces = tri.faces.reshape(-1, 4)[:, 1:]
     P = np.asarray(tri.points)
-    im = ax.tripcolor(P[:, 0], P[:, 1], faces, tri.point_data["edot"], cmap="inferno",
-                      vmin=clim[0], vmax=clim[1], shading="gouraud")
+    im = ax.tripcolor(P[:, 0], P[:, 1], faces, facecolors=tri.cell_data["edot"],
+                      cmap="inferno", vmin=clim[0], vmax=clim[1], shading="flat")
     ax.set_title(f"z = {z:g} km{eta_label(z)}", fontsize=10, loc="left")
     ax.set_xlim(-half, half)
     ax.set_ylim(-30, 0)
