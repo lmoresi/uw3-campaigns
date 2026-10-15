@@ -27,7 +27,7 @@ params = uw.Params(uw_label="grid", uw_velocity_transport="eulerian", uw_stress_
                    uw_Re=200.0, uw_Wi=0.5, uw_beta=0.5, uw_store="log_conformation", uw_devss=0.0,
                    uw_resolution=20, uw_circle_ratio=0.25, uw_courant=1.0, uw_t_end=8.0, uw_ramp=0.5,
                    uw_checkpoint_every=4, uw_store_smoothing=0.0, uw_direct=0, uw_refinement=2, uw_log_every=25, uw_tracers=40, uw_tracer_halfwidth=0.012, uw_tracer_offset=0.024,
-                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0, uw_kick=0.0, uw_kick_x=0.35, uw_kick_y=0.2, uw_kick_w=0.025, uw_reaction=0, uw_dt=0.0)
+                   uw_snapshot_every=0, uw_keep_snapshots=4, uw_restart="", uw_restart_step=0, uw_fit_limiter=0, uw_ksp_max_it=0, uw_reconstruction="cell", uw_debug_recon=0, uw_cylinder_bc="noslip", uw_velocity_reconstruction="cell", uw_dump_history=0, uw_bubble_penalty=0.0, uw_relaxation="linear", uw_L2=100.0, uw_debug_fene=0, uw_relax=0, uw_integrator="etd", uw_vdegree=2, uw_custom_fmg=-1, uw_monitor=0, uw_inner_max_it=0, uw_kick=0.0, uw_kick_x=0.35, uw_kick_y=0.2, uw_kick_w=0.025, uw_reaction=0, uw_dt=0.0, uw_lagged_stretch=0, uw_theta=0.5, uw_mf_operator=0, uw_test_jacobian=0, uw_ksp_rtol=0.0, uw_snapback=0, uw_snes_max_it=0, uw_snapback_check=0, uw_stretch="implicit", uw_dump_jacobian="", uw_dump_newton="", uw_pc_flux="jacobian", uw_vsmoother="", uw_gamg_nsmooths=-1, uw_strategy="", uw_switch=0, uw_switch_margin=0.15, uw_switch_retry=10, uw_switch_wall=150.0)
 comm = uw.mpi.comm
 outdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", str(params.uw_label))
 ckdir = os.path.join(outdir, "checkpoints")
@@ -93,7 +93,30 @@ p = uw.discretisation.MeshVariable("P", mesh, 1, degree=vdeg - 1)
 eta = U_mean * D / float(params.uw_Re)             # rho = 1
 Wi, beta = float(params.uw_Wi), float(params.uw_beta)
 vt, st = str(params.uw_velocity_transport), str(params.uw_stress_transport)
-ns = uw.systems.NavierStokes(mesh, v, p, rho=1.0, order=1, velocity_transport=vt)
+import inspect
+
+
+def _accepted(callable_, wanted, defaults):
+    """The keyword arguments ``callable_`` takes, from ``wanted``; one it does not
+    take is dropped when it holds its default and refused otherwise (the same
+    driver runs on builds with and without the forward-from-nodes options)."""
+    names = inspect.signature(callable_).parameters
+    out = {}
+    for k, val in wanted.items():
+        if k in names:
+            out[k] = val
+        elif val != defaults.get(k):
+            raise ValueError(f"this build has no {k!r} option (asked for {val!r})")
+    return out
+
+
+ns = uw.systems.NavierStokes(mesh, v, p, rho=1.0, order=1,
+                             **_accepted(uw.systems.NavierStokes.__init__, {"velocity_transport": vt},
+                                         {"velocity_transport": "eulerian"}))
+if float(params.uw_theta) != 0.5:
+    # 1.0 = backward Euler: damps the high-Courant modes Crank-Nicolson leaves undamped
+    ns.theta = float(params.uw_theta)
+    uw.pprint(f"momentum theta = {ns.theta}")
 # the native velocity FMG needs PETSc's DMCreateInjection between the refined
 # levels, which it cannot build for P3 ("Could not locate matching functional for
 # injection"); underworld3's own transfers over the same coarse levels need none.
@@ -104,10 +127,16 @@ if Wi > 0:
     lam = Wi * D / U_mean
     eta_p, eta_s = (1 - beta) * eta, beta * eta
     ns.stress_transport = st
-    ns.constitutive_model = uw.constitutive_models.ViscoElasticPlasticFlowModel(
+    VEP = uw.constitutive_models.ViscoElasticPlasticFlowModel
+    ns.constitutive_model = VEP(
         ns.Unknowns, order=1, integrator=str(params.uw_integrator), objective_rate="upper_convected",
-        stress_history=str(params.uw_store), element="jeffreys" if beta > 0 else "maxwell",
-        relaxation=str(params.uw_relaxation))
+        stress_history=str(params.uw_store),
+        **_accepted(VEP.__init__,
+                    {"element": "jeffreys" if beta > 0 else "maxwell",
+                     "relaxation": str(params.uw_relaxation),
+                     "stretch_in_momentum": str(params.uw_stretch)},
+                    {"element": "jeffreys" if beta > 0 else "maxwell", "relaxation": "linear",
+                     "stretch_in_momentum": "implicit"}))
     cm = ns.constitutive_model
     if str(params.uw_relaxation) == "fene_p":
         cm.Parameters.extensibility = float(params.uw_L2)
@@ -122,6 +151,12 @@ if Wi > 0:
         ns.DFDt.store_smoothing = float(params.uw_store_smoothing)
     if float(params.uw_devss) > 0:
         ns.devss_viscosity = float(params.uw_devss) * eta
+    if int(params.uw_lagged_stretch):
+        # EXPERIMENTAL: one factor of the quadratic stretching terms from the
+        # extrapolated advecting velocity, so each step is linear in the velocity
+        # 2 = the unknown itself through the same hook (must reproduce the default)
+        cm.lagged_stretch_velocity = v.sym if int(params.uw_lagged_stretch) == 2 else ns._a_var.sym
+        uw.pprint(f"stretching terms linearised about the {'unknown (identity check)' if int(params.uw_lagged_stretch) == 2 else 'extrapolated'} velocity")
 else:
     ns.constitutive_model = uw.constitutive_models.ViscousFlowModel
     ns.constitutive_model.Parameters.shear_viscosity_0 = eta
@@ -157,6 +192,49 @@ if int(params.uw_inner_max_it):
     for b in ("velocity", "pressure"):
         ns.petsc_options[f"fieldsplit_{b}_ksp_max_it"] = n_in
         ns.petsc_options[f"fieldsplit_{b}_ksp_error_if_not_converged"] = None
+if float(params.uw_ksp_rtol) > 0:
+    # a fixed outer linear tolerance in place of Eisenstat-Walker's adaptive one
+    # (EW loosens the linear solve when Newton is slow, which can feed a stall)
+    ns.petsc_options["snes_ksp_ew"] = "false"
+    ns.petsc_options["ksp_rtol"] = float(params.uw_ksp_rtol)
+    uw.pprint(f"Eisenstat-Walker off, ksp_rtol {float(params.uw_ksp_rtol):g}")
+if int(params.uw_snes_max_it) > 0:
+    # a Newton cap: with snap-back, a step that cannot converge is detected in
+    # this many iterations rather than by the guard's hang timer
+    ns.petsc_options["snes_max_it"] = int(params.uw_snes_max_it)
+if int(params.uw_test_jacobian):
+    # diagnosis: compare the assembled Jacobian with a finite-difference one (small runs only)
+    ns.petsc_options["snes_test_jacobian"] = None
+if str(params.uw_strategy):
+    # the solver's named strategy: "bulletproof" is gmres x8 + ASM on the velocity levels
+    ns.strategy = str(params.uw_strategy)
+    uw.pprint(f"solver strategy {ns.strategy}")
+if str(params.uw_vsmoother):
+    # the velocity multigrid's level smoother: the default Chebyshev/Jacobi
+    # assumes an SPD block; "gmres_sor" / "gmres_asm" do not
+    ksp_t, pc_t = str(params.uw_vsmoother).split("_")
+    ns.petsc_options["fieldsplit_velocity_mg_levels_ksp_type"] = ksp_t
+    ns.petsc_options["fieldsplit_velocity_mg_levels_pc_type"] = pc_t
+    if pc_t == "asm":
+        ns.petsc_options["fieldsplit_velocity_mg_levels_sub_pc_type"] = "ilu"
+    uw.pprint(f"velocity smoother {ksp_t} + {pc_t}")
+if int(params.uw_gamg_nsmooths) >= 0:
+    ns.petsc_options["fieldsplit_velocity_pc_gamg_agg_nsmooths"] = int(params.uw_gamg_nsmooths)
+    uw.pprint(f"GAMG prolongator smoothing steps {int(params.uw_gamg_nsmooths)}")
+if str(params.uw_pc_flux) != "jacobian":
+    # the velocity block of the preconditioning matrix from the model's
+    # stretch-free flux; the Jacobian (the Newton step) is unchanged
+    if hasattr(type(ns), "preconditioner_flux"):
+        ns.preconditioner_flux = str(params.uw_pc_flux)
+        uw.pprint(f"preconditioner_flux = {ns.preconditioner_flux}")
+    else:
+        uw.pprint("this build has no preconditioner_flux; option ignored")
+if int(params.uw_mf_operator):
+    # diagnosis: Newton on the matrix-free (finite-difference) Jacobian action, the
+    # assembled Jacobian kept as the preconditioner -- tests whether the assembled
+    # tangent is exact
+    ns.petsc_options["snes_mf_operator"] = None
+    uw.pprint("snes_mf_operator: matrix-free Jacobian action")
 if int(params.uw_monitor):
     # diagnosis: every nonlinear residual and every Krylov outcome, the inner blocks too
     ns.petsc_options["snes_monitor"] = None
@@ -375,10 +453,218 @@ if int(params.uw_dump_history) and Wi > 0:
     raise SystemExit
 
 t, wall = start * dt, 0.0
+orchestration_model = uw.get_default_model()
+n_snap = int(params.uw_snapback)
+snap_log = []
+
+
+def advance(h, depth=0):
+    """One step of length h. With -uw_snapback N, a step whose Newton solve does not
+    converge is rolled back to the in-memory state saved before it and retaken as
+    two half steps, down to N halvings. Returns the number of solves accepted."""
+    token = orchestration_model.save_state() if n_snap else None
+    if Wi > 0:
+        cm.Parameters.dt_elastic = h
+    ns.solve(timestep=h, zero_init_guess=False)
+    reason = int(ns.snes.getConvergedReason())
+    if not n_snap or reason > 0:
+        return 1
+    if depth >= n_snap:
+        uw.pprint(f"snap back: dt {h:g} still not converged (reason {reason}) at the halving limit; accepted")
+        snap_log.append((h, "accepted unconverged"))
+        return 1
+    orchestration_model.load_state(token)
+    uw.pprint(f"snap back: Newton failed (reason {reason}) at dt {h:g}; restored, retaking as 2 x {h / 2:g}")
+    snap_log.append((h, "halved"))
+    return advance(h / 2, depth + 1) + advance(h / 2, depth + 1)
+
+
+# -uw_switch 1: the momentum's share of the stretch switches per step. Implicit while the
+# velocity block's diagonal margin (min / mean) holds; a step whose Newton fails is
+# restored and retaken with "linear", and a converged step whose margin has fallen
+# below -uw_switch_margin sends the next steps to "linear". After -uw_switch_retry
+# linear steps the implicit form is tried again (the wait doubles each time the
+# retry falls back, up to 8x). Both forms store the same stress: no state crosses.
+switch = dict(retry=int(params.uw_switch_retry), wait=0, trial=False, log=None)
+
+
+def velocity_diag_margin():
+    """min / mean of the diagonal of the assembled Jacobian's velocity block."""
+    J = ns.snes.getJacobian()[0]
+    _, isets, _ = ns.dm.createFieldDecomposition()
+    d = J.createSubMatrix(isets[0], isets[0]).getDiagonal().getArray()
+    lo = comm.allreduce(float(d.min()) if d.size else float("inf"), op=MPI.MIN)
+    total = comm.allreduce(float(d.sum()), op=MPI.SUM)
+    count = comm.allreduce(int(d.size), op=MPI.SUM)
+    return lo / (total / count)
+
+
+def _switch_log(mode, reason, margin, note=""):
+    if uw.mpi.rank == 0:
+        if switch["log"] is None:
+            new = not os.path.exists(os.path.join(outdir, "stretch_modes.csv"))
+            switch["log"] = open(os.path.join(outdir, "stretch_modes.csv"), "a")
+            if new:
+                switch["log"].write("step,mode,reason,margin,note\n")
+        switch["log"].write(f"{current_step[0]},{mode},{reason},{margin:.5f},{note}\n")
+        switch["log"].flush()
+
+
+def _go_linear(note):
+    if switch["trial"]:
+        switch["retry"] = min(2 * switch["retry"], 8 * int(params.uw_switch_retry))
+    switch["trial"] = False
+    switch["wait"] = 0
+    cm.stretch_in_momentum = "linear"
+    uw.pprint(f"step {current_step[0]}: stretch -> linear ({note}); next implicit try in {switch['retry']} steps")
+
+
+def advance_switching(h):
+    if cm.stretch_in_momentum != "implicit":
+        switch["wait"] += 1
+        if switch["wait"] > switch["retry"]:
+            cm.stretch_in_momentum = "implicit"
+            switch["trial"] = True
+            uw.pprint(f"step {current_step[0]}: stretch -> implicit (trial)")
+    cm.Parameters.dt_elastic = h
+    if cm.stretch_in_momentum == "implicit":
+        token = orchestration_model.save_state()
+        # an implicit attempt that grinds inside one Newton step (inner solves at
+        # their caps) is stopped by the wall-clock deadline and counts as a failure
+        ns.guard(wall_per_step=float(params.uw_switch_wall))
+        try:
+            ns.solve(timestep=h, zero_init_guess=False)
+        finally:
+            ns.unguard()
+        reason = int(ns.snes.getConvergedReason())
+        if getattr(ns.solve_report, "deadline_expired", False):
+            reason = min(reason, -3)
+        if reason > 0:
+            margin = velocity_diag_margin()
+            if margin >= float(params.uw_switch_margin):
+                if switch["trial"]:
+                    switch["retry"] = int(params.uw_switch_retry)
+                switch["trial"] = False
+                _switch_log("implicit", reason, margin)
+                return 1
+            _switch_log("implicit", reason, margin, "low margin: kept")
+            _go_linear(f"margin {margin:.3f}")
+            return 1
+        _switch_log("implicit", reason, float("nan"),
+                    "deadline: restored" if getattr(ns.solve_report, "deadline_expired", False)
+                    else "failed: restored")
+        orchestration_model.load_state(token)
+        cm.Parameters.dt_elastic = h
+        _go_linear(f"Newton reason {reason}")
+    ns.solve(timestep=h, zero_init_guess=False)
+    reason = int(ns.snes.getConvergedReason())
+    _switch_log(cm.stretch_in_momentum, reason, velocity_diag_margin() if reason > 0 else float("nan"))
+    return 1
+
+
+if int(params.uw_snapback_check):
+    # the machinery's own test: save, solve, restore, solve again -- the two
+    # solutions must agree to round-off
+    ramp.sym = min(1.0, max((t + dt) / float(params.uw_ramp), 1.0e-6))   # the first step's inflow
+    tok = orchestration_model.save_state()
+    ns.solve(timestep=dt, zero_init_guess=False)
+    v1 = np.array(v.array[...]); c1 = 2 * float(F_x.evaluate()) / (U_mean ** 2 * D)
+    orchestration_model.load_state(tok)
+    ns.solve(timestep=dt, zero_init_guess=False)
+    v2 = np.array(v.array[...]); c2 = 2 * float(F_x.evaluate()) / (U_mean ** 2 * D)
+    dv = comm.allreduce(float(np.abs(v1 - v2).max()) if v1.size else 0.0, op=MPI.MAX)
+    uw.pprint(f"snapback check: max |v1 - v2| = {dv:.3e}, cd {c1:.8f} vs {c2:.8f}")
+    orchestration_model.load_state(tok)
+
+
+def dump_jacobian(base):
+    """The assembled Jacobian and preconditioning matrix of the current Newton
+    iterate, the global velocity rows and their coordinates, for an offline spectrum."""
+    from petsc4py import PETSc
+    J, P = ns.snes.getJacobian()[:2]
+    names, isets, _ = ns.dm.createFieldDecomposition()
+    for mat, tag in ((J, "J"), (P, "P")):
+        viewer = PETSc.Viewer().createBinary(f"{base}_{tag}.bin", "w", comm=PETSc.COMM_WORLD)
+        mat.view(viewer); viewer.destroy()
+    # coordinates of each owned velocity dof: vertices from the coordinate
+    # section, edge dofs (P2) at the edge centroid
+    dm = ns.dm
+    gsec = dm.getGlobalSection()
+    csec = dm.getCoordinateSection(); cvec = dm.getCoordinatesLocal().array
+    vStart, vEnd = dm.getDepthStratum(0)
+    idx, xy = [], []
+    for pt in range(*gsec.getChart()):
+        nd = gsec.getFieldDof(pt, 0)
+        off = gsec.getFieldOffset(pt, 0)
+        if nd <= 0 or off < 0:
+            continue
+        if vStart <= pt < vEnd:
+            co = csec.getOffset(pt); x = cvec[co:co + 2]
+        else:
+            x = dm.computeCellGeometryFVM(pt)[1][:2]
+        for k in range(nd):
+            idx.append(off + k); xy.append(x)
+    rows = comm.gather(np.asarray(isets[0].getIndices()), root=0)
+    cidx = comm.gather(np.asarray(idx, dtype=np.int64), root=0)
+    cxy = comm.gather(np.asarray(xy, dtype=float).reshape(-1, 2), root=0)
+    if uw.mpi.rank == 0:
+        np.save(f"{base}_velocity_rows.npy", np.concatenate(rows))
+        np.save(f"{base}_dof_index.npy", np.concatenate(cidx))
+        np.save(f"{base}_dof_xy.npy", np.concatenate(cxy))
+        print(f"[0] dumped Jacobian {os.path.basename(base)}: fields {names}", flush=True)
+
+
+# -uw_dump_newton "50:1,6,12" dumps the Jacobian inside step 50's Newton solve,
+# at the monitor calls of the listed iterations (each holds the previous iterate's Jacobian)
+newton_dumps = {}
+if str(params.uw_dump_newton):
+    for item in str(params.uw_dump_newton).split(";"):
+        st, its = item.split(":")
+        newton_dumps[int(st)] = {int(k) for k in its.split(",")}
+current_step = [0]
+
+
+def _newton_dump_monitor(snes, its, fnorm):
+    if its in newton_dumps.get(current_step[0], ()) and its > 0:
+        dump_jacobian(os.path.join(outdir, f"jacobian_{current_step[0]:05d}_newton{its:02d}"))
+
+
+monitored_snes = [None]
+
 for step in range(start, n_steps):
+    current_step[0] = step + 1
+    if step == start + 1 and not globals().get("_pc_reported"):
+        # what the velocity block actually ran: multigrid flavour and level smoother
+        _pc_reported = True
+        try:
+            sub = ns.snes.getKSP().getPC().getFieldSplitSubKSP()[0]
+            vpc = sub.getPC()
+            info = f"velocity ksp {sub.getType()} pc {vpc.getType()}"
+            if vpc.getType() in ("mg", "gamg"):
+                n = vpc.getMGLevels()
+                sm = vpc.getMGSmoother(n - 1)
+                info += (f" levels {n} mg type {vpc.getMGType()} finest smoother "
+                         f"{sm.getType()} x{sm.getTolerances()[3]} + {sm.getPC().getType()}")
+            uw.pprint(info)
+        except Exception as err:
+            uw.pprint(f"velocity pc report failed: {err}")
+    # the solver may rebuild its SNES; attach the dump monitor to whichever is live
+    if newton_dumps and getattr(ns, "snes", None) is not None and ns.snes is not monitored_snes[0]:
+        ns.snes.setMonitor(_newton_dump_monitor)
+        monitored_snes[0] = ns.snes
     ramp.sym = min(1.0, max((t + dt) / float(params.uw_ramp), 1.0e-6))
     t0 = time.perf_counter()
-    ns.solve(timestep=dt, zero_init_guess=False)
+    if int(params.uw_lagged_stretch) and step == start:
+        _u0 = np.array(v.array[...]); _up = np.array(ns._u_prev.array[...])
+    n_solves = advance_switching(dt) if int(params.uw_switch) else advance(dt)
+    if Wi > 0:
+        cm.Parameters.dt_elastic = dt
+    if n_solves > 1:
+        uw.pprint(f"step {step + 1}: taken in {n_solves} substeps")
+    if int(params.uw_lagged_stretch) and step == start:
+        _a = np.array(ns._a_var.array[...]); _u1 = np.array(v.array[...])
+        _m = lambda q: comm.allreduce(float(np.abs(q).max()) if q.size else 0.0, op=uw.MPI.MAX)
+        uw.pprint(f'DEBUG a-check: |u1|={_m(_u1):.4g} |a-(2u0-up)|={_m(_a-(2*_u0-_up)):.4g} |a-u1|={_m(_a-_u1):.4g} |u1-u0|={_m(_u1-_u0):.4g} |u0-up|={_m(_u0-_up):.4g}')
     wall += time.perf_counter() - t0
     tracers.advection(v.sym, dt, order=2, corrector=False, evalf=False)
     tracers.add_particles_with_coordinates(seed)
@@ -443,6 +729,20 @@ for step in range(start, n_steps):
                   f"| tr c nodes max {tmax_all:.2f} qp max {qc:.2f} | tr s/G nodes [{lo*0+float(trs.min()):.1f},{float(trs.max()):.1f}] qp [{qlo:.1f},{qhi:.1f}]")
         if float(trc.max()) == tmax_all:
             print(f"  worst node: tr c {loc[0]:.2f} tr s/G {loc[1]:.1f} f_raw {loc[4]:.3f} at ({loc[2]:.4f},{loc[3]:.4f})", flush=True)
+    if str(params.uw_dump_jacobian) and (step + 1) in {int(k) for k in str(params.uw_dump_jacobian).split(",")}:
+        # diagnosis: the assembled Jacobian of the last Newton iterate, its
+        # preconditioning matrix and the velocity rows, for an offline spectrum
+        from petsc4py import PETSc
+        J, P = ns.snes.getJacobian()[:2]
+        names, isets, _ = ns.dm.createFieldDecomposition()
+        base = os.path.join(outdir, f"jacobian_{step + 1:05d}")
+        for mat, tag in ((J, "J"), (P, "P")):
+            viewer = PETSc.Viewer().createBinary(f"{base}_{tag}.bin", "w", comm=PETSc.COMM_WORLD)
+            mat.view(viewer); viewer.destroy()
+        rows = comm.gather(np.asarray(isets[0].getIndices()), root=0)
+        if uw.mpi.rank == 0:
+            np.save(f"{base}_velocity_rows.npy", np.concatenate(rows))
+            uw.pprint(f"dumped Jacobian at step {step + 1}: fields {names}")
     if int(params.uw_snapshot_every) and (step + 1) % int(params.uw_snapshot_every) == 0:
         snapshot(step + 1)
     if not np.isfinite(cd) or abs(cd) > 1.0e3:
