@@ -18,6 +18,8 @@ cd ~/+Simulations/uw3-campaigns/ve_cylinder_demo
 
 - `ve_cylinder_demo/` — the confined cylinder (DFG 2D-2 geometry) for viscoelastic flow: Oldroyd-B and FENE-P, every stress history and reconstruction, Re 100 and 200. `ve_cylinder.py` is the driver; `render_demo.py` / `render_movie.sh` render frames and movies; `forces_summary.py t0 t1 runs...` gives cd, lift amplitude and St over a window; `night_report.py` tabulates every run; `lanes/` are the overnight queue scripts of 2026-10-04/05; `reports/` keeps the reports those produced.
 
+- `zg95_lid_regimes/` — yielding-lid convection in a 4 x 1 box (Moresi & Solomatov rheology with internal heating) with and without a split-node fault through the lid: the base regimes, the bistable lid at tau1/Ra 1, a fixed and a moving-trench fault, and the fault removed again. `drivers/` (base and faulted models, needing underworld3 `feature/box-faults`), `render/`, `analysis/`, `probes/`; `REPORT.md` has the findings and how to run.
+
 ## Tools
 
 - `tools/` — the scripts that moved the planning hub to GitHub (parse the planning file, load Project items, the viscoelastic items). One-off, kept for the record.
