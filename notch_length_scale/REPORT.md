@@ -1274,3 +1274,55 @@ mid-strike.
 
 The floor check therefore uses saved nodal arrays only (above). Worth an issue in the
 units system.
+
+## 3-D notch as a restricted block (2026-10-14 to 16)
+
+Louis (2026-10-14): an extruded notch roots the bands everywhere along strike and
+hides the crossover, so restrict the notch in the mesh. `drivers/make_notch_block_3d.py`
+extrudes the benchmark bump (5 km wide, 2.5 km high, 0.6 km fillets) only from z = 0
+to z = Ln on a weak layer that runs the whole strike; u_z = 0 on z = 0 is a symmetry
+plane, so the block is 2 Ln long. Lz = 32 km, h_band 4.8 km at ref 0 (1.2 at ref 2,
+0.6 at ref 3), h_near 1.2 km round the block. Micromorphic, beta 0.1, l 1 km, xi 0,
+capped Eisenstat-Walker (production_ew1e-2), np 16, FMG with one gmsh tail level
+(`_c2`; the c4 -> c2 transfer orphans coarse dofs at np >= 12). Ref 3 grid-sequenced
+from the ref-2 checkpoint. The 10 km block (Ln 5, length = 2 x width) is the standard
+case (Louis, 2026-10-15).
+
+| Block length | Ref | Newton its | Wall (s) | Note |
+|---|---|---|---|---|
+| 5 km (Ln 2.5) | 1 | 5 | 751 | "not enough resolution" |
+| 5 km | 2 | 8 | 2,291 | |
+| 5 km | 3 | 11 | 16,825 | |
+| 10 km (Ln 5) | 2 | 6 | 3,891 | |
+| 10 km | 3 | 11 | 26,427 | ~4.6 h of it at machine load 58-138 |
+| 20 km (Ln 10) | 2 | 6 | 3,735 | |
+
+**Reading (sections across the notch, strong layer only; yield maps as eta_eff/eta_lin).**
+- Over the block (z = 1 km) a sharp symmetric band pair rises from the block's top
+  corners to the surface, below yield along its whole length (eta_eff/eta_lin 0.4-0.6);
+  sharper at ref 3 than ref 2.
+- The bands persist past the block's end and fade along strike: for the 10 km block
+  the X is still clear and yielding 2.5 km past the end (z = 7.5), gone by z = 15. For
+  the 5 km block it is already faint 2.5 km past the end. The 20 km block (ref 2) has
+  strong bands along its length, persisting ~2.5 km past the end, faint by 10 km past.
+- Away from the block the strong layer shows only the uniform yielding of its upper
+  ~8 km (low pressure, Drucker-Prager) over a sub-yield deeper part.
+- The integral width W (median outside +-9 km) is not a band measure here: away from
+  the block it measures background, and it rises ref 2 -> 3 (5 km block 4.16 -> 4.82
+  km mid-strike). Near the block the 10 km case gives 4.1 km at z = 0.6 and 4.3 at 3.2
+  (ref 3). A band-tracking measure is needed before quoting 3-D widths.
+- The ragged one-element strip just above the weak layer is in the solution, not the
+  rendering: it halves in thickness ref 2 -> ref 3 (coarse tets touching the
+  viscosity jump). The renderer now samples each slice cell at its centroid (cell
+  data), which removed the separate point-location speckle.
+
+**Issues found on the way.**
+- Every gmsh-tail run printed a PETSc "PCFieldSplitGetSubKSP before PCSetUp" banner:
+  #827, a second path through `custom_mg._pcmg_still_installed` after a
+  `consistent_jacobian` rebuild. Fixed in PR #850.
+- `strong_layer_range` evaluates rank-locally at each rank's own P1 nodes and the
+  library warns that every point is extrapolated (#606 guard) at np 16. The headline W
+  uses `global_evaluate` and is unaffected; the range diagnostic is suspect until
+  checked.
+
+Figures: `figures/micro_ref{2,3}_..._notchblock3d_hb4.8_Lz32_Ln{2.5,5,10}_n1.2_tail1_blk_notchsections{,3d}{,_yield}.png`.
