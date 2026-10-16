@@ -41,6 +41,12 @@ params = uw.Params(
                                            "tau_y with the micromorphic shift (1 = at yield)"),
     uw_beta=uw.Param(0.1, description="the run's beta (for the yield field)"),
     uw_l_km=uw.Param(1.0, description="the run's l in km (for the yield field)"),
+    uw_camera=uw.Param("", description="camera position 'x,y,z' in km (empty: low-z side, "
+                                        "(55, 28, -55)); it looks at the middle of the sections"),
+    uw_cmap=uw.Param("inferno", description="colour map; a light-background one (Blues, "
+                                             "YlOrRd) reads better through the see-through planes"),
+    uw_opacity=uw.Param(0.55, description="opacity of every plane but the farthest"),
+    uw_tag=uw.Param("", description="suffix for the output names (keeps other section sets)"),
     uw_clim=uw.Param("", description="edot_II/(V/H) colour range 'lo,hi' (empty = the "
                                       "2nd-99.5th percentile over the sections above y = -20 km)"),
 )
@@ -135,14 +141,24 @@ def eta_label(z):
     return f", log10 eta_b = {21 + 1 - math.tanh((ramp[0] - z) / ramp[1]):.2f}"
 
 
+# the geometry and values, for re-drawing views without rebuilding the model
+# (render_3d_sections_view.py)
+tag = ("" if FIELD == "edot" else "_yield") + (f"_{params.uw_tag}" if str(params.uw_tag) else "")
+cache = pv.MultiBlock({"weak": weak_body, **{f"s{k}": s for k, s in enumerate(sections)}})
+cache.field_data["zs"] = np.array(zs)
+cache.field_data["clim"] = np.array(clim)
+cache.field_data["Lz"] = np.array([Lz])
+cache.field_data["half"] = np.array([half])
+cache.save(os.path.join(RES, f"{run}_notchsections{tag}.vtm"))
+
 # --- oblique 3-D view ----------------------------------------------------------
 pl = pv.Plotter(off_screen=True, window_size=(1800, 1100))
 pl.set_background("white")
 pl.add_mesh(weak_body, color="#c9b48a", smooth_shading=True)
 far = int(np.argmax(zs))                  # the camera sits on the low-z side: every
 for k, s in enumerate(sections):          # plane but the farthest is see-through
-    pl.add_mesh(s, scalars="edot", preference="cell", cmap="inferno", clim=clim, lighting=False,
-                opacity=(1.0 if k == far or len(zs) == 1 else 0.55),
+    pl.add_mesh(s, scalars="edot", preference="cell", cmap=str(params.uw_cmap), clim=clim, lighting=False,
+                opacity=(1.0 if k == far or len(zs) == 1 else float(params.uw_opacity)),
                 show_scalar_bar=(k == 0),
                 scalar_bar_args=dict(title=("eta_eff / eta_lin" if FIELD == "yield" else "edot_II / (V/H)")
                                      + ", strong layer", color="black",
@@ -150,8 +166,11 @@ for k, s in enumerate(sections):          # plane but the farthest is see-throug
                                      width=0.4))
 pl.add_mesh(pv.Box(bounds=(-half, half, -30, 0, 0, Lz)).extract_all_edges(), color="grey",
             line_width=1)
-pl.camera_position = [(55.0, 28.0, -55.0), (0.0, -14.0, Lz / 2), (0.0, 1.0, 0.0)]
-tag = "" if FIELD == "edot" else "_yield"
+if str(params.uw_camera):
+    eye = tuple(float(v) for v in str(params.uw_camera).split(","))
+    pl.camera_position = [eye, (0.0, -14.0, 0.5 * (min(zs) + max(zs))), (0.0, 1.0, 0.0)]
+else:
+    pl.camera_position = [(55.0, 28.0, -55.0), (0.0, -14.0, Lz / 2), (0.0, 1.0, 0.0)]
 outs = [os.path.join(RES, f"{run}_notchsections3d{tag}.png")]
 pl.screenshot(outs[-1])
 pl.close()
@@ -168,7 +187,7 @@ for ax, z, s in zip(axes[:, 0], zs, sections):
     faces = tri.faces.reshape(-1, 4)[:, 1:]
     P = np.asarray(tri.points)
     im = ax.tripcolor(P[:, 0], P[:, 1], faces, facecolors=tri.cell_data["edot"],
-                      cmap="inferno", vmin=clim[0], vmax=clim[1], shading="flat")
+                      cmap=str(params.uw_cmap), vmin=clim[0], vmax=clim[1], shading="flat")
     ax.set_title(f"z = {z:g} km{eta_label(z)}", fontsize=10, loc="left")
     ax.set_xlim(-half, half)
     ax.set_ylim(-30, 0)
