@@ -1,0 +1,24 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.21587
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:104: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:104: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.533126
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 5.331261100626e-01 gnorm 2.842357235956e-02
+  1 SNES Function norm 0.0284236
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 2.842357235956e-02 gnorm 3.115791179228e-03
+  2 SNES Function norm 0.00311579
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 3.115791179228e-03 gnorm 9.584470244178e-05
+  3 SNES Function norm 9.58447e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 9.584470244178e-05 gnorm 1.926820248103e-07
+  4 SNES Function norm 1.92682e-07
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+[0] [cosserat] ref 1 xi 0.0 c 1.0 l 1.0 km P1: CONVERGED_FNORM_ABS its 4 (212 s) W_L/W_R 'L': 3.702818142162603, 'R': 2.80869091913043 omega [-8.118341288980422e-15, 7.961380688108803e-15] eta_eff strong [1.1252554505497935e+22, 1.3254368221005272e+23]

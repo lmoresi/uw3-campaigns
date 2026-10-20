@@ -1,0 +1,8 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref5_xi0_beta0.1_l1_production_tight_np16 '6km_cut': 4.265, '6km_outside': 4.392, '9km_cut': 4.275, '9km_outside': 4.64, '12km_cut': 4.275, '12km_outside': 4.634, '30km_cut': 4.282, '30km_outside': 4.282
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref5_xi0_beta0.1_l0.5_production_tight_np16 '6km_cut': 3.394, '6km_outside': 3.557, '9km_cut': 3.396, '9km_outside': 3.635, '12km_cut': 3.396, '12km_outside': 3.396, '30km_cut': 3.396, '30km_outside': 3.396

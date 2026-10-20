@@ -1,0 +1,32 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 0.952075
+  0 SNES Function norm 0.114252
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 37
+      Line search: Using full step: fnorm 1.142515279380e-01 gnorm 1.415888271869e-02
+  1 SNES Function norm 0.0141589
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: Using full step: fnorm 1.415888271869e-02 gnorm 1.020934273550e-02
+  2 SNES Function norm 0.0102093
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: Using full step: fnorm 1.020934273550e-02 gnorm 1.577733866041e-03
+  3 SNES Function norm 0.00157773
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 48
+      Line search: Using full step: fnorm 1.577733866041e-03 gnorm 2.063257041278e-04
+  4 SNES Function norm 0.000206326
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 46
+      Line search: Using full step: fnorm 2.063257041278e-04 gnorm 6.979102803759e-06
+  5 SNES Function norm 6.9791e-06
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 33
+      Line search: Using full step: fnorm 6.979102803759e-06 gnorm 1.020970152162e-08
+  6 SNES Function norm 1.02097e-08
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1031 of 1031 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1071 of 1071 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 999 of 999 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1055 of 1055 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [plain] ref 2 xi 0.03 np 4: CONVERGED_FNORM_ABS its 6 ksp 264 (414 s) W_int 3.03 W_out9 3.92

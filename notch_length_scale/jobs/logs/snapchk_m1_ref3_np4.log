@@ -1,0 +1,12 @@
+notch_mesh1  np 4   (analytic Weak area 2-D: 1.013888889 x Lz in 3-D)
+variant   lvl  cells     max d(all)  max d(arc)  calls max move   min size    min q   Weak measure    arc deficit  missing Inner  inverted  rank mismatch
+snapped     0      492  2.220e-16  3.123e-17    1  1.110e-16  1.320e-04  0.5029  1.013888889  1.253e-04       0     0  0.00e+00
+snapped     1     1968  2.776e-16  2.429e-17    2  1.407e-03  2.753e-05  0.4825  1.013888889  3.205e-05       0     0  0.00e+00
+snapped     2     7872  3.331e-16  4.857e-17    2  3.769e-04  6.090e-06  0.4219  1.013888889  8.059e-06       0     0  0.00e+00
+snapped     3    31488  3.331e-16  5.551e-17    2  9.584e-05  1.408e-06  0.3875  1.013888889  2.018e-06       0     0  0.00e+00
+unsnapped   0      492  2.220e-16  1.214e-16    0  -1.000e+00  1.320e-04  0.5029  1.013888889  1.253e-04       0        0.00e+00
+unsnapped   1     1968  1.522e-03  1.522e-03    0  -1.000e+00  3.301e-05  0.5029  1.013888889  1.253e-04       0        0.00e+00
+unsnapped   2     7872  1.522e-03  1.522e-03    0  -1.000e+00  8.252e-06  0.5029  1.013888889  1.253e-04       0        0.00e+00
+unsnapped   3    31488  1.522e-03  1.522e-03    0  -1.000e+00  2.063e-06  0.5029  1.013888889  1.253e-04       0        0.00e+00
+arc vertices (interior, level 0): [1, 1, 1, 1]
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/snap_check/notch_mesh1_ref3_np4.json

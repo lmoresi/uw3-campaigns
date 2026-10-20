@@ -1,0 +1,36 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref1_xi0_c1_l1_P1: W 6.610 km peak 0.407
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref2_xi0_c1_l0.5_P1: W 5.326 km peak 0.882
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref2_xi0_c1_l1_P1: W 6.629 km peak 0.439
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref3_xi0_c1_l0.5_P1: W 5.329 km peak 0.904
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref3_xi0_c1_l1_P1: W 6.648 km peak 0.449
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref4_xi0_c1_l0.5_P1_production_tight_np8: W 5.339 km peak 0.912
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref4_xi0_c1_l1_P1_production_tight_np8: W 6.676 km peak 0.454
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref5_xi0_c1_l0.5_P1_production_tight_np16: W 5.342 km peak 0.917
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] cosserat_ref5_xi0_c1_l1_P1_production_tight_np16: W 6.685 km peak 0.457

@@ -1,0 +1,180 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0.01_beta0.01_l1: W_v 'L': 2.456740213011936, 'R': 2.851368516727035 peak 'L': 1.5767921109017462, 'R': 1.1730784988419738 floor bound 73.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0.01_beta0.05_l0.5: W_v 'L': 2.4332568454664623, 'R': 3.1439446454834425 peak 'L': 1.2407926786786003, 'R': 1.014419159166544 floor bound 65.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0.01_beta0.05_l1: W_v 'L': 2.9289222041726006, 'R': 3.4078544626706977 peak 'L': 1.0222014323572397, 'R': 0.8606371341204425 floor bound 66.3
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.05_l0.5: W_v 'L': 2.2662442056190852, 'R': 2.880568529198816 peak 'L': 1.9686352493492634, 'R': 1.5237334716735158 floor bound 63.0
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.05_l1: W_v 'L': 2.375943960097108, 'R': 3.2417896376560864 peak 'L': 1.5312048931981788, 'R': 1.2760517297898009 floor bound 64.3
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l0.25: W_v 'L': 2.409903491762625, 'R': 2.8902508323491083 peak 'L': 2.0058451929685828, 'R': 1.5337106146155677 floor bound 51.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l0.5: W_v 'L': 2.607387985809795, 'R': 3.116590315128176 peak 'L': 1.493804586896259, 'R': 1.2939254270279625 floor bound 52.6
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l1: W_v 'L': 2.8310753994145057, 'R': 3.555637307228046 peak 'L': 1.021745627931105, 'R': 0.9265826601602813 floor bound 55.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l1_check: W_v 'L': 2.8310753994145057, 'R': 3.555637307228046 peak 'L': 1.021745627931105, 'R': 0.9265826601602813 floor bound 55.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l1_np2_smoke: W_v 'L': 2.831075399011317, 'R': 3.555637308162992 peak 'L': 1.0217456275691499, 'R': 0.9265826582302505 floor bound 55.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l1_production: W_v 'L': 2.8310573564089743, 'R': 3.555654035048925 peak 'L': 1.0217447239365227, 'R': 0.9265706678196071 floor bound 55.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l1_production_tight: W_v 'L': 2.831075399904056, 'R': 3.5556373072022565 peak 'L': 1.0217456277447106, 'R': 0.9265826603338216 floor bound 55.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.1_l2: W_v 'L': 3.2256157779510923, 'R': 3.5191999269560275 peak 'L': 0.7606068523059031, 'R': 0.6782806470344521 floor bound 58.4
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.2_l0.5: W_v 'L': 2.93132295878093, 'R': 3.3763886336048854 peak 'L': 1.0834925402482667, 'R': 1.0139649932297332 floor bound 32.3
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref1_xi0_beta0.2_l1: W_v 'L': 3.1413279880983382, 'R': 3.604851659067327 peak 'L': 0.6548277197055358, 'R': 0.61382585172885 floor bound 37.5
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0.01_beta0.05_l0.5: W_v 'L': 1.6731250431336366, 'R': 2.5214872813672398 peak 'L': 1.530074332489559, 'R': 1.4101345784933805 floor bound 66.6
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0.01_beta0.05_l1: W_v 'L': 3.399262879444564, 'R': 2.901124653007132 peak 'L': 1.1580319157164072, 'R': 1.0958205480521424 floor bound 68.9
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0.01_beta0.05_l1_taylor: W_v 'L': 3.399262879444564, 'R': 2.901124653007132 peak 'L': 1.1580319157164072, 'R': 1.0958205480521424 floor bound 68.9
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0.01_beta0.1_l1: W_v 'L': 3.363809335700466, 'R': 3.416523940595102 peak 'L': 0.7868695151034744, 'R': 0.7571390461394731 floor bound 59.4
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0.05_beta0.1_l1: W_v 'L': 2.9306870941610126, 'R': 3.4708419814241944 peak 'L': 0.2294503710831281, 'R': 0.22222356710582566 floor bound 69.9
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.05_l1: W_v 'L': 2.3603303600767402, 'R': 2.625827069130197 peak 'L': 1.8631489464640727, 'R': 1.7324778955160671 floor bound 66.0
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l0.25: W_v 'L': 2.038892556392619, 'R': 1.7791128896680206 peak 'L': 2.8192357826733927, 'R': 2.499493114185743 floor bound 49.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l0.5: W_v 'L': 3.103425925164575, 'R': 3.1412197796855126 peak 'L': 1.801225190522033, 'R': 1.6872701466287157 floor bound 52.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l1: W_v 'L': 3.5817115418073477, 'R': 3.786354660454831 peak 'L': 1.1460730649983102, 'R': 1.1171780736558143 floor bound 56.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l1_check_gs: W_v 'L': 3.581712140624051, 'R': 3.786355157386401 peak 'L': 1.1460730328445887, 'R': 1.1171759028651673 floor bound 56.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l1_production: W_v 'L': 3.5816795617545965, 'R': 3.786315941215748 peak 'L': 1.146082776977835, 'R': 1.1172187805617022 floor bound 56.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l1_production_tight: W_v 'L': 3.581711541769766, 'R': 3.786354659954335 peak 'L': 1.1460730651062665, 'R': 1.1171780738383539 floor bound 56.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.1_l2: W_v 'L': 4.053113525899471, 'R': 3.820733103052885 peak 'L': 0.7631737579949349, 'R': 0.744931640195261 floor bound 62.3
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.2_l0.5: W_v 'L': 3.4320038412411753, 'R': 3.4128723604601205 peak 'L': 1.269828241475465, 'R': 1.2350427946516367 floor bound 29.4
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref2_xi0_beta0.2_l1: W_v 'L': 4.146448311921356, 'R': 4.030518827702868 peak 'L': 0.7041629843024799, 'R': 0.682298995120032 floor bound 38.0
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0.01_beta0.05_l0.5: W_v 'L': 2.393513361907459, 'R': 2.365967457116321 peak 'L': 1.5428970392138335, 'R': 1.5053782712727177 floor bound 68.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0.01_beta0.05_l1: W_v 'L': 3.471746624436855, 'R': 2.9266649516006904 peak 'L': 1.1450076670433713, 'R': 1.127011764938724 floor bound 72.5
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0.01_beta0.05_l1_prolonged: W_v 'L': 3.471748192950501, 'R': 2.926664906747155 peak 'L': 1.145007469666536, 'R': 1.1270117241021411 floor bound 72.5
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0.01_beta0.1_l1: W_v 'L': 3.8998410851743355, 'R': 3.8870991964993578 peak 'L': 0.7897797294315457, 'R': 0.7756681166459392 floor bound 63.2
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0.05_beta0.1_l1: W_v 'L': 3.5860245211961748, 'R': 3.8855410175414384 peak 'L': 0.2320519544640022, 'R': 0.22874622440034767 floor bound 79.4
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l0.25: W_v 'L': 2.2026050150475216, 'R': 2.1809034946361603 peak 'L': 2.8127872050479006, 'R': 2.637040437759231 floor bound 43.7
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l0.5: W_v 'L': 2.9770987378877294, 'R': 2.926030134238108 peak 'L': 1.8360869897970282, 'R': 1.7723089093684747 floor bound 50.4
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l1: W_v 'L': 3.767243837188238, 'R': 2.610848896798117 peak 'L': 1.1804697890993923, 'R': 1.1519961340873714 floor bound 59.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l1_gridseq: W_v 'L': 3.7672438340797205, 'R': 2.6108489200586655 peak 'L': 1.1804697939923003, 'R': 1.151996118301766 floor bound 59.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l1_production_tight: W_v 'L': 3.7672438359951026, 'R': 2.610848896472694 peak 'L': 1.180469788986112, 'R': 1.1519961337520654 floor bound 59.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l1_production_tight_gridseq: W_v 'L': 3.7672438342370613, 'R': 2.6108489203746887 peak 'L': 1.180469794032129, 'R': 1.1519961185040086 floor bound 59.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l1_prolonged: W_v 'L': 3.7672438193762154, 'R': 2.610848933660618 peak 'L': 1.1804697395889323, 'R': 1.1519961469993492 floor bound 59.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.1_l2: W_v 'L': 4.011125743542647, 'R': 4.073092883160464 peak 'L': 0.7619457546420998, 'R': 0.7533526869779906 floor bound 67.5
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.2_l0.5: W_v 'L': 3.5634241061417136, 'R': 2.5788400327175864 peak 'L': 1.3017998822749968, 'R': 1.2723380571285094 floor bound 24.0
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref3_xi0_beta0.2_l1: W_v 'L': 3.1649384501983153, 'R': 3.485709968937184 peak 'L': 0.7113721244205327, 'R': 0.703192648145617 floor bound 40.1

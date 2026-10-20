@@ -1,0 +1,134 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 2.77705
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0200079
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0200079
+    1 KSP Residual norm 0.000192189
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 2.000792756896e-02 gnorm 1.472927931214e-02
+  1 SNES Function norm 0.0147293
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0147293
+    1 KSP Residual norm 9.84312e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 1.472927931214e-02 gnorm 3.687833066940e-03
+  2 SNES Function norm 0.00368783
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00368783
+    1 KSP Residual norm 5.8501e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 3.687833066940e-03 gnorm 1.922131695545e-03
+  3 SNES Function norm 0.00192213
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00192213
+    1 KSP Residual norm 4.0303e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: gnorm after quadratic fit 1.570847763766e-03
+      Line search: Quadratically determined step, lambda=2.6022566571525657e-01
+  4 SNES Function norm 0.00157085
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00157085
+    1 KSP Residual norm 3.8231e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 1.570847763766e-03 gnorm 2.543499936375e-04
+  5 SNES Function norm 0.00025435
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00025435
+    1 KSP Residual norm 3.14213e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 2.543499936375e-04 gnorm 5.041119136734e-05
+  6 SNES Function norm 5.04112e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 5.04112e-05
+    1 KSP Residual norm 2.75748e-05
+    2 KSP Residual norm 2.2263e-05
+    3 KSP Residual norm 1.89836e-05
+    4 KSP Residual norm 1.86725e-05
+    5 KSP Residual norm 1.65282e-05
+    6 KSP Residual norm 1.19906e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 6
+      Line search: gnorm after quadratic fit 4.609359282693e-05
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  7 SNES Function norm 4.60936e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 4.60936e-05
+    1 KSP Residual norm 2.52905e-05
+    2 KSP Residual norm 1.9929e-05
+    3 KSP Residual norm 1.7513e-05
+    4 KSP Residual norm 1.58107e-05
+    5 KSP Residual norm 1.36249e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 5
+      Line search: gnorm after quadratic fit 3.684778051544e-05
+      Line search: Quadratically determined step, lambda=2.3834068589020463e-01
+  8 SNES Function norm 3.68478e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 3.68478e-05
+    1 KSP Residual norm 2.09766e-05
+    2 KSP Residual norm 1.63244e-05
+    3 KSP Residual norm 1.40708e-05
+    4 KSP Residual norm 1.14889e-05
+    5 KSP Residual norm 8.96946e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 5
+      Line search: gnorm after quadratic fit 2.986815021502e-05
+      Line search: Quadratically determined step, lambda=2.1840552001636690e-01
+  9 SNES Function norm 2.98682e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 2.98682e-05
+    1 KSP Residual norm 1.72223e-05
+    2 KSP Residual norm 1.30854e-05
+    3 KSP Residual norm 1.17288e-05
+    4 KSP Residual norm 8.27161e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 4
+      Line search: gnorm after quadratic fit 1.945551542244e-05
+      Line search: Quadratically determined step, lambda=4.9255598918413634e-01
+ 10 SNES Function norm 1.94555e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 1.94555e-05
+    1 KSP Residual norm 1.11555e-05
+    2 KSP Residual norm 9.24654e-06
+    3 KSP Residual norm 6.70492e-06
+    4 KSP Residual norm 3.91116e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 4
+      Line search: Using full step: fnorm 1.945551542244e-05 gnorm 9.196623595260e-06
+ 11 SNES Function norm 9.19662e-06
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 9.19662e-06
+    1 KSP Residual norm 3.36485e-06
+    2 KSP Residual norm 3.20227e-06
+    3 KSP Residual norm 3.18164e-06
+    4 KSP Residual norm 3.1797e-06
+    5 KSP Residual norm 3.17051e-06
+    6 KSP Residual norm 3.17051e-06
+    7 KSP Residual norm 3.14582e-06
+    8 KSP Residual norm 2.81829e-06
+    9 KSP Residual norm 2.26534e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 9
+      Line search: Using full step: fnorm 9.196623595260e-06 gnorm 3.200999291377e-06
+ 12 SNES Function norm 3.201e-06
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 3.201e-06
+    1 KSP Residual norm 1.98396e-06
+    2 KSP Residual norm 1.91118e-06
+    3 KSP Residual norm 1.88345e-06
+    4 KSP Residual norm 1.87241e-06
+    5 KSP Residual norm 1.87172e-06
+    6 KSP Residual norm 1.86611e-06
+    7 KSP Residual norm 1.85529e-06
+    8 KSP Residual norm 1.74189e-06
+    9 KSP Residual norm 1.53283e-06
+   10 KSP Residual norm 1.28207e-06
+   11 KSP Residual norm 1.04883e-06
+   12 KSP Residual norm 8.46921e-07
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 12
+      Line search: Using full step: fnorm 3.200999291377e-06 gnorm 2.515269595040e-06
+ 13 SNES Function norm 2.51527e-06
+[0] [micromorphic] ref 4 xi 0.0 beta 0.1 l 0.25 km np 2: CONVERGED_FNORM_ABS its 13 (3099 s) W_int 2.44 W_v 'L': 2.194826007546017, 'R': 2.1831619782692093 peak 'L': 2.817983572402219, 'R': 2.7217921035551647 floor bound 40.9

@@ -1,0 +1,9 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+[edot] z = 1: min -0.1368 p50 0.5119 max 3.83
+[edot] z = 5: min 0.2119 p50 0.51 max 1.528
+[edot] z = 15: min 0.2723 p50 0.5061 max 1.427
+[edot] z = 28: min 0.3316 p50 0.5145 max 1.355
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref2_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln2.5_n1.2_tail1_blk_notchsections3d.png
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref2_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln2.5_n1.2_tail1_blk_notchsections.png

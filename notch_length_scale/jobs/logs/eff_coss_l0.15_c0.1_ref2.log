@@ -1,0 +1,61 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 0.393837
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.128988
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 38
+      Line search: Using full step: fnorm 1.289876201158e-01 gnorm 1.752171384818e-02
+  1 SNES Function norm 0.0175217
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 75
+      Line search: gnorm after quadratic fit 1.570063421799e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  2 SNES Function norm 0.0157006
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 73
+      Line search: gnorm after quadratic fit 1.410350748392e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  3 SNES Function norm 0.0141035
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 69
+      Line search: gnorm after quadratic fit 1.243113631027e-02
+      Line search: Quadratically determined step, lambda=1.1776063593802968e-01
+  4 SNES Function norm 0.0124311
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 67
+      Line search: gnorm after quadratic fit 8.649386999328e-03
+      Line search: Quadratically determined step, lambda=3.1017158891071583e-01
+  5 SNES Function norm 0.00864939
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 63
+      Line search: Using full step: fnorm 8.649386999328e-03 gnorm 4.329879762726e-03
+  6 SNES Function norm 0.00432988
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 51
+      Line search: Using full step: fnorm 4.329879762726e-03 gnorm 6.447221250985e-04
+  7 SNES Function norm 0.000644722
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 54
+      Line search: Using full step: fnorm 6.447221250985e-04 gnorm 4.953721827444e-05
+  8 SNES Function norm 4.95372e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 53
+      Line search: Using full step: fnorm 4.953721827444e-05 gnorm 6.321208930564e-07
+  9 SNES Function norm 6.32121e-07
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 42
+      Line search: Using full step: fnorm 6.321208930564e-07 gnorm 1.433540173115e-10
+ 10 SNES Function norm 1.434e-10
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1071 of 1071 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1055 of 1055 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 999 of 999 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1031 of 1031 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+[0] [cosserat] ref 2 xi 0.0 c 0.1 l 0.15 km P1: CONVERGED_FNORM_ABS its 10 (1695 s) W_L/W_R 'L': 1.2857978073712177, 'R': 1.625000682977939 omega [-2.2148017961171843e-14, 2.250673486975857e-14] eta_eff strong [6.034216890357427e+21, 1.272170295275757e+23]
+[0] [cosserat] current estimator: W 2.975 km peak 2.447

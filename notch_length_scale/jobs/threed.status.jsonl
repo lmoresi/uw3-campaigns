@@ -1,0 +1,846 @@
+{"name": "3d_b0.1_ref1", "state": "queued", "time": "2026-10-12 00:37:29", "np": 8}
+{"name": "3d_b0.3_ref1", "state": "queued", "time": "2026-10-12 00:37:29", "np": 8}
+{"name": "3d_b0.1_ref2", "state": "queued", "time": "2026-10-12 00:37:29", "np": 8}
+{"name": "3d_b0.3_ref2", "state": "queued", "time": "2026-10-12 00:37:29", "np": 8}
+{"name": "3d_b0.1_ref1", "state": "running", "time": "2026-10-12 00:37:29", "np": 8, "pid": 488824}
+{"name": "3d_b0.1_ref1", "state": "queued", "time": "2026-10-12 02:38:24", "note": "stopped by hand after 2 h at Newton step 1 (about 2 min per outer Krylov iteration); profiling the 3-D FMG first"}
+{"name": "3d_b0.1_ref1", "state": "killed", "time": "2026-10-12 06:08:09", "rc": -1, "note": "retired: hb2.4 base has a 37k-dof coarse level (6.5 min factorisation per Newton step); replaced by the hb4.8 Lz6 runs"}
+{"name": "3d_b0.3_ref1", "state": "killed", "time": "2026-10-12 06:08:09", "rc": -1, "note": "retired: hb2.4 base has a 37k-dof coarse level (6.5 min factorisation per Newton step); replaced by the hb4.8 Lz6 runs"}
+{"name": "3d_b0.1_ref2", "state": "killed", "time": "2026-10-12 06:08:09", "rc": -1, "note": "retired: hb2.4 base has a 37k-dof coarse level (6.5 min factorisation per Newton step); replaced by the hb4.8 Lz6 runs"}
+{"name": "3d_b0.3_ref2", "state": "killed", "time": "2026-10-12 06:08:09", "rc": -1, "note": "retired: hb2.4 base has a 37k-dof coarse level (6.5 min factorisation per Newton step); replaced by the hb4.8 Lz6 runs"}
+{"name": "3dv2_b0.1_ref2", "state": "queued", "time": "2026-10-12 06:08:11", "np": 8}
+{"name": "3dv2_b0.3_ref2", "state": "queued", "time": "2026-10-12 06:08:11", "np": 8}
+{"name": "3dv2_b0.1_ref2", "state": "running", "time": "2026-10-12 06:08:11", "np": 8, "pid": 716996}
+{"name": "3dv2_b0.1_ref2", "state": "done", "time": "2026-10-12 08:26:11", "rc": 0}
+{"name": "3dv2_b0.3_ref2", "state": "running", "time": "2026-10-12 08:26:11", "np": 8, "pid": 907421}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "queued", "time": "2026-10-12 08:37:11", "np": 8}
+{"name": "3dv2_b0.3_ref2", "state": "done", "time": "2026-10-12 10:07:41", "rc": 0}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "running", "time": "2026-10-12 10:07:41", "np": 8, "pid": 1031313}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "failed", "time": "2026-10-12 10:08:11", "rc": 1}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "queued", "time": "2026-10-12 10:09:43", "note": "requeued: N.z -> N[2] fixed (CoordinateSystem.N is a Matrix)"}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "queued", "time": "2026-10-12 10:10:35", "np": 8}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "running", "time": "2026-10-12 10:10:35", "np": 8, "pid": 1033953}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "killed", "time": "2026-10-12 12:11:36", "rc": 124}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "queued", "time": "2026-10-12 12:11:47", "note": "requeued: the viscous seed ran with the native coarse LU (MUMPS was set only for the Newton solve) and sat silent for 2 h; MUMPS and a Krylov monitor now set at Stokes creation in 3-D"}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "queued", "time": "2026-10-12 12:11:52", "np": 8}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "running", "time": "2026-10-12 12:11:52", "np": 8, "pid": 1181071}
+{"name": "3dramp_b0.1_z8w2_ref2", "state": "killed", "time": "2026-10-12 12:43:02", "rc": -15, "note": "stopped by hand at 30 min: moved to np 16 (the 2-D runs are done)"}
+{"name": "3dramp_b0.1_z8w2_ref2_np16", "state": "queued", "time": "2026-10-12 12:43:04", "np": 16}
+{"name": "3dramp_b0.1_z8w2_ref2_np16", "state": "running", "time": "2026-10-12 12:43:04", "np": 16, "pid": 1231054}
+{"name": "fmgcmp_mesh1_ref3", "state": "queued", "time": "2026-10-12 12:58:04", "np": 4}
+{"name": "fmgcmp_c4_ref5_snap", "state": "queued", "time": "2026-10-12 12:58:04", "np": 4}
+{"name": "fmgcmp_c4_ref5_nosnap", "state": "queued", "time": "2026-10-12 12:58:04", "np": 4}
+{"name": "fmgcmp_c2_ref4_snap", "state": "queued", "time": "2026-10-12 12:58:04", "np": 4}
+{"name": "fmgcmp_mesh1_ref3", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "fmgcmp_c4_ref5_snap", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "fmgcmp_c4_ref5_nosnap", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "fmgcmp_c2_ref4_snap", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_ew1e-2_ref2", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_ew1e-3_ref2", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_rtol1e-4_ref2", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_ew1e-2_ref3", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_ew1e-3_ref3", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "inexact_rtol1e-4_ref3", "state": "queued", "time": "2026-10-12 17:58:01", "np": 4}
+{"name": "3dramp_b0.1_z8w2_ref2_np16", "state": "done", "time": "2026-10-12 22:28:32", "rc": 0}
+{"name": "inexact_ew1e-2_ref2", "state": "running", "time": "2026-10-12 22:28:32", "np": 4, "pid": 1601266}
+{"name": "inexact_ew1e-3_ref2", "state": "running", "time": "2026-10-12 22:28:32", "np": 4, "pid": 1601267}
+{"name": "inexact_rtol1e-4_ref2", "state": "running", "time": "2026-10-12 22:28:32", "np": 4, "pid": 1601268}
+{"name": "inexact_ew1e-2_ref3", "state": "running", "time": "2026-10-12 22:28:32", "np": 4, "pid": 1601269}
+{"name": "inexact_ew1e-2_ref2", "state": "done", "time": "2026-10-12 22:30:32", "rc": 0}
+{"name": "inexact_ew1e-3_ref2", "state": "done", "time": "2026-10-12 22:30:32", "rc": 0}
+{"name": "inexact_ew1e-3_ref3", "state": "running", "time": "2026-10-12 22:30:32", "np": 4, "pid": 1630850}
+{"name": "inexact_rtol1e-4_ref3", "state": "running", "time": "2026-10-12 22:30:32", "np": 4, "pid": 1630851}
+{"name": "inexact_rtol1e-4_ref2", "state": "done", "time": "2026-10-12 22:31:02", "rc": 0}
+{"name": "fmgcmp_mesh1_ref3", "state": "running", "time": "2026-10-12 22:31:02", "np": 4, "pid": 1642714}
+{"name": "inexact_ew1e-2_ref3", "state": "done", "time": "2026-10-12 22:34:32", "rc": 0}
+{"name": "fmgcmp_c4_ref5_snap", "state": "running", "time": "2026-10-12 22:34:32", "np": 4, "pid": 1653282}
+{"name": "inexact_ew1e-3_ref3", "state": "done", "time": "2026-10-12 22:39:02", "rc": 0}
+{"name": "fmgcmp_c4_ref5_nosnap", "state": "running", "time": "2026-10-12 22:39:02", "np": 4, "pid": 1663931}
+{"name": "inexact_rtol1e-4_ref3", "state": "done", "time": "2026-10-12 22:41:02", "rc": 0}
+{"name": "fmgcmp_c2_ref4_snap", "state": "running", "time": "2026-10-12 22:41:02", "np": 4, "pid": 1674365}
+{"name": "fmgcmp_mesh1_ref3", "state": "failed", "time": "2026-10-12 22:50:32", "rc": 1}
+{"name": "fmgcmp_c2_ref4_snap", "state": "failed", "time": "2026-10-12 23:29:32", "rc": 1}
+{"name": "fmgcmp_c4_ref5_snap", "state": "failed", "time": "2026-10-13 01:38:32", "rc": 1}
+{"name": "fmgcmp_c4_ref5_nosnap", "state": "failed", "time": "2026-10-13 01:51:32", "rc": 1}
+{"name": "3dramp_ew_z8w2", "state": "queued", "time": "2026-10-13 03:18:11", "np": 16}
+{"name": "3dramp_ew_z8w4", "state": "queued", "time": "2026-10-13 03:18:11", "np": 16}
+{"name": "3dramp_ew_z8w1", "state": "queued", "time": "2026-10-13 03:18:11", "np": 16}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:18:11", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:18:11", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:18:11", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:18:11", "np": 4}
+{"name": "3dramp_ew_z8w2", "state": "running", "time": "2026-10-13 03:18:11", "np": 16, "pid": 1703928}
+{"name": "3dramp_ew_z8w4", "state": "queued", "time": "2026-10-13 03:19:45", "np": 16}
+{"name": "3dramp_ew_z8w1", "state": "queued", "time": "2026-10-13 03:19:45", "np": 16}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:19:45", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:19:45", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:19:45", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:19:45", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 03:19:45", "np": 1}
+{"name": "3dramp_ew_z8w4", "state": "queued", "time": "2026-10-13 03:35:57", "np": 16}
+{"name": "3dramp_ew_z8w1", "state": "queued", "time": "2026-10-13 03:35:57", "np": 16}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 03:35:57", "np": 1}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:35:57", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:35:57", "np": 1}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:35:57", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:35:57", "np": 4}
+{"name": "coarse_native_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:35:57", "np": 8}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:35:57", "np": 8}
+{"name": "3dramp_ew_z8w2", "state": "killed", "time": "2026-10-13 03:37:42", "note": "stopped: ranks freed for coarse/snap checks; ramp scope under review"}
+{"name": "3dramp_ew_z8w4", "state": "killed", "time": "2026-10-13 03:37:42", "note": "held: ramp applied to the whole Weak region; awaiting Louis"}
+{"name": "3dramp_ew_z8w1", "state": "killed", "time": "2026-10-13 03:37:42", "note": "held: ramp applied to the whole Weak region; awaiting Louis"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 03:37:43", "np": 1}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:37:43", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:37:43", "np": 1}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:37:43", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:37:43", "np": 4}
+{"name": "coarse_native_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:37:43", "np": 8}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:37:43", "np": 8}
+{"name": "render_3dramp_w2", "state": "running", "time": "2026-10-13 03:37:43", "np": 1, "pid": 1707136}
+{"name": "snapchk_m1_ref3_np1", "state": "running", "time": "2026-10-13 03:37:43", "np": 1, "pid": 1707137}
+{"name": "snapchk_m1_ref3_np4", "state": "running", "time": "2026-10-13 03:37:43", "np": 4, "pid": 1707138}
+{"name": "snapchk_c4_ref5_np1", "state": "running", "time": "2026-10-13 03:37:43", "np": 1, "pid": 1707139}
+{"name": "snapchk_c4_ref5_np4", "state": "running", "time": "2026-10-13 03:37:43", "np": 4, "pid": 1707140}
+{"name": "snapchk_3d_ref2_np1", "state": "running", "time": "2026-10-13 03:37:43", "np": 1, "pid": 1707141}
+{"name": "snapchk_3d_ref2_np4", "state": "running", "time": "2026-10-13 03:37:43", "np": 4, "pid": 1707142}
+{"name": "snapchk_m1_ref3_np1", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "snapchk_m1_ref3_np4", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "snapchk_c4_ref5_np1", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "snapchk_c4_ref5_np4", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "snapchk_3d_ref2_np1", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "snapchk_3d_ref2_np4", "state": "done", "time": "2026-10-13 03:38:13", "rc": 0}
+{"name": "coarse_native_hb4.8Lz6_ref2", "state": "running", "time": "2026-10-13 03:38:13", "np": 8, "pid": 1707306}
+{"name": "maskchk_ref0", "state": "queued", "time": "2026-10-13 03:39:13", "np": 1}
+{"name": "maskchk_ref1", "state": "queued", "time": "2026-10-13 03:39:13", "np": 1}
+{"name": "maskchk_ref0", "state": "running", "time": "2026-10-13 03:39:13", "np": 1, "pid": 1707494}
+{"name": "maskchk_ref1", "state": "running", "time": "2026-10-13 03:39:13", "np": 1, "pid": 1707495}
+{"name": "maskchk_ref0", "state": "done", "time": "2026-10-13 03:39:43", "rc": 0}
+{"name": "maskchk_ref1", "state": "done", "time": "2026-10-13 03:39:43", "rc": 0}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:39:53"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:39:57", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:39:57", "np": 1}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:39:57", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:39:57", "np": 4}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:39:57", "np": 8}
+{"name": "snapchk_m1_ref3_np1", "state": "running", "time": "2026-10-13 03:39:57", "np": 1, "pid": 1707614}
+{"name": "snapchk_m1_ref3_np4", "state": "running", "time": "2026-10-13 03:39:57", "np": 4, "pid": 1707615}
+{"name": "snapchk_c4_ref5_np1", "state": "running", "time": "2026-10-13 03:39:57", "np": 1, "pid": 1707616}
+{"name": "snapchk_3d_ref2_np1", "state": "running", "time": "2026-10-13 03:39:57", "np": 1, "pid": 1707617}
+{"name": "snapchk_m1_ref3_np1", "state": "done", "time": "2026-10-13 03:40:27", "rc": 0}
+{"name": "snapchk_m1_ref3_np4", "state": "done", "time": "2026-10-13 03:40:27", "rc": 0}
+{"name": "snapchk_c4_ref5_np1", "state": "done", "time": "2026-10-13 03:40:27", "rc": 0}
+{"name": "snapchk_3d_ref2_np1", "state": "done", "time": "2026-10-13 03:40:27", "rc": 0}
+{"name": "snapchk_c4_ref5_np4", "state": "running", "time": "2026-10-13 03:40:27", "np": 4, "pid": 1707724}
+{"name": "snapchk_c4_ref5_np4", "state": "done", "time": "2026-10-13 03:40:57", "rc": 0}
+{"name": "snapchk_3d_ref2_np4", "state": "running", "time": "2026-10-13 03:40:57", "np": 4, "pid": 1707787}
+{"name": "snapchk_3d_ref2_np4", "state": "done", "time": "2026-10-13 03:41:27", "rc": 0}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:42:37"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "snapchk_m1_ref3_np1", "state": "queued", "time": "2026-10-13 03:42:41", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "snapchk_c4_ref5_np1", "state": "queued", "time": "2026-10-13 03:42:41", "np": 1}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:42:41", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:42:41", "np": 4}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 03:42:41", "np": 8}
+{"name": "snapchk_m1_ref3_np1", "state": "running", "time": "2026-10-13 03:42:41", "np": 1, "pid": 1708037}
+{"name": "snapchk_m1_ref3_np4", "state": "running", "time": "2026-10-13 03:42:41", "np": 4, "pid": 1708038}
+{"name": "snapchk_c4_ref5_np1", "state": "running", "time": "2026-10-13 03:42:41", "np": 1, "pid": 1708039}
+{"name": "snapchk_3d_ref2_np1", "state": "running", "time": "2026-10-13 03:42:41", "np": 1, "pid": 1708040}
+{"name": "snapchk_m1_ref3_np1", "state": "done", "time": "2026-10-13 03:43:11", "rc": 0}
+{"name": "snapchk_m1_ref3_np4", "state": "done", "time": "2026-10-13 03:43:11", "rc": 0}
+{"name": "snapchk_c4_ref5_np1", "state": "done", "time": "2026-10-13 03:43:11", "rc": 0}
+{"name": "snapchk_3d_ref2_np1", "state": "done", "time": "2026-10-13 03:43:11", "rc": 0}
+{"name": "snapchk_c4_ref5_np4", "state": "running", "time": "2026-10-13 03:43:11", "np": 4, "pid": 1708131}
+{"name": "snapchk_c4_ref5_np4", "state": "done", "time": "2026-10-13 03:43:41", "rc": 0}
+{"name": "snapchk_3d_ref2_np4", "state": "running", "time": "2026-10-13 03:43:41", "np": 4, "pid": 1708183}
+{"name": "render_3dramp_w2", "state": "done", "time": "2026-10-13 03:44:11", "rc": 0}
+{"name": "snapchk_3d_ref2_np4", "state": "done", "time": "2026-10-13 03:44:11", "rc": 0}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "running", "time": "2026-10-13 03:44:11", "np": 8, "pid": 1708281}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:44:51"}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:44:51"}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:44:51"}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:44:51"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:44:55", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:44:55", "np": 4}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:56:05", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 03:56:05", "np": 4}
+{"name": "maskchk_ref0", "state": "queued", "time": "2026-10-13 03:56:28"}
+{"name": "maskchk_ref1", "state": "queued", "time": "2026-10-13 03:56:28"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:56:33", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "maskchk_ref0", "state": "queued", "time": "2026-10-13 03:56:33", "np": 1}
+{"name": "maskchk_ref1", "state": "queued", "time": "2026-10-13 03:56:33", "np": 1}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 03:56:33", "np": 4}
+{"name": "maskchk_ref2", "state": "queued", "time": "2026-10-13 03:56:33", "np": 1}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 03:56:51"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 03:56:56", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 03:56:56", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "maskchk_ref0", "state": "queued", "time": "2026-10-13 03:56:56", "np": 1}
+{"name": "maskchk_ref1", "state": "queued", "time": "2026-10-13 03:56:56", "np": 1}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 03:56:56", "np": 4}
+{"name": "maskchk_ref2", "state": "queued", "time": "2026-10-13 03:56:56", "np": 1}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "maskchk_ref0", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "maskchk_ref1", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "maskchk_ref2", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "libsnap_np1", "state": "queued", "time": "2026-10-13 04:00:15", "np": 1}
+{"name": "libsnap_np4", "state": "queued", "time": "2026-10-13 04:00:15", "np": 4}
+{"name": "maskchk_ref0", "state": "killed", "time": "2026-10-13 04:01:05", "note": "superseded: split mesh"}
+{"name": "maskchk_ref1", "state": "killed", "time": "2026-10-13 04:01:05", "note": "superseded: split mesh"}
+{"name": "maskchk_ref2", "state": "killed", "time": "2026-10-13 04:01:05", "note": "superseded: split mesh"}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 04:01:10", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 04:01:10", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "libsnap_np1", "state": "queued", "time": "2026-10-13 04:01:10", "np": 1}
+{"name": "libsnap_np4", "state": "queued", "time": "2026-10-13 04:01:10", "np": 4}
+{"name": "mesh_hb4.8_Lz6_split", "state": "queued", "time": "2026-10-13 04:01:10", "np": 1}
+{"name": "fmgW_mesh1_ref3", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "fmgW_c2_ref4_snap", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "fmgW_c4_ref5_snap", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "fmgW_c4_ref5_nosnap", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "render_3dramp_w2", "state": "queued", "time": "2026-10-13 04:11:50", "np": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "snapchk_c4_ref5_np4", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "snapchk_3d_ref2_np1", "state": "queued", "time": "2026-10-13 04:11:50", "np": 1}
+{"name": "snapchk_3d_ref2_np4", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "libsnap_np1", "state": "queued", "time": "2026-10-13 04:11:50", "np": 1}
+{"name": "libsnap_np4", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "mesh_hb4.8_Lz6_split", "state": "queued", "time": "2026-10-13 04:11:50", "np": 1}
+{"name": "gamg2d_ew_ref3", "state": "queued", "time": "2026-10-13 04:11:50", "np": 4}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 04:11:50", "np": 8}
+{"name": "coarse_native_hb4.8Lz6_ref2", "state": "done", "time": "2026-10-13 04:32:50", "rc": 0}
+{"name": "mesh_hb4.8_Lz6_split", "state": "running", "time": "2026-10-13 04:32:50", "np": 1, "pid": 1853539}
+{"name": "libsnap_np1", "state": "running", "time": "2026-10-13 04:32:50", "np": 1, "pid": 1853540}
+{"name": "libsnap_np4", "state": "running", "time": "2026-10-13 04:32:50", "np": 4, "pid": 1853541}
+{"name": "mesh_hb4.8_Lz6_split", "state": "done", "time": "2026-10-13 04:33:20", "rc": 0}
+{"name": "libsnap_np1", "state": "done", "time": "2026-10-13 04:33:20", "rc": 0}
+{"name": "libsnap_np4", "state": "done", "time": "2026-10-13 04:33:20", "rc": 0}
+{"name": "gamg2d_ew_ref3", "state": "running", "time": "2026-10-13 04:33:20", "np": 4, "pid": 1860524}
+{"name": "coarse_mumps_hb4.8Lz6_ref2", "state": "done", "time": "2026-10-13 04:33:50", "rc": 0}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "running", "time": "2026-10-13 04:33:50", "np": 8, "pid": 1863770}
+{"name": "render_3dramp_w2", "state": "running", "time": "2026-10-13 04:33:50", "np": 1, "pid": 1863771}
+{"name": "snapchk_3d_ref2_np1", "state": "running", "time": "2026-10-13 04:33:50", "np": 1, "pid": 1863772}
+{"name": "snapchk_3d_ref2_np1", "state": "done", "time": "2026-10-13 04:34:20", "rc": 0}
+{"name": "gamg2d_ew_ref3", "state": "failed", "time": "2026-10-13 04:36:50", "rc": 1}
+{"name": "snapchk_m1_ref3_np4", "state": "running", "time": "2026-10-13 04:36:50", "np": 4, "pid": 1864724}
+{"name": "snapchk_m1_ref3_np4", "state": "done", "time": "2026-10-13 04:37:20", "rc": 0}
+{"name": "snapchk_c4_ref5_np4", "state": "running", "time": "2026-10-13 04:37:20", "np": 4, "pid": 1864874}
+{"name": "snapchk_c4_ref5_np4", "state": "done", "time": "2026-10-13 04:37:50", "rc": 0}
+{"name": "snapchk_3d_ref2_np4", "state": "running", "time": "2026-10-13 04:37:50", "np": 4, "pid": 1870449}
+{"name": "snapchk_3d_ref2_np4", "state": "done", "time": "2026-10-13 04:38:20", "rc": 0}
+{"name": "plain_ew_ref2", "state": "running", "time": "2026-10-13 04:38:20", "np": 4, "pid": 1877464}
+{"name": "plain_ew_ref2", "state": "failed", "time": "2026-10-13 04:39:50", "rc": 1}
+{"name": "plain_ew_ref3", "state": "running", "time": "2026-10-13 04:39:50", "np": 4, "pid": 1899329}
+{"name": "render_3dramp_w2", "state": "done", "time": "2026-10-13 04:40:20", "rc": 0}
+{"name": "fmgW_mesh1_ref3", "state": "running", "time": "2026-10-13 04:40:20", "np": 4, "pid": 1906344}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "done", "time": "2026-10-13 04:42:20", "rc": 0}
+{"name": "fmgW_c2_ref4_snap", "state": "running", "time": "2026-10-13 04:42:20", "np": 4, "pid": 1933691}
+{"name": "fmgW_c4_ref5_snap", "state": "running", "time": "2026-10-13 04:42:20", "np": 4, "pid": 1933692}
+{"name": "fmgW_mesh1_ref3", "state": "done", "time": "2026-10-13 04:46:50", "rc": 0}
+{"name": "fmgW_c4_ref5_nosnap", "state": "running", "time": "2026-10-13 04:46:50", "np": 4, "pid": 1945617}
+{"name": "plain_ew_ref3", "state": "failed", "time": "2026-10-13 04:51:20", "rc": 1}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:52:04"}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:52:04"}
+{"name": "gamg2d_ew_ref3", "state": "queued", "time": "2026-10-13 04:52:04"}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:52:09", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:52:09", "np": 4}
+{"name": "gamg2d_ew_ref3", "state": "queued", "time": "2026-10-13 04:52:09", "np": 4}
+{"name": "gamg2d_ew_ref3", "state": "running", "time": "2026-10-13 04:52:09", "np": 4, "pid": 1947609}
+{"name": "plain_ew_ref2", "state": "queued", "time": "2026-10-13 04:52:26", "np": 4}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:52:26", "np": 4}
+{"name": "maskchk_split_ref0", "state": "queued", "time": "2026-10-13 04:52:26", "np": 1}
+{"name": "maskchk_split_ref2", "state": "queued", "time": "2026-10-13 04:52:26", "np": 1}
+{"name": "gamg2d_ew_ref3", "state": "done", "time": "2026-10-13 04:56:26", "rc": 0}
+{"name": "maskchk_split_ref0", "state": "running", "time": "2026-10-13 04:56:26", "np": 1, "pid": 1959616}
+{"name": "maskchk_split_ref2", "state": "running", "time": "2026-10-13 04:56:26", "np": 1, "pid": 1959617}
+{"name": "maskchk_split_ref0", "state": "done", "time": "2026-10-13 04:56:56", "rc": 0}
+{"name": "maskchk_split_ref2", "state": "done", "time": "2026-10-13 04:56:56", "rc": 0}
+{"name": "plain_ew_ref2", "state": "running", "time": "2026-10-13 04:56:56", "np": 4, "pid": 1959916}
+{"name": "gamg2d_ew_ref3", "state": "queued", "time": "2026-10-13 04:57:05"}
+{"name": "plain_ew_ref3", "state": "queued", "time": "2026-10-13 04:57:09", "np": 4}
+{"name": "gamg2d_ew_ref3", "state": "queued", "time": "2026-10-13 04:57:09", "np": 4}
+{"name": "plain_ew_ref2", "state": "done", "time": "2026-10-13 04:58:39", "rc": 0}
+{"name": "gamg2d_ew_ref3", "state": "running", "time": "2026-10-13 04:58:39", "np": 4, "pid": 1974387}
+{"name": "fmgW_c2_ref4_snap", "state": "done", "time": "2026-10-13 05:00:39", "rc": 0}
+{"name": "plain_ew_ref3", "state": "running", "time": "2026-10-13 05:00:39", "np": 4, "pid": 1985299}
+{"name": "gamg2d_ew_ref3", "state": "done", "time": "2026-10-13 05:09:09", "rc": 0}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 05:09:36"}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 05:09:40", "np": 8}
+{"name": "coarse_native_Lz16_ref1", "state": "queued", "time": "2026-10-13 05:09:40", "np": 8}
+{"name": "coarse_gamg_Lz16_ref1", "state": "queued", "time": "2026-10-13 05:09:40", "np": 8}
+{"name": "plain_ew_ref3", "state": "done", "time": "2026-10-13 05:12:10", "rc": 0}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "running", "time": "2026-10-13 05:12:10", "np": 8, "pid": 2007059}
+{"name": "coarse_native_Lz16_ref1", "state": "queued", "time": "2026-10-13 05:13:08", "np": 8}
+{"name": "coarse_gamg_Lz16_ref1", "state": "queued", "time": "2026-10-13 05:13:08", "np": 8}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 05:13:08", "np": 8}
+{"name": "fmgW_c4_ref5_snap", "state": "done", "time": "2026-10-13 05:58:38", "rc": 0}
+{"name": "fmgW_c4_ref5_nosnap", "state": "done", "time": "2026-10-13 06:39:08", "rc": 0}
+{"name": "coarse_native_Lz16_ref1", "state": "running", "time": "2026-10-13 06:39:08", "np": 8, "pid": 2089555}
+{"name": "coarse_gamg_hb4.8Lz6_ref2", "state": "done", "time": "2026-10-13 06:40:38", "rc": 0}
+{"name": "coarse_gamg_Lz16_ref1", "state": "running", "time": "2026-10-13 06:40:38", "np": 8, "pid": 2109663}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 07:43:17", "np": 8}
+{"name": "snapvol_c4_ref5_np1", "state": "queued", "time": "2026-10-13 07:43:17", "np": 1}
+{"name": "snapvol_3d_ref2_np1", "state": "queued", "time": "2026-10-13 07:43:17", "np": 1}
+{"name": "snapvol_3d_ref2_np4", "state": "queued", "time": "2026-10-13 07:43:17", "np": 4}
+{"name": "snapvol_c4_ref5_np4", "state": "queued", "time": "2026-10-13 07:43:17", "np": 4}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 08:01:54", "np": 8}
+{"name": "snapvol_c4_ref5_np1", "state": "queued", "time": "2026-10-13 08:01:54", "np": 1}
+{"name": "snapvol_3d_ref2_np1", "state": "queued", "time": "2026-10-13 08:01:54", "np": 1}
+{"name": "snapvol_3d_ref2_np4", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "snapvol_c4_ref5_np4", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:01:54", "np": 4}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 08:03:11", "np": 8}
+{"name": "snapvol_c4_ref5_np1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 1}
+{"name": "snapvol_3d_ref2_np1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 1}
+{"name": "snapvol_3d_ref2_np4", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "snapvol_c4_ref5_np4", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "tail_plain_ref2_np1", "state": "queued", "time": "2026-10-13 08:03:11", "np": 1}
+{"name": "tail_plain_ref2_np4", "state": "queued", "time": "2026-10-13 08:03:11", "np": 4}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 08:05:45", "np": 8}
+{"name": "snapvol_c4_ref5_np1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 1}
+{"name": "snapvol_3d_ref2_np1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 1}
+{"name": "snapvol_3d_ref2_np4", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "snapvol_c4_ref5_np4", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "tail_plain_ref2_np1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 1}
+{"name": "tail_plain_ref2_np4", "state": "queued", "time": "2026-10-13 08:05:45", "np": 4}
+{"name": "t1075_before_np1", "state": "queued", "time": "2026-10-13 08:05:45", "np": 1}
+{"name": "coarse_native_Lz16_ref1", "state": "done", "time": "2026-10-13 08:26:45", "rc": 0}
+{"name": "t1075_before_np1", "state": "running", "time": "2026-10-13 08:26:45", "np": 1, "pid": 2245595}
+{"name": "tail_plain_ref2_np1", "state": "running", "time": "2026-10-13 08:26:45", "np": 1, "pid": 2245596}
+{"name": "tail_plain_ref2_np4", "state": "running", "time": "2026-10-13 08:26:45", "np": 4, "pid": 2245597}
+{"name": "snapvol_c4_ref5_np1", "state": "running", "time": "2026-10-13 08:26:45", "np": 1, "pid": 2245598}
+{"name": "snapvol_3d_ref2_np1", "state": "running", "time": "2026-10-13 08:26:45", "np": 1, "pid": 2245599}
+{"name": "t1075_before_np1", "state": "failed", "time": "2026-10-13 08:27:15", "rc": 1}
+{"name": "snapvol_c4_ref5_np1", "state": "done", "time": "2026-10-13 08:27:45", "rc": 0}
+{"name": "snapvol_3d_ref2_np1", "state": "done", "time": "2026-10-13 08:27:45", "rc": 0}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "queued", "time": "2026-10-13 08:28:47", "np": 8}
+{"name": "snapvol_3d_ref2_np4", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "snapvol_c4_ref5_np4", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "t1075_after_np1", "state": "queued", "time": "2026-10-13 08:28:47", "np": 1}
+{"name": "t1075_after_np4", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "t1017_after_np4", "state": "queued", "time": "2026-10-13 08:28:47", "np": 4}
+{"name": "t1017_1022_after_np1", "state": "queued", "time": "2026-10-13 08:28:47", "np": 1}
+{"name": "t1075_after_np1", "state": "running", "time": "2026-10-13 08:28:47", "np": 1, "pid": 2248856}
+{"name": "t1017_1022_after_np1", "state": "running", "time": "2026-10-13 08:28:47", "np": 1, "pid": 2248857}
+{"name": "t1075_after_np1", "state": "done", "time": "2026-10-13 08:29:17", "rc": 0}
+{"name": "tail_plain_ref2_np1", "state": "done", "time": "2026-10-13 08:35:17", "rc": 0}
+{"name": "tail_plain_ref2_np4", "state": "done", "time": "2026-10-13 08:35:17", "rc": 0}
+{"name": "t1075_after_np4", "state": "running", "time": "2026-10-13 08:35:17", "np": 4, "pid": 2265085}
+{"name": "t1075_after_np4", "state": "done", "time": "2026-10-13 08:35:47", "rc": 0}
+{"name": "t1017_after_np4", "state": "running", "time": "2026-10-13 08:35:47", "np": 4, "pid": 2265270}
+{"name": "t1017_after_np4", "state": "done", "time": "2026-10-13 08:37:17", "rc": 0}
+{"name": "snapvol_3d_ref2_np4", "state": "running", "time": "2026-10-13 08:37:17", "np": 4, "pid": 2266964}
+{"name": "snapvol_3d_ref2_np4", "state": "done", "time": "2026-10-13 08:37:47", "rc": 0}
+{"name": "snapvol_c4_ref5_np4", "state": "running", "time": "2026-10-13 08:37:47", "np": 4, "pid": 2267337}
+{"name": "snapvol_c4_ref5_np4", "state": "done", "time": "2026-10-13 08:38:17", "rc": 0}
+{"name": "t1017_1022_after_np1", "state": "done", "time": "2026-10-13 08:40:17", "rc": 0}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "running", "time": "2026-10-13 08:40:17", "np": 8, "pid": 2276618}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "tail_micro_ref3_tight", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 08:41:18", "np": 4}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "tail_micro_ref3_tight", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 08:41:38", "np": 4}
+{"name": "mesh_c8", "state": "queued", "time": "2026-10-13 08:41:38", "np": 1}
+{"name": "cmap_l0.15_c0.1", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "tail_micro_ref3_tight", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 09:53:17", "np": 4}
+{"name": "mesh_c8", "state": "queued", "time": "2026-10-13 09:53:17", "np": 1}
+{"name": "mesh3d_c4", "state": "queued", "time": "2026-10-13 09:53:17", "np": 1}
+{"name": "mesh3d_c2", "state": "queued", "time": "2026-10-13 09:53:17", "np": 1}
+{"name": "mesh3d_f015", "state": "queued", "time": "2026-10-13 09:53:17", "np": 1}
+{"name": "coarse_gamg_Lz16_ref1", "state": "done", "time": "2026-10-13 10:15:47", "rc": 0}
+{"name": "mesh_c8", "state": "running", "time": "2026-10-13 10:15:47", "np": 1, "pid": 2388436}
+{"name": "mesh3d_c4", "state": "running", "time": "2026-10-13 10:15:47", "np": 1, "pid": 2388437}
+{"name": "mesh3d_c2", "state": "running", "time": "2026-10-13 10:15:47", "np": 1, "pid": 2388438}
+{"name": "mesh3d_f015", "state": "running", "time": "2026-10-13 10:15:47", "np": 1, "pid": 2388439}
+{"name": "tail_micro_ref3_tight", "state": "running", "time": "2026-10-13 10:15:47", "np": 4, "pid": 2388440}
+{"name": "mesh_c8", "state": "done", "time": "2026-10-13 10:16:17", "rc": 0}
+{"name": "mesh3d_c4", "state": "done", "time": "2026-10-13 10:16:17", "rc": 0}
+{"name": "mesh3d_c2", "state": "done", "time": "2026-10-13 10:16:17", "rc": 0}
+{"name": "mesh3d_f015", "state": "done", "time": "2026-10-13 10:16:17", "rc": 0}
+{"name": "tail_micro_ref3_ew1e-2", "state": "running", "time": "2026-10-13 10:16:17", "np": 4, "pid": 2388676}
+{"name": "tail_micro_ref3_ew1e-2", "state": "done", "time": "2026-10-13 10:30:17", "rc": 0}
+{"name": "cmap_l0.15_c0.1", "state": "running", "time": "2026-10-13 10:30:17", "np": 4, "pid": 2449163}
+{"name": "uniform_split_hb4.8Lz6_ref2", "state": "done", "time": "2026-10-13 10:34:47", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "running", "time": "2026-10-13 10:34:47", "np": 4, "pid": 2476396}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "running", "time": "2026-10-13 10:34:47", "np": 4, "pid": 2476397}
+{"name": "cmap_l0.15_c0.1", "state": "done", "time": "2026-10-13 10:36:17", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "running", "time": "2026-10-13 10:36:17", "np": 4, "pid": 2487757}
+{"name": "eff_coss_l0.15_c0.1_ref1", "state": "done", "time": "2026-10-13 10:38:17", "rc": 0}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "running", "time": "2026-10-13 10:38:17", "np": 4, "pid": 2510018}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 10:44:01"}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 10:44:07", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 10:44:07", "np": 4}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 10:44:07", "np": 4}
+{"name": "t1075_v2_np1", "state": "queued", "time": "2026-10-13 10:44:07", "np": 1}
+{"name": "t1075_v2_np4", "state": "queued", "time": "2026-10-13 10:44:07", "np": 4}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 10:44:20", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 10:44:20", "np": 4}
+{"name": "tail_micro_ref3_ew1e-2", "state": "queued", "time": "2026-10-13 10:44:20", "np": 4}
+{"name": "t1075_v2_np1", "state": "queued", "time": "2026-10-13 10:44:20", "np": 1}
+{"name": "t1075_v2_np4", "state": "queued", "time": "2026-10-13 10:44:20", "np": 4}
+{"name": "tail3d_nested_f015_ref1", "state": "queued", "time": "2026-10-13 10:44:20", "np": 8}
+{"name": "tail3d_gmsh_f015_ref1", "state": "queued", "time": "2026-10-13 10:44:20", "np": 8}
+{"name": "cold_coss_l0.15_c0.1_ref1", "state": "done", "time": "2026-10-13 10:51:20", "rc": 0}
+{"name": "t1075_v2_np1", "state": "running", "time": "2026-10-13 10:51:20", "np": 1, "pid": 2537254}
+{"name": "t1075_v2_np1", "state": "done", "time": "2026-10-13 10:52:20", "rc": 0}
+{"name": "t1075_v2_np4", "state": "running", "time": "2026-10-13 10:52:20", "np": 4, "pid": 2537454}
+{"name": "t1075_v2_np4", "state": "done", "time": "2026-10-13 10:52:50", "rc": 0}
+{"name": "tail_micro_ref3_ew1e-2", "state": "running", "time": "2026-10-13 10:52:50", "np": 4, "pid": 2537565}
+{"name": "tail_micro_ref3_tight", "state": "done", "time": "2026-10-13 11:05:51", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref2", "state": "done", "time": "2026-10-13 11:06:21", "rc": 0}
+{"name": "tail3d_nested_f015_ref1", "state": "running", "time": "2026-10-13 11:06:21", "np": 8, "pid": 2570147}
+{"name": "tail_micro_ref3_ew1e-2", "state": "done", "time": "2026-10-13 11:07:21", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 11:08:02", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 11:08:02", "np": 4}
+{"name": "tail3d_gmsh_f015_ref1", "state": "queued", "time": "2026-10-13 11:08:02", "np": 8}
+{"name": "prof_tail_micro_ref3", "state": "queued", "time": "2026-10-13 11:08:02", "np": 4}
+{"name": "prof_tail_micro_ref3", "state": "running", "time": "2026-10-13 11:08:02", "np": 4, "pid": 2575365}
+{"name": "prof_tail_micro_ref3", "state": "done", "time": "2026-10-13 11:24:32", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 12:18:50", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 12:18:50", "np": 4}
+{"name": "tail3d_gmsh_f015_ref1", "state": "queued", "time": "2026-10-13 12:18:50", "np": 8}
+{"name": "kv_nested_np1", "state": "queued", "time": "2026-10-13 12:18:50", "np": 1}
+{"name": "kv_tail_np1", "state": "queued", "time": "2026-10-13 12:18:50", "np": 1}
+{"name": "kv_nested_np4", "state": "queued", "time": "2026-10-13 12:18:50", "np": 4}
+{"name": "kv_tail_np4", "state": "queued", "time": "2026-10-13 12:18:50", "np": 4}
+{"name": "kv_nested_np1", "state": "running", "time": "2026-10-13 12:18:50", "np": 1, "pid": 2605379}
+{"name": "kv_tail_np1", "state": "running", "time": "2026-10-13 12:18:50", "np": 1, "pid": 2605380}
+{"name": "kv_tail_np1", "state": "done", "time": "2026-10-13 12:29:50", "rc": 0}
+{"name": "kv_nested_np1", "state": "done", "time": "2026-10-13 12:37:50", "rc": 0}
+{"name": "kv_nested_np4", "state": "running", "time": "2026-10-13 12:37:50", "np": 4, "pid": 2611611}
+{"name": "cold_coss_l0.15_c0.1_ref2", "state": "done", "time": "2026-10-13 12:41:20", "rc": 0}
+{"name": "kv_tail_np4", "state": "running", "time": "2026-10-13 12:41:20", "np": 4, "pid": 2626778}
+{"name": "kv_nested_np4", "state": "done", "time": "2026-10-13 12:46:20", "rc": 0}
+{"name": "kv_tail_np4", "state": "done", "time": "2026-10-13 12:50:20", "rc": 0}
+{"name": "tail3d_gmsh_f015_ref1", "state": "running", "time": "2026-10-13 12:50:20", "np": 8, "pid": 2649051}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 12:50:59", "np": 4}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "queued", "time": "2026-10-13 12:50:59", "np": 4}
+{"name": "lv_nested", "state": "queued", "time": "2026-10-13 12:50:59", "np": 4}
+{"name": "lv_tail", "state": "queued", "time": "2026-10-13 12:50:59", "np": 4}
+{"name": "tail3d_nested_f015_ref1", "state": "done", "time": "2026-10-13 14:23:00", "rc": 0}
+{"name": "lv_nested", "state": "running", "time": "2026-10-13 14:23:00", "np": 4, "pid": 2797615}
+{"name": "lv_tail", "state": "running", "time": "2026-10-13 14:23:00", "np": 4, "pid": 2797616}
+{"name": "tail3d_gmsh_f015_ref1", "state": "done", "time": "2026-10-13 14:27:00", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "running", "time": "2026-10-13 14:27:00", "np": 4, "pid": 2839599}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "running", "time": "2026-10-13 14:27:00", "np": 4, "pid": 2839600}
+{"name": "lv_nested", "state": "done", "time": "2026-10-13 14:32:30", "rc": 0}
+{"name": "lv_tail", "state": "done", "time": "2026-10-13 14:33:00", "rc": 0}
+{"name": "eff_coss_l0.15_c0.1_ref3", "state": "killed", "time": "2026-10-13 15:34:19", "note": "superseded by l = 0.146 re-match (Louis)"}
+{"name": "cold_coss_l0.15_c0.1_ref3", "state": "killed", "time": "2026-10-13 15:34:19", "note": "superseded by l = 0.146 re-match (Louis)"}
+{"name": "cmap_l0.146_c0.1", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref1", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref1", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:34:25", "np": 4}
+{"name": "cmap_l0.146_c0.1", "state": "running", "time": "2026-10-13 15:34:25", "np": 4, "pid": 2885099}
+{"name": "eff_coss_l0.146_c0.1_ref1", "state": "running", "time": "2026-10-13 15:34:25", "np": 4, "pid": 2885100}
+{"name": "cold_coss_l0.146_c0.1_ref1", "state": "running", "time": "2026-10-13 15:34:25", "np": 4, "pid": 2885101}
+{"name": "eff_coss_l0.146_c0.1_ref2", "state": "running", "time": "2026-10-13 15:34:25", "np": 4, "pid": 2885102}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:37:44", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:37:44", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:37:44", "np": 4}
+{"name": "lv3d_nested", "state": "queued", "time": "2026-10-13 15:37:44", "np": 8}
+{"name": "lv3d_tail", "state": "queued", "time": "2026-10-13 15:37:44", "np": 8}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:37:56", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:37:56", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:37:56", "np": 4}
+{"name": "lv3d_nested", "state": "queued", "time": "2026-10-13 15:37:56", "np": 8}
+{"name": "lv3d_tail", "state": "queued", "time": "2026-10-13 15:37:56", "np": 8}
+{"name": "eff_coss_l0.146_c0.1_ref1", "state": "done", "time": "2026-10-13 15:38:56", "rc": 0}
+{"name": "cmap_l0.146_c0.1", "state": "done", "time": "2026-10-13 15:41:26", "rc": 0}
+{"name": "lv3d_nested", "state": "running", "time": "2026-10-13 15:41:26", "np": 8, "pid": 2920089}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:41:42", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:41:42", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:41:42", "np": 4}
+{"name": "lv3d_tail", "state": "queued", "time": "2026-10-13 15:41:42", "np": 8}
+{"name": "eff_coss_l0.146_c0.1_ref4", "state": "queued", "time": "2026-10-13 15:41:42", "np": 8}
+{"name": "lv3d_nested", "state": "done", "time": "2026-10-13 15:42:12", "rc": 0}
+{"name": "lv3d_nested", "state": "queued", "time": "2026-10-13 15:42:31", "np": 8}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "queued", "time": "2026-10-13 15:42:36", "np": 4}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:42:36", "np": 4}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "queued", "time": "2026-10-13 15:42:36", "np": 4}
+{"name": "lv3d_nested", "state": "queued", "time": "2026-10-13 15:42:36", "np": 8}
+{"name": "lv3d_tail", "state": "queued", "time": "2026-10-13 15:42:36", "np": 8}
+{"name": "eff_coss_l0.146_c0.1_ref4", "state": "queued", "time": "2026-10-13 15:42:36", "np": 8}
+{"name": "cold_coss_l0.146_c0.1_ref1", "state": "done", "time": "2026-10-13 15:48:36", "rc": 0}
+{"name": "eff_coss_l0.146_c0.1_ref2", "state": "done", "time": "2026-10-13 15:54:06", "rc": 0}
+{"name": "lv3d_nested", "state": "running", "time": "2026-10-13 15:54:36", "np": 8, "pid": 2962773}
+{"name": "lv3d_tail", "state": "running", "time": "2026-10-13 15:54:36", "np": 8, "pid": 2962774}
+{"name": "lv3d_tail", "state": "done", "time": "2026-10-13 16:59:36", "rc": 0}
+{"name": "eff_coss_l0.146_c0.1_ref4", "state": "running", "time": "2026-10-13 16:59:36", "np": 8, "pid": 3029282}
+{"name": "eff_coss_l0.146_c0.1_ref4", "state": "done", "time": "2026-10-13 18:16:06", "rc": 0}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "running", "time": "2026-10-13 18:16:06", "np": 4, "pid": 3073662}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "running", "time": "2026-10-13 18:16:06", "np": 4, "pid": 3073663}
+{"name": "lv3d_nested", "state": "done", "time": "2026-10-13 18:20:36", "rc": 0}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "running", "time": "2026-10-13 18:20:36", "np": 4, "pid": 3124589}
+{"name": "cold_coss_l0.146_c0.1_ref2", "state": "done", "time": "2026-10-13 19:41:07", "rc": 0}
+{"name": "eff_coss_l0.146_c0.1_ref3", "state": "done", "time": "2026-10-13 19:46:07", "rc": 0}
+{"name": "cold_coss_l0.146_c0.1_ref3", "state": "done", "time": "2026-10-13 20:08:07", "rc": 0}
+{"name": "xsec_ramp_w2", "state": "queued", "time": "2026-10-14 08:28:16", "np": 1}
+{"name": "xsec_ramp_w2", "state": "running", "time": "2026-10-14 08:28:16", "np": 1, "pid": 3416112}
+{"name": "xsec_ramp_w2", "state": "failed", "time": "2026-10-14 08:42:16", "rc": 1}
+{"name": "xsec_ramp_w2", "state": "queued", "time": "2026-10-14 08:42:39"}
+{"name": "xsec_ramp_w2", "state": "queued", "time": "2026-10-14 08:42:44", "np": 1}
+{"name": "xsec_ramp_w2", "state": "running", "time": "2026-10-14 08:42:44", "np": 1, "pid": 3448501}
+{"name": "xsec_ramp_w2", "state": "done", "time": "2026-10-14 08:58:14", "rc": 0}
+{"name": "xsec_ramp_w2", "state": "queued", "time": "2026-10-14 08:58:59"}
+{"name": "xsec_ramp_w2", "state": "queued", "time": "2026-10-14 08:59:06", "np": 1}
+{"name": "xsec_ramp_w2", "state": "running", "time": "2026-10-14 08:59:06", "np": 1, "pid": 3494020}
+{"name": "xsec_ramp_w2", "state": "failed", "time": "2026-10-14 09:13:06", "rc": -15}
+{"name": "nsec_ramp_w2", "state": "queued", "time": "2026-10-14 09:13:22", "np": 1}
+{"name": "nsec_ramp_w2", "state": "running", "time": "2026-10-14 09:13:22", "np": 1, "pid": 3528523}
+{"name": "nsec_ramp_w2", "state": "failed", "time": "2026-10-14 09:18:22", "rc": 1}
+{"name": "nsec_ramp_w2", "state": "queued", "time": "2026-10-14 09:18:41"}
+{"name": "nsec_ramp_w2", "state": "queued", "time": "2026-10-14 09:18:46", "np": 1}
+{"name": "nsec_ramp_w2", "state": "running", "time": "2026-10-14 09:18:46", "np": 1, "pid": 3558525}
+{"name": "nsec_ramp_w2", "state": "done", "time": "2026-10-14 09:26:16", "rc": 0}
+{"name": "nsec_ramp_w2", "state": "queued", "time": "2026-10-14 09:26:49"}
+{"name": "nsec_ramp_w2", "state": "queued", "time": "2026-10-14 09:26:54", "np": 1}
+{"name": "nsec_ramp_w2", "state": "running", "time": "2026-10-14 09:26:54", "np": 1, "pid": 3585274}
+{"name": "nsec_ramp_w2", "state": "done", "time": "2026-10-14 09:32:54", "rc": 0}
+{"name": "mblock_top", "state": "queued", "time": "2026-10-14 09:57:07", "np": 1}
+{"name": "mblock_c2", "state": "queued", "time": "2026-10-14 09:57:07", "np": 1}
+{"name": "mblock_c4", "state": "queued", "time": "2026-10-14 09:57:07", "np": 1}
+{"name": "mblock_top", "state": "running", "time": "2026-10-14 09:57:07", "np": 1, "pid": 3824352}
+{"name": "mblock_c2", "state": "running", "time": "2026-10-14 09:57:07", "np": 1, "pid": 3824353}
+{"name": "mblock_c4", "state": "running", "time": "2026-10-14 09:57:07", "np": 1, "pid": 3824354}
+{"name": "mblock_top", "state": "done", "time": "2026-10-14 09:57:37", "rc": 0}
+{"name": "mblock_c2", "state": "done", "time": "2026-10-14 09:57:37", "rc": 0}
+{"name": "mblock_c4", "state": "done", "time": "2026-10-14 09:57:37", "rc": 0}
+{"name": "geom_block", "state": "queued", "time": "2026-10-14 09:58:01", "np": 1}
+{"name": "geom_block", "state": "running", "time": "2026-10-14 09:58:01", "np": 1, "pid": 3831355}
+{"name": "geom_block", "state": "done", "time": "2026-10-14 09:58:31", "rc": 0}
+{"name": "block_ref1", "state": "queued", "time": "2026-10-14 09:58:53", "np": 16}
+{"name": "block_ref2", "state": "queued", "time": "2026-10-14 09:58:53", "np": 16}
+{"name": "block_ref1", "state": "running", "time": "2026-10-14 09:58:53", "np": 16, "pid": 3838364}
+{"name": "block_ref2", "state": "queued", "time": "2026-10-14 09:59:16", "np": 16}
+{"name": "nsec_block_ref1", "state": "queued", "time": "2026-10-14 09:59:16", "np": 1}
+{"name": "block_ref1", "state": "done", "time": "2026-10-14 10:00:16", "rc": 0}
+{"name": "nsec_block_ref1", "state": "running", "time": "2026-10-14 10:00:16", "np": 1, "pid": 3847969}
+{"name": "nsec_block_ref1", "state": "failed", "time": "2026-10-14 10:00:46", "rc": 1}
+{"name": "block_ref2", "state": "running", "time": "2026-10-14 10:00:46", "np": 16, "pid": 3850363}
+{"name": "block_ref2", "state": "failed", "time": "2026-10-14 10:02:16", "rc": 59}
+{"name": "repro_coords_c4", "state": "queued", "time": "2026-10-14 10:02:40", "np": 16}
+{"name": "repro_coords_c4", "state": "running", "time": "2026-10-14 10:02:40", "np": 16, "pid": 3862241}
+{"name": "repro_coords_c4", "state": "failed", "time": "2026-10-14 10:03:10", "rc": 142}
+{"name": "rc_block_c4_np4", "state": "queued", "time": "2026-10-14 10:03:42", "np": 4}
+{"name": "rc_block_c4_np8", "state": "queued", "time": "2026-10-14 10:03:42", "np": 8}
+{"name": "rc_block_top_np16", "state": "queued", "time": "2026-10-14 10:03:42", "np": 16}
+{"name": "rc_ext_c4_np16", "state": "queued", "time": "2026-10-14 10:03:42", "np": 16}
+{"name": "rc_ext_base_np16", "state": "queued", "time": "2026-10-14 10:03:42", "np": 16}
+{"name": "rc_block_c4_np4", "state": "running", "time": "2026-10-14 10:03:42", "np": 4, "pid": 3869328}
+{"name": "rc_block_c4_np8", "state": "running", "time": "2026-10-14 10:03:42", "np": 8, "pid": 3869329}
+{"name": "rc_block_c4_np4", "state": "done", "time": "2026-10-14 10:04:12", "rc": 0}
+{"name": "rc_block_c4_np8", "state": "done", "time": "2026-10-14 10:04:12", "rc": 0}
+{"name": "rc_block_top_np16", "state": "running", "time": "2026-10-14 10:04:12", "np": 16, "pid": 3872867}
+{"name": "rc_block_top_np16", "state": "done", "time": "2026-10-14 10:04:42", "rc": 0}
+{"name": "rc_ext_c4_np16", "state": "running", "time": "2026-10-14 10:04:42", "np": 16, "pid": 3876414}
+{"name": "rc_ext_c4_np16", "state": "done", "time": "2026-10-14 10:05:12", "rc": 0}
+{"name": "rc_ext_base_np16", "state": "running", "time": "2026-10-14 10:05:12", "np": 16, "pid": 3882063}
+{"name": "rc_ext_base_np16", "state": "done", "time": "2026-10-14 10:05:42", "rc": 0}
+{"name": "rc_c4_np16_b", "state": "queued", "time": "2026-10-14 10:06:02", "np": 16}
+{"name": "rc_c4_np12", "state": "queued", "time": "2026-10-14 10:06:02", "np": 12}
+{"name": "rc_c4_np14", "state": "queued", "time": "2026-10-14 10:06:02", "np": 14}
+{"name": "rc_c2_np16", "state": "queued", "time": "2026-10-14 10:06:02", "np": 16}
+{"name": "rc_c4_np16_b", "state": "running", "time": "2026-10-14 10:06:02", "np": 16, "pid": 3890289}
+{"name": "rc_c4_np16_b", "state": "failed", "time": "2026-10-14 10:06:32", "rc": 142}
+{"name": "rc_c4_np12", "state": "running", "time": "2026-10-14 10:06:32", "np": 12, "pid": 3897255}
+{"name": "rc_c4_np12", "state": "done", "time": "2026-10-14 10:07:02", "rc": 0}
+{"name": "rc_c4_np14", "state": "running", "time": "2026-10-14 10:07:02", "np": 14, "pid": 3905451}
+{"name": "rc_c4_np14", "state": "done", "time": "2026-10-14 10:07:32", "rc": 0}
+{"name": "rc_c2_np16", "state": "running", "time": "2026-10-14 10:07:32", "np": 16, "pid": 3913178}
+{"name": "rc_c2_np16", "state": "done", "time": "2026-10-14 10:08:02", "rc": 0}
+{"name": "block_ref1_np12", "state": "queued", "time": "2026-10-14 10:08:26", "np": 12}
+{"name": "block_ref1_np12", "state": "running", "time": "2026-10-14 10:08:26", "np": 12, "pid": 3918419}
+{"name": "block_ref1_np12", "state": "queued", "time": "2026-10-14 10:12:47", "np": 12}
+{"name": "dbg_block_tail_np4", "state": "queued", "time": "2026-10-14 10:12:47", "np": 4}
+{"name": "dbg_block_nested_np4", "state": "queued", "time": "2026-10-14 10:12:47", "np": 4}
+{"name": "block_ref1_np12", "state": "running", "time": "2026-10-14 10:12:47", "np": 12, "pid": 3993505}
+{"name": "dbg_block_tail_np4", "state": "running", "time": "2026-10-14 10:12:47", "np": 4, "pid": 3993506}
+{"name": "block_ref1_np12", "state": "done", "time": "2026-10-14 10:20:17", "rc": 0}
+{"name": "dbg_block_nested_np4", "state": "running", "time": "2026-10-14 10:20:17", "np": 4, "pid": 82126}
+{"name": "dbg_block_tail_np4", "state": "done", "time": "2026-10-14 10:25:47", "rc": 0}
+{"name": "dbg_block_nested_np4", "state": "done", "time": "2026-10-14 10:26:47", "rc": 0}
+{"name": "dbg_r1_tail_np4", "state": "queued", "time": "2026-10-14 10:27:09", "np": 4}
+{"name": "dbg_r1_nested_np12", "state": "queued", "time": "2026-10-14 10:27:09", "np": 12}
+{"name": "dbg_r0_tail_np12", "state": "queued", "time": "2026-10-14 10:27:09", "np": 12}
+{"name": "dbg_r1_tail_np4", "state": "running", "time": "2026-10-14 10:27:09", "np": 4, "pid": 193415}
+{"name": "dbg_r1_nested_np12", "state": "running", "time": "2026-10-14 10:27:09", "np": 12, "pid": 193416}
+{"name": "dbg_r1_tail_np4", "state": "done", "time": "2026-10-14 11:04:09", "rc": 0}
+{"name": "dbg_r0_tail_np12", "state": "queued", "time": "2026-10-14 11:08:06", "np": 12}
+{"name": "lab_block_np1", "state": "queued", "time": "2026-10-14 11:08:06", "np": 1}
+{"name": "lab_block_np12", "state": "queued", "time": "2026-10-14 11:08:06", "np": 12}
+{"name": "lab_ext_np1", "state": "queued", "time": "2026-10-14 11:08:06", "np": 1}
+{"name": "lab_ext_np12", "state": "queued", "time": "2026-10-14 11:08:06", "np": 12}
+{"name": "lab_block_np1", "state": "running", "time": "2026-10-14 11:08:06", "np": 1, "pid": 431556}
+{"name": "lab_ext_np1", "state": "running", "time": "2026-10-14 11:08:06", "np": 1, "pid": 431557}
+{"name": "lab_block_np1", "state": "failed", "time": "2026-10-14 11:08:36", "rc": 1}
+{"name": "lab_ext_np1", "state": "failed", "time": "2026-10-14 11:08:36", "rc": 1}
+{"name": "dbg_r1_nested_np12", "state": "done", "time": "2026-10-14 11:10:06", "rc": 0}
+{"name": "lab_block_np12", "state": "running", "time": "2026-10-14 11:10:06", "np": 12, "pid": 487572}
+{"name": "lab_block_np12", "state": "done", "time": "2026-10-14 11:10:36", "rc": 0}
+{"name": "lab_ext_np12", "state": "running", "time": "2026-10-14 11:10:36", "np": 12, "pid": 488838}
+{"name": "lab_ext_np12", "state": "failed", "time": "2026-10-14 11:11:06", "rc": 59}
+{"name": "dbg_r0_tail_np12", "state": "running", "time": "2026-10-14 11:11:06", "np": 12, "pid": 492381}
+{"name": "dbg_r0_tail_np12", "state": "failed", "time": "2026-10-14 11:11:36", "rc": 1}
+{"name": "dbg_r0_tail_np12", "state": "queued", "time": "2026-10-14 11:12:25"}
+{"name": "dbg_r0_tail_np12", "state": "queued", "time": "2026-10-14 11:12:30", "np": 12}
+{"name": "dbg_r0_tail_np16", "state": "queued", "time": "2026-10-14 11:12:30", "np": 16}
+{"name": "dbg_r0_tail_np12", "state": "running", "time": "2026-10-14 11:12:30", "np": 12, "pid": 496422}
+{"name": "dbg_r0_tail_np12", "state": "failed", "time": "2026-10-14 11:15:30", "rc": 143}
+{"name": "dbg_r0_tail_np16", "state": "running", "time": "2026-10-14 11:15:30", "np": 16, "pid": 505306}
+{"name": "dbg_r0_tail_np16", "state": "failed", "time": "2026-10-14 11:17:30", "rc": 142}
+{"name": "dbg_r0_c2only_np16", "state": "queued", "time": "2026-10-14 11:18:19", "np": 16}
+{"name": "dbg_r0_c2only_np16", "state": "running", "time": "2026-10-14 11:18:19", "np": 16, "pid": 512031}
+{"name": "dbg_r0_c2only_np16", "state": "done", "time": "2026-10-14 11:25:49", "rc": 0}
+{"name": "blk_ref1", "state": "queued", "time": "2026-10-14 11:26:05", "np": 16}
+{"name": "nsec_blk_ref1", "state": "queued", "time": "2026-10-14 11:26:05", "np": 1}
+{"name": "blk_ref2", "state": "queued", "time": "2026-10-14 11:26:05", "np": 16}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-14 11:26:05", "np": 1}
+{"name": "nsec_blk_ref1", "state": "running", "time": "2026-10-14 11:26:05", "np": 1, "pid": 658511}
+{"name": "nsec_blk_ref1", "state": "failed", "time": "2026-10-14 11:26:35", "rc": 1}
+{"name": "blk_ref1", "state": "running", "time": "2026-10-14 11:26:35", "np": 16, "pid": 660892}
+{"name": "blk_ref1", "state": "done", "time": "2026-10-14 11:52:36", "rc": 0}
+{"name": "nsec_blk_ref2", "state": "running", "time": "2026-10-14 11:52:36", "np": 1, "pid": 905741}
+{"name": "nsec_blk_ref1", "state": "queued", "time": "2026-10-14 11:52:53"}
+{"name": "nsec_blk_ref1", "state": "queued", "time": "2026-10-14 11:52:58", "np": 1}
+{"name": "blk_ref2", "state": "queued", "time": "2026-10-14 11:52:58", "np": 16}
+{"name": "nsec_blk_ref1", "state": "running", "time": "2026-10-14 11:52:58", "np": 1, "pid": 908077}
+{"name": "nsec_blk_ref2", "state": "done", "time": "2026-10-14 11:53:28", "rc": 0}
+{"name": "nsec_blk_ref1", "state": "done", "time": "2026-10-14 11:53:58", "rc": 0}
+{"name": "blk_ref2", "state": "running", "time": "2026-10-14 11:53:58", "np": 16, "pid": 909329}
+{"name": "nsec_blk_ref1", "state": "queued", "time": "2026-10-14 11:54:39"}
+{"name": "nsec_blk_ref1", "state": "queued", "time": "2026-10-14 11:54:43", "np": 1}
+{"name": "blk_ref2", "state": "done", "time": "2026-10-14 13:08:44", "rc": 0}
+{"name": "nsec_blk_ref1", "state": "running", "time": "2026-10-14 13:08:44", "np": 1, "pid": 1329149}
+{"name": "nsec_blk_ref1", "state": "done", "time": "2026-10-14 13:09:44", "rc": 0}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-14 13:10:17"}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-14 13:10:22", "np": 1}
+{"name": "nsec_blk_ref2", "state": "running", "time": "2026-10-14 13:10:22", "np": 1, "pid": 1337770}
+{"name": "nsec_blk_ref2", "state": "done", "time": "2026-10-14 13:15:22", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-14 13:16:39", "np": 1}
+{"name": "ysec_blk_ref2", "state": "running", "time": "2026-10-14 13:16:39", "np": 1, "pid": 1378423}
+{"name": "ysec_blk_ref2", "state": "done", "time": "2026-10-14 13:44:40", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-14 13:45:08"}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-14 13:45:13", "np": 1}
+{"name": "ysec_blk_ref2", "state": "running", "time": "2026-10-14 13:45:13", "np": 1, "pid": 1550722}
+{"name": "blk_ref3", "state": "queued", "time": "2026-10-14 14:08:32", "np": 16}
+{"name": "nsec_blk_ref3", "state": "queued", "time": "2026-10-14 14:08:32", "np": 1}
+{"name": "blk_ref3", "state": "queued", "time": "2026-10-14 14:08:49", "np": 16}
+{"name": "nsec_blk_ref3", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "mblock_Ln5", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "mblock_Ln5_c2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 16}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "mblock_Ln10", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "mblock_Ln10_c2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 16}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 14:08:49", "np": 1}
+{"name": "mblock_Ln5", "state": "running", "time": "2026-10-14 14:08:49", "np": 1, "pid": 1668340}
+{"name": "mblock_Ln5_c2", "state": "running", "time": "2026-10-14 14:08:49", "np": 1, "pid": 1668341}
+{"name": "mblock_Ln10", "state": "running", "time": "2026-10-14 14:08:49", "np": 1, "pid": 1668342}
+{"name": "mblock_Ln10_c2", "state": "running", "time": "2026-10-14 14:08:49", "np": 1, "pid": 1668343}
+{"name": "mblock_Ln5", "state": "done", "time": "2026-10-14 14:09:19", "rc": 0}
+{"name": "mblock_Ln5_c2", "state": "done", "time": "2026-10-14 14:09:19", "rc": 0}
+{"name": "mblock_Ln10", "state": "done", "time": "2026-10-14 14:09:19", "rc": 0}
+{"name": "mblock_Ln10_c2", "state": "done", "time": "2026-10-14 14:09:19", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "done", "time": "2026-10-14 14:21:19", "rc": 0}
+{"name": "blk_ref3", "state": "running", "time": "2026-10-14 14:21:19", "np": 16, "pid": 1726969}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-14 14:21:51"}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-14 14:21:56", "np": 1}
+{"name": "nsec_blk_ref3", "state": "queued", "time": "2026-10-14 14:21:56", "np": 1}
+{"name": "blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 14:21:56", "np": 16}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 14:21:56", "np": 1}
+{"name": "blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 14:21:56", "np": 16}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 14:21:56", "np": 1}
+{"name": "blk_ref3", "state": "done", "time": "2026-10-14 15:52:56", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "running", "time": "2026-10-14 15:52:56", "np": 1, "pid": 2095583}
+{"name": "nsec_blk_ref3", "state": "running", "time": "2026-10-14 15:52:56", "np": 1, "pid": 2095584}
+{"name": "blk_ref3", "state": "queued", "time": "2026-10-14 15:52:57"}
+{"name": "blk_ref3", "state": "queued", "time": "2026-10-14 15:53:02", "np": 16}
+{"name": "blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 15:53:02", "np": 16}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-14 15:53:02", "np": 1}
+{"name": "blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 15:53:02", "np": 16}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-14 15:53:02", "np": 1}
+{"name": "nsec_blk_ref3", "state": "done", "time": "2026-10-14 16:01:02", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "done", "time": "2026-10-14 16:28:32", "rc": 0}
+{"name": "blk_Ln5_ref2", "state": "running", "time": "2026-10-14 16:28:32", "np": 16, "pid": 2270139}
+{"name": "blk_Ln5_ref2", "state": "done", "time": "2026-10-14 18:27:02", "rc": 0}
+{"name": "blk_Ln10_ref2", "state": "running", "time": "2026-10-14 18:27:02", "np": 16, "pid": 2852375}
+{"name": "blk_Ln10_ref2", "state": "done", "time": "2026-10-14 20:27:33", "rc": 0}
+{"name": "nsec_blk_Ln5_ref2", "state": "running", "time": "2026-10-14 20:27:33", "np": 1, "pid": 3461661}
+{"name": "nsec_blk_Ln10_ref2", "state": "running", "time": "2026-10-14 20:27:33", "np": 1, "pid": 3461662}
+{"name": "nsec_blk_Ln5_ref2", "state": "done", "time": "2026-10-14 20:33:03", "rc": 0}
+{"name": "nsec_blk_Ln10_ref2", "state": "done", "time": "2026-10-14 20:33:33", "rc": 0}
+{"name": "blk_ref3", "state": "running", "time": "2026-10-14 20:33:33", "np": 16, "pid": 3483085}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:20"}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:20"}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:25", "np": 1}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:25", "np": 1}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-15 02:54:40"}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-15 02:54:40"}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:45", "np": 1}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-15 02:54:45", "np": 1}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-15 02:54:45", "np": 1}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-15 02:54:45", "np": 1}
+{"name": "nsec_blk_ref2", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "ysec_blk_ref2", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "nsec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "nsec_blk_Ln10_ref2", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "blk_Ln5_ref3", "state": "queued", "time": "2026-10-15 04:49:34", "np": 16}
+{"name": "nsec_blk_Ln5_ref3", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "ysec_blk_Ln5_ref3", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "ysec_blk_Ln5_ref2", "state": "queued", "time": "2026-10-15 04:49:34", "np": 1}
+{"name": "blk_ref3", "state": "done", "time": "2026-10-15 05:22:04", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "running", "time": "2026-10-15 05:22:04", "np": 1, "pid": 263784}
+{"name": "ysec_blk_Ln5_ref2", "state": "running", "time": "2026-10-15 05:22:04", "np": 1, "pid": 263785}
+{"name": "nsec_blk_ref2", "state": "running", "time": "2026-10-15 05:22:04", "np": 1, "pid": 263786}
+{"name": "nsec_blk_Ln5_ref2", "state": "running", "time": "2026-10-15 05:22:04", "np": 1, "pid": 263787}
+{"name": "nsec_blk_Ln10_ref2", "state": "running", "time": "2026-10-15 05:22:04", "np": 1, "pid": 263788}
+{"name": "nsec_blk_ref2", "state": "done", "time": "2026-10-15 05:27:04", "rc": 0}
+{"name": "nsec_blk_Ln5_ref2", "state": "done", "time": "2026-10-15 05:27:34", "rc": 0}
+{"name": "nsec_blk_Ln10_ref2", "state": "done", "time": "2026-10-15 05:28:04", "rc": 0}
+{"name": "ysec_blk_Ln5_ref2", "state": "done", "time": "2026-10-15 05:56:34", "rc": 0}
+{"name": "ysec_blk_ref2", "state": "done", "time": "2026-10-15 05:57:04", "rc": 0}
+{"name": "blk_Ln5_ref3", "state": "running", "time": "2026-10-15 05:57:04", "np": 16, "pid": 285718}
+{"name": "nsec_blk_ref3", "state": "queued", "time": "2026-10-15 05:57:14"}
+{"name": "nsec_blk_ref3", "state": "queued", "time": "2026-10-15 05:57:19", "np": 1}
+{"name": "nsec_blk_Ln5_ref3", "state": "queued", "time": "2026-10-15 05:57:19", "np": 1}
+{"name": "ysec_blk_Ln5_ref3", "state": "queued", "time": "2026-10-15 05:57:19", "np": 1}
+{"name": "blk_Ln5_ref3", "state": "done", "time": "2026-10-15 20:18:33", "rc": 0}
+{"name": "nsec_blk_ref3", "state": "running", "time": "2026-10-15 20:18:33", "np": 1, "pid": 3834069}
+{"name": "nsec_blk_Ln5_ref3", "state": "running", "time": "2026-10-15 20:18:33", "np": 1, "pid": 3834070}
+{"name": "ysec_blk_Ln5_ref3", "state": "running", "time": "2026-10-15 20:18:33", "np": 1, "pid": 3834071}
+{"name": "nsec_blk_ref3", "state": "done", "time": "2026-10-15 20:51:33", "rc": 0}
+{"name": "nsec_blk_Ln5_ref3", "state": "done", "time": "2026-10-15 20:53:33", "rc": 0}
+{"name": "ysec_blk_Ln5_ref3", "state": "done", "time": "2026-10-15 21:35:33", "rc": 0}

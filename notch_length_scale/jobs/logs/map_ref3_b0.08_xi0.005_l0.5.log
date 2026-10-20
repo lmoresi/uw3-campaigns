@@ -1,0 +1,33 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.80703
+  0 SNES Function norm 0.078968
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 7.896799560480e-02 gnorm 1.066660153069e-02
+  1 SNES Function norm 0.0106666
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 9.408912130805e-03
+      Line search: Quadratically determined step, lambda=1.1795501499798709e-01
+  2 SNES Function norm 0.00940891
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 6.577164126159e-03
+      Line search: Quadratically determined step, lambda=3.1869470011834788e-01
+  3 SNES Function norm 0.00657716
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 4.978089138096e-03
+      Line search: Quadratically determined step, lambda=2.5004426981772648e-01
+  4 SNES Function norm 0.00497809
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.978089138096e-03 gnorm 2.907932504994e-03
+  5 SNES Function norm 0.00290793
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 2.907932504994e-03 gnorm 3.457208350165e-04
+  6 SNES Function norm 0.000345721
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 3.457208350165e-04 gnorm 4.391438948204e-05
+  7 SNES Function norm 4.39144e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.391438948204e-05 gnorm 1.167176710024e-06
+  8 SNES Function norm 1.16718e-06
+[micromorphic] ref 3 xi 0.005 beta 0.08 l 0.5 km np 1: CONVERGED_FNORM_ABS its 8 (428 s) W_int 3.32 W_v 'L': 3.04945109112018, 'R': 2.930749538543205 peak 'L': 1.6234195157343778, 'R': 1.5773921343710067 floor bound 57.9

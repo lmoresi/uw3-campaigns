@@ -1,0 +1,352 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 33 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 33 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 33 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 33 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 24 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 24 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 24 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 24 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+  0 SNES Function norm 1.99331
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Object is in wrong state
+[0]PETSC ERROR: Must call KSPSetUp() or PCSetUp() before calling PCFieldSplitGetSubKSP()
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_gmres_restart value: 30 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_rtol value: 3.3e-08 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_pc_type value: redundant source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_factor_shift_type value: nonzero source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_type value: lu source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_converged_maxits (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_max_it value: 4 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_norm_type value: none source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_type value: gmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_pc_type value: sor source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_galerkin value: both source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_type value: mg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_type value: preonly source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_pc_type value: bjacobi source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_0_fields value: 0,2 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_1_fields value: 1 source: code
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py with 4 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Tue Oct 13 10:15:48 2026
+[0]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[0]PETSC ERROR: #1 PCFieldSplitGetSubKSP_FieldSplit_Schur() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2267
+[0]PETSC ERROR: #2 PCFieldSplitGetSubKSP() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2773
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 2 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0776757
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0776757
+    1 KSP Residual norm 0.00547349
+    2 KSP Residual norm 0.00420129
+    3 KSP Residual norm 0.00181334
+    4 KSP Residual norm 0.000921123
+    5 KSP Residual norm 0.000666945
+    6 KSP Residual norm 0.000523495
+    7 KSP Residual norm 0.00038917
+    8 KSP Residual norm 0.000266908
+    9 KSP Residual norm 0.000156235
+   10 KSP Residual norm 9.451e-05
+   11 KSP Residual norm 6.21691e-05
+   12 KSP Residual norm 3.73533e-05
+   13 KSP Residual norm 2.09765e-05
+   14 KSP Residual norm 1.35113e-05
+   15 KSP Residual norm 9.1112e-06
+   16 KSP Residual norm 5.85694e-06
+   17 KSP Residual norm 3.37558e-06
+   18 KSP Residual norm 2.00013e-06
+   19 KSP Residual norm 1.13078e-06
+   20 KSP Residual norm 5.75964e-07
+   21 KSP Residual norm 2.76061e-07
+   22 KSP Residual norm 1.28333e-07
+   23 KSP Residual norm 5.81868e-08
+   24 KSP Residual norm 2.82611e-08
+   25 KSP Residual norm 1.59758e-08
+   26 KSP Residual norm 9.39065e-09
+   27 KSP Residual norm 5.84326e-09
+   28 KSP Residual norm 4.38574e-09
+   29 KSP Residual norm 3.48171e-09
+   30 KSP Residual norm 2.67647e-09
+   31 KSP Residual norm 1.97638e-09
+   32 KSP Residual norm 1.46315e-09
+   33 KSP Residual norm 1.04921e-09
+   34 KSP Residual norm 7.618e-10
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 34
+      Line search: Using full step: fnorm 7.767571329464e-02 gnorm 1.054025609481e-02
+  1 SNES Function norm 0.0105403
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0105403
+    1 KSP Residual norm 0.00160411
+    2 KSP Residual norm 0.00156175
+    3 KSP Residual norm 0.00123744
+    4 KSP Residual norm 0.000871055
+    5 KSP Residual norm 0.000719751
+    6 KSP Residual norm 0.000485415
+    7 KSP Residual norm 0.000288298
+    8 KSP Residual norm 0.000193031
+    9 KSP Residual norm 0.000141561
+   10 KSP Residual norm 8.7579e-05
+   11 KSP Residual norm 4.69554e-05
+   12 KSP Residual norm 2.3143e-05
+   13 KSP Residual norm 1.36536e-05
+   14 KSP Residual norm 6.68452e-06
+   15 KSP Residual norm 3.66297e-06
+   16 KSP Residual norm 2.28915e-06
+   17 KSP Residual norm 1.35703e-06
+   18 KSP Residual norm 9.11289e-07
+   19 KSP Residual norm 5.96545e-07
+   20 KSP Residual norm 4.2705e-07
+   21 KSP Residual norm 3.01916e-07
+   22 KSP Residual norm 2.22081e-07
+   23 KSP Residual norm 1.60126e-07
+   24 KSP Residual norm 1.18653e-07
+   25 KSP Residual norm 8.52235e-08
+   26 KSP Residual norm 6.24415e-08
+   27 KSP Residual norm 4.49481e-08
+   28 KSP Residual norm 3.21809e-08
+   29 KSP Residual norm 2.2981e-08
+   30 KSP Residual norm 1.64083e-08
+   31 KSP Residual norm 1.14608e-08
+   32 KSP Residual norm 8.235e-09
+   33 KSP Residual norm 6.04633e-09
+   34 KSP Residual norm 4.385e-09
+   35 KSP Residual norm 3.41242e-09
+   36 KSP Residual norm 2.40248e-09
+   37 KSP Residual norm 1.64644e-09
+   38 KSP Residual norm 1.15416e-09
+   39 KSP Residual norm 8.005e-10
+   40 KSP Residual norm 5.645e-10
+   41 KSP Residual norm 3.819e-10
+   42 KSP Residual norm 2.635e-10
+   43 KSP Residual norm 1.908e-10
+   44 KSP Residual norm 1.351e-10
+   45 KSP Residual norm 9.265e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: gnorm after quadratic fit 6.181094736362e-03
+      Line search: Quadratically determined step, lambda=4.8997824078616953e-01
+  2 SNES Function norm 0.00618109
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00618109
+    1 KSP Residual norm 0.000937773
+    2 KSP Residual norm 0.000909658
+    3 KSP Residual norm 0.000821224
+    4 KSP Residual norm 0.000560528
+    5 KSP Residual norm 0.000454973
+    6 KSP Residual norm 0.000302989
+    7 KSP Residual norm 0.000176393
+    8 KSP Residual norm 0.000118584
+    9 KSP Residual norm 8.5478e-05
+   10 KSP Residual norm 5.23701e-05
+   11 KSP Residual norm 2.77666e-05
+   12 KSP Residual norm 1.38762e-05
+   13 KSP Residual norm 7.90122e-06
+   14 KSP Residual norm 3.64815e-06
+   15 KSP Residual norm 1.8282e-06
+   16 KSP Residual norm 1.12998e-06
+   17 KSP Residual norm 6.53933e-07
+   18 KSP Residual norm 3.65692e-07
+   19 KSP Residual norm 2.14567e-07
+   20 KSP Residual norm 1.42509e-07
+   21 KSP Residual norm 1.07086e-07
+   22 KSP Residual norm 8.93173e-08
+   23 KSP Residual norm 7.08074e-08
+   24 KSP Residual norm 4.92931e-08
+   25 KSP Residual norm 3.08258e-08
+   26 KSP Residual norm 2.0617e-08
+   27 KSP Residual norm 1.35174e-08
+   28 KSP Residual norm 9.38375e-09
+   29 KSP Residual norm 6.93963e-09
+   30 KSP Residual norm 5.68186e-09
+   31 KSP Residual norm 4.67462e-09
+   32 KSP Residual norm 3.77808e-09
+   33 KSP Residual norm 2.99225e-09
+   34 KSP Residual norm 2.22238e-09
+   35 KSP Residual norm 1.61208e-09
+   36 KSP Residual norm 1.14173e-09
+   37 KSP Residual norm 7.917e-10
+   38 KSP Residual norm 5.612e-10
+   39 KSP Residual norm 4.074e-10
+   40 KSP Residual norm 2.886e-10
+   41 KSP Residual norm 1.996e-10
+   42 KSP Residual norm 1.426e-10
+   43 KSP Residual norm 1.004e-10
+   44 KSP Residual norm 6.607e-11
+   45 KSP Residual norm 4.208e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: Using full step: fnorm 6.181094736362e-03 gnorm 3.137754135160e-03
+  3 SNES Function norm 0.00313775
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00313775
+    1 KSP Residual norm 3.21439e-05
+    2 KSP Residual norm 2.01329e-05
+    3 KSP Residual norm 1.64686e-05
+    4 KSP Residual norm 1.01782e-05
+    5 KSP Residual norm 7.64572e-06
+    6 KSP Residual norm 5.77451e-06
+    7 KSP Residual norm 4.07548e-06
+    8 KSP Residual norm 2.36172e-06
+    9 KSP Residual norm 1.70649e-06
+   10 KSP Residual norm 1.28134e-06
+   11 KSP Residual norm 9.26343e-07
+   12 KSP Residual norm 6.72619e-07
+   13 KSP Residual norm 5.14978e-07
+   14 KSP Residual norm 3.51403e-07
+   15 KSP Residual norm 2.25168e-07
+   16 KSP Residual norm 1.44197e-07
+   17 KSP Residual norm 8.0599e-08
+   18 KSP Residual norm 4.67186e-08
+   19 KSP Residual norm 2.52836e-08
+   20 KSP Residual norm 1.64915e-08
+   21 KSP Residual norm 1.11762e-08
+   22 KSP Residual norm 7.47078e-09
+   23 KSP Residual norm 5.14211e-09
+   24 KSP Residual norm 3.65379e-09
+   25 KSP Residual norm 2.53327e-09
+   26 KSP Residual norm 1.89967e-09
+   27 KSP Residual norm 1.32268e-09
+   28 KSP Residual norm 8.787e-10
+   29 KSP Residual norm 5.073e-10
+   30 KSP Residual norm 3.076e-10
+   31 KSP Residual norm 1.899e-10
+   32 KSP Residual norm 1.236e-10
+   33 KSP Residual norm 7.894e-11
+   34 KSP Residual norm 5.542e-11
+   35 KSP Residual norm 3.493e-11
+   36 KSP Residual norm 2.091e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 36
+      Line search: Using full step: fnorm 3.137754135160e-03 gnorm 4.555587739764e-04
+  4 SNES Function norm 0.000455559
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000455559
+    1 KSP Residual norm 1.28453e-06
+    2 KSP Residual norm 1.01062e-06
+    3 KSP Residual norm 8.51994e-07
+    4 KSP Residual norm 6.7374e-07
+    5 KSP Residual norm 6.02723e-07
+    6 KSP Residual norm 3.79869e-07
+    7 KSP Residual norm 2.71252e-07
+    8 KSP Residual norm 1.81782e-07
+    9 KSP Residual norm 1.3937e-07
+   10 KSP Residual norm 8.7957e-08
+   11 KSP Residual norm 5.02394e-08
+   12 KSP Residual norm 2.92371e-08
+   13 KSP Residual norm 1.66927e-08
+   14 KSP Residual norm 1.01899e-08
+   15 KSP Residual norm 6.36793e-09
+   16 KSP Residual norm 4.34893e-09
+   17 KSP Residual norm 2.95153e-09
+   18 KSP Residual norm 2.06318e-09
+   19 KSP Residual norm 1.43008e-09
+   20 KSP Residual norm 1.02547e-09
+   21 KSP Residual norm 7.618e-10
+   22 KSP Residual norm 5.894e-10
+   23 KSP Residual norm 4.566e-10
+   24 KSP Residual norm 3.254e-10
+   25 KSP Residual norm 2.450e-10
+   26 KSP Residual norm 1.866e-10
+   27 KSP Residual norm 1.387e-10
+   28 KSP Residual norm 1.114e-10
+   29 KSP Residual norm 9.078e-11
+   30 KSP Residual norm 6.921e-11
+   31 KSP Residual norm 5.206e-11
+   32 KSP Residual norm 3.447e-11
+   33 KSP Residual norm 2.298e-11
+   34 KSP Residual norm 1.474e-11
+   35 KSP Residual norm < 1.e-11
+   36 KSP Residual norm < 1.e-11
+   37 KSP Residual norm < 1.e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 37
+      Line search: Using full step: fnorm 4.555587739764e-04 gnorm 1.575571000510e-05
+  5 SNES Function norm 1.57557e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.57557e-05
+    1 KSP Residual norm 1.73633e-08
+    2 KSP Residual norm 1.39694e-08
+    3 KSP Residual norm 1.23653e-08
+    4 KSP Residual norm 1.13707e-08
+    5 KSP Residual norm 1.07004e-08
+    6 KSP Residual norm 8.23827e-09
+    7 KSP Residual norm 5.18112e-09
+    8 KSP Residual norm 3.50861e-09
+    9 KSP Residual norm 2.58116e-09
+   10 KSP Residual norm 1.73709e-09
+   11 KSP Residual norm 9.238e-10
+   12 KSP Residual norm 5.421e-10
+   13 KSP Residual norm 3.157e-10
+   14 KSP Residual norm 1.845e-10
+   15 KSP Residual norm 1.200e-10
+   16 KSP Residual norm 8.105e-11
+   17 KSP Residual norm 5.447e-11
+   18 KSP Residual norm 3.635e-11
+   19 KSP Residual norm 2.400e-11
+   20 KSP Residual norm 1.464e-11
+   21 KSP Residual norm 1.132e-11
+   22 KSP Residual norm < 1.e-11
+   23 KSP Residual norm < 1.e-11
+   24 KSP Residual norm < 1.e-11
+   25 KSP Residual norm < 1.e-11
+   26 KSP Residual norm < 1.e-11
+   27 KSP Residual norm < 1.e-11
+   28 KSP Residual norm < 1.e-11
+   29 KSP Residual norm < 1.e-11
+   30 KSP Residual norm < 1.e-11
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 30
+      Line search: Using full step: fnorm 1.575571000510e-05 gnorm 1.004523294419e-07
+  6 SNES Function norm 1.00452e-07
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 3901 of 3901 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4173 of 4173 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 3997 of 3997 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4109 of 4109 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+Variable with name floor_bound already exists on the mesh - Skipping.
+Variable with name floor_bound already exists on the mesh - Skipping.
+Variable with name floor_bound already exists on the mesh - Skipping.
+Variable with name floor_bound already exists on the mesh - Skipping.
+[0] [micromorphic] current estimator: W 4.617 km peak 1.222
+[0] [micromorphic] ref 3 xi 0.0 beta 0.1 l 1.0 km np 4: CONVERGED_FNORM_ABS its 6 (2708 s) W_int 4.26 W_v 'L': 3.7672438751700392, 'R': 2.610848896139488 peak 'L': 1.1791421757731304, 'R': 1.15199613403133 floor bound 59.1

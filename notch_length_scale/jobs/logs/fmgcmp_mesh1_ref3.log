@@ -1,0 +1,128 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.99331
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:119: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:119: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:119: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:119: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0776757
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 34
+      Line search: Using full step: fnorm 7.767571318974e-02 gnorm 1.054025546162e-02
+  1 SNES Function norm 0.0105403
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: gnorm after quadratic fit 6.181094513508e-03
+      Line search: Quadratically determined step, lambda=4.8997821728792768e-01
+  2 SNES Function norm 0.00618109
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: Using full step: fnorm 6.181094513508e-03 gnorm 3.137754327919e-03
+  3 SNES Function norm 0.00313775
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 36
+      Line search: Using full step: fnorm 3.137754327919e-03 gnorm 4.555587493995e-04
+  4 SNES Function norm 0.000455559
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 37
+      Line search: Using full step: fnorm 4.555587493995e-04 gnorm 1.575570901947e-05
+  5 SNES Function norm 1.57557e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 30
+      Line search: Using full step: fnorm 1.575570901947e-05 gnorm 1.004522826261e-07
+  6 SNES Function norm 1.00452e-07
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py", line 127, in <module>
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py", line 127, in <module>
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py", line 127, in <module>
+    measured = cn.measure(S, OUT, name)
+    measured = cn.measure(S, OUT, name)
+               ^^^^^               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 186, in measure
+^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 186, in measure
+    measured = cn.measure(S, OUT, name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 186, in measure
+    bw = _band_module()
+    bw = _band_module()
+         ^         ^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 176, in _band_module
+^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 176, in _band_module
+    bw = _band_module()
+    spec.loader.exec_module(bw)
+    spec.loader.exec_module(bw)
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+         ^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 176, in _band_module
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/band_width_vs_h.py", line 103, in <module>
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/band_width_vs_h.py", line 103, in <module>
+    spec.loader.exec_module(bw)
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/band_width_vs_h.py", line 103, in <module>
+    params = uw.Params(
+    params = uw.Params(
+                        ^^^^^^^^^^
+  ^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 181, in __init__
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 181, in __init__
+    params = uw.Params(
+               cli_value = self._get_petsc_option(opts, lookup_name, default)
+  ^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 181, in __init__
+    cli_value = self._get_petsc_option(opts, lookup_name, default)
+                ^                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 281, in _get_petsc_option
+^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 281, in _get_petsc_option
+    cli_value = self._get_petsc_option(opts, lookup_name, default)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^    value = self._parse_cli_value(val_str, default)
+^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 281, in _get_petsc_option
+    value = self._parse_cli_value(val_str, default)
+                      ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 236, in _parse_cli_value
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 236, in _parse_cli_value
+    value = self._parse_cli_value(val_str, default)
+    return int(float(val_str))
+    return int(float(val_str))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^         ^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/meshes/notch_mesh1.msh'
+     ^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/meshes/notch_mesh1.msh'
+^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 236, in _parse_cli_value
+    return int(float(val_str))
+               ^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/meshes/notch_mesh1.msh'
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py", line 127, in <module>
+    measured = cn.measure(S, OUT, name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 186, in measure
+    bw = _band_module()
+         ^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 176, in _band_module
+    spec.loader.exec_module(bw)
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/band_width_vs_h.py", line 103, in <module>
+    params = uw.Params(
+             ^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 181, in __init__
+    cli_value = self._get_petsc_option(opts, lookup_name, default)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 281, in _get_petsc_option
+    value = self._parse_cli_value(val_str, default)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_params.py", line 236, in _parse_cli_value
+    return int(float(val_str))
+               ^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/meshes/notch_mesh1.msh'

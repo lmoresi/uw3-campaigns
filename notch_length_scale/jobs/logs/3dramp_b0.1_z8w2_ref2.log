@@ -1,0 +1,19 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 2.79205
+    1 KSP Residual norm 0.015441
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.015441
+    1 KSP Residual norm 0.0108107
+    2 KSP Residual norm 0.0104771
+    3 KSP Residual norm 0.00881652
+    4 KSP Residual norm 0.00552289
+    5 KSP Residual norm 0.00344636
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00344636
+    1 KSP Residual norm 0.0027371
+    2 KSP Residual norm 0.00217516
+    3 KSP Residual norm 0.00188274
+    4 KSP Residual norm 0.00170335

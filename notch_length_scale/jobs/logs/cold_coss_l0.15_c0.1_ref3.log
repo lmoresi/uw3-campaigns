@@ -1,0 +1,28 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 0.385795
+  0 SNES Function norm 0.385795
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 138
+      Line search: Using full step: fnorm 3.857947097112e-01 gnorm 3.242610134408e-01
+  1 SNES Function norm 0.324261
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.324261
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 41
+      Line search: gnorm after quadratic fit 3.344087329976e-01
+      Line search: Cubic step, current gnorm 2.530857188727e-01 lambda=1.2855832580128926e-01
+  1 SNES Function norm 0.253086
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 41
+      Line search: gnorm after quadratic fit 2.048668041736e-01
+      Line search: Quadratically determined step, lambda=4.1507572346941390e-01
+  2 SNES Function norm 0.204867
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 75
+      Line search: Using full step: fnorm 2.048668041736e-01 gnorm 1.317784459408e-01
+  3 SNES Function norm 0.131778

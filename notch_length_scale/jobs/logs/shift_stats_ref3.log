@@ -1,0 +1,144 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.05_l0.5: s/C max -0.012 min -0.514 max H chi/C 0.514
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.05_l1: s/C max -0.024 min -0.363 max H chi/C 0.363
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.06_l0.5_map: s/C max -0.014 min -0.459 max H chi/C 0.459
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.06_l1_map: s/C max -0.028 min -0.448 max H chi/C 0.448
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.07_l0.5_map: s/C max -0.017 min -0.659 max H chi/C 0.659
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.07_l1_map: s/C max -0.033 min -0.508 max H chi/C 0.508
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.08_l0.5_map: s/C max -0.020 min -0.850 max H chi/C 0.850
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.08_l1_map: s/C max -0.038 min -0.566 max H chi/C 0.566
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.25: s/C max -0.012 min -1.561 max H chi/C 1.561
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.5: s/C max -0.024 min -1.012 max H chi/C 1.012
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.5_map: s/C max -0.024 min -1.012 max H chi/C 1.012
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.5_production_tight_np4_cold: s/C max -0.024 min -1.012 max H chi/C 1.012
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.5_production_tight_np4_fmgtable: s/C max -0.024 min -1.012 max H chi/C 1.012
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_gridseq: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_map: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_production_tight: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_production_tight_gridseq: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_production_tight_np4: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_production_tight_np4_cold: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_production_tight_np4_eff: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1_prolonged: s/C max -0.047 min -0.680 max H chi/C 0.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l2: s/C max -0.078 min -0.480 max H chi/C 0.480
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l2_production_tight_np4_fmgtable: s/C max -0.078 min -0.480 max H chi/C 0.480
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.2_l0.125_np4_stiffmap: s/C max -0.012 min -3.990 max H chi/C 3.990
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.2_l0.25_np4_stiffmap: s/C max -0.025 min -2.680 max H chi/C 2.680
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.2_l0.5: s/C max -0.049 min -1.736 max H chi/C 1.736
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.2_l0.5_np4_stiffmap: s/C max -0.049 min -1.736 max H chi/C 1.736
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.2_l1: s/C max -0.096 min -1.216 max H chi/C 1.216
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.3_l0.125_np4_stiffmap: s/C max -0.019 min -5.523 max H chi/C 5.523
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.3_l0.25_np4_stiffmap: s/C max -0.038 min -3.642 max H chi/C 3.642
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.3_l0.272_np4_stiffmatch: s/C max -0.040 min -3.457 max H chi/C 3.457
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.3_l0.5_np4_stiffmap: s/C max -0.073 min -2.389 max H chi/C 2.389
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta1_l0.125_np4_stiffmap: s/C max -0.064 min -13.733 max H chi/C 13.733
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta1_l0.25_np4_stiffmap: s/C max -0.116 min -8.900 max H chi/C 8.900
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta1_l0.5_np4_stiffmap: s/C max -0.240 min -6.276 max H chi/C 6.276

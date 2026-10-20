@@ -1,0 +1,286 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 3.67357
+    1 KSP Residual norm 0.0582399
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0582399
+    1 KSP Residual norm 0.018434
+    2 KSP Residual norm 0.0138964
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0138964
+    1 KSP Residual norm 0.00986512
+    2 KSP Residual norm 0.00842444
+    3 KSP Residual norm 0.00704711
+    4 KSP Residual norm 0.00276089
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00276089
+    1 KSP Residual norm 0.00170414
+    2 KSP Residual norm 0.00123475
+    3 KSP Residual norm 0.00102335
+    4 KSP Residual norm 0.0007909
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0007909
+    1 KSP Residual norm 0.000681581
+    2 KSP Residual norm 0.000585375
+    3 KSP Residual norm 0.000468414
+    4 KSP Residual norm 0.000266097
+    5 KSP Residual norm 0.000130398
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.000130398
+    1 KSP Residual norm 9.07092e-05
+    2 KSP Residual norm 6.96441e-05
+    3 KSP Residual norm 3.36134e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 3.36134e-05
+    1 KSP Residual norm 2.90058e-05
+    2 KSP Residual norm 2.53784e-05
+    3 KSP Residual norm 1.56857e-05
+    4 KSP Residual norm 1.19534e-05
+    5 KSP Residual norm 7.85447e-06
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 7.85447e-06
+    1 KSP Residual norm 6.77932e-06
+    2 KSP Residual norm 5.22838e-06
+    3 KSP Residual norm 3.33545e-06
+    4 KSP Residual norm 2.66492e-06
+    5 KSP Residual norm 2.2758e-06
+  0 SNES Function norm 0.193476
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Object is in wrong state
+[0]PETSC ERROR: Must call KSPSetUp() or PCSetUp() before calling PCFieldSplitGetSubKSP()
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_ksp_gmres_restart value: 30 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_ksp_rtol value: 3.3e-08 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_coarse_pc_type value: redundant source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_coarse_redundant_pc_factor_shift_type value: nonzero source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_coarse_redundant_pc_type value: lu source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_levels_ksp_converged_maxits (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_levels_ksp_max_it value: 4 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_levels_ksp_norm_type value: none source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_levels_ksp_type value: gmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_mg_levels_pc_type value: sor source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_pc_mg_galerkin value: both source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_pc_mg_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_0_pc_type value: mg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_1_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_1_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_1_ksp_type value: preonly source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_1_pc_type value: bjacobi source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_pressure_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_fieldsplit_pressure_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_pc_fieldsplit_0_fields value: 0,2 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_122_pc_fieldsplit_1_fields value: 1 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_type value: preonly source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_pc_type value: bjacobi source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_ksp_gmres_restart value: 30 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_ksp_rtol value: 3.3e-08 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mat_block_size value: 3 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_coarse_pc_type value: redundant source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_coarse_redundant_pc_factor_shift_type value: nonzero source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_coarse_redundant_pc_type value: lu source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_levels_ksp_converged_maxits (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_levels_ksp_max_it value: 4 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_levels_ksp_norm_type value: none source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_levels_ksp_type value: gmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_mg_levels_pc_type value: sor source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_gamg_agg_nsmooths value: 2 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_gamg_repartition value: true source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_gamg_type value: agg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_mg_galerkin value: both source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_mg_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_velocity_pc_type value: mg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_ksp_atol value: 1e-12 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_ksp_gmres_restart value: 100 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_ksp_monitor_short (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_diag_use_amat (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_off_diag_use_amat (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_schur_fact_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_schur_precondition value: a11 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_type value: schur source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_type value: fieldsplit source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_error_if_not_converged value: false source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_ksp_ew (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_ksp_ew_version value: 3 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_linesearch_type value: bt source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_rtol value: 1e-06 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_snes_type value: newtonls source: code
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 20:33:34 2026
+[0]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[0]PETSC ERROR: #1 PCFieldSplitGetSubKSP_FieldSplit_Schur() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2267
+[0]PETSC ERROR: #2 PCFieldSplitGetSubKSP() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2773
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.00870654
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00870654
+    1 KSP Residual norm 0.000171784
+    2 KSP Residual norm 4.96569e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 2
+      Line search: Using full step: fnorm 8.706542480752e-03 gnorm 2.815948471055e-03
+  1 SNES Function norm 0.00281595
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00281595
+    1 KSP Residual norm 3.07471e-05
+    2 KSP Residual norm 2.6351e-05
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 2
+      Line search: Using full step: fnorm 2.815948471055e-03 gnorm 4.991994386710e-04
+  2 SNES Function norm 0.000499199
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.000499199
+    1 KSP Residual norm 2.35035e-05
+    2 KSP Residual norm 2.07407e-05
+    3 KSP Residual norm 1.05704e-05
+    4 KSP Residual norm 6.3894e-06
+    5 KSP Residual norm 2.72073e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 5
+      Line search: gnorm after quadratic fit 2.537803909629e-04
+      Line search: Quadratically determined step, lambda=3.6467259135168784e-01
+  3 SNES Function norm 0.00025378
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00025378
+    1 KSP Residual norm 1.50929e-05
+    2 KSP Residual norm 1.34586e-05
+    3 KSP Residual norm 6.56784e-06
+    4 KSP Residual norm 4.04989e-06
+    5 KSP Residual norm 1.74092e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 5
+      Line search: Using full step: fnorm 2.537803909629e-04 gnorm 2.301613210666e-04
+  4 SNES Function norm 0.000230161
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.000230161
+    1 KSP Residual norm 1.37733e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 2.301613210666e-04 gnorm 1.628482769134e-04
+  5 SNES Function norm 0.000162848
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.000162848
+    1 KSP Residual norm 1.14738e-06
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 1
+      Line search: Using full step: fnorm 1.628482769134e-04 gnorm 6.211763160122e-05
+  6 SNES Function norm 6.21176e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 6.21176e-05
+    1 KSP Residual norm 1.04211e-06
+    2 KSP Residual norm 9.1524e-07
+    3 KSP Residual norm 6.03791e-07
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 3
+      Line search: Using full step: fnorm 6.211763160122e-05 gnorm 3.620926124720e-05
+  7 SNES Function norm 3.62093e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 3.62093e-05
+    1 KSP Residual norm 5.15955e-07
+    2 KSP Residual norm 4.60815e-07
+    3 KSP Residual norm 3.65295e-07
+    4 KSP Residual norm 3.06057e-07
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 4
+      Line search: gnorm after quadratic fit 2.770627798302e-05
+      Line search: Quadratically determined step, lambda=4.7560061117200908e-01
+  8 SNES Function norm 2.77063e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 2.77063e-05
+    1 KSP Residual norm 3.6698e-07
+    2 KSP Residual norm 3.43944e-07
+    3 KSP Residual norm 2.22074e-07
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 3
+      Line search: Using full step: fnorm 2.770627798302e-05 gnorm 6.231325260715e-06
+  9 SNES Function norm 6.23133e-06
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 6.23133e-06
+    1 KSP Residual norm 1.83977e-07
+    2 KSP Residual norm 1.4502e-07
+    3 KSP Residual norm 1.30819e-07
+    4 KSP Residual norm 1.06396e-07
+    5 KSP Residual norm 8.94145e-08
+    6 KSP Residual norm 4.25785e-08
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 6
+      Line search: Using full step: fnorm 6.231325260715e-06 gnorm 1.563469384500e-06
+ 10 SNES Function norm 1.56347e-06
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 1.56347e-06
+    1 KSP Residual norm 3.06539e-08
+    2 KSP Residual norm 2.03208e-08
+    3 KSP Residual norm 1.82294e-08
+    4 KSP Residual norm 1.64652e-08
+    5 KSP Residual norm 1.14529e-08
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 5
+      Line search: Using full step: fnorm 1.563469384500e-06 gnorm 7.826135831958e-08
+ 11 SNES Function norm 7.82614e-08
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 25481 of 25481 query points are not located on this rank (rank 10 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 25141 of 25141 query points are not located on this rank (rank 1 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 25605 of 25605 query points are not located on this rank (rank 8 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26441 of 26441 query points are not located on this rank (rank 7 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26265 of 26265 query points are not located on this rank (rank 2 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26053 of 26053 query points are not located on this rank (rank 6 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 24481 of 24481 query points are not located on this rank (rank 9 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26529 of 26529 query points are not located on this rank (rank 12 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26713 of 26713 query points are not located on this rank (rank 4 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 25861 of 25861 query points are not located on this rank (rank 15 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 26861 of 26861 query points are not located on this rank (rank 14 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 27229 of 27229 query points are not located on this rank (rank 5 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 27177 of 27177 query points are not located on this rank (rank 11 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 27801 of 27801 query points are not located on this rank (rank 13 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 27685 of 27685 query points are not located on this rank (rank 0 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 28097 of 28097 query points are not located on this rank (rank 3 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [micromorphic 3-D] ref 3 beta 0.1 l 1.0 km np 16: CONVERGED_FNORM_ABS its 11 (16825 s) mid-strike W 4.819 km, peak 0.345; W(z) 4.79 4.91 4.95 4.80 4.94 4.82 4.84 4.91 4.95 4.87 4.82

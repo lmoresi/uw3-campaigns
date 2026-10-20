@@ -1,0 +1,47 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.6216
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:108: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.080271
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 8.027099217130e-02 gnorm 1.088822419028e-02
+  1 SNES Function norm 0.0108882
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 9.788114203943e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  2 SNES Function norm 0.00978811
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 7.403124068118e-03
+      Line search: Quadratically determined step, lambda=2.5108431962259492e-01
+  3 SNES Function norm 0.00740312
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.943483160390e-03
+      Line search: Quadratically determined step, lambda=2.0031112960449815e-01
+  4 SNES Function norm 0.00594348
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.351645581097e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  5 SNES Function norm 0.00535165
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 4.817909169301e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  6 SNES Function norm 0.00481791
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.236603882406e-03
+      Line search: Quadratically determined step, lambda=3.4306868553226316e-01
+  7 SNES Function norm 0.0032366
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 3.236603882406e-03 gnorm 1.450307680898e-03
+  8 SNES Function norm 0.00145031
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.450307680898e-03 gnorm 1.919515133898e-04
+  9 SNES Function norm 0.000191952
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.919515133898e-04 gnorm 2.122786436624e-05
+ 10 SNES Function norm 2.12279e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 2.122786436624e-05 gnorm 2.895781635809e-07
+ 11 SNES Function norm 2.89578e-07
+[micromorphic] ref 3 xi 0.0 beta 0.08 l 0.5 km np 1: CONVERGED_FNORM_ABS its 11 (425 s) W_int 3.14 W_v 'L': 2.510661556649766, 'R': 2.7061756009424656 peak 'L': 2.0505173144182796, 'R': 1.9694809793246288 floor bound 55.7

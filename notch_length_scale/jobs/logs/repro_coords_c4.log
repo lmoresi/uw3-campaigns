@@ -1,0 +1,145 @@
+[5]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[5]PETSC ERROR: Argument out of range
+[5]PETSC ERROR: Inserting a new nonzero at global row/column (66, 96) into matrix
+[5]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[5]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[5]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[5]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[5]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[5]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/repro_coords_basis.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:02:40 2026
+[5]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[5]PETSC ERROR: #1 MatSetValues_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:609
+[5]PETSC ERROR: #2 MatAssemblyEnd_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:795
+[5]PETSC ERROR: #3 MatAssemblyEnd() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/interface/matrix.c:6015
+[5]PETSC ERROR: #4 DMPlexComputeInterpolatorNested() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plexfem.c:3159
+[5]PETSC ERROR: #5 DMCreateInterpolation_Plex() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plex.c:10328
+[5]PETSC ERROR: #6 DMCreateInterpolation() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/interface/dm.c:1243
+[14]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[14]PETSC ERROR: Argument out of range
+[14]PETSC ERROR: Inserting a new nonzero at global row/column (321, 102) into matrix
+[14]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[14]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[14]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[14]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[14]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[14]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/repro_coords_basis.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:02:40 2026
+[14]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[14]PETSC ERROR: #1 MatSetValues_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:609
+[14]PETSC ERROR: #2 MatAssemblyEnd_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:795
+[14]PETSC ERROR: #3 MatAssemblyEnd() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/interface/matrix.c:6015
+[14]PETSC ERROR: #4 DMPlexComputeInterpolatorNested() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plexfem.c:3159
+[14]PETSC ERROR: #5 DMCreateInterpolation_Plex() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plex.c:10328
+[14]PETSC ERROR: #6 DMCreateInterpolation() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/interface/dm.c:1243
+[7]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[7]PETSC ERROR: Argument out of range
+[7]PETSC ERROR: New nonzero at (6,51) caused a malloc. Use MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE) to turn off this check
+[7]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[7]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[7]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[7]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[7]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[7]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/repro_coords_basis.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:02:40 2026
+[7]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[7]PETSC ERROR: #1 MatSetValues_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:614
+[7]PETSC ERROR: #2 MatAssemblyEnd_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:795
+[7]PETSC ERROR: #3 MatAssemblyEnd() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/interface/matrix.c:6015
+[7]PETSC ERROR: #4 DMPlexComputeInterpolatorNested() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plexfem.c:3159
+[7]PETSC ERROR: #5 DMCreateInterpolation_Plex() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plex.c:10328
+[7]PETSC ERROR: #6 DMCreateInterpolation() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/interface/dm.c:1243
+[9]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[9]PETSC ERROR: Argument out of range
+[9]PETSC ERROR: New nonzero at (0,3) caused a malloc. Use MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE) to turn off this check
+[9]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[9]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[9]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[9]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[9]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[9]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/repro_coords_basis.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:02:40 2026
+[9]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[9]PETSC ERROR: #1 MatSetValues_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:614
+[9]PETSC ERROR: #2 MatAssemblyEnd_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:795
+[9]PETSC ERROR: #3 MatAssemblyEnd() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/interface/matrix.c:6015
+[9]PETSC ERROR: #4 DMPlexComputeInterpolatorNested() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plexfem.c:3159
+[9]PETSC ERROR: #5 DMCreateInterpolation_Plex() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plex.c:10328
+[9]PETSC ERROR: #6 DMCreateInterpolation() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/interface/dm.c:1243
+[15]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[15]PETSC ERROR: Argument out of range
+[15]PETSC ERROR: Inserting a new nonzero at global row/column (357, 156) into matrix
+[15]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[15]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[15]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[15]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[15]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[15]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/repro_coords_basis.py with 16 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:02:40 2026
+[15]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[15]PETSC ERROR: #1 MatSetValues_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:609
+[15]PETSC ERROR: #2 MatAssemblyEnd_MPIAIJ() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/impls/aij/mpi/mpiaij.c:795
+[15]PETSC ERROR: #3 MatAssemblyEnd() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/mat/interface/matrix.c:6015
+[15]PETSC ERROR: #4 DMPlexComputeInterpolatorNested() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plexfem.c:3159
+[15]PETSC ERROR: #5 DMCreateInterpolation_Plex() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/impls/plex/plex.c:10328
+[15]PETSC ERROR: #6 DMCreateInterpolation() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/dm/interface/dm.c:1243
+Abort(744041870) on node 5 (rank 5 in comm 496): Fatal error in internal_Allreduce_c: Message truncated, error stack:
+internal_Allreduce_c(342)....................: MPI_Allreduce_c(sendbuf=0x7ffddb1670ef, recvbuf=0x7ffddb167537, count=1, dtype=0x4c00013f, MPI_LOR, comm=0x84000001) failed
+MPID_Allreduce(483)..........................: 
+MPIDI_Allreduce_allcomm_composition_json(400): 
+MPIDI_Allreduce_intra_composition_gamma(708).: 
+MPIDI_POSIX_mpi_allreduce(353)...............: 
+MPIR_Allreduce_impl(4921)....................: 
+MPIR_Allreduce_allcomm_auto(4817)............: 
+MPIR_Allreduce_intra_recursive_doubling(113).: 
+MPIC_Sendrecv(280)...........................: 
+MPIC_Wait(99)................................: 
+MPIR_Wait(745)...............................: 
+MPIDIG_recv_type_init(74)....................: Message from rank 4 and tag 14 truncated; 1 bytes received but buffer size is 8
+Abort(1012477326) on node 7 (rank 7 in comm 496): Fatal error in internal_Allreduce_c: Message truncated, error stack:
+internal_Allreduce_c(342)....................: MPI_Allreduce_c(sendbuf=0x7ffd18b08a4f, recvbuf=0x7ffd18b08e97, count=1, dtype=0x4c00013f, MPI_LOR, comm=0x84000001) failed
+MPID_Allreduce(483)..........................: 
+MPIDI_Allreduce_allcomm_composition_json(400): 
+MPIDI_Allreduce_intra_composition_gamma(708).: 
+MPIDI_POSIX_mpi_allreduce(353)...............: 
+MPIR_Allreduce_impl(4921)....................: 
+MPIR_Allreduce_allcomm_auto(4817)............: 
+MPIR_Allreduce_intra_recursive_doubling(113).: 
+MPIC_Sendrecv(280)...........................: 
+MPIC_Wait(99)................................: 
+MPIR_Wait(745)...............................: 
+MPIDIG_recv_type_init(74)....................: Message from rank 6 and tag 14 truncated; 1 bytes received but buffer size is 8
+Abort(408497550) on node 9 (rank 9 in comm 496): Fatal error in internal_Allreduce_c: Message truncated, error stack:
+internal_Allreduce_c(342)....................: MPI_Allreduce_c(sendbuf=0x7ffc9fdbb46f, recvbuf=0x7ffc9fdbb8b7, count=1, dtype=0x4c00013f, MPI_LOR, comm=0x84000001) failed
+MPID_Allreduce(483)..........................: 
+MPIDI_Allreduce_allcomm_composition_json(400): 
+MPIDI_Allreduce_intra_composition_gamma(708).: 
+MPIDI_POSIX_mpi_allreduce(353)...............: 
+MPIR_Allreduce_impl(4921)....................: 
+MPIR_Allreduce_allcomm_auto(4817)............: 
+MPIR_Allreduce_intra_recursive_doubling(113).: 
+MPIC_Sendrecv(280)...........................: 
+MPIC_Wait(99)................................: 
+MPIR_Wait(745)...............................: 
+MPIDIG_recv_type_init(74)....................: Message from rank 8 and tag 14 truncated; 1 bytes received but buffer size is 8
+Abort(475606414) on node 14 (rank 14 in comm 496): Fatal error in internal_Allreduce_c: Message truncated, error stack:
+internal_Allreduce_c(342)....................: MPI_Allreduce_c(sendbuf=0x7ffdaf443ddf, recvbuf=0x7ffdaf444227, count=1, dtype=0x4c00013f, MPI_LOR, comm=0x84000001) failed
+MPID_Allreduce(483)..........................: 
+MPIDI_Allreduce_allcomm_composition_json(400): 
+MPIDI_Allreduce_intra_composition_gamma(708).: 
+MPIDI_POSIX_mpi_allreduce(353)...............: 
+MPIR_Allreduce_impl(4921)....................: 
+MPIR_Allreduce_allcomm_auto(4817)............: 
+MPIR_Allreduce_intra_recursive_doubling(113).: 
+MPIC_Sendrecv(280)...........................: 
+MPIC_Wait(99)................................: 
+MPIR_Wait(745)...............................: 
+MPIDIG_copy_from_unexp_req(55)...............: Message from rank 12 and tag 14 truncated; 1 bytes received but buffer size is 8
+Abort(207170958) on node 15 (rank 15 in comm 496): Fatal error in internal_Allreduce_c: Message truncated, error stack:
+internal_Allreduce_c(342)....................: MPI_Allreduce_c(sendbuf=0x7fffff67da2f, recvbuf=0x7fffff67de77, count=1, dtype=0x4c00013f, MPI_LOR, comm=0x84000001) failed
+MPID_Allreduce(483)..........................: 
+MPIDI_Allreduce_allcomm_composition_json(400): 
+MPIDI_Allreduce_intra_composition_gamma(708).: 
+MPIDI_POSIX_mpi_allreduce(353)...............: 
+MPIR_Allreduce_impl(4921)....................: 
+MPIR_Allreduce_allcomm_auto(4817)............: 
+MPIR_Allreduce_intra_recursive_doubling(113).: 
+MPIC_Sendrecv(280)...........................: 
+MPIC_Wait(99)................................: 
+MPIR_Wait(745)...............................: 
+MPIDIG_copy_from_unexp_req(55)...............: Message from rank 13 and tag 14 truncated; 1 bytes received but buffer size is 8

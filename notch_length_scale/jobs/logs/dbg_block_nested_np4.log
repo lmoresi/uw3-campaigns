@@ -1,0 +1,123 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 3.91578
+    1 KSP Residual norm 0.933112
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.933112
+    1 KSP Residual norm 0.661767
+    2 KSP Residual norm 0.214765
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.214765
+    1 KSP Residual norm 0.20194
+    2 KSP Residual norm 0.158936
+    3 KSP Residual norm 0.104308
+    4 KSP Residual norm 0.0794074
+    5 KSP Residual norm 0.0499574
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0499574
+    1 KSP Residual norm 0.0460994
+    2 KSP Residual norm 0.0355186
+    3 KSP Residual norm 0.0159149
+    4 KSP Residual norm 0.0112265
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0112265
+    1 KSP Residual norm 0.0106882
+    2 KSP Residual norm 0.010039
+    3 KSP Residual norm 0.00540768
+    4 KSP Residual norm 0.00450099
+    5 KSP Residual norm 0.00227531
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00227531
+    1 KSP Residual norm 0.00208145
+    2 KSP Residual norm 0.00159304
+    3 KSP Residual norm 0.000720244
+    4 KSP Residual norm 0.000519272
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000519272
+    1 KSP Residual norm 0.00044885
+    2 KSP Residual norm 0.000326006
+    3 KSP Residual norm 0.00024783
+    4 KSP Residual norm 9.69209e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 9.69209e-05
+    1 KSP Residual norm 5.89002e-05
+    2 KSP Residual norm 4.15428e-05
+    3 KSP Residual norm 2.93028e-05
+    4 KSP Residual norm 2.30365e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 2.30365e-05
+    1 KSP Residual norm 1.94754e-05
+    2 KSP Residual norm 1.66776e-05
+    3 KSP Residual norm 1.2093e-05
+    4 KSP Residual norm 9.81123e-06
+    5 KSP Residual norm 5.69578e-06
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 5.69578e-06
+    1 KSP Residual norm 4.87825e-06
+    2 KSP Residual norm 2.49065e-06
+    3 KSP Residual norm 1.33977e-06
+  0 SNES Function norm 0.371939
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0704333
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0704333
+    1 KSP Residual norm 0.0142104
+    2 KSP Residual norm 0.0118552
+    3 KSP Residual norm 0.00621056
+    4 KSP Residual norm 0.00236356
+    5 KSP Residual norm 0.00138113
+    6 KSP Residual norm 0.00107621
+    7 KSP Residual norm 0.000880828
+    8 KSP Residual norm 0.000748289
+    9 KSP Residual norm 0.00046224
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 9
+      Line search: Using full step: fnorm 7.043325491162e-02 gnorm 1.209905971785e-02
+  1 SNES Function norm 0.0120991
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0120991
+    1 KSP Residual norm 0.00462249
+    2 KSP Residual norm 0.00424296
+    3 KSP Residual norm 0.00215102
+    4 KSP Residual norm 0.00127757
+    5 KSP Residual norm 0.00101868
+    6 KSP Residual norm 0.000834205
+    7 KSP Residual norm 0.000533748
+    8 KSP Residual norm 0.00030398
+    9 KSP Residual norm 0.000183091
+   10 KSP Residual norm 0.000119608
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 10
+      Line search: Using full step: fnorm 1.209905971785e-02 gnorm 1.337730143573e-03
+  2 SNES Function norm 0.00133773
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00133773
+    1 KSP Residual norm 0.00036381
+    2 KSP Residual norm 0.000279795
+    3 KSP Residual norm 0.000153426
+    4 KSP Residual norm 9.86418e-05
+    5 KSP Residual norm 7.46485e-05
+    6 KSP Residual norm 5.41547e-05
+    7 KSP Residual norm 2.69867e-05
+    8 KSP Residual norm 1.37023e-05
+    9 KSP Residual norm 9.83322e-06
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 9
+      Line search: Using full step: fnorm 1.337730143573e-03 gnorm 4.311648845737e-05
+  3 SNES Function norm 4.31165e-05
+[0] SNES solve diverged after 3 iterations: DIVERGED_MAX_IT The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 323 of 323 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 317 of 317 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 343 of 343 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 299 of 299 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [micromorphic 3-D] ref 0 beta 0.1 l 1.0 km np 4: DIVERGED_MAX_IT its 3 (134 s) mid-strike W 2.506 km, peak 0.601; W(z) 2.42 1.96 1.74 1.83 1.91 2.51 1.79 2.28 2.05 2.59 2.86

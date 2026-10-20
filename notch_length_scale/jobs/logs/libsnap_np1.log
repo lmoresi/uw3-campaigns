@@ -1,0 +1,9 @@
+Annulus lvl 0 mismatch 0.00e+00 label |r-ro| 0.00e+00 |r-ri| 2.22e-16 or-label |r-ro| 0.00e+00 |r-ri| 2.22e-16 vertices labelled only elsewhere 0
+Annulus lvl 1 mismatch 0.00e+00 label |r-ro| 2.22e-16 |r-ri| 1.11e-16 or-label |r-ro| 2.22e-16 |r-ri| 1.11e-16 vertices labelled only elsewhere 0
+Annulus lvl 2 mismatch 0.00e+00 label |r-ro| 2.22e-16 |r-ri| 2.22e-16 or-label |r-ro| 2.22e-16 |r-ri| 2.22e-16 vertices labelled only elsewhere 0
+Created inner boundary surface
+Created outer boundary surface
+Shell lvl 0 mismatch 0.00e+00 label |r-ro| 2.22e-16 |r-ri| 2.22e-16 or-label |r-ro| 2.22e-16 |r-ri| 2.22e-16 vertices labelled only elsewhere 0
+Shell lvl 1 mismatch 0.00e+00 label |r-ro| 2.22e-16 |r-ri| 2.22e-16 or-label |r-ro| 2.22e-16 |r-ri| 2.22e-16 vertices labelled only elsewhere 0
+Shell lvl 2 mismatch 0.00e+00 label |r-ro| 2.22e-16 |r-ri| 3.33e-16 or-label |r-ro| 2.22e-16 |r-ri| 3.33e-16 vertices labelled only elsewhere 0
+np 1

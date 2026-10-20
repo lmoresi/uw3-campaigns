@@ -1,0 +1,4 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+40 vertices with edot_II <= 0, |x| 2.6-5.1 km, y -22.4--21.9 km

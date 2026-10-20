@@ -1,0 +1,701 @@
+{"name": "smoke_micro_ref1_np2", "state": "queued", "time": "2026-10-09 13:34:19", "np": 2}
+{"name": "smoke_cosserat_ref1_np2", "state": "queued", "time": "2026-10-09 13:34:19", "np": 2}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 13:34:19", "np": 4}
+{"name": "measure_all", "state": "queued", "time": "2026-10-09 13:34:19", "np": 1}
+{"name": "micro_ref4_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 13:34:19", "np": 2}
+{"name": "smoke_micro_ref1_np2", "state": "running", "time": "2026-10-09 14:44:49", "np": 2, "pid": 1699767}
+{"name": "smoke_micro_ref1_np2", "state": "done", "time": "2026-10-09 14:48:19", "rc": 0}
+{"name": "smoke_cosserat_ref1_np2", "state": "running", "time": "2026-10-09 14:48:19", "np": 2, "pid": 1704282}
+{"name": "smoke_cosserat_ref1_np2", "state": "done", "time": "2026-10-09 14:53:19", "rc": 0}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 14:53:56", "np": 4}
+{"name": "measure_all", "state": "queued", "time": "2026-10-09 14:53:56", "np": 1}
+{"name": "micro_ref4_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 14:53:56", "np": 2}
+{"name": "measure_all", "state": "running", "time": "2026-10-09 14:53:56", "np": 1, "pid": 1709906}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 15:03:32", "np": 4}
+{"name": "micro_ref4_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 15:03:32", "np": 2}
+{"name": "migrate_ref4", "state": "queued", "time": "2026-10-09 15:04:02", "np": 1}
+{"name": "micro_ref4_l0.25_tight_np2", "state": "running", "time": "2026-10-09 15:04:02", "np": 2, "pid": 1711815}
+{"name": "measure_all", "state": "done", "time": "2026-10-09 15:18:33", "rc": 0}
+{"name": "migrate_ref4", "state": "running", "time": "2026-10-09 15:18:33", "np": 1, "pid": 1714158}
+{"name": "migrate_ref4", "state": "done", "time": "2026-10-09 15:20:03", "rc": 0}
+{"name": "measure_ref4", "state": "queued", "time": "2026-10-09 15:20:33", "np": 1}
+{"name": "measure_ref4", "state": "running", "time": "2026-10-09 15:20:33", "np": 1, "pid": 1714499}
+{"name": "measure_ref4", "state": "done", "time": "2026-10-09 15:29:03", "rc": 0}
+{"name": "measure_cosserat", "state": "queued", "time": "2026-10-09 15:31:03", "np": 1}
+{"name": "measure_cosserat", "state": "running", "time": "2026-10-09 15:31:03", "np": 1, "pid": 1719518}
+{"name": "measure_cosserat", "state": "done", "time": "2026-10-09 15:43:03", "rc": 0}
+{"name": "map_ref3_b0.06_xi0_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 17:47:03", "np": 1}
+{"name": "map_ref3_b0.06_xi0_l1", "state": "running", "time": "2026-10-09 17:47:03", "np": 1, "pid": 1749888}
+{"name": "map_ref3_b0.06_xi0_l1", "state": "done", "time": "2026-10-09 18:03:03", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.005_l1", "state": "running", "time": "2026-10-09 18:03:03", "np": 1, "pid": 1751858}
+{"name": "map_ref3_b0.06_xi0.005_l1", "state": "done", "time": "2026-10-09 18:18:03", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.01_l1", "state": "running", "time": "2026-10-09 18:18:03", "np": 1, "pid": 1753571}
+{"name": "map_ref3_b0.06_xi0.01_l1", "state": "done", "time": "2026-10-09 18:31:33", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.02_l1", "state": "running", "time": "2026-10-09 18:31:33", "np": 1, "pid": 1755124}
+{"name": "map_ref3_b0.06_xi0.02_l1", "state": "done", "time": "2026-10-09 18:44:03", "rc": 0}
+{"name": "map_ref3_b0.07_xi0_l1", "state": "running", "time": "2026-10-09 18:44:03", "np": 1, "pid": 1756547}
+{"name": "map_ref3_b0.07_xi0_l1", "state": "done", "time": "2026-10-09 18:58:03", "rc": 0}
+{"name": "map_ref3_b0.07_xi0.005_l1", "state": "running", "time": "2026-10-09 18:58:03", "np": 1, "pid": 1758067}
+{"name": "map_ref3_b0.07_xi0.005_l1", "state": "done", "time": "2026-10-09 19:12:03", "rc": 0}
+{"name": "map_ref3_b0.07_xi0.01_l1", "state": "running", "time": "2026-10-09 19:12:03", "np": 1, "pid": 1759726}
+{"name": "micro_ref4_l0.25_tight_np2", "state": "killed", "time": "2026-10-09 19:24:03", "rc": 124}
+{"name": "map_ref3_b0.07_xi0.02_l1", "state": "running", "time": "2026-10-09 19:24:03", "np": 1, "pid": 1761072}
+{"name": "map_ref3_b0.08_xi0_l1", "state": "running", "time": "2026-10-09 19:24:03", "np": 1, "pid": 1761073}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:25:03", "np": 2}
+{"name": "map_ref3_b0.07_xi0.01_l1", "state": "done", "time": "2026-10-09 19:25:33", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.005_l1", "state": "running", "time": "2026-10-09 19:25:33", "np": 1, "pid": 1761366}
+{"name": "map_ref3_b0.08_xi0_l1", "state": "done", "time": "2026-10-09 19:36:03", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.01_l1", "state": "running", "time": "2026-10-09 19:36:03", "np": 1, "pid": 1762538}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 19:36:32", "np": 4}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:36:32", "np": 1}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:36:32", "np": 2}
+{"name": "map_ref3_b0.07_xi0.02_l1", "state": "done", "time": "2026-10-09 19:37:02", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.005_l1", "state": "done", "time": "2026-10-09 19:39:02", "rc": 0}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "running", "time": "2026-10-09 19:39:02", "np": 2, "pid": 1762946}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "failed", "time": "2026-10-09 19:39:32", "rc": 16}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "running", "time": "2026-10-09 19:39:32", "np": 1, "pid": 1763005}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "running", "time": "2026-10-09 19:39:32", "np": 1, "pid": 1763006}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "failed", "time": "2026-10-09 19:40:02", "rc": 16}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "failed", "time": "2026-10-09 19:40:02", "rc": 16}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "running", "time": "2026-10-09 19:40:02", "np": 1, "pid": 1763135}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "running", "time": "2026-10-09 19:40:02", "np": 1, "pid": 1763136}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:40:23", "note": "requeued: launched with the system mpirun (PMIx), fixed in the runner"}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "queued", "time": "2026-10-09 19:40:23", "note": "requeued: launched with the system mpirun (PMIx), fixed in the runner"}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:40:23", "note": "requeued: launched with the system mpirun (PMIx), fixed in the runner"}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 19:40:30", "np": 4}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:40:30", "np": 1}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:40:30", "np": 2}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "running", "time": "2026-10-09 19:40:30", "np": 2, "pid": 1763227}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "running", "time": "2026-10-09 19:40:30", "np": 1, "pid": 1763228}
+{"name": "measure_ref4_l0.5", "state": "queued", "time": "2026-10-09 19:42:00", "np": 1}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:56:11", "note": "stopped by hand: OpenMP pool of ~96 threads per rank (OMP_NUM_THREADS unset); rerun with one thread per rank"}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 19:56:14", "np": 4}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "queued", "time": "2026-10-09 19:56:14", "np": 2}
+{"name": "measure_ref4_l0.5", "state": "queued", "time": "2026-10-09 19:56:14", "np": 1}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "running", "time": "2026-10-09 19:56:14", "np": 2, "pid": 1765433}
+{"name": "map_ref3_b0.08_xi0.01_l1", "state": "done", "time": "2026-10-09 19:57:44", "rc": 0}
+{"name": "measure_ref4_l0.5", "state": "running", "time": "2026-10-09 19:57:44", "np": 1, "pid": 1765627}
+{"name": "measure_ref4_l0.5", "state": "done", "time": "2026-10-09 20:01:44", "rc": 0}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "running", "time": "2026-10-09 20:01:44", "np": 1, "pid": 1766133}
+{"name": "map_ref3_b0.08_xi0.02_l1", "state": "done", "time": "2026-10-09 20:03:14", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "running", "time": "2026-10-09 20:03:14", "np": 1, "pid": 1766376}
+{"name": "hangprobe_ref3_l0.25_tight_np1", "state": "queued", "time": "2026-10-09 20:07:44", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l1", "state": "done", "time": "2026-10-09 20:13:44", "rc": 0}
+{"name": "hangprobe_ref3_l0.25_tight_np1", "state": "running", "time": "2026-10-09 20:13:44", "np": 1, "pid": 1767863}
+{"name": "map_ref3_b0.1_xi0.005_l1", "state": "done", "time": "2026-10-09 20:16:14", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "running", "time": "2026-10-09 20:16:14", "np": 1, "pid": 1768163}
+{"name": "hangprobe_ref3_l0.25_tight_np1", "state": "failed", "time": "2026-10-09 20:24:14", "rc": -15}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "running", "time": "2026-10-09 20:24:14", "np": 1, "pid": 1769218}
+{"name": "micro_ref4_l0.25_tight_np2_pinned", "state": "queued", "time": "2026-10-09 20:24:44", "np": 2}
+{"name": "hangprobe_ref3_l0.25_tight_np2", "state": "killed", "time": "2026-10-09 20:25:39", "rc": -15, "note": "stopped by hand: diagnosis done; tight Krylov stagnates ~2.4e-8 at l=0.25, same in serial"}
+{"name": "check_micro_ref3_tight_np4", "state": "queued", "time": "2026-10-09 20:25:41", "np": 4}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "queued", "time": "2026-10-09 20:25:41", "np": 1}
+{"name": "micro_ref4_l0.25_production_np2", "state": "queued", "time": "2026-10-09 20:25:41", "np": 2}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "running", "time": "2026-10-09 20:25:41", "np": 1, "pid": 1769641}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "running", "time": "2026-10-09 20:25:41", "np": 1, "pid": 1769642}
+{"name": "map_ref3_b0.1_xi0.01_l1", "state": "done", "time": "2026-10-09 20:27:41", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "running", "time": "2026-10-09 20:27:41", "np": 1, "pid": 1769862}
+{"name": "map_ref3_b0.1_xi0.02_l1", "state": "done", "time": "2026-10-09 20:35:11", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "running", "time": "2026-10-09 20:35:11", "np": 1, "pid": 1770488}
+{"name": "map_ref3_b0.06_xi0.005_l0.5", "state": "done", "time": "2026-10-09 20:41:11", "rc": 0}
+{"name": "map_ref3_b0.06_xi0.01_l0.5", "state": "done", "time": "2026-10-09 20:41:11", "rc": 0}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "running", "time": "2026-10-09 20:41:11", "np": 1, "pid": 1771040}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "running", "time": "2026-10-09 20:41:11", "np": 1, "pid": 1771041}
+{"name": "map_ref3_b0.06_xi0.02_l0.5", "state": "done", "time": "2026-10-09 20:46:11", "rc": 0}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "running", "time": "2026-10-09 20:46:11", "np": 1, "pid": 1771544}
+{"name": "map_ref3_b0.06_xi0_l0.5", "state": "done", "time": "2026-10-09 20:48:11", "rc": 0}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "running", "time": "2026-10-09 20:48:11", "np": 1, "pid": 1771709}
+{"name": "map_ref3_b0.07_xi0.005_l0.5", "state": "done", "time": "2026-10-09 20:55:11", "rc": 0}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "running", "time": "2026-10-09 20:55:11", "np": 1, "pid": 1772276}
+{"name": "map_ref3_b0.07_xi0.01_l0.5", "state": "done", "time": "2026-10-09 20:58:11", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "running", "time": "2026-10-09 20:58:11", "np": 1, "pid": 1772518}
+{"name": "map_ref3_b0.07_xi0.02_l0.5", "state": "done", "time": "2026-10-09 20:59:11", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "running", "time": "2026-10-09 20:59:11", "np": 1, "pid": 1772611}
+{"name": "map_ref3_b0.08_xi0_l0.5", "state": "done", "time": "2026-10-09 21:07:41", "rc": 0}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "running", "time": "2026-10-09 21:07:41", "np": 1, "pid": 1773294}
+{"name": "map_ref3_b0.07_xi0_l0.5", "state": "done", "time": "2026-10-09 21:08:11", "rc": 0}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "running", "time": "2026-10-09 21:08:11", "np": 1, "pid": 1773343}
+{"name": "map_ref3_b0.08_xi0.005_l0.5", "state": "done", "time": "2026-10-09 21:10:41", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "running", "time": "2026-10-09 21:10:41", "np": 1, "pid": 1773543}
+{"name": "map_ref3_b0.08_xi0.01_l0.5", "state": "done", "time": "2026-10-09 21:11:11", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "running", "time": "2026-10-09 21:11:11", "np": 1, "pid": 1773596}
+{"name": "map_ref3_b0.08_xi0.02_l0.5", "state": "done", "time": "2026-10-09 21:18:41", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "running", "time": "2026-10-09 21:18:41", "np": 1, "pid": 1774214}
+{"name": "map_ref3_b0.1_xi0_l0.5", "state": "done", "time": "2026-10-09 21:19:41", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.01_l0.5", "state": "done", "time": "2026-10-09 21:22:41", "rc": 0}
+{"name": "micro_ref4_l0.25_production_np2", "state": "running", "time": "2026-10-09 21:22:41", "np": 2, "pid": 1774563}
+{"name": "map_ref3_b0.1_xi0.005_l0.5", "state": "done", "time": "2026-10-09 21:23:11", "rc": 0}
+{"name": "map_ref3_b0.1_xi0.02_l0.5", "state": "done", "time": "2026-10-09 21:29:11", "rc": 0}
+{"name": "check_micro_ref3_tight_np4", "state": "running", "time": "2026-10-09 21:32:41", "np": 4, "pid": 1775810}
+{"name": "window_check", "state": "queued", "time": "2026-10-09 21:34:11", "np": 2}
+{"name": "window_check", "state": "running", "time": "2026-10-09 21:34:11", "np": 2, "pid": 1776041}
+{"name": "check_micro_ref3_tight_np4", "state": "done", "time": "2026-10-09 21:51:41", "rc": 0}
+{"name": "micro_ref5_l1_tight_np16", "state": "queued", "time": "2026-10-09 21:52:41", "np": 16}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "queued", "time": "2026-10-09 21:52:41", "np": 16}
+{"name": "micro_ref5_l1_tight_np16", "state": "running", "time": "2026-10-09 21:52:41", "np": 16, "pid": 1867756}
+{"name": "window_check", "state": "done", "time": "2026-10-09 21:53:11", "rc": 0}
+{"name": "micro_ref5_l1_tight_np16", "state": "failed", "time": "2026-10-09 21:53:11", "rc": 59}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "running", "time": "2026-10-09 21:53:11", "np": 16, "pid": 1868043}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "failed", "time": "2026-10-09 21:53:41", "rc": 59}
+{"name": "micro_ref4_l0.25_production_np2", "state": "done", "time": "2026-10-09 22:26:11", "rc": 0}
+{"name": "micro_ref5_l1_tight_np16", "state": "queued", "time": "2026-10-10 00:01:02", "note": "requeued: notch_model._cells segfaulted on ranks owning no Weak cell (NULL IS); fixed"}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "queued", "time": "2026-10-10 00:01:02", "note": "requeued: notch_model._cells segfaulted on ranks owning no Weak cell (NULL IS); fixed"}
+{"name": "micro_ref5_l1_tight_np16", "state": "queued", "time": "2026-10-10 00:01:19", "np": 16}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "queued", "time": "2026-10-10 00:01:19", "np": 16}
+{"name": "micro_ref5_l1_tight_np16", "state": "running", "time": "2026-10-10 00:01:19", "np": 16, "pid": 1885093}
+{"name": "micro_ref5_l1_tight_np16", "state": "done", "time": "2026-10-10 01:23:19", "rc": 0}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "running", "time": "2026-10-10 01:23:19", "np": 16, "pid": 1940839}
+{"name": "micro_ref5_l0.5_tight_np16", "state": "done", "time": "2026-10-10 03:03:19", "rc": 0}
+{"name": "window_check_ref5", "state": "queued", "time": "2026-10-10 03:04:20", "np": 8}
+{"name": "window_check_ref5", "state": "running", "time": "2026-10-10 03:04:20", "np": 8, "pid": 1997913}
+{"name": "window_check_ref5", "state": "done", "time": "2026-10-10 03:15:50", "rc": 0}
+{"name": "measure_current", "state": "queued", "time": "2026-10-10 04:31:33", "np": 8}
+{"name": "measure_current", "state": "running", "time": "2026-10-10 04:31:33", "np": 8, "pid": 2144402}
+{"name": "measure_current", "state": "done", "time": "2026-10-10 04:37:33", "rc": 0}
+{"name": "render_refinement", "state": "queued", "time": "2026-10-10 04:37:49", "np": 1}
+{"name": "render_refinement", "state": "running", "time": "2026-10-10 04:37:49", "np": 1, "pid": 2296364}
+{"name": "render_refinement", "state": "queued", "time": "2026-10-10 04:38:03", "np": 1}
+{"name": "render_refinement", "state": "running", "time": "2026-10-10 04:38:03", "np": 1, "pid": 2296423}
+{"name": "render_refinement", "state": "done", "time": "2026-10-10 04:44:19", "rc": 0}
+{"name": "render_refinement", "state": "done", "time": "2026-10-10 04:44:33", "rc": 0}
+{"name": "render_refinement_2", "state": "queued", "time": "2026-10-10 04:45:25", "np": 1}
+{"name": "render_refinement_2", "state": "running", "time": "2026-10-10 04:45:25", "np": 1, "pid": 2297590}
+{"name": "render_refinement_2", "state": "failed", "time": "2026-10-10 04:45:55", "rc": -15}
+{"name": "render_refinement_3", "state": "queued", "time": "2026-10-10 04:46:25", "np": 1}
+{"name": "render_refinement_3", "state": "running", "time": "2026-10-10 04:46:25", "np": 1, "pid": 2297723}
+{"name": "render_refinement_3", "state": "done", "time": "2026-10-10 04:52:55", "rc": 0}
+{"name": "render_refinement_4", "state": "queued", "time": "2026-10-10 04:53:25", "np": 1}
+{"name": "render_refinement_4", "state": "running", "time": "2026-10-10 04:53:25", "np": 1, "pid": 2298914}
+{"name": "render_refinement_4", "state": "done", "time": "2026-10-10 04:59:56", "rc": 0}
+{"name": "fmgtable_plain_ref1", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_plain_ref2", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_plain_ref3", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref1_l0.25", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref2_l0.25", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref3_l0.25", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref1_l0.5", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref2_l0.5", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref3_l0.5", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref1_l2", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref2_l2", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_micro_ref3_l2", "state": "queued", "time": "2026-10-10 05:58:38", "np": 4}
+{"name": "fmgtable_plain_ref1", "state": "running", "time": "2026-10-10 05:58:38", "np": 4, "pid": 2309886}
+{"name": "fmgtable_plain_ref2", "state": "running", "time": "2026-10-10 05:58:38", "np": 4, "pid": 2309887}
+{"name": "fmgtable_plain_ref3", "state": "running", "time": "2026-10-10 05:58:38", "np": 4, "pid": 2309888}
+{"name": "fmgtable_micro_ref1_l0.25", "state": "running", "time": "2026-10-10 05:58:38", "np": 4, "pid": 2309889}
+{"name": "fmgtable_micro_ref2_l0.25", "state": "running", "time": "2026-10-10 05:58:38", "np": 4, "pid": 2309890}
+{"name": "fmgtable_plain_ref1", "state": "done", "time": "2026-10-10 06:02:08", "rc": 0}
+{"name": "fmgtable_micro_ref3_l0.25", "state": "running", "time": "2026-10-10 06:02:08", "np": 4, "pid": 2343132}
+{"name": "fmgtable_micro_ref1_l0.25", "state": "done", "time": "2026-10-10 06:02:38", "rc": 0}
+{"name": "fmgtable_micro_ref1_l0.5", "state": "running", "time": "2026-10-10 06:02:38", "np": 4, "pid": 2350234}
+{"name": "fmgtable_micro_ref1_l0.5", "state": "done", "time": "2026-10-10 06:06:08", "rc": 0}
+{"name": "fmgtable_micro_ref2_l0.5", "state": "running", "time": "2026-10-10 06:06:08", "np": 4, "pid": 2381556}
+{"name": "fmgtable_plain_ref2", "state": "done", "time": "2026-10-10 06:06:38", "rc": 0}
+{"name": "fmgtable_micro_ref3_l0.5", "state": "running", "time": "2026-10-10 06:06:38", "np": 4, "pid": 2388123}
+{"name": "fmgtable_coss_ref1_l1", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "fmgtable_coss_ref2_l1", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "fmgtable_coss_ref3_l1", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "coss_ref4_l1_np8", "state": "queued", "time": "2026-10-10 06:13:38", "np": 8}
+{"name": "fmgtable_coss_ref1_l0.5", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "fmgtable_coss_ref2_l0.5", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "fmgtable_coss_ref3_l0.5", "state": "queued", "time": "2026-10-10 06:13:38", "np": 4}
+{"name": "coss_ref4_l0.5_np8", "state": "queued", "time": "2026-10-10 06:13:38", "np": 8}
+{"name": "fmgtable_micro_ref2_l0.5", "state": "done", "time": "2026-10-10 06:20:08", "rc": 0}
+{"name": "fmgtable_micro_ref1_l2", "state": "running", "time": "2026-10-10 06:20:08", "np": 4, "pid": 2411717}
+{"name": "fmgtable_micro_ref1_l2", "state": "done", "time": "2026-10-10 06:24:08", "rc": 0}
+{"name": "fmgtable_micro_ref2_l2", "state": "running", "time": "2026-10-10 06:24:08", "np": 4, "pid": 2429251}
+{"name": "fmgtable_micro_ref2_l0.25", "state": "done", "time": "2026-10-10 06:28:38", "rc": 0}
+{"name": "fmgtable_micro_ref3_l2", "state": "running", "time": "2026-10-10 06:28:38", "np": 4, "pid": 2441296}
+{"name": "fmgtable_micro_ref2_l2", "state": "done", "time": "2026-10-10 06:32:38", "rc": 0}
+{"name": "fmgtable_coss_ref1_l1", "state": "running", "time": "2026-10-10 06:32:38", "np": 4, "pid": 2452743}
+{"name": "fmgtable_coss_ref1_l1", "state": "done", "time": "2026-10-10 06:36:08", "rc": 0}
+{"name": "fmgtable_coss_ref2_l1", "state": "running", "time": "2026-10-10 06:36:08", "np": 4, "pid": 2470521}
+{"name": "fmgtable_coss_ref2_l1", "state": "done", "time": "2026-10-10 06:41:38", "rc": 0}
+{"name": "fmgtable_coss_ref3_l1", "state": "running", "time": "2026-10-10 06:41:38", "np": 4, "pid": 2483465}
+{"name": "fmgtable_micro_ref3_l2", "state": "done", "time": "2026-10-10 07:00:08", "rc": 0}
+{"name": "fmgtable_coss_ref1_l0.5", "state": "running", "time": "2026-10-10 07:00:08", "np": 4, "pid": 2494439}
+{"name": "fmgtable_coss_ref3_l1", "state": "done", "time": "2026-10-10 07:01:08", "rc": 0}
+{"name": "fmgtable_coss_ref2_l0.5", "state": "running", "time": "2026-10-10 07:01:08", "np": 4, "pid": 2503444}
+{"name": "fmgtable_coss_ref1_l0.5", "state": "done", "time": "2026-10-10 07:03:08", "rc": 0}
+{"name": "fmgtable_coss_ref3_l0.5", "state": "running", "time": "2026-10-10 07:03:08", "np": 4, "pid": 2520803}
+{"name": "fmgtable_coss_ref2_l0.5", "state": "done", "time": "2026-10-10 07:09:08", "rc": 0}
+{"name": "fmgtable_micro_ref3_l0.25", "state": "killed", "time": "2026-10-10 07:11:08", "rc": 124}
+{"name": "coss_ref4_l1_np8", "state": "running", "time": "2026-10-10 07:11:08", "np": 8, "pid": 2533782}
+{"name": "fmgtable_plain_ref3", "state": "done", "time": "2026-10-10 07:23:38", "rc": 0}
+{"name": "fmgtable_coss_ref3_l0.5", "state": "done", "time": "2026-10-10 07:26:38", "rc": 0}
+{"name": "coss_ref4_l0.5_np8", "state": "running", "time": "2026-10-10 07:26:38", "np": 8, "pid": 2555863}
+{"name": "fmgtable_micro_ref3_l0.5", "state": "done", "time": "2026-10-10 07:34:08", "rc": 0}
+{"name": "coss_ref4_l1_np8", "state": "done", "time": "2026-10-10 07:45:08", "rc": 0}
+{"name": "coss_ref4_l0.5_np8", "state": "done", "time": "2026-10-10 07:58:38", "rc": 0}
+{"name": "coss_ref5_l1_np16", "state": "queued", "time": "2026-10-10 07:59:08", "np": 16}
+{"name": "coss_ref5_l0.5_np16", "state": "queued", "time": "2026-10-10 07:59:08", "np": 16}
+{"name": "coss_ref5_l1_np16", "state": "running", "time": "2026-10-10 07:59:08", "np": 16, "pid": 2614064}
+{"name": "coss_ref5_l1_np16", "state": "done", "time": "2026-10-10 09:23:38", "rc": 0}
+{"name": "coss_ref5_l0.5_np16", "state": "running", "time": "2026-10-10 09:23:38", "np": 16, "pid": 2675858}
+{"name": "coss_ref5_l0.5_np16", "state": "done", "time": "2026-10-10 10:36:09", "rc": 0}
+{"name": "measure_current_cosserat", "state": "queued", "time": "2026-10-10 10:36:39", "np": 8}
+{"name": "measure_current_cosserat", "state": "running", "time": "2026-10-10 10:36:39", "np": 8, "pid": 2736001}
+{"name": "measure_current_cosserat", "state": "done", "time": "2026-10-10 10:41:09", "rc": 0}
+{"name": "render_refinement_cosserat", "state": "queued", "time": "2026-10-10 10:42:59", "np": 1}
+{"name": "render_refinement_cosserat", "state": "running", "time": "2026-10-10 10:42:59", "np": 1, "pid": 2810344}
+{"name": "render_refinement_cosserat", "state": "done", "time": "2026-10-10 10:49:59", "rc": 0}
+{"name": "cmap_l0.125_c0.01", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.125_c0.03", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.125_c0.1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.125_c0.3", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.125_c1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.25_c0.01", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.25_c0.03", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.25_c0.1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.25_c0.3", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.25_c1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.5_c0.01", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.5_c0.03", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.5_c0.1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.5_c0.3", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.5_c1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l1_c0.01", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l1_c0.03", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l1_c0.1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l1_c0.3", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l1_c1", "state": "queued", "time": "2026-10-11 10:12:56", "np": 4}
+{"name": "cmap_l0.125_c0.01", "state": "running", "time": "2026-10-11 10:12:56", "np": 4, "pid": 3106127}
+{"name": "cmap_l0.125_c0.03", "state": "running", "time": "2026-10-11 10:12:56", "np": 4, "pid": 3106128}
+{"name": "cmap_l0.125_c0.1", "state": "running", "time": "2026-10-11 10:12:56", "np": 4, "pid": 3106129}
+{"name": "cmap_l0.125_c0.3", "state": "running", "time": "2026-10-11 10:12:56", "np": 4, "pid": 3106130}
+{"name": "cmap_l0.125_c0.3", "state": "done", "time": "2026-10-11 10:22:56", "rc": 0}
+{"name": "cmap_l0.125_c1", "state": "running", "time": "2026-10-11 10:22:56", "np": 4, "pid": 3120407}
+{"name": "cmap_l0.125_c0.1", "state": "done", "time": "2026-10-11 10:24:56", "rc": 0}
+{"name": "cmap_l0.25_c0.01", "state": "running", "time": "2026-10-11 10:24:56", "np": 4, "pid": 3131654}
+{"name": "cmap_l0.125_c1", "state": "done", "time": "2026-10-11 10:28:26", "rc": 0}
+{"name": "cmap_l0.25_c0.03", "state": "running", "time": "2026-10-11 10:28:26", "np": 4, "pid": 3147185}
+{"name": "cmap_l0.125_c0.03", "state": "done", "time": "2026-10-11 10:38:26", "rc": 0}
+{"name": "cmap_l0.25_c0.1", "state": "running", "time": "2026-10-11 10:38:26", "np": 4, "pid": 3172748}
+{"name": "cmap_l0.125_c0.01", "state": "done", "time": "2026-10-11 10:40:26", "rc": 0}
+{"name": "cmap_l0.25_c0.3", "state": "running", "time": "2026-10-11 10:40:26", "np": 4, "pid": 3184270}
+{"name": "cmap_l0.25_c0.1", "state": "done", "time": "2026-10-11 10:46:26", "rc": 0}
+{"name": "cmap_l0.25_c0.3", "state": "done", "time": "2026-10-11 10:46:56", "rc": 0}
+{"name": "cmap_l0.25_c1", "state": "running", "time": "2026-10-11 10:46:56", "np": 4, "pid": 3207921}
+{"name": "cmap_l0.25_c0.01", "state": "done", "time": "2026-10-11 10:50:26", "rc": 0}
+{"name": "cmap_l0.5_c0.01", "state": "running", "time": "2026-10-11 10:50:26", "np": 4, "pid": 3220078}
+{"name": "cmap_l0.25_c1", "state": "done", "time": "2026-10-11 10:52:26", "rc": 0}
+{"name": "cmap_l0.5_c0.03", "state": "running", "time": "2026-10-11 10:52:26", "np": 4, "pid": 3231528}
+{"name": "cmap_l0.25_c0.03", "state": "done", "time": "2026-10-11 10:53:26", "rc": 0}
+{"name": "cmap_l0.5_c0.1", "state": "running", "time": "2026-10-11 10:53:26", "np": 4, "pid": 3242618}
+{"name": "cmap_l0.5_c0.3", "state": "running", "time": "2026-10-11 10:54:56", "np": 4, "pid": 3244452}
+{"name": "cmap_l0.5_c0.1", "state": "done", "time": "2026-10-11 11:00:26", "rc": 0}
+{"name": "cmap_l0.5_c0.3", "state": "done", "time": "2026-10-11 11:01:26", "rc": 0}
+{"name": "cmap_l0.5_c1", "state": "running", "time": "2026-10-11 11:01:26", "np": 4, "pid": 3276179}
+{"name": "cmap_l0.5_c0.03", "state": "done", "time": "2026-10-11 11:02:26", "rc": 0}
+{"name": "cmap_l1_c0.01", "state": "running", "time": "2026-10-11 11:02:26", "np": 4, "pid": 3285535}
+{"name": "cmap_l1_c0.03", "state": "running", "time": "2026-10-11 11:03:26", "np": 4, "pid": 3286108}
+{"name": "cmap_l0.5_c1", "state": "done", "time": "2026-10-11 11:06:26", "rc": 0}
+{"name": "cmap_l1_c0.1", "state": "running", "time": "2026-10-11 11:06:26", "np": 4, "pid": 3300168}
+{"name": "cmap_l1_c0.03", "state": "done", "time": "2026-10-11 11:12:56", "rc": 0}
+{"name": "cmap_l1_c0.1", "state": "done", "time": "2026-10-11 11:12:56", "rc": 0}
+{"name": "cmap_l1_c0.3", "state": "running", "time": "2026-10-11 11:12:56", "np": 4, "pid": 3326190}
+{"name": "cmap_l1_c1", "state": "running", "time": "2026-10-11 11:12:56", "np": 4, "pid": 3326191}
+{"name": "cmap_l0.5_c0.01", "state": "done", "time": "2026-10-11 11:16:26", "rc": 0}
+{"name": "cmap_l1_c1", "state": "done", "time": "2026-10-11 11:17:56", "rc": 0}
+{"name": "cmap_l1_c0.3", "state": "done", "time": "2026-10-11 11:18:26", "rc": 0}
+{"name": "cmap_l1_c0.01", "state": "done", "time": "2026-10-11 11:26:56", "rc": 0}
+{"name": "cmatch_l0.14_c1", "state": "queued", "time": "2026-10-11 11:44:26", "np": 4}
+{"name": "cmatch_l0.236_c1", "state": "queued", "time": "2026-10-11 11:44:26", "np": 4}
+{"name": "cmatch_l0.39_c1", "state": "queued", "time": "2026-10-11 11:44:26", "np": 4}
+{"name": "cmatch_l0.5_c0.054", "state": "queued", "time": "2026-10-11 11:44:26", "np": 4}
+{"name": "cmatch_l1_c0.041", "state": "queued", "time": "2026-10-11 11:44:26", "np": 4}
+{"name": "cmatch_l0.14_c1", "state": "running", "time": "2026-10-11 11:44:26", "np": 4, "pid": 3406126}
+{"name": "cmatch_l0.236_c1", "state": "running", "time": "2026-10-11 11:44:26", "np": 4, "pid": 3406127}
+{"name": "cmatch_l0.39_c1", "state": "running", "time": "2026-10-11 11:44:26", "np": 4, "pid": 3406128}
+{"name": "cmatch_l0.5_c0.054", "state": "running", "time": "2026-10-11 11:44:26", "np": 4, "pid": 3406129}
+{"name": "cmatch_l0.236_c1", "state": "done", "time": "2026-10-11 11:49:26", "rc": 0}
+{"name": "cmatch_l0.39_c1", "state": "done", "time": "2026-10-11 11:49:26", "rc": 0}
+{"name": "cmatch_l1_c0.041", "state": "running", "time": "2026-10-11 11:49:26", "np": 4, "pid": 3431010}
+{"name": "cmatch_l0.14_c1", "state": "done", "time": "2026-10-11 11:50:56", "rc": 0}
+{"name": "cmatch_l0.5_c0.054", "state": "done", "time": "2026-10-11 11:53:26", "rc": 0}
+{"name": "cmatch_l1_c0.041", "state": "done", "time": "2026-10-11 11:57:26", "rc": 0}
+{"name": "cmatch_l0.37_c1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.14_c1_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.14_c1_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.14_c1_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.14_c1_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_coss_l0.236_c1_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.236_c1_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.236_c1_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.236_c1_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_coss_l0.25_c0.1_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.25_c0.1_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.25_c0.1_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.25_c0.1_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_coss_l0.5_c0.054_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.5_c0.054_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.5_c0.054_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.5_c0.054_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_coss_l0.37_c1_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.37_c1_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.37_c1_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_coss_l0.37_c1_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_micro_l1_ref1", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_micro_l1_ref2", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_micro_l1_ref3", "state": "queued", "time": "2026-10-11 11:58:26", "np": 4}
+{"name": "eff_micro_l0.25_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_micro_l0.5_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "eff_micro_l1_ref4", "state": "queued", "time": "2026-10-11 11:58:26", "np": 8}
+{"name": "cmatch_l0.37_c1", "state": "running", "time": "2026-10-11 11:58:26", "np": 4, "pid": 3475059}
+{"name": "eff_coss_l0.14_c1_ref1", "state": "running", "time": "2026-10-11 11:58:27", "np": 4, "pid": 3475060}
+{"name": "eff_coss_l0.14_c1_ref2", "state": "running", "time": "2026-10-11 11:58:27", "np": 4, "pid": 3475061}
+{"name": "eff_coss_l0.14_c1_ref3", "state": "running", "time": "2026-10-11 11:58:27", "np": 4, "pid": 3475062}
+{"name": "eff_coss_l0.14_c1_ref1", "state": "done", "time": "2026-10-11 12:02:57", "rc": 0}
+{"name": "eff_coss_l0.236_c1_ref1", "state": "running", "time": "2026-10-11 12:02:57", "np": 4, "pid": 3504033}
+{"name": "cmatch_l0.37_c1", "state": "done", "time": "2026-10-11 12:03:57", "rc": 0}
+{"name": "eff_coss_l0.236_c1_ref2", "state": "running", "time": "2026-10-11 12:03:57", "np": 4, "pid": 3512608}
+{"name": "eff_coss_l0.236_c1_ref1", "state": "done", "time": "2026-10-11 12:06:27", "rc": 0}
+{"name": "eff_coss_l0.236_c1_ref3", "state": "running", "time": "2026-10-11 12:06:27", "np": 4, "pid": 3535303}
+{"name": "eff_coss_l0.236_c1_ref2", "state": "done", "time": "2026-10-11 12:17:57", "rc": 0}
+{"name": "eff_coss_l0.25_c0.1_ref1", "state": "running", "time": "2026-10-11 12:17:57", "np": 4, "pid": 3558654}
+{"name": "eff_coss_l0.25_c0.1_ref1", "state": "done", "time": "2026-10-11 12:23:27", "rc": 0}
+{"name": "eff_coss_l0.25_c0.1_ref2", "state": "running", "time": "2026-10-11 12:23:27", "np": 4, "pid": 3581195}
+{"name": "eff_coss_l0.14_c1_ref2", "state": "done", "time": "2026-10-11 12:31:57", "rc": 0}
+{"name": "eff_coss_l0.25_c0.1_ref3", "state": "running", "time": "2026-10-11 12:31:57", "np": 4, "pid": 3607150}
+{"name": "eff_coss_l0.25_c0.1_ref2", "state": "done", "time": "2026-10-11 12:34:27", "rc": 0}
+{"name": "eff_coss_l0.5_c0.054_ref1", "state": "running", "time": "2026-10-11 12:34:27", "np": 4, "pid": 3625239}
+{"name": "eff_coss_l0.5_c0.054_ref1", "state": "done", "time": "2026-10-11 12:39:27", "rc": 0}
+{"name": "eff_coss_l0.5_c0.054_ref2", "state": "running", "time": "2026-10-11 12:39:27", "np": 4, "pid": 3649366}
+{"name": "eff_coss_l0.5_c0.054_ref2", "state": "done", "time": "2026-10-11 12:46:57", "rc": 0}
+{"name": "eff_coss_l0.5_c0.054_ref3", "state": "running", "time": "2026-10-11 12:46:57", "np": 4, "pid": 3666079}
+{"name": "eff_coss_l0.236_c1_ref3", "state": "done", "time": "2026-10-11 12:49:27", "rc": 0}
+{"name": "eff_coss_l0.37_c1_ref1", "state": "running", "time": "2026-10-11 12:49:27", "np": 4, "pid": 3677317}
+{"name": "eff_coss_l0.37_c1_ref1", "state": "done", "time": "2026-10-11 12:52:27", "rc": 0}
+{"name": "eff_coss_l0.37_c1_ref2", "state": "running", "time": "2026-10-11 12:52:27", "np": 4, "pid": 3700155}
+{"name": "eff_coss_l0.37_c1_ref2", "state": "done", "time": "2026-10-11 13:01:27", "rc": 0}
+{"name": "eff_coss_l0.37_c1_ref3", "state": "running", "time": "2026-10-11 13:01:27", "np": 4, "pid": 3718880}
+{"name": "cold_micro_l0.25_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l0.5_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l1_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.14_c1_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.236_c1_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.25_c0.1_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.37_c1_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.5_c0.054_ref1", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l0.25_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l0.5_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l1_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.14_c1_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.236_c1_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.25_c0.1_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.37_c1_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.5_c0.054_ref2", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l0.25_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l0.5_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_micro_l1_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.14_c1_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.236_c1_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.25_c0.1_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.37_c1_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "cold_coss_l0.5_c0.054_ref3", "state": "queued", "time": "2026-10-11 13:06:57", "np": 4}
+{"name": "eff_coss_l0.25_c0.1_ref3", "state": "done", "time": "2026-10-11 13:18:27", "rc": 0}
+{"name": "eff_micro_l1_ref1", "state": "running", "time": "2026-10-11 13:18:27", "np": 4, "pid": 3738996}
+{"name": "eff_coss_l0.5_c0.054_ref3", "state": "done", "time": "2026-10-11 13:22:57", "rc": 0}
+{"name": "eff_micro_l1_ref2", "state": "running", "time": "2026-10-11 13:22:57", "np": 4, "pid": 3751272}
+{"name": "eff_micro_l1_ref1", "state": "done", "time": "2026-10-11 13:24:27", "rc": 0}
+{"name": "eff_micro_l1_ref3", "state": "running", "time": "2026-10-11 13:24:27", "np": 4, "pid": 3772320}
+{"name": "eff_coss_l0.37_c1_ref3", "state": "done", "time": "2026-10-11 13:29:27", "rc": 0}
+{"name": "eff_micro_l1_ref2", "state": "done", "time": "2026-10-11 13:31:27", "rc": 0}
+{"name": "eff_coss_l0.14_c1_ref4", "state": "running", "time": "2026-10-11 13:31:27", "np": 8, "pid": 3799760}
+{"name": "eff_micro_l1_ref3", "state": "done", "time": "2026-10-11 14:00:27", "rc": 0}
+{"name": "eff_coss_l0.14_c1_ref3", "state": "done", "time": "2026-10-11 14:41:57", "rc": 0}
+{"name": "eff_coss_l0.236_c1_ref4", "state": "running", "time": "2026-10-11 14:41:57", "np": 8, "pid": 3841458}
+{"name": "eff_coss_l0.236_c1_ref4", "state": "done", "time": "2026-10-11 15:26:28", "rc": 0}
+{"name": "eff_coss_l0.25_c0.1_ref4", "state": "running", "time": "2026-10-11 15:26:28", "np": 8, "pid": 3888085}
+{"name": "eff_coss_l0.14_c1_ref4", "state": "done", "time": "2026-10-11 15:27:28", "rc": 0}
+{"name": "eff_coss_l0.5_c0.054_ref4", "state": "running", "time": "2026-10-11 15:27:28", "np": 8, "pid": 3904186}
+{"name": "eff_coss_l0.25_c0.1_ref4", "state": "done", "time": "2026-10-11 16:15:58", "rc": 0}
+{"name": "eff_micro_l0.25_ref4", "state": "running", "time": "2026-10-11 16:15:58", "np": 8, "pid": 3938393}
+{"name": "eff_coss_l0.5_c0.054_ref4", "state": "done", "time": "2026-10-11 16:19:28", "rc": 0}
+{"name": "eff_micro_l0.5_ref4", "state": "running", "time": "2026-10-11 16:19:28", "np": 8, "pid": 3967686}
+{"name": "eff_micro_l0.25_ref4", "state": "killed", "time": "2026-10-11 17:21:58", "rc": 124}
+{"name": "eff_micro_l1_ref4", "state": "running", "time": "2026-10-11 17:21:58", "np": 8, "pid": 3974415}
+{"name": "eff_micro_l0.5_ref4", "state": "done", "time": "2026-10-11 17:28:28", "rc": 0}
+{"name": "eff_coss_l0.37_c1_ref4", "state": "running", "time": "2026-10-11 17:28:28", "np": 8, "pid": 4002495}
+{"name": "eff_coss_l0.37_c1_ref4", "state": "done", "time": "2026-10-11 18:00:58", "rc": 0}
+{"name": "cold_micro_l0.25_ref1", "state": "running", "time": "2026-10-11 18:00:58", "np": 4, "pid": 4034931}
+{"name": "cold_micro_l0.5_ref1", "state": "running", "time": "2026-10-11 18:00:58", "np": 4, "pid": 4034932}
+{"name": "cold_micro_l0.5_ref1", "state": "done", "time": "2026-10-11 18:04:28", "rc": 0}
+{"name": "cold_micro_l1_ref1", "state": "running", "time": "2026-10-11 18:04:28", "np": 4, "pid": 4063273}
+{"name": "cold_micro_l0.25_ref1", "state": "done", "time": "2026-10-11 18:04:58", "rc": 0}
+{"name": "cold_coss_l0.14_c1_ref1", "state": "running", "time": "2026-10-11 18:04:58", "np": 4, "pid": 4076454}
+{"name": "cold_micro_l1_ref1", "state": "done", "time": "2026-10-11 18:07:58", "rc": 0}
+{"name": "cold_coss_l0.236_c1_ref1", "state": "running", "time": "2026-10-11 18:07:58", "np": 4, "pid": 4097312}
+{"name": "cold_coss_l0.14_c1_ref1", "state": "done", "time": "2026-10-11 18:09:28", "rc": 0}
+{"name": "cold_coss_l0.25_c0.1_ref1", "state": "running", "time": "2026-10-11 18:09:28", "np": 4, "pid": 4119159}
+{"name": "cold_coss_l0.236_c1_ref1", "state": "done", "time": "2026-10-11 18:11:58", "rc": 0}
+{"name": "cold_coss_l0.37_c1_ref1", "state": "running", "time": "2026-10-11 18:11:58", "np": 4, "pid": 4141101}
+{"name": "cold_coss_l0.37_c1_ref1", "state": "done", "time": "2026-10-11 18:15:28", "rc": 0}
+{"name": "cold_coss_l0.5_c0.054_ref1", "state": "running", "time": "2026-10-11 18:15:28", "np": 4, "pid": 4163166}
+{"name": "eff_micro_l1_ref4", "state": "done", "time": "2026-10-11 18:16:58", "rc": 0}
+{"name": "cold_micro_l0.25_ref2", "state": "running", "time": "2026-10-11 18:16:58", "np": 4, "pid": 4190695}
+{"name": "cold_micro_l0.5_ref2", "state": "running", "time": "2026-10-11 18:16:59", "np": 4, "pid": 4190696}
+{"name": "cold_coss_l0.25_c0.1_ref1", "state": "done", "time": "2026-10-11 18:22:29", "rc": 0}
+{"name": "cold_micro_l1_ref2", "state": "running", "time": "2026-10-11 18:22:29", "np": 4, "pid": 20154}
+{"name": "cold_coss_l0.5_c0.054_ref1", "state": "done", "time": "2026-10-11 18:26:29", "rc": 0}
+{"name": "cold_coss_l0.14_c1_ref2", "state": "running", "time": "2026-10-11 18:26:29", "np": 4, "pid": 44240}
+{"name": "cold_micro_l0.5_ref2", "state": "done", "time": "2026-10-11 18:26:59", "rc": 0}
+{"name": "cold_coss_l0.236_c1_ref2", "state": "running", "time": "2026-10-11 18:26:59", "np": 4, "pid": 56090}
+{"name": "cold_micro_l1_ref2", "state": "done", "time": "2026-10-11 18:31:29", "rc": 0}
+{"name": "cold_coss_l0.25_c0.1_ref2", "state": "running", "time": "2026-10-11 18:31:29", "np": 4, "pid": 70286}
+{"name": "cold_micro_l0.25_ref2", "state": "done", "time": "2026-10-11 18:38:29", "rc": 0}
+{"name": "cold_coss_l0.37_c1_ref2", "state": "running", "time": "2026-10-11 18:38:29", "np": 4, "pid": 84788}
+{"name": "cold_coss_l0.236_c1_ref2", "state": "done", "time": "2026-10-11 18:47:29", "rc": 0}
+{"name": "cold_coss_l0.5_c0.054_ref2", "state": "running", "time": "2026-10-11 18:47:29", "np": 4, "pid": 100197}
+{"name": "cold_coss_l0.37_c1_ref2", "state": "done", "time": "2026-10-11 18:52:59", "rc": 0}
+{"name": "cold_micro_l0.25_ref3", "state": "running", "time": "2026-10-11 18:52:59", "np": 4, "pid": 115242}
+{"name": "cold_coss_l0.14_c1_ref2", "state": "done", "time": "2026-10-11 19:02:59", "rc": 0}
+{"name": "cold_micro_l0.5_ref3", "state": "running", "time": "2026-10-11 19:02:59", "np": 4, "pid": 130743}
+{"name": "cold_coss_l0.25_c0.1_ref2", "state": "done", "time": "2026-10-11 19:55:29", "rc": 0}
+{"name": "cold_micro_l1_ref3", "state": "running", "time": "2026-10-11 19:55:29", "np": 4, "pid": 153596}
+{"name": "profile_pairs_ref3", "state": "queued", "time": "2026-10-11 20:00:59", "np": 4}
+{"name": "profile_pairs_ref4", "state": "queued", "time": "2026-10-11 20:00:59", "np": 4}
+{"name": "cold_coss_l0.5_c0.054_ref2", "state": "done", "time": "2026-10-11 20:00:59", "rc": 0}
+{"name": "profile_pairs_ref3", "state": "running", "time": "2026-10-11 20:00:59", "np": 4, "pid": 168956}
+{"name": "profile_pairs_ref3", "state": "done", "time": "2026-10-11 20:02:59", "rc": 0}
+{"name": "profile_pairs_ref4", "state": "running", "time": "2026-10-11 20:02:59", "np": 4, "pid": 189705}
+{"name": "profile_pairs_ref4", "state": "done", "time": "2026-10-11 20:07:59", "rc": 0}
+{"name": "cold_coss_l0.14_c1_ref3", "state": "running", "time": "2026-10-11 20:07:59", "np": 4, "pid": 216655}
+{"name": "cold_micro_l0.25_ref3", "state": "killed", "time": "2026-10-11 20:12:29", "rc": 124}
+{"name": "cold_coss_l0.236_c1_ref3", "state": "running", "time": "2026-10-11 20:12:29", "np": 4, "pid": 217173}
+{"name": "cold_micro_l0.5_ref3", "state": "done", "time": "2026-10-11 20:14:29", "rc": 0}
+{"name": "cold_coss_l0.25_c0.1_ref3", "state": "running", "time": "2026-10-11 20:14:29", "np": 4, "pid": 227660}
+{"name": "cold_micro_l1_ref3", "state": "done", "time": "2026-10-11 20:36:29", "rc": 0}
+{"name": "cold_coss_l0.37_c1_ref3", "state": "running", "time": "2026-10-11 20:36:29", "np": 4, "pid": 240329}
+{"name": "cold_coss_l0.37_c1_ref3", "state": "done", "time": "2026-10-11 21:52:00", "rc": 0}
+{"name": "cold_coss_l0.5_c0.054_ref3", "state": "running", "time": "2026-10-11 21:52:00", "np": 4, "pid": 259333}
+{"name": "cold_coss_l0.25_c0.1_ref3", "state": "done", "time": "2026-10-11 21:57:30", "rc": 0}
+{"name": "peak_positions", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.2_l0.125", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.2_l0.25", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.2_l0.5", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.3_l0.125", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.3_l0.25", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b0.3_l0.5", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b1_l0.125", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b1_l0.25", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "stiffmap_b1_l0.5", "state": "queued", "time": "2026-10-11 22:04:30", "np": 4}
+{"name": "peak_positions", "state": "running", "time": "2026-10-11 22:04:30", "np": 4, "pid": 271903}
+{"name": "peak_positions", "state": "done", "time": "2026-10-11 22:06:30", "rc": 0}
+{"name": "stiffmap_b0.2_l0.125", "state": "running", "time": "2026-10-11 22:06:30", "np": 4, "pid": 290550}
+{"name": "smoke2d_after_3d_edits", "state": "queued", "time": "2026-10-11 22:07:30", "np": 2}
+{"name": "smoke3d_hb3_ref0", "state": "queued", "time": "2026-10-11 22:07:30", "np": 2}
+{"name": "stiffmap_b0.2_l0.125", "state": "done", "time": "2026-10-11 22:22:30", "rc": 0}
+{"name": "smoke2d_after_3d_edits", "state": "running", "time": "2026-10-11 22:22:30", "np": 2, "pid": 303424}
+{"name": "smoke3d_hb3_ref0", "state": "running", "time": "2026-10-11 22:22:30", "np": 2, "pid": 303425}
+{"name": "smoke2d_after_3d_edits", "state": "done", "time": "2026-10-11 22:25:00", "rc": 0}
+{"name": "cold_coss_l0.236_c1_ref3", "state": "done", "time": "2026-10-11 22:27:30", "rc": 0}
+{"name": "stiffmap_b0.2_l0.25", "state": "running", "time": "2026-10-11 22:27:30", "np": 4, "pid": 321803}
+{"name": "stiffmap_b0.2_l0.25", "state": "done", "time": "2026-10-11 22:39:00", "rc": 0}
+{"name": "stiffmap_b0.2_l0.5", "state": "running", "time": "2026-10-11 22:39:00", "np": 4, "pid": 333521}
+{"name": "stiffmap_b0.2_l0.5", "state": "done", "time": "2026-10-11 22:47:00", "rc": 0}
+{"name": "stiffmap_b0.3_l0.125", "state": "running", "time": "2026-10-11 22:47:00", "np": 4, "pid": 344796}
+{"name": "smoke3d_hb3_ref0", "state": "killed", "time": "2026-10-11 22:53:30", "rc": 124}
+{"name": "stiffmap_b0.3_l0.25", "state": "running", "time": "2026-10-11 22:53:30", "np": 4, "pid": 345561}
+{"name": "cold_coss_l0.5_c0.054_ref3", "state": "done", "time": "2026-10-11 23:00:30", "rc": 0}
+{"name": "stiffmap_b0.3_l0.5", "state": "running", "time": "2026-10-11 23:00:30", "np": 4, "pid": 357233}
+{"name": "stiffmap_b0.3_l0.125", "state": "done", "time": "2026-10-11 23:02:30", "rc": 0}
+{"name": "stiffmap_b1_l0.125", "state": "running", "time": "2026-10-11 23:02:30", "np": 4, "pid": 367719}
+{"name": "stiffmap_b0.3_l0.25", "state": "done", "time": "2026-10-11 23:04:00", "rc": 0}
+{"name": "stiffmap_b1_l0.25", "state": "running", "time": "2026-10-11 23:04:00", "np": 4, "pid": 378151}
+{"name": "stiffmap_b0.3_l0.5", "state": "done", "time": "2026-10-11 23:08:30", "rc": 0}
+{"name": "stiffmap_b1_l0.5", "state": "running", "time": "2026-10-11 23:08:30", "np": 4, "pid": 389029}
+{"name": "stiffmap_b1_l0.25", "state": "done", "time": "2026-10-11 23:21:00", "rc": 0}
+{"name": "stiffmap_b1_l0.125", "state": "done", "time": "2026-10-11 23:21:30", "rc": 0}
+{"name": "stiffmap_b1_l0.5", "state": "done", "time": "2026-10-11 23:21:30", "rc": 0}
+{"name": "cold_coss_l0.14_c1_ref3", "state": "done", "time": "2026-10-11 23:35:30", "rc": 0}
+{"name": "stiffmatch_b0.3_l0.138", "state": "queued", "time": "2026-10-12 00:37:30", "np": 4}
+{"name": "stiffmatch_b0.3_l0.272", "state": "queued", "time": "2026-10-12 00:37:30", "np": 4}
+{"name": "stiffmatch_b1_l0.148", "state": "queued", "time": "2026-10-12 00:37:30", "np": 4}
+{"name": "stiffmatch_b0.3_l0.138", "state": "running", "time": "2026-10-12 00:37:30", "np": 4, "pid": 488852}
+{"name": "stiffmatch_b0.3_l0.272", "state": "running", "time": "2026-10-12 00:37:30", "np": 4, "pid": 488853}
+{"name": "shift_stats_ref3", "state": "queued", "time": "2026-10-12 00:40:30", "np": 4}
+{"name": "stiffmatch_b0.3_l0.272", "state": "done", "time": "2026-10-12 00:47:30", "rc": 0}
+{"name": "shift_stats_ref3", "state": "running", "time": "2026-10-12 00:47:30", "np": 4, "pid": 500277}
+{"name": "shift_stats_ref3", "state": "done", "time": "2026-10-12 00:50:00", "rc": 0}
+{"name": "stiffmatch_b1_l0.148", "state": "running", "time": "2026-10-12 00:50:00", "np": 4, "pid": 510765}
+{"name": "stiffmatch_b0.3_l0.138", "state": "done", "time": "2026-10-12 00:51:30", "rc": 0}
+{"name": "stiffmatch_b1_l0.148", "state": "done", "time": "2026-10-12 01:06:30", "rc": 0}
+{"name": "shift_stats_ref3_v2", "state": "queued", "time": "2026-10-12 02:39:01", "np": 4}
+{"name": "shift_stats_ref3_v2", "state": "running", "time": "2026-10-12 02:39:01", "np": 4, "pid": 541560}
+{"name": "eff_micro_b0.3_l0.138_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.138_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.138_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.138_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.138_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.138_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.138_ref4", "state": "queued", "time": "2026-10-12 02:39:31", "np": 8}
+{"name": "eff_micro_b0.3_l0.272_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.272_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.272_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.272_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.272_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b0.3_l0.272_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b0.3_l0.272_ref4", "state": "queued", "time": "2026-10-12 02:39:31", "np": 8}
+{"name": "eff_micro_b1_l0.148_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b1_l0.148_ref1", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b1_l0.148_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b1_l0.148_ref2", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b1_l0.148_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "cold_micro_b1_l0.148_ref3", "state": "queued", "time": "2026-10-12 02:39:31", "np": 4}
+{"name": "eff_micro_b1_l0.148_ref4", "state": "queued", "time": "2026-10-12 02:39:31", "np": 8}
+{"name": "eff_micro_b0.3_l0.138_ref1", "state": "running", "time": "2026-10-12 02:39:31", "np": 4, "pid": 543621}
+{"name": "shift_stats_ref3_v2", "state": "done", "time": "2026-10-12 02:41:31", "rc": 0}
+{"name": "cold_micro_b0.3_l0.138_ref1", "state": "running", "time": "2026-10-12 02:41:31", "np": 4, "pid": 552647}
+{"name": "eff_micro_b0.3_l0.138_ref1", "state": "done", "time": "2026-10-12 02:44:31", "rc": 0}
+{"name": "eff_micro_b0.3_l0.138_ref2", "state": "running", "time": "2026-10-12 02:44:31", "np": 4, "pid": 592257}
+{"name": "cold_micro_b0.3_l0.138_ref1", "state": "done", "time": "2026-10-12 02:45:01", "rc": 0}
+{"name": "cold_micro_b0.3_l0.138_ref2", "state": "running", "time": "2026-10-12 02:45:01", "np": 4, "pid": 594026}
+{"name": "cold_micro_b0.3_l0.138_ref2", "state": "done", "time": "2026-10-12 03:00:01", "rc": 0}
+{"name": "eff_micro_b0.3_l0.138_ref3", "state": "running", "time": "2026-10-12 03:00:01", "np": 4, "pid": 608926}
+{"name": "eff_micro_b0.3_l0.138_ref2", "state": "done", "time": "2026-10-12 03:16:31", "rc": 0}
+{"name": "cold_micro_b0.3_l0.138_ref3", "state": "running", "time": "2026-10-12 03:16:31", "np": 4, "pid": 623962}
+{"name": "cold_micro_b0.3_l0.138_ref3", "state": "done", "time": "2026-10-12 05:11:02", "rc": 0}
+{"name": "eff_micro_b0.3_l0.272_ref1", "state": "running", "time": "2026-10-12 05:11:02", "np": 4, "pid": 643602}
+{"name": "eff_micro_b0.3_l0.272_ref1", "state": "done", "time": "2026-10-12 05:14:02", "rc": 0}
+{"name": "cold_micro_b0.3_l0.272_ref1", "state": "running", "time": "2026-10-12 05:14:02", "np": 4, "pid": 664384}
+{"name": "cold_micro_b0.3_l0.272_ref1", "state": "done", "time": "2026-10-12 05:17:02", "rc": 0}
+{"name": "eff_micro_b0.3_l0.272_ref2", "state": "running", "time": "2026-10-12 05:17:02", "np": 4, "pid": 685170}
+{"name": "eff_micro_b0.3_l0.272_ref2", "state": "done", "time": "2026-10-12 05:26:02", "rc": 0}
+{"name": "cold_micro_b0.3_l0.272_ref2", "state": "running", "time": "2026-10-12 05:26:02", "np": 4, "pid": 699722}
+{"name": "cold_micro_b0.3_l0.272_ref2", "state": "done", "time": "2026-10-12 05:34:02", "rc": 0}
+{"name": "eff_micro_b0.3_l0.272_ref3", "state": "running", "time": "2026-10-12 05:34:02", "np": 4, "pid": 714068}
+{"name": "shift_stats_ref3_v3", "state": "queued", "time": "2026-10-12 06:10:02", "np": 4}
+{"name": "eff_micro_b0.3_l0.272_ref3", "state": "done", "time": "2026-10-12 06:15:32", "rc": 0}
+{"name": "shift_stats_ref3_v3", "state": "running", "time": "2026-10-12 06:15:32", "np": 4, "pid": 728420}
+{"name": "shift_stats_ref3_v3", "state": "done", "time": "2026-10-12 06:18:32", "rc": 0}
+{"name": "cold_micro_b0.3_l0.272_ref3", "state": "running", "time": "2026-10-12 06:18:32", "np": 4, "pid": 740136}
+{"name": "cold_micro_b0.3_l0.272_ref3", "state": "done", "time": "2026-10-12 06:47:02", "rc": 0}
+{"name": "eff_micro_b1_l0.148_ref1", "state": "running", "time": "2026-10-12 06:47:02", "np": 4, "pid": 753388}
+{"name": "eff_micro_b1_l0.148_ref1", "state": "done", "time": "2026-10-12 06:50:32", "rc": 0}
+{"name": "cold_micro_b1_l0.148_ref1", "state": "running", "time": "2026-10-12 06:50:32", "np": 4, "pid": 774214}
+{"name": "cold_micro_b1_l0.148_ref1", "state": "done", "time": "2026-10-12 06:53:32", "rc": 0}
+{"name": "eff_micro_b1_l0.148_ref2", "state": "running", "time": "2026-10-12 06:53:32", "np": 4, "pid": 794985}
+{"name": "eff_micro_b1_l0.148_ref2", "state": "done", "time": "2026-10-12 07:15:03", "rc": 0}
+{"name": "cold_micro_b1_l0.148_ref2", "state": "running", "time": "2026-10-12 07:15:03", "np": 4, "pid": 810482}
+{"name": "cold_micro_b1_l0.148_ref2", "state": "done", "time": "2026-10-12 07:27:33", "rc": 0}
+{"name": "eff_micro_b1_l0.148_ref3", "state": "running", "time": "2026-10-12 07:27:33", "np": 4, "pid": 825206}
+{"name": "eff_micro_b0.3_l0.138_ref3", "state": "done", "time": "2026-10-12 07:38:03", "rc": 0}
+{"name": "cold_micro_b1_l0.148_ref3", "state": "running", "time": "2026-10-12 07:38:03", "np": 4, "pid": 836420}
+{"name": "shift_stats_ref3_v4", "state": "queued", "time": "2026-10-12 08:11:03", "np": 4}
+{"name": "cold_micro_b1_l0.148_ref3", "state": "done", "time": "2026-10-12 08:27:33", "rc": 0}
+{"name": "shift_stats_ref3_v4", "state": "running", "time": "2026-10-12 08:27:33", "np": 4, "pid": 917839}
+{"name": "shift_stats_ref3_v4", "state": "done", "time": "2026-10-12 08:30:33", "rc": 0}
+{"name": "eff_micro_b1_l0.148_ref3", "state": "done", "time": "2026-10-12 09:12:33", "rc": 0}
+{"name": "eff_micro_b0.3_l0.138_ref4", "state": "running", "time": "2026-10-12 09:12:33", "np": 8, "pid": 944722}
+{"name": "eff_micro_b0.3_l0.138_ref4", "state": "done", "time": "2026-10-12 11:20:04", "rc": 0}
+{"name": "eff_micro_b0.3_l0.272_ref4", "state": "running", "time": "2026-10-12 11:20:04", "np": 8, "pid": 1094179}
+{"name": "eff_micro_b0.3_l0.272_ref4", "state": "done", "time": "2026-10-12 11:52:04", "rc": 0}
+{"name": "eff_micro_b1_l0.148_ref4", "state": "running", "time": "2026-10-12 11:52:04", "np": 8, "pid": 1130086}
+{"name": "eff_micro_b1_l0.148_ref4", "state": "done", "time": "2026-10-12 12:18:34", "rc": 0}

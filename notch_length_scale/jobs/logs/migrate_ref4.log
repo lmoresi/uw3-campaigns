@@ -1,0 +1,8 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+checkpoint written: micro_ref4_xi0_beta0.1_l1_production_tight
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+checkpoint written: micro_ref4_xi0_beta0.1_l2_production_tight
