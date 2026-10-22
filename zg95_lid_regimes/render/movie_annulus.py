@@ -19,9 +19,10 @@ params = uw.Params(
     uw_out="",                  # default: <run>/renders/movie.mp4
     uw_fps=3,
     uw_width=1920,              # output width in pixels
+    uw_renders="renders",       # the renders directory under the run (renders_strain for the strain panels)
 )
 run = os.path.expanduser(params.uw_run)
-renders = os.path.join(run, "renders")
+renders = os.path.join(run, params.uw_renders)
 out = os.path.expanduser(params.uw_out) if params.uw_out else os.path.join(renders, "movie.mp4")
 
 steps = sorted(int(re.search(r"frame_(\d+)\.png", f).group(1))
