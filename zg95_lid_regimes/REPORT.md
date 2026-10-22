@@ -91,7 +91,46 @@ warm-start rules, and the rebuild rules for a moving trench. Through an overturn
 nonlinear solve sets the cost (15-25 Newton increments per step on the moving-trench
 run); a tolerance of 1e-2 or the declared regularisation eta_reg are the open choices.
 
+## The annulus
+
+Drivers: `drivers/annulus_model.py`, `annulus_convection.py` (no fault), `annulus_fault.py`
+(one fault: fixed, window, fault-normal or strain-steered trench), `annulus_faults.py`
+(faults formed and retired by damage), `strain_band.py` (the band detector). The annulus is
+built in layer depths (r_o 1/0.45, r_i 0.55/0.45), so every box parameter carries over
+unconverted. Outputs in `~/+Simulations/zg95/annulus_regimes/runs/` and
+`~/+Simulations/zg95/annulus_faults/runs/`; the movie `movies/04_annulus_fault_strain_weakening.mp4`.
+
+**Calibration.** At Hyperion's resolution (finest d/11) the driver reproduces Hyperion's
+mobile `conv_ms98` (M 0.60, lid 0.23 d, T_mid 0.68). At tau1/Ra 1 the annulus mobilises at
+d/32 too, from either seed (six cells within t 0.05, ten cells after t 0.13), where the box
+stays stagnant to t 1.0 (the box at d/11 is stagnant to t 0.55, then overturns episodically).
+The annulus counterpart of the box reference is tau1/Ra 1.5 with the ten-cell seed: stagnant
+to t 0.59 (M 0.037, lid 0.34 d, T_mid 0.885). A two-cell box at tau1/Ra 1 is mobile (M 0.69):
+long cells alone move the bistable lid onto the mobile branch.
+
+**A moving fault through that lid** (45 degrees, 0.35 d, from t 0.295): episodic. A slab goes
+down the fault and M rises to 0.51, the lid relocks (M 0.13 by t 0.33), and a second episode
+follows. With **strain weakening** (yield x1.25 intact, x0.5 at gamma 0.5, transported plastic
+strain) and the declared regularisation **eta_reg** (100 held M back to 0.26; 10 kept it at
+0.36-0.43 at 5-14 Newton increments per step) the first episode is stronger (M 0.66) and the
+second reaches M 0.81, with a ridge opening at about +100 degrees.
+
+**The fault leaves the downwelling** under both kinematic trench laws (the overriding-plate
+window, and the fault's own mean normal velocity): the slab sinks near-vertically at the
+original trench while the straight fault, held at 45 degrees, drifts 15-20 degrees away.
+
+**Strain-steered faults.** The detector finds the saturated, cold, descending plastic-strain
+band and fits its ridge (the position of greatest strain at each depth, over the depth the
+fault occupies). The fault relaxes onto it in trench angle, dip (which may pass vertical: the
+slab steepens from 40-55 to 80-95 degrees) and depth (the local thermal boundary layer, the
+T = 0.7 isotherm beside the trench, 0.08-0.15 d before the relock thickens it). The fault then
+stays on the downwelling. The lid still relocks after the first slab: the relock is physical.
+With faults formed where a band's damage exceeds 0.05 d^2 (and retired below 0.01), a second
+fault formed at +30 degrees and took over the slip while the first stayed on its own band.
+The remobilisation at +100 degrees is a spreading ridge, which the downwelling criterion
+correctly leaves without a fault: mid-ocean-ridge physics is the open item.
+
 ## Next
 
-The annulus as the periodic domain: moving fault against no fault, after matching the
-annulus lid mobility and boundary-layer thickness to the box's.
+Mid-ocean-ridge physics for the divergent boundaries; the regime map of the damage-fault
+model against tau1/Ra.
