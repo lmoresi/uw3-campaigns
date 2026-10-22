@@ -94,7 +94,8 @@ only when Louis asks.
 ## Waiting on Louis
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
-- rsync lid-regime checkpoints 3580 (and 3250) to kaiju `~/campaigns/zg95/checkpoints/`.
+- Resume the kaiju nodes (all eight down since 2026-10-22 17:22).
+- rsync the lid-regime run directory to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines/`.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
   `~/.claude` mirror, local notes).
@@ -118,3 +119,11 @@ only when Louis asks.
   the stress-transport follow-ups. The lid-regime drivers were pushed (e258447). Kaiju's rules:
   no credentials, fixes go to the hub as patches. Louis agreed to make uw3-campaigns public.
   This file was created.
+- 2026-10-23: uw3-campaigns made public; kaiju cloned zg95-annulus-for-kaiju and wrote its launch
+  scripts (~/campaigns/kaiju-launch/, uncommitted). The first patch came through the hub:
+  kaiju/movie-ffmpeg-fallback 9f7a2e2. **All eight kaiju nodes went down together at 17:22 on
+  10-22 ("Node unexpectedly rebooted")** and need `scontrol update NodeName=n[1-8] State=RESUME`
+  from an admin. Job 2070 is queued behind that. Restart layout: kaiju's
+  `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines/` mirrors the laptop run and kaiju only reads it.
+  Kaiju restarts in a sibling directory, `..._kaiju3580`, because the driver truncates
+  records.json and would overwrite the laptop's later checkpoints.
