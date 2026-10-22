@@ -133,3 +133,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   reorganise it. Bootstrap job 2070 OK (8 ranks, convection steps 6.5-13 s, 2.8 GB rss). Fresh
   faulted test 2071 OK (10 steps, ~60 s/step, 4.4 GB rss) but too short to trigger a fault
   rebuild. Restart check 2072 (3580 -> 3600 against the laptop's records) is running.
+- 2026-10-23: Louis's ruling: validate scaling to more cores before any science runs on kaiju.
+  Rank-count study from the 3580 restart, 15 steps (covering the laptop's rebuilds at 3582 and
+  3592), at np 8 (job 2072), 16, 32, 52 (one node, one rank per core) and 104 (2 nodes over
+  IPoIB). Measured per run: per-phase step times, Newton and KSP iterations, placement time and
+  refusals, memory, and agreement with the laptop. Results go to kaiju runs/ and NOTES.
