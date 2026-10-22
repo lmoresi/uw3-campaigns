@@ -58,8 +58,8 @@ No long campaigns.
 - **There are no GitHub credentials on kaiju.** Fixes come to the hub as `git format-patch`
   output, and the hub pushes them.
 
-**wombat (laptop)**: runs the live lid-regime run on 8 cores at most. Commits to uw3-campaigns
-only when Louis asks.
+**wombat (laptop)**: development only since 2026-10-23, no production runs (8-core budget).
+Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to kaiju.
 
 ## Standing rules (Louis)
 
@@ -94,8 +94,8 @@ only when Louis asks.
 ## Waiting on Louis
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
-- Resume the kaiju nodes (all eight down since 2026-10-22 17:22).
-- rsync the lid-regime run directory to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines/`.
+- Lid-regime on kaiju: continue from the laptop's last checkpoint (>= 3910) or from kaiju's own
+  3600, and which sweep to run alongside it (after job 2072 confirms kaiju reproduces 3581-3600).
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
   `~/.claude` mirror, local notes).
@@ -127,3 +127,9 @@ only when Louis asks.
   `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines/` mirrors the laptop run and kaiju only reads it.
   Kaiju restarts in a sibling directory, `..._kaiju3580`, because the driver truncates
   records.json and would overwrite the laptop's later checkpoints.
+- 2026-10-23 (later): Louis resumed the kaiju nodes, and all eight are idle (n1-n4 are back too).
+  The laptop is now for development only; kaiju is production for lid-regime. The checkpoint set is
+  in `~/campaigns/zg95/checkpoints/ra3x_tau1x1.50_lines/` (records to step 3910), and kaiju may
+  reorganise it. Bootstrap job 2070 OK (8 ranks, convection steps 6.5-13 s, 2.8 GB rss). Fresh
+  faulted test 2071 OK (10 steps, ~60 s/step, 4.4 GB rss) but too short to trigger a fault
+  rebuild. Restart check 2072 (3580 -> 3600 against the laptop's records) is running.
