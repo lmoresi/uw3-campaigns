@@ -214,3 +214,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   plus MUMPS, telescope or redundant LU, measured before building. Kaiju is testing both fixes as
   a box-faults overlay at np 16 and at np 32/52 with the 124-cell coarse level. The kaiju dev
   session's patch is now just the refused set and decision state.
+- 2026-10-24: Louis's ruling: **testing belongs to kaiju; the laptop is informed only.** It hears
+  about solver-recipe changes (the warm-start switch, a possible side-aware transfer, the coarse-solve
+  redesign) and changes nothing until the hub reports them validated. Kaiju runs the clean A/B
+  (371d3bd1 cherry-picked alone onto c1107957, np 16) and the band-residual probe (job 2100).
+  From the driver: only same-set rebuilds (moved or shortened fault) are warm-started; a changed set
+  and the first step after a restart are cold by design. warm_start evaluates the old V,P at the new
+  nodes, so the old jump lands on the wrong side in the band the fault sweeps.
