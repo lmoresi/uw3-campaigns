@@ -130,7 +130,39 @@ fault formed at +30 degrees and took over the slip while the first stayed on its
 The remobilisation at +100 degrees is a spreading ridge, which the downwelling criterion
 correctly leaves without a fault: mid-ocean-ridge physics is the open item.
 
+**Line-law faults, 2026-10-18 to 10-23.** Up to four faults fitted to the damage as straight
+lines (RANSAC on plastic strain at or above 2, each as long as its damage is deep), matched
+to the existing faults by trench angle, formed where unmatched, retired after three
+detections without a line. The conjugate V of a downwelling resolves as a stem and two
+arms; a converging pair closed into a V and hung the mesher at 0.2 cells of spine
+separation, so faults are kept apart by a clearance rule (0.08 d: the weaker, by slip, is
+shortened, and retires if it cannot clear). Movie: `renders/movie_lines_2870_3250.mp4`.
+
+**Ra x 3 (2.73e6, tau1/Ra 1.5) from the line-law run's checkpoint 3250.** vrms tripled at
+once, the lid thinned from 0.33 to 0.20-0.22 d over t 0.433-0.445 (Ra^(1/3) predicts 0.23),
+q_top 2.8 to 4.8, q_base 2.7 to 5.9, the internally heated fraction 0.40 to 0.23. A second
+downwelling formed at the antipode with its own faults and the planform became degree 2;
+the two trenches alternate in slip (up to 50 on one while the other locks), each with a
+conjugate pair whose dips swing through vertical as the polarity flips. Rebuilds every 5-10
+steps cost a Picard-first cold solve (20-40 Newton iterations, 10-25 min on 7 ranks) against
+2-5 iterations warm: the dominant cost. Stopped at checkpoint 3910 (t 0.4696) for kaiju.
+Movie with the strain panels: `renders_strain/movie_strain_3250_3910.mp4`.
+
+**What the strain panels say.** A slipping fault is a one-cell band at a strain rate of 1e3
+inside a yield zone at 1e2 that is 0.3 d wide: the fault adds a decade on one cell while the
+yielding lid takes most of the convergence, so the downwellings are fat, symmetric and
+two-sided. A locked fault keeps its damage scar (no healing in the lid), and the line fit
+keeps it there: damage is a memory, not a measure of activity. The plastic strain is also
+fed by the faults (0.5 x slip within two band widths), so damage is highest exactly where
+the continuum plastic strain rate is lowest.
+
 ## Next
 
-Mid-ocean-ridge physics for the divergent boundaries; the regime map of the damage-fault
-model against tau1/Ra.
+The regime suite for kaiju (`launch/suite_kaiju/`): Ra 2.7e6 and 9.1e6, tau1/Ra 1.5 and 3,
+with an asthenosphere channel (viscosity x 0.1 between 0.25-0.3 and 0.7 d), the surface
+yield stress tripled, weak_min 0.25 and the fault depth cap at the lid base, all from
+checkpoint 3910. The aim is a lid that is stagnant unless damaged, so that the faults
+reinforce the shear bands instead of decorating a yielding lid, and a slab that can roll
+back. Then: form and steer the faults on the plastic strain rate rather than the damage,
+advect the trench with the overriding plate between detections, retire on slip; lid
+healing; mid-ocean-ridge physics for the divergent boundaries.

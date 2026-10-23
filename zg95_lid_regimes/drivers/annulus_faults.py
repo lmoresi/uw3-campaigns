@@ -59,6 +59,11 @@ params = uw.Params(
     uw_tau1=1.366875e6,
     uw_heating=1.4175,
     uw_yield_softness=0.2,
+    # an asthenosphere: the viscosity times uw_asth in a channel between two depths
+    uw_asth=1.0,                # 1: no channel; 0.01-0.1 for a weak channel under the lid
+    uw_asth_top=0.3,
+    uw_asth_bottom=0.7,
+    uw_asth_ramp=0.05,
     # the first fault, when starting from an annulus run
     uw_theta_trench=0.0,
     uw_dip=45.0,
@@ -92,6 +97,10 @@ params = uw.Params(
     uw_bl_T=0.7,
     uw_fault_depth_min=0.06,
     uw_fault_depth_max=0.25,
+    uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
+                                #    lid depth of the last record plus uw_fault_lid_margin, so a
+                                #    fault can cut the whole lithosphere
+    uw_fault_lid_margin=0.05,
     uw_detect_max_ddepth=0.05,
     # forming and removing faults
     uw_fault_law="lines",       # "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking
@@ -225,6 +234,15 @@ def placed_ladders(host, faults, coarsening):
                 raise RuntimeError(str(err))
 
 
+def fault_depth_cap():
+    """The deepest a fault may reach: uw_fault_depth_max, or with uw_fault_cut_lid the
+    lid depth of the last record plus a margin if that is deeper."""
+    cap = float(params.uw_fault_depth_max)
+    if params.uw_fault_cut_lid and records:
+        cap = max(cap, float(records[-1]["lid_depth"]) + float(params.uw_fault_lid_margin))
+    return cap
+
+
 def keep_apart(faults, slips, damage, events):
     """Shorten the weaker of any two faults whose spines come within uw_fault_clearance
     of each other, so the mesher never has to carve two ribbons through one cell (a
@@ -319,8 +337,10 @@ class FaultedMesh:
         weak = 1 - (1 - params.uw_eta_w) * self.zone.sym[0]
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
+        asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
+                if params.uw_asth < 1 else None)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
-                                      r_o, weak, yield_factor)
+                                      r_o, weak, yield_factor, asthenosphere=asth)
         if params.uw_eta_reg > 0:
             s.constitutive_model.Parameters.plastic_rate_strengthening = params.uw_eta_reg
         s.bodyforce = Ra * self.T.sym[0] * mesh.CoordinateSystem.unit_e_0
@@ -513,7 +533,7 @@ def as_fault(name, band, depth=None):
             "dip": float(np.clip(band["phi"], params.uw_dip_min, params.uw_dip_max)),
             "depth": float(np.clip(band["bl_depth"] if band.get("bl_depth") is not None
                                    else (depth or params.uw_fault_depth),
-                                   params.uw_fault_depth_min, params.uw_fault_depth_max))}
+                                   params.uw_fault_depth_min, fault_depth_cap()))}
 
 
 def write_records(records):
@@ -577,7 +597,9 @@ last_damage = {}               # each fault's line damage at the last detection
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
 faulted = FaultedMesh(faults, "f0")
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
-          f"{params.uw_tau1 / params.uw_ra:.3g}, H {params.uw_heating:.4g}; {len(faults)} fault(s); "
+          f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
+          f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
+          f"{len(faults)} fault(s); "
           f"from t {t:.4f}; output {out}")
 
 
@@ -680,7 +702,7 @@ for k in range(params.uw_steps):
             phi = float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max))
             f["dip"] = float(f["dip"] + np.clip(phi - f["dip"], -params.uw_detect_max_ddip,
                                                 params.uw_detect_max_ddip))
-            target = float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, params.uw_fault_depth_max))
+            target = float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap()))
             f["depth"] = float(f["depth"] + np.clip(target - f["depth"], -params.uw_detect_max_ddepth,
                                                     params.uw_detect_max_ddepth))
         if k % (10 * params.uw_detect_every) == 0:
@@ -699,7 +721,7 @@ for k in range(params.uw_steps):
                 continue
             new = {"name": f"F{next_id}", "theta": float(ln["theta_t"]),
                    "dip": float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max)),
-                   "depth": float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, params.uw_fault_depth_max)),
+                   "depth": float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap())),
                    "misses": 0}
             next_id += 1
             faults.append(new)
@@ -719,7 +741,7 @@ for k in range(params.uw_steps):
             f["dip"] = float(f["dip"] + np.clip(phi - f["dip"], -params.uw_detect_max_ddip,
                                                 params.uw_detect_max_ddip))
             if band.get("bl_depth") is not None:
-                target = float(np.clip(band["bl_depth"], params.uw_fault_depth_min, params.uw_fault_depth_max))
+                target = float(np.clip(band["bl_depth"], params.uw_fault_depth_min, fault_depth_cap()))
                 f["depth"] = float(f["depth"] + np.clip(target - f["depth"], -params.uw_detect_max_ddepth,
                                                         params.uw_detect_max_ddepth))
     if params.uw_fault_law == "bands" and params.uw_global_every and k % params.uw_global_every == 0:

@@ -34,13 +34,28 @@ def radius_of(mesh):
     return sympy.sqrt(x ** 2 + y ** 2)
 
 
-def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1):
+def asthenosphere_factor(depth, factor, top, bottom, ramp):
+    """A viscosity factor below 1 in a channel between the depths ``top`` and
+    ``bottom`` (layer depths), with tanh ramps of width ``ramp`` at both edges; 1
+    elsewhere. ``factor`` 1 is no channel."""
+    if factor >= 1:
+        return 1
+    window = (1 + sympy.tanh((depth - top) / ramp)) * (1 - sympy.tanh((depth - bottom) / ramp)) / 4
+    return 1 - (1 - factor) * window
+
+
+def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1,
+                     asthenosphere=None):
     """Temperature-dependent viscosity capped by a yield stress that grows with depth
     below the outer wall. ``weak`` (1 by default) multiplies both the viscosity and
     the yield stress, for a weak zone; ``yield_factor`` multiplies the yield stress
-    alone (strain weakening). Returns eta(T), the viscosity the yield law caps."""
+    alone (strain weakening); ``asthenosphere`` = (factor, top, bottom, ramp) multiplies
+    the viscosity by ``factor`` in a depth channel (see ``asthenosphere_factor``).
+    Returns eta(T) with the channel factor, the viscosity the yield law caps."""
     depth = r_o - radius_of(stokes.mesh)
     eta_T = sympy.exp(sympy.log(deta) * (1 - T_sym))
+    if asthenosphere is not None:
+        eta_T = eta_T * asthenosphere_factor(depth, *asthenosphere)
     stokes.constitutive_model = uw.constitutive_models.ViscoPlasticFlowModel
     stokes.constitutive_model.Parameters.shear_viscosity_0 = eta_T * weak
     stokes.constitutive_model.Parameters.shear_viscosity_min = 1
