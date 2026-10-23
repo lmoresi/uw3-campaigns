@@ -256,3 +256,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   partition-dependent; runs agreeing to 1e-6 in vrms put F0 at 0.116 or 0.108, so
   strain_band.fit_fault_lines has a near-tie that decides a rebuild. Told the laptop (fault
   tracking). Newton-from-0 probes (2102/2103) still running.
+- 2026-10-24: **switch-criterion probes (kaiju 2102/2103) rule out remedy (b).** Newton from
+  iteration 0 on a warm rebuild is worse: 3582 update 26 its / 1320 s (vs 18 / 410 with the
+  1e-2*ref switch); slight move 46 its / 1583 s (vs 9 / 198). Two Picard then Newton: 42 its on the
+  big update, 8 on the small one. All monotone, no rises, but 20+ iterations of 2-10% decreases at
+  34-51 s each: damped Newton far from the basin. Reading: the band-localised residual after a
+  fault update is outside Newton's basin; the yield nonlinearity in the band needs Picard first,
+  which is cheap and makes the big early gains. The 1e-2*ref switch (371d3bd) stays. The remedy
+  must shrink the band residual itself: the fault-attached transfer (dev session) or a band-local
+  solve. Kaiju is idle.
+- The laptop fixed the 3591 detector flip (uncommitted, awaiting Louis): depth hysteresis of two
+  detection-grid rows (0.016), since the grid row spacing 0.0078 equals the 2S rebuild threshold.
