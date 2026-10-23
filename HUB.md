@@ -33,7 +33,10 @@ cannot (its Claude Code is too old to prove a trusted device), so the hub reads 
 
 ## Machines and roles
 
-**hyperion**: one big box with a failing system disk (nvme0 throws EIO). Use it for
+**hyperion**: one big box with a failing system disk (nvme0 throws EIO); a disk rebuild is
+scheduled (weekend of 2026-10-25), so /mnt/data may not survive. **Commit and push after every
+meaningful change, WIP included; results tables and probe scripts go in the branch.** The hub
+checks every 3 h that hyperion's commits are on origin. Use it for
 **fast-turnaround parallel development jobs** (tests, probes, np 2-16, minutes, not days).
 No long campaigns.
 - Everything lives on the second drive under `/mnt/data/lmoresi/`: the `underworld3` clone,
@@ -244,3 +247,5 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   transfer fails first, the FMG build falls back, and the ranks deadlock. Handed to hyperion with the
   coarse-solve design; a gathered coarse communicator would address both this and the serial SVD.
   Kaiju's Newton-from-0 probes (2102: switch 1.0; 2103: 2 Picard then Newton) are running.
+- 2026-10-24: hyperion disk rebuild imminent. Rule: nothing uncommitted on hyperion; push after
+  every change; measurement scripts and results in the branch. Hub vigilance check every 3 h.
