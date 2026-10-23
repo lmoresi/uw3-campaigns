@@ -25,6 +25,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | hub (current) | `session_013CgVT1Gx9WTvaZVqU58HsQ` |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
+| kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
 | laptop (wombat), lid regime | `session_019aromUkeWWPzcL2Kb8365E` ("Lid regime box heating runs") |
 
 Messaging: the hub can message all three. Kaiju and the laptop can message the hub. Hyperion
@@ -94,8 +95,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 ## Waiting on Louis
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
-- Lid-regime on kaiju: continue from the laptop's last checkpoint (>= 3910) or from kaiju's own
-  3600, and which sweep to run alongside it (after job 2072 confirms kaiju reproduces 3581-3600).
+- rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
+- Choose NP for the suite (`launch/suite_kaiju`), from the scaling study.
+- Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
   `~/.claude` mirror, local notes).
@@ -138,3 +140,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   3592), at np 8 (job 2072), 16, 32, 52 (one node, one rank per core) and 104 (2 nodes over
   IPoIB). Measured per run: per-phase step times, Newton and KSP iterations, placement time and
   refusals, memory, and agreement with the laptop. Results go to kaiju runs/ and NOTES.
+- 2026-10-23: the laptop run stopped at checkpoint 3910 (t 0.4696, four faults) and moves to kaiju.
+  zg95-annulus-for-kaiju now carries c7741c4 (strain panels in the renderer) and 22f69c2
+  (asthenosphere channel, `-uw_fault_cut_lid`, a four-run suite in `launch/suite_kaiju` starting
+  from 3910). Nothing launches until the scaling results set NP. Two driver restart defects were
+  found in job 2072: the first step after a restart is cold (33 Newton iterations vs 3), and the
+  `refused` set is not checkpointed. Both were handed to a new kaiju dev session
+  (`session_015H8d4zLWhW1moUQ8u1nMtw`), on branch kaiju/annulus-restart-fixes, rebased on 22f69c2,
+  delivered as a patch through the hub. The scaling study (jobs 2072-2077, np 8/16/32/52/104) is
+  running.
