@@ -177,3 +177,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   zg95-annulus-for-kaiju is now at db179bd: a rate-based fault law, a slab initial state, rollback
   metrics, and the `launch/slab_kaiju` scan (10 runs). Louis's priority is fault evolution, with the
   slab experiment as the clean test bed.
+- 2026-10-23: Louis's diagnosis of the np >= 32 failures: the coarse level is too small for the
+  rank count (Annulus cellSize 0.5, refinement 4, so a 124-cell coarsest level). Kaiju is rerunning
+  with `-uw_cell 0.25 -uw_refinement 3` (same finest cell, 496-cell coarsest level) at
+  np 16/32/52/104 (jobs 2085, 2087-2089), seeded without the old mesh file. The library side, to
+  make the multigrid bulletproof, stays with hyperion: the empty-rank fix and agglomeration of the
+  coarse levels onto fewer ranks (design proposal first), or at least a clear error instead of a
+  hang.
