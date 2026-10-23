@@ -156,6 +156,34 @@ keeps it there: damage is a memory, not a measure of activity. The plastic strai
 fed by the faults (0.5 x slip within two band widths), so damage is highest exactly where
 the continuum plastic strain rate is lowest.
 
+**Fault evolution rethought (2026-10-23).** A fault pinned to a damage scar does not move
+when the scar goes inactive, because the damage is a memory. New rules in the driver
+(`-uw_fault_law rate`): the lines are fitted to the total strain-rate invariant of the base
+velocity (normalised by the lid's 99.5th-percentile rate; a slipping fault is a one-cell
+band in it), so faults form and follow where the lid deforms now; the trench advects every
+step with the surface velocity of its overriding plate (sampled 0.1 d beyond the trench on
+the side the fault dips under) and the fit only corrects it; a fault retires when its slip
+stays below a tenth of the largest for three detections, not when the fit misses; damage
+decides nothing but the weakening, and `-uw_heal_time_lid` lets the lid's scars fade. Also:
+`-uw_detect_start` (no fit before a shear band exists), the records carry the surface
+velocity of the plate on each side of every trench and the trench's own rate.
+
+**The foundering slab (after Zhong and Gurnis 1995).** `-uw_init slab` builds the state from
+an age line: the plate age ramps from zero at each plate's ridge (opposite the trench by
+default) to uw_age_sub (0.0025: a 0.1 d plate) on the subducting plate and uw_age_over (0.001,
+0.063 d) on the overriding one; the age continues down the fault plane as the trench age plus
+the distance down-dip over uw_slab_rate, and the subducting plate's one-sided profile at the
+trench diffuses freely into both the slab and the wedge for that time (tabulated, no closed
+form), fading beyond the slab's end over its own diffusion length. At rate 100, the model's own
+plate speed at Ra 3e6, a 0.35 d slab warms through: the thermal Peclet number of this regime;
+1000 (a plate-tectonic value) keeps a cold core. First steps on the laptop (Ra 2.7e6, tau1/Ra
+1.5, asthenosphere x0.1, one fault on the slab's upper surface, cut through the lithosphere):
+with the sharp contact the fault slips at 153, the subducting plate converges at 96, the
+overriding plate advances at 29 and the trench retreats at 29; with the freely diffused slab
+(half the thermal anomaly) 57, 41, 4 and 4. A fault placed along the slab's cold core instead
+of its upper surface locks (slip 11). The scan for kaiju is `launch/slab_kaiju/` (ten runs,
+one change each: asthenosphere, tau1/Ra, dip, slab length, plate ages, deta, two faults).
+
 ## Next
 
 The regime suite for kaiju (`launch/suite_kaiju/`): Ra 2.7e6 and 9.1e6, tau1/Ra 1.5 and 3,

@@ -48,8 +48,31 @@ from strain_band import (boundary_layer_depth, detect_fault, fit_fault_lines, po
 
 params = uw.Params(
     uw_out="~/+Simulations/zg95/annulus_faults/runs/test_multi",
+    uw_init="checkpoint",       # "checkpoint": T, V from uw_source at uw_source_index; "slab": the
+                                #   prescribed lithosphere + slab below (t = 0, at rest, no damage)
     uw_source="~/+Simulations/zg95/annulus_regimes/runs/tau1x1.50_seed5",
     uw_source_index=2050,
+    # the "slab" state (half-space cooling referenced to an age line): the plate age along
+    # the surface ramps from zero at each plate's ridge to uw_age_sub (subducting side) or
+    # uw_age_over (overriding side, the side the fault dips under) at the trench; the age
+    # continues down the slab's upper surface, the fault plane, as the trench age plus the
+    # distance down-dip over uw_slab_rate; T = T_i erf(d / 2 sqrt(age)) with d the distance
+    # to the age line (the depth below the surface, or the distance into the subducting side
+    # of the slab plane), the colder of the two where both apply. Plate thickness 2 sqrt(age):
+    # age 0.0025 is a 0.1 d plate.
+    uw_T_interior=0.75,
+    uw_age_sub=0.0025,
+    uw_age_over=0.001,
+    uw_ridge_sub=3.14159,       # angle from the trench to the subducting plate's ridge (radians)
+    uw_ridge_over=3.14159,      # angle from the trench to the overriding plate's ridge (radians)
+    uw_slab_length=0.35,
+    uw_slab_rate=1000.0,        # the convergence rate the slab went down at (its age continuation); at
+                                #   100 (the model's own plate speed at Ra 3e6) a 0.35 d slab has warmed through
+    uw_slab_warm_top=1,         # 1: since subduction the slab has exchanged heat with the mantle on its
+                                #    contact side: the one-sided plate profile diffuses freely for tau (the
+                                #    distance down-dip over uw_slab_rate), so the slab warms and the wedge
+                                #    beside it cools, continuously across the plane (tabulated, no closed
+                                #    form); 0: the contact side is masked and the slab keeps its erf profile
     uw_restart=-1,
     uw_cell=0.5,
     uw_refinement=4,
@@ -85,6 +108,8 @@ params = uw.Params(
     uw_heal_T=0.7,
     # following the bands
     uw_detect_every=5,
+    uw_detect_start=0,          # steps before the first detection (a prescribed slab needs a few to
+                                #   establish its shear band before the fit is allowed to move the fault)
     uw_detect_window=40.0,      # largest half-width of a fault's own search arc (degrees)
     uw_detect_gamma_sat=0.5,
     uw_detect_T_lith=0.6,
@@ -110,6 +135,19 @@ params = uw.Params(
     uw_line_surface=0.05,       # "lines": a fault's damage must start within this of the surface
     uw_line_match=6.0,          # "lines": a line within this arc of a fault's trench is that fault (degrees)
     uw_line_patience=3,         # "lines": detections a fault survives without a line before retiring
+    # "rate": faults fitted to the strain rate of the lithosphere (the total invariant on the
+    # base mesh, which carries a slipping fault's jump as a one-cell band), normalised by its
+    # robust maximum; the trench advects with the overriding plate between detections; a
+    # fault retires when its slip stays below a fraction of the largest
+    uw_rate_frac=0.3,           # "rate": points at or above this fraction of the lid's 99.5th-percentile rate
+    uw_rate_min_activity=0.002, # "rate": smallest rate-area (normalised rate x area) that is a fault
+    uw_retire_slip_frac=0.1,    # "rate": slip below this fraction of the largest slip counts as idle
+    uw_retire_patience=3,       # "rate": detections idle before retiring (the last fault stays)
+    uw_trench_advect=0,         # 1: every step, move each trench with the surface velocity of its
+                                #    overriding plate (sampled uw_advect_offset beyond the trench on
+                                #    the side the fault dips under); "rate" turns it on
+    uw_advect_offset=0.1,
+    uw_heal_time_lid=0.0,       # > 0: damage also decays on this time scale everywhere (the lid's scars fade)
     uw_fault_damage=0.0,        # > 0: a fault damages its surroundings at this rate x slip, within a band width,
                                 #      from its trench to one band width past its tip (so it can grow)
     uw_global_every=10,
@@ -171,8 +209,14 @@ if params.uw_heal_time > 0:
     heal_rate = 1 / params.uw_heal_time
     if params.uw_heal_T > 0:
         heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - params.uw_heal_T) / 0.02)) / 2
+if params.uw_heal_time_lid > 0:
+    heal_rate = heal_rate + 1 / params.uw_heal_time_lid
 fault_damage_b = uw.discretisation.MeshVariable("fault_damage", base, 1, degree=1)
 strain_adv.f = edot_p_b.sym[0] + fault_damage_b.sym[0] - gamma_b.sym[0] * heal_rate
+# the strain-rate invariant of the base velocity, for the "rate" law and the trench advection
+_E_b = (V_b.sym.jacobian(base.X) + V_b.sym.jacobian(base.X).T) / 2
+edot_total_b = sympy.sqrt((_E_b[0, 0] ** 2 + _E_b[1, 1] ** 2 + 2 * _E_b[0, 1] ** 2) / 2)
+trench_advect = bool(params.uw_trench_advect) or params.uw_fault_law == "rate"
 
 
 def onto(points):
@@ -484,6 +528,49 @@ def sample(th, dep, xy):
     return T, v_r, gamma, edot
 
 
+def sample_rate(th, dep, xy):
+    """T and the total strain-rate invariant at grid points (collective)."""
+    pts = onto(xy)
+    shape = (len(dep), len(th))
+    T = np.asarray(uw.function.global_evaluate(T_b.sym[0], pts)).reshape(shape)
+    rate = np.asarray(uw.function.global_evaluate(edot_total_b, pts)).reshape(shape)
+    return T, rate
+
+
+def plate_velocities(faults):
+    """Tangential surface velocity (positive toward +theta) uw_advect_offset on each side
+    of every trench, just inside the outer wall: {name: (v at -theta side, v at +theta
+    side)}. Collective."""
+    if not faults:
+        return {}
+    pts = []
+    for f in faults:
+        for sign in (-1.0, 1.0):
+            th = f["theta"] + sign * params.uw_advect_offset / r_o
+            pts.append([(r_o - 0.01) * np.cos(th), (r_o - 0.01) * np.sin(th)])
+    pts = np.array(pts)
+    v = np.asarray(uw.function.global_evaluate(V_b.sym, onto(pts))).reshape(-1, 2)
+    th = np.arctan2(pts[:, 1], pts[:, 0])
+    v_t = -v[:, 0] * np.sin(th) + v[:, 1] * np.cos(th)
+    return {f["name"]: (float(v_t[2 * n]), float(v_t[2 * n + 1])) for n, f in enumerate(faults)}
+
+
+def advect_trenches(faults, dt):
+    """Each trench moves with the surface velocity of its overriding plate: the plate on
+    the side the fault dips under (+theta for a dip below 90 degrees), sampled
+    uw_advect_offset beyond the trench, just inside the outer wall. Collective."""
+    pts = []
+    for f in faults:
+        sign = 1.0 if f["dip"] < 90 else -1.0
+        th = f["theta"] + sign * params.uw_advect_offset / r_o
+        pts.append([(r_o - 0.01) * np.cos(th), (r_o - 0.01) * np.sin(th)])
+    v = np.asarray(uw.function.global_evaluate(V_b.sym, onto(np.array(pts)))).reshape(-1, 2)
+    for n, f in enumerate(faults):
+        th = np.arctan2(pts[n][1], pts[n][0])
+        v_theta = -v[n, 0] * np.sin(th) + v[n, 1] * np.cos(th)
+        f["theta"] = float(wrap(f["theta"] + v_theta / r_o * dt))
+
+
 def detect_band(theta_c, half_width, fit_depth=None, prefer=True):
     """The band nearest ``theta_c`` within ``half_width``: trench, dip angle phi, the
     local boundary-layer depth and the band's damage, or None. The line is fitted over
@@ -563,7 +650,101 @@ def checkpoint(step, t, records, faulted, faults, next_id):
 
 # ----------------------------------------------------------------------------- initial state
 records = []
-if params.uw_restart < 0:
+def slab_temperature(xy):
+    """The prescribed state from an age line (see the parameters): interior at T_i, the
+    surface plates by half-space cooling of the surface age, and the slab by half-space
+    cooling of the age continued down the fault plane, into the subducting side only.
+    T is the colder of the plate and the slab values. Any numpy array of points."""
+    from scipy.special import erf, erfc
+    xy = np.asarray(xy, dtype=float)
+    r = np.hypot(xy[:, 0], xy[:, 1])
+    theta = np.arctan2(xy[:, 1], xy[:, 0])
+    depth = np.maximum(r_o - r, 0.0)
+    theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
+    over = 1.0 if params.uw_dip < 90 else -1.0            # the overriding plate's side (+theta for a dip below 90)
+    T_i = float(params.uw_T_interior)
+
+    def half_space(dist, age):
+        return T_i * erf(dist / (2.0 * np.sqrt(np.maximum(age, 1e-8))))
+
+    # the surface age: a ramp from the ridge to the trench on each side
+    rel = over * wrap(theta - theta_t)                    # positive on the overriding side
+    ridge_o, ridge_s = abs(float(params.uw_ridge_over)), abs(float(params.uw_ridge_sub))
+    age_o = params.uw_age_over * np.clip(1 - np.abs(rel) / max(ridge_o, 1e-6), 0, 1)
+    age_s = params.uw_age_sub * np.clip(1 - np.abs(rel) / max(ridge_s, 1e-6), 0, 1)
+    age_surface = np.where(rel >= 0, age_o, age_s)
+    T_plate = half_space(depth, age_surface)
+    # the slab: the age line is the fault plane from the trench, down-dip to uw_slab_length
+    r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
+    t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
+    down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
+    n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)   # into the subducting side
+    a = r_hat * r_o
+    rel_xy = xy - a
+    s_raw = rel_xy @ down
+    s_along = np.clip(s_raw, 0.0, params.uw_slab_length)
+    n_into = rel_xy @ n_sub
+    foot = a + np.outer(s_along, down)
+    dist = np.linalg.norm(xy - foot, axis=1)
+    # one-sided along the plane: on the overriding side the slab does not cool the wedge;
+    # beyond the tip the profile wraps round (a rounded end)
+    dist = np.where((n_into < 0) & (s_raw < params.uw_slab_length), np.inf, dist)
+    tau = s_along / max(float(params.uw_slab_rate), 1e-6)         # time since subduction
+    if params.uw_slab_warm_top:
+        # signed distance to the plane (positive into the subducting side; beyond the tip the
+        # distance to the tip), and the freely diffused one-sided profile
+        # the perpendicular distance to the plane everywhere; the profile fades beyond
+        # either end of the segment over its own diffusion length, so the tip is rounded
+        # on both sides without the cold profile wrapping round into the wedge
+        age_end = float(params.uw_age_sub) + tau
+        overshoot = np.maximum(s_raw - params.uw_slab_length, 0.0) + np.maximum(-s_raw, 0.0)
+        end_factor = erfc(overshoot / (2.0 * np.sqrt(age_end)))
+        T_slab = T_i - T_i * end_factor * slab_diffused(n_into, tau, float(params.uw_age_sub))
+    else:
+        T_slab = half_space(dist, params.uw_age_sub + tau)
+    return np.minimum(T_plate, T_slab)
+
+
+_slab_table = {}
+
+
+def slab_diffused(signed, tau, age):
+    """u / T_i for the one-sided plate profile u0 = erfc(x / 2 sqrt(age)) on x > 0, zero on
+    x < 0, diffused freely for time tau: u(x, tau) = int_0^inf G(x - xi, tau) u0(xi) dxi.
+    Tabulated once per age on x in [-0.6, 0.6] and tau in [0, tau_max] and interpolated
+    bilinearly; the half-space value erfc(x / 2 sqrt(age)) at tau = 0."""
+    from scipy.special import erfc
+    from scipy.interpolate import RegularGridInterpolator
+    tau = np.asarray(tau, dtype=float)
+    key = (round(age, 9), float(np.ceil(tau.max() * 1.05 * 1e6) / 1e6) if tau.size else 0.0)
+    if key not in _slab_table:
+        x = np.linspace(-0.6, 0.6, 1201)
+        tau_max = max(key[1], 1e-6)
+        taus = np.concatenate([[0.0], np.geomspace(1e-7, tau_max, 120)])
+        xi = np.linspace(0.0, 1.2, 2401)
+        u0 = erfc(xi / (2.0 * np.sqrt(age)))
+        table = np.empty((len(taus), len(x)))
+        table[0] = np.where(x > 0, erfc(np.maximum(x, 0) / (2.0 * np.sqrt(age))), 0.0)
+        dxi = xi[1] - xi[0]
+        for n, t in enumerate(taus[1:], 1):
+            G = np.exp(-(x[:, None] - xi[None, :]) ** 2 / (4.0 * t)) / np.sqrt(4.0 * np.pi * t)
+            table[n] = (G * u0[None, :]).sum(axis=1) * dxi
+        _slab_table[key] = RegularGridInterpolator((taus, x), table, bounds_error=False, fill_value=None)
+    f = _slab_table[key]
+    xs = np.clip(np.asarray(signed, dtype=float), -0.6, 0.6)
+    out = f(np.stack([np.clip(tau, 0.0, key[1]), xs], axis=-1))
+    out = np.where(np.abs(np.asarray(signed)) > 0.6, 0.0, out)
+    return np.clip(out, 0.0, 1.0)
+
+
+if params.uw_init == "slab":
+    T_b.array[:, 0, 0] = slab_temperature(T_b.coords)
+    V_b.array[:, 0, :] = 0.0
+    state = {"t": 0.0, "step": -1}
+    faults = [{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
+               "depth": float(params.uw_fault_depth)}]
+    next_id = 1
+elif params.uw_restart < 0:
     source = os.path.expanduser(params.uw_source)
     for var in (T_b, V_b):
         var.read_timestep("annulus", var.name, params.uw_source_index, outputPath=source)
@@ -670,9 +851,12 @@ for k in range(params.uw_steps):
     strain_adv.solve(timestep=dt)
     gamma_b.array[:, 0, 0] = np.maximum(gamma_b.array[:, 0, 0], 0.0)
     t += dt
+    if trench_advect:
+        advect_trenches(faults, dt)
 
     damage = {}
-    if params.uw_fault_law == "lines" and k % params.uw_detect_every == 0:
+    detect_now = k >= params.uw_detect_start and (k - params.uw_detect_start) % params.uw_detect_every == 0
+    if params.uw_fault_law == "lines" and detect_now:
         # N faults fitted to the damage: each existing fault takes the line nearest its
         # trench (by bounded steps), an unmatched line forms a fault, a fault with no
         # line for uw_line_patience detections retires
@@ -727,7 +911,69 @@ for k in range(params.uw_steps):
             faults.append(new)
             events.append(f"formed {new['name']} at {np.degrees(new['theta']):.1f} deg (line damage "
                           f"{ln['damage']:.3f}), dip {new['dip']:.1f}, depth {new['depth']:.3f}")
-    elif k % params.uw_detect_every == 0:
+    elif params.uw_fault_law == "rate" and detect_now:
+        # N faults fitted to the strain rate of the lithosphere: each fault takes the line
+        # nearest its trench (by bounded steps), an unmatched line forms a fault, a fault
+        # whose slip stays below a fraction of the largest for uw_retire_patience
+        # detections retires. The damage decides nothing here: it weakens the material.
+        th, dep, xy = polar_grid(r_o, n_theta=1440, depth_max=0.5, n_depth=64)
+        T, rate = sample_rate(th, dep, xy)
+        lith = (T <= params.uw_detect_T_lith) & (dep[:, None] <= params.uw_detect_depth_max)
+        rate_ref = float(np.percentile(rate[lith], 99.5)) if lith.any() else 1.0
+        rate_n = rate / max(rate_ref, 1e-30)
+        lines = fit_fault_lines(th, dep, rate_n, T, r_o, params.uw_rate_frac, params.uw_detect_T_lith,
+                                0.02, params.uw_detect_depth_max, params.uw_max_faults + 2,
+                                params.uw_rate_min_activity, params.uw_line_width,
+                                surface_reach=params.uw_line_surface)
+        taken = set()
+        for f in faults:
+            best, best_d = None, np.deg2rad(params.uw_line_match)
+            for n, ln in enumerate(lines):
+                d = abs(wrap(ln["theta_t"] - f["theta"]))
+                if n not in taken and d < best_d:
+                    best, best_d = n, d
+            if best is not None:
+                taken.add(best)
+                ln = lines[best]
+                damage[f["name"]] = ln["damage"]
+                cap = np.deg2rad(params.uw_detect_max_dtheta)
+                f["theta"] = float(f["theta"] + np.clip(wrap(ln["theta_t"] - f["theta"]), -cap, cap))
+                phi = float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max))
+                f["dip"] = float(f["dip"] + np.clip(phi - f["dip"], -params.uw_detect_max_ddip,
+                                                    params.uw_detect_max_ddip))
+                target = float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap()))
+                f["depth"] = float(f["depth"] + np.clip(target - f["depth"], -params.uw_detect_max_ddepth,
+                                                        params.uw_detect_max_ddepth))
+            else:
+                damage[f["name"]] = 0.0
+        slip_max = max(rec["slip"].values()) if rec["slip"] else 0.0
+        for f in faults:
+            idle = rec["slip"].get(f["name"], 0.0) < params.uw_retire_slip_frac * slip_max
+            f["idle"] = f.get("idle", 0) + 1 if idle else 0
+        if k % (10 * params.uw_detect_every) == 0:
+            refused.clear()
+        for f in list(faults):
+            if len(faults) > 1 and f.get("idle", 0) >= params.uw_retire_patience:
+                faults.remove(f)
+                events.append(f"retired {f['name']} at {np.degrees(f['theta']):.1f} deg "
+                              f"(slip {rec['slip'].get(f['name'], 0.0):.1f} of {slip_max:.1f})")
+        sep = np.deg2rad(params.uw_fault_separation)
+        for n, ln in enumerate(lines):
+            if n in taken or len(faults) >= params.uw_max_faults:
+                continue
+            if any(abs(wrap(ln["theta_t"] - f["theta"])) < sep for f in faults):
+                continue
+            if any(abs(wrap(ln["theta_t"] - th_r)) < np.deg2rad(3.0) for th_r in refused.values()):
+                continue
+            new = {"name": f"F{next_id}", "theta": float(ln["theta_t"]),
+                   "dip": float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max)),
+                   "depth": float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap())),
+                   "idle": 0}
+            next_id += 1
+            faults.append(new)
+            events.append(f"formed {new['name']} at {np.degrees(new['theta']):.1f} deg (rate-area "
+                          f"{ln['damage']:.4f} of ref {rate_ref:.3g}), dip {new['dip']:.1f}, depth {new['depth']:.3f}")
+    elif detect_now:
         # each fault follows its own band, by bounded steps
         for f in faults:
             band = detect_band(f["theta"], own_window(f, faults), fit_depth=max(f["depth"] + 0.05, 0.15))
@@ -767,7 +1013,7 @@ for k in range(params.uw_steps):
             faults.append(new)
             events.append(f"formed {new['name']} at {np.degrees(new['theta']):.1f} deg (damage {b[4]:.3f}), "
                           f"dip {new['dip']:.1f}, depth {new['depth']:.3f}")
-    if k % params.uw_detect_every == 0:
+    if detect_now:
         keep_apart(faults, rec["slip"], damage, events)
     if damage:
         last_damage = dict(damage)
@@ -778,6 +1024,14 @@ for k in range(params.uw_steps):
     record.update(rec)
     local = gamma_b.array[:, 0, 0]
     record["strain_max"] = float(uw.utilities.gather_data(local.max() if local.size else 0.0, bcast=True).max())
+    # the plates beside each trench: tangential surface velocity on the -theta and +theta
+    # sides (the overriding plate is the +theta side for a dip below 90 degrees), and the
+    # trench's own rate from the fault's theta history
+    record["plates"] = plate_velocities(faults)
+    if records and "faults" in records[-1] and dt > 0:
+        previous = {f["name"]: f["theta"] for f in records[-1]["faults"]}
+        record["trench_rate"] = {f["name"]: float(wrap(f["theta"] - previous[f["name"]]) * r_o / dt)
+                                 for f in faults if f["name"] in previous}
     record.update({"faults": [dict(f) for f in faults], "n_faults": len(faults), "damage": damage,
                    "events": events, "theta_trench": faults[0]["theta"], "dip": faults[0]["dip"],
                    "fault_depth": faults[0]["depth"], "n_built": n_built, "t_build": round(faulted.t_build, 1)})
