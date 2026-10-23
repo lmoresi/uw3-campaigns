@@ -229,3 +229,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   (2101 vs 2099) will confirm it. Next lever: a fault-attached transfer (map band nodes by
   arc length and signed normal distance from the new spine onto the old spine, blended to the
   direct transfer outside the band), assigned to the kaiju dev session after the refused-set item.
+- 2026-10-24 (probe 2100 complete, overlay-test includes 371d3bd): after a same-set fault update
+  the warm transfer leaves |F̂| at 58% (3582 update) or 24% (slight move) of the cold residual, all
+  of it within 0.08 of the fault traces (7% of DOFs), 74-79% within 0.01 after one iteration. Solves
+  on overlay-test: cold 33 its / 628 s; 3582 update warm 18 its / 410 s (switch at 12; was ~25-28
+  on the current library); slight move 9 its / 198 s (switch at 4). So 371d3bd helps but cannot
+  switch at 0: the warm r0 is 24-58% of the rest-state reference, so Picard still grinds a
+  band-localised residual down globally. Three remedies in motion: (a) the fault-attached transfer
+  (kaiju dev session); (b) Newton from iteration 0 on the warm start (kaiju probe, cheap test);
+  (c) a band-local pre-solve (FAC patch; the band label already exists) if (a) and (b) fall short.
