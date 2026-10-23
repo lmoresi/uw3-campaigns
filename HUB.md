@@ -95,7 +95,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Choose NP for the suite (`launch/suite_kaiju`), from the scaling study.
+- Production launch, after the multigrid fixes and the warm-start diagnosis: NP 16 per run for now.
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
@@ -164,3 +164,16 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   Also: the dev session's `git checkout main` in the shared clone broke four jobs. Production now
   runs from its own clone `~/campaigns/zg95-drivers`. Rule: never switch a checkout you didn't
   create.
+- 2026-10-23 (scaling, final): np 16 is the working point: 99 s per ordinary step, 2.8x the laptop,
+  efficiency 0.75 against np 8, agreeing with the laptop to 1e-3 with identical rebuilds. np >= 32
+  is blocked on the custom_mg bugs (hyperion is fixing them). Write-up:
+  kaiju `~/campaigns/zg95/runs/SCALING_2026-10-23.md`.
+  **Louis's rulings: no production runs until (1) the multigrid is bulletproof and (2) warm
+  starting is understood.** Rebuild steps take 23-27 Newton iterations even with a warm start
+  (ordinary steps take 4). The laptop session is diagnosing why (a discarded warm start via
+  has_solution, the guess near the moved fault, lock-and-release continuation, the pressure
+  gauge). The kaiju dev session holds its warm-start item until then and finishes checkpointing
+  the refused set.
+  zg95-annulus-for-kaiju is now at db179bd: a rate-based fault law, a slab initial state, rollback
+  metrics, and the `launch/slab_kaiju` scan (10 runs). Louis's priority is fault evolution, with the
+  slab experiment as the clean test bed.
