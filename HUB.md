@@ -46,8 +46,7 @@ No long campaigns.
   frozen; do not modify it.
 
 **kaiju**: a Slurm cluster. Use it for **long runs and campaigns**.
-- Usable nodes are n5-n8 (n1-n4 down since 2026-09-23, including bigmem n3); use
-  `--exclude='n[1-4]'`. Each node has 52 cores (Slurm counts 104 CPUs) and 140-188 GB.
+- All of n1-n8 are up since Louis's resume on 2026-10-23 (n3 is bigmem, 378 GB). Each node has 52 cores (Slurm counts 104 CPUs) and 140-188 GB.
 - Underworld3 runs in Apptainer. Use the personal image `~/uw3/images/uw3-gadi-development-20261021.sif`
   (the shared site images are stale and have no g++), and run a branch as an overlay built
   inside it. See [uw3-hpc-install-run kaiju/container](https://github.com/underworld-community/uw3-hpc-install-run/tree/main/kaiju/container)
@@ -149,3 +148,19 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   (`session_015H8d4zLWhW1moUQ8u1nMtw`), on branch kaiju/annulus-restart-fixes, rebased on 22f69c2,
   delivered as a patch through the hub. The scaling study (jobs 2072-2077, np 8/16/32/52/104) is
   running.
+- 2026-10-23 (scaling, interim): the campaign does NOT scale past one node's worth of ranks yet.
+  - np 104: IndexError in `custom_mg._colocate_level` on ranks with no cells of the 124-cell
+    coarsest level, then a hang.
+  - np 32 and 52: the custom-P FMG build fails with a PETSc "new nonzero" error in
+    DMCreateInterpolation and falls back to the default preconditioner; no step finished in 1.6 h.
+  - np 8 and 16 work; np 16 ordinary steps run about 2.3x faster than np 8 (2072 likely shared
+    hyperthreads; clean reruns are 2083 and 2084).
+  - The cold first step after a restart takes 33 Newton iterations at every np.
+  - Kaiju vs laptop over 3581-3600 agrees to about 1e-3, but a 0.006 change in fault depth (below
+    the 0.008 threshold) moved a rebuild from 3592 to 3597, so threshold decisions are sensitive
+    to rounding.
+  Both custom_mg bugs went to hyperion on `bugfix/custom-mg-empty-rank` (from
+  parallel-addon-distribution), the empty-rank bug with a regression test.
+  Also: the dev session's `git checkout main` in the shared clone broke four jobs. Production now
+  runs from its own clone `~/campaigns/zg95-drivers`. Rule: never switch a checkout you didn't
+  create.
