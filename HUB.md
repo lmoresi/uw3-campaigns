@@ -184,3 +184,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   make the multigrid bulletproof, stays with hyperion: the empty-rank fix and agglomeration of the
   coarse levels onto fewer ranks (design proposal first), or at least a clear error instead of a
   hang.
+- 2026-10-23: **warm start diagnosed** (laptop session). The driver does transfer V,P on a rebuild
+  (zero_init_guess=False), but it switches Picard -> Newton at `uw_rebuild_newton_switch` = 1e-2
+  RELATIVE to that solve's own |F0|. Picard contracts at ~0.91 per iteration, so even a good warm
+  start runs 20-37 Picard iterations before ~5 Newton iterations; the warm start is wasted. The
+  proposed fix is an absolute switch: keep a cold-scale |F| reference (saved in state_N.json),
+  start Newton at once when |F0_warm|/|F_ref| < 1e-2, with a guarded Picard fallback. The kaiju
+  dev session tests A (as is) against B (Newton at once) at np 16 through the 3582 and 3592
+  rebuilds, then folds the fix into kaiju/annulus-restart-fixes along with checkpointing the
+  refused set.
