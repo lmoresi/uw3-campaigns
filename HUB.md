@@ -200,3 +200,17 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   development), with a regression test shown failing, and checks other switches for the same
   inconsistency. Kaiju tests the one-liner as a local overlay against the campaign (A vs C at
   np 16 through the 3582 and 3592 rebuilds). The driver-side absolute switch is dropped if C works.
+- 2026-10-23/24: library fixes pushed by hyperion (no PRs):
+  - bugfix/warm-start-newton-switch 371d3bd: a warm re-solve switches to Newton at iteration 0
+    instead of 12 (test in test_1018); rotated 133 passed, fault/contact 65 passed.
+  - bugfix/custom-mg-empty-rank aed17e23 and bfae3e65: custom-P MG, the fault cut and the
+    provenance transfer on ranks holding no coarse cells.
+  - bugfix/backward-nodes-snapshot-order adb20e9d: Eulerian histories fixed, the test renumbered
+    to 1102, review done.
+  **Coarse-solve finding (kaiju):** the free-slip annulus leaves a rotation null mode, so the FMG
+  coarse level is a dense SVD on one rank. With a 448-cell coarse level, np 16 costs 70-80 s per
+  Newton iteration (20-25 s with 124 cells), np 52 costs 178 s, and np 104 did not finish. More
+  ranks make it slower. Hyperion is to design a scalable coarse solve: an explicit null space
+  plus MUMPS, telescope or redundant LU, measured before building. Kaiju is testing both fixes as
+  a box-faults overlay at np 16 and at np 32/52 with the 124-cell coarse level. The kaiju dev
+  session's patch is now just the refused set and decision state.
