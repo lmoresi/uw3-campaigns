@@ -193,3 +193,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   dev session tests A (as is) against B (Newton at once) at np 16 through the 3582 and 3592
   rebuilds, then folds the fix into kaiju/annulus-restart-fixes along with checkpointing the
   refused set.
+- 2026-10-23: **the root cause is in the library.** In `utilities/rotated_bc.py` the rotated
+  nonlinear loop's convergence test already uses `ref = max(r0, |F(rest)|)` (the warm-start rtol
+  cure), but its Picard->Newton switch still uses the solve's own `r0`. The fix is
+  `switch_rtol * ref`. Hyperion does it first on `bugfix/warm-start-newton-switch` (from
+  development), with a regression test shown failing, and checks other switches for the same
+  inconsistency. Kaiju tests the one-liner as a local overlay against the campaign (A vs C at
+  np 16 through the 3582 and 3592 rebuilds). The driver-side absolute switch is dropped if C works.
