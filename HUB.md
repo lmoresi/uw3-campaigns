@@ -238,3 +238,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   band-localised residual down globally. Three remedies in motion: (a) the fault-attached transfer
   (kaiju dev session); (b) Newton from iteration 0 on the warm start (kaiju probe, cheap test);
   (c) a band-local pre-solve (FAC patch; the band label already exists) if (a) and (b) fall short.
+- 2026-10-24: the empty-rank fix does NOT unblock np 32/52 on the 124-cell coarse level (kaiju
+  2097/2098, identical failure counts). That is a second bug: PETSc's nested interpolation between
+  custom_mg levels (DMPlexComputeInterpolatorNested) fails on preallocation at np 32+, the barycentric
+  transfer fails first, the FMG build falls back, and the ranks deadlock. Handed to hyperion with the
+  coarse-solve design; a gathered coarse communicator would address both this and the serial SVD.
+  Kaiju's Newton-from-0 probes (2102: switch 1.0; 2103: 2 Picard then Newton) are running.
