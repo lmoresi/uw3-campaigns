@@ -249,3 +249,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   Kaiju's Newton-from-0 probes (2102: switch 1.0; 2103: 2 Picard then Newton) are running.
 - 2026-10-24: hyperion disk rebuild imminent. Rule: nothing uncommitted on hyperion; push after
   every change; measurement scripts and results in the branch. Hub vigilance check every 3 h.
+- 2026-10-24: **clean A/B at np 16 (kaiju 2101 vs 2099)**: the warm-start switch fix alone cuts the
+  3582 same-set rebuild from 27 to 19 nonlinear iterations (Picard 21 -> 14; 618 -> 456 s, -26%);
+  ordinary steps unchanged (3-6 its). The first step after a restart is still cold (33 its). No
+  changed-set rebuild occurred in 3581-3595. Correction: the 3592 rebuild flip is NOT
+  partition-dependent; runs agreeing to 1e-6 in vrms put F0 at 0.116 or 0.108, so
+  strain_band.fit_fault_lines has a near-tie that decides a rebuild. Told the laptop (fault
+  tracking). Newton-from-0 probes (2102/2103) still running.
