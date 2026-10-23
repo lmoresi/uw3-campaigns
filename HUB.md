@@ -221,3 +221,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   From the driver: only same-set rebuilds (moved or shortened fault) are warm-started; a changed set
   and the first step after a restart are cold by design. warm_start evaluates the old V,P at the new
   nodes, so the old jump lands on the wrong side in the band the fault sweeps.
+- 2026-10-24: **band probe (kaiju job 2100) confirms Louis's argument.** After the driver's 3582
+  same-set update, the warm-start |F̂| is 5.3e4, 58% of the cold 9.2e4. Velocity rows carry it all,
+  100% of it within 0.08 of the old/new fault spines (7% of the DOFs; 52% within 0.01). The far
+  field arrives converged. Expected consequence: the switch fix (371d3bd1) alone saves only a few
+  Picard iterations, because the warm r0 is barely below the rest-state reference; the clean A/B
+  (2101 vs 2099) will confirm it. Next lever: a fault-attached transfer (map band nodes by
+  arc length and signed normal distance from the new spine onto the old spine, blended to the
+  direct transfer outside the band), assigned to the kaiju dev session after the refused-set item.
