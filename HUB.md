@@ -98,8 +98,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Confirm the laptop's push of the compositional-slab driver (in the laptop session), then kaiju builds
-  the overlay and runs the slab suite at np 16 (one node per run).
+- Choose the slab production cases for kaiju (B1, B2, C1 with the overriding plate, the slab_kaiju
+  scan), after the np 16 smoke test.
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
@@ -304,3 +304,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   laptop's report. Uncommitted on the laptop, awaiting Louis's confirmation to push to
   zg95-annulus-for-kaiju; the dev session rebases its warm-start patch on top afterwards. Louis wants
   these runs on kaiju; the warm-start and MG conditions don't bind (no faults, np 16 works).
+- 2026-10-25: the laptop pushed the compositional-slab driver: zg95-annulus-for-kaiju 878b9c2
+  (8 files, +677). Kaiju starts the np 16 smoke test (fresh clone pinned at 878b9c2; the Ra x3 clone
+  stays at e258447). The dev session rebases its warm-start patch onto 878b9c2.
