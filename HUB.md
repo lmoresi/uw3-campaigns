@@ -267,3 +267,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   solve. Kaiju is idle.
 - The laptop fixed the 3591 detector flip (uncommitted, awaiting Louis): depth hysteresis of two
   detection-grid rows (0.016), since the grid row spacing 0.0078 equals the 2S rebuild threshold.
+- 2026-10-24: **Louis: kaiju owns the fault-update warm-start problem** and is to find a reliable
+  way forward. The main kaiju session measures and designs (lines of attack in order: fault-attached
+  transfer; band-local pre-solve; lock-and-release; warm-starting the cold cases, i.e. the restart's
+  first step and the changed-set rebuild; whether the strain/yield-state transfer matters as much as
+  V). The kaiju dev session implements driver changes and coordinates with it directly. Library
+  changes come to the hub as patches with regression tests. The laptop stays informed only.
