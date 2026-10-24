@@ -93,6 +93,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` e258447, needs underworld3 `feature/box-faults` c1107957 | being moved to kaiju (below) |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
+| Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
 
@@ -332,3 +333,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   tangential velocity jump against depth), and the movie. Tested on the Ra x3 run (67 checkpoints).
   Limitation: the solver's split mesh is not checkpointed, so the mesh panel shows the base mesh;
   writing the solver mesh at checkpoints goes into the dev session's checkpoint design.
+- 2026-10-25: pushed bugfix/rotated-solve-diagnostics 210c7307 (kaiju's LIB-1 patch: fnorm_rest, ref,
+  rnorm_history, line_search_alpha in the rotated result dict; test written first). Hyperion runs
+  the rotated and parallel suites on it. The laptop mapped the solver-record field names into its
+  renderer and will draw the checkpointed solver mesh (annulus.solver_mesh.NNNNN.h5) when present.
