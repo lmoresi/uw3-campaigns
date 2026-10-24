@@ -286,3 +286,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
     ordinary step.
   - Remaining same-set cost (A: 12 Picard + 5 Newton): kaiju continues with a band-local pre-solve
     and lock-and-release. Library: 371d3bd is the enabler; merge it.
+- 2026-10-24: **warm-start milestone 2 (kaiju).** Lock-and-release does not pay: a penalty weld via
+  add_fault_bc wrecks the FMG conditioning (the locked solve never finished its first linear solve
+  in 1h45m); a topological weld is the retire+spawn pair, ~27 its against 17 for the direct warm
+  rebuild. A band-local pre-solve cannot be prototyped in-process: it needs library work (SNES NASM
+  with the band as a subdomain, or a band-restricted Picard/Newton on the rotated loop's Q with a
+  sub-matrix solve); build it only if same-set updates still dominate after the driver changes.
+  Recommendation stands: merge 371d3bd; driver warm-starts changed-set rebuilds and the restart;
+  faulted-mesh checkpoint; detector hysteresis (laptop has it, uncommitted). Kaiju idle until the
+  dev session's driver patch exists, then the 15-step A/B.
