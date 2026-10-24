@@ -320,3 +320,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   sub-record spec and the analysis figure spec; the kaiju dev session implements the record in the
   driver and analysis/solver_record.py; the laptop builds the solver/band visualisation panels and
   the movie. Results and solver tables go to a wiki campaign page when runs exist.
+- 2026-10-25: solver-record spec written by kaiju (`runs/SOLVER_RECORD_SPEC.md` on kaiju): per-step
+  record["solver"] (kind, warm/cold, F0/F_ref, Picard/Newton its, KSP per increment, per-phase wall,
+  pc_fallbacks, mesh stats at rebuilds), run_info.json per run, and analysis/solver_record.py (five
+  panels, events marked through all). Relayed to the dev session to implement. Three fields need a
+  small library change ([LIB-1]: rotated loop returns fnorm_rest, ref, rnorm_history, line-search
+  alpha); kaiju writes that patch for the hub to push as bugfix/rotated-solve-diagnostics.
