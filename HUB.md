@@ -273,3 +273,16 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   first step and the changed-set rebuild; whether the strain/yield-state transfer matters as much as
   V). The kaiju dev session implements driver changes and coordinates with it directly. Library
   changes come to the hub as patches with regression tests. The laptop stays informed only.
+- 2026-10-24: **warm-start milestone 1 (kaiju 2110/2111; `runs/WARMSTART_2026-10-24.md`).**
+  - The fault-attached transfer does NOT help (A: 17 -> 15 its; B: identical). The same-set
+    residual is the physics change at the moved fault tip, not a misplaced jump. Dropped.
+  - The plastic-strain carry-over matters as much as V (zeroing it: 2.4-3.8x |F̂0|, 20% different
+    converged V). Keep it.
+  - With 371d3bd, the cold cases warm-start fine, agreeing with cold to 1e-5: spawn 34 -> 11 its
+    (772 -> 267 s); retire 30 -> 16 (607 -> 243 s); restart's first step from the checkpointed base
+    V 33 -> 17 (663 -> 430 s). The driver's "failed on forming a second fault" comment does not
+    reproduce. The dev session implements both (drop the same-set condition on warm_start; warm f0
+    from V_b), then designs a faulted-mesh checkpoint (V, P, fault state) so a restart is an
+    ordinary step.
+  - Remaining same-set cost (A: 12 Picard + 5 Newton): kaiju continues with a band-local pre-solve
+    and lock-and-release. Library: 371d3bd is the enabler; merge it.
