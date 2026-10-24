@@ -42,7 +42,7 @@ from underworld3.utilities.place_surface import place_fault_ribbon_2d
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii,
-                           free_slip_walls, set_viscoplastic)
+                           free_slip_walls, ridge_factor, set_viscoplastic)
 from strain_band import (boundary_layer_depth, detect_fault, fit_fault_lines, polar_grid, rank_bands,
                          spine_separation)
 
@@ -65,9 +65,51 @@ params = uw.Params(
     uw_age_over=0.001,
     uw_ridge_sub=3.14159,       # angle from the trench to the subducting plate's ridge (radians)
     uw_ridge_over=3.14159,      # angle from the trench to the overriding plate's ridge (radians)
+    uw_age_thin=2.0e-5,         # the age of the surface where there is no plate (a 0.009 d boundary layer)
+    uw_over_plate=1,            # 0: no overriding plate, the thin boundary layer instead
+    uw_top_hot=0,               # 1: the surface on the overriding side is HELD at T_interior (no boundary
+                                #   layer grows there: at this Peclet number the thin layer thickens into a
+                                #   plate within the run), from uw_top_hot_start past the trench to the same
+                                #   distance short of the antipode, tanh ramps of uw_over_ramp
+    uw_top_hot_start=0.06,
+    uw_over_gap=0.0,            # the overriding plate starts this arc length (layer depths) from the trench
+    uw_over_ramp=0.03,          # over which its age ramps up from the thin layer's
+    # an imposed ridge (any state): a weak vertical seam through the lid at each ridge
+    # angle (uw_theta_trench + uw_ridge_sub and - uw_ridge_over, fixed in the mantle frame),
+    # the viscosity and the yield stress times uw_ridge_weak, Gaussian across the seam
+    # with half-width uw_ridge_width (layer depths), down to uw_ridge_depth; 1 = no ridge
+    uw_ridge_weak=1.0,
+    uw_ridge_width=0.06,
+    uw_ridge_depth=0.2,
+    # a weak oceanic crust carried by particles: a layer uw_crust_thick thick (< 0: one cell)
+    # on the subducting plate's surface and down the slab's top face, its viscosity and yield
+    # stress times uw_crust_weak (1 = no crust), the weakness fading below uw_crust_depth
+    uw_crust_weak=1.0,
+    uw_crust_thick=-1.0,
+    uw_crust_depth=0.5,
+    uw_crust_fill=1,            # particles per cell parameter (1: about 3 per cell)
+    # a compositional slab on the same particles: the subducting plate and its slab as a
+    # layer uw_comp_thick thick whose buoyancy is a fixed temperature deficit uw_comp_dT
+    # (0 = none; it does not diffuse) and whose viscosity and yield stress are times
+    # uw_comp_eta; uw_buoy_T scales the thermal buoyancy (0 with uw_deta 1: the slab is
+    # compositional and the mantle isoviscous, the standard foundering-slab model)
+    uw_comp_dT=0.0,
+    uw_comp_eta=1.0,
+    uw_comp_thick=0.1,
+    uw_buoy_T=1.0,
+    # the compositional overriding plate (stage 3): a layer uw_over_comp_thick thick from
+    # uw_over_gap behind the trench to its ridge, viscosity x uw_over_eta, deficit uw_over_dT
+    uw_over_dT=0.0,
+    uw_over_eta=1.0,
+    uw_over_comp_thick=0.1,
     uw_slab_length=0.35,
     uw_slab_rate=1000.0,        # the convergence rate the slab went down at (its age continuation); at
                                 #   100 (the model's own plate speed at Ra 3e6) a 0.35 d slab has warmed through
+    uw_slab_contact=-1.0,       # the slab's top stays cold (against the overriding plate) to this depth and
+                                #   is heated by the mantle below it; < 0: the overriding plate's thickness at
+                                #   the trench, 2 sqrt(uw_age_over) (zero without an overriding plate)
+    uw_slab_wedge_age=6.25e-4,  # cold top (uw_slab_warm_top 0): the wedge is cooled beside the slab over
+                                #   2 sqrt(this) (0.05 d), continuous across the plane, no mask
     uw_slab_warm_top=1,         # 1: since subduction the slab has exchanged heat with the mantle on its
                                 #    contact side: the one-sided plate profile diffuses freely for tau (the
                                 #    distance down-dip over uw_slab_rate), so the slab warms and the wedge
@@ -98,6 +140,7 @@ params = uw.Params(
     uw_band_widen=1,
     uw_rebuild_rungs=4,
     uw_rebuild_dip=2.0,
+    uw_depth_hysteresis=0.016,  # a fitted depth within this of the fault's keeps the fault's (two detection rows)
     uw_rebuild_newton_switch=1.0e-2,
     # strain weakening, regularisation, healing
     uw_strain_crit=0.5,
@@ -128,7 +171,7 @@ params = uw.Params(
     uw_fault_lid_margin=0.05,
     uw_detect_max_ddepth=0.05,
     # forming and removing faults
-    uw_fault_law="lines",       # "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking
+    uw_fault_law="lines",       # "none": no detection; "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking
     uw_line_gamma=2.0,          # "lines": damage counted (plastic strain at or above this)
     uw_line_min_damage=0.01,    # "lines": smallest damage (strain x area) that is a fault
     uw_line_width=0.035,        # "lines": half-width of a line's inlier band
@@ -153,7 +196,7 @@ params = uw.Params(
     uw_global_every=10,
     uw_damage_spawn=0.05,       # band damage (strain x area, layer depths squared) that forms a fault
     uw_damage_retire=0.01,      # a fault whose band has healed below this is removed
-    uw_max_faults=3,
+    uw_max_faults=3,            # 0: no fault at all (the plain annulus, the slab founders on its own)
     uw_fault_separation=20.0,   # no new fault within this arc of an existing one (degrees)
     uw_fault_clearance=0.08,    # smallest distance between two faults' spines (layer depths): a
                                 #   converging pair (the conjugate V) is kept apart by shortening the
@@ -186,6 +229,51 @@ yield_ratio_b = uw.discretisation.MeshVariable("yield_ratio", base, 1, degree=1)
 gamma_b = uw.discretisation.MeshVariable("plastic_strain", base, 1, degree=2)
 edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 
+# The crust: particles over the whole base mesh carrying a 0/1 crust marker; its proxy is
+# the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
+# cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
+crust_on = params.uw_crust_weak < 1
+comp_on = params.uw_comp_dT > 0 or params.uw_comp_eta != 1
+over_on = params.uw_over_dT > 0 or params.uw_over_eta != 1
+swarm_on = crust_on or comp_on or over_on
+crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
+               else float(params.uw_cell) / 2 ** int(params.uw_refinement))
+# the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
+# of the slab state as a function of particle coordinates)
+markers = {}
+if swarm_on:
+    crust_swarm = uw.swarm.Swarm(base)
+    # populated by the initial state: fresh particles for the slab state, the saved ones on a restart
+for name, on, geometry in (("crust", crust_on, lambda xy: layer_marker(xy, crust_thick)),
+                           ("slab", comp_on, lambda xy: layer_marker(xy, float(params.uw_comp_thick))),
+                           ("over", over_on, lambda xy: over_marker(xy, float(params.uw_over_comp_thick)))):
+    if on:
+        markers[name] = (uw.swarm.SwarmVariable(name, crust_swarm, 1, proxy_location="cells", proxy_degree=1),
+                         uw.discretisation.MeshVariable(name, base, 1, degree=1), geometry)
+if crust_on:
+    crust_var, crust_b = markers["crust"][:2]
+if comp_on:
+    slab_var, slab_b = markers["slab"][:2]
+
+
+def clamp01(sym):
+    return sympy.Max(0, sympy.Min(1, sym))
+
+
+def crust_factor_on(mesh, crust_sym):
+    """The viscosity (and yield stress) factor of the crust proxy ``crust_sym`` on ``mesh``:
+    uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth."""
+    depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
+    window = (1 - sympy.tanh((depth - params.uw_crust_depth) / 0.05)) / 2
+    return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym) * window
+
+
+def comp_factor_on(marker_sym, eta):
+    """The viscosity (and yield stress) factor of a compositional layer: ``eta`` where
+    the marker is 1."""
+    return 1 + (eta - 1) * clamp01(marker_sym)
+
+
 Ra = uw.expression(r"\mathrm{Ra}", params.uw_ra, "Rayleigh number on the basal viscosity")
 deta = uw.expression(r"\Delta\eta", params.uw_deta, "viscosity contrast across the layer")
 tau0 = uw.expression(r"\tau_0", params.uw_tau0, "yield stress at the surface")
@@ -196,7 +284,26 @@ adv = uw.systems.AdvDiffusion(base, T_b, V_b.sym, order=1)
 adv.constitutive_model = uw.constitutive_models.DiffusionModel
 adv.constitutive_model.Parameters.diffusivity = 1
 adv.f = H
-adv.add_dirichlet_bc(0.0, "Upper")
+
+
+def hot_top_window(rel_arc, lib=np):
+    """1 where the surface is held hot (uw_top_hot): on the overriding side between
+    uw_top_hot_start past the trench and the same distance short of the antipode, with
+    tanh ramps; numpy or sympy."""
+    start, ramp = float(params.uw_top_hot_start), max(float(params.uw_over_ramp), 1e-6)
+    far = np.pi * r_o - start
+    return (1 + lib.tanh((rel_arc - start) / ramp)) * (1 + lib.tanh((far - rel_arc) / ramp)) / 4
+
+
+if params.uw_top_hot:
+    x_s, y_s = base.X
+    th_t = float(params.uw_theta_trench)
+    over_sign = 1.0 if params.uw_dip < 90 else -1.0
+    rel_sym = over_sign * sympy.atan2(sympy.sin(sympy.atan2(y_s, x_s) - th_t),
+                                      sympy.cos(sympy.atan2(y_s, x_s) - th_t)) * r_o
+    adv.add_dirichlet_bc([float(params.uw_T_interior) * hot_top_window(rel_sym, sympy)], "Upper")
+else:
+    adv.add_dirichlet_bc(0.0, "Upper")
 adv.add_dirichlet_bc(1.0, "Lower")
 
 # Accumulated plastic strain, carried by the flow, growing at the plastic strain rate
@@ -287,6 +394,18 @@ def fault_depth_cap():
     return cap
 
 
+def depth_target(line, fault):
+    """The depth a fitted line asks of its fault, with hysteresis: the fit's bottom is the
+    deepest inlier ROW of the detection grid (rows 0.008 apart, the same as the rebuild
+    threshold 2S), so a one-row flip on round-off noise decided rebuilds (kaiju, step
+    3591 of the Ra x3 run: 0.116 in three runs, 0.108 in a fourth agreeing to 1e-6 in
+    vrms). A change smaller than uw_depth_hysteresis keeps the fault's depth."""
+    target = float(np.clip(line["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap()))
+    if abs(target - fault["depth"]) <= float(params.uw_depth_hysteresis):
+        return float(fault["depth"])
+    return target
+
+
 def keep_apart(faults, slips, damage, events):
     """Shorten the weaker of any two faults whose spines come within uw_fault_clearance
     of each other, so the mesher never has to carve two ribbons through one cell (a
@@ -347,7 +466,7 @@ class FaultedMesh:
         wall = time.perf_counter()
         self.faults = [dict(f) for f in faults]
         self.names = [f["name"] for f in self.faults]
-        chain = int(params.uw_chain)
+        chain = int(params.uw_chain) if self.faults else 0
         mids = []
         for k in range(chain, 0, -1):
             host = levels[len(levels) - k]
@@ -356,10 +475,14 @@ class FaultedMesh:
             except (RuntimeError, ValueError) as err:
                 uw.pprint(f"  chain level {2 ** k}S refused ({str(err)[:80]}): welded")
                 mids.append(host)
-        self.levels = levels[:len(levels) - chain] + mids if chain else levels
-        self.mesh, info, self.pieces = placed_ladders(base, self.faults, 1)
+        if self.faults:
+            self.levels = levels[:len(levels) - chain] + mids if chain else levels
+            self.mesh, info, self.pieces = placed_ladders(base, self.faults, 1)
+            band = np.asarray(info["band"], dtype=bool)
+        else:                  # no fault: the base mesh is the solver's mesh
+            self.levels, self.mesh, self.pieces = levels[:-1], base, {}
+            band = None
         mesh = self.mesh
-        band = np.asarray(info["band"], dtype=bool)
         self.T = uw.discretisation.MeshVariable(f"T_{tag}", mesh, 1, degree=2)
         self.v = uw.discretisation.MeshVariable(f"V_{tag}", mesh, mesh.dim, degree=2)
         self.p = uw.discretisation.MeshVariable(f"P_{tag}", mesh, 1, degree=1, continuous=True)
@@ -368,17 +491,33 @@ class FaultedMesh:
         self.yield_ratio = uw.discretisation.MeshVariable(f"yield_ratio_{tag}", mesh, 1, degree=1)
         self.gamma = uw.discretisation.MeshVariable(f"plastic_strain_{tag}", mesh, 1, degree=2)
         self.edot_p = uw.discretisation.MeshVariable(f"edot_plastic_{tag}", mesh, 1, degree=1)
+        # the crust marker on this mesh (DG1, filled from the particles' proxy at each solve)
+        self.crust = (uw.discretisation.MeshVariable(f"crust_{tag}", mesh, 1, degree=1, continuous=False)
+                      if crust_on else None)
+        self.slab = (uw.discretisation.MeshVariable(f"slab_{tag}", mesh, 1, degree=1, continuous=False)
+                     if comp_on else None)
+        self.over = (uw.discretisation.MeshVariable(f"over_{tag}", mesh, 1, degree=1, continuous=False)
+                     if over_on else None)
         # Each fault's bridge: its band cells outside its split's upper tip.
         centroids = np.asarray(self.zone.coords)
         radius = np.hypot(centroids[:, 0], centroids[:, 1])
         bridge = np.zeros(len(centroids), dtype=bool)
+        if band is None:
+            band = bridge
         for name, (spine, trace) in self.pieces.items():
             near = segment_distance(centroids, spine[0], spine[-1]) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
-        weak = 1 - (1 - params.uw_eta_w) * self.zone.sym[0]
+        weak = (1 - (1 - params.uw_eta_w) * self.zone.sym[0]) * ridge_factor(
+            mesh, r_o, ridges, params.uw_ridge_width, params.uw_ridge_depth, params.uw_ridge_weak)
+        if crust_on:
+            weak = weak * crust_factor_on(mesh, self.crust.sym[0])
+        if comp_on:
+            weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta)
+        if over_on:
+            weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta)
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
@@ -387,7 +526,12 @@ class FaultedMesh:
                                       r_o, weak, yield_factor, asthenosphere=asth)
         if params.uw_eta_reg > 0:
             s.constitutive_model.Parameters.plastic_rate_strengthening = params.uw_eta_reg
-        s.bodyforce = Ra * self.T.sym[0] * mesh.CoordinateSystem.unit_e_0
+        buoyancy = params.uw_buoy_T * self.T.sym[0]
+        if comp_on:                # the slab's fixed temperature deficit, carried by the particles
+            buoyancy = buoyancy - params.uw_comp_dT * clamp01(self.slab.sym[0])
+        if over_on:
+            buoyancy = buoyancy - params.uw_over_dT * clamp01(self.over.sym[0])
+        s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
         free_slip_walls(s)
         for name in self.names:
             s.add_fault_bc(0, boundary=name)
@@ -412,7 +556,7 @@ class FaultedMesh:
         level_cells = [int(uw.utilities.gather_data(m.dm.getHeightStratum(0)[1], bcast=True).sum())
                        for m in self.levels + [mesh]]
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
-                              f"depth {f['depth']:.3f}" for f in self.faults)
+                              f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
                   f"built in {self.t_build:.1f} s")
 
@@ -459,6 +603,10 @@ class FaultedMesh:
             uw.function.global_evaluate(T_b.sym[0], onto(self.T.coords))).ravel()
         self.gamma.array[:, 0, 0] = np.asarray(
             uw.function.global_evaluate(gamma_b.sym[0], onto(self.gamma.coords))).ravel()
+        for name, (var, _, _) in markers.items():
+            mine = getattr(self, name)
+            mine.array[:, 0, 0] = np.asarray(
+                uw.function.global_evaluate(var.sym[0], onto(mine.coords))).ravel()
         info = self._stokes_solve(from_rest=not self.has_guess)
         if not info.get("converged") and self.has_guess:
             uw.pprint("  the warm start did not converge: solving from rest")
@@ -632,17 +780,24 @@ def write_records(records):
 
 def checkpoint(step, t, records, faulted, faults, next_id):
     faulted.render_fields_to_base()
-    base.write_timestep("annulus", index=step, outputPath=out,
-                        meshVars=[V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b])
+    mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
+    for var, picture, _ in markers.values():
+        picture.array[:, 0, 0] = np.asarray(
+            uw.function.global_evaluate(var.sym[0], onto(picture.coords))).ravel()
+        mesh_vars.append(picture)
+    if swarm_on:
+        crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
+                                   swarmVars=[m[0] for m in markers.values()], outputPath=out)
+    base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
     with uw.selective_ranks(0) as selected:
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
                 json.dump({"step": step, "t": t, "params": params.to_dict(), "faults": faults,
-                           "next_id": next_id,
+                           "next_id": next_id, "ridge_origin": theta_0, "ridges": ridges,
                            # the first fault, for the single-fault readers (renders)
-                           "theta_trench": faults[0]["theta"], "dip": faults[0]["dip"],
-                           "fault_depth": faults[0]["depth"],
-                           "trace": faulted.pieces[faults[0]["name"]][1].tolist(),
+                           "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
+                           "dip": faults[0]["dip"] if faults else float(params.uw_dip),
+                           "fault_depth": faults[0]["depth"] if faults else 0.0,
                            "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults]},
                           f, indent=1, default=str)
     write_records(records)
@@ -670,10 +825,18 @@ def slab_temperature(xy):
     # the surface age: a ramp from the ridge to the trench on each side
     rel = over * wrap(theta - theta_t)                    # positive on the overriding side
     ridge_o, ridge_s = abs(float(params.uw_ridge_over)), abs(float(params.uw_ridge_sub))
+    age_thin = float(params.uw_age_thin)
     age_o = params.uw_age_over * np.clip(1 - np.abs(rel) / max(ridge_o, 1e-6), 0, 1)
     age_s = params.uw_age_sub * np.clip(1 - np.abs(rel) / max(ridge_s, 1e-6), 0, 1)
-    age_surface = np.where(rel >= 0, age_o, age_s)
+    if not params.uw_over_plate:                          # no overriding plate: the thin layer
+        age_o = np.full_like(age_o, age_thin)
+    elif params.uw_over_gap > 0:                          # the plate set back from the trench
+        w = np.clip((np.abs(rel) * r_o - params.uw_over_gap) / max(params.uw_over_ramp, 1e-6), 0, 1)
+        age_o = age_thin + (age_o - age_thin) * w
+    age_surface = np.maximum(np.where(rel >= 0, age_o, age_s), age_thin)
     T_plate = half_space(depth, age_surface)
+    if params.uw_top_hot:                                 # no cooling at all where the surface is held hot
+        T_plate = np.maximum(T_plate, T_i * hot_top_window(rel * r_o))
     # the slab: the age line is the fault plane from the trench, down-dip to uw_slab_length
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
@@ -684,12 +847,14 @@ def slab_temperature(xy):
     s_raw = rel_xy @ down
     s_along = np.clip(s_raw, 0.0, params.uw_slab_length)
     n_into = rel_xy @ n_sub
-    foot = a + np.outer(s_along, down)
-    dist = np.linalg.norm(xy - foot, axis=1)
     # one-sided along the plane: on the overriding side the slab does not cool the wedge;
     # beyond the tip the profile wraps round (a rounded end)
-    dist = np.where((n_into < 0) & (s_raw < params.uw_slab_length), np.inf, dist)
-    tau = s_along / max(float(params.uw_slab_rate), 1e-6)         # time since subduction
+    # time since the slab's top left the overriding plate's base (cold against the plate above it)
+    contact = float(params.uw_slab_contact)
+    if contact < 0:
+        contact = 2.0 * np.sqrt(float(params.uw_age_over)) if params.uw_over_plate else 0.0
+    s_contact = contact / max(abs(np.sin(phi)), 0.1)
+    tau = np.maximum(s_along - s_contact, 0.0) / max(float(params.uw_slab_rate), 1e-6)
     if params.uw_slab_warm_top:
         # signed distance to the plane (positive into the subducting side; beyond the tip the
         # distance to the tip), and the freely diffused one-sided profile
@@ -701,7 +866,14 @@ def slab_temperature(xy):
         end_factor = erfc(overshoot / (2.0 * np.sqrt(age_end)))
         T_slab = T_i - T_i * end_factor * slab_diffused(n_into, tau, float(params.uw_age_sub))
     else:
-        T_slab = half_space(dist, params.uw_age_sub + tau)
+        # cold top: T = 0 on the plane, the plate's half-space profile into the subducting
+        # side (its age continued down-dip) and a short cooled halo into the wedge, so the
+        # field is continuous across the plane; the ends fade as above
+        age_end = float(params.uw_age_sub) + tau
+        overshoot = np.maximum(s_raw - params.uw_slab_length, 0.0) + np.maximum(-s_raw, 0.0)
+        end_factor = erfc(overshoot / (2.0 * np.sqrt(age_end)))
+        scale = np.where(n_into >= 0, 2.0 * np.sqrt(age_end), 2.0 * np.sqrt(float(params.uw_slab_wedge_age)))
+        T_slab = T_i - T_i * end_factor * erfc(np.abs(n_into) / scale)
     return np.minimum(T_plate, T_slab)
 
 
@@ -737,17 +909,85 @@ def slab_diffused(signed, tau, age):
     return np.clip(out, 0.0, 1.0)
 
 
+def layer_marker(xy, thick):
+    """1 in a layer ``thick`` thick of the slab state: at the subducting plate's surface
+    (from its ridge to the trench) and down the slab's top face (the plane, into the
+    subducting side) to the slab's end; the geometry of slab_temperature. The crust is
+    the one-cell layer, the compositional slab the plate-thick one."""
+    crust_thick = thick
+    xy = np.asarray(xy, dtype=float)
+    r = np.hypot(xy[:, 0], xy[:, 1])
+    theta = np.arctan2(xy[:, 1], xy[:, 0])
+    depth = np.maximum(r_o - r, 0.0)
+    theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    rel = over * wrap(theta - theta_t)
+    ridge_s = abs(float(params.uw_ridge_sub))
+    plate = (rel < 0) & (np.abs(rel) < ridge_s) & (depth < crust_thick)
+    r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
+    t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
+    down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
+    n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
+    rel_xy = xy - r_hat * r_o
+    s_raw, n_into = rel_xy @ down, rel_xy @ n_sub
+    slab = (s_raw >= 0) & (s_raw <= params.uw_slab_length - crust_thick) & (n_into >= 0) & (n_into < crust_thick)
+    return (plate | slab).astype(float)
+
+
+def over_marker(xy, thick):
+    """1 in the compositional overriding plate of the slab state: a layer ``thick`` thick
+    at the surface on the overriding side, from uw_over_gap (arc length) behind the trench
+    to the overriding plate's ridge."""
+    xy = np.asarray(xy, dtype=float)
+    r = np.hypot(xy[:, 0], xy[:, 1])
+    theta = np.arctan2(xy[:, 1], xy[:, 0])
+    depth = np.maximum(r_o - r, 0.0)
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    rel = over * wrap(theta - float(params.uw_theta_trench))
+    ridge_o = abs(float(params.uw_ridge_over))
+    plate = (rel * r_o >= float(params.uw_over_gap)) & (rel < ridge_o) & (depth < thick)
+    return plate.astype(float)
+
+
+def seed_swarm():
+    """Fresh particles over the base mesh with the slab state's markers."""
+    crust_swarm.populate(fill_param=int(params.uw_crust_fill))
+    for var, _, geometry in markers.values():
+        var.array[:, 0, 0] = geometry(crust_swarm.coords)
+        var._update()
+
+
+def restore_swarm(path, index):
+    """The particles of checkpoint ``index`` in ``path``; a checkpoint without particles
+    (an older run) gets fresh ones, and a marker the checkpoint lacks is seeded from the
+    slab state's geometry on the saved particles."""
+    if not os.path.exists(os.path.join(path, f"annulus.crust_swarm.{index:05d}.h5")):
+        seed_swarm()
+        return
+    crust_swarm.read_timestep("annulus", "crust_swarm", index, outputPath=path)
+    for name, (var, _, geometry) in markers.items():
+        if os.path.exists(os.path.join(path, f"annulus.crust_swarm.{name}.{index:05d}.h5")):
+            var.read_timestep("annulus", "crust_swarm", name, index, outputPath=path)
+        else:
+            var.array[:, 0, 0] = geometry(crust_swarm.coords)
+        var._update()
+
+
 if params.uw_init == "slab":
     T_b.array[:, 0, 0] = slab_temperature(T_b.coords)
     V_b.array[:, 0, :] = 0.0
+    if swarm_on:
+        seed_swarm()
     state = {"t": 0.0, "step": -1}
     faults = [{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
-               "depth": float(params.uw_fault_depth)}]
+               "depth": float(params.uw_fault_depth)}] if params.uw_max_faults > 0 else []
     next_id = 1
 elif params.uw_restart < 0:
     source = os.path.expanduser(params.uw_source)
     for var in (T_b, V_b):
         var.read_timestep("annulus", var.name, params.uw_source_index, outputPath=source)
+    if swarm_on:
+        restore_swarm(source, params.uw_source_index)
     with open(os.path.join(source, f"state_{params.uw_source_index:05d}.json")) as f:
         state = json.load(f)
     if os.path.exists(os.path.join(source, "records.json")):
@@ -759,6 +999,8 @@ elif params.uw_restart < 0:
 else:
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+    if swarm_on:
+        restore_swarm(out, params.uw_restart)
     with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
         state = json.load(f)
     with open(os.path.join(out, "records.json")) as f:
@@ -771,6 +1013,16 @@ else:
                    "depth": float(state.get("fault_depth", params.uw_fault_depth))}]
         next_id = 1
 t, step = float(state["t"]), int(state["step"]) + 1
+# the imposed ridges stay where the plates' ridges were at the start (the mantle frame),
+# carried through restarts in the state
+if params.uw_ridge_weak < 1:
+    theta_0 = float(state.get("ridge_origin", faults[0]["theta"] if faults else params.uw_theta_trench))
+    ridges = [float(wrap(theta_0 + params.uw_ridge_sub))]
+    other = float(wrap(theta_0 - params.uw_ridge_over))
+    if abs(wrap(other - ridges[0])) > 0.01:      # one ridge when both plates share it (the antipode)
+        ridges.append(other)
+else:
+    theta_0, ridges = float(faults[0]["theta"] if faults else params.uw_theta_trench), []
 
 n_built = 1
 refused = {}                   # formation trenches the surgery refused: no new fault within 3 deg for a while
@@ -781,7 +1033,17 @@ uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra 
           f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
           f"{len(faults)} fault(s); "
-          f"from t {t:.4f}; output {out}")
+          + (f"ridge x{params.uw_ridge_weak:g} at {', '.join(f'{np.degrees(a):.1f}' for a in ridges)} deg "
+             f"(width {params.uw_ridge_width:g}, to {params.uw_ridge_depth:g}); " if ridges else "")
+          + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {params.uw_crust_depth:g}; "
+             if crust_on else "")
+          + (f"compositional slab {params.uw_comp_thick:g} thick, dT {params.uw_comp_dT:g}, eta x{params.uw_comp_eta:g}, "
+             f"thermal buoyancy x{params.uw_buoy_T:g}; " if comp_on else "")
+          + (f"compositional overriding plate {params.uw_over_comp_thick:g} thick from {params.uw_over_gap:g} "
+             f"behind the trench, dT {params.uw_over_dT:g}, eta x{params.uw_over_eta:g}; " if over_on else "")
+          + (f"{int(uw.utilities.gather_data(crust_swarm.local_size, bcast=True).sum())} particles; "
+             if swarm_on else "")
+          + f"from t {t:.4f}; output {out}")
 
 
 def needs_rebuild(faults, built):
@@ -850,12 +1112,17 @@ for k in range(params.uw_steps):
     adv.solve(timestep=dt)
     strain_adv.solve(timestep=dt)
     gamma_b.array[:, 0, 0] = np.maximum(gamma_b.array[:, 0, 0], 0.0)
+    if swarm_on:
+        crust_swarm.advection(V_b.sym, dt, order=2)
+        for var, _, _ in markers.values():
+            var._update()
     t += dt
     if trench_advect:
         advect_trenches(faults, dt)
 
     damage = {}
-    detect_now = k >= params.uw_detect_start and (k - params.uw_detect_start) % params.uw_detect_every == 0
+    detect_now = (params.uw_fault_law != "none" and k >= params.uw_detect_start
+                  and (k - params.uw_detect_start) % params.uw_detect_every == 0)
     if params.uw_fault_law == "lines" and detect_now:
         # N faults fitted to the damage: each existing fault takes the line nearest its
         # trench (by bounded steps), an unmatched line forms a fault, a fault with no
@@ -886,7 +1153,7 @@ for k in range(params.uw_steps):
             phi = float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max))
             f["dip"] = float(f["dip"] + np.clip(phi - f["dip"], -params.uw_detect_max_ddip,
                                                 params.uw_detect_max_ddip))
-            target = float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap()))
+            target = depth_target(ln, f)
             f["depth"] = float(f["depth"] + np.clip(target - f["depth"], -params.uw_detect_max_ddepth,
                                                     params.uw_detect_max_ddepth))
         if k % (10 * params.uw_detect_every) == 0:
@@ -941,7 +1208,7 @@ for k in range(params.uw_steps):
                 phi = float(np.clip(ln["phi"], params.uw_dip_min, params.uw_dip_max))
                 f["dip"] = float(f["dip"] + np.clip(phi - f["dip"], -params.uw_detect_max_ddip,
                                                     params.uw_detect_max_ddip))
-                target = float(np.clip(ln["depth_bottom"], params.uw_fault_depth_min, fault_depth_cap()))
+                target = depth_target(ln, f)
                 f["depth"] = float(f["depth"] + np.clip(target - f["depth"], -params.uw_detect_max_ddepth,
                                                         params.uw_detect_max_ddepth))
             else:
@@ -1033,13 +1300,15 @@ for k in range(params.uw_steps):
         record["trench_rate"] = {f["name"]: float(wrap(f["theta"] - previous[f["name"]]) * r_o / dt)
                                  for f in faults if f["name"] in previous}
     record.update({"faults": [dict(f) for f in faults], "n_faults": len(faults), "damage": damage,
-                   "events": events, "theta_trench": faults[0]["theta"], "dip": faults[0]["dip"],
-                   "fault_depth": faults[0]["depth"], "n_built": n_built, "t_build": round(faulted.t_build, 1)})
+                   "events": events, "n_built": n_built, "t_build": round(faulted.t_build, 1),
+                   "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
+                   "dip": faults[0]["dip"] if faults else float(params.uw_dip),
+                   "fault_depth": faults[0]["depth"] if faults else 0.0})
     record.update({"step": step, "t": t, "dt": dt, "courant": dt / dt_crossing,
                    "t_stokes": round(t_stokes, 2), "t_step": round(time.perf_counter() - wall, 2)})
     records.append(record)
     described = " ".join(f"{f['name']}@{np.degrees(f['theta']):.1f}/{f['dip']:.0f}/{f['depth']:.2f}"
-                         f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults)
+                         f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults) or "none"
     uw.pprint(f"step {step:5d} t {t:.5f} dt {dt:.2e} | vrms {record['vrms']:8.2f} "
               f"M {record['mobility']:.3f} lid {record['lid_depth']:.3f} T_mid {record['T_mid']:.3f} "
               f"slip {record['slip_max']:.2f} | faults {described} | "

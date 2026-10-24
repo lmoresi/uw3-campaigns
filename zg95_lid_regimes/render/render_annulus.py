@@ -79,6 +79,25 @@ def checkpoint_indices():
     return sorted(int(re.search(r"\.T\.(\d+)\.h5", f).group(1)) for f in files)
 
 
+marker_vars = {name: uw.discretisation.MeshVariable(name, mesh, 1, degree=1) for name in ("crust", "slab", "over")}
+MARKER_COLOURS = {"crust": ("#1e8449", "white"), "slab": ("#d35400", "#f5b041"), "over": ("#6c3483", "#bb8fce")}
+
+
+def marker_outlines(index):
+    """The particle-carried layers of the checkpoint (the weak crust, the compositional
+    slab) as (name, 0.5 contour) pairs; empty when the checkpoint has none."""
+    lines = []
+    for name, var in marker_vars.items():
+        if not os.path.exists(os.path.join(run, f"annulus.mesh.{name}.{index:05d}.h5")):
+            continue
+        var.read_timestep("annulus", name, index, outputPath=run)
+        line = field_mesh(var, name).contour([0.5], scalars=name)
+        if line.n_points:
+            line.points[:, 2] = 0.02
+            lines.append((name, line))
+    return lines
+
+
 def field_mesh(var, name):
     """T (P2) on the Delaunay of its own DOFs; the P1 fields on the mesh's own cells,
     evaluated at its vertices (exact for P1), so VTK interpolates within elements."""
@@ -131,9 +150,9 @@ def place_camera(pl, theta_trench=None):
     pl.camera.parallel_scale = 1.18 * r_o
 
 
-def render_strain(index, state, trace, strm, vmax, bar):
+def render_strain(index, state, trace, strm, vmax, bar, outline=()):
     """The strain panels: T with streamlines, log10 strain rate, log10 plastic strain
-    rate, plastic strain; the faults on every panel."""
+    rate, plastic strain; the faults on every panel, the crust's outline on the first two."""
     t = state["t"]
     pl = pv.Plotter(off_screen=True, shape=(1, 4), window_size=(3200, 860), border=False)
     pl.set_background("white")
@@ -171,6 +190,9 @@ def render_strain(index, state, trace, strm, vmax, bar):
             pl.add_text(f"step {index}, t = {t:.4f}, |v|max {vmax:.0f}", font_size=11, color="black")
         if trace is not None:
             pl.add_mesh(trace, color=fault_colour[n], line_width=fault_width[n], lighting=False)
+        if n < 2:
+            for name, line in outline:
+                pl.add_mesh(line, color=MARKER_COLOURS[name][n], line_width=(1.5, 1.0)[n], lighting=False)
         place_camera(pl, state.get("theta_trench"))
     for bar_actor in pl.scalar_bars.values():
         bar_actor.SetTextPositionToPrecedeScalarBar()
@@ -202,8 +224,9 @@ def render(index):
     strm, vmax = streamlines()
     bar = dict(vertical=False, position_x=0.2, position_y=0.04, height=0.05, width=0.6,
                color="black", title_font_size=14, label_font_size=12)
+    outline = marker_outlines(index)
     if params.uw_panels == "strain":
-        return render_strain(index, state, trace, strm, vmax, bar)
+        return render_strain(index, state, trace, strm, vmax, bar, outline)
     panels = 4 if has_strain else 3
     pl = pv.Plotter(off_screen=True, shape=(1, panels), window_size=(800 * panels, 860), border=False)
     pl.set_background("white")
@@ -224,6 +247,8 @@ def render(index):
     pl.add_text(f"step {index}, t = {t:.4f}, |v|max {vmax:.0f}", font_size=11, color="black")
     if trace is not None:
         pl.add_mesh(trace, color="#c0392b", line_width=3, lighting=False)
+    for name, line in outline:
+        pl.add_mesh(line, color=MARKER_COLOURS[name][0], line_width=1.5, lighting=False)
     place_camera(pl, state.get("theta_trench"))
 
     pl.subplot(0, 1)
@@ -232,6 +257,8 @@ def render(index):
                 scalar_bar_args=dict(title="log10 eta_eff", **bar))
     if trace is not None:
         pl.add_mesh(trace, color="#c0392b", line_width=3, lighting=False)
+    for name, line in outline:
+        pl.add_mesh(line, color=MARKER_COLOURS[name][1], line_width=1.0, lighting=False)
     place_camera(pl, state.get("theta_trench"))
 
     pl.subplot(0, 2)

@@ -183,6 +183,58 @@ overriding plate advances at 29 and the trench retreats at 29; with the freely d
 (half the thermal anomaly) 57, 41, 4 and 4. A fault placed along the slab's cold core instead
 of its upper surface locks (slip 11). The scan for kaiju is `launch/slab_kaiju/` (ten runs,
 one change each: asthenosphere, tau1/Ra, dip, slab length, plate ages, deta, two faults).
+Rerun on the age-line state the two contacts are alike at step 1 (slip 67 and 64); the diffused
+slab rolls back twice as fast (trench rate 14 against 6) because the cooled wedge couples the
+overriding plate to the slab.
+
+**Sixty steps of the diffused slab (laptop, 4 ranks, dt at the Courant limit: the driver's
+accuracy estimate, `uw_dt_mult` x the library's, was six times smaller and would have needed
+hundreds of steps).** No roll-back. The slab drips vertically under the trench and is gone by
+step 40 (peak speed 900, dt 4e-5); the overriding plate moves toward the trench at 30
+throughout, so the trench advected with it retreats 0.05 d by step 20 and the refits then walk
+it 0.8 deg the other way, to the strain-rate band on the overriding side. The ridge in the
+initial state does not develop: by step 20 the lid at the antipode has thickened from 0.04 to
+0.14 and the surface divergence there is gone (`analysis/surface_profile.py`: surface velocity,
+divergence and lid depth around the annulus).
+
+**An imposed ridge.** `-uw_ridge_weak f` puts a weak vertical seam through the lid at each
+plate's ridge angle (`ridge_factor` in `annulus_model.py`: the viscosity and the yield stress
+times f, Gaussian across the seam with half-width uw_ridge_width 0.06, to uw_ridge_depth 0.2,
+fixed in the mantle frame and carried through restarts in the state). At f 0.01 the seam
+spreads (divergence 600 at the antipode, lid 0.09 instead of 0.14) and the fault slips twice as
+fast (124), but the young plate it feeds drips at 108 deg from the trench before it gets there,
+and by step 59 the ridge side of the annulus is a field of small drips and new spreading
+centres (speeds 1300) while the trench side is a slow plate (subducting 10, overriding 96, no
+retreat). The yield-everywhere lid again: the thin plate near the ridge fails on its own. Next
+on the laptop: the same with tau1/Ra 3 (`runs/slab_ridge_tau3`).
+
+**Stage A without a fault or an overriding plate (laptop, 2026-10-24).** Louis's plan: (1) a
+half-annulus plate with a thin boundary layer elsewhere, no fault, no overriding plate, tuned
+until the slab founders by half its own length; (2) an overriding plate set back at least a plate
+thickness; (3) the fault. No thermal slab founders. At Ra 2.7e7 with a thin plate (age 0.0025),
+a held-hot overriding surface and the cold-top slab state (A4), the hinge is a free pivot (the
+chord dip goes 63 to 88 deg with the hinge fixed) and the core warms from 0.04 to 0.3 by
+t 0.0005, before anything rolls back; a weak channel from depth 0.15 (A5) drops the slab
+straight through; a one-cell weak crust carried by particles (A7) is the best of them, 0.12 d of
+retreat by t 0.0006, at 7 min a step with 15 to 21 Newton iterations as the crust yields.
+`analysis/slab_metrics.py` tabulates the hinge, tip, chord, dip, core temperature and cold mass
+of every checkpoint.
+
+**The compositional slab (the recipe).** The subducting plate and its slab are a particle
+marker with a fixed temperature deficit in the buoyancy and a viscosity factor, on one swarm
+with the crust (`markers` in the driver: crust, slab, over; per-cell linear proxies, P1
+pictures `annulus.mesh.<name>.NNNNN.h5` for the renders, the swarm checkpointed with the mesh).
+Thermal buoyancy off, isoviscous mantle: `-uw_deta 1 -uw_buoy_T 0 -uw_asth 1 -uw_ra 3e6
+-uw_tau0 2.25e5 -uw_tau1 3e7 -uw_comp_dT 0.5 -uw_comp_eta 100 -uw_comp_thick 0.1
+-uw_crust_weak 0.001` with the stage-A flags (`launch/stage_a/run_stage_b_comp.sh`); the
+overriding plate for stage 3 is `-uw_over_eta 100 -uw_over_gap 0.15` (neutrally buoyant). Read
+the metrics' trench column (the marker's surface edge); the hinge band mixes steepening with
+retreat. Refinement 5, 4 ranks, 75 s a step, one Newton iteration. B1 (slab x100): steepens to
+vertical by step 20, then rolls back at 450 with the plate feeding in at 800 to 970; trench
+retreat 0.33 d at t 0.0007 and 0.45 d at t 0.0011; the tip reaches the base at step 70, the slab
+drapes at 75 deg and the rate halves. B2 (x1000): the same path at a third of the rate. C1
+(stage 3): the overriding plate halves the rate (0.19 d at t 0.0007, 0.39 d at t 0.0018), is
+drawn along with the trench and rides on the crust from step 40. The fault goes at that contact.
 
 ## Next
 

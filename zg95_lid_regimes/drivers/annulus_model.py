@@ -44,6 +44,26 @@ def asthenosphere_factor(depth, factor, top, bottom, ramp):
     return 1 - (1 - factor) * window
 
 
+def ridge_factor(mesh, r_o, thetas, half_width, depth_cut, factor, ramp=0.02):
+    """An imposed mid-ocean ridge: a factor ``factor`` (below 1) in a vertical seam
+    through the lid at each angle in ``thetas``, Gaussian across the seam with the
+    half-width ``half_width`` (arc length, layer depths) and ending at the depth
+    ``depth_cut`` with a tanh ramp of width ``ramp``; 1 elsewhere. Multiplies the
+    viscosity and the yield stress alike, so the plates can part there."""
+    if factor >= 1 or not thetas:
+        return 1
+    x, y = mesh.X
+    depth = r_o - radius_of(mesh)
+    window = 0
+    for theta_r in thetas:
+        # the distance from the ridge, periodic, without acos (singular derivative at the ridge)
+        cos_d = (x * np.cos(theta_r) + y * np.sin(theta_r)) / radius_of(mesh)
+        chord2 = 2 * r_o ** 2 * (1 - cos_d)         # the squared chord, the arc squared near the ridge
+        window = window + sympy.exp(-chord2 / half_width ** 2)
+    window = sympy.Min(window, 1) * (1 - sympy.tanh((depth - depth_cut) / ramp)) / 2
+    return 1 - (1 - factor) * window
+
+
 def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1,
                      asthenosphere=None):
     """Temperature-dependent viscosity capped by a yield stress that grows with depth
