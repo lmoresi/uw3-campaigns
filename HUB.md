@@ -98,7 +98,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Production launch, after the multigrid fixes and the warm-start diagnosis: NP 16 per run for now.
+- Confirm the laptop's push of the compositional-slab driver (in the laptop session), then kaiju builds
+  the overlay and runs the slab suite at np 16 (one node per run).
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
@@ -295,3 +296,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   Recommendation stands: merge 371d3bd; driver warm-starts changed-set rebuilds and the restart;
   faulted-mesh checkpoint; detector hysteresis (laptop has it, uncommitted). Kaiju idle until the
   dev session's driver patch exists, then the 15-step A/B.
+- 2026-10-24: **ZG95 slab recipe settled on the laptop: a compositional slab** (no thermal slab
+  founders; the hinge is a free pivot and the core warms before rollback). Particle markers on a
+  swarm over the base mesh (crust, slab, overriding plate), with `-uw_comp_dT`, `-uw_comp_eta`,
+  `-uw_buoy_T`, `-uw_over_*`, `-uw_crust_weak`; refinement 5 (127k cells, 381k particles), fault-free
+  (`-uw_max_faults 0`), 75 s/step at 4 laptop ranks, Newton 1 iteration. B1/B2/C1 results in the
+  laptop's report. Uncommitted on the laptop, awaiting Louis's confirmation to push to
+  zg95-annulus-for-kaiju; the dev session rebases its warm-start patch on top afterwards. Louis wants
+  these runs on kaiju; the warm-start and MG conditions don't bind (no faults, np 16 works).
