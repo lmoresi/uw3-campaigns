@@ -1124,10 +1124,14 @@ for k in range(k0, k0 + params.uw_steps):
                 faults = [dict(f) for f in previous.faults]
                 faulted = previous
         n_built += 1
-        if faulted is not previous and faulted.names == previous.names:
-            # the same faults, moved: start from the old solution. A changed set (a fault
-            # formed or removed) starts from rest: the warm start from the old set failed
-            # to converge (measured on forming a second fault) and was then repeated cold.
+        if faulted is not previous:
+            # start from the old solution, also when the set has changed (a fault formed or
+            # removed): measured on kaiju from 3580 (np 16), a spawn takes 11 iterations warm
+            # against 34 cold and a retire 16 against 30, converging to the cold solution
+            # within 1e-5. This needs the rotated loop's Picard->Newton switch keyed on the
+            # rest-state residual (underworld3 371d3bd); without it a changed set's warm start
+            # failed to converge (measured on forming a second fault). solve() retries cold
+            # if the warm start does not converge.
             faulted.warm_start(previous.v, previous.p)
             faulted.stokes.newton_switch_rtol = params.uw_rebuild_newton_switch
         del previous
