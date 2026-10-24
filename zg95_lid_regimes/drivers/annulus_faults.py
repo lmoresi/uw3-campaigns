@@ -1059,6 +1059,10 @@ if params.uw_restart >= 0:
     k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
 faulted = FaultedMesh(built, "f0")
+if params.uw_restart >= 0:
+    # the first solve starts from the checkpointed velocity (continuous across the faults,
+    # no pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
+    faulted.warm_start(V_b)
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
           f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
