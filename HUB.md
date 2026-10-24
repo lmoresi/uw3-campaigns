@@ -326,3 +326,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   panels, events marked through all). Relayed to the dev session to implement. Three fields need a
   small library change ([LIB-1]: rotated loop returns fnorm_rest, ref, rnorm_history, line-search
   alpha); kaiju writes that patch for the hub to push as bugfix/rotated-solve-diagnostics.
+- 2026-10-25: the laptop built the solver visualisation (uncommitted, awaiting Louis): `-uw_panels
+  solver` (mesh with old/new fault traces, strain rate, plastic strain, an iteration strip with
+  rebuild/spawn/retire/cold markers), `-uw_band 1` (before/after zoom on a moved fault with the
+  tangential velocity jump against depth), and the movie. Tested on the Ra x3 run (67 checkpoints).
+  Limitation: the solver's split mesh is not checkpointed, so the mesh panel shows the base mesh;
+  writing the solver mesh at checkpoints goes into the dev session's checkpoint design.
