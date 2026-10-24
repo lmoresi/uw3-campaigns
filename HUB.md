@@ -314,3 +314,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   not in git (runs/ is gitignored). Gotcha: `-uw_init slab` silently ignores `-uw_restart`; restarts
   need `-uw_init checkpoint`; a guard goes to the dev session. Production estimate: 120 steps ~65 min
   per case at np 16, one node each, up to 8 side by side. Waiting on Louis's case list.
+- 2026-10-25: **Louis's purpose statement for the annulus rollback experiment: show how the solvers
+  behave in moving-fault situations, and be a good example; best science plus visualisation plus
+  solver numbers, instrumented and recorded.** Division: kaiju (main) writes the per-step "solver"
+  sub-record spec and the analysis figure spec; the kaiju dev session implements the record in the
+  driver and analysis/solver_record.py; the laptop builds the solver/band visualisation panels and
+  the movie. Results and solver tables go to a wiki campaign page when runs exist.
