@@ -307,3 +307,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: the laptop pushed the compositional-slab driver: zg95-annulus-for-kaiju 878b9c2
   (8 files, +677). Kaiju starts the np 16 smoke test (fresh clone pinned at 878b9c2; the Ra x3 clone
   stays at e258447). The dev session rebases its warm-start patch onto 878b9c2.
+- 2026-10-25: **slab smoke test passed on kaiju** (job 2114, np 16, 878b9c2): 31 s/step (laptop 75 s
+  at 4 ranks), Newton 1 it, ~1 GB/rank, 380,928 particles conserved through advection and checkpoint,
+  restart from step 5 reproduces steps 6-9 (vrms 9e-5, M 1e-3 on the first step then 1e-5). Metrics
+  qualitatively match B1 (steepening to vertical). No quantitative check: the laptop's B1 records are
+  not in git (runs/ is gitignored). Gotcha: `-uw_init slab` silently ignores `-uw_restart`; restarts
+  need `-uw_init checkpoint`; a guard goes to the dev session. Production estimate: 120 steps ~65 min
+  per case at np 16, one node each, up to 8 side by side. Waiting on Louis's case list.
