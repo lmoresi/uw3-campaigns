@@ -90,7 +90,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` e258447, needs underworld3 `feature/box-faults` c1107957 | being moved to kaiju (below) |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2, needs underworld3 `feature/box-faults` c1107957 (+371d3bd for the warm starts) | on kaiju; slab production awaits Louis's case list |
+| Restart / warm-start driver fixes | uw3-campaigns `kaiju/annulus-restart-fixes` 4485bea (on 878b9c2) | validated on kaiju; merge into the campaign branch is Louis's call |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -337,3 +338,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   rnorm_history, line_search_alpha in the rotated result dict; test written first). Hyperion runs
   the rotated and parallel suites on it. The laptop mapped the solver-record field names into its
   renderer and will draw the checkpointed solver mesh (annulus.solver_mesh.NNNNN.h5) when present.
+- 2026-10-25: pushed kaiju/annulus-restart-fixes 4485bea (dev session's 3 commits, tree verified
+  identical): decisions (k, n_built, refused, last_damage, built) in state_N.json and restored;
+  -uw_restart beats -uw_init slab; changed-set rebuilds warm-start; the restart's first solve
+  warm-starts from V_b. Test (np 16, 3580 -> 3600, restart at 3590): first step 33 -> 17 its,
+  events identical restart vs uninterrupted, fault geometry 1.8e-6, slip 2e-4. Needs 371d3bd in the
+  library. Kaiju runs the 15-step A/B for total wall saving. Item 3 design accepted: solver mesh +
+  V/P checkpointed (reload verified exact), swarm through the same restore, loud failure on missing
+  files.
