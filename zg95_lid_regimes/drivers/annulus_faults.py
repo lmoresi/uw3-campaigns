@@ -778,7 +778,7 @@ def write_records(records):
                 json.dump(records, f, indent=1)
 
 
-def checkpoint(step, t, records, faulted, faults, next_id):
+def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
     for var, picture, _ in markers.values():
@@ -798,7 +798,9 @@ def checkpoint(step, t, records, faulted, faults, next_id):
                            "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
                            "dip": faults[0]["dip"] if faults else float(params.uw_dip),
                            "fault_depth": faults[0]["depth"] if faults else 0.0,
-                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults]},
+                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults],
+                           # what steers the next decisions (restored_decisions)
+                           "decisions": dict(decisions, built=faulted.faults)},
                           f, indent=1, default=str)
     write_records(records)
 
@@ -973,7 +975,7 @@ def restore_swarm(path, index):
         var._update()
 
 
-if params.uw_init == "slab":
+if params.uw_init == "slab" and params.uw_restart < 0:     # a restart of a slab run reads its checkpoint
     T_b.array[:, 0, 0] = slab_temperature(T_b.coords)
     V_b.array[:, 0, :] = 0.0
     if swarm_on:
@@ -1024,11 +1026,39 @@ if params.uw_ridge_weak < 1:
 else:
     theta_0, ridges = float(faults[0]["theta"] if faults else params.uw_theta_trench), []
 
+
+
+def restored_decisions(state, records, faults):
+    """What steers the fault decisions, as the checkpoint at ``state`` left it: the loop
+    counter of the next step (the detection cadence, uw_detect_start and the clearing of
+    the refused set run on it), the rebuild count, the refused formation trenches, each
+    fault's damage at the last detection, and the faults the mesh was built with (not yet
+    the current ones when a fault has moved less than a rebuild; needs_rebuild compares
+    against them). A checkpoint from before these were saved: the cadence from the last
+    detection in the records (a detection step records its damage), the rebuild count
+    and the damage from the records, nothing refused, the mesh built at the faults."""
+    saved = state.get("decisions")
+    if saved is not None:
+        return (int(saved["k"]), int(saved["n_built"]), {n: float(v) for n, v in saved["refused"].items()},
+                dict(saved["last_damage"]), saved["built"])
+    detections = [r for r in records if r.get("damage")]
+    k0 = 0
+    if detections:
+        k0 = int(params.uw_detect_start) + (int(state["step"]) + 1 - int(detections[-1]["step"])) \
+            % int(params.uw_detect_every)
+    n_built = int(records[-1].get("n_built", 1)) if records else 1
+    return k0, n_built, {}, dict(detections[-1]["damage"]) if detections else {}, faults
+
+
+k0 = 0                         # the loop counter of the first step
 n_built = 1
 refused = {}                   # formation trenches the surgery refused: no new fault within 3 deg for a while
 last_damage = {}               # each fault's line damage at the last detection
+built = faults
+if params.uw_restart >= 0:
+    k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
-faulted = FaultedMesh(faults, "f0")
+faulted = FaultedMesh(built, "f0")
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
           f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
@@ -1058,7 +1088,7 @@ def needs_rebuild(faults, built):
 
 
 # ----------------------------------------------------------------------------- time loop
-for k in range(params.uw_steps):
+for k in range(k0, k0 + params.uw_steps):
     wall = time.perf_counter()
     events = []
     damage = last_damage
@@ -1314,8 +1344,9 @@ for k in range(params.uw_steps):
               f"slip {record['slip_max']:.2f} | faults {described} | "
               f"newton {record['newton']} conv {record['converged']} "
               f"{record['t_stokes']:.1f}/{record['t_step']:.1f} s", flush=True)
-    if step % params.uw_ckpt_every == 0 or k == params.uw_steps - 1:
-        checkpoint(step, t, records, faulted, faults, next_id)
+    if step % params.uw_ckpt_every == 0 or k == k0 + params.uw_steps - 1:
+        checkpoint(step, t, records, faulted, faults, next_id,
+                   {"k": k + 1, "n_built": n_built, "refused": refused, "last_damage": last_damage})
     step += 1
 
 uw.pprint("done")
