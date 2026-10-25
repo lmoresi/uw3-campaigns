@@ -1046,7 +1046,9 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
                            "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
                            "dip": faults[0]["dip"] if faults else float(params.uw_dip),
                            "fault_depth": faults[0]["depth"] if faults else 0.0,
-                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults],
+                           # the traces of the faults built into THIS checkpoint's mesh: a fault the
+                           # step's detection just formed is not placed until the next step's rebuild
+                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faulted.faults],
                            # what steers the next decisions (restored_decisions)
                            "decisions": dict(decisions, built=faulted.faults),
                            "solver_checkpoint": solver_files, "checkpoint_files": needed},
