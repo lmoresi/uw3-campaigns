@@ -128,7 +128,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju dd8efcb | GO sent to kaiju 2026-10-25; job ids pending |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju dd8efcb | launched 2026-10-25 ~22:02 kaiju time: jobs 2187 B1_crust0.1_fault (n3), 2188 B1_crust1_fault (n4), 2189 C1_crust0.1_fault (n5), 2190 B1_crust0.1_nofault (n6); 300 steps, np 16, overlay-warmdiag 99259d35, 12 h wall; driver clone `~/campaigns/zg95-fault-drivers` detached at dd8efcb (zg95-drivers stays pinned at e258447 for the Ra x3 record); run dirs `runs/slab_fault_<case>/` |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -547,3 +547,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: hyperion confirmed alive by reading its transcript (the two scheduled check-ins fail with
   ACCESS_DENIED when they fire): bugfix/visualisation-headless-no-trame 7392233c and
   feature/coarse-solve-nullspace bdc87294 are on origin; it has started the 2026-022 figures.
+- 2026-10-25: **faulted set launched on kaiju** (jobs 2187-2190, see Open work). The fault flags follow BASE's
+  `-uw_fault_law none -uw_max_faults 0`, so the later values win, as in run_stage_b_comp.sh. Kaiju reports the
+  first fault build and first rebuild iteration counts per run when they appear.
