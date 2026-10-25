@@ -85,9 +85,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 1. One branch per note, `note/<slug>`, on Underworld-Technical-Notes/underworldcode.org. The branch is the
    note; the pen holder is recorded in the table below. Nobody pushes to main; a PR only when Louis asks.
-2. Hub access: until the Claude GitHub App is on the Underworld-Technical-Notes organisation, the hub
-   relays each commit as `git format-patch --binary` in uw3-campaigns `relay/`; wombat applies it with
-   `git am` onto `note/<slug>`, runs the checks and pushes. Once the App is installed the hub pushes itself.
+2. Hub access: the Claude GitHub App is installed on the Underworld-Technical-Notes organisation
+   (Louis, 2026-10-25) and the hub pushes to `note/<slug>` itself (verified with a throwaway branch). The
+   `relay/` route in uw3-campaigns is retired; it remains the fallback if access lapses.
 3. Figures: hyperion commits each script with its PNG to underworld3 under
    `scripts/sessions/<area>/uwtn_<id>/` and pushes. Wombat copies them in one commit (scripts to
    `articles/<slug>/figures/src/`, PNGs to `articles/<slug>/figures/`), naming the underworld3 hash. If
@@ -146,7 +146,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
     (f) link 018 from the parallel paragraph once 018 is published; (g) check iterations.png alt text
     against the made figure.
   - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
-- Install the Claude GitHub App for the Underworld-Technical-Notes organisation (https://github.com/apps/claude/installations/select_target), so the hub can push note branches; until then the hub hands patches to the wombat notes session.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
 - rsync the slab controls to the laptop: `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/slab_control/ ~/+Simulations/zg95/kaiju_figures/slab_control/`, then the laptop commits them to zg95-annulus-for-kaiju.
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
@@ -550,3 +549,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: **faulted set launched on kaiju** (jobs 2187-2190, see Open work). The fault flags follow BASE's
   `-uw_fault_law none -uw_max_faults 0`, so the later values win, as in run_stage_b_comp.sh. Kaiju reports the
   first fault build and first rebuild iteration counts per run when they appear.
+- 2026-10-25: Louis installed the Claude GitHub App on Underworld-Technical-Notes; the hub pushes note
+  branches directly from its clone (`/home/user/underworld-technical-notes/underworldcode.org`, now tracking
+  origin's note/faults-on-an-add-on-mesh at 36e15f7). relay/ retired.
