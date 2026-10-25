@@ -127,13 +127,17 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
-| Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
+| Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
 
+- Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
+  (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
+  mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
+  (3) a check run for the crust x1 + fault case with fewer rebuilds (-uw_rebuild_rungs 8)? Kaiju is idle.
 - Technical notes, answers needed (from the wombat workbench report, 2026-10-25):
   - 2026-018: (1) title "Faults in parallel: partitioning the add-on once" OK? (2) re-measure the parallel
     split-level iteration counts (13 Oct, before partition-once) on hyperion? (3) wall times 65/34/25 s
@@ -632,3 +636,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   result; a run with fewer rebuilds (-uw_rebuild_rungs 8) or a transfer that carries the jump is the check.
   Figures: kaiju figures_out/slab_fault/, to GitHub via Louis's rsync and the laptop's commit (the hub does
   not ask a session to use Louis's ssh access). layered_mantle to its wall (~05:20) then slab_control is final.
+- 2026-10-26: **slab controls complete, 12 of 12; kaiju idle.** layered_mantle (-uw_deta 3e4 -uw_asth 0.1
+  -uw_buoy_T 1) stopped at its 12 h wall during step 128 (records and checkpoints to 120, t 0.0045, 333 s/step
+  mean, no KSP-cap hits in 121 steps). Its 26-iteration step 17 is the LINE SEARCH, not the switch: an
+  ordinary warm step goes straight to Newton (uw_warm_newton_switch 1.0) with F0 = F_ref = 2.7e5 (the fields
+  move a lot per step), and damped Newton crawls (20 cutbacks, alpha to 0.03, 1591 s); steps 8, 10, 15, 18,
+  26, 32, 106 look the same, median 3 its. A Picard warm-up on ordinary steps is the likely fix (recipe
+  change, Louis). Physics: the slab sinks as a near-vertical sheet in place, no rollback (trench 0 to +0.04 d),
+  the weak crust stripped into blobs in the wedge; the slab warms to T 0.5-0.6 so slab_metrics' cold test
+  understates its tip depth (0.27) and mass; judge from the frames. Folders ready to rsync together:
+  figures_out/{slab_control 5.9 MB, slab_fault 3.0 MB, restart_table 249 KB}.
