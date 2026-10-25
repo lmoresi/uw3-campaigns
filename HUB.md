@@ -91,7 +91,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
 | Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2, needs underworld3 `feature/box-faults` c1107957 (+371d3bd for the warm starts) | on kaiju; slab production awaits Louis's case list |
-| Restart / warm-start driver fixes | uw3-campaigns `kaiju/annulus-restart-fixes` 4485bea (on 878b9c2) | validated on kaiju; merge into the campaign branch is Louis's call |
+| Restart / warm-start fixes + solver record | uw3-campaigns `kaiju/annulus-restart-fixes` b0147e1 (on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -346,3 +346,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   library. Kaiju runs the 15-step A/B for total wall saving. Item 3 design accepted: solver mesh +
   V/P checkpointed (reload verified exact), swarm through the same restore, loud failure on missing
   files.
+- 2026-10-25: pushed the solver-record set (b0147e1): record["solver"] per step (kind, warm/cold,
+  F0/F_ref, Picard/Newton its, KSP per increment, per-phase wall, pc_fallbacks, mesh at rebuilds),
+  run_info.json per run, analysis/solver_record.py (figure + summary CSV + wiki table). Tested on
+  kaiju (job 2122): all fields filled. With the library's 210c7307 the F_history / line-search
+  fields fill too. Kaiju's A/B and the slab runs use b0147e1 + overlay-diag, so they are
+  instrumented from the start. The dev session is on item 3 (solver-mesh + V/P checkpoint).
