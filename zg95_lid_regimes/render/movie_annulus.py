@@ -1,7 +1,11 @@
 """A movie of an annulus run's rendered checkpoints: the full annulus over the zoom on
-the trench, each frame labelled with its frame number, step and time.
+the trench, each frame labelled with its frame number, step and time. For the solver
+renders (``-uw_renders renders_solver``) each frame is the solver panels with their
+iteration strip, and under them the band view of the fault that moved since the previous
+checkpoint when there is one (the space stays blank otherwise, so the layout holds).
 
     python movie_annulus.py -uw_run <run dir> -uw_out <movie.mp4> -uw_fps 3
+    python movie_annulus.py -uw_run <run dir> -uw_renders renders_solver
 """
 import glob
 import json
@@ -27,7 +31,12 @@ out = os.path.expanduser(params.uw_out) if params.uw_out else os.path.join(rende
 
 steps = sorted(int(re.search(r"frame_(\d+)\.png", f).group(1))
                for f in glob.glob(os.path.join(renders, "frame_*.png")))
-steps = [s for s in steps if os.path.exists(os.path.join(renders, f"zoom_{s:05d}.png"))]
+solver = os.path.basename(renders) == "renders_solver"
+second = "band" if solver else "zoom"            # the lower picture of each frame
+if not solver:
+    steps = [s for s in steps if os.path.exists(os.path.join(renders, f"zoom_{s:05d}.png"))]
+bands = [Image.open(f).size for f in glob.glob(os.path.join(renders, "band_*.png"))]
+band_size = max(bands) if bands else None        # the blank space keeps the band's size
 font = None
 for path in ("/System/Library/Fonts/Supplemental/Arial Bold.ttf", "/System/Library/Fonts/Helvetica.ttc"):
     if os.path.exists(path):
@@ -38,7 +47,13 @@ font = font or ImageFont.load_default()
 tmp = tempfile.mkdtemp(dir=renders)
 for k, step in enumerate(steps):
     full = Image.open(os.path.join(renders, f"frame_{step:05d}.png")).convert("RGB")
-    zoom = Image.open(os.path.join(renders, f"zoom_{step:05d}.png")).convert("RGB")
+    lower = os.path.join(renders, f"{second}_{step:05d}.png")
+    if os.path.exists(lower):
+        zoom = Image.open(lower).convert("RGB")
+    elif band_size is not None:
+        zoom = Image.new("RGB", band_size, "white")
+    else:
+        zoom = Image.new("RGB", (full.width, 1), "white")
     header = 110                # the label sits in its own strip, clear of the panels
     canvas = Image.new("RGB", (max(full.width, zoom.width), header + full.height + zoom.height), "white")
     canvas.paste(full, (0, header))
