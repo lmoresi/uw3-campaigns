@@ -418,3 +418,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   and crust-weakening choice to be proposed, the overriding-plate contact). Kaiju prepares, without
   launching, the fault-free control set at 300 steps: B1, B2, C1 and the nine-run compositional
   scan (twelve runs, two waves). trench_retreat.png is on the branch at 347b947.
+- 2026-10-25: **stage-3 fault design (laptop, fault law "crust"), building now.** Geometry: at each
+  detection the crust marker's proxy on the polar grid gives the sub-surface crust centreline,
+  chained from the trench, resampled at the rung spacing to the depth cap (0.15 d); the polyline is
+  the fault spine (curved spines are accepted by the placer). Rebuild when any point moves more
+  than 4 rungs (0.016); expect a same-set rebuild every 4-5 steps in B1 (8 rungs for cheaper
+  production). No line fit, so no knife-edge. Law: the split fault with its bridge band, no rate
+  fitting; first runs at crust_weak 0.1 (the crust locates the fault, the fault carries the
+  decoupling). Test: B1 (crust 0.001, no fault) vs crust 0.1 no fault vs crust 0.1 + fault, plus
+  crust_weak 1 (passive marker). Overriding plate: no special case; the rule covers its contact.
+  Records and band view unchanged. Smoke test: 4 ranks from B1/C1 checkpoint 60.
