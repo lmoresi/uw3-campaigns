@@ -128,8 +128,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju, driver zg95-annulus-for-kaiju 0fb51f9, run dirs `runs/slab_fault_<case>/` | 2190 (no fault) running; faulted runs leak ~0.4 GB/rank per rebuild (library bug, hyperion), so they run as restart segments of <= ~15 rebuilds: 2195 B1_crust1 from ckpt 130 (2193 OOM-killed at step 136), 2197 B1_crust0.1 from ckpt 140 (2192 stopped at 141), 2194 C1 on bigmem to ~200 then restart; one more segment each to 300 |
-| Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: ~0.4 GB/rank per rebuild; the driver deletes the old child and gc.collects, so the reference is held in the library (DM hierarchy / custom-P transfers / rotated-solve cache / expression caches / swarm proxies suspected) |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju, driver zg95-annulus-for-kaiju 0fb51f9, run dirs `runs/slab_fault_<case>/` | B1_crust0.1_nofault, B1_crust0.1_fault and B1_crust1_fault COMPLETE (0-299; the faulted ones as restart segments, every segment restored at match distance 0, records continuous); C1 segment 171-270 running, then 270-299 |
+| Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -612,3 +612,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   process's life (per-step on the faulted path, or per-rebuild growing with the meshes retained). Kaiju fits
   node RSS against step and n_built on four live runs for 90 min; hyperion told to shape its fixture run
   for that distinction.
+- 2026-10-26: **leak fit (kaiju, 90 min of node RSS on four runs)**: a constant 6.96-7.24 GB/node per rebuild on
+  fresh and old processes alike (0.44 GB/rank), linear not compounding (the interim "compounds" and the
+  "+0.02 GB" sample are withdrawn: that sample preceded the rebuild step's operator allocation). The size is
+  one faulted mesh's footprint at np 16, so each rebuild looks to retain the previous child or its PETSc
+  objects in full. Between rebuilds 40-135 MB/node/step, present without a fault too. Passed to hyperion.
+  Segment totals agree (~20 GB base + 7 GB per mesh). Three of the four slab cases are complete to step 299.
