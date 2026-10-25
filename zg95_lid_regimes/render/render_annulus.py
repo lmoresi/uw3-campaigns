@@ -63,6 +63,7 @@ params = uw.Params(
     uw_band_offset=2.0,         # cells to either side of the trace where the velocity jump is sampled
     uw_window=150,              # steps of iteration history in the solver strip
     uw_solver_mesh="annulus.solver_mesh",   # the checkpointed solver mesh's file prefix (kaiju's driver)
+    uw_trace_width=0.0,         # px: the fault trace on every panel of a whole-annulus frame (uw_zoom 0); 0 keeps the zoom widths
 )
 if params.uw_panels == "solver" and params.uw_zoom <= 0:
     params.uw_zoom = 0.5        # the solver panels are a window on the trench
@@ -216,6 +217,9 @@ def render_strain(index, state, trace, strm, vmax, bar, outline=()):
     g_hi = max(1.0, np.ceil(2 * pv_g["plastic strain"].max()) / 2)
     fault_colour = ("#c0392b", "white", "white", "#2471a3")
     fault_width = (3, 1, 1, 3)     # thin on the strain-rate panels: a 3 px line hides the one-cell band
+    if params.uw_zoom <= 0 and params.uw_trace_width > 0:
+        # the whole annulus: the one-cell band is far below a pixel, so the trace is drawn wide enough to see
+        fault_width = (params.uw_trace_width,) * 4
     fields = [(pv_T, "T", "RdBu_r", (0.0, T_hi)),
               (pv_e, "log10 strain rate", "viridis", (e_lo, e_hi)),
               (pv_ep, "log10 plastic strain rate", "viridis", (e_lo, e_hi)),

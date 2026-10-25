@@ -33,7 +33,8 @@ steps = sorted(int(re.search(r"frame_(\d+)\.png", f).group(1))
                for f in glob.glob(os.path.join(renders, "frame_*.png")))
 solver = os.path.basename(renders) == "renders_solver"
 second = "band" if solver else "zoom"            # the lower picture of each frame
-if not solver:
+if not solver and glob.glob(os.path.join(renders, "zoom_*.png")):
+    # frames and zooms together: only the steps that have both (whole-annulus frames alone pass)
     steps = [s for s in steps if os.path.exists(os.path.join(renders, f"zoom_{s:05d}.png"))]
 bands = [Image.open(f).size for f in glob.glob(os.path.join(renders, "band_*.png"))]
 band_size = max(bands) if bands else None        # the blank space keeps the band's size
