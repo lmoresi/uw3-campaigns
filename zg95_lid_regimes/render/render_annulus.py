@@ -273,7 +273,8 @@ def solver_info(r, previous):
         events = list(r.get("events") or [])
         if before is not None and after is not None and not events:
             events = [f"formed {n}" for n in after if n not in before] + [f"retired {n}" for n in before if n not in after]
-        ksp = sub.get("ksp_its")
+        # the velocity block's iterations (the outer fieldsplit KSP takes one per Newton step)
+        ksp = sub.get("vel_its") if sub.get("vel_its") is not None else sub.get("ksp_its")
         f0, f_ref = sub.get("F0"), sub.get("F_ref")
         return {"step": r["step"], "kind": kind, "rebuild": kind.startswith("rebuild"),
                 "warm": {"warm": True, "cold": False}.get(sub.get("start")),
