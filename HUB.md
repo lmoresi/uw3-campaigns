@@ -81,6 +81,36 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - Show figures through GitHub links. Write useful machine knowledge back to
   underworld-community/uw3-hpc-install-run. If a container must be built, use conda PETSc.
 
+## Technical notes workflow (wombat notes-workbench proposal, adopted 2026-10-25)
+
+1. One branch per note, `note/<slug>`, on Underworld-Technical-Notes/underworldcode.org. The branch is the
+   note; the pen holder is recorded in the table below. Nobody pushes to main; a PR only when Louis asks.
+2. Hub access: until the Claude GitHub App is on the Underworld-Technical-Notes organisation, the hub
+   relays each commit as `git format-patch --binary` in uw3-campaigns `relay/`; wombat applies it with
+   `git am` onto `note/<slug>`, runs the checks and pushes. Once the App is installed the hub pushes itself.
+3. Figures: hyperion commits each script with its PNG to underworld3 under
+   `scripts/sessions/<area>/uwtn_<id>/` and pushes. Wombat copies them in one commit (scripts to
+   `articles/<slug>/figures/src/`, PNGs to `articles/<slug>/figures/`), naming the underworld3 hash. If
+   hyperion can push to the notes organisation (untested), it pushes that commit to `note/<slug>` directly.
+   PNGs never travel through hub patches.
+4. Checks before any review request, run on wombat: `pixi run validate`, `pixi run check-style`, and
+   `python3 scripts/preview_build.py --slugs <slug> --base-url /x`; results and hash reported to the hub.
+   PR previews are broken until PREVIEW_TOKEN is regenerated (Louis).
+5. IDs: allocate only after fetching every branch; push the metadata.yml carrying the ID the same day.
+6. Fetch before every push; never force-push. Wombat's planned workbench tool (`scripts/note.py`,
+   awaiting Louis's go-ahead) refuses to overwrite commits it has not seen.
+7. State: `metadata.yml status:` is canonical. The table below keeps one row per note.
+8. Conventions: commit messages "UWTN <id>: <what>"; figure scripts in `figures/src/`, launchable
+   examples in `examples/`; every figure and table ships its script; `software_version` pinned to the
+   underworld3 commit the numbers came from. The `myst.yml` toc block is generated; do not edit it.
+
+| Note | Branch, head | Status | Pen | Waiting on | Last checks |
+|---|---|---|---|---|---|
+| UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` d93b855 | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 36e15f7 (hub draft a43535f + wombat fixes) | draft | hub (prose), hyperion (figures), wombat (checks) | 3 figures (hyperion: stack, iterations, moving-fault); Louis's judgement items (a)-(g) | 2026-10-25 validate OK, check-style clean, preview fails only on the missing PNGs |
+| UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
+| UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
+
 ## Open work
 
 | What | Where | State |
@@ -96,15 +126,26 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
-| Technical note UWTN 2026-022 "Faults on an add-on mesh" (M3/F3 settled: this is the serial method) | Underworld-Technical-Notes/underworldcode.org `note/faults-on-an-add-on-mesh` 948bb02 (local to the hub; push refused, see Waiting on Louis) | first draft written 2026-10-25; three figures declared, to be made on hyperion |
-| Technical note UWTN 2026-018 "Faults in parallel" revision | `note/faults-in-parallel` 168ad65 | brief sent to the wombat notes-workbench session (session_011S876ckjYqqth1aPyojrhh) 2026-10-25; it also owes the hub a notes-workflow proposal |
-| Adjoint notes UWTN 2026-020 / 2026-021 | PR #59 (green, awaiting Louis's merge) / `note/discrete-adjoint` 87fbcb1 (held until the viscosity-floor example has a result) | wombat session session_018wSha1nV5DddcThnCRoFab |
+| Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set | kaiju `~/campaigns/kaiju-launch/slab_fault/` | waits for the laptop's slab_fault figure hash on e009873 |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju dd8efcb | GO sent to kaiju 2026-10-25; job ids pending |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
 
+- Technical notes, answers needed (from the wombat workbench report, 2026-10-25):
+  - 2026-018: (1) title "Faults in parallel: partitioning the add-on once" OK? (2) re-measure the parallel
+    split-level iteration counts (13 Oct, before partition-once) on hyperion? (3) wall times 65/34/25 s
+    quoted, the 72/38/30 read as "before" and left out: correct? (4) software_version moves to a
+    development sha on merge.
+  - 2026-022: (a) three "route" passages (the weights-of-five/NaN clamp story, the nearest-node repair,
+    the zero pivot under rotated walls): keep as motivation or cut to rule plus reason? (b) the
+    "(UWTN 2026-017 describes the fault laws)" link is wrong, 017 is conceptual: reword or drop;
+    (c) `stokes._rotated_freeslip_info` is a private attribute in a published note; (d) the restart
+    table needs a script (kaiju annulus runs); (e) software_version 0.0.0 until the figures are re-run;
+    (f) link 018 from the parallel paragraph once 018 is published; (g) check iterations.png alt text
+    against the made figure.
+  - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
 - Install the Claude GitHub App for the Underworld-Technical-Notes organisation (https://github.com/apps/claude/installations/select_target), so the hub can push note branches; until then the hub hands patches to the wombat notes session.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
 - rsync the slab controls to the laptop: `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/slab_control/ ~/+Simulations/zg95/kaiju_figures/slab_control/`, then the laptop commits them to zg95-annulus-for-kaiju.
@@ -492,3 +533,17 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   revision and on a written workflow proposal (branch ownership, hyperion figures into examples/, who runs
   pixi validate/build). The hub cannot push to that organisation (Claude GitHub App not installed there):
   the draft goes to the wombat session as a patch.
+- 2026-10-25: **notes workflow adopted** (section above). Wombat workbench applied the hub's 2026-022 patch
+  (notes-repo hash a43535f; git am re-records the committer) and pushed 36e15f7 with mechanical fixes (toc
+  line dropped as generated; classification.yml entry; one rewrap; figures/src/). It revised 2026-018
+  (d93b855): re-centred on partition-once, the split-through-the-seam kept only as the rejected comparison,
+  the September figures removed (no scripts, and one drew the rejected route), three figures pending from
+  hyperion. Both notes validate clean. Questions for Louis are under "Waiting on Louis".
+- 2026-10-25: the laptop pushed zg95-annulus-for-kaiju dd8efcb (b039759: the iteration strip plots vel_its,
+  not the outer ksp_its; dd8efcb: slab_fault figures with the parabolic crust fault). Recipe and flags
+  unchanged. Laptop smoke on the pushed driver: B1 fault at -8.3 deg / dip 50, first build 5 velocity its,
+  ordinary 3-5, same-set rebuild 4, slip 740-850 vs plate 800-970; C1 -6.4 deg / dip 41, slip 840-930; both
+  Newton-converged. **GO sent to kaiju for the four faulted cases on dd8efcb.**
+- 2026-10-25: hyperion confirmed alive by reading its transcript (the two scheduled check-ins fail with
+  ACCESS_DENIED when they fire): bugfix/visualisation-headless-no-trame 7392233c and
+  feature/coarse-solve-nullspace bdc87294 are on origin; it has started the 2026-022 figures.
