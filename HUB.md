@@ -386,3 +386,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   the fix; theta/dip under review. Also seen: the pressure KSP at its 200 cap on one step (3595 of
   run 2148), to watch in production. Sample run for the renderer: kaiju
   `~/campaigns/zg95/samples/i3_sample` (52 MB), to rsync to the laptop.
+- 2026-10-25: **detector finding (laptop, on the Ra x3 checkpoints with driver 460e49d).** The
+  rebuild thresholds are 0.41 deg (4 rungs) and 2 deg dip. At a FIXED field, fit_fault_lines over
+  RANSAC seeds spreads 0.33-0.65 deg in theta and 2.7-5.4 deg in dip, at or above those thresholds.
+  In the run, F0's fitted theta swung +-0.25 deg and dip +-1 deg per detection, and 10 of 11
+  detections over 3540-3600 triggered a rebuild: most rebuilds are fit noise, not fault motion.
+  Seeding is already deterministic, so a tie-break does nothing; the fit stops short of its fixed
+  point (best-of-400 random candidate, two refinement rounds). Measured fix: iterate the weighted-axis
+  refinement to a fixed inlier set (spread falls to 0.04-0.17 deg, 0.2-1.2 deg; all seeds find the
+  same six lines); then a deterministic candidate grid over (theta, dip) so the fit is a function of
+  the field alone; then theta/dip hysteresis like depth's. Nothing changed in the driver yet.
