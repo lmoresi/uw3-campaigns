@@ -52,7 +52,12 @@ for k, step in enumerate(steps):
     canvas = canvas.resize((params.uw_width, 2 * round(canvas.height * scale / 2)), Image.LANCZOS)
     canvas.save(os.path.join(tmp, f"m_{k:04d}.png"))
 
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(params.uw_fps),
+# Machines without ffmpeg on PATH (kaiju) use the binary bundled with imageio-ffmpeg.
+ffmpeg = shutil.which("ffmpeg")
+if ffmpeg is None:
+    import imageio_ffmpeg
+    ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-framerate", str(params.uw_fps),
                 "-i", os.path.join(tmp, "m_%04d.png"), "-c:v", "libx264", "-pix_fmt", "yuv420p",
                 "-crf", "18", out], check=True)
 shutil.rmtree(tmp)
