@@ -122,13 +122,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 361657f (restart fixes and ffmpeg fallback merged); library `feature/box-faults-warm` 99259d35 | on kaiju; slab production awaits Louis's case list |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 0fb51f9 (crust fault law, renderer, checkpoint-traces fix); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju dd8efcb | launched 2026-10-25 ~22:02 kaiju time: jobs 2187 B1_crust0.1_fault (n3), 2188 B1_crust1_fault (n4), 2189 C1_crust0.1_fault (n5), 2190 B1_crust0.1_nofault (n6); 300 steps, np 16, overlay-warmdiag 99259d35, 12 h wall; driver clone `~/campaigns/zg95-fault-drivers` detached at dd8efcb (zg95-drivers stays pinned at e258447 for the Ra x3 record); run dirs `runs/slab_fault_<case>/` |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju 0fb51f9 | 2190 (no fault) running since 2026-10-25 22:02; 2187-2189 died at step 0 on the checkpoint-traces bug, fixed in 0fb51f9, relaunch requested; np 16, overlay-warmdiag 99259d35, 12 h wall; run dirs `runs/slab_fault_<case>/` |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -564,3 +564,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   now places but keeps no split coarse level. Wombat copied figures and records into the note and rewrote
   the affected text to match (c0a998a); the hub fixed the hierarchy sentence and the 017 link (015c1c0).
   2026-018 (da848fa) uses the same serial numbers. The restart table still needs a script (kaiju).
+- 2026-10-25: **faulted runs 2187-2189 died at step 0** (kaiju): checkpoint() wrote "traces" from the
+  detection's fault list, which at a formation step holds the new fault before the mesh has it (the rebuild
+  comes at the next step), so faulted.pieces["F0"] raised KeyError on rank 0 and the ranks hung. A fresh slab
+  start with -uw_detect_start 0 forms F0 at step 0, always a checkpoint step; the laptop's smoke tests from
+  step 60 could not see it. Kaiju's fix ("traces" lists faulted.faults, the faults built into the saved
+  mesh; "faults" keeps the detection list) tested at np 16 for 2 steps (job 2191), sent as a patch, pushed
+  by the hub as **0fb51f9**; relaunch of the three cases requested; 2190 (no fault) unaffected. The laptop
+  is informed. Kaiju also asked for zg95_lid_regimes/analysis/restart_table.py, the script behind the
+  2026-022 restart table.
