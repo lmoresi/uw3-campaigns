@@ -19,6 +19,7 @@ Also writes <run>/solver_summary.csv (medians by step kind, and totals) and, wit
 -uw_table, one markdown table of those summaries for all the runs (for the wiki).
 
     python solver_record.py -uw_runs <dir>[,<dir>...] -uw_x step|t -uw_out solver.png [-uw_table solver.md]
+                            [-uw_first <step> -uw_last <step>]
 """
 import csv
 import json
@@ -35,6 +36,8 @@ params = uw.Params(
     uw_x="step",                # "step" or "t"
     uw_out="solver_record.png",
     uw_table="",                # a markdown file for the summary table ("" for none)
+    uw_first=-1,                # first step shown and summarised (-1: from the start)
+    uw_last=-1,                 # last step (-1: to the end)
 )
 
 PHASES = ["build", "transfer", "stokes", "to_base", "energy_strain", "swarm", "detection", "checkpoint"]
@@ -52,8 +55,19 @@ def load(run):
     return [by_step[s] for s in sorted(by_step)]
 
 
-def solver_of(records):
-    """Each record's solver sub-record, or one inferred from the top-level fields."""
+def restarts_of(run):
+    """The steps a run (re)started from, from run_info.json (one entry per start)."""
+    try:
+        with open(os.path.join(run, "run_info.json")) as f:
+            return {int(r["restart_from"]) for r in json.load(f) if r.get("restart_from") is not None}
+    except (OSError, ValueError):
+        return set()
+
+
+def solver_of(records, restarts=()):
+    """Each record's solver sub-record, or one inferred from the top-level fields: a
+    restart's first step (after a step listed in run_info.json, or where n_built drops,
+    as older drivers reset it), a rebuild where n_built grows."""
     out = []
     for n, r in enumerate(records):
         s = r.get("solver")
@@ -68,8 +82,11 @@ def solver_of(records):
         before = names_of(n - 2) if n >= 2 else after
         names = after
         rebuilt = prev is not None and r.get("n_built", 0) > prev.get("n_built", 0)
+        restarted = prev is not None and (prev["step"] in restarts or r.get("n_built", 0) < prev.get("n_built", 0))
         kind = "ordinary"
-        if rebuilt:
+        if restarted:
+            kind = "restart_first"
+        elif rebuilt:
             kind = "rebuild_same_set" if names == before else "rebuild_changed_set"
         out.append({"kind": kind, "start": None, "cold_retry": False, "faults_before": before,
                     "faults_after": names, "nonlinear_its": r.get("newton"), "picard_its": None,
@@ -106,6 +123,7 @@ def draw_events(axes, x, solver, label_ax):
 
 
 def plot_run(axes, run, records, solver, xkey):
+    recorded = any(r.get("solver") is not None for r in records)
     x = np.array([r["step"] if xkey == "step" else r["t"] for r in records], dtype=float)
     width = 0.8 * (np.median(np.diff(x)) if len(x) > 1 else 1.0)
     ax = axes[0]
@@ -164,12 +182,16 @@ def plot_run(axes, run, records, solver, xkey):
     ax.set_ylabel("line-search\ncutbacks")
 
     ax = axes[5]
+    # each trench's shift from where it was first seen, wrapped (faults sit anywhere,
+    # -180 deg included, so absolute angles crush the motion)
     names = sorted({f["name"] for r in records for f in r.get("faults", [])}, key=lambda n: int(n[1:]))
     for n, name in enumerate(names):
-        theta = np.array([next((np.degrees(f["theta"]) for f in r.get("faults", []) if f["name"] == name), np.nan)
+        theta = np.array([next((f["theta"] for f in r.get("faults", []) if f["name"] == name), np.nan)
                           for r in records])
-        ax.plot(x, theta, lw=2, color=SERIES[n % len(SERIES)], label=name)
-    ax.set_ylabel("trench (deg)")
+        first = theta[np.isfinite(theta)][0]
+        shift = np.degrees((theta - first + np.pi) % (2 * np.pi) - np.pi)
+        ax.plot(x, shift, lw=2, color=SERIES[n % len(SERIES)], label=f"{name} ({np.degrees(first):.0f} deg)")
+    ax.set_ylabel("trench shift (deg)")
 
     axes[6].plot(x, [num(r.get("slip_max")) for r in records], color=SERIES[0], lw=2, label="slip_max")
     axes[6].set_ylabel("slip_max")
@@ -177,10 +199,11 @@ def plot_run(axes, run, records, solver, xkey):
     axes[7].set_ylabel("vrms")
     axes[7].set_xlabel("step" if xkey == "step" else "t")
 
+    empty = [not ax.lines and not ax.patches for ax in axes]      # before the event lines
     draw_events(axes, x, solver, axes[0])
-    for ax in axes:
-        if not ax.lines and not ax.patches:
-            ax.text(0.5, 0.5, "not recorded", transform=ax.transAxes, ha="center", va="center",
+    for ax, nothing in zip(axes, empty):
+        if nothing:
+            ax.text(0.5, 0.5, "not recorded" if recorded else "no solver record", transform=ax.transAxes, ha="center", va="center",
                     color=MUTED, fontsize=9)
             ax.set_yticks([])
         ax.grid(axis="y", color=GRID, lw=0.8)
@@ -234,7 +257,10 @@ fig, grid = plt.subplots(8, len(runs), figsize=(6.5 * len(runs), 17), sharex="co
 table = []
 for c, run in enumerate(runs):
     records = load(run)
-    solver = solver_of(records)
+    solver = solver_of(records, restarts_of(run))
+    keep = [n for n, r in enumerate(records) if (params.uw_first < 0 or r["step"] >= params.uw_first)
+            and (params.uw_last < 0 or r["step"] <= params.uw_last)]
+    records, solver = [records[n] for n in keep], [solver[n] for n in keep]
     plot_run(grid[:, c], run, records, solver, params.uw_x)
     rows = summarise(records, solver)
     with open(os.path.join(run, "solver_summary.csv"), "w", newline="") as f:
