@@ -27,6 +27,8 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
 | laptop (wombat), lid regime | `session_019aromUkeWWPzcL2Kb8365E` ("Lid regime box heating runs") |
+| laptop (wombat), technical notes workflow | `session_011S876ckjYqqth1aPyojrhh` ("Notes workbench with git branches"): owns the notes workflow with the hub, revises UWTN 2026-018 |
+| laptop (wombat), adjoint notes | `session_018wSha1nV5DddcThnCRoFab` ("CONTRIBUTING.md figure script placement"): UWTN 2026-020/021 |
 
 Messaging: the hub can message all three. Kaiju and the laptop can message the hub. Hyperion
 cannot (its Claude Code is too old to prove a trusted device), so the hub reads its transcript.
