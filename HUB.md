@@ -441,3 +441,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   `-uw_fault_law crust -uw_max_faults 1 -uw_fault_depth_max 0.15 -uw_crust_weak 0.1
   -uw_detect_start 0 -uw_detect_every 5` (+ `-uw_rebuild_rungs 8` for fewer rebuilds). Comparison
   set: B1 / crust 0.1 no fault / crust 0.1 + fault / crust 1 + fault.
+- 2026-10-25: crust-fault smoke renders on zg95-annulus-for-kaiju dbebbbf (`figures/slab_fault/`).
+  Slab controls: comp_eta_30 finished (300 steps, no KSP-cap hits); wave 2 started with dip_60.
+  Library bug found on kaiju (worked around): visualisation.initialise() catches only RuntimeError
+  when setting the trame backend, so headless pyvista without trame raises ImportError and every
+  render crashes. Fix handed to hyperion (bugfix/visualisation-headless-no-trame).
