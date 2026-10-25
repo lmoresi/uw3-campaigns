@@ -150,7 +150,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   treats a remote deletion as yours to approve. `git push origin --delete hub-push-test`.
   - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
-- rsync the slab controls to the laptop: `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/slab_control/ ~/+Simulations/zg95/kaiju_figures/slab_control/`, then the laptop commits them to zg95-annulus-for-kaiju.
+- rsync kaiju's figure folders to the laptop (slab_control 5.5 MB, restart_table 249 KB):
+  `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/ ~/+Simulations/zg95/kaiju_figures/`
+  then tell the sessions: the lid-regime session commits slab_control to zg95-annulus-for-kaiju; the notes
+  workbench copies restart_table/ into UWTN 2026-022's figures/src/restart_table/.
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
@@ -580,3 +583,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   into UWTN 2026-022's figures/src/ (b9a678e). Provenance caveat: the i3 pair's run_info.json driver_commit
   is stale (a worktree HEAD); the note cites the run paths. Trimmed records (steps 3580-3600) requested from
   kaiju to ship with the note.
+- 2026-10-25: kaiju prepared `~/campaigns/zg95/figures_out/restart_table/` (249 KB): the six runs' records
+  trimmed to steps 3580-3600, run_info.json or PROVENANCE.txt per run, README; restart_table.py run from that
+  directory reproduces the table exactly. It reaches the note through Louis's rsync and the wombat workbench.
