@@ -646,3 +646,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   the weak crust stripped into blobs in the wedge; the slab warms to T 0.5-0.6 so slab_metrics' cold test
   understates its tip depth (0.27) and mass; judge from the frames. Folders ready to rsync together:
   figures_out/{slab_control 5.9 MB, slab_fault 3.0 MB, restart_table 249 KB}.
+- 2026-10-26: **Louis: whole-annulus movies of the slab runs**, the fault drawn at a width legible at that scale
+  (separate from the zooms' width). Kaiju renders all 16 runs from their checkpoints with the laptop's
+  movie_annulus/render_annulus (branch 788f481), adding the smallest renderer option if the mode or the
+  full-scale fault width is missing (patch via the hub; the laptop informed). Output
+  figures_out/slab_movies/ with README and a contact sheet; delivery by Louis's rsync.
