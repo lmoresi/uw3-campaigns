@@ -101,7 +101,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
 - Choose the slab production cases for kaiju (B1, B2, C1 with the overriding plate, the slab_kaiju
-  scan), after the np 16 smoke test.
+  scan); they run on driver 460e49d + feature/box-faults-warm, instrumented.
+- Confirm the laptop's commit (renderer, band view, depth hysteresis) and the merge of
+  kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju.
+- rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
 - Hyperion: approve the `~/.bashrc` env lines and phase 3 (Simulations symlink, hourly
@@ -373,3 +376,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   advection solver states that start from zero after a restart; a fix (edot_plastic on the faulted
   mesh + solver `.state` restore) is in test. solver_record.py marks restarts in old records, plots
   trench shift rather than absolute angle, labels empty panels. Kaiju adds a 460e49d row to the A/B.
+- 2026-10-25: **final restart table (kaiju, np 16, 15 steps 3581-3595, restart at 3590).** Per
+  restart step: old driver 36 its / 799 s (cold); b0147e1 19 / 470 (warm from V_b); 460e49d 4 / 115
+  (an ordinary warm step from its own solver-mesh checkpoint; vrms 4e-8 from uninterrupted). Totals
+  3153 / 2992 / 2311 s. Figure `runs/ab_restart_compare/solver_record_ab3.png` on kaiju.
+  **The remaining blocker for restart == uninterrupted is the detector knife-edge**, not the restart:
+  fields differing by 1e-8 flip F0's fitted depth 0.108/0.116 (and theta by 0.1 deg, dip by 0.7 deg),
+  which decides a rebuild and leaves slip 7% apart after. The laptop's uncommitted depth hysteresis is
+  the fix; theta/dip under review. Also seen: the pressure KSP at its 200 cap on one step (3595 of
+  run 2148), to watch in production. Sample run for the renderer: kaiju
+  `~/campaigns/zg95/samples/i3_sample` (52 MB), to rsync to the laptop.
