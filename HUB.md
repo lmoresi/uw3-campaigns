@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 015c1c0 (figures and re-measured numbers c0a998a; hub fixes (b),(h) 015c1c0) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(d),(g); a script for the restart table | 2026-10-25 validate OK, check-style clean, preview build passes (PDF and HTML) at c0a998a |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 015c1c0 (figures and re-measured numbers c0a998a; hub fixes (b),(h) 015c1c0) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(d),(g); a script for the restart table | 2026-10-25 at 015c1c0: validate 0 warnings, check-style clean, preview build passes (wombat) |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
