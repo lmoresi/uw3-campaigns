@@ -128,7 +128,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju 0fb51f9 | 2190 (no fault, n6) running since 2026-10-25 22:02; relaunched on 0fb51f9: 2192 B1_crust0.1_fault (n7), 2193 B1_crust1_fault (n8), 2194 C1_crust0.1_fault (n3); failed dd8efcb dirs kept as runs/slab_fault_<case>_failed_dd8efcb; np 16, overlay-warmdiag 99259d35, 12 h wall; run dirs `runs/slab_fault_<case>/` |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju, driver zg95-annulus-for-kaiju 0fb51f9, run dirs `runs/slab_fault_<case>/` | 2190 (no fault) running; faulted runs leak ~0.4 GB/rank per rebuild (library bug, hyperion), so they run as restart segments of <= ~15 rebuilds: 2195 B1_crust1 from ckpt 130 (2193 OOM-killed at step 136), 2197 B1_crust0.1 from ckpt 140 (2192 stopped at 141), 2194 C1 on bigmem to ~200 then restart; one more segment each to 300 |
+| Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: ~0.4 GB/rank per rebuild; the driver deletes the old child and gc.collects, so the reference is held in the library (DM hierarchy / custom-P transfers / rotated-solve cache / expression caches / swarm proxies suspected) |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -597,3 +598,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   artefact; (2) |F0|/F_ref is 1.0 on every step, warm starts included: with -uw_dt_mult 20 the fields move
   enough per step that the previous solution is no closer than rest, so the warm start buys nothing in this
   recipe (and need not, at 1 nonlinear iteration). layered_mantle runs to its wall (~05:20).
+- 2026-10-26: **memory leak per faulted-mesh rebuild** (kaiju). B1_crust1_fault (2193) OOM-killed at step 136
+  after rebuild 24 on a 188 GB node; RSS 1.5 GB/rank with one build (2190, 179 steps) against 8.7-10.3 GB/rank
+  with 17-21 rebuilds: ~0.4 GB/rank, 6.7 GB/node per rebuild. The driver dels the previous FaultedMesh and
+  gc.collects, so the library keeps old children or their PETSc objects alive. Hyperion has it as a priority
+  task (fixture first, then the driver at np 2; regression test first). Kaiju runs the faulted set as restart
+  segments (fresh process each; the faulted-mesh checkpoint restores at match distance 0 and the same rebuild
+  follows): 2195 from 130, 2197 from 140, C1 to be restarted near 200; records continuous. For the 2026-022
+  note: if the leak is not fixed before publication, it is a limit to state in "What it costs".
