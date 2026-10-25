@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` b9a678e (figures c0a998a; hub fixes 015c1c0; restart script b9a678e) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); kaiju: trimmed records for the restart table; Louis's items (a),(c),(g) | 2026-10-25 at b9a678e: validate 0 warnings, check-style clean, script compiles, preview build passes (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 24ae608 (figures c0a998a; restart script b9a678e; restart records b9662c3; drift clause 24ae608) | draft, complete but for hyperion's (i),(j) and Louis's items | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(g) | 2026-10-26 at b9662c3: validate 0 warnings, preview build passes, restart_table.py reproduces the table from figures/src/ (wombat); 24ae608 is a one-clause prose change |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -155,10 +155,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   treats a remote deletion as yours to approve. `git push origin --delete hub-push-test`.
   - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
-- rsync kaiju's figure folders to the laptop (slab_control 5.5 MB, slab_fault 3.0 MB, restart_table 249 KB):
-  `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/ ~/+Simulations/zg95/kaiju_figures/`
-  then tell the sessions: the lid-regime session commits slab_control to zg95-annulus-for-kaiju; the notes
-  workbench copies restart_table/ into UWTN 2026-022's figures/src/restart_table/.
+- When kaiju's slab_movies/ is ready, re-run the rsync (it asks for a password, so from a terminal, not a
+  Claude Code prompt): `rsync -av louis@kaiju.anu.edu.au:/home/louis/campaigns/zg95/figures_out/ /Users/lmoresi/+Simulations/zg95/kaiju_figures/`
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
@@ -651,3 +649,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   movie_annulus/render_annulus (branch 788f481), adding the smallest renderer option if the mode or the
   full-scale fault width is missing (patch via the hub; the laptop informed). Output
   figures_out/slab_movies/ with README and a contact sheet; delivery by Louis's rsync.
+- 2026-10-26: Louis rsynced figures_out/{slab_control,slab_fault,restart_table} to the laptop (kaiju asks for a
+  password, so the rsync is Louis's, from a terminal). The notes workbench shipped the restart-table records
+  with the note (b9662c3: six trimmed run records, provenance files, README; restart_table.py reproduces the
+  table from figures/src/ exactly, first-step vrms 3.4e-15, later steps 4.1e-4); the hub added the later-step
+  agreement clause (24ae608). The lid-regime session is asked to commit slab_control and slab_fault to
+  zg95-annulus-for-kaiju for GitHub links.
