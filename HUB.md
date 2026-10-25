@@ -357,3 +357,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   a public commit. Kaiju's overlay for it is overlay-warmdiag (overlay-diag lacks box-faults and
   cannot import the driver). The restart A/B runs: 878b9c2/overlay-warmonly vs b0147e1/overlay-warmdiag,
   3580 -> 3590 then a 5-step restart.
+- 2026-10-25: **restart A/B (kaiju 2131/2132 vs 2140/2141, np 16).** New driver b0147e1 on
+  feature/box-faults-warm vs old 878b9c2: the first step after a restart 34.5 -> 18 its, 736 -> 460 s
+  (-37%); total 3153 -> 2992 s even with one extra rebuild (like-for-like about -15%); ordinary steps
+  unchanged (4 its, ~95 s). The old driver's restart LOSES fault state: slip_max jumps 6% with no
+  geometry change and it skips the 3592 rebuild; the new one follows the laptop (slip_max 35.269 vs
+  35.245, vrms 1.2e-3). Kaiju recommends merging b0147e1 into zg95-annulus-for-kaiju; an uninterrupted
+  3580->3595 check (job 2148) confirms restart == uninterrupted on the new driver. Figure:
+  `runs/ab_restart_compare/solver_record_ab.png` on kaiju.
