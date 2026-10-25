@@ -396,3 +396,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   refinement to a fixed inlier set (spread falls to 0.04-0.17 deg, 0.2-1.2 deg; all seeds find the
   same six lines); then a deterministic candidate grid over (theta, dip) so the fit is a function of
   the field alone; then theta/dip hysteresis like depth's. Nothing changed in the driver yet.
+- 2026-10-25: the 4e-4 post-restart drift is NOT in the auxiliary solvers (checkpointing their state
+  changed nothing). With u identical to 6e-16 and fields to 1e-11, the Stokes starting residual
+  differs by 6e-4 between a solver with 10 prior solves and a fresh one: solver-side state enters
+  the rotated residual evaluation. Library determinism probe handed to hyperion (reuse_operator /
+  cached Ahat, gauge datum, continuation state). Restart stands at: exact first step, identical
+  events, drift <= 4.1e-4 against uw_tol 1e-3. The dev session writes RESTART_AND_RECORDS.md and is
+  then free.
