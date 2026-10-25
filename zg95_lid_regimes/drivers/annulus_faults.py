@@ -32,6 +32,7 @@ import json
 import os
 import sys
 import time
+import warnings
 
 import numpy as np
 import sympy
@@ -458,6 +459,72 @@ def segment_distance(points, a, b):
     return np.linalg.norm(points - (a + s[:, None] * ab), axis=1)
 
 
+def _num(x, kind=float):
+    return None if x is None else kind(x)
+
+
+def nonlinear_record(info):
+    """One nonlinear solve's numbers from the rotated loop's info dict. fnorm_rest, ref,
+    rnorm_history and line_search_alpha come with a library addition and are None before."""
+    its = _num(info.get("nonlinear_iterations"), int)
+    switch = _num(info.get("continuation_switch_iteration"), int)
+    picard = switch if switch is not None else its
+    F0, F_rest, F_final = _num(info.get("rnorm0")), _num(info.get("fnorm_rest")), _num(info.get("rnorm"))
+    F_ref = _num(info.get("ref"))
+    if F_ref is None and F_rest is not None and F0 is not None:
+        F_ref = max(F0, F_rest)
+    alpha = info.get("line_search_alpha")
+    alpha = None if alpha is None else [float(a) for a in alpha]
+    history = info.get("rnorm_history")
+    return {"F0": F0, "F_rest": F_rest, "F_ref": F_ref, "F_final": F_final,
+            "rel_final": F_final / F_ref if F_final is not None and F_ref else None,
+            "converged": bool(info.get("converged")), "nonlinear_its": its, "picard_its": picard,
+            "switch_iteration": switch,
+            "newton_its": its - picard if its is not None and picard is not None else None,
+            "F_history": None if history is None else [float(r) for r in history],
+            "line_search_alpha": alpha,
+            "line_search_cutbacks": None if alpha is None else sum(a < 1.0 for a in alpha)}
+
+
+def solver_record(info, attempts, start, caught, wall):
+    """The step's "solver" sub-record: the nonlinear numbers summed over the attempts (the
+    first attempt's F0, the last one's final state), the last attempt's linear solves,
+    the preconditioner fallbacks among the warnings caught, and the solve's wall times."""
+    rec = dict(attempts[-1])
+    rec["F0"] = attempts[0]["F0"]
+    for key in ("nonlinear_its", "picard_its", "newton_its", "line_search_cutbacks"):
+        values = [a[key] for a in attempts]
+        rec[key] = None if any(v is None for v in values) else sum(values)
+    if len(attempts) > 1:
+        rec["switch_iteration"] = None if attempts[-1]["switch_iteration"] is None else \
+            attempts[0]["nonlinear_its"] + attempts[-1]["switch_iteration"]
+
+    def ints(x):
+        if x is None:
+            return None
+        return [int(v) for v in x] if np.ndim(x) else int(x)
+
+    def summary(x):
+        x = [] if x is None else list(np.atleast_1d(x))
+        return (float(np.mean(x)), int(np.max(x))) if x else (None, None)
+
+    ksp, vel, pres = ints(info.get("ksp_its")), ints(info.get("vel_its_last")), ints(info.get("pres_its_last"))
+    (om, ox), (vm, vx), (pm, px) = summary(ksp), summary(vel), summary(pres)
+    keep = ("custom_mg", "fell back", "fallback", "default preconditioner")
+    rec.update({
+        "start": start, "cold_retry": len(attempts) > 1, "attempts": attempts,
+        "ksp_its": ksp, "vel_its": vel, "pres_its": pres,
+        "ksp_summary": {"outer_mean": om, "outer_max": ox, "vel_mean": vm, "vel_max": vx,
+                        "pres_mean": pm, "pres_max": px},
+        "velocity_pc": info.get("velocity_pc"), "velocity_pc_type": info.get("velocity_pc_type"),
+        "schur_pre": info.get("schur_pre"),
+        "operator_reused": bool(info.get("rotation_reused")) and bool(info.get("workspace_reused")),
+        "pc_fallbacks": sorted({str(w.message)[:200] for w in caught
+                                if any(k in str(w.message) for k in keep)}),
+        "wall": {k: round(v, 3) for k, v in wall.items()}})
+    return rec
+
+
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
     solver, the bridge zones and the P1 fields the renders read."""
@@ -468,6 +535,7 @@ class FaultedMesh:
         self.names = [f["name"] for f in self.faults]
         chain = int(params.uw_chain) if self.faults else 0
         mids = []
+        welded = []
         for k in range(chain, 0, -1):
             host = levels[len(levels) - k]
             try:
@@ -475,6 +543,7 @@ class FaultedMesh:
             except (RuntimeError, ValueError) as err:
                 uw.pprint(f"  chain level {2 ** k}S refused ({str(err)[:80]}): welded")
                 mids.append(host)
+                welded.append(f"{2 ** k}S")
         if self.faults:
             self.levels = levels[:len(levels) - chain] + mids if chain else levels
             self.mesh, info, self.pieces = placed_ladders(base, self.faults, 1)
@@ -555,6 +624,11 @@ class FaultedMesh:
         self.t_build = time.perf_counter() - wall
         level_cells = [int(uw.utilities.gather_data(m.dm.getHeightStratum(0)[1], bcast=True).sum())
                        for m in self.levels + [mesh]]
+        band_cells = int(uw.utilities.gather_data(int(band.sum()) if band is not None else 0, bcast=True).sum())
+        # for the solver record of the step that solves on this mesh
+        self.mesh_record = {"levels_cells": level_cells,
+                            "band_cells_fraction": band_cells / max(level_cells[-1], 1),
+                            "split_pairs": None, "chain_welded": welded}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
@@ -599,6 +673,7 @@ class FaultedMesh:
         return self.stokes._rotated_freeslip_info
 
     def solve(self):
+        wall = time.perf_counter()
         self.T.array[:, 0, 0] = np.asarray(
             uw.function.global_evaluate(T_b.sym[0], onto(self.T.coords))).ravel()
         self.gamma.array[:, 0, 0] = np.asarray(
@@ -607,11 +682,19 @@ class FaultedMesh:
             mine = getattr(self, name)
             mine.array[:, 0, 0] = np.asarray(
                 uw.function.global_evaluate(var.sym[0], onto(mine.coords))).ravel()
-        info = self._stokes_solve(from_rest=not self.has_guess)
-        if not info.get("converged") and self.has_guess:
-            uw.pprint("  the warm start did not converge: solving from rest")
-            self.stokes.newton_switch_rtol = params.uw_newton_switch
-            info = self._stokes_solve(from_rest=True)
+        t_transfer = time.perf_counter() - wall
+        start = "cold" if not self.has_guess else "warm"
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            info = self._stokes_solve(from_rest=not self.has_guess)
+            attempts = [nonlinear_record(info)]
+            if not info.get("converged") and self.has_guess:
+                uw.pprint("  the warm start did not converge: solving from rest")
+                self.stokes.newton_switch_rtol = params.uw_newton_switch
+                info = self._stokes_solve(from_rest=True)
+                attempts.append(nonlinear_record(info))
+        for w in caught:           # put the warnings back where they would have gone
+            warnings.showwarning(w.message, w.category, w.filename, w.lineno)
         self.stokes.newton_switch_rtol = params.uw_warm_newton_switch
         self.has_guess = True
         slips = {}
@@ -626,6 +709,8 @@ class FaultedMesh:
             "converged": bool(info.get("converged")),
             "slip": slips,
             "slip_max": max(slips.values()) if slips else 0.0,
+            "solver": solver_record(info, attempts, start, caught,
+                                    {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer}),
         }
 
     def to_base(self, slips=None):
@@ -778,7 +863,46 @@ def write_records(records):
                 json.dump(records, f, indent=1)
 
 
-def checkpoint(step, t, records, faulted, faults, next_id):
+def write_solver_fields(faulted, step):
+    """The solver's (faulted, split) mesh and its V, P at checkpoint ``step``: the mesh by
+    Mesh.write (it reloads exactly, split copies included: 33650 cells and 17313 vertices
+    at np 16 and np 1), V and P as their values at their DOF coordinates nudged onto their
+    own side of each fault (split_nudges), gathered to rank 0. A restart matches them to
+    the rebuilt mesh's DOFs by position, on any rank count. Returns the file names."""
+    import h5py
+    files = {"mesh": f"annulus.solver_mesh.{step:05d}.h5"}
+    faulted.mesh.write(os.path.join(out, files["mesh"]))
+    for name, var in (("V", faulted.v), ("P", faulted.p)):
+        values = var.array[:, 0, :]
+        xy = uw.utilities.gather_data((np.asarray(var.coords) + faulted.split_nudges(var)).ravel())
+        vals = uw.utilities.gather_data(values.ravel())
+        files[name] = f"annulus.solver_mesh.{name}.{step:05d}.h5"
+        with uw.selective_ranks(0) as selected:
+            if selected:
+                with h5py.File(os.path.join(out, files[name]), "w") as h:
+                    h["coords"] = np.asarray(xy).reshape(-1, 2)
+                    h["values"] = np.asarray(vals).reshape(-1, values.shape[1])
+    return files
+
+
+def read_solver_fields(faulted, files):
+    """Seed a faulted mesh from checkpointed V, P (write_solver_fields): each DOF takes the
+    saved value at the nearest saved nudged coordinate. Returns the largest match distance
+    over all ranks: zero when the rebuilt mesh is the checkpointed one."""
+    import h5py
+    from scipy.spatial import cKDTree
+    worst = 0.0
+    for name, var in (("V", faulted.v), ("P", faulted.p)):
+        with h5py.File(os.path.join(out, files[name]), "r") as h:
+            xy, values = h["coords"][...], h["values"][...]
+        dist, idx = cKDTree(xy).query(np.asarray(var.coords) + faulted.split_nudges(var))
+        var.array[:, 0, :] = values[idx]
+        worst = max(worst, float(dist.max()) if len(dist) else 0.0)
+    faulted.has_guess = True
+    return float(uw.utilities.gather_data(worst, bcast=True).max())
+
+
+def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
     for var, picture, _ in markers.values():
@@ -789,6 +913,12 @@ def checkpoint(step, t, records, faulted, faults, next_id):
         crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
                                    swarmVars=[m[0] for m in markers.values()], outputPath=out)
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
+    solver_files = write_solver_fields(faulted, step)
+    # everything a restart from here reads: it refuses to start if any is missing
+    needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
+    if swarm_on:
+        needed += [f"annulus.crust_swarm.{step:05d}.h5"] + [f"annulus.crust_swarm.{name}.{step:05d}.h5"
+                                                          for name in markers]
     with uw.selective_ranks(0) as selected:
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
@@ -798,7 +928,10 @@ def checkpoint(step, t, records, faulted, faults, next_id):
                            "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
                            "dip": faults[0]["dip"] if faults else float(params.uw_dip),
                            "fault_depth": faults[0]["depth"] if faults else 0.0,
-                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults]},
+                           "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults],
+                           # what steers the next decisions (restored_decisions)
+                           "decisions": dict(decisions, built=faulted.faults),
+                           "solver_checkpoint": solver_files, "checkpoint_files": needed},
                           f, indent=1, default=str)
     write_records(records)
 
@@ -973,7 +1106,7 @@ def restore_swarm(path, index):
         var._update()
 
 
-if params.uw_init == "slab":
+if params.uw_init == "slab" and params.uw_restart < 0:     # a restart of a slab run reads its checkpoint
     T_b.array[:, 0, 0] = slab_temperature(T_b.coords)
     V_b.array[:, 0, :] = 0.0
     if swarm_on:
@@ -997,12 +1130,15 @@ elif params.uw_restart < 0:
                "depth": float(params.uw_fault_depth)}]
     next_id = 1
 else:
+    with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
+        state = json.load(f)
+    missing = [name for name in state.get("checkpoint_files", []) if not os.path.exists(os.path.join(out, name))]
+    if missing:
+        raise FileNotFoundError(f"checkpoint {params.uw_restart} in {out} lists files that are missing: {missing}")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
     if swarm_on:
         restore_swarm(out, params.uw_restart)
-    with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
-        state = json.load(f)
     with open(os.path.join(out, "records.json")) as f:
         records = [r for r in json.load(f) if r["step"] <= params.uw_restart]
     if "faults" in state:
@@ -1024,11 +1160,55 @@ if params.uw_ridge_weak < 1:
 else:
     theta_0, ridges = float(faults[0]["theta"] if faults else params.uw_theta_trench), []
 
+
+
+def restored_decisions(state, records, faults):
+    """What steers the fault decisions, as the checkpoint at ``state`` left it: the loop
+    counter of the next step (the detection cadence, uw_detect_start and the clearing of
+    the refused set run on it), the rebuild count, the refused formation trenches, each
+    fault's damage at the last detection, and the faults the mesh was built with (not yet
+    the current ones when a fault has moved less than a rebuild; needs_rebuild compares
+    against them). A checkpoint from before these were saved: the cadence from the last
+    detection in the records (a detection step records its damage), the rebuild count
+    and the damage from the records, nothing refused, the mesh built at the faults."""
+    saved = state.get("decisions")
+    if saved is not None:
+        return (int(saved["k"]), int(saved["n_built"]), {n: float(v) for n, v in saved["refused"].items()},
+                dict(saved["last_damage"]), saved["built"])
+    detections = [r for r in records if r.get("damage")]
+    k0 = 0
+    if detections:
+        k0 = int(params.uw_detect_start) + (int(state["step"]) + 1 - int(detections[-1]["step"])) \
+            % int(params.uw_detect_every)
+    n_built = int(records[-1].get("n_built", 1)) if records else 1
+    return k0, n_built, {}, dict(detections[-1]["damage"]) if detections else {}, faults
+
+
+k0 = 0                         # the loop counter of the first step
 n_built = 1
 refused = {}                   # formation trenches the surgery refused: no new fault within 3 deg for a while
 last_damage = {}               # each fault's line damage at the last detection
+built = faults
+if params.uw_restart >= 0:
+    k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
-faulted = FaultedMesh(faults, "f0")
+faulted = FaultedMesh(built, "f0")
+restart_transfer = "none"
+if params.uw_restart >= 0 and "solver_checkpoint" in state:
+    # the first solve starts from the checkpointed solution on the faulted mesh: on the
+    # same mesh (the built set rebuilt) it is the solution an uninterrupted run would
+    # start from, so the step is an ordinary warm step (Newton at once)
+    worst = read_solver_fields(faulted, state["solver_checkpoint"])
+    same = worst < 1.0e-3 * S
+    restart_transfer = "checkpoint" if same else "checkpoint_nearest"
+    faulted.stokes.newton_switch_rtol = params.uw_warm_newton_switch if same else params.uw_rebuild_newton_switch
+    uw.pprint(f"restart: V, P from the faulted-mesh checkpoint ({'same mesh' if same else 'nearest DOF'}, "
+              f"largest match distance {worst:.2e})")
+elif params.uw_restart >= 0:
+    # an older checkpoint: start from the base velocity (continuous across the faults, no
+    # pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
+    faulted.warm_start(V_b)
+    restart_transfer = "base_V"
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
           f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
@@ -1046,6 +1226,75 @@ uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra 
           + f"from t {t:.4f}; output {out}")
 
 
+def git_head(path):
+    """The commit checked out at ``path`` (a clone or a worktree), read from the files: the
+    image has no git. None if it cannot be read."""
+    try:
+        d = os.path.abspath(path)
+        while not os.path.exists(os.path.join(d, ".git")):
+            if os.path.dirname(d) == d:
+                return None
+            d = os.path.dirname(d)
+        gitdir = os.path.join(d, ".git")
+        if os.path.isfile(gitdir):                      # a worktree: "gitdir: <path>"
+            gitdir = open(gitdir).read().split(":", 1)[1].strip()
+        head = open(os.path.join(gitdir, "HEAD")).read().strip()
+        if not head.startswith("ref:"):
+            return head
+        ref = head.split(None, 1)[1]
+        common = gitdir
+        if os.path.exists(os.path.join(gitdir, "commondir")):
+            common = os.path.normpath(os.path.join(gitdir, open(os.path.join(gitdir, "commondir")).read().strip()))
+        for g in (gitdir, common):
+            if os.path.exists(os.path.join(g, ref)):
+                return open(os.path.join(g, ref)).read().strip()
+        for line in open(os.path.join(common, "packed-refs")):
+            if line.strip().endswith(" " + ref):
+                return line.split()[0]
+    except (OSError, IndexError):
+        pass
+    return None
+
+
+def write_run_info():
+    """Where and with what this run (or restart) ran, appended to <out>/run_info.json."""
+    import datetime
+    import socket
+    from mpi4py import MPI
+    from petsc4py import PETSc
+    ranks_per_node = MPI.COMM_WORLD.Split_type(MPI.COMM_TYPE_SHARED).Get_size()
+    if uw.mpi.rank != 0:
+        return
+    uw3_commit, uw3_branch = os.environ.get("UW3_COMMIT"), os.environ.get("UW3_BRANCH")
+    stamp = os.path.join(os.path.dirname(uw.__file__), "_build_commit.txt")
+    if uw3_commit is None and os.path.exists(stamp):
+        words = open(stamp).read().split()
+        uw3_commit = words[0] if words else None
+        uw3_branch = uw3_branch or (words[1] if len(words) > 1 else None)
+    info = {"started": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "host": socket.gethostname(), "nodes": os.environ.get("SLURM_JOB_NODELIST"),
+            "mpi_ranks": uw.mpi.size, "ranks_per_node": ranks_per_node,
+            "omp_threads": os.environ.get("OMP_NUM_THREADS"),
+            "container": os.environ.get("APPTAINER_CONTAINER") or os.environ.get("SINGULARITY_CONTAINER"),
+            "uw3_path": uw.__file__, "uw3_commit": uw3_commit, "uw3_branch": uw3_branch,
+            "driver_commit": os.environ.get("DRIVER_COMMIT") or git_head(os.path.dirname(os.path.abspath(__file__))),
+            "petsc": ".".join(str(v) for v in PETSc.Sys.getVersion()), "argv": sys.argv,
+            "params": params.to_dict(), "restart_from": int(params.uw_restart) if params.uw_restart >= 0 else None,
+            "slurm_job": os.environ.get("SLURM_JOB_ID")}
+    path = os.path.join(out, "run_info.json")
+    runs = []
+    if os.path.exists(path):
+        try:
+            runs = json.load(open(path))
+        except ValueError:
+            pass
+    with open(path, "w") as f:
+        json.dump(runs + [info], f, indent=1, default=str)
+
+
+write_run_info()
+
+
 def needs_rebuild(faults, built):
     if [f["name"] for f in faults] != [f["name"] for f in built]:
         return True
@@ -1058,10 +1307,15 @@ def needs_rebuild(faults, built):
 
 
 # ----------------------------------------------------------------------------- time loop
-for k in range(params.uw_steps):
+for k in range(k0, k0 + params.uw_steps):
     wall = time.perf_counter()
     events = []
     damage = last_damage
+    # for the solver record: what kind of solve this step is, and the phases' wall times
+    kind = ("restart_first" if params.uw_restart >= 0 else "init_first") if k == k0 else "ordinary"
+    faults_before = list(faulted.names)
+    mesh_rec = faulted.mesh_record if k == k0 else None
+    t_build = t_warm = 0.0
     if needs_rebuild(faults, faulted.faults):
         previous = faulted
         try:
@@ -1094,17 +1348,30 @@ for k in range(params.uw_steps):
                 faults = [dict(f) for f in previous.faults]
                 faulted = previous
         n_built += 1
-        if faulted is not previous and faulted.names == previous.names:
-            # the same faults, moved: start from the old solution. A changed set (a fault
-            # formed or removed) starts from rest: the warm start from the old set failed
-            # to converge (measured on forming a second fault) and was then repeated cold.
+        if faulted is not previous:
+            # start from the old solution, also when the set has changed (a fault formed or
+            # removed): measured on kaiju from 3580 (np 16), a spawn takes 11 iterations warm
+            # against 34 cold and a retire 16 against 30, converging to the cold solution
+            # within 1e-5. This needs the rotated loop's Picard->Newton switch keyed on the
+            # rest-state residual (underworld3 371d3bd); without it a changed set's warm start
+            # failed to converge (measured on forming a second fault). solve() retries cold
+            # if the warm start does not converge.
+            t_warm = time.perf_counter()
             faulted.warm_start(previous.v, previous.p)
+            t_warm = time.perf_counter() - t_warm
             faulted.stokes.newton_switch_rtol = params.uw_rebuild_newton_switch
+            mesh_rec = faulted.mesh_record
+            if k != k0:
+                kind = "rebuild_same_set" if faulted.names == previous.names else "rebuild_changed_set"
+        t_build = time.perf_counter() - wall - t_warm
         del previous
         gc.collect()
     rec = faulted.solve()
     t_stokes = time.perf_counter() - wall
+    t_phase = time.perf_counter()
     faulted.to_base(rec["slip"])
+    t_to_base = time.perf_counter() - t_phase
+    t_phase = time.perf_counter()
     dt_accuracy = params.uw_dt_mult * float(adv.estimate_dt())
     adv.estimate_dt(basis="resolution", direction_aware=True)
     dt_crossing = adv.dt_adv
@@ -1112,10 +1379,14 @@ for k in range(params.uw_steps):
     adv.solve(timestep=dt)
     strain_adv.solve(timestep=dt)
     gamma_b.array[:, 0, 0] = np.maximum(gamma_b.array[:, 0, 0], 0.0)
+    t_energy_strain = time.perf_counter() - t_phase
+    t_phase = time.perf_counter()
     if swarm_on:
         crust_swarm.advection(V_b.sym, dt, order=2)
         for var, _, _ in markers.values():
             var._update()
+    t_swarm = time.perf_counter() - t_phase
+    t_phase = time.perf_counter()
     t += dt
     if trench_advect:
         advect_trenches(faults, dt)
@@ -1287,6 +1558,7 @@ for k in range(params.uw_steps):
     for e in events:
         uw.pprint(f"  fault {e}")
 
+    t_detection = time.perf_counter() - t_phase
     record, profile = faulted.diagnostics.record()
     record.update(rec)
     local = gamma_b.array[:, 0, 0]
@@ -1306,6 +1578,16 @@ for k in range(params.uw_steps):
                    "fault_depth": faults[0]["depth"] if faults else 0.0})
     record.update({"step": step, "t": t, "dt": dt, "courant": dt / dt_crossing,
                    "t_stokes": round(t_stokes, 2), "t_step": round(time.perf_counter() - wall, 2)})
+    solver = record["solver"] = dict(rec["solver"])
+    solver.update({
+        "kind": kind, "faults_before": faults_before, "faults_after": list(faulted.names),
+        "transfer": (restart_transfer if kind == "restart_first"
+                     else "driver" if solver["start"] == "warm" and kind != "ordinary" else "none"),
+        "mesh": mesh_rec,
+        "wall": {"build": round(t_build, 3), "transfer": round(t_warm + solver["wall"]["transfer"], 3),
+                 "stokes": solver["wall"]["stokes"], "to_base": round(t_to_base, 3),
+                 "energy_strain": round(t_energy_strain, 3), "swarm": round(t_swarm, 3),
+                 "detection": round(t_detection, 3), "checkpoint": 0.0, "step": record["t_step"]}})
     records.append(record)
     described = " ".join(f"{f['name']}@{np.degrees(f['theta']):.1f}/{f['dip']:.0f}/{f['depth']:.2f}"
                          f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults) or "none"
@@ -1314,8 +1596,14 @@ for k in range(params.uw_steps):
               f"slip {record['slip_max']:.2f} | faults {described} | "
               f"newton {record['newton']} conv {record['converged']} "
               f"{record['t_stokes']:.1f}/{record['t_step']:.1f} s", flush=True)
-    if step % params.uw_ckpt_every == 0 or k == params.uw_steps - 1:
-        checkpoint(step, t, records, faulted, faults, next_id)
+    if step % params.uw_ckpt_every == 0 or k == k0 + params.uw_steps - 1:
+        t_phase = time.perf_counter()
+        checkpoint(step, t, records, faulted, faults, next_id,
+                   {"k": k + 1, "n_built": n_built, "refused": refused, "last_damage": last_damage})
+        # the next checkpoint writes it; the last one is written here
+        solver["wall"]["checkpoint"] = round(time.perf_counter() - t_phase, 3)
+        if k == k0 + params.uw_steps - 1:
+            write_records(records)
     step += 1
 
 uw.pprint("done")
