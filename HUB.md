@@ -406,3 +406,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: pushed RESTART_AND_RECORDS.md (3345ce7): the checkpoint set, the restart order and
   fallbacks, every record["solver"] field, run_info.json, solver_record.py usage, and the measured
   restart numbers. kaiju/annulus-restart-fixes is complete (8 commits); the dev session is free.
+- 2026-10-25: slab example figures on zg95-annulus-for-kaiju dbec55d (`zg95_lid_regimes/figures/slab/`:
+  B1/B2/C1 at steps 20, 60, 119 + README; trench_retreat.png to follow). The old launch/slab_kaiju
+  scan is stale (thermal-slab baseline, which never founders). Proposed new scan on the
+  compositional baseline, one change each: comp_eta 30; comp_dT 0.25; slab_length 0.2 and 0.5;
+  dip 60; crust_weak 0.01; overriding plate at over_gap 0.3 and at over_eta 1000; and one run with
+  the mantle structure back (deta, buoy_T 1, asth 0.1). 200-300 steps each. The stage-3 fault at
+  the plate contact waits on Louis's law/placement choice.
