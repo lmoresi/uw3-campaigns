@@ -863,6 +863,45 @@ def write_records(records):
                 json.dump(records, f, indent=1)
 
 
+def write_solver_fields(faulted, step):
+    """The solver's (faulted, split) mesh and its V, P at checkpoint ``step``: the mesh by
+    Mesh.write (it reloads exactly, split copies included: 33650 cells and 17313 vertices
+    at np 16 and np 1), V and P as their values at their DOF coordinates nudged onto their
+    own side of each fault (split_nudges), gathered to rank 0. A restart matches them to
+    the rebuilt mesh's DOFs by position, on any rank count. Returns the file names."""
+    import h5py
+    files = {"mesh": f"annulus.solver_mesh.{step:05d}.h5"}
+    faulted.mesh.write(os.path.join(out, files["mesh"]))
+    for name, var in (("V", faulted.v), ("P", faulted.p)):
+        values = var.array[:, 0, :]
+        xy = uw.utilities.gather_data((np.asarray(var.coords) + faulted.split_nudges(var)).ravel())
+        vals = uw.utilities.gather_data(values.ravel())
+        files[name] = f"annulus.solver_mesh.{name}.{step:05d}.h5"
+        with uw.selective_ranks(0) as selected:
+            if selected:
+                with h5py.File(os.path.join(out, files[name]), "w") as h:
+                    h["coords"] = np.asarray(xy).reshape(-1, 2)
+                    h["values"] = np.asarray(vals).reshape(-1, values.shape[1])
+    return files
+
+
+def read_solver_fields(faulted, files):
+    """Seed a faulted mesh from checkpointed V, P (write_solver_fields): each DOF takes the
+    saved value at the nearest saved nudged coordinate. Returns the largest match distance
+    over all ranks: zero when the rebuilt mesh is the checkpointed one."""
+    import h5py
+    from scipy.spatial import cKDTree
+    worst = 0.0
+    for name, var in (("V", faulted.v), ("P", faulted.p)):
+        with h5py.File(os.path.join(out, files[name]), "r") as h:
+            xy, values = h["coords"][...], h["values"][...]
+        dist, idx = cKDTree(xy).query(np.asarray(var.coords) + faulted.split_nudges(var))
+        var.array[:, 0, :] = values[idx]
+        worst = max(worst, float(dist.max()) if len(dist) else 0.0)
+    faulted.has_guess = True
+    return float(uw.utilities.gather_data(worst, bcast=True).max())
+
+
 def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
@@ -874,6 +913,12 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
         crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
                                    swarmVars=[m[0] for m in markers.values()], outputPath=out)
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
+    solver_files = write_solver_fields(faulted, step)
+    # everything a restart from here reads: it refuses to start if any is missing
+    needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
+    if swarm_on:
+        needed += [f"annulus.crust_swarm.{step:05d}.h5"] + [f"annulus.crust_swarm.{name}.{step:05d}.h5"
+                                                          for name in markers]
     with uw.selective_ranks(0) as selected:
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
@@ -885,7 +930,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
                            "fault_depth": faults[0]["depth"] if faults else 0.0,
                            "traces": [faulted.pieces[f["name"]][1].tolist() for f in faults],
                            # what steers the next decisions (restored_decisions)
-                           "decisions": dict(decisions, built=faulted.faults)},
+                           "decisions": dict(decisions, built=faulted.faults),
+                           "solver_checkpoint": solver_files, "checkpoint_files": needed},
                           f, indent=1, default=str)
     write_records(records)
 
@@ -1084,12 +1130,15 @@ elif params.uw_restart < 0:
                "depth": float(params.uw_fault_depth)}]
     next_id = 1
 else:
+    with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
+        state = json.load(f)
+    missing = [name for name in state.get("checkpoint_files", []) if not os.path.exists(os.path.join(out, name))]
+    if missing:
+        raise FileNotFoundError(f"checkpoint {params.uw_restart} in {out} lists files that are missing: {missing}")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
     if swarm_on:
         restore_swarm(out, params.uw_restart)
-    with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
-        state = json.load(f)
     with open(os.path.join(out, "records.json")) as f:
         records = [r for r in json.load(f) if r["step"] <= params.uw_restart]
     if "faults" in state:
@@ -1144,10 +1193,22 @@ if params.uw_restart >= 0:
     k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
 faulted = FaultedMesh(built, "f0")
-if params.uw_restart >= 0:
-    # the first solve starts from the checkpointed velocity (continuous across the faults,
-    # no pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
+restart_transfer = "none"
+if params.uw_restart >= 0 and "solver_checkpoint" in state:
+    # the first solve starts from the checkpointed solution on the faulted mesh: on the
+    # same mesh (the built set rebuilt) it is the solution an uninterrupted run would
+    # start from, so the step is an ordinary warm step (Newton at once)
+    worst = read_solver_fields(faulted, state["solver_checkpoint"])
+    same = worst < 1.0e-3 * S
+    restart_transfer = "checkpoint" if same else "checkpoint_nearest"
+    faulted.stokes.newton_switch_rtol = params.uw_warm_newton_switch if same else params.uw_rebuild_newton_switch
+    uw.pprint(f"restart: V, P from the faulted-mesh checkpoint ({'same mesh' if same else 'nearest DOF'}, "
+              f"largest match distance {worst:.2e})")
+elif params.uw_restart >= 0:
+    # an older checkpoint: start from the base velocity (continuous across the faults, no
+    # pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
     faulted.warm_start(V_b)
+    restart_transfer = "base_V"
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
           f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
@@ -1520,7 +1581,8 @@ for k in range(k0, k0 + params.uw_steps):
     solver = record["solver"] = dict(rec["solver"])
     solver.update({
         "kind": kind, "faults_before": faults_before, "faults_after": list(faulted.names),
-        "transfer": "driver" if solver["start"] == "warm" and kind != "ordinary" else "none",
+        "transfer": (restart_transfer if kind == "restart_first"
+                     else "driver" if solver["start"] == "warm" and kind != "ordinary" else "none"),
         "mesh": mesh_rec,
         "wall": {"build": round(t_build, 3), "transfer": round(t_warm + solver["wall"]["transfer"], 3),
                  "stokes": solver["wall"]["stokes"], "to_base": round(t_to_base, 3),
