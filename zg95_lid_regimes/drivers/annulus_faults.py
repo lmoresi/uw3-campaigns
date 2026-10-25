@@ -36,6 +36,7 @@ import warnings
 
 import numpy as np
 import sympy
+from scipy.optimize import brentq
 import underworld3 as uw
 from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
@@ -172,7 +173,7 @@ params = uw.Params(
     uw_fault_lid_margin=0.05,
     uw_detect_max_ddepth=0.05,
     # forming and removing faults
-    uw_fault_law="lines",       # "none": no detection; "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking
+    uw_fault_law="lines",       # "none": no detection; "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking; "crust": one fault on the compositional slab's top (the weak crust), from the trench to uw_fault_depth_max
     uw_line_gamma=2.0,          # "lines": damage counted (plastic strain at or above this)
     uw_line_min_damage=0.01,    # "lines": smallest damage (strain x area) that is a fault
     uw_line_width=0.035,        # "lines": half-width of a line's inlier band
@@ -234,6 +235,8 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 crust_on = params.uw_crust_weak < 1
+if params.uw_fault_law == "crust" and not (params.uw_comp_dT > 0 or params.uw_comp_eta != 1):
+    raise ValueError("the crust fault law follows the compositional slab's top: set uw_comp_dT or uw_comp_eta")
 comp_on = params.uw_comp_dT > 0 or params.uw_comp_eta != 1
 over_on = params.uw_over_dT > 0 or params.uw_over_eta != 1
 swarm_on = crust_on or comp_on or over_on
@@ -338,7 +341,12 @@ def wrap(angle):
 def fault_trace(fault, coarsening=1):
     """A fault's spine (from just above the outer wall to its tip) and the trace to cut
     (more than three finest rungs inside the wall), at ``coarsening`` times the rung
-    spacing; the dip angle phi is measured below the local horizontal from +theta."""
+    spacing; the dip angle phi is measured below the local horizontal from +theta. A
+    fault with ``points`` (the crust-following law) is that polyline, already at the
+    rung spacing with its surface end above the wall."""
+    if "points" in fault:
+        spine = np.asarray(fault["points"], dtype=float)[::coarsening]
+        return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - 3.0 * S]
     theta_t, phi = fault["theta"], np.deg2rad(fault["dip"])
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
@@ -525,6 +533,116 @@ def solver_record(info, attempts, start, caught, wall):
     return rec
 
 
+def polyline_distance(points, poly):
+    """The distance from each of ``points`` to the polyline ``poly``."""
+    poly = np.asarray(poly, dtype=float)
+    return np.min([segment_distance(points, poly[i], poly[i + 1]) for i in range(len(poly) - 1)], axis=0)
+
+
+def polyline_gap(a, b):
+    """The largest distance between two polylines, either way (Hausdorff)."""
+    a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
+    return float(max(polyline_distance(a, b).max(), polyline_distance(b, a).max()))
+
+
+def resample_polyline(poly, spacing, block):
+    """``poly`` resampled by arc length at about ``spacing``, with a multiple of ``block``
+    segments (the chain levels subsample by 2^k)."""
+    poly = np.asarray(poly, dtype=float)
+    s = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(poly, axis=0), axis=1))]
+    n = block * max(1, int(round(s[-1] / (block * spacing))))
+    t = np.linspace(0.0, s[-1], n + 1)
+    return np.c_[np.interp(t, s, poly[:, 0]), np.interp(t, s, poly[:, 1])]
+
+
+def parabola_fit(pts):
+    """A parabola through a polyline's points, least squares in the frame of its chord
+    (distance along the chord, offset from it). A marker contour wiggles at the cell
+    scale, and the ladder places every vertex verbatim (the wiggles become kinks in the
+    band and in the slip direction); the parabola keeps the trace's position and
+    curvature only. Returns the curve as a function of distance along the chord (s = 0
+    at the first point, negative before it) and the chord length."""
+    pts = np.asarray(pts, dtype=float)
+    chord = pts[-1] - pts[0]
+    L = max(np.linalg.norm(chord), 1e-12)
+    e = chord / L
+    nrm = np.array([-e[1], e[0]])
+    s = (pts - pts[0]) @ e
+    d = (pts - pts[0]) @ nrm
+    c = np.polyfit(s, d, 2)
+
+    def curve(ss):
+        ss = np.asarray(ss, dtype=float)
+        return pts[0] + ss[..., None] * e + np.polyval(c, ss)[..., None] * nrm
+
+    return curve, L
+
+
+def crust_fault_points(faults):
+    """The fault that follows the weak crust: the crust rides on the compositional slab,
+    so its position is the slab top, the slab marker's 0.5 contour on the polar grid from
+    the surface down to the depth cap. The crust's own proxy is one cell thick and too
+    smeared to chain (measured on B1 at step 60: values 0.2-0.6 with gaps), the slab's
+    is crisp. The contour piece taken is the one whose surface end is nearest the fault's
+    trench when there is a fault, else the one reaching the cap by the shortest path. The
+    piece is replaced by its least-squares parabola, which runs from 0.02 above the wall
+    (as the straight traces start) down to the cap, resampled at the rung spacing.
+    Collective. Returns the points and (theta, dip, depth) in the fault's usual terms,
+    or None."""
+    import contourpy
+    th, dep, xy = polar_grid(r_o, n_theta=1440, depth_max=0.5, n_depth=64)
+    m = np.asarray(uw.function.global_evaluate(markers["slab"][0].sym[0], onto(xy))).reshape(len(dep), len(th))
+    cap = fault_depth_cap()
+    best, best_score = None, np.inf
+    for line in contourpy.contour_generator(th, dep, m).lines(0.5):
+        line = np.asarray(line, dtype=float)
+        if line[-1, 1] < line[0, 1]:
+            line = line[::-1]                        # the surface end first
+        if line[0, 1] > dep[1] or line[:, 1].max() < cap:
+            continue
+        k = int(np.argmax(line[:, 1] >= cap))        # the first point at or below the cap
+        w = (cap - line[k - 1, 1]) / max(line[k, 1] - line[k - 1, 1], 1e-12)
+        path = np.vstack([line[:k], line[k - 1] + w * (line[k] - line[k - 1])])
+        r = r_o - path[:, 1]
+        pts = np.c_[r * np.cos(path[:, 0]), r * np.sin(path[:, 0])]
+        if faults:
+            score = abs(wrap(path[0, 0] - faults[0]["theta"]))
+            if score > np.deg2rad(params.uw_line_match):
+                continue
+        else:
+            score = np.linalg.norm(np.diff(pts, axis=0), axis=1).sum()
+        if score < best_score:
+            best, best_score = pts, score
+    if best is None:
+        return None
+    # the contour hooks along the wall in the top rows (the marker sits at 0.5 there):
+    # fit below them, and the fault is the parabola itself all the way up, through the
+    # wall to 0.02 above it. The surface is the placement's business: the cut stops
+    # three rungs inside the wall (fault_trace) and the ribbon's TI zone covers the rest.
+    buried = (r_o - np.hypot(best[:, 0], best[:, 1])) >= 0.012
+    curve, L = parabola_fit(best[buried] if buried.sum() >= 4 else best)
+    lift = r_o + 0.02
+    s_top, step = 0.0, 0.005
+    while np.hypot(*curve(s_top)) < lift and s_top > -0.5:
+        s_top -= step
+    if np.hypot(*curve(s_top)) < lift:
+        return None                                  # the parabola turns away from the wall
+    s_top = brentq(lambda s: np.hypot(*curve(s)) - lift, s_top, s_top + step)
+    poly = resample_polyline(curve(np.linspace(s_top, L, 400)), S, 2 ** int(params.uw_chain))
+    radius = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(radius <= r_o))
+    w = (radius[k - 1] - r_o) / max(radius[k - 1] - radius[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - radius - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = below - at_wall
+    down /= max(np.linalg.norm(down), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    return poly, theta_t, dip, float((r_o - radius).max())
+
+
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
     solver, the bridge zones and the P1 fields the renders read."""
@@ -574,7 +692,7 @@ class FaultedMesh:
         if band is None:
             band = bridge
         for name, (spine, trace) in self.pieces.items():
-            near = segment_distance(centroids, spine[0], spine[-1]) < 2.0 * W
+            near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
 
@@ -1112,9 +1230,10 @@ if params.uw_init == "slab" and params.uw_restart < 0:     # a restart of a slab
     if swarm_on:
         seed_swarm()
     state = {"t": 0.0, "step": -1}
-    faults = [{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
-               "depth": float(params.uw_fault_depth)}] if params.uw_max_faults > 0 else []
-    next_id = 1
+    faults = ([{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
+                "depth": float(params.uw_fault_depth)}]
+              if params.uw_max_faults > 0 and params.uw_fault_law != "crust" else [])
+    next_id = 1 if faults else 0
 elif params.uw_restart < 0:
     source = os.path.expanduser(params.uw_source)
     for var in (T_b, V_b):
@@ -1126,9 +1245,10 @@ elif params.uw_restart < 0:
     if os.path.exists(os.path.join(source, "records.json")):
         with open(os.path.join(source, "records.json")) as f:
             records = [r for r in json.load(f) if r["step"] <= params.uw_source_index]
-    faults = [{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
-               "depth": float(params.uw_fault_depth)}]
-    next_id = 1
+    faults = ([{"name": "F0", "theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
+                "depth": float(params.uw_fault_depth)}]
+              if params.uw_max_faults > 0 and params.uw_fault_law != "crust" else [])
+    next_id = 1 if faults else 0
 else:
     with open(os.path.join(out, f"state_{params.uw_restart:05d}.json")) as f:
         state = json.load(f)
@@ -1299,6 +1419,12 @@ def needs_rebuild(faults, built):
     if [f["name"] for f in faults] != [f["name"] for f in built]:
         return True
     for f, g in zip(faults, built):
+        if ("points" in f) != ("points" in g):
+            return True
+        if "points" in f:          # a crust-following fault: its polyline moved by more than the rungs
+            if polyline_gap(f["points"], g["points"]) > params.uw_rebuild_rungs * S:
+                return True
+            continue
         if (abs(wrap(f["theta"] - g["theta"])) * r_o > params.uw_rebuild_rungs * S
                 or abs(f["dip"] - g["dip"]) > params.uw_rebuild_dip
                 or abs(f["depth"] - g["depth"]) > 2 * S):
@@ -1449,6 +1575,25 @@ for k in range(k0, k0 + params.uw_steps):
             faults.append(new)
             events.append(f"formed {new['name']} at {np.degrees(new['theta']):.1f} deg (line damage "
                           f"{ln['damage']:.3f}), dip {new['dip']:.1f}, depth {new['depth']:.3f}")
+    elif params.uw_fault_law == "crust" and detect_now and params.uw_max_faults > 0:
+        # one fault following the weak crust on the compositional slab's top, from the
+        # trench down to the depth cap; it forms at the first detection and never retires
+        found = crust_fault_points(faults)
+        if found is None:
+            uw.pprint("  crust fault: no slab top reaching the cap from the surface; the fault keeps its place")
+        else:
+            poly, theta_t, dip, depth = found
+            if faults:
+                f = faults[0]
+                moved = polyline_gap(poly, f["points"])
+                f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth})
+                damage[f["name"]] = float(moved)
+            else:
+                faults.append({"name": f"F{next_id}", "points": poly.tolist(), "theta": theta_t,
+                               "dip": dip, "depth": depth})
+                next_id += 1
+                events.append(f"formed {faults[0]['name']} on the crust at {np.degrees(theta_t):.1f} deg, "
+                              f"dip {dip:.1f}, depth {depth:.3f}, {len(poly)} points")
     elif params.uw_fault_law == "rate" and detect_now:
         # N faults fitted to the strain rate of the lithosphere: each fault takes the line
         # nearest its trench (by bounded steps), an unmatched line forms a fault, a fault
