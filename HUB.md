@@ -90,7 +90,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2, needs underworld3 `feature/box-faults` c1107957 (+371d3bd for the warm starts) | on kaiju; slab production awaits Louis's case list |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2; library `feature/box-faults-warm` 99259d35 (= box-faults c1107957 + 371d3bd + 210c7307) | on kaiju; slab production awaits Louis's case list |
 | Restart / warm-start fixes + solver record | uw3-campaigns `kaiju/annulus-restart-fixes` b0147e1 (on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -352,3 +352,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   kaiju (job 2122): all fields filled. With the library's 210c7307 the F_history / line-search
   fields fill too. Kaiju's A/B and the slab runs use b0147e1 + overlay-diag, so they are
   instrumented from the start. The dev session is on item 3 (solver-mesh + V/P checkpoint).
+- 2026-10-25: pushed underworld3 feature/box-faults-warm 99259d35: the campaign's library lineage
+  (box-faults + the warm-start switch + the rotated-solve diagnostics), so instrumented runs point at
+  a public commit. Kaiju's overlay for it is overlay-warmdiag (overlay-diag lacks box-faults and
+  cannot import the driver). The restart A/B runs: 878b9c2/overlay-warmonly vs b0147e1/overlay-warmdiag,
+  3580 -> 3590 then a 5-step restart.
