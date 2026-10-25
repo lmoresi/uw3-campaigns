@@ -90,8 +90,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2; library `feature/box-faults-warm` 99259d35 (= box-faults c1107957 + 371d3bd + 210c7307) | on kaiju; slab production awaits Louis's case list |
-| Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | uw3-campaigns `kaiju/annulus-restart-fixes` 3345ce7 (8 commits on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 361657f (restart fixes and ffmpeg fallback merged); library `feature/box-faults-warm` 99259d35 | on kaiju; slab production awaits Louis's case list |
+| Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -100,8 +100,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Confirm the laptop's commit (crust fault law, renderer, band view, depth hysteresis) and the merge
-  of kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju; then kaiju runs the faulted set.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
@@ -454,3 +452,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   (wiggly contour: 480-600). Driver, renderer and movie still uncommitted, awaiting Louis's word.
   Slab controls: 5 of 12 done, no KSP-cap hits; layered_mantle is ~16x slower per step (12-13 Newton
   its, T-dependent viscosity) and will reach ~step 90 of 300 at its 12 h wall; default is to let it.
+- 2026-10-25: **Louis: merge what other sessions need.** Merged kaiju/annulus-restart-fixes (4955e80)
+  and kaiju/movie-ffmpeg-fallback into zg95-annulus-for-kaiju; head 361657f, pushed. The laptop is
+  told to commit and push its crust fault law, renderer, movie and hysteresis on top (rebasing on
+  361657f). Kaiju prepares the faulted set (B1 crust 0.1 no fault; B1 crust 0.1 + fault; B1 crust 1
+  + fault; C1 crust 0.1 + fault) from the branch head once the laptop's push lands.
