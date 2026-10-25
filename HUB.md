@@ -128,7 +128,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; the laptop asked to rsync and commit the figures |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
@@ -151,7 +151,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   treats a remote deletion as yours to approve. `git push origin --delete hub-push-test`.
   - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
-- rsync kaiju's figure folders to the laptop (slab_control 5.5 MB, restart_table 249 KB):
+- rsync kaiju's figure folders to the laptop (slab_control 5.5 MB, slab_fault 3.0 MB, restart_table 249 KB):
   `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/ ~/+Simulations/zg95/kaiju_figures/`
   then tell the sessions: the lid-regime session commits slab_control to zg95-annulus-for-kaiju; the notes
   workbench copies restart_table/ into UWTN 2026-022's figures/src/restart_table/.
@@ -630,5 +630,5 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   science**: the crust x1 + fault case rebuilds every ~5 steps and its slip is dominated by the rebuild
   transfer effect (the old jump does not follow the moved fault), so its doubled retreat is not yet a clean
   result; a run with fewer rebuilds (-uw_rebuild_rungs 8) or a transfer that carries the jump is the check.
-  Figures: kaiju figures_out/slab_fault/; the laptop session asked to rsync both folders and commit them to
-  zg95-annulus-for-kaiju for GitHub viewing. layered_mantle to its wall (~05:20) then slab_control is final.
+  Figures: kaiju figures_out/slab_fault/, to GitHub via Louis's rsync and the laptop's commit (the hub does
+  not ask a session to use Louis's ssh access). layered_mantle to its wall (~05:20) then slab_control is final.
