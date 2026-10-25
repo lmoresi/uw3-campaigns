@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 015c1c0 (figures and re-measured numbers c0a998a; hub fixes (b),(h) 015c1c0) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(d),(g); a script for the restart table | 2026-10-25 at 015c1c0: validate 0 warnings, check-style clean, preview build passes (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` b9a678e (figures c0a998a; hub fixes 015c1c0; restart script b9a678e) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); kaiju: trimmed records for the restart table; Louis's items (a),(c),(g) | 2026-10-25 at 015c1c0: validate 0 warnings, check-style clean, preview build passes (wombat) |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -122,13 +122,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 0fb51f9 (crust fault law, renderer, checkpoint-traces fix); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 788f481 (crust fault law, renderer, checkpoint-traces fix, restart_table.py); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju 0fb51f9 | 2190 (no fault) running since 2026-10-25 22:02; 2187-2189 died at step 0 on the checkpoint-traces bug, fixed in 0fb51f9, relaunch requested; np 16, overlay-warmdiag 99259d35, 12 h wall; run dirs `runs/slab_fault_<case>/` |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/kaiju-launch/slab_fault/`, driver zg95-annulus-for-kaiju 0fb51f9 | 2190 (no fault, n6) running since 2026-10-25 22:02; relaunched on 0fb51f9: 2192 B1_crust0.1_fault (n7), 2193 B1_crust1_fault (n8), 2194 C1_crust0.1_fault (n3); failed dd8efcb dirs kept as runs/slab_fault_<case>_failed_dd8efcb; np 16, overlay-warmdiag 99259d35, 12 h wall; run dirs `runs/slab_fault_<case>/` |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -573,3 +573,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   by the hub as **0fb51f9**; relaunch of the three cases requested; 2190 (no fault) unaffected. The laptop
   is informed. Kaiju also asked for zg95_lid_regimes/analysis/restart_table.py, the script behind the
   2026-022 restart table.
+- 2026-10-25: faulted set relaunched on kaiju (2192-2194 on 0fb51f9). Kaiju wrote
+  zg95_lid_regimes/analysis/restart_table.py (regenerates RESTART_AND_RECORDS §5's table from the six run
+  records, with provenance; output matches: 36/783, 17/387, 4/103 against uninterrupted 4/95, 4/94, 4/101;
+  vrms within 4.1e-4, events identical for the two warm designs); hub pushed it as 788f481 and put the script
+  into UWTN 2026-022's figures/src/ (b9a678e). Provenance caveat: the i3 pair's run_info.json driver_commit
+  is stale (a worktree HEAD); the note cites the run paths. Trimmed records (steps 3580-3600) requested from
+  kaiju to ship with the note.
