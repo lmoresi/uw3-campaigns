@@ -100,8 +100,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Choose the slab production cases for kaiju (B1, B2, C1 with the overriding plate, the slab_kaiju
-  scan); they run on driver 460e49d + feature/box-faults-warm, instrumented.
+- Say go for the fault-free control set on kaiju (B1, B2, C1 + the nine-run scan, 300 steps), or
+  wait for the faulted driver.
 - Confirm the laptop's commit (renderer, band view, depth hysteresis) and the merge of
   kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
@@ -413,3 +413,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   dip 60; crust_weak 0.01; overriding plate at over_gap 0.3 and at over_eta 1000; and one run with
   the mantle structure back (deta, buoy_T 1, asth 0.1). 200-300 steps each. The stage-3 fault at
   the plate contact waits on Louis's law/placement choice.
+- 2026-10-25: **Louis: add faults to the slab runs, following the weak crust layer.** The laptop
+  designs and implements the crust-following fault (geometry from the crust marker contour, law
+  and crust-weakening choice to be proposed, the overriding-plate contact). Kaiju prepares, without
+  launching, the fault-free control set at 300 steps: B1, B2, C1 and the nine-run compositional
+  scan (twelve runs, two waves). trench_retreat.png is on the branch at 347b947.
