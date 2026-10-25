@@ -122,7 +122,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 788f481 (crust fault law, renderer, checkpoint-traces fix, restart_table.py); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 52275dc (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -655,3 +655,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   table from figures/src/ exactly, first-step vrms 3.4e-15, later steps 4.1e-4); the hub added the later-step
   agreement clause (24ae608). The lid-regime session is asked to commit slab_control and slab_fault to
   zg95-annulus-for-kaiju for GitHub links.
+- 2026-10-26: the laptop committed kaiju's slab_control and slab_fault folders to zg95-annulus-for-kaiju
+  (52275dc, 138 files, under zg95_lid_regimes/figures/kaiju/). Links:
+  https://github.com/lmoresi/uw3-campaigns/blob/zg95-annulus-for-kaiju/zg95_lid_regimes/figures/kaiju/slab_control/trench_retreat.png
+  https://github.com/lmoresi/uw3-campaigns/blob/zg95-annulus-for-kaiju/zg95_lid_regimes/figures/kaiju/slab_fault/trench_retreat.png
+  and the READMEs beside them. Movies follow the same route when kaiju has them.
