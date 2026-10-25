@@ -91,7 +91,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
 | Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2; library `feature/box-faults-warm` 99259d35 (= box-faults c1107957 + 371d3bd + 210c7307) | on kaiju; slab production awaits Louis's case list |
-| Restart / warm-start fixes + solver record | uw3-campaigns `kaiju/annulus-restart-fixes` b0147e1 (on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
+| Restart / warm-start fixes + solver record + faulted-mesh checkpoint | uw3-campaigns `kaiju/annulus-restart-fixes` 460e49d (on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -365,3 +365,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   35.245, vrms 1.2e-3). Kaiju recommends merging b0147e1 into zg95-annulus-for-kaiju; an uninterrupted
   3580->3595 check (job 2148) confirms restart == uninterrupted on the new driver. Figure:
   `runs/ab_restart_compare/solver_record_ab.png` on kaiju.
+- 2026-10-25: pushed 460e49d (item 3 + analysis fixes): each checkpoint writes the solver's faulted
+  mesh (annulus.solver_mesh.NNNNN.h5) and its V, P; a restart rebuilds the mesh and seeds the DOFs
+  by position (exact match at np 16 and np 8), so the first step is an ordinary warm step: 4 its,
+  3e-15 from the uninterrupted run at step 3591 (was 17 warm from V_b, 33-36 cold). A missing
+  checkpoint file fails loudly. Known residual: a 4e-4 drift from 3592 on, from projection and
+  advection solver states that start from zero after a restart; a fix (edot_plastic on the faulted
+  mesh + solver `.state` restore) is in test. solver_record.py marks restarts in old records, plots
+  trench shift rather than absolute angle, labels empty panels. Kaiju adds a 460e49d row to the A/B.
