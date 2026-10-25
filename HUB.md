@@ -446,3 +446,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   Library bug found on kaiju (worked around): visualisation.initialise() catches only RuntimeError
   when setting the trame backend, so headless pyvista without trame raises ImportError and every
   render crashes. Fix handed to hyperion (bugfix/visualisation-headless-no-trame).
+- 2026-10-25: Louis (in the laptop session) chose a PARABOLA for the crust fault: fitted to the slab
+  marker's 0.5 contour below depth 0.012, used as the fault from 0.02 above the wall to the 0.15 cap,
+  the placement handling the surface as before (cut stops three rungs inside the wall, top in the
+  ribbon's TI zone). Smoke (4 ranks, B1 from step 60, crust x0.1, 7 steps): cold build 6 linear
+  its then 3-5; slip 734-849 against plate 800-970, so the fault carries nearly all the decoupling
+  (wiggly contour: 480-600). Driver, renderer and movie still uncommitted, awaiting Louis's word.
+  Slab controls: 5 of 12 done, no KSP-cap hits; layered_mantle is ~16x slower per step (12-13 Newton
+  its, T-dependent viscosity) and will reach ~step 90 of 300 at its 12 h wall; default is to let it.
