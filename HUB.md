@@ -667,3 +667,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   10-step checkpoints (layered_mantle 13), ~6 s at 5 fps; the 10-step cadence is coarser than the ~5-step
   rebuild interval, so the fault jumps between frames. Test job 2202 (B1_crust1_fault), then the other 15.
   Output figures_out/slab_movies/ with README and contact sheet; Louis's rsync brings them over.
+- 2026-10-26: **whole-annulus movies done** (kaiju): 16 mp4s in figures_out/slab_movies/ (25 MB; 1.4-1.8 MB each,
+  layered_mantle 0.6), render f46eaa3 with -uw_panels strain -uw_zoom 0 -uw_trace_width 6, left two panels at
+  native 1600x860, h264 5 fps, 31 frames per run (layered_mantle 13); README with the table and
+  contact_sheet.png (first and last frame per run, 2200x2008). Frame 0 of a faulted run has no trace (the
+  fault is built at the first rebuild after step 0); at step 150 the 6 px trace reads as a short red/white
+  stub at the trench. One movie (fault_B1_crust1_fault) viewable in the browser:
+  https://claude.ai/artifact/DJctapP4niLphKaazzJeK9. Louis's rsync brings the folder to the laptop; the
+  lid-regime session then commits it beside the figure folders.
