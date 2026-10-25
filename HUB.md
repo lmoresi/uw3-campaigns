@@ -128,7 +128,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
-| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju, driver zg95-annulus-for-kaiju 0fb51f9, run dirs `runs/slab_fault_<case>/` | B1_crust0.1_nofault, B1_crust0.1_fault and B1_crust1_fault COMPLETE (0-299; the faulted ones as restart segments, every segment restored at match distance 0, records continuous); C1 segment 171-270 running, then 270-299 |
+| Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; the laptop asked to rsync and commit the figures |
 | Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
@@ -618,3 +618,17 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   one faulted mesh's footprint at np 16, so each rebuild looks to retain the previous child or its PETSc
   objects in full. Between rebuilds 40-135 MB/node/step, present without a fault too. Passed to hyperion.
   Segment totals agree (~20 GB base + 7 GB per mesh). Three of the four slab cases are complete to step 299.
+- 2026-10-26: **slab faulted set complete** (kaiju, 0fb51f9, overlay-warmdiag, np 16; 300 steps each, Newton 1
+  per step throughout, velocity its build 6-7 / rebuild 4-6 / ordinary 2-5, 26-28 s/step, 2.2-2.4 h per run).
+  Segments: B1_crust0.1_fault 2192+2197+2198, B1_crust1_fault 2193+2195+2200, C1_crust0.1_fault
+  2194+2199+2201, nofault 2190 alone. Readings (trench retreat in layer depths): crust x0.1 no fault 0.62 d by
+  t 0.0032; crust x0.1 + fault IDENTICAL trench history to its no-fault twin (fault forms at step 0, tracks
+  the trench through 27 rebuilds, slips heavily, median 484, yet adds nothing at plate scale: with a weak
+  crust the fault is redundant); crust x1 + fault (no weak crust) DOUBLES the retreat, 1.16 d by t 0.0046, 29
+  deg of trench motion, slab flattens to 53 deg, 47 rebuilds, slip falls from 434 to a steady 15-50 as each
+  rebuild halves it; C1 + crust x0.1 + fault 0.76 d by t 0.0053 against 0.56 d without. **Caveat for the
+  science**: the crust x1 + fault case rebuilds every ~5 steps and its slip is dominated by the rebuild
+  transfer effect (the old jump does not follow the moved fault), so its doubled retreat is not yet a clean
+  result; a run with fewer rebuilds (-uw_rebuild_rungs 8) or a transfer that carries the jump is the check.
+  Figures: kaiju figures_out/slab_fault/; the laptop session asked to rsync both folders and commit them to
+  zg95-annulus-for-kaiju for GitHub viewing. layered_mantle to its wall (~05:20) then slab_control is final.
