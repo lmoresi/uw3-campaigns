@@ -100,8 +100,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Confirm the laptop's commit (renderer, band view, depth hysteresis) and the merge of
-  kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju.
+- Confirm the laptop's commit (crust fault law, renderer, band view, depth hysteresis) and the merge
+  of kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju; then kaiju runs the faulted set.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
 - Approve commands in the new kaiju dev session.
 - Choose the first kaiju sweep (the laptop session recommends tau1/Ra 2.5-3 at Ra x3, from 3570/3580).
@@ -432,3 +432,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   assembles `~/campaigns/zg95/figures_out/slab_control/` (< 15 MB) for Louis to rsync to the laptop,
   which commits it so the renders reach him as GitHub links. The layered-mantle run keeps both
   compositional and thermal buoyancy.
+- 2026-10-25: **stage-3 "crust" fault law built and smoke-tested on the laptop (uncommitted, awaiting
+  Louis).** Correction to the design: the fault polyline is the SLAB marker's 0.5 contour (its top,
+  where the crust rides), since the one-cell crust picture is too smeared to chain; the law needs
+  the compositional slab. Smoke (4 ranks from checkpoint 60, crust_weak 0.1, cap 0.15, 12 steps):
+  B1 formed F0 at step 61, cold build 6 velocity its, **same-set warm rebuild at 72 = 4 its, an
+  ordinary step's count**; C1 similar (5 its). Newton 1 every step. Production flags on BASE:
+  `-uw_fault_law crust -uw_max_faults 1 -uw_fault_depth_max 0.15 -uw_crust_weak 0.1
+  -uw_detect_start 0 -uw_detect_every 5` (+ `-uw_rebuild_rungs 8` for fewer rebuilds). Comparison
+  set: B1 / crust 0.1 no fault / crust 0.1 + fault / crust 1 + fault.
