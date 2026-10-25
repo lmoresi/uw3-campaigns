@@ -106,8 +106,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
-| UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` d93b855 | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 36e15f7 (hub draft a43535f + wombat fixes) | draft | hub (prose), hyperion (figures), wombat (checks) | 3 figures (hyperion: stack, iterations, moving-fault); Louis's judgement items (a)-(g) | 2026-10-25 validate OK, check-style clean, preview fails only on the missing PNGs |
+| UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 015c1c0 (figures and re-measured numbers c0a998a; hub fixes (b),(h) 015c1c0) | draft, figures in | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(d),(g); a script for the restart table | 2026-10-25 validate OK, check-style clean, preview build passes (PDF and HTML) at c0a998a |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -139,12 +139,15 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
     quoted, the 72/38/30 read as "before" and left out: correct? (4) software_version moves to a
     development sha on merge.
   - 2026-022: (a) three "route" passages (the weights-of-five/NaN clamp story, the nearest-node repair,
-    the zero pivot under rotated walls): keep as motivation or cut to rule plus reason? (b) the
-    "(UWTN 2026-017 describes the fault laws)" link is wrong, 017 is conceptual: reword or drop;
+    the zero pivot under rotated walls): keep as motivation or cut to rule plus reason?
     (c) `stokes._rotated_freeslip_info` is a private attribute in a published note; (d) the restart
-    table needs a script (kaiju annulus runs); (e) software_version 0.0.0 until the figures are re-run;
-    (f) link 018 from the parallel paragraph once 018 is published; (g) check iterations.png alt text
-    against the made figure.
+    table needs a script (kaiju annulus runs); (f) link 018 from the parallel paragraph once 018 is
+    published; (g) check iterations.png alt text against the made figure (wombat rewrote it from the
+    figure; a look by Louis closes it). Done by the hub: (b) the 017 link reworded, (h) the
+    hierarchy sentence limited to what the figure measures; (e) software_version pinned by wombat.
+- Delete the empty branch `hub-push-test` on Underworld-Technical-Notes/underworldcode.org (points at
+  36e15f7, already in note/faults-on-an-add-on-mesh): the hub's proxy refuses ref deletions and wombat
+  treats a remote deletion as yours to approve. `git push origin --delete hub-push-test`.
   - The wombat workbench tool (`scripts/note.py`, `pixi run note sync`) awaits your go-ahead.
 - Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
 - rsync the slab controls to the laptop: `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/slab_control/ ~/+Simulations/zg95/kaiju_figures/slab_control/`, then the laptop commits them to zg95-annulus-for-kaiju.
@@ -552,3 +555,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: Louis installed the Claude GitHub App on Underworld-Technical-Notes; the hub pushes note
   branches directly from its clone (`/home/user/underworld-technical-notes/underworldcode.org`, now tracking
   origin's note/faults-on-an-add-on-mesh at 36e15f7). relay/ retired.
+- 2026-10-25: **2026-022 has its figures.** Hyperion made stack.png, iterations.png and moving-fault.png at
+  library e135429f (feature/coarse-solve-nullspace, scripts/sessions/fault_mg/uwtn_2026_022/ with a README of
+  every number) and re-measured the draft's claims: split 5/5/4 against welded 8/13/18 at tolerance 1e-6
+  (the draft's 6/5/4 vs 13/18/23 was the 13 Oct state; the welded tail improved), viscous k=3 5 vs 12,
+  moving-fault steps at np 8 0.3-0.6 / 0.75-0.9 / 4.5-4.8 s (serial 0.8-1.4 / 1.1-1.2 / 6.0-6.5 s), the
+  junction replay stops for a side-assignment reason not the ligament closing, the 3-D two-level sheet
+  now places but keeps no split coarse level. Wombat copied figures and records into the note and rewrote
+  the affected text to match (c0a998a); the hub fixed the hierarchy sentence and the 017 link (015c1c0).
+  2026-018 (da848fa) uses the same serial numbers. The restart table still needs a script (kaiju).
