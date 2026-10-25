@@ -91,7 +91,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
 | Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 878b9c2; library `feature/box-faults-warm` 99259d35 (= box-faults c1107957 + 371d3bd + 210c7307) | on kaiju; slab production awaits Louis's case list |
-| Restart / warm-start fixes + solver record + faulted-mesh checkpoint | uw3-campaigns `kaiju/annulus-restart-fixes` 460e49d (on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
+| Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | uw3-campaigns `kaiju/annulus-restart-fixes` 3345ce7 (8 commits on 878b9c2) | validated on kaiju; per-step record["solver"], run_info.json, analysis/solver_record.py; merge into the campaign branch is Louis's call |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -403,3 +403,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   cached Ahat, gauge datum, continuation state). Restart stands at: exact first step, identical
   events, drift <= 4.1e-4 against uw_tol 1e-3. The dev session writes RESTART_AND_RECORDS.md and is
   then free.
+- 2026-10-25: pushed RESTART_AND_RECORDS.md (3345ce7): the checkpoint set, the restart order and
+  fallbacks, every record["solver"] field, run_info.json, solver_record.py usage, and the measured
+  restart numbers. kaiju/annulus-restart-fixes is complete (8 commits); the dev session is free.
