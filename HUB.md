@@ -94,10 +94,18 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
+| Technical note UWTN 2026-022 "Faults on an add-on mesh" (M3/F3 settled: this is the serial method) | Underworld-Technical-Notes/underworldcode.org `note/faults-on-an-add-on-mesh` 948bb02 (local to the hub; push refused, see Waiting on Louis) | first draft written 2026-10-25; three figures declared, to be made on hyperion |
+| Technical note UWTN 2026-018 "Faults in parallel" revision | `note/faults-in-parallel` 168ad65 | brief sent to the wombat notes-workbench session (session_011S876ckjYqqth1aPyojrhh) 2026-10-25; it also owes the hub a notes-workflow proposal |
+| Adjoint notes UWTN 2026-020 / 2026-021 | PR #59 (green, awaiting Louis's merge) / `note/discrete-adjoint` 87fbcb1 (held until the viscosity-floor example has a result) | wombat session session_018wSha1nV5DddcThnCRoFab |
+| Slab control set (11 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.5 MB, README with the table) | done; layered_mantle runs to its 12 h wall (~step 50, t 0.005) and is added after |
+| Slab faulted set | kaiju `~/campaigns/kaiju-launch/slab_fault/` | waits for the laptop's slab_fault figure hash on e009873 |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
 
+- Install the Claude GitHub App for the Underworld-Technical-Notes organisation (https://github.com/apps/claude/installations/select_target), so the hub can push note branches; until then the hub hands patches to the wombat notes session.
+- Regenerate PREVIEW_TOKEN in Underworld-Technical-Notes/underworldcode.org (rejected since after 2 Oct; every PR preview fails, production deploy unaffected). Merge PR #59 (UWTN 2026-020) when ready.
+- rsync the slab controls to the laptop: `rsync -av louis@kaiju.anu.edu.au:campaigns/zg95/figures_out/slab_control/ ~/+Simulations/zg95/kaiju_figures/slab_control/`, then the laptop commits them to zg95-annulus-for-kaiju.
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
@@ -457,3 +465,28 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   told to commit and push its crust fault law, renderer, movie and hysteresis on top (rebasing on
   361657f). Kaiju prepares the faulted set (B1 crust 0.1 no fault; B1 crust 0.1 + fault; B1 crust 1
   + fault; C1 crust 0.1 + fault) from the branch head once the laptop's push lands.
+- 2026-10-25: the laptop pushed zg95-annulus-for-kaiju e009873 (3463bbd crust fault law, parabola fitted to
+  the slab top and run to the surface, "points" rebuild rule; e009873 solver panels, iteration strip, band
+  view, movie layout) on 361657f, on Louis's word in that session. slab_fault figures are being
+  regenerated (B1 and C1 from step 60, 4 ranks, crust x0.1); the hash goes to kaiju for the faulted set.
+- 2026-10-25: **kaiju slab controls done, 11 of 12**: 300 steps each, exit 0, no KSP-cap hits, Newton 1 per
+  step, 24-38 s/step (B2 79), 2-3.2 h each (B2 6.6 h), ~27-30 GB per node. Readings (trench shift in layer
+  depths): B1 reaches the stage-A target 0.175 d at t 0.0004 and 0.56 d by 0.0022; B2 (x1000) 4.7x slower to
+  the target but furthest (0.80 d by 0.0070); an overriding plate halves the rate (C1), over1000 nearly
+  suppresses it (peak 0.23 d, then the trench advances); comp_eta_30 fastest start then stalls at 0.41 d;
+  slab_0.2 most retreat (0.95 d), slab_0.5 least (0.35 d); dip_60 and crust_weak_0.01 indistinguishable from
+  B1. layered_mantle is very uneven (step 16: 4 Newton its, 192 s; step 17: 26 its, 1604 s; ~840 s/step mean)
+  and stops at its wall near step 50, t 0.005; its 26-iteration step is to be read from the solver record.
+  Folder `~/campaigns/zg95/figures_out/slab_control/` (README table, trench_retreat.png, per-case frames,
+  solver_record.jpg, solver_summary.csv, slab_metrics.json).
+- 2026-10-25: **Louis: wrap up with the technical note for the add-on-top fault approach**; the FMG/parallel
+  draft to be revised by the wombat notes session. Decision on WRITING-PLAN's M3/F3 overlap: UWTN 2026-022
+  "Faults on an add-on mesh" (new, hub) is the serial method (static base, ephemeral child, split add-on
+  levels, moving fault, warm start and restart, limits); UWTN 2026-018 "Faults in parallel" (draft of 8 Sep,
+  branch note/faults-in-parallel) is the parallel half and needs re-centring on the October partition-once
+  design (the split no longer cuts through the seam; the conform mode stays for the band). F3 is absorbed by
+  the two. The hub allocated 2026-022 with scripts/new_article.py after fetching all branches, wrote the
+  first draft (commit 948bb02, local), and briefed the wombat notes-workbench session on the 2026-018
+  revision and on a written workflow proposal (branch ownership, hyperion figures into examples/, who runs
+  pixi validate/build). The hub cannot push to that organisation (Claude GitHub App not installed there):
+  the draft goes to the wombat session as a patch.
