@@ -586,3 +586,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-25: kaiju prepared `~/campaigns/zg95/figures_out/restart_table/` (249 KB): the six runs' records
   trimmed to steps 3580-3600, run_info.json or PROVENANCE.txt per run, README; restart_table.py run from that
   directory reproduces the table exactly. It reaches the note through Louis's rsync and the wombat workbench.
+- 2026-10-26: **faulted set healthy at step 10** (kaiju, 0fb51f9, np 16). In every faulted run F0 forms at step 0
+  on the crust (dip 46-49, depth 0.149-0.150, 61 points), is built at step 1 (changed-set rebuild, warm: 1
+  nonlinear it, 6-7 velocity its, build 11-12 s, Stokes 20-28 s), and the step-5 detection steepens the dip
+  (46->57, 48->61, 49->58) so a same-set rebuild follows at step 6 (1 / 4-6 its, Stokes 18-23 s). Ordinary
+  steps 2-5 velocity its, Stokes 10-17 s; all Newton-converged in 1 nonlinear iteration. Within 1-2 its of
+  the laptop smoke at np 4. Two observations for Louis: (1) slip_max halves at each same-set rebuild
+  (608->302, 404->166, 440->196) and recovers over about 4 steps: the transferred velocity's jump does not
+  follow the moved fault, costing no iterations but visible in slip, so the slip record carries a rebuild
+  artefact; (2) |F0|/F_ref is 1.0 on every step, warm starts included: with -uw_dt_mult 20 the fields move
+  enough per step that the previous solution is no closer than rest, so the warm start buys nothing in this
+  recipe (and need not, at 1 nonlinear iteration). layered_mantle runs to its wall (~05:20).
