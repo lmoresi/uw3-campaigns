@@ -606,3 +606,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   segments (fresh process each; the faulted-mesh checkpoint restores at match distance 0 and the same rebuild
   follows): 2195 from 130, 2197 from 140, C1 to be restarted near 200; records continuous. For the 2026-022
   note: if the leak is not fixed before publication, it is a limit to state in "What it costs".
+- 2026-10-26: leak, interim (kaiju): the particle count is flat (380928 in every checkpoint, faulted or not).
+  On a fresh process a rebuild costs ~0.02 GB/rank and the process sits at the fault-free 1.2-1.5 GB/rank; the
+  0.4 GB/rank figure was the average over a 140-step, 21-rebuild process. The growth compounds over a
+  process's life (per-step on the faulted path, or per-rebuild growing with the meshes retained). Kaiju fits
+  node RSS against step and n_built on four live runs for 90 min; hyperion told to shape its fixture run
+  for that distinction.
