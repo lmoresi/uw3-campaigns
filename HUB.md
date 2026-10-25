@@ -100,8 +100,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 - Make uw3-campaigns public (agreed), so kaiju can clone it.
 - rsync the laptop's checkpoint-3910 set to kaiju `~/campaigns/zg95/runs/ra3x_tau1x1.50_lines_laptop_3910/`.
-- Say go for the fault-free control set on kaiju (B1, B2, C1 + the nine-run scan, 300 steps), or
-  wait for the faulted driver.
 - Confirm the laptop's commit (renderer, band view, depth hysteresis) and the merge of
   kaiju/annulus-restart-fixes into zg95-annulus-for-kaiju.
 - rsync kaiju:campaigns/zg95/samples/i3_sample/ to the laptop's ~/+Simulations/zg95/kaiju_samples/i3_sample/.
@@ -428,3 +426,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   decoupling). Test: B1 (crust 0.001, no fault) vs crust 0.1 no fault vs crust 0.1 + fault, plus
   crust_weak 1 (passive marker). Overriding plate: no special case; the rule covers its contact.
   Records and band view unchanged. Smoke test: 4 ranks from B1/C1 checkpoint 60.
+- 2026-10-25: **Louis: run the cases.** Kaiju launched the twelve-run fault-free control set (B1, B2,
+  C1 + the nine-run compositional scan; 300 steps, np 16, driver 460e49d, instrumented; 7 then 5
+  runs, ~5.5 h). On completion kaiju renders each run, runs slab_metrics and solver_record, and
+  assembles `~/campaigns/zg95/figures_out/slab_control/` (< 15 MB) for Louis to rsync to the laptop,
+  which commits it so the renders reach him as GitHub links. The layered-mantle run keeps both
+  compositional and thermal buoyancy.
