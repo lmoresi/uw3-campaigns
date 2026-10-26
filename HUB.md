@@ -142,13 +142,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   swarm would be a driver-level change after the fault law, only if Louis wants the physics stated that way.
 - Thermal runs: Louis ruled 2026-10-26 "a manageable difference, I would not try to change this": no Picard
   warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
-  **Style question for Louis (step 50):** the thermal slab sinks vertically and conveys the plate in (v_plate
-  1800-2350, ~10x B1) rather than rolling back; hinge retreat per model time is like B1's but a small share of
-  the motion. If B1-like rollback is wanted, the candidates kaiju names: the plate's strength profile (thermal:
-  graded, stiff core over a weak lower part; compositional: uniform x100 over the 0.1 layer; TB's deta 1e4
-  helped only slightly), and the thermal mantle convecting around the slab (vrms 700-850 vs 330). The crust
-  decoupling is NOT a candidate: B1 also runs crust x0.001. Nothing changed; runs continue to the wall then
-  restart as is.
+  Style, ruled 2026-10-26: "We want it to drive the plate, not worried about rollback per se." The thermal
+  slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target. The one
+  watch item before faults: the crust layer breaks into blobs down the slab top, and the crust-base fit was
+  tested on a continuous layer; smoke the fit at np 4 from a thermal checkpoint before any faulted 300-step run.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -823,3 +820,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   TB 8-17, 340-640 s; TA_age25 5-12, 170-460 s; pressure its down to 32-42, velocity 7-10; yielded fraction
   unchanged; dt ~3.4e-6; the wall ends near step 110-120 (t ~0.0005). Renders in
   figures_work/slab_control/thermal_*/ (steps 0-50 every 10).
+- 2026-10-26: Louis: the thermal slab should drive the plate; rollback is not the target. Thermal runs continue
+  unchanged; kaiju leads its reports with plate velocity, descent and the solver record. Watch item: the crust
+  blobs against the crust-base fault fit, to be smoked before a faulted thermal run.
