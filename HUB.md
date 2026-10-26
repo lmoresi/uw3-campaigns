@@ -122,7 +122,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` d0dca11 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` c147c9d (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -768,3 +768,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   dominate; mantle turning over beside the slab, vrms 370-440. Solver steps 11-20 as 1-10 (4-13 Newton its,
   F0/F_ref 0.55-0.8, pres 40-59, vel 7-10, 160-580 s). Renders in figures_work/slab_control/thermal_*/. Step 50
   in ~3 h.
+- 2026-10-26: kaiju's -uw_addon_timing measurement mode pushed as c147c9d (addon_timing.py wraps library calls
+  from the driver with an exclusive-time clock; off by default; a restart with -uw_addon_timing N forces N
+  rebuilds and writes addon_timing.json). Deviation recorded: the module uses mpi4py directly for its
+  allgather/Allreduce; acceptable in a measurement-only module, to be replaced if the library offers a helper.
