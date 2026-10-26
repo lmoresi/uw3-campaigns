@@ -724,3 +724,16 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   step 0 and the initial slab is 0.35 long, so the crust base is already below the 0.15 cap: the fault gate is
   met from the start and a faulted thermal run can begin from step 0 or any checkpoint. Kaiju reports deepest
   crust particle, T-based tip, Newton its, hinge rate at steps 10-50. kaiju-fault-drivers pinned at d0dca11.
+- 2026-10-26: TA_Pe3 cancelled (Louis). **Why the thermal runs are slow** (kaiju, from record["solver"], steps
+  0-10; script kaiju-launch/slab_thermal/solver_table.py): both, mostly the nonlinear part, and the new
+  ingredient is YIELDING, not bigger jumps. B1's plate never yields (yield_frac 0), so B1 is effectively linear
+  Stokes; the thermal plate yields over 1.5 % of the domain, 3.7 % of the lid. Linear: 3.2x B1 per Newton
+  iteration (51-57 s vs 17 s), all of it in the pressure Schur solve with the 1/mu-mass preconditioner (pres its
+  44-60 mean / 54-72 max vs B1 21-23; velocity FMG 6-8 mean vs 4-6, fine). Nonlinear: 3-14 Newton its per
+  step vs 1 (~7x, dominant): warm steps go straight to damped Newton (picard 0), F0/F_ref 0.7-1.0, 2-7
+  cutbacks, alphas 0.5/0.25, F falls to 0.3 F0 then stalls at 0.1-0.4 F0 for 3-6 its before quadratic
+  convergence; TA step 8: 11 its, 6 cutbacks, 567 s. Step 0 (cold, 3 Picard + 1 Newton) converged in 4 its
+  with no cutbacks in every run: direct evidence for -uw_warm_newton_switch 1e-2 at the restarts. Stokes is
+  96-98 % of the step. Realised log10 eta (P1 field, a lower bound on the one-cell crust): B1 spans 3.1 decades
+  (-0.6 to 2.5), thermal 4.1-4.7 (TA -0.4 to 4.2, TB 0.0 to 4.7), max falling by step 10 as yielding caps the
+  cold surface. B1's true kaiju numbers are vel 5-6 / pres 21-23, not the 3-5 / 12-14 quoted earlier.
