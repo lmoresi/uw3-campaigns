@@ -139,12 +139,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   which thermal cases take a fault, and when** (a fault forms only once the slab has reached the cap depth 0.15;
   the FAULT flags are unchanged). The swarm stays pervasive (5 % of a faulted step); a crust-only repopulated
   swarm would be a driver-level change after the fault law, only if Louis wants the physics stated that way.
-- Thermal runs are slow: 5-12 Newton its and 175-570 s/step (B1: 1 it, 30 s), dt halved by ~2x faster flow, so
-  the 12 h wall reaches step ~90-100, t ~0.0005 (B1's retreat needed t 0.002). Kaiju continues by restart. Decide:
-  (a) a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2) for the thermal recipe, applied at the
-  next restart (the same crawl as layered_mantle's: warm steps start at F0 = F_ref). TA_Pe3: Louis said cancel
-  (2026-10-26), passed to kaiju. Louis asks whether the slowness is the nonlinear problem or the linear solves
-  too (viscosity jumps); kaiju answers from the solver records.
+- Thermal runs: Louis ruled 2026-10-26 "a manageable difference, I would not try to change this": no Picard
+  warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -737,3 +733,5 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   96-98 % of the step. Realised log10 eta (P1 field, a lower bound on the one-cell crust): B1 spans 3.1 decades
   (-0.6 to 2.5), thermal 4.1-4.7 (TA -0.4 to 4.2, TB 0.0 to 4.7), max falling by step 10 as yielding caps the
   cold surface. B1's true kaiju numbers are vel 5-6 / pres 21-23, not the 3-5 / 12-14 quoted earlier.
+- 2026-10-26: Louis: the thermal runs' cost is manageable; no recipe change. Kaiju continues TA, TB, TA_age25 by
+  restart with the flags as launched.
