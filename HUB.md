@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 24ae608 (figures c0a998a; restart script b9a678e; restart records b9662c3; drift clause 24ae608) | draft, complete but for hyperion's (i),(j) and Louis's items | hub (prose), hyperion (figure records), wombat (checks) | hyperion: shipped records for fig_iterations (i), global peak slip at np 8 (j); Louis's items (a),(c),(g) | 2026-10-26 at 24ae608: validate 0 warnings, check-style clean, preview build passes; the 4e-4 clause verified against the shipped records, uw_tol 0.001 recorded for the saved-child pair (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` ebb5a76 (figures c0a998a; restart table b9a678e/b9662c3; trench demonstration ebb5a76) | draft; trench section added, two figures pending from kaiju | hub (prose), hyperion (figure records), wombat (checks) | kaiju: trench-mesh.png, trench-cost.png, per-rank load, rebuild cost breakdown, records (figures_out/addon_demo/); hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 24ae608: validate 0 warnings, check-style clean, preview build passes; the 4e-4 clause verified against the shipped records, uw_tol 0.001 recorded for the saved-child pair (wombat) |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -735,3 +735,13 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   cold surface. B1's true kaiju numbers are vel 5-6 / pres 21-23, not the 3-5 / 12-14 quoted earlier.
 - 2026-10-26: Louis: the thermal runs' cost is manageable; no recipe change. Kaiju continues TA, TB, TA_age25 by
   restart with the flags as launched.
+- 2026-10-26: **Louis (via the notes session): the kaiju slab runs go into UWTN 2026-022 as the moving-fault
+  demonstration**, the discussion on partitioning and solver efficiency; 2026-022 now precedes 2026-021 in the
+  writing order. Hub drafted the section (ebb5a76): the crust-base fault following a retreating trench, four
+  300-step runs at np 16 (a split step costs an unfaulted step; 27 rebuilds cost 7 % of the run, 47 cost
+  27 %; 1 Newton it per step; no cap hits), the fit's sensitivity, two figures declared; the rebuild leak stated
+  as a defect in "What it costs". Kaiju asked for: the add-on mesh at four steps of the 47-rebuild run from the
+  solver_mesh checkpoints; wall per step by phase plus cells per process at each rebuild (recorded or
+  re-measured at np 16); a per-rebuild cost breakdown (refine / conform+split / partition / solver setup /
+  first solve, one instrumented rebuild if needed); records.json and solver_summary.csv for the five runs; all to
+  figures_out/addon_demo/ for Louis's rsync and the notes session's copy.
