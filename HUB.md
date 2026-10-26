@@ -122,7 +122,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` f46eaa3 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` d0dca11 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -135,15 +135,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 ## Waiting on Louis
 
-- Thermal slab + faults: RULED 2026-10-26 (Louis): keep the crust compositional marker in the thermal recipe (a
-  thin layer populated/repopulated into the upper elements and entrained by the slab, not a pervasive material
-  swarm); the fault trace is the BASE of that layer (Sandiford & Moresi 2019). The laptop changes
-  crust_fault_points and the guard (crust marker present, no slab marker), smoke-tests a formation on a
-  checkpoint step, patch via the hub. Kaiju confirms the thermal runs keep the crust marker and its x0.001
-  weakening (one cell, 0.0156 d thick, fading below depth 0.5; crust_on is independent of the slab marker), so
-  they can take the fault later; the swarm is still the pervasive one (380928 particles carrying a 0/1 crust
-  marker); slimming it to a repopulated upper-element swarm is Louis's suggestion on efficiency grounds, not a
-  requirement (confirmed 2026-10-26). No thermal faulted set before the fault-law change lands.
+- Thermal slab + faults: the crust-base fault law is in (d0dca11, laptop); kaiju has it pinned. **Decision needed:
+  which thermal cases take a fault, and when** (a fault forms only once the slab has reached the cap depth 0.15;
+  the FAULT flags are unchanged). The swarm stays pervasive (5 % of a faulted step); a crust-only repopulated
+  swarm would be a driver-level change after the fault law, only if Louis wants the physics stated that way.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -705,3 +700,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   Frank-Kamenetskii deta 4e3 (TB 1e4), Ra and tau scaled by deta^0.25 (interior Ra 3e6, TA_Pe3 9e6), plate age
   0.0035 (TA_age25 0.0025), hot top kept. The swarm is still pervasive; the crust-only repopulated swarm Louis
   described is a separate change.
+- 2026-10-26: **crust-base fault law** (laptop, d0dca11 on zg95-annulus-for-kaiju). With the crust marker on, the
+  trace is the BASE of the crust layer from the crust particles (subducted ones gathered to every rank,
+  clustered by theta, the cluster nearest the trench, or the deepest for a new fault so stripped blobs cannot
+  seed one; a parabola in the cluster's principal frame offset to its lower envelope, 9 in 10 particles above).
+  Without a crust marker the slab-marker contour remains (B1_crust1_fault still runs); the guard refuses only
+  neither-marker runs. Smoke (4 ranks, B1 from 60, checkpoint every step): crust x0.1 F0 at -9.0 deg, dip 42,
+  57 points, build 5 its, ordinary 4, slip 864-918 (the slab-top trace gave 736-849: the base is one cell
+  deeper, at the real interface); crust x1 path F0 at -8.2 deg, build 7, slip 366-430. Thermal recipe needs
+  nothing more (one-cell crust resolved to +-0.005; ~70 subducted crust particles over 0.15 d). Swarm kept
+  pervasive: advection 6.9 s of a 126 s faulted step on 4 ranks. Kaiju told to pin d0dca11 and wait for
+  Louis's choice of thermal faulted cases.
