@@ -141,6 +141,10 @@ params = uw.Params(
     uw_chain=2,
     uw_band_widen=1,
     uw_rebuild_rungs=4,
+    uw_addon_timing=0,          # measurement runs (addon_timing.py): > 0 times each faulted-mesh build and
+                                #   its first solve, counts every level's cells per rank, forces this many
+                                #   rebuilds of the same set after the first step, stops after the last
+                                #   one's solve, and writes <uw_out>/addon_timing.json; nothing else written
     uw_rebuild_dip=2.0,
     uw_depth_hysteresis=0.016,  # a fitted depth within this of the fault's keeps the fault's (two detection rows)
     uw_rebuild_newton_switch=1.0e-2,
@@ -1123,6 +1127,88 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     write_records(records)
 
 
+# ----------------------------------------------------------------------------- add-on timing
+# Measurement runs only (-uw_addon_timing N): the phases of every faulted-mesh build and of
+# its first solve, and each level's cells per rank, into <uw_out>/addon_timing.json.
+if params.uw_addon_timing:
+    import addon_timing
+    _clk = addon_timing.install()
+    _clk.placements = []
+    _addon_placed, _addon_init, _addon_solve = placed_ladders, FaultedMesh.__init__, FaultedMesh.solve
+    _addon_warm, _addon_read = FaultedMesh.warm_start, read_solver_fields
+
+    def placed_ladders(host, faults, coarsening):
+        snap = _clk.snapshot()
+        with _clk.section("conform_split", "placed_ladders"):
+            result = _addon_placed(host, faults, coarsening)
+        phases, labels, calls, events = _clk.since(snap)
+        _clk.placements.append({"coarsening": coarsening, "phases": phases, "labels": labels,
+                                "calls": calls, "events": events})
+        return result
+
+    def _level_names(fm):
+        n, chain = len(levels), (int(params.uw_chain) if fm.faults else 0)
+        if not fm.faults:
+            return [f"base_L{i}" for i in range(n - 1)] + [f"finest_base_L{n - 1}"]
+        return ([f"base_L{i}" for i in range(n - chain)]
+                + [f"addon_{2 ** k}S_on_L{n - k}" for k in range(chain, 0, -1)] + ["finest_1S_on_L%d" % (n - 1)])
+
+    def _timed_init(self, faults, tag):
+        _clk.placements = []
+        snap = _clk.snapshot()
+        with _clk.section("solver_setup", "FaultedMesh.__init__"):
+            _addon_init(self, faults, tag)
+        phases, labels, calls, events = _clk.since(snap)
+        with _clk.section("instr", "instr"):
+            self._addon_tag = tag
+            cells = []
+            for name, m in zip(_level_names(self), self.levels + [self.mesh]):
+                owned, local = addon_timing.per_rank_cells(m.dm)
+                cells.append({"level": name, "owned_per_rank": owned, "local_per_rank": local,
+                              "global": int(sum(owned))})
+            placements = [{"coarsening": p["coarsening"],
+                           "phases": addon_timing.reduce_over_ranks(p["phases"]),
+                           "labels": addon_timing.reduce_over_ranks(p["labels"]),
+                           "calls": p["calls"], "events": p["events"]} for p in _clk.placements]
+            addon_timing.RECORDS.append({
+                "record": "build", "tag": tag, "faults": [f["name"] for f in self.faults],
+                "t_build_driver": round(self.t_build, 3), "chain_welded": self.mesh_record["chain_welded"],
+                "phases": addon_timing.reduce_over_ranks(phases),
+                "labels": addon_timing.reduce_over_ranks(labels), "calls": calls, "events": events,
+                "placements": placements, "levels": cells})
+            addon_timing.dump(out)
+
+    def _timed_solve(self):
+        first = not getattr(self, "_addon_solved", False)
+        snap = _clk.snapshot()
+        with _clk.section("solve", "FaultedMesh.solve"):
+            rec = _addon_solve(self)
+        if first:
+            self._addon_solved = True
+            phases, labels, calls, events = _clk.since(snap)
+            with _clk.section("instr", "instr"):
+                h = (getattr(self.stokes, "_custom_mg", None) or {}).get("hierarchy")
+                addon_timing.RECORDS.append({
+                    "record": "first_solve", "tag": getattr(self, "_addon_tag", None),
+                    "phases": addon_timing.reduce_over_ranks(phases),
+                    "labels": addon_timing.reduce_over_ranks(labels), "calls": calls, "events": events,
+                    "driver_wall": rec["solver"]["wall"], "newton": rec["newton"], "converged": rec["converged"],
+                    "level_transfer_stats": getattr(h, "level_transfer_stats", None),
+                    "pc_fallbacks": getattr(self.stokes, "pc_fallbacks", None), "solver_record": rec["solver"]})
+                addon_timing.dump(out)
+        return rec
+
+    def _timed_warm(self, V, P=None):
+        with _clk.section("transfer_warm", "warm_start"):
+            return _addon_warm(self, V, P)
+
+    def read_solver_fields(faulted, files):
+        with _clk.section("transfer_warm", "read_solver_fields"):
+            return _addon_read(faulted, files)
+
+    FaultedMesh.__init__, FaultedMesh.solve, FaultedMesh.warm_start = _timed_init, _timed_solve, _timed_warm
+
+
 # ----------------------------------------------------------------------------- initial state
 records = []
 def slab_temperature(xy):
@@ -1511,7 +1597,7 @@ for k in range(k0, k0 + params.uw_steps):
     faults_before = list(faulted.names)
     mesh_rec = faulted.mesh_record if k == k0 else None
     t_build = t_warm = 0.0
-    if needs_rebuild(faults, faulted.faults):
+    if needs_rebuild(faults, faulted.faults) or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing):
         previous = faulted
         try:
             faulted = FaultedMesh(faults, f"f{n_built}")
@@ -1563,6 +1649,18 @@ for k in range(k0, k0 + params.uw_steps):
         gc.collect()
     rec = faulted.solve()
     t_stokes = time.perf_counter() - wall
+    if params.uw_addon_timing:
+        # the step's wall phases as the run's solver record has them (build, transfer, stokes)
+        addon_timing.RECORDS.append({
+            "record": "step", "step": step, "k": k, "kind": kind, "tag": getattr(faulted, "_addon_tag", None),
+            "driver_wall": {"build": round(t_build, 3), "transfer": round(t_warm + rec["solver"]["wall"]["transfer"], 3),
+                            "stokes": round(rec["solver"]["wall"]["stokes"], 3)},
+            "newton": rec["newton"], "converged": rec["converged"],
+            "cumulative_labels": {k_: round(v_, 4) for k_, v_ in _clk.snapshot()[1].items()}})
+        addon_timing.dump(out)
+        if k == k0 + params.uw_addon_timing:
+            uw.pprint(f"addon timing: done after {params.uw_addon_timing} forced rebuild(s)")
+            break
     t_phase = time.perf_counter()
     faulted.to_base(rec["slip"])
     t_to_base = time.perf_counter() - t_phase
