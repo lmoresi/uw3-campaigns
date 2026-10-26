@@ -128,6 +128,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
+| Thermal slab set (TA, TB, TA_age25, TA_Pe3) | kaiju jobs 2224, 2225, 2227, 2228 (n2-n5); scripts `~/campaigns/kaiju-launch/slab_thermal/`, runs `runs/slab_thermal_*` | launched 2026-10-26 at Louis's direct request in the kaiju session; 300 steps, 12 h wall |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -675,3 +676,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   stub at the trench. One movie (fault_B1_crust1_fault) viewable in the browser:
   https://claude.ai/artifact/DJctapP4niLphKaazzJeK9. Louis's rsync brings the folder to the laptop; the
   lid-regime session then commits it beside the figure folders.
+- 2026-10-26: **Louis, in the kaiju session: the compositional slab is not for publication** (no thermal
+  buoyancy); the goal is foundering like B1 with thermal diffusion and buoyancy. Kaiju launched four thermal-slab
+  runs on B1's recipe with -uw_buoy_T 1 -uw_comp_dT 0 -uw_comp_eta 1 (no slab marker), Frank-Kamenetskii
+  viscosity eta = deta^(1-T), plate age 0.0035 (thermal deficit matching the compositional 0.05), Ra, tau0 and
+  tau1 scaled by deta^0.25 (interior Ra 3e6, B1's yield/buoyancy ratio), hot top kept for now ("a giant
+  mid-ocean ridge", to be backed off next). Cases: TA deta 4e3; TB deta 1e4; TA_age25 plate age 0.0025;
+  TA_Pe3 interior Ra 9e6. Driver 460e49d, overlay-warmdiag. The compositional controls and faulted set stand
+  as the solver-behaviour record and the method demonstration.
