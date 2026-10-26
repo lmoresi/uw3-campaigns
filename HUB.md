@@ -144,9 +144,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
   **Style question for Louis (step 50):** the thermal slab sinks vertically and conveys the plate in (v_plate
   1800-2350, ~10x B1) rather than rolling back; hinge retreat per model time is like B1's but a small share of
-  the motion. If B1-like rollback is wanted, the candidates kaiju names: a stronger plate (TB's deta 1e4 helped
-  only slightly), less crust decoupling than x0.001, or an overriding side that resists (the hot top offers
-  none). Nothing changed; runs continue to the wall then restart as is.
+  the motion. If B1-like rollback is wanted, the candidates kaiju names: the plate's strength profile (thermal:
+  graded, stiff core over a weak lower part; compositional: uniform x100 over the 0.1 layer; TB's deta 1e4
+  helped only slightly), and the thermal mantle convecting around the slab (vrms 700-850 vs 330). The crust
+  decoupling is NOT a candidate: B1 also runs crust x0.001. Nothing changed; runs continue to the wall then
+  restart as is.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
