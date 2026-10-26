@@ -135,6 +135,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 ## Waiting on Louis
 
+- Thermal slab + faults: the crust fault law cannot run on the thermal runs as it stands (it contours the slab
+  MARKER's 0.5 level and the driver refuses -uw_fault_law crust when comp_dT is 0 and comp_eta is 1). Choose the
+  trace source for a thermal slab: a T isotherm (0.5-0.6 on the polar grid, trench side; the laptop's
+  recommendation) or the crust marker's lower side. The laptop makes the change once the thermal recipe is
+  settled, smoke-tested with a formation on a checkpoint step. Do not launch a thermal faulted set before.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -684,3 +689,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   mid-ocean ridge", to be backed off next). Cases: TA deta 4e3; TB deta 1e4; TA_age25 plate age 0.0025;
   TA_Pe3 interior Ra 9e6. Driver 460e49d, overlay-warmdiag. The compositional controls and faulted set stand
   as the solver-behaviour record and the method demonstration.
+- 2026-10-26: the laptop flags that the crust fault law needs a new trace source for the thermal slab (no slab
+  marker to contour; the driver's guard refuses it). Options: a T isotherm or the crust marker's lower side.
+  Listed under Waiting on Louis; the laptop makes the change when the recipe is settled.
