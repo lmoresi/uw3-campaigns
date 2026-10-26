@@ -142,6 +142,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   swarm would be a driver-level change after the fault law, only if Louis wants the physics stated that way.
 - Thermal runs: Louis ruled 2026-10-26 "a manageable difference, I would not try to change this": no Picard
   warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
+  **Style question for Louis (step 50):** the thermal slab sinks vertically and conveys the plate in (v_plate
+  1800-2350, ~10x B1) rather than rolling back; hinge retreat per model time is like B1's but a small share of
+  the motion. If B1-like rollback is wanted, the candidates kaiju names: a stronger plate (TB's deta 1e4 helped
+  only slightly), less crust decoupling than x0.001, or an overriding side that resists (the hot top offers
+  none). Nothing changed; runs continue to the wall then restart as is.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -807,3 +812,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   triggering detection median 6.6 rungs (4.1-18.5); slip ratio median 1.55; sawtooth amplitude median 0.89.
 - 2026-10-26: wombat's second review of the trench section (phase bands vs breakdown, 24 s vs 19-25 s, per-level
   cell counts, 24th rebuild, "peak slip rate" and 46 vs 47) fixed in d41d224.
+- 2026-10-26: **thermal runs at step 50** (kaiju): the slab founders in about half B1's model time (tip at the base
+  by t ~0.0003 against 0.0007; TA_age25 tip 0.95 at step 60) but sinks as a straight radial slab with the plate
+  conveyed into it (v_plate 1800-2350 at t 0.00025, B1 210 at the same t), hinge retreat 3.4 deg against B1's
+  4.6 over t 0.00025. T_core 0.13 -> 0.18-0.19, cold mass growing as the plate feeds in; the one-cell crust
+  stays in blobs down the slab top with a plastic-strain band below the trench; the hot top does not dominate
+  (mantle cells beside the slab, vrms 700-850 vs B1 330). Solver steps 21-50: TA 8-11 Newton its, 280-440 s;
+  TB 8-17, 340-640 s; TA_age25 5-12, 170-460 s; pressure its down to 32-42, velocity 7-10; yielded fraction
+  unchanged; dt ~3.4e-6; the wall ends near step 110-120 (t ~0.0005). Renders in
+  figures_work/slab_control/thermal_*/ (steps 0-50 every 10).
