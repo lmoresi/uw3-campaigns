@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` ebb5a76 (figures c0a998a; restart table b9a678e/b9662c3; trench demonstration ebb5a76) | draft; trench section added, two figures pending from kaiju | hub (prose), hyperion (figure records), wombat (checks) | kaiju: trench-mesh.png, trench-cost.png, per-rank load, rebuild cost breakdown, records (figures_out/addon_demo/); hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 24ae608: validate 0 warnings, check-style clean, preview build passes; the 4e-4 clause verified against the shipped records, uw_tol 0.001 recorded for the saved-child pair (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` ebb5a76 (figures c0a998a; restart table b9a678e/b9662c3; trench demonstration ebb5a76) | draft; trench section added, two figures pending from kaiju | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 24ae608: validate 0 warnings, check-style clean, preview build passes; the 4e-4 clause verified against the shipped records, uw_tol 0.001 recorded for the saved-child pair (wombat) |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -745,3 +745,26 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   re-measured at np 16); a per-rebuild cost breakdown (refine / conform+split / partition / solver setup /
   first solve, one instrumented rebuild if needed); records.json and solver_summary.csv for the five runs; all to
   figures_out/addon_demo/ for Louis's rsync and the notes session's copy.
+- 2026-10-26: **addon_demo delivered by kaiju** (figures_out/addon_demo/: trench-mesh.png, trench-cost.png, json/csv,
+  scripts, records for five runs 0.7-1.9 MB each, README). Mesh figure (recorded): steps 10/100/200/290 of
+  B1_crust1_fault, trench -0.9/-10.8/-24.1/-28.9 deg; base edges > 0.1 from the trace identical 100 % at every
+  step; the add-on adds 432-566 cells to the base's 126976. Costs (recorded): ordinary step 24.2 s (transfer
+  1.6, stokes 14.8, rest 7.9), rebuild step 48.6 s (build 11.6, transfer 2.3, stokes 25.6: the rebuild solve
+  starts with Picard). Breakdown (re-measured, 21 builds at np 16): no refinement at a rebuild (placed band);
+  conform+split 9.0 s (carve/fill/sew 4.3, new meshes 2.5, cut 1.3-1.5, split 0.5); partition 1.5; solver setup
+  4.0 (1.0 constructor, 1.4 compiling, 1.1 transfers); first solve 20 (2.3 fields, 18 Newton). Load (re-measured,
+  7 checkpoints): base partition 12x8192 + 4x7168 on every level; finest max/mean 1.03 to step 100, 1.08-1.09
+  from 150 when the band sits on a full rank; gather moved 0-102 cells; transfer misses rank-local only; no
+  fallbacks. Findings for the library (to hyperion after the leak): adopt_hierarchy's alignment of the base
+  levels is superseded by set_custom_fmg's levels (0.8-2 s per rebuild wasted, 7-17 % of the build); the
+  solver's functions recompile on every rebuild (1.4 s). Instrumented driver kaiju/addon-timers 6f53c8c
+  (-uw_addon_timing, off by default), patch requested for the branch. Cost table confirmed; C1: KSP 5/20,
+  12082 s. Note updated locally (held: wombat's push hold on note/faults-on-an-add-on-mesh).
+- 2026-10-26: **thermal runs at step 20** (kaiju): the slabs founder from the start and sink faster than B1 (tip
+  0.5 by t 0.00013-0.00015 against B1's ~0.0004); the plate moves from the outset (v_plate 700-950; B1 started
+  at rest); the hinge moves in the rollback sense (3.6 -> 2.0 deg in 20 steps); the tip curls to the overriding
+  side; T_core 0.03 -> 0.13-0.15 (the thin stretched tip, not diffusion); the one-cell crust breaks into blobs
+  along the slab top (continuous in B1); plastic strain confined to the trench corner; the hot top does not
+  dominate; mantle turning over beside the slab, vrms 370-440. Solver steps 11-20 as 1-10 (4-13 Newton its,
+  F0/F_ref 0.55-0.8, pres 40-59, vel 7-10, 160-580 s). Renders in figures_work/slab_control/thermal_*/. Step 50
+  in ~3 h.
