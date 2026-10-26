@@ -173,7 +173,7 @@ params = uw.Params(
     uw_fault_lid_margin=0.05,
     uw_detect_max_ddepth=0.05,
     # forming and removing faults
-    uw_fault_law="lines",       # "none": no detection; "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking; "crust": one fault on the compositional slab's top (the weak crust), from the trench to uw_fault_depth_max
+    uw_fault_law="lines",       # "none": no detection; "lines": N faults fitted to the damage each detection; "bands": per-fault band tracking; "crust": one fault on the base of the crust layer (or, without a crust marker, the compositional slab's top), a parabola from the trench to uw_fault_depth_max
     uw_line_gamma=2.0,          # "lines": damage counted (plastic strain at or above this)
     uw_line_min_damage=0.01,    # "lines": smallest damage (strain x area) that is a fault
     uw_line_width=0.035,        # "lines": half-width of a line's inlier band
@@ -235,9 +235,10 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 crust_on = params.uw_crust_weak < 1
-if params.uw_fault_law == "crust" and not (params.uw_comp_dT > 0 or params.uw_comp_eta != 1):
-    raise ValueError("the crust fault law follows the compositional slab's top: set uw_comp_dT or uw_comp_eta")
 comp_on = params.uw_comp_dT > 0 or params.uw_comp_eta != 1
+if params.uw_fault_law == "crust" and not (crust_on or comp_on):
+    raise ValueError("the crust fault law follows the base of the crust layer (uw_crust_weak < 1) "
+                     "or, without one, the compositional slab's top (uw_comp_dT or uw_comp_eta)")
 over_on = params.uw_over_dT > 0 or params.uw_over_eta != 1
 swarm_on = crust_on or comp_on or over_on
 crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
@@ -578,21 +579,68 @@ def parabola_fit(pts):
     return curve, L
 
 
-def crust_fault_points(faults):
-    """The fault that follows the weak crust: the crust rides on the compositional slab,
-    so its position is the slab top, the slab marker's 0.5 contour on the polar grid from
-    the surface down to the depth cap. The crust's own proxy is one cell thick and too
-    smeared to chain (measured on B1 at step 60: values 0.2-0.6 with gaps), the slab's
-    is crisp. The contour piece taken is the one whose surface end is nearest the fault's
-    trench when there is a fault, else the one reaching the cap by the shortest path. The
-    piece is replaced by its least-squares parabola, which runs from 0.02 above the wall
-    (as the straight traces start) down to the cap, resampled at the rung spacing.
-    Collective. Returns the points and (theta, dip, depth) in the fault's usual terms,
-    or None."""
+def crust_base_curve(faults, cap):
+    """The base of the crust layer from the crust particles (the marker's proxy is one
+    cell thick and too smeared to contour: values 0.2-0.6 with gaps on B1 at step 60;
+    the particles themselves draw the layer cleanly). The subducted crust, particles with
+    the marker set deeper than 1.25 layer thicknesses and no deeper than the cap plus two,
+    is gathered to every rank; the cluster nearest the fault's trench (or holding the
+    shallowest subducted particle) and connected in theta is fitted by a least-squares
+    parabola in its own principal frame and offset to its lower envelope (nine particles
+    in ten sit above the curve), which is the base. Needs the cloud to reach the cap.
+    Collective. Returns the curve as a function of distance along its axis (increasing
+    with depth) and the start of the fitted range, or None."""
+    xy = np.asarray(crust_swarm.coords, dtype=float)
+    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+    depth = r_o - np.hypot(xy[:, 0], xy[:, 1])
+    sel = (marker > 0.5) & (depth > 1.25 * crust_thick) & (depth <= cap + 2.0 * crust_thick)
+    P = np.c_[uw.utilities.gather_data(xy[sel, 0], bcast=True), uw.utilities.gather_data(xy[sel, 1], bcast=True)]
+    if len(P) < 12:
+        return None
+    depth = r_o - np.hypot(P[:, 0], P[:, 1])
+    theta = np.arctan2(P[:, 1], P[:, 0])
+    # the clusters: particles connected in theta (gaps under 0.03 rad); stray crust
+    # elsewhere (the ridge, stripped blobs) makes small or shallow ones
+    order = np.argsort(theta)
+    pieces = [p for p in np.split(order, np.flatnonzero(np.diff(theta[order]) > 0.03) + 1) if len(p) >= 12]
+    if faults:
+        hint = faults[0]["theta"]
+        pieces = [p for p in pieces if np.abs(wrap(theta[p] - hint)).min() < 0.4]
+        pieces.sort(key=lambda p: np.abs(wrap(theta[p] - hint)).min())
+    else:
+        pieces.sort(key=lambda p: -depth[p].max())  # the slab's crust is the one that goes deepest
+    if not pieces or depth[pieces[0]].max() < cap:
+        return None
+    piece = pieces[0]
+    Q = P[piece]
+    mu = Q.mean(axis=0)
+    e = np.linalg.svd(Q - mu, full_matrices=False)[2][0]
+    nrm = np.array([-e[1], e[0]])
+    if nrm @ mu > 0:
+        nrm = -nrm                                   # the normal points down, away from the surface
+    s, d = (Q - mu) @ e, (Q - mu) @ nrm
+    if depth[piece][np.argmin(s)] > depth[piece][np.argmax(s)]:
+        e, s = -e, -s                                # s increases with depth
+    coef = np.polyfit(s, d, 2)
+    off = float(np.quantile(d - np.polyval(coef, s), 0.9))
+
+    def curve(ss):
+        ss = np.asarray(ss, dtype=float)
+        return mu + ss[..., None] * e + (np.polyval(coef, ss) + off)[..., None] * nrm
+
+    return curve, float(s.min())
+
+
+def slab_top_curve(faults, cap):
+    """The slab top where there is no crust marker: the slab marker's 0.5 contour on the
+    polar grid from the surface down to the cap (the compositional slab's proxy is crisp).
+    The piece taken is the one whose surface end is nearest the fault's trench when there
+    is a fault, else the one reaching the cap by the shortest path; its least-squares
+    parabola is fitted below the top rows, where the contour hooks along the wall.
+    Collective. Returns the curve and the start of the fitted range, or None."""
     import contourpy
     th, dep, xy = polar_grid(r_o, n_theta=1440, depth_max=0.5, n_depth=64)
     m = np.asarray(uw.function.global_evaluate(markers["slab"][0].sym[0], onto(xy))).reshape(len(dep), len(th))
-    cap = fault_depth_cap()
     best, best_score = None, np.inf
     for line in contourpy.contour_generator(th, dep, m).lines(0.5):
         line = np.asarray(line, dtype=float)
@@ -615,20 +663,39 @@ def crust_fault_points(faults):
             best, best_score = pts, score
     if best is None:
         return None
-    # the contour hooks along the wall in the top rows (the marker sits at 0.5 there):
-    # fit below them, and the fault is the parabola itself all the way up, through the
-    # wall to 0.02 above it. The surface is the placement's business: the cut stops
-    # three rungs inside the wall (fault_trace) and the ribbon's TI zone covers the rest.
     buried = (r_o - np.hypot(best[:, 0], best[:, 1])) >= 0.012
-    curve, L = parabola_fit(best[buried] if buried.sum() >= 4 else best)
+    curve, _ = parabola_fit(best[buried] if buried.sum() >= 4 else best)
+    return curve, 0.0
+
+
+def crust_fault_points(faults):
+    """The fault that follows the weak crust: the base of the crust layer when the run
+    carries the crust marker (crust_base_curve; Sandiford & Moresi 2019, the fault is the
+    base of the weak crust), else the compositional slab's top (slab_top_curve). The
+    fault is the fitted parabola itself all the way up, through the wall to 0.02 above
+    it, and down to the depth cap, resampled at the rung spacing. The surface is the
+    placement's business: the cut stops three rungs inside the wall (fault_trace) and
+    the ribbon's TI zone covers the rest. Collective. Returns the points and (theta,
+    dip, depth) in the fault's usual terms, or None."""
+    cap = fault_depth_cap()
+    got = crust_base_curve(faults, cap) if crust_on else slab_top_curve(faults, cap)
+    if got is None:
+        return None
+    curve, s_lo = got
     lift = r_o + 0.02
-    s_top, step = 0.0, 0.005
-    while np.hypot(*curve(s_top)) < lift and s_top > -0.5:
+    s_top, step = s_lo, 0.005
+    while np.hypot(*curve(s_top)) < lift and s_top > s_lo - 0.5:
         s_top -= step
     if np.hypot(*curve(s_top)) < lift:
         return None                                  # the parabola turns away from the wall
     s_top = brentq(lambda s: np.hypot(*curve(s)) - lift, s_top, s_top + step)
-    poly = resample_polyline(curve(np.linspace(s_top, L, 400)), S, 2 ** int(params.uw_chain))
+    s_cap = s_lo
+    while r_o - np.hypot(*curve(s_cap)) < cap and s_cap < s_lo + 1.0:
+        s_cap += step
+    if r_o - np.hypot(*curve(s_cap)) < cap:
+        return None                                  # the parabola turns up before the cap
+    s_cap = brentq(lambda s: (r_o - np.hypot(*curve(s))) - cap, s_cap - step, s_cap)
+    poly = resample_polyline(curve(np.linspace(s_top, s_cap, 400)), S, 2 ** int(params.uw_chain))
     radius = np.hypot(poly[:, 0], poly[:, 1])
     k = int(np.argmax(radius <= r_o))
     w = (radius[k - 1] - r_o) / max(radius[k - 1] - radius[k], 1e-12)
