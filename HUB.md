@@ -852,3 +852,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   500-850 s/step. **Caveat**: crust weakening reads that proxy, so the uniform-swarm thermal runs (TA, TB,
   TA_age25) carry a weak layer broken where the proxy is; -uw_crust_ppc keeps it continuous. Louis decides the
   faulted thermal cases and whether the running thermal set should be redone with the dense crust.
+- 2026-10-26: wombat's rework of 2026-022 to the updated "How the notes read" is drafted on the workbench
+  (unsaved, under Louis's review; hub edits held): four figures kept (stack, iterations, trench-mesh,
+  trench-cost), moving-fault.png and rebuild-spacing.png dropped with their numbers kept in the text (the
+  rungs8 records still ship in figures/src/rungs8/); the restart material and its table moved to an
+  appendix; the cost shares separated (14 % = the 47-rebuild run's rebuild extra over its own wall, 1174 of
+  8471 s; 7 % = the 27-rebuild run against the no-fault run, 6 % of its own wall, 519 of 8324 s); alt texts
+  unchanged with kaiju's numbers.
