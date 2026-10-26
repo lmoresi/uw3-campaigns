@@ -90,6 +90,10 @@ params = uw.Params(
     uw_crust_thick=-1.0,
     uw_crust_depth=0.5,
     uw_crust_fill=1,            # particles per cell parameter (1: about 3 per cell)
+    uw_crust_ppc=0,             # > 0: the crust layer seeded denser than the swarm, about this many
+                                #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
+    uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the crust on the subducting
+                                #   plate's surface topped up to the uw_crust_ppc spacing where it has thinned
     # a compositional slab on the same particles: the subducting plate and its slab as a
     # layer uw_comp_thick thick whose buoyancy is a fixed temperature deficit uw_comp_dT
     # (0 = none; it does not diffuse) and whose viscosity and yield stress are times
@@ -1355,9 +1359,72 @@ def over_marker(xy, thick):
     return plate.astype(float)
 
 
+def crust_spacing():
+    """The lattice spacing of the dense crust: about uw_crust_ppc particles per (triangular) cell."""
+    h = float(params.uw_cell) / 2 ** int(params.uw_refinement)
+    return h / np.sqrt(2.0 * float(params.uw_crust_ppc))
+
+
+def crust_layer_points(spacing, surface_only=False):
+    """A lattice at ``spacing`` through the slab state's crust layer: the subducting plate's
+    surface layer (ridge to trench) and, unless ``surface_only``, the slab's top face, in the
+    layer's own frame (along it and across it), kept where layer_marker says crust."""
+    theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    ridge_s = abs(float(params.uw_ridge_sub))
+    across = np.arange(0.5 * spacing, crust_thick, spacing)
+    rel = -np.arange(0.5 * spacing / r_o, ridge_s, spacing / r_o)
+    R, D = np.meshgrid(rel, across, indexing="ij")
+    th, rad = theta_t + over * R.ravel(), r_o - D.ravel()
+    pts = [np.c_[rad * np.cos(th), rad * np.sin(th)]]
+    if not surface_only:
+        r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
+        t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
+        down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
+        n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
+        sa = np.arange(0.5 * spacing, float(params.uw_slab_length) - crust_thick, spacing)
+        Sg, Ng = np.meshgrid(sa, across, indexing="ij")
+        pts.append(r_hat * r_o + Sg.ravel()[:, None] * down + Ng.ravel()[:, None] * n_sub)
+    xy = onto(np.vstack(pts))
+    return xy[layer_marker(xy, crust_thick) > 0.5]
+
+
+def refill_crust():
+    """Top up the crust on the subducting plate's surface: lattice points of the dense crust
+    (uw_crust_ppc spacing) where the crust is (its proxy >= 0.5) and no crust particle on this
+    rank lies within 0.75 spacing become crust particles; other markers from the nearest
+    particle. Crust is never made where there was none, and the slab's (stretched) crust is
+    left alone. Collective. Returns the particles added on this rank."""
+    from scipy.spatial import cKDTree
+    spacing = crust_spacing()
+    cand = crust_layer_points(spacing, surface_only=True)
+    is_crust = np.asarray(uw.function.global_evaluate(crust_var.sym[0], cand)).ravel() >= 0.5
+    cand = cand[is_crust]
+    xy = np.asarray(crust_swarm.coords, dtype=float).reshape(-1, 2)
+    old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
+    mine = xy[old["crust"] > 0.5]
+    if len(mine) and len(cand):
+        cand = cand[cKDTree(mine).query(cand)[0] > 0.75 * spacing]
+    added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
+    if added:
+        new_xy = np.asarray(crust_swarm.coords, dtype=float).reshape(-1, 2)[-added:]
+        nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
+        for name, (var, _, _) in markers.items():
+            if name == "crust":
+                var.array[-added:, 0, 0] = 1.0
+            elif nearest is not None:
+                var.array[-added:, 0, 0] = old[name][nearest]
+    for var, _, _ in markers.values():
+        var._update()
+    return int(added)
+
+
 def seed_swarm():
-    """Fresh particles over the base mesh with the slab state's markers."""
+    """Fresh particles over the base mesh with the slab state's markers; with uw_crust_ppc the
+    crust layer gets its own denser lattice on top of the swarm's fill."""
     crust_swarm.populate(fill_param=int(params.uw_crust_fill))
+    if crust_on and params.uw_crust_ppc > 0:
+        crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
     for var, _, geometry in markers.values():
         var.array[:, 0, 0] = geometry(crust_swarm.coords)
         var._update()
@@ -1678,6 +1745,11 @@ for k in range(k0, k0 + params.uw_steps):
         crust_swarm.advection(V_b.sym, dt, order=2)
         for var, _, _ in markers.values():
             var._update()
+        if (crust_on and params.uw_crust_ppc > 0 and params.uw_crust_refill_every > 0
+                and (k + 1) % int(params.uw_crust_refill_every) == 0):
+            n_refill = int(uw.utilities.gather_data(refill_crust(), bcast=True).sum())
+            if n_refill:
+                events.append(f"crust refill: {n_refill} particles")
     t_swarm = time.perf_counter() - t_phase
     t_phase = time.perf_counter()
     t += dt
