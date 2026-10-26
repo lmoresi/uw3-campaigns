@@ -139,8 +139,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   thin layer populated/repopulated into the upper elements and entrained by the slab, not a pervasive material
   swarm); the fault trace is the BASE of that layer (Sandiford & Moresi 2019). The laptop changes
   crust_fault_points and the guard (crust marker present, no slab marker), smoke-tests a formation on a
-  checkpoint step, patch via the hub. Kaiju confirms whether the thermal runs still seed the crust marker.
-  No thermal faulted set before the change lands.
+  checkpoint step, patch via the hub. Kaiju confirms the thermal runs keep the crust marker and its x0.001
+  weakening (one cell, 0.0156 d thick, fading below depth 0.5; crust_on is independent of the slab marker), so
+  they can take the fault later; the swarm is still the pervasive one (380928 particles carrying a 0/1 crust
+  marker), and slimming it to a repopulated upper-element swarm is a separate change (Louis's preference, not
+  a blocker). No thermal faulted set before the fault-law change lands.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -697,3 +700,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   (Sandiford & Moresi 2019). The marker need not be a pervasive swarm: populated/repopulated into the upper
   elements, entrained by the slab. Laptop makes the fault-law change; kaiju reports what the thermal recipe
   seeds now.
+- 2026-10-26: kaiju: the thermal runs 2224-2228 carry the crust marker and weakening (x0.001 on eta and tau_y,
+  one cell thick, fading below 0.5); only the slab and over markers are off. Recipe as launched: buoy_T 1,
+  Frank-Kamenetskii deta 4e3 (TB 1e4), Ra and tau scaled by deta^0.25 (interior Ra 3e6, TA_Pe3 9e6), plate age
+  0.0035 (TA_age25 0.0025), hot top kept. The swarm is still pervasive; the crust-only repopulated swarm Louis
+  described is a separate change.
