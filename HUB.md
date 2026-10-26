@@ -122,14 +122,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9c7c1e7 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing, dense crust); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9c7c1e7 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing, crust particle sampling); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
-| Crust particle density (-uw_crust_ppc, -uw_crust_refill_every) | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
+| Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
 | Thermal slab set (TA, TB, TA_age25, TA_Pe3) | kaiju jobs 2224, 2225, 2227, 2228 (n2-n5); scripts `~/campaigns/kaiju-launch/slab_thermal/`, runs `runs/slab_thermal_*` | launched 2026-10-26 at Louis's direct request in the kaiju session; 300 steps, 12 h wall |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
@@ -145,7 +145,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
   Style, ruled 2026-10-26: "We want it to drive the plate, not worried about rollback per se." The thermal
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
-  **Faulted thermal cases: decision needed.** Kaiju's suggested recipe: the TA flags + -uw_crust_ppc 12
+  **Faulted thermal cases: decision needed.** Kaiju's suggested recipe: the TA flags + -uw_crust_ppc 12 (12 particles per cell in the crust layer)
   -uw_crust_refill_every 5 + the FAULT flags, from a fresh -uw_init slab (dense seeding applies only there).
   The fit works on the thermal crust (smoke: F0 at -2.1 deg, dip 34 above the cap, slip 3750-4800 at a plate
   converging at 2000-4000); the broken weak layer in the uniform-swarm runs is the proxy, which
@@ -842,7 +842,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - 2026-10-26: **pen on 2026-022 passes to the wombat workbench**: Louis updated CONTRIBUTING.md "How the notes read"
   and asked wombat to rework the note to it. The hub makes no edits to the article, captions or metadata until
   wombat says so; numbers and corrections go by message, figure material only under figures/src/.
-- 2026-10-26: **dense crust pushed** (9c7c1e7, kaiju at Louis's request): -uw_crust_ppc N seeds the crust layer on
+- 2026-10-26: **densely SAMPLED crust pushed** (9c7c1e7; particles per cell, no change to buoyancy or any material property; kaiju at Louis's request): -uw_crust_ppc N seeds the crust layer on
   its own lattice (~N per cell) at -uw_init slab; -uw_crust_refill_every K tops up the plate-surface crust where
   it has thinned. Smoke 1 (TA + ppc 12, refill 2, np 16, 6 steps): crust particles 15485 vs 4015, swarm +3 %,
   advection +0.2 s/step, refill a no-op until the crust thins. Smoke 2 (TA checkpoint 50 + FAULT flags, 6
@@ -851,7 +851,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bend above the 0.15 cap), rebuilt at 52, retargeted at 56; slip 3754-4816, vrms 770-1006, Newton 8-13,
   500-850 s/step. **Caveat**: crust weakening reads that proxy, so the uniform-swarm thermal runs (TA, TB,
   TA_age25) carry a weak layer broken where the proxy is; -uw_crust_ppc keeps it continuous. Louis decides the
-  faulted thermal cases and whether the running thermal set should be redone with the dense crust.
+  faulted thermal cases and whether the running thermal set should be redone with the densely sampled crust.
 - 2026-10-26: wombat's rework of 2026-022 to the updated "How the notes read" is drafted on the workbench
   (unsaved, under Louis's review; hub edits held): four figures kept (stack, iterations, trench-mesh,
   trench-cost), moving-fault.png and rebuild-spacing.png dropped with their numbers kept in the text (the
@@ -859,3 +859,5 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   appendix; the cost shares separated (14 % = the 47-rebuild run's rebuild extra over its own wall, 1174 of
   8471 s; 7 % = the 27-rebuild run against the no-fault run, 6 % of its own wall, 519 of 8324 s); alt texts
   unchanged with kaiju's numbers.
+- 2026-10-26: Louis: "dense" in the crust change means particles per cell, not a physical density affecting
+  buoyancy. HUB wording tightened; the driver's option comment already says particles per cell.
