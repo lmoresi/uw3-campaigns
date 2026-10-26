@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` ebb5a76 (figures c0a998a; restart table b9a678e/b9662c3; trench demonstration ebb5a76) | draft; trench section added, two figures pending from kaiju | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 24ae608: validate 0 warnings, check-style clean, preview build passes; the 4e-4 clause verified against the shipped records, uw_tol 0.001 recorded for the saved-child pair (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` e73fc7f (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76, measured numbers 9d5c6c3, review fixes e73fc7f; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 2edfb4e: validate 0 warnings, check-style clean, preview fails only on the missing trench PNGs (wombat); e73fc7f to be checked |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -772,3 +772,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   from the driver with an exclusive-time clock; off by default; a restart with -uw_addon_timing N forces N
   rebuilds and writes addon_timing.json). Deviation recorded: the module uses mpi4py directly for its
   allgather/Allreduce; acceptable in a measurement-only module, to be replaced if the library offers a helper.
+- 2026-10-26: wombat repaired note/faults-on-an-add-on-mesh (force-with-lease with Louis's OK: 2edfb4e = ebb5a76 +
+  the Sandiford_2019 bib entry, which the hub had wrongly said was present) and reviewed the trench section;
+  hub pushed 9d5c6c3 (kaiju's measured numbers in prose, captions and alt text) and e73fc7f (one nonlinear
+  iteration per step, Newton ordinary / Picard after a rebuild; overhead measured one way, 7 % for 27 rebuilds
+  and 14 % for 47, the 27 % stated as the rebuild steps' share; sensitivity cut to mechanisms; the runs named
+  demonstrations of the mesh, not a subduction result). Kaiju asked to add a slip panel with rebuilds marked to
+  trench-cost.png and the per-rebuild drop ratio to the README.
