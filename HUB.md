@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` e6189fb (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76, measured numbers 9d5c6c3, review fixes e73fc7f, slip regimes e6189fb; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 2edfb4e: validate 0 warnings, check-style clean, preview fails only on the missing trench PNGs (wombat); e73fc7f to be checked |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` d41d224 (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76 → d41d224 after two wombat reviews; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at e6189fb: validate 0 warnings, check-style clean, preview fails only on the missing trench PNGs (wombat); d41d224 (five consistency fixes) to be checked |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -805,3 +805,5 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   rebuild 25.7 / +1 17.9 / +2 15.7 / ordinary 13.6 s; velocity its 6.2 / 4.9 / 3.9 / 3.3 (the warm-start cost
   is in the linear iterations and the Picard step, not in nonlinear iterations, all 1 at F0/F_ref ~1); gap at a
   triggering detection median 6.6 rungs (4.1-18.5); slip ratio median 1.55; sawtooth amplitude median 0.89.
+- 2026-10-26: wombat's second review of the trench section (phase bands vs breakdown, 24 s vs 19-25 s, per-level
+  cell counts, 24th rebuild, "peak slip rate" and 46 vs 47) fixed in d41d224.
