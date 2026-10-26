@@ -142,8 +142,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - Thermal runs are slow: 5-12 Newton its and 175-570 s/step (B1: 1 it, 30 s), dt halved by ~2x faster flow, so
   the 12 h wall reaches step ~90-100, t ~0.0005 (B1's retreat needed t 0.002). Kaiju continues by restart. Decide:
   (a) a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2) for the thermal recipe, applied at the
-  next restart (the same crawl as layered_mantle's: warm steps start at F0 = F_ref); (b) whether to cancel
-  TA_Pe3 after ~step 40 (kaiju asked you directly).
+  next restart (the same crawl as layered_mantle's: warm steps start at F0 = F_ref). TA_Pe3: Louis said cancel
+  (2026-10-26), passed to kaiju. Louis asks whether the slowness is the nonlinear problem or the linear solves
+  too (viscosity jumps); kaiju answers from the solver records.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
