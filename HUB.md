@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` e73fc7f (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76, measured numbers 9d5c6c3, review fixes e73fc7f; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 2edfb4e: validate 0 warnings, check-style clean, preview fails only on the missing trench PNGs (wombat); e73fc7f to be checked |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` e6189fb (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76, measured numbers 9d5c6c3, review fixes e73fc7f, slip regimes e6189fb; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 2edfb4e: validate 0 warnings, check-style clean, preview fails only on the missing trench PNGs (wombat); e73fc7f to be checked |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -779,3 +779,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   and 14 % for 47, the 27 % stated as the rebuild steps' share; sensitivity cut to mechanisms; the runs named
   demonstrations of the mesh, not a subduction result). Kaiju asked to add a slip panel with rebuilds marked to
   trench-cost.png and the per-rebuild drop ratio to the README.
+- 2026-10-26: kaiju's slip panel overturns "a rebuild halves the slip" as a general statement. B1_crust1_fault,
+  slip at the rebuild step over the step before, 46 rebuilds: median 1.55, range 0.20-3.52, 17 below 1. Two
+  regimes: steps 6-41 (first 8 rebuilds) every rebuild drops it (median 0.43) and it climbs back over ~4 steps
+  while slip falls from ~430 (step 3) to ~20 (step 45); steps 141-296 (last 24) a sawtooth the other way, the
+  slip peaking ON the rebuild step (1.5-2x, 3.5 once) and decaying until the next. Kaiju's untested reading: a
+  rebuild re-fits the fault to the damage and the fit ages between rebuilds; to check against the trace-to-band
+  spacing before anyone states it. Note corrected to the measured regimes without the mechanism (e6189fb).
+  trench-cost.png now has three panels; trench_cost.json carries the ratios.
