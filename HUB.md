@@ -107,7 +107,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Note | Branch, head | Status | Pen | Waiting on | Last checks |
 |---|---|---|---|---|---|
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel` da848fa | draft | wombat workbench | 3 figures (hyperion: parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 | 2026-10-25 validate 0 warnings, check-style clean |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 0085faf (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76 → 748ca7f; rebuild spacing 03d1625 → 0085faf; Sandiford bib 2edfb4e) | draft; trench section complete in prose, its two PNGs and records await Louis's rsync of addon_demo | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 0085faf: validate 0 warnings, check-style clean; preview fails only on the three PNGs awaiting the addon_demo rsync (wombat) |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh` 0085faf (figures c0a998a; restart table b9a678e/b9662c3; trench section ebb5a76 → 748ca7f; rebuild spacing 03d1625 → 0085faf; Sandiford bib 2edfb4e) | draft; PEN WITH WOMBAT from 2026-10-26: Louis asked it to rework the prose to the updated CONTRIBUTING "How the notes read"; the hub sends numbers and corrections by message, commits only under figures/src/ | hub (prose), hyperion (figure records), wombat (checks) | kaiju's addon_demo delivered (figures_out/addon_demo/), to come over by Louis's rsync and the notes session's copy; hyperion: (i) fig_iterations records, (j) global peak slip; Louis's items (a),(c),(g) and review of the trench section | 2026-10-26 at 0085faf: validate 0 warnings, check-style clean; preview fails only on the three PNGs awaiting the addon_demo rsync (wombat) |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
@@ -836,3 +836,6 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   rebuilt more often than the slab needed; the sawtooth is set by the ageing between fits, not the frequency.
   In the note (figure rebuild-spacing.png from overlay.png). Louis has asked kaiju directly for denser crust
   particles (-uw_crust_ppc) with an optional plate-surface top-up (-uw_crust_refill_every), off by default.
+- 2026-10-26: **pen on 2026-022 passes to the wombat workbench**: Louis updated CONTRIBUTING.md "How the notes read"
+  and asked wombat to rework the note to it. The hub makes no edits to the article, captions or metadata until
+  wombat says so; numbers and corrections go by message, figure material only under figures/src/.
