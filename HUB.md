@@ -139,6 +139,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   which thermal cases take a fault, and when** (a fault forms only once the slab has reached the cap depth 0.15;
   the FAULT flags are unchanged). The swarm stays pervasive (5 % of a faulted step); a crust-only repopulated
   swarm would be a driver-level change after the fault law, only if Louis wants the physics stated that way.
+- Thermal runs are slow: 5-12 Newton its and 175-570 s/step (B1: 1 it, 30 s), dt halved by ~2x faster flow, so
+  the 12 h wall reaches step ~90-100, t ~0.0005 (B1's retreat needed t 0.002). Kaiju continues by restart. Decide:
+  (a) a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2) for the thermal recipe, applied at the
+  next restart (the same crawl as layered_mantle's: warm steps start at F0 = F_ref); (b) whether to cancel
+  TA_Pe3 after ~step 40 (kaiju asked you directly).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -711,3 +716,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   nothing more (one-cell crust resolved to +-0.005; ~70 subducted crust particles over 0.15 d). Swarm kept
   pervasive: advection 6.9 s of a 126 s faulted step on 4 ranks. Kaiju told to pin d0dca11 and wait for
   Louis's choice of thermal faulted cases.
+- 2026-10-26: thermal runs at step 7 after 55 min, Newton converging every step but slow (TA vrms 404, dt 5.8e-6,
+  5-9 its, 270-415 s/step; TB 5-12 its, 300-560 s; TA_age25 3-10, 175-570 s; TA_Pe3 vrms 1206, dt 1.9e-6, 6-9
+  its). Yielding in the Frank-Kamenetskii plate costs the iterations, ~2x flow speed costs the dt; the wall
+  ends near step 90-100 (t 0.0005); kaiju continues by restart. The crust is laid along the slab's top face at
+  step 0 and the initial slab is 0.35 long, so the crust base is already below the 0.15 cap: the fault gate is
+  met from the start and a faulted thermal run can begin from step 0 or any checkpoint. Kaiju reports deepest
+  crust particle, T-based tip, Newton its, hinge rate at steps 10-50. kaiju-fault-drivers pinned at d0dca11.
