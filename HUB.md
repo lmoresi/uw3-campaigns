@@ -905,3 +905,12 @@ frozen as the hand-over state; they are not updated here after this date.
   compute items for the notes are hyperion's (i) shipped records for fig_iterations and (j) the global peak
   slip at np 8 for 2026-022, and the three 2026-018 figures (parallel-pipeline, load-per-processor,
   band-through-the-boundary), all queued behind the leak-fix PR. The wombat notes sessions are told.
+- 2026-10-27: **hyperion reimaged tonight, offline 12-24 h from ~30-60 min after 2026-10-27 (Louis).** Hyperion told
+  to shut down cleanly: nothing new; commit and push everything (WIP included) in every worktree and confirm no
+  unpushed commits; write scripts/sessions/HANDOVER-2026-10-27.md (branches and heads, leak-fix PR state, coarse
+  solve state, queued items, non-git material on /mnt/data, the env recipe) and push it; final transcript
+  message lists pushed heads for the hub to verify. The leak-fix PR to development pauses where it stands;
+  kaiju runs the fix as overlay-leakfix meanwhile and nothing in production depends on hyperion. After the
+  reimage: Louis recreates /mnt/data/lmoresi if the second drive did not survive; the hub walks the new
+  session through the "Machines and roles" recipe (pixi env dev, caches and env vars on /mnt/data,
+  OMP_NUM_THREADS=1), the hourly ~/.claude mirror and the Simulations symlink still await Louis's approval.
