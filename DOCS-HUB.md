@@ -192,5 +192,7 @@ Measured here, not inherited.
   Louis); the open-PR table above is from the repository, not from a report.
 - 2026-10-27: Louis ruled the split through the science hub ("the day-to-day flow of that
   work is quite distinct"); HUB.md froze its notes section and now names this hub. This
-  hub's session id recorded in HUB.md; the science hub and the two wombat notes sessions
-  messaged with it.
+  hub's session id recorded in HUB.md. Louis approved the "reach my other sessions" grant;
+  the two wombat notes sessions were messaged with it (delivered). The science hub cannot
+  be messaged from here (cloud to cloud needs a trusted device); it learns of this hub from
+  HUB.md, or Louis tells it.

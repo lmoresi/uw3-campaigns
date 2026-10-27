@@ -23,6 +23,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | | Session id |
 |---|---|
 | hub (current) | `session_013CgVT1Gx9WTvaZVqU58HsQ` |
+| docs and technical notes hub (from 2026-10-27) | `session_01HxWvn87HYCEJodpgCdaBro`; keeps `DOCS-HUB.md` |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
@@ -85,7 +86,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 
 Louis: "The tech notes and documentation fixes are going to be handled via a different Hub since the
 day-to-day flow of that work is quite distinct." From 2026-10-27 this hub no longer coordinates the notes
-repo, its branches, reviews or workflow; the notes hub does (session id to be recorded here when known).
+repo, its branches, reviews or workflow; the notes hub does (`session_01HxWvn87HYCEJodpgCdaBro`, "Underworld Docs and technical notes Hub"; its state file is `DOCS-HUB.md` beside this one).
 What stays with this hub is the compute side: figure scripts and records produced on hyperion or kaiju
 (fault_mg/uwtn_*, parallel_addon/uwtn_*, kaiju figures_out/) are made on request and reach the notes by
 hyperion's pushes to underworld3 or Louis's rsync from kaiju, as before. The section and table below are
