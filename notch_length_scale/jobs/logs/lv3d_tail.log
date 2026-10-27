@@ -1,0 +1,709 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 577 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 5 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.5013
+    1 KSP Residual norm 0.11431
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.11431
+    1 KSP Residual norm 0.0450016
+    2 KSP Residual norm 0.0282617
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0282617
+    1 KSP Residual norm 0.0250834
+    2 KSP Residual norm 0.0196741
+    3 KSP Residual norm 0.0116344
+    4 KSP Residual norm 0.00828403
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00828403
+    1 KSP Residual norm 0.0071247
+    2 KSP Residual norm 0.0069431
+    3 KSP Residual norm 0.00346474
+    4 KSP Residual norm 0.00293325
+    5 KSP Residual norm 0.0018077
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0018077
+    1 KSP Residual norm 0.00172977
+    2 KSP Residual norm 0.00150133
+    3 KSP Residual norm 0.000985162
+    4 KSP Residual norm 0.000610509
+    5 KSP Residual norm 0.000490995
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000490995
+    1 KSP Residual norm 0.000478392
+    2 KSP Residual norm 0.000363855
+    3 KSP Residual norm 0.000271999
+    4 KSP Residual norm 0.000193465
+    5 KSP Residual norm 0.000145299
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000145299
+    1 KSP Residual norm 0.000138536
+    2 KSP Residual norm 0.000122167
+    3 KSP Residual norm 7.61102e-05
+    4 KSP Residual norm 5.83355e-05
+    5 KSP Residual norm 4.02647e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 4.02647e-05
+    1 KSP Residual norm 3.91089e-05
+    2 KSP Residual norm 2.69516e-05
+    3 KSP Residual norm 2.17602e-05
+    4 KSP Residual norm 1.4999e-05
+    5 KSP Residual norm 1.16001e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.16001e-05
+    1 KSP Residual norm 1.04218e-05
+    2 KSP Residual norm 1.03165e-05
+    3 KSP Residual norm 6.00349e-06
+    4 KSP Residual norm 4.96601e-06
+    5 KSP Residual norm 3.1212e-06
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 3.1212e-06
+    1 KSP Residual norm 2.97374e-06
+    2 KSP Residual norm 2.5576e-06
+    3 KSP Residual norm 1.67384e-06
+    4 KSP Residual norm 1.27552e-06
+    5 KSP Residual norm 9.67227e-07
+    6 KSP Residual norm 5.42058e-07
+  0 SNES Function norm 0.0949986
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Object is in wrong state
+[0]PETSC ERROR: Must call KSPSetUp() or PCSetUp() before calling PCFieldSplitGetSubKSP()
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_gmres_restart value: 30 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_rtol value: 3.3e-08 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_pc_type value: redundant source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_factor_shift_type value: nonzero source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_type value: lu source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_converged_maxits (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_max_it value: 4 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_norm_type value: none source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_type value: gmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_pc_type value: sor source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_galerkin value: both source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_type value: mg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_type value: preonly source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_pc_type value: bjacobi source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_0_fields value: 0,2 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_1_fields value: 1 source: code
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py with 8 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Tue Oct 13 15:54:37 2026
+[0]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[0]PETSC ERROR: #1 PCFieldSplitGetSubKSP_FieldSplit_Schur() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2267
+[0]PETSC ERROR: #2 PCFieldSplitGetSubKSP() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2773
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 32 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 3 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0119429
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0119429
+    1 KSP Residual norm 0.00215943
+    2 KSP Residual norm 0.00154528
+    3 KSP Residual norm 0.000739192
+    4 KSP Residual norm 0.00033948
+    5 KSP Residual norm 0.000228527
+    6 KSP Residual norm 0.000181917
+    7 KSP Residual norm 0.000147663
+    8 KSP Residual norm 0.000105837
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 8
+      Line search: Using full step: fnorm 1.194292149642e-02 gnorm 2.367825126010e-03
+  1 SNES Function norm 0.00236783
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00236783
+    1 KSP Residual norm 0.000702671
+    2 KSP Residual norm 0.000646196
+    3 KSP Residual norm 0.000592022
+    4 KSP Residual norm 0.000383901
+    5 KSP Residual norm 0.000305311
+    6 KSP Residual norm 0.000210991
+    7 KSP Residual norm 0.000128168
+    8 KSP Residual norm 8.74253e-05
+    9 KSP Residual norm 5.72642e-05
+   10 KSP Residual norm 3.44739e-05
+   11 KSP Residual norm 1.80254e-05
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 11
+      Line search: Using full step: fnorm 2.367825126010e-03 gnorm 1.693592325752e-03
+  2 SNES Function norm 0.00169359
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00169359
+    1 KSP Residual norm 9.96824e-05
+    2 KSP Residual norm 7.56568e-05
+    3 KSP Residual norm 6.89965e-05
+    4 KSP Residual norm 4.13492e-05
+    5 KSP Residual norm 3.06311e-05
+    6 KSP Residual norm 2.07377e-05
+    7 KSP Residual norm 1.467e-05
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 7
+      Line search: Using full step: fnorm 1.693592325752e-03 gnorm 1.866413653144e-04
+  3 SNES Function norm 0.000186641
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000186641
+    1 KSP Residual norm 1.43212e-05
+    2 KSP Residual norm 1.13448e-05
+    3 KSP Residual norm 9.33734e-06
+    4 KSP Residual norm 6.89464e-06
+    5 KSP Residual norm 4.84394e-06
+    6 KSP Residual norm 3.25232e-06
+    7 KSP Residual norm 2.19667e-06
+    8 KSP Residual norm 1.43724e-06
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 8
+      Line search: Using full step: fnorm 1.866413653144e-04 gnorm 1.385118272023e-05
+  4 SNES Function norm 1.38512e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.38512e-05
+    1 KSP Residual norm 1.5931e-06
+    2 KSP Residual norm 1.31562e-06
+    3 KSP Residual norm 9.27665e-07
+    4 KSP Residual norm 6.90071e-07
+    5 KSP Residual norm 4.97512e-07
+    6 KSP Residual norm 3.75181e-07
+    7 KSP Residual norm 2.67206e-07
+    8 KSP Residual norm 2.1639e-07
+    9 KSP Residual norm 1.27726e-07
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 9
+      Line search: Using full step: fnorm 1.385118272023e-05 gnorm 1.658481151455e-07
+  5 SNES Function norm 1.65848e-07
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.65848e-07
+    1 KSP Residual norm 9.18071e-08
+    2 KSP Residual norm 7.05309e-08
+    3 KSP Residual norm 4.32243e-08
+    4 KSP Residual norm 3.00371e-08
+    5 KSP Residual norm 2.03448e-08
+    6 KSP Residual norm 9.57423e-09
+    7 KSP Residual norm 6.98179e-09
+    8 KSP Residual norm 5.49931e-09
+    9 KSP Residual norm 4.20895e-09
+   10 KSP Residual norm 2.95279e-09
+   11 KSP Residual norm 1.78872e-09
+   12 KSP Residual norm 1.22247e-09
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 12
+      Line search: Using full step: fnorm 1.658481151455e-07 gnorm 1.225441006883e-09
+  6 SNES Function norm 1.22544e-09
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1017 of 1017 query points are not located on this rank (rank 6 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1007 of 1007 query points are not located on this rank (rank 0 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1084 of 1084 query points are not located on this rank (rank 2 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1083 of 1083 query points are not located on this rank (rank 5 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1021 of 1021 query points are not located on this rank (rank 4 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1123 of 1123 query points are not located on this rank (rank 1 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1311 of 1311 query points are not located on this rank (rank 3 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1283 of 1283 query points are not located on this rank (rank 7 of 8), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [micromorphic 3-D] ref 1 beta 0.1 l 1.0 km np 8: CONVERGED_FNORM_ABS its 6 (2477 s) mid-strike W 4.874 km, peak 1.049; W(z) 4.55 4.59 4.72 4.80 4.94 4.87 4.70 4.64 4.60 4.56 4.56
+****************************************************************************************************************************************************************
+***                                WIDEN YOUR WINDOW TO 160 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document                                 ***
+****************************************************************************************************************************************************************
+
+------------------------------------------------------------------ PETSc Performance Summary: ------------------------------------------------------------------
+
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py on a  named hyperion with 8 processes, by lmoresi on Tue Oct 13 16:59:15 2026
+Using 1 OpenMP threads
+Using PETSc Release Version 3.25.3, Jun 29, 2026
+
+                         Max       Max/Min     Avg       Total
+Time (sec):           3.879e+03     1.000   3.879e+03
+Objects:              0.000e+00     0.000   0.000e+00
+Flops:                2.283e+12     1.365   2.025e+12  1.620e+13
+Flops/sec:            5.887e+08     1.365   5.222e+08  4.178e+09
+MPI Msg Count:        8.564e+06     1.239   7.637e+06  6.109e+07
+MPI Msg Len (bytes):  2.898e+10     1.722   2.843e+03  1.737e+11
+MPI Reductions:       1.798e+04     1.010
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flop ------  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total    Count   %Total     Avg         %Total    Count   %Total
+ 0:      Main Stage: 3.8786e+03 100.0%  1.6203e+13 100.0%  6.109e+07 100.0%  2.843e+03      100.0%  1.792e+04 100.6%
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flop: Max - maximum over all processes
+                  Ratio - ratio of maximum to minimum over all processes
+   Mess: number of messages sent
+   AvgLen: average message length (bytes)
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flop in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 1e-6 * (sum of flop over all processes)/(max time over all processes)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flop                              --- Global ---  --- Stage ----  Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   AvgLen  Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+BuildTwoSided       7597 1.0 4.3985e+00 4.7 0.00e+00 0.0 1.3e+05 4.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+BuildTwoSidedF      2895 1.0 3.7833e+00 5.4 0.00e+00 0.0 7.3e+04 2.7e+04 0.0e+00  0  0  0  1  0   0  0  0  1  0     0
+ISView               110 2.1 9.0623e-01 2.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+ISLoad                54 1.0 4.8054e-02 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 1.1e+02  0  0  0  0  1   0  0  0  0  1     0
+SFSetGraph          5972 1.0 1.8071e-01 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFSetUp             4702 1.0 8.3325e-01 1.7 0.00e+00 0.0 2.0e+05 3.0e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFBcastBegin        6016 1.0 8.6372e-02 1.7 0.00e+00 0.0 1.4e+05 6.2e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFBcastEnd          6016 1.0 3.7161e+00 101.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFReduceBegin       1053 1.0 2.8321e-02 1.9 0.00e+00 0.0 2.4e+04 2.0e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFReduceEnd         1053 1.0 2.0464e+01 14.7 6.16e+04 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFFetchOpBegin        96 1.0 1.8321e-03 3.9 0.00e+00 0.0 1.8e+03 7.7e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFFetchOpEnd          96 1.0 4.5105e-01 66.9 0.00e+00 0.0 1.8e+03 7.7e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFCreateEmbed        188 1.0 9.0173e-01 98.6 0.00e+00 0.0 3.5e+03 1.2e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFDistSection        382 1.0 3.5728e-02 1.9 0.00e+00 0.0 1.8e+04 3.3e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFSectionSF          567 1.0 3.7185e-01 5.6 0.00e+00 0.0 1.2e+04 1.3e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFRemoteOff          185 1.0 9.5071e-01 50.0 0.00e+00 0.0 7.1e+03 2.9e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFPack           1306682 1.0 6.9742e+00 2.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SFUnpack         1306778 1.0 6.2343e-01 1.5 1.39e+08 2.1 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1395
+VecView               11 1.4 1.4142e-01 1.4 0.00e+00 0.0 3.4e+02 6.8e+02 9.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecMax                 1 1.0 1.0233e-04 6.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecMin                 1 1.0 1.0229e-04 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecDot               104 1.0 2.0501e-02 3.8 9.82e+05 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   354
+VecMDot           702273 1.0 4.5429e+02 5.1 2.72e+10 1.2 0.0e+00 0.0e+00 0.0e+00  6  1  0  0  0   6  1  0  0  0   453
+VecNorm           875056 1.0 1.1577e+02 3.9 9.44e+09 1.2 0.0e+00 0.0e+00 0.0e+00  2  0  0  0  0   2  0  0  0  0   617
+VecScale          874840 1.0 1.9884e+00 1.3 4.72e+09 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0 17953
+VecCopy           172955 1.0 2.0587e+00 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet            533455 1.0 2.2215e+00 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY           301049 1.0 2.0125e+00 1.2 3.42e+09 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0 12852
+VecAYPX            92860 1.0 6.6741e-01 1.3 4.42e+08 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  5009
+VecAXPBYCZ          3520 1.0 4.7747e-03 2.8 1.19e+07 1.6 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0 15937
+VecWAXPY             454 1.0 2.0691e-02 1.3 8.63e+06 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  3147
+VecMAXPY          874641 1.0 9.2908e+00 1.3 3.49e+10 1.2 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0 28371
+VecAssemblyBegin     792 1.0 3.3919e-02 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAssemblyEnd       792 1.0 6.8478e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecPointwiseMult    7216 1.0 6.9234e-03 2.2 4.87e+06 1.6 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  4506
+VecReciprocal        723 1.0 2.1406e-03 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecLoad                3 1.0 1.0957e-03 2.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin  1299517 1.0 2.9371e+01 1.5 0.00e+00 0.0 6.0e+07 2.8e+03 0.0e+00  1  0 99 98  0   1  0 99 98  0     0
+VecScatterEnd    1299517 1.0 2.7010e+02 8.3 1.39e+08 2.1 0.0e+00 0.0e+00 0.0e+00  4  0  0  0  0   4  0  0  0  0     3
+VecReduceArith       208 1.0 1.7619e-03 1.4 1.96e+06 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  8241
+VecReduceComm        104 1.0 1.4501e-02 2.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecNormalize      859596 1.0 1.1669e+02 3.9 1.31e+10 1.2 0.0e+00 0.0e+00 0.0e+00  2  1  0  0  0   2  1  0  0  0   850
+MatMult           707627 1.1 2.0482e+03 1.1 1.51e+12 1.4 5.2e+07 3.1e+03 0.0e+00 51 66 85 92  0  51 66 85 92  0  5200
+MatMultAdd         86700 1.0 5.8555e+00 1.1 1.73e+09 1.2 4.1e+06 1.1e+03 0.0e+00  0  0  7  3  0   0  0  7  3  0  2196
+MatMultTranspose  129515 1.0 3.8383e+01 2.4 3.47e+09 1.2 5.9e+06 1.2e+03 0.0e+00  1  0 10  4  0   1  0 10  4  0   668
+MatSolve           57686 1.0 2.2658e+02 1.0 1.29e+11 1.0 0.0e+00 0.0e+00 0.0e+00  6  6  0  0  0   6  6  0  0  0  4545
+MatSOR            857220 1.0 1.0621e+03 1.3 8.64e+11 1.4 0.0e+00 0.0e+00 0.0e+00 24 37  0  0  0  24 37  0  0  0  5642
+MatLUFactorSym        90 1.0 1.4750e-01 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatLUFactorNum       120 1.0 7.1118e+00 1.1 1.37e+10 1.0 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0 15436
+MatILUFactorSym        2 1.0 2.4482e-04 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatCopy               16 1.0 2.9448e-02 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatConvert           266 1.0 3.5924e-02 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 1.8e+02  0  0  0  0  1   0  0  0  0  1     0
+MatScale             880 1.0 1.7116e-02 1.1 6.03e+06 1.3 8.6e+03 3.0e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0  2598
+MatResidual        86602 1.0 1.3618e+02 1.2 1.01e+11 1.5 4.3e+06 3.3e+03 0.0e+00  3  4  7  8  0   3  4  7  8  0  5194
+MatAssemblyBegin    7544 1.0 4.3631e+00 1.4 0.00e+00 0.0 7.3e+04 2.7e+04 0.0e+00  0  0  0  1  0   0  0  0  1  0     0
+MatAssemblyEnd      7544 1.0 3.4759e+00 1.4 1.70e+07 1.9 1.3e+05 7.6e+01 2.1e+03  0  0  0  0 12   0  0  0  0 11    30
+MatGetRowIJ           92 23.0 4.7865e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatCreateSubMats      18 1.0 1.5949e-01 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatCreateSubMat      284 1.0 1.4704e+00 1.0 0.00e+00 0.0 5.9e+03 1.3e+03 9.2e+02  0  0  0  0  5   0  0  0  0  5     0
+MatGetOrdering        92 23.0 1.4787e-02 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatPartitioning       88 1.0 3.7074e+00 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 2.2e+02  0  0  0  0  1   0  0  0  0  1     0
+MatCoarsen           176 1.0 1.5131e-01 1.0 0.00e+00 0.0 9.5e+04 2.2e+02 7.9e+02  0  0  0  0  4   0  0  0  0  4     0
+MatZeroEntries       427 1.0 2.8304e-01 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatAXPY              528 1.0 2.3689e-01 1.1 2.20e+06 1.3 1.7e+04 7.7e+01 1.8e+02  0  0  0  0  1   0  0  0  0  1    68
+MatTranspose         816 1.0 3.0951e-01 1.0 0.00e+00 0.0 7.0e+04 6.1e+02 7.9e+02  0  0  0  0  4   0  0  0  0  4     0
+MatMatMultSym        728 1.0 5.1627e-01 1.3 0.00e+00 0.0 8.2e+04 3.7e+02 1.1e+03  0  0  0  0  6   0  0  0  0  6     0
+MatMatMultNum        920 1.0 6.2231e-01 2.2 3.21e+08 2.3 1.7e+04 1.1e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0  3278
+MatPtAPSymbolic      188 1.0 1.2202e+00 1.0 0.00e+00 0.0 5.3e+04 2.2e+03 5.6e+02  0  0  0  0  3   0  0  0  0  3     0
+MatPtAPNumeric       284 1.0 5.0541e+00 1.2 7.00e+08 1.8 4.6e+04 3.1e+04 1.9e+02  0  0  0  1  1   0  0  0  1  1   931
+MatTrnMatMultSym      88 1.0 1.1403e+00 1.0 0.00e+00 0.0 2.7e+04 5.0e+03 3.5e+02  0  0  0  0  2   0  0  0  0  2     0
+MatRedundantMat       18 1.0 1.9410e-01 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetLocalMat      1076 1.0 4.9063e-02 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetBrAoCol        988 1.0 2.1013e-01 1.2 0.00e+00 0.0 1.0e+05 1.3e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatCreateGraph       176 1.0 4.8750e-01 1.0 5.14e+06 1.3 8.6e+04 5.4e+02 7.0e+02  0  0  0  0  4   0  0  0  0  4    78
+MatSetPreallCOO      390 1.0 1.1615e-03 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatSetValuesCOO      390 1.0 7.2059e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+PCSetUp_GAMG+         88 1.0 7.6744e+00 1.0 1.83e+08 1.4 5.3e+05 8.5e+02 6.3e+03  0  0  1  0 35   0  0  1  0 35   163
+ PCGAMGCreateG       176 1.0 4.8785e-01 1.0 5.14e+06 1.3 8.6e+04 5.4e+02 7.0e+02  0  0  0  0  4   0  0  0  0  4    78
+ GAMG Coarsen        352 1.0 1.3661e+00 1.0 0.00e+00 0.0 1.4e+05 1.2e+03 1.1e+03  0  0  0  0  6   0  0  0  0  6     0
+  GAMG MIS/Agg       176 1.0 1.3003e+00 1.0 0.00e+00 0.0 1.2e+05 1.3e+03 1.1e+03  0  0  0  0  6   0  0  0  0  6     0
+ PCGAMGProl          176 1.0 1.1058e-01 1.0 0.00e+00 0.0 2.7e+04 3.8e+02 5.3e+02  0  0  0  0  3   0  0  0  0  3     0
+  GAMG Prol-col      176 1.0 2.9704e-02 1.0 0.00e+00 0.0 1.1e+04 8.2e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+  GAMG Prol-lift     176 1.0 5.9517e-02 1.0 0.00e+00 0.0 1.6e+04 7.4e+01 1.8e+02  0  0  0  0  1   0  0  0  0  1     0
+ PCGAMGOptProl       176 1.0 6.2589e-01 1.0 8.57e+07 1.3 1.9e+05 4.0e+02 1.1e+03  0  0  0  0  6   0  0  0  0  6  1003
+  GAMG smooth        352 1.0 4.3875e-01 1.0 2.40e+07 1.4 9.9e+04 4.9e+02 1.1e+03  0  0  0  0  6   0  0  0  0  6   373
+ PCGAMGCreateL       176 1.0 4.8392e+00 1.0 9.73e+07 2.3 8.9e+04 1.7e+03 2.8e+03  0  0  0  0 16   0  0  0  0 15   121
+  GAMG PtAP          176 1.0 7.8669e-01 1.0 9.73e+07 2.3 8.1e+04 1.8e+03 7.0e+02  0  0  0  0  4   0  0  0  0  4   743
+  GAMG Reduce        176 1.0 4.1856e+00 1.0 1.55e+07 2.2 4.6e+04 6.6e+02 2.4e+03  0  0  0  0 14   0  0  0  0 14    23
+   GAMG Repart        88 1.0 3.7477e+00 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 5.7e+02  0  0  0  0  3   0  0  0  0  3     0
+PCGAMG Squ l00        88 1.0 1.1406e+00 1.0 0.00e+00 0.0 2.7e+04 5.0e+03 3.5e+02  0  0  0  0  2   0  0  0  0  2     0
+PCGAMG Gal l00        88 1.0 6.6239e-01 1.0 8.17e+07 2.3 4.3e+04 2.7e+03 3.5e+02  0  0  0  0  2   0  0  0  0  2   739
+PCGAMG Opt l00       176 1.0 2.5118e-01 1.0 1.22e+07 1.2 4.5e+04 4.7e+02 5.3e+02  0  0  0  0  3   0  0  0  0  3   360
+PCGAMG Gal l01        88 1.0 1.2542e-01 1.1 1.55e+07 2.2 3.9e+04 7.7e+02 3.5e+02  0  0  0  0  2   0  0  0  0  2   757
+PCGAMG Opt l01       176 1.0 1.2629e-01 1.1 9.38e+06 2.9 5.4e+04 5.1e+02 5.3e+02  0  0  0  0  3   0  0  0  0  3   403
+PCSetUp              124 1.0 1.7623e+01 1.0 1.40e+10 1.0 5.4e+05 1.2e+03 6.4e+03  0  1  1  0 36   0  1  1  0 36  6325
+PCSetUpOnBlocks      554 1.0 4.6020e+00 1.0 5.38e+08 1.8 1.3e+04 9.6e+04 0.0e+00  0  0  0  1  0   0  0  0  1  0   800
+PCApply              538 1.0 3.0122e+03 1.0 2.23e+12 1.4 6.0e+07 2.8e+03 0.0e+00 78 98 99 98  0  78 98 99 98  0  5253
+PCApplyOnBlocks      538 1.0 9.2773e-03 1.4 2.91e+06 1.5 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2164
+KSPSolve_FS_0         98 1.0 1.0220e+03 1.0 7.51e+11 1.4 2.0e+07 2.8e+03 0.0e+00 26 33 33 33  0  26 33 33 33  0  5204
+KSPSolve_FS_Schu      98 1.0 1.0171e+03 1.0 7.53e+11 1.4 2.0e+07 2.8e+03 0.0e+00 26 33 33 33  0  26 33 33 33  0  5237
+KSPSolve_FS_Low       98 1.0 9.7233e+02 1.0 7.29e+11 1.4 1.9e+07 2.8e+03 0.0e+00 25 32 32 32  0  25 32 32 32  0  5323
+KSPSetUp             120 1.0 1.4767e-02 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve             104 1.0 3.0136e+03 1.0 2.23e+12 1.4 6.0e+07 2.8e+03 0.0e+00 78 98 99 98  0  78 98 99 98  0  5252
+KSPGMRESOrthog    702273 1.0 4.6338e+02 4.7 5.44e+10 1.2 0.0e+00 0.0e+00 0.0e+00  6  3  0  0  0   6  3  0  0  0   888
+DMRefine               1 1.0 3.2531e-02 1.0 5.37e+03 1.0 2.7e+02 4.1e+02 9.0e+00  0  0  0  0  0   0  0  0  0  0     1
+DMCreateInterp        19 1.0 1.4381e+00 1.0 5.28e+06 1.2 3.4e+03 6.7e+03 1.9e+02  0  0  0  0  1   0  0  0  0  1    28
+DMCreateMat           92 1.0 1.6466e+01 1.0 0.00e+00 0.0 4.1e+04 3.1e+03 3.7e+02  0  0  0  0  2   0  0  0  0  2     0
+DMView                 5 2.5 1.0369e+00 1.9 0.00e+00 0.0 4.2e+02 4.8e+02 1.5e+02  0  0  0  0  1   0  0  0  0  1     0
+DMPlexCreateGmsh       3 0.0 1.1598e-01 0.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexCrFromFile       3 0.0 1.1661e-01 0.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+Mesh Partition         3 1.0 3.7154e-02 1.0 0.00e+00 0.0 1.0e+02 5.2e+03 1.5e+01  0  0  0  0  0   0  0  0  0  0     0
+Mesh Migration         3 1.0 2.0095e-02 1.0 0.00e+00 0.0 1.4e+03 3.1e+03 1.6e+02  0  0  0  0  1   0  0  0  0  1     0
+DMPlexPartSelf         3 1.0 7.8878e-03 857.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexPartLblInv       3 1.0 8.7128e-03 10.6 0.00e+00 0.0 0.0e+00 0.0e+00 6.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexPartLblSF        3 1.0 9.6553e-04 1.2 0.00e+00 0.0 4.2e+01 2.5e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexPartStrtSF       3 1.0 3.2547e-03 1.0 0.00e+00 0.0 2.1e+01 1.0e+04 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexPointSF          3 1.0 1.5821e-03 1.0 0.00e+00 0.0 4.2e+01 1.3e+04 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexInterp         821 1.0 8.5119e-02 1.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexDistribute       3 1.0 5.9353e-02 1.0 0.00e+00 0.0 1.5e+03 3.5e+03 1.8e+02  0  0  0  0  1   0  0  0  0  1     0
+DMPlexDistCones        3 1.0 1.8646e-03 1.0 0.00e+00 0.0 1.3e+02 8.6e+03 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexDistLabels       3 1.0 1.5190e-02 1.0 0.00e+00 0.0 1.1e+03 2.7e+03 1.5e+02  0  0  0  0  1   0  0  0  0  1     0
+DMPlexDistField        3 1.0 6.7642e-04 1.1 0.00e+00 0.0 1.5e+02 7.4e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexStratify      1375 1.0 3.4279e-02 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexSymmetrize    1375 1.0 7.3987e-03 3.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexPrealloc        92 1.0 1.6369e+01 1.0 0.00e+00 0.0 4.1e+04 3.1e+03 3.7e+02  0  0  0  0  2   0  0  0  0  2     0
+DMPlexResidualFE     198 1.0 7.4897e+01 1.2 1.12e+10 1.1 0.0e+00 0.0e+00 0.0e+00  2  1  0  0  0   2  1  0  0  0  1136
+DMPlexJacobianFE     106 1.0 5.8349e+02 1.0 3.20e+10 1.1 4.7e+03 8.5e+04 0.0e+00 15  2  0  0  0  15  2  0  0  0   419
+DMPlexInterpFE        19 1.0 1.4029e+00 1.0 1.08e+04 1.0 2.0e+03 1.1e+04 9.5e+01  0  0  0  0  1   0  0  0  0  1     0
+DMPlexTopologyLoad       3 1.0 1.8003e-02 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 2.7e+01  0  0  0  0  0   0  0  0  0  0     0
+DMPlexLabelsLoad       3 1.0 5.6911e-02 1.0 0.00e+00 0.0 1.3e+03 4.7e+02 1.3e+02  0  0  0  0  1   0  0  0  0  1     0
+DMPlexCoordinatesLoad       3 1.0 2.6531e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 3.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrSetUp          1 1.0 3.8913e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrApply          1 1.0 1.9911e-02 1.0 0.00e+00 0.0 1.5e+02 2.6e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrSizes          1 1.0 2.9819e-03 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrCones          1 1.0 8.8803e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrSF             1 1.0 5.6742e-04 1.3 0.00e+00 0.0 1.5e+02 2.6e+02 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrLabels         1 1.0 2.6067e-03 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMPlexTrCoords         1 1.0 6.1726e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMSwarmMigrate       311 1.0 7.9407e+01 2.0 0.00e+00 0.0 1.7e+04 2.7e+04 9.3e+02  2  0  0  0  5   2  0  0  0  5     0
+DMSwarmDETSetup      311 1.0 2.6178e-01 1.1 0.00e+00 0.0 1.0e+04 6.0e+00 9.3e+02  0  0  0  0  5   0  0  0  0  5     0
+DMSwarmDExBegin      311 1.0 1.0206e-03 2.3 0.00e+00 0.0 1.7e+03 1.3e+05 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMSwarmDExEnd        311 1.0 1.0374e+00 1.5 0.00e+00 0.0 1.7e+03 1.3e+05 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMSwarmDESendCnt     311 1.0 1.3193e-02 5.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMSwarmDEPack        311 1.0 3.2034e-01 1.2 0.00e+00 0.0 3.5e+03 4.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+DMSwarmAddPnts        88 1.0 8.3949e-03 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNESSolve             92 1.0 3.6358e+03 1.0 2.27e+12 1.4 6.1e+07 2.8e+03 6.5e+03 94 100 100 99 36  94 100 100 99 36  4437
+SNESSetUp             90 1.0 1.6468e+01 1.0 0.00e+00 0.0 4.1e+04 3.1e+03 3.7e+02  0  0  0  0  2   0  0  0  0  2     0
+SNESFunctionEval     198 1.0 8.6992e+01 1.4 1.12e+10 1.1 1.1e+04 4.4e+02 1.8e+02  2  1  0  0  1   2  1  0  0  1   981
+SNESJacobianEval     106 1.0 5.8524e+02 1.0 3.21e+10 1.1 6.7e+03 6.0e+04 0.0e+00 15  2  0  0  0  15  2  0  0  0   418
+SNESLineSearch       104 1.0 5.2242e+01 1.0 6.88e+09 1.1 8.3e+03 1.0e+03 9.0e+01  1  0  0  0  1   1  0  0  0  1  1005
+DualSpaceSetUp       201 1.0 1.9938e-01 1.1 4.23e+04 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     2
+FESetUp              201 1.0 5.5024e-03 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+Function.evaluate_nd      95 1.0 2.0164e+02 1.2 1.42e+10 1.1 9.8e+05 9.3e+02 1.4e+04  4  1  2  1 81   4  1  2  1 80   540
+Function.rbf_evaluate      63 1.1 9.7458e+00 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+_warn_if_points_are_not_owned      49 1.0 2.5972e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+global_evaluate       88 1.0 2.6426e+02 1.0 1.42e+10 1.1 1.0e+06 1.4e+03 1.5e+04  7  1  2  1 86   7  1  2  1 85   412
+_gmsh_to_h5            3 1.0 1.1309e+00 2.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+_from_gmsh             3 1.0 1.2166e+00 1.9 0.00e+00 0.0 1.3e+03 4.7e+02 1.6e+02  0  0  0  0  1   0  0  0  0  1     0
+_from_plexh5           3 1.0 8.5901e-02 1.0 0.00e+00 0.0 1.3e+03 4.7e+02 1.6e+02  0  0  0  0  1   0  0  0  0  1     0
+Mesh.__init__          5 1.0 1.0419e+00 1.0 2.21e+06 1.1 3.0e+03 1.9e+03 3.2e+02  0  0  0  0  2   0  0  0  0  2    16
+Mesh.update_lvec     266 1.0 7.2707e+00 1.0 0.00e+00 0.0 6.2e+04 5.4e+03 5.8e+03  0  0  0  0 33   0  0  0  0 32     0
+Mesh.write_timestep       1 1.0 7.3494e-01 1.0 7.83e+04 1.0 9.9e+02 6.1e+02 2.0e+02  0  0  0  0  1   0  0  0  0  1     1
+Mesh.write             1 1.0 5.4776e-01 1.0 0.00e+00 0.0 4.2e+02 4.8e+02 1.5e+02  0  0  0  0  1   0  0  0  0  1     0
+Mesh._wrap_coarse_level       2 1.0 4.5746e-01 1.0 1.15e+06 1.1 4.9e+02 3.8e+02 5.6e+01  0  0  0  0  0   0  0  0  0  0    19
+_BaseMeshVariable.__init__      10 1.0 7.9214e-01 1.0 3.11e+06 1.1 3.0e+03 2.4e+03 3.5e+02  0  0  0  0  2   0  0  0  0  2    30
+collective_operation.<locals>.wrapper      91 1.0 2.2090e+01 1.0 7.83e+04 1.0 1.2e+04 2.3e+04 7.1e+02  1  0  0  0  4   1  0  0  0  4     0
+SwarmVariable.__init__     616 1.0 1.5288e-01 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+Swarm.__init__        88 1.0 1.1349e-01 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+Swarm.add_particles_with_global_coordinates      88 1.0 2.0167e-02 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+getext                90 1.0 7.2726e+00 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+_aux_component_offsets      90 1.0 4.4498e-03 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SolverBaseClass._build      90 1.0 1.8380e+01 1.0 9.84e+05 1.0 8.9e+03 3.3e+02 1.2e+03  0  0  0  0  7   0  0  0  0  7     0
+SolverBaseClass.add_condition       5 1.0 1.9956e-03 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SolverBaseClass.add_dirichlet_bc       5 1.0 2.0286e-03 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNES_Scalar.__init__       1 1.0 2.9066e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNES_Scalar._setup_discretisation      88 1.0 2.4072e-01 1.0 8.39e+05 1.0 0.0e+00 0.0e+00 3.5e+02  0  0  0  0  2   0  0  0  0  2    28
+SNES_Scalar._setup_pointwise_functions      88 1.0 5.2921e+00 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNES_Scalar._setup_solver      88 1.0 2.2041e+00 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 5.3e+02  0  0  0  0  3   0  0  0  0  3     0
+SNES_Scalar.solve      88 1.0 1.3382e+02 1.0 8.98e+09 1.1 9.2e+05 6.6e+02 8.9e+03  3  0  2  0 50   3  0  2  0 50   511
+SNES_Stokes_SaddlePt.__init__       1 1.0 4.4702e-02 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNES_Stokes_SaddlePt._setup_pointwise_functions       2 1.0 1.0449e+01 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+SNES_Stokes_SaddlePt._setup_discretisation       2 1.0 3.2678e-02 1.0 1.46e+05 1.0 3.7e+03 3.7e+02 1.1e+02  0  0  0  0  1   0  0  0  0  1    36
+SNES_Stokes_SaddlePt._setup_solver       2 1.0 9.2103e-02 1.0 4.00e+00 1.0 5.2e+03 3.0e+02 2.2e+02  0  0  0  0  1   0  0  0  0  1     0
+SNES_Stokes_SaddlePt.solve       2 1.0 3.6077e+03 1.0 2.27e+12 1.4 6.0e+07 2.9e+03 1.7e+03 93 99 98 99  9  93 99 98 99  9  4461
+SNES_Stokes.solve       2 1.0 3.6077e+03 1.0 2.27e+12 1.4 6.0e+07 2.9e+03 1.7e+03 93 99 98 99  9  93 99 98 99  9  4461
+SNES_Projection.__init__       1 1.0 3.1052e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+Constitutive_Model._declared_terms       1 1.0 1.3806e-02 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KDTree.find_closest_n_points    1143 1.3 1.3493e+01 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KDTree.query         471 2.1 9.1136e+00 6.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+------------------------------------------------------------------------------------------------------------------------
+
+Object Type          Creations   Destructions. Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+           Container  4455           3660
+              Viewer    18             17
+         PetscRandom   176            176
+           Index Set 45426          42098
+   IS L to G Mapping  3501           2739
+             Section 15081          11184
+   Star Forest Graph 20917          18528
+              Vector 15356          14123
+              Matrix 12087          11352
+ Matrix Partitioning    88             88
+      Matrix Coarsen   176             88
+      Preconditioner   642            183
+       Krylov Solver   642            183
+     DMKSP interface    90              0
+                SNES    90             88
+              DMSNES    90              0
+      SNESLineSearch    92             90
+    Distributed Mesh  6083           4454
+            DM Label 29340          23250
+          Quadrature  5834           3539
+      Mesh Transform     1              1
+    GraphPartitioner  1375            885
+     Discrete System 10195           8571
+           Weak Form 10455           8781
+        Linear Space   241            113
+          Dual Space  1115            615
+            FE Space   201             73
+       Field over DM    95              1
+========================================================================================================================
+Average time to get PetscTime(): 4.85e-08
+Average time for MPI_Barrier(): 1.38592e-05
+Average time for zero size MPI_Send(): 3.7275e-06
+#PETSc Option Table entries:
+-_scratch_clement_petscdualspace_lagrange_continuity true # (source: code)
+-_scratch_clement_petscspace_degree 1 # (source: code)
+-coordinterp_petscdualspace_lagrange_continuity true # (source: code)
+-coordinterp_petscdualspace_lagrange_node_endpoints false # (source: code)
+-coordinterp_petscspace_degree 1 # (source: code)
+-dm_plex_hash_location # (source: code)
+-log_view # (source: code)
+-meshproj_1_petscdualspace_lagrange_continuity true # (source: code)
+-meshproj_1_petscdualspace_lagrange_node_endpoints false # (source: code)
+-meshproj_1_petscspace_degree 1 # (source: code)
+-meshproj_2_petscdualspace_lagrange_continuity true # (source: code)
+-meshproj_2_petscdualspace_lagrange_node_endpoints false # (source: code)
+-meshproj_2_petscspace_degree 1 # (source: code)
+-meshproj_3_petscdualspace_lagrange_continuity true # (source: code)
+-meshproj_3_petscdualspace_lagrange_node_endpoints false # (source: code)
+-meshproj_3_petscspace_degree 1 # (source: code)
+-meshproj_4_petscdualspace_lagrange_continuity true # (source: code)
+-meshproj_4_petscdualspace_lagrange_node_endpoints false # (source: code)
+-meshproj_4_petscspace_degree 1 # (source: code)
+-meshproj_5_petscdualspace_lagrange_continuity true # (source: code)
+-meshproj_5_petscdualspace_lagrange_node_endpoints false # (source: code)
+-meshproj_5_petscspace_degree 1 # (source: code)
+-options_left 0 # (source: code)
+-private_Solver_17__coupled_chi_petscdualspace_lagrange_continuity true # (source: code)
+-private_Solver_17__coupled_chi_petscdualspace_lagrange_node_endpoints false # (source: code)
+-private_Solver_17__coupled_chi_petscspace_degree 1 # (source: code)
+-private_Solver_17__p_petscdualspace_lagrange_continuity true # (source: code)
+-private_Solver_17__p_petscdualspace_lagrange_node_endpoints false # (source: code)
+-private_Solver_17__p_petscspace_degree 1 # (source: code)
+-private_Solver_17__u_petscdualspace_lagrange_continuity true # (source: code)
+-private_Solver_17__u_petscdualspace_lagrange_node_endpoints false # (source: code)
+-private_Solver_17__u_petscspace_degree 2 # (source: code)
+-private_Solver_90__petscdualspace_lagrange_continuity true # (source: code)
+-private_Solver_90__petscdualspace_lagrange_node_endpoints false # (source: code)
+-private_Solver_90__petscspace_degree 1 # (source: code)
+-Solver_17_fieldsplit_0_ksp_gmres_restart 30 # (source: code)
+-Solver_17_fieldsplit_0_ksp_max_it 200 # (source: code)
+-Solver_17_fieldsplit_0_ksp_rtol 3.3e-08 # (source: code)
+-Solver_17_fieldsplit_0_ksp_type fgmres # (source: code)
+-Solver_17_fieldsplit_0_mg_coarse_pc_type redundant # (source: code)
+-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_factor_shift_type nonzero # (source: code)
+-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_type lu # (source: code)
+-Solver_17_fieldsplit_0_mg_levels_ksp_converged_maxits # (source: code)
+-Solver_17_fieldsplit_0_mg_levels_ksp_max_it 4 # (source: code)
+-Solver_17_fieldsplit_0_mg_levels_ksp_norm_type none # (source: code)
+-Solver_17_fieldsplit_0_mg_levels_ksp_type gmres # (source: code)
+-Solver_17_fieldsplit_0_mg_levels_pc_type sor # (source: code)
+-Solver_17_fieldsplit_0_pc_mg_galerkin both # (source: code)
+-Solver_17_fieldsplit_0_pc_mg_type full # (source: code)
+-Solver_17_fieldsplit_0_pc_type mg # (source: code)
+-Solver_17_fieldsplit_1_ksp_max_it 200 # (source: code)
+-Solver_17_fieldsplit_1_ksp_rtol 1e-07 # (source: code)
+-Solver_17_fieldsplit_1_ksp_type preonly # (source: code)
+-Solver_17_fieldsplit_1_pc_type bjacobi # (source: code)
+-Solver_17_fieldsplit_pressure_ksp_max_it 200 # (source: code)
+-Solver_17_fieldsplit_pressure_ksp_rtol 1e-07 # (source: code)
+-Solver_17_fieldsplit_pressure_ksp_type preonly # (source: code)
+-Solver_17_fieldsplit_pressure_pc_type bjacobi # (source: code)
+-Solver_17_fieldsplit_velocity_ksp_gmres_restart 30 # (source: code)
+-Solver_17_fieldsplit_velocity_ksp_max_it 200 # (source: code)
+-Solver_17_fieldsplit_velocity_ksp_rtol 3.3e-08 # (source: code)
+-Solver_17_fieldsplit_velocity_ksp_type fgmres # (source: code)
+-Solver_17_fieldsplit_velocity_mg_coarse_pc_type redundant # (source: code)
+-Solver_17_fieldsplit_velocity_mg_coarse_redundant_pc_factor_shift_type nonzero # (source: code)
+-Solver_17_fieldsplit_velocity_mg_coarse_redundant_pc_type lu # (source: code)
+-Solver_17_fieldsplit_velocity_mg_levels_ksp_converged_maxits # (source: code)
+-Solver_17_fieldsplit_velocity_mg_levels_ksp_max_it 4 # (source: code)
+-Solver_17_fieldsplit_velocity_mg_levels_ksp_norm_type none # (source: code)
+-Solver_17_fieldsplit_velocity_mg_levels_ksp_type gmres # (source: code)
+-Solver_17_fieldsplit_velocity_mg_levels_pc_type sor # (source: code)
+-Solver_17_fieldsplit_velocity_pc_mg_galerkin both # (source: code)
+-Solver_17_fieldsplit_velocity_pc_mg_type full # (source: code)
+-Solver_17_fieldsplit_velocity_pc_type mg # (source: code)
+-Solver_17_ksp_atol 1e-12 # (source: code)
+-Solver_17_ksp_converged_reason # (source: code)
+-Solver_17_ksp_gmres_restart 100 # (source: code)
+-Solver_17_ksp_max_it 500 # (source: code)
+-Solver_17_ksp_monitor_short # (source: code)
+-Solver_17_ksp_type fgmres # (source: code)
+-Solver_17_pc_fieldsplit_0_fields 0,2 # (source: code)
+-Solver_17_pc_fieldsplit_1_fields 1 # (source: code)
+-Solver_17_pc_fieldsplit_diag_use_amat # (source: code)
+-Solver_17_pc_fieldsplit_off_diag_use_amat # (source: code)
+-Solver_17_pc_fieldsplit_schur_fact_type full # (source: code)
+-Solver_17_pc_fieldsplit_schur_precondition a11 # (source: code)
+-Solver_17_pc_fieldsplit_type schur # (source: code)
+-Solver_17_pc_type fieldsplit # (source: code)
+-Solver_17_snes_error_if_not_converged false # (source: code)
+-Solver_17_snes_ksp_ew # (source: code)
+-Solver_17_snes_ksp_ew_rtol0 0.01 # (source: code)
+-Solver_17_snes_ksp_ew_rtolmax 0.01 # (source: code)
+-Solver_17_snes_ksp_ew_version 3 # (source: code)
+-Solver_17_snes_linesearch_monitor # (source: code)
+-Solver_17_snes_linesearch_type bt # (source: code)
+-Solver_17_snes_max_it 40 # (source: code)
+-Solver_17_snes_monitor_short # (source: code)
+-Solver_17_snes_rtol 1e-06 # (source: code)
+-Solver_17_snes_type newtonls # (source: code)
+-Solver_90_ksp_gmres_restart 100 # (source: code)
+-Solver_90_mg_levels_ksp_converged_maxits # (source: code)
+-Solver_90_mg_levels_ksp_max_it 3 # (source: code)
+-Solver_90_pc_gamg_agg_nsmooths 2 # (source: code)
+-Solver_90_pc_gamg_repartition true # (source: code)
+-Solver_90_pc_gamg_type agg # (source: code)
+-Solver_90_pc_mg_type multiplicative # (source: code)
+-Solver_90_pc_type gamg # (source: code)
+-Solver_90_snes_rtol 1e-06 # (source: code)
+-Solver_90_snes_type newtonls # (source: code)
+-uw_beta 0.1 # (source: code)
+-uw_budget 40 # (source: code)
+-uw_fmg_tail /home/lmoresi/+Simulations/spiegelman_hardcase/meshes/notch3d_hb19.2_Lz6_c4.msh,/home/lmoresi/+Simulations/spiegelman_hardcase/meshes/notch3d_hb9.6_Lz6_c2.msh # (source: code)
+-uw_ksp_max_it 500 # (source: code)
+-uw_l_km 1 # (source: code)
+-uw_linear production_ew1e-2 # (source: code)
+-uw_mesh /home/lmoresi/+Simulations/spiegelman_hardcase/meshes/notch3d_hb4.8_Lz6_f0.15.msh # (source: code)
+-uw_ref 1 # (source: code)
+-uw_tag lv3d # (source: code)
+-uw_xi 0 # (source: code)
+-VAR_petscdualspace_lagrange_continuity true # (source: code)
+-VAR_petscdualspace_lagrange_node_endpoints false # (source: code)
+-VAR_petscspace_degree 1 # (source: code)
+-viewer_hdf5_collective false # (source: code)
+-viewer_hdf5_sp_output true # (source: code)
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
+Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+-----------------------------------------
+Libraries compiled on 2026-06-30 07:50:08 on reproducible
+Machine characteristics: Linux-6.17.0-1018-azure-x86_64-with-glibc2.34
+Using PETSc directory: /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+Using PETSc arch: 
+-----------------------------------------
+
+Using C compiler: mpicc  -fPIC -Wall -Wwrite-strings -Wno-unknown-pragmas -Wno-lto-type-mismatch -fstack-protector -fvisibility=hidden -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3 -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fopenmp
+Using Fortran compiler: mpifort  -fPIC -Wall -ffree-line-length-none -ffree-line-length-0 -Wno-lto-type-mismatch -Wno-unused-dummy-argument -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3   -fopenmp -DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fopenmp
+-----------------------------------------
+
+Using include paths: -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/suitesparse -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist
+-----------------------------------------
+
+Using C linker: mpicc
+Using Fortran linker: mpifort
+Using libraries: -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -lpetsc -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -lHYPRE -lspqr -lumfpack -lklu -lcholmod -lamd -lfftw3_mpi -lfftw3 -lsmumps -ldmumps -lcmumps -lzmumps -lmumps_common -lpord -lpthread -lscalapack -lsuperlu_dist -lsuperlu -llapack -lblas -lptesmumps -lptscotchparmetisv3 -lptscotch -lptscotcherr -lesmumps -lscotch -lscotcherr -lpthread -lhdf5_hl -lhdf5 -lparmetis -lmetis -lm -lyaml -lhwloc -lquadmath -ldl
+-----------------------------------------
+

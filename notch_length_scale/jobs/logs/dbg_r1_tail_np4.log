@@ -1,0 +1,168 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 119 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 119 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 119 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 119 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 7 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 7 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 7 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 1->2 had 7 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 3.84988
+    1 KSP Residual norm 0.408153
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.408153
+    1 KSP Residual norm 0.185744
+    2 KSP Residual norm 0.0949016
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0949016
+    1 KSP Residual norm 0.0874068
+    2 KSP Residual norm 0.0690682
+    3 KSP Residual norm 0.0445165
+    4 KSP Residual norm 0.033809
+    5 KSP Residual norm 0.0207499
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0207499
+    1 KSP Residual norm 0.0193392
+    2 KSP Residual norm 0.0162123
+    3 KSP Residual norm 0.00523475
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00523475
+    1 KSP Residual norm 0.004548
+    2 KSP Residual norm 0.0043119
+    3 KSP Residual norm 0.00328949
+    4 KSP Residual norm 0.00206762
+    5 KSP Residual norm 0.000943552
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000943552
+    1 KSP Residual norm 0.000634287
+    2 KSP Residual norm 0.000348915
+    3 KSP Residual norm 0.000249266
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000249266
+    1 KSP Residual norm 0.000197242
+    2 KSP Residual norm 0.000156745
+    3 KSP Residual norm 0.000117117
+    4 KSP Residual norm 8.57728e-05
+    5 KSP Residual norm 5.46749e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 5.46749e-05
+    1 KSP Residual norm 4.3861e-05
+    2 KSP Residual norm 3.58255e-05
+    3 KSP Residual norm 2.421e-05
+    4 KSP Residual norm 1.78855e-05
+    5 KSP Residual norm 1.49759e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 1.49759e-05
+    1 KSP Residual norm 1.4088e-05
+    2 KSP Residual norm 1.10048e-05
+    3 KSP Residual norm 8.50298e-06
+    4 KSP Residual norm 4.24005e-06
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 4.24005e-06
+    1 KSP Residual norm 3.9756e-06
+    2 KSP Residual norm 3.39607e-06
+    3 KSP Residual norm 1.81946e-06
+    4 KSP Residual norm 1.4177e-06
+    5 KSP Residual norm 1.24164e-06
+  0 SNES Function norm 0.256047
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Object is in wrong state
+[0]PETSC ERROR: Must call KSPSetUp() or PCSetUp() before calling PCFieldSplitGetSubKSP()
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_gmres_restart value: 30 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_rtol value: 3.3e-08 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_ksp_type value: fgmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_pc_type value: redundant source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_factor_shift_type value: nonzero source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_coarse_redundant_pc_type value: lu source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_converged_maxits (no value) source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_max_it value: 4 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_norm_type value: none source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_ksp_type value: gmres source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_mg_levels_pc_type value: sor source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_galerkin value: both source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_mg_type value: full source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_0_pc_type value: mg source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_ksp_type value: preonly source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_1_pc_type value: bjacobi source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_max_it value: 200 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_fieldsplit_pressure_ksp_rtol value: 1e-07 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_0_fields value: 0,2 source: code
+[0]PETSC ERROR:   Option left: name:-Solver_17_pc_fieldsplit_1_fields value: 1 source: code
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py with 4 MPI process(es) and PETSC_ARCH  on hyperion by lmoresi Wed Oct 14 10:27:09 2026
+[0]PETSC ERROR: Configure options: AR=x86_64-conda-linux-gnu-ar CPP=${PREFIX}/bin/x86_64-conda-linux-gnu-cpp RANLIB=x86_64-conda-linux-gnu-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include" LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -Wl,-rpath-link,/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib -L/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib" --COPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I${PREFIX}/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.so --with-lapack-lib=liblapack.so --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-x=0 --with-scalar-type=real   --with-cuda=0 --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev
+[0]PETSC ERROR: #1 PCFieldSplitGetSubKSP_FieldSplit_Schur() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2267
+[0]PETSC ERROR: #2 PCFieldSplitGetSubKSP() at /home/conda/feedstock_root/build_artifacts/bld/rattler-build_petsc_1782805808/work/src/ksp/pc/impls/fieldsplit/fieldsplit.c:2773
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 6 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 6 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 6 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:1531: UserWarning: custom_mg: parallel transfer 0->1 had 6 coarse DOF(s) with no fine image (non-nested levels); repaired by nearest-fine-DOF injection.
+  warnings.warn(
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:103: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0375718
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0375718
+    1 KSP Residual norm 0.00705759
+    2 KSP Residual norm 0.00513365
+    3 KSP Residual norm 0.00245554
+    4 KSP Residual norm 0.000967297
+    5 KSP Residual norm 0.000533438
+    6 KSP Residual norm 0.000419925
+    7 KSP Residual norm 0.000353764
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 7
+      Line search: Using full step: fnorm 3.757183521394e-02 gnorm 6.534174489873e-03
+  1 SNES Function norm 0.00653417
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00653417
+    1 KSP Residual norm 0.0019133
+    2 KSP Residual norm 0.00183135
+    3 KSP Residual norm 0.00103442
+    4 KSP Residual norm 0.000591443
+    5 KSP Residual norm 0.000543248
+    6 KSP Residual norm 0.000467197
+    7 KSP Residual norm 0.000264551
+    8 KSP Residual norm 0.000167274
+    9 KSP Residual norm 0.000111484
+   10 KSP Residual norm 6.96666e-05
+   11 KSP Residual norm 4.35668e-05
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 11
+      Line search: Using full step: fnorm 6.534174489873e-03 gnorm 1.468305618244e-03
+  2 SNES Function norm 0.00146831
+[0] SNES solve diverged after 2 iterations: DIVERGED_MAX_IT The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1958 of 1958 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1958 of 1958 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 1903 of 1903 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 2106 of 2106 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [micromorphic 3-D] ref 1 beta 0.1 l 1.0 km np 4: DIVERGED_MAX_IT its 2 (637 s) mid-strike W 4.492 km, peak 0.374; W(z) 5.23 5.38 5.41 4.21 3.93 4.49 4.61 4.14 4.70 5.12 5.07

@@ -1,0 +1,24 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.80703
+  0 SNES Function norm 0.078968
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 7.896799560480e-02 gnorm 1.016450715480e-02
+  1 SNES Function norm 0.0101645
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.016450715480e-02 gnorm 1.007193717166e-02
+  2 SNES Function norm 0.0100719
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.007193717166e-02 gnorm 3.198409708255e-03
+  3 SNES Function norm 0.00319841
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 3.198409708255e-03 gnorm 4.452702681240e-04
+  4 SNES Function norm 0.00044527
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.452702681240e-04 gnorm 3.246450257249e-05
+  5 SNES Function norm 3.24645e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 3.246450257249e-05 gnorm 5.361825508185e-07
+  6 SNES Function norm 5.36183e-07
+[micromorphic] ref 3 xi 0.005 beta 0.08 l 1.0 km np 1: CONVERGED_FNORM_ABS its 6 (382 s) W_int 4.14 W_v 'L': 3.779065340067252, 'R': 3.773920784120174 peak 'L': 1.106433652985058, 'R': 1.0734167810690785 floor bound 64.8

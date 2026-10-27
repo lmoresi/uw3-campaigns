@@ -1,0 +1,4 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref4_xi0_beta0.1_l0.5_production_tight: W_int 3.39 peak 'L': 1.8390500816761104, 'R': 1.8115470753454073

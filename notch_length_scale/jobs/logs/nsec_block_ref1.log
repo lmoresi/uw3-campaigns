@@ -1,0 +1,15 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/render_3d_notch_sections.py", line 56, in <module>
+    S["v"].read_timestep(run, S["v"].name, 0,
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/discretisation/enhanced_variables.py", line 582, in read_timestep
+    return self._base_var.read_timestep(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh_variables.py", line 1356, in read_timestep
+    raise RuntimeError(
+RuntimeError: /home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/results/micromorphic/checkpoints/micro_ref1_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln2.5_n1.2_tail2_block.mesh.U.00000.h5 does not exist

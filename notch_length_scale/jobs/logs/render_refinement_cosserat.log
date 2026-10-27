@@ -1,0 +1,30 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+27 vertices with edot_II <= 0, |x| 2.6-60.0 km, y -30.0--21.9 km
+loaded cosserat_ref3_xi0_c1_l1_P1: 15929 vertices, peak at y = -9.19 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+2 vertices with edot_II <= 0, |x| 60.0-60.0 km, y -30.0--30.0 km
+loaded cosserat_ref4_xi0_c1_l1_P1_production_tight_np8: 63345 vertices, peak at y = -9.39 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded cosserat_ref5_xi0_c1_l1_P1_production_tight_np16: 252641 vertices, peak at y = -9.39 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+26 vertices with edot_II <= 0, |x| 2.6-60.0 km, y -30.0--21.9 km
+loaded cosserat_ref3_xi0_c1_l0.5_P1: 15929 vertices, peak at y = -9.16 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+2 vertices with edot_II <= 0, |x| 60.0-60.0 km, y -30.0--30.0 km
+loaded cosserat_ref4_xi0_c1_l0.5_P1_production_tight_np8: 63345 vertices, peak at y = -8.95 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded cosserat_ref5_xi0_c1_l0.5_P1_production_tight_np16: 252641 vertices, peak at y = -9.05 km
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../figures/refinement_maps_cosserat.png clim (-1.5265983299149137, 0.6748294124668718)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../figures/refinement_zoom_cosserat.png clim (-0.35829630856817557, 0.03471852559951191)

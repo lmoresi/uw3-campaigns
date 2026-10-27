@@ -1,0 +1,23 @@
+....................................                                     [100%]
+=============================== warnings summary ===============================
+test_1016_custom_mg_hierarchy.py::test_advdiff_on_nvb_adapt_child_gets_custom_mg
+test_1016_custom_mg_hierarchy.py::test_advdiff_on_nvb_adapt_child_gets_custom_mg
+test_1016_custom_mg_hierarchy.py::test_advdiff_on_nvb_adapt_child_gets_custom_mg
+test_1016_custom_mg_hierarchy.py::test_advdiff_on_nvb_adapt_child_gets_custom_mg
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:3562: DeprecationWarning: mesh.data is deprecated, use mesh.X.coords instead
+    coords = numpy.ascontiguousarray(self.data)
+
+test_1070_stokes_coupled_fields.py: 16 warnings
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/memprobe.py:269: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    return func(*args, **kw)
+
+test_1070_stokes_coupled_fields.py::test_cold_frozen_tangent_of_a_bare_invariant_source_is_finite[picard3-2]
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/tests/test_1070_stokes_coupled_fields.py:338: RuntimeWarning: [Solver_738_] the Picard warm-up step ended DIVERGED_LINE_SEARCH (-6); Newton continues from its iterate.
+    stokes.solve(picard=picard)
+
+test_1070_stokes_coupled_fields.py::test_cold_coupled_solve_with_a_picard_warmup_converges[3-2]
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/tests/test_1070_stokes_coupled_fields.py:358: RuntimeWarning: [Solver_872_] the Picard warm-up step ended DIVERGED_LINE_SEARCH (-6); Newton continues from its iterate.
+    stokes.solve(picard=picard)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+36 passed, 22 warnings in 658.03s (0:10:58)

@@ -1,0 +1,5 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref1_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln2.5_n1.2_tail1_blk_notchsections3d.png
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref1_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln2.5_n1.2_tail1_blk_notchsections.png

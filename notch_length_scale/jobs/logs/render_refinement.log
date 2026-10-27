@@ -1,0 +1,26 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref3_xi0_beta0.1_l1: 15929 vertices, peak at y = -10.06 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref4_xi0_beta0.1_l1_production_tight: 63345 vertices, peak at y = -10.06 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref5_xi0_beta0.1_l1_production_tight_np16: 252641 vertices, peak at y = -10.06 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref3_xi0_beta0.1_l0.5: 15929 vertices, peak at y = -9.61 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref4_xi0_beta0.1_l0.5_production_tight: 63345 vertices, peak at y = -9.61 km
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+loaded micro_ref5_xi0_beta0.1_l0.5_production_tight_np16: 252641 vertices, peak at y = -9.50 km
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../figures/refinement_maps.png clim (-30.0, 0.7812223422776807)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../figures/refinement_zoom.png clim (-0.33985853153369866, 0.17972433467237856)

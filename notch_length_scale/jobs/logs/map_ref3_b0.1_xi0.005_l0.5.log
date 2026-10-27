@@ -1,0 +1,31 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 2.18016
+  0 SNES Function norm 0.0763696
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 7.636964648356e-02 gnorm 1.101222307395e-02
+  1 SNES Function norm 0.0110122
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 7.600916066546e-03
+      Line search: Quadratically determined step, lambda=3.3685136787646724e-01
+  2 SNES Function norm 0.00760092
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 7.600916066546e-03 gnorm 6.559721322276e-03
+  3 SNES Function norm 0.00655972
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 6.559721322276e-03 gnorm 1.749829795305e-03
+  4 SNES Function norm 0.00174983
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.749829795305e-03 gnorm 4.792139517800e-04
+  5 SNES Function norm 0.000479214
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.792139517800e-04 gnorm 1.222612921030e-04
+  6 SNES Function norm 0.000122261
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 1.222612921030e-04 gnorm 7.638222174756e-06
+  7 SNES Function norm 7.63822e-06
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 7.638222174756e-06 gnorm 2.916359455298e-08
+  8 SNES Function norm 2.91636e-08
+[micromorphic] ref 3 xi 0.005 beta 0.1 l 0.5 km np 1: CONVERGED_FNORM_ABS its 8 (425 s) W_int 3.56 W_v 'L': 3.2777714775364397, 'R': 3.1361316381266247 peak 'L': 1.4686098226071906, 'R': 1.4304707893799797 floor bound 52.6

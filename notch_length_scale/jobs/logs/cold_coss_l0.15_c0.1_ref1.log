@@ -1,0 +1,193 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 0.485864
+  0 SNES Function norm 0.485864
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 73
+      Line search: gnorm after quadratic fit 4.712303897682e-01
+      Line search: Quadratically determined step, lambda=3.3607165977976799e-01
+  1 SNES Function norm 0.47123
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:115: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.47123
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 38
+      Line search: gnorm after quadratic fit 3.806048450208e-01
+      Line search: Quadratically determined step, lambda=1.9556678833238583e-01
+  1 SNES Function norm 0.380605
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 40
+      Line search: gnorm after quadratic fit 3.254990286951e-01
+      Line search: Quadratically determined step, lambda=1.4349255823565216e-01
+  2 SNES Function norm 0.325499
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 41
+      Line search: gnorm after quadratic fit 2.879067072252e-01
+      Line search: Quadratically determined step, lambda=1.1314429982278364e-01
+  3 SNES Function norm 0.287907
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 43
+      Line search: gnorm after quadratic fit 2.583057153250e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  4 SNES Function norm 0.258306
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 43
+      Line search: gnorm after quadratic fit 2.314800958640e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  5 SNES Function norm 0.23148
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 44
+      Line search: gnorm after quadratic fit 2.071386528626e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  6 SNES Function norm 0.207139
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 44
+      Line search: gnorm after quadratic fit 1.847483779187e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  7 SNES Function norm 0.184748
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: gnorm after quadratic fit 1.646859591413e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  8 SNES Function norm 0.164686
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: gnorm after quadratic fit 1.464158286133e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  9 SNES Function norm 0.146416
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 45
+      Line search: gnorm after quadratic fit 1.301864280903e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 10 SNES Function norm 0.130186
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 46
+      Line search: gnorm after quadratic fit 1.160048747528e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 11 SNES Function norm 0.116005
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 1.035811067398e-01
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 12 SNES Function norm 0.103581
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 46
+      Line search: gnorm after quadratic fit 9.207053970329e-02
+      Line search: Quadratically determined step, lambda=1.0164463703497158e-01
+ 13 SNES Function norm 0.0920705
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 8.138880572744e-02
+      Line search: Quadratically determined step, lambda=1.1162042575078146e-01
+ 14 SNES Function norm 0.0813888
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 7.328930227722e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 15 SNES Function norm 0.0732893
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 6.608794212637e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 16 SNES Function norm 0.0660879
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 5.962389127502e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 17 SNES Function norm 0.0596239
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 5.380279941817e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 18 SNES Function norm 0.0538028
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 49
+      Line search: gnorm after quadratic fit 4.857464028447e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 19 SNES Function norm 0.0485746
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 4.383583430043e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 20 SNES Function norm 0.0438358
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 3.951167712128e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 21 SNES Function norm 0.0395117
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 3.554060724686e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 22 SNES Function norm 0.0355406
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 3.193569534670e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 23 SNES Function norm 0.0319357
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 2.867442909668e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 24 SNES Function norm 0.0286744
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 50
+      Line search: gnorm after quadratic fit 2.572363419409e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 25 SNES Function norm 0.0257236
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 49
+      Line search: gnorm after quadratic fit 2.302011757687e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 26 SNES Function norm 0.0230201
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 49
+      Line search: gnorm after quadratic fit 2.045115192653e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 27 SNES Function norm 0.0204512
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 49
+      Line search: gnorm after quadratic fit 1.796522824943e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 28 SNES Function norm 0.0179652
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 49
+      Line search: gnorm after quadratic fit 1.566042123818e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 29 SNES Function norm 0.0156604
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 48
+      Line search: gnorm after quadratic fit 1.349424206312e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 30 SNES Function norm 0.0134942
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 48
+      Line search: gnorm after quadratic fit 1.161356782134e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 31 SNES Function norm 0.0116136
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 1.022519183367e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 32 SNES Function norm 0.0102252
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 9.420662279038e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 33 SNES Function norm 0.00942066
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 9.192140588867e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 34 SNES Function norm 0.00919214
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 9.001824367137e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 35 SNES Function norm 0.00900182
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 8.453215115491e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 36 SNES Function norm 0.00845322
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 7.871732901378e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 37 SNES Function norm 0.00787173
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 7.246647815655e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 38 SNES Function norm 0.00724665
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 6.609747715875e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 39 SNES Function norm 0.00660975
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 5.873423823036e-03
+      Line search: Quadratically determined step, lambda=1.2377974082432520e-01
+ 40 SNES Function norm 0.00587342
+[0] SNES solve diverged after 40 iterations: DIVERGED_MAX_IT The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 262 of 262 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 274 of 274 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 282 of 282 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 278 of 278 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+[0] [cosserat] ref 1 xi 0.0 c 0.1 l 0.15 km P1: DIVERGED_MAX_IT its 41 (925 s) W_L/W_R 'L': 1.8707854796188457, 'R': 1.550318511716763 omega [-1.85928723233921e-14, 2.0089881154022358e-14] eta_eff strong [4.035541001299858e+21, 1.3264377426475417e+23]
+[0] [cosserat] current estimator: W 4.033 km peak 1.692

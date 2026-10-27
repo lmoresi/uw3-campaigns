@@ -1,0 +1,62 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+
+=== MPI SUPERVISOR: no output for 1801 s ===
+Traceback (most recent call last):
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/micromorphic_notch.py", line 92, in <module>
+    seconds = cn.solve_newton(S, name, OUT, params.uw_budget, int(params.uw_monitor),
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py", line 89, in solve_newton
+    stokes.solve(zero_init_guess=False)
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/memprobe.py", line 269, in wrapper
+    return func(*args, **kw)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/systems/solvers.py", line 2075, in solve
+    super().solve(
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/underworld3/cython/petsc_generic_snes_solvers.pyx", line 11256, in underworld3.cython.generic_solvers.SNES_Stokes_SaddlePt.solve
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/underworld3/cython/petsc_generic_snes_solvers.pyx", line 3306, in underworld3.cython.generic_solvers.SolverBaseClass._build
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/underworld3/cython/petsc_generic_snes_solvers.pyx", line 9807, in underworld3.cython.generic_solvers.SNES_Stokes_SaddlePt._setup_pointwise_functions
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_jitextension.py", line 973, in getext
+    module, tmpdir = compile_and_load(
+                     ^^^^^^^^^^^^^^^^^
+  File "/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/_jitextension.py", line 1884, in compile_and_load
+    raise RuntimeError(
+RuntimeError: The Underworld extension module does not appear to have been built successfully. The generated module may be found at:
+    /tmp/fn_ptr_ext_7a14556c19ba2830_303434_1791718798331_6837
+To investigate, you may attempt to build it manually by running
+    python3 setup.py build_ext --inplace
+from the above directory. Note that a new module will always be written by Underworld and therefore any modifications to the above files will not persist into your Underworld runtime.
+Please contact the developers if you are unable to resolve the issue.
+    no rank moved in 20 s: this is stuck, not slow
+    the ranks are in different places, and with no majority none can be called the odd one out:
+      rank 0 is in _try_wait()
+      rank 1 is in getext()
+    rank 1: 100% CPU, spinning — a busy-wait, which is what an MPI progress engine does
+    stacks written to /tmp/uw-stacks-j1oi15l5
+[0]PETSC ERROR: 
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 303435 RUNNING AT hyperion
+=   EXIT CODE: 15
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Terminated (signal 15)
+This typically refers to a problem with your application.
+Please see the FAQ page for debugging suggestions

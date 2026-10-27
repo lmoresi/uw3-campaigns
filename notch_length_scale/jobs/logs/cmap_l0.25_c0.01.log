@@ -1,0 +1,210 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 0.368353
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:108: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:108: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:108: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:108: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0905662
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 9.056618693824e-02 gnorm 1.124814739523e-02
+  1 SNES Function norm 0.0112481
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 2.146451186849e-01
+      Line search: Cubic step, current gnorm 1.118341556033e-02 lambda=1.0000000000000002e-02
+  2 SNES Function norm 0.0111834
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.039864600221e-01
+      Line search: Cubic step, current gnorm 1.106250885023e-02 lambda=1.0000000000000002e-02
+  3 SNES Function norm 0.0110625
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.069808425976e-01
+      Line search: Cubic step, current gnorm 1.094689821456e-02 lambda=1.0000000000000002e-02
+  4 SNES Function norm 0.0109469
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.349135873486e-02
+      Line search: Cubic step, current gnorm 1.083876278194e-02 lambda=1.0000000000000002e-02
+  5 SNES Function norm 0.0108388
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 8.572891790573e-02
+      Line search: Cubic step, current gnorm 1.077182302860e-02 lambda=1.0000000000000002e-02
+  6 SNES Function norm 0.0107718
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 2.335610806733e-01
+      Line search: Cubic step, current gnorm 1.067705248927e-02 lambda=1.0000000000000002e-02
+  7 SNES Function norm 0.0106771
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.677144787055e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.294875556110e-02 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 1.066947560767e-02 lambda=4.2006171607334858e-03
+  8 SNES Function norm 0.0106695
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.674226268817e-01
+      Line search: Cubic step, current gnorm 1.059983031290e-02 lambda=1.0000000000000002e-02
+  9 SNES Function norm 0.0105998
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 7.140380135252e-02
+      Line search: Cubic step, current gnorm 1.050120864049e-02 lambda=1.0000000000000002e-02
+ 10 SNES Function norm 0.0105012
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.371256644919e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.635711150007e-02 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 1.049225998480e-02 lambda=1.0000000000000002e-03
+ 11 SNES Function norm 0.0104923
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.108656071074e-01
+      Line search: Cubic step, current gnorm 1.040120065866e-02 lambda=1.0000000000000002e-02
+ 12 SNES Function norm 0.0104012
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.759369906621e-02
+      Line search: Cubic step, current gnorm 1.030313554484e-02 lambda=1.0000000000000002e-02
+ 13 SNES Function norm 0.0103031
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.328900398991e+00
+      Line search: Cubic step no good, shrinking lambda, current gnorm 2.683136351694e-01 lambda=1.0000000000000002e-02
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.182152294207e-02 lambda=1.0000000000000002e-03
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.031584450737e-02 lambda=3.7307944550623434e-04
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.030345883936e-02 lambda=1.8653972275311717e-04
+      Line search: Cubic step, current gnorm 1.030261184289e-02 lambda=9.3269861376558586e-05
+ 14 SNES Function norm 0.0103026
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 2.085445492111e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.269517704152e-02 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 1.029260359710e-02 lambda=1.0000000000000002e-03
+ 15 SNES Function norm 0.0102926
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.246188683601e+00
+      Line search: Cubic step no good, shrinking lambda, current gnorm 6.212943295528e-01 lambda=1.0000000000000002e-02
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.368053727915e-01 lambda=1.0000000000000002e-03
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.052411013154e-02 lambda=1.0000000000000003e-04
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.029852011843e-02 lambda=5.0000000000000016e-05
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.029322664680e-02 lambda=2.5000000000000008e-05
+      Line search: Cubic step, current gnorm 1.029258683831e-02 lambda=7.0114336555922015e-06
+ 16 SNES Function norm 0.0102926
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.104253229702e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.325858305423e-02 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 1.027639105826e-02 lambda=2.1508654528256338e-03
+ 17 SNES Function norm 0.0102764
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 2.705805292653e-02
+      Line search: Cubic step, current gnorm 1.017573645528e-02 lambda=1.0000000000000002e-02
+ 18 SNES Function norm 0.0101757
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.817338663621e-02
+      Line search: Cubic step, current gnorm 1.017503944153e-02 lambda=1.0000000000000002e-02
+ 19 SNES Function norm 0.010175
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.080582296123e-01
+      Line search: Cubic step, current gnorm 1.009854355306e-02 lambda=1.0000000000000002e-02
+ 20 SNES Function norm 0.0100985
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.001436220435e-02
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+ 21 SNES Function norm 0.0100144
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 4.878150805878e-02
+      Line search: Cubic step, current gnorm 9.911007355421e-03 lambda=1.0000000000000002e-02
+ 22 SNES Function norm 0.00991101
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 2.341107954455e-02
+      Line search: Cubic step, current gnorm 9.814642705314e-03 lambda=1.0000000000000002e-02
+ 23 SNES Function norm 0.00981464
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.561146317466e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 9.861815589797e-03 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 9.777423140884e-03 lambda=5.0000000000000010e-03
+ 24 SNES Function norm 0.00977742
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.108423086156e+00
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.298609211147e-01 lambda=1.0000000000000002e-02
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.905800316170e-02 lambda=1.0000000000000002e-03
+      Line search: Cubic step, current gnorm 9.777349941494e-03 lambda=1.0000000000000003e-04
+ 25 SNES Function norm 0.00977735
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.026088887860e-01
+      Line search: Cubic step, current gnorm 9.690332665747e-03 lambda=1.0000000000000002e-02
+ 26 SNES Function norm 0.00969033
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.334317077723e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 5.758036423668e-02 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 9.683953263696e-03 lambda=1.0000000000000002e-03
+ 27 SNES Function norm 0.00968395
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.613262896862e+00
+      Line search: Cubic step no good, shrinking lambda, current gnorm 3.300673058787e-01 lambda=1.0000000000000002e-02
+      Line search: Cubic step no good, shrinking lambda, current gnorm 1.232937209626e-02 lambda=1.0000000000000002e-03
+      Line search: Cubic step no good, shrinking lambda, current gnorm 9.696683885527e-03 lambda=3.2804341387007930e-04
+      Line search: Cubic step no good, shrinking lambda, current gnorm 9.684283350223e-03 lambda=1.6402170693503965e-04
+      Line search: Cubic step, current gnorm 9.683542147359e-03 lambda=8.2010853467519824e-05
+ 28 SNES Function norm 0.00968354
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.809770134815e-01
+      Line search: Cubic step, current gnorm 9.648772729859e-03 lambda=1.0000000000000002e-02
+ 29 SNES Function norm 0.00964877
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 8.305884176502e-02
+      Line search: Cubic step, current gnorm 9.584993335835e-03 lambda=1.0000000000000002e-02
+ 30 SNES Function norm 0.00958499
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 9.595287904622e-02
+      Line search: Cubic step, current gnorm 9.514531445602e-03 lambda=1.0000000000000002e-02
+ 31 SNES Function norm 0.00951453
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.461531999587e-02
+      Line search: Cubic step, current gnorm 9.358912124269e-03 lambda=1.7003536085425361e-02
+ 32 SNES Function norm 0.00935891
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.468016681192e-02
+      Line search: Cubic step, current gnorm 9.278707691936e-03 lambda=1.0000000000000002e-02
+ 33 SNES Function norm 0.00927871
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.042887235871e-02
+      Line search: Cubic step, current gnorm 8.918584552758e-03 lambda=4.9570414359238195e-02
+ 34 SNES Function norm 0.00891858
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.765689256438e-02
+      Line search: Cubic step, current gnorm 8.835351464012e-03 lambda=1.0000000000000002e-02
+ 35 SNES Function norm 0.00883535
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.932554279779e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 8.996595210618e-03 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 8.812431322406e-03 lambda=5.0000000000000010e-03
+ 36 SNES Function norm 0.00881243
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 1.403406011523e-01
+      Line search: Cubic step no good, shrinking lambda, current gnorm 9.370487038236e-03 lambda=1.0000000000000002e-02
+      Line search: Cubic step, current gnorm 8.790318745058e-03 lambda=3.5711367626977664e-03
+ 37 SNES Function norm 0.00879032
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.547412228781e-02
+      Line search: Cubic step, current gnorm 8.730734151485e-03 lambda=1.0000000000000002e-02
+ 38 SNES Function norm 0.00873073
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 9.482222917819e-02
+      Line search: Cubic step, current gnorm 8.684591396857e-03 lambda=1.0000000000000002e-02
+ 39 SNES Function norm 0.00868459
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 3.492051636002e-02
+      Line search: Cubic step, current gnorm 8.611717100447e-03 lambda=1.0000000000000002e-02
+ 40 SNES Function norm 0.00861172
+[0] SNES solve diverged after 40 iterations: DIVERGED_MAX_IT The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 3901 of 3901 query points are not located on this rank (rank 1 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4109 of 4109 query points are not located on this rank (rank 2 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4173 of 4173 query points are not located on this rank (rank 0 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls2/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 3997 of 3997 query points are not located on this rank (rank 3 of 4), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+Variable with name range_scratch already exists on the mesh - Skipping.
+[0] [cosserat] ref 3 xi 0.0 c 0.01 l 0.25 km P1: DIVERGED_MAX_IT its 40 (1346 s) W_L/W_R 'L': 1.008419946387849, 'R': 0.7846878454571469 omega [-5.492815929068616e-15, 5.535587923439701e-15] eta_eff strong [1.1579181155242434e+22, 1.1755082128754372e+23]
+[0] [cosserat] current estimator: W 2.477 km peak 1.666

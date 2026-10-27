@@ -1,0 +1,258 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 3.90068
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:89: RuntimeWarning: [Solver_122_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0115991
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0115991
+    1 KSP Residual norm 6.85921e-05
+    2 KSP Residual norm 2.10205e-05
+    3 KSP Residual norm 1.35912e-05
+    4 KSP Residual norm 9.18716e-06
+    5 KSP Residual norm 5.01558e-06
+    6 KSP Residual norm 3.52877e-06
+    7 KSP Residual norm 2.89662e-06
+    8 KSP Residual norm 2.61114e-06
+    9 KSP Residual norm 2.31397e-06
+   10 KSP Residual norm 1.79155e-06
+   11 KSP Residual norm 1.28408e-06
+   12 KSP Residual norm 9.40315e-07
+   13 KSP Residual norm 7.20571e-07
+   14 KSP Residual norm 5.40563e-07
+   15 KSP Residual norm 4.05568e-07
+   16 KSP Residual norm 3.10612e-07
+   17 KSP Residual norm 2.30446e-07
+   18 KSP Residual norm 1.59818e-07
+   19 KSP Residual norm 1.05993e-07
+   20 KSP Residual norm 6.88727e-08
+   21 KSP Residual norm 4.55594e-08
+   22 KSP Residual norm 3.32007e-08
+   23 KSP Residual norm 2.42982e-08
+   24 KSP Residual norm 1.73615e-08
+   25 KSP Residual norm 1.26768e-08
+   26 KSP Residual norm 9.07049e-09
+   27 KSP Residual norm 6.14563e-09
+   28 KSP Residual norm 4.14908e-09
+   29 KSP Residual norm 2.95078e-09
+   30 KSP Residual norm 2.47699e-09
+   31 KSP Residual norm 2.37562e-09
+   32 KSP Residual norm 2.36378e-09
+   33 KSP Residual norm 2.32691e-09
+   34 KSP Residual norm 2.19781e-09
+   35 KSP Residual norm 2.05403e-09
+   36 KSP Residual norm 1.87899e-09
+   37 KSP Residual norm 1.56413e-09
+   38 KSP Residual norm 1.19014e-09
+   39 KSP Residual norm 9.217e-10
+   40 KSP Residual norm 7.236e-10
+   41 KSP Residual norm 5.523e-10
+   42 KSP Residual norm 4.092e-10
+   43 KSP Residual norm 3.107e-10
+   44 KSP Residual norm 2.479e-10
+   45 KSP Residual norm 1.903e-10
+   46 KSP Residual norm 1.431e-10
+   47 KSP Residual norm 1.107e-10
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 47
+      Line search: gnorm after quadratic fit 7.415595447438e-03
+      Line search: Quadratically determined step, lambda=3.2244575607206322e-01
+  1 SNES Function norm 0.0074156
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.0074156
+    1 KSP Residual norm 4.53849e-05
+    2 KSP Residual norm 1.27487e-05
+    3 KSP Residual norm 8.38937e-06
+    4 KSP Residual norm 5.13379e-06
+    5 KSP Residual norm 3.13083e-06
+    6 KSP Residual norm 2.06683e-06
+    7 KSP Residual norm 1.6849e-06
+    8 KSP Residual norm 1.48303e-06
+    9 KSP Residual norm 1.20821e-06
+   10 KSP Residual norm 8.82303e-07
+   11 KSP Residual norm 6.40399e-07
+   12 KSP Residual norm 4.73392e-07
+   13 KSP Residual norm 3.35743e-07
+   14 KSP Residual norm 2.48745e-07
+   15 KSP Residual norm 1.86539e-07
+   16 KSP Residual norm 1.2426e-07
+   17 KSP Residual norm 8.00032e-08
+   18 KSP Residual norm 5.26297e-08
+   19 KSP Residual norm 3.1922e-08
+   20 KSP Residual norm 2.05827e-08
+   21 KSP Residual norm 1.44518e-08
+   22 KSP Residual norm 1.02311e-08
+   23 KSP Residual norm 7.63641e-09
+   24 KSP Residual norm 5.38926e-09
+   25 KSP Residual norm 3.82506e-09
+   26 KSP Residual norm 2.43165e-09
+   27 KSP Residual norm 1.72453e-09
+   28 KSP Residual norm 1.56622e-09
+   29 KSP Residual norm 1.53675e-09
+   30 KSP Residual norm 1.40035e-09
+   31 KSP Residual norm 1.14201e-09
+   32 KSP Residual norm 1.01486e-09
+   33 KSP Residual norm 9.203e-10
+   34 KSP Residual norm 7.514e-10
+   35 KSP Residual norm 6.075e-10
+   36 KSP Residual norm 4.966e-10
+   37 KSP Residual norm 3.740e-10
+   38 KSP Residual norm 2.616e-10
+   39 KSP Residual norm 1.866e-10
+   40 KSP Residual norm 1.435e-10
+   41 KSP Residual norm 1.115e-10
+   42 KSP Residual norm 8.819e-11
+   43 KSP Residual norm 6.817e-11
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 43
+      Line search: Using full step: fnorm 7.415595447438e-03 gnorm 2.127613844296e-03
+  2 SNES Function norm 0.00212761
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.00212761
+    1 KSP Residual norm 1.33731e-06
+    2 KSP Residual norm 7.64379e-07
+    3 KSP Residual norm 5.47938e-07
+    4 KSP Residual norm 4.44572e-07
+    5 KSP Residual norm 2.63334e-07
+    6 KSP Residual norm 1.24383e-07
+    7 KSP Residual norm 7.83783e-08
+    8 KSP Residual norm 5.30789e-08
+    9 KSP Residual norm 3.73617e-08
+   10 KSP Residual norm 2.70171e-08
+   11 KSP Residual norm 1.95998e-08
+   12 KSP Residual norm 1.60695e-08
+   13 KSP Residual norm 1.47444e-08
+   14 KSP Residual norm 1.33362e-08
+   15 KSP Residual norm 1.07962e-08
+   16 KSP Residual norm 8.47092e-09
+   17 KSP Residual norm 7.13221e-09
+   18 KSP Residual norm 5.55607e-09
+   19 KSP Residual norm 3.63208e-09
+   20 KSP Residual norm 2.40405e-09
+   21 KSP Residual norm 1.63659e-09
+   22 KSP Residual norm 1.11806e-09
+   23 KSP Residual norm 8.613e-10
+   24 KSP Residual norm 6.754e-10
+   25 KSP Residual norm 5.148e-10
+   26 KSP Residual norm 3.627e-10
+   27 KSP Residual norm 2.537e-10
+   28 KSP Residual norm 1.787e-10
+   29 KSP Residual norm 1.408e-10
+   30 KSP Residual norm 1.212e-10
+   31 KSP Residual norm 1.019e-10
+   32 KSP Residual norm 8.376e-11
+   33 KSP Residual norm 6.645e-11
+   34 KSP Residual norm 5.076e-11
+   35 KSP Residual norm 3.766e-11
+   36 KSP Residual norm 2.732e-11
+   37 KSP Residual norm 1.862e-11
+    Linear Solver_122_ solve converged due to CONVERGED_RTOL iterations 37
+      Line search: Using full step: fnorm 2.127613844296e-03 gnorm 1.195829016609e-04
+  3 SNES Function norm 0.000119583
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 0.000119583
+    1 KSP Residual norm 2.90197e-08
+    2 KSP Residual norm 1.75279e-08
+    3 KSP Residual norm 1.18106e-08
+    4 KSP Residual norm 6.80607e-09
+    5 KSP Residual norm 5.25713e-09
+    6 KSP Residual norm 4.72169e-09
+    7 KSP Residual norm 4.29556e-09
+    8 KSP Residual norm 3.56867e-09
+    9 KSP Residual norm 2.59869e-09
+   10 KSP Residual norm 1.78173e-09
+   11 KSP Residual norm 1.36903e-09
+   12 KSP Residual norm 1.03634e-09
+   13 KSP Residual norm 7.175e-10
+   14 KSP Residual norm 5.010e-10
+   15 KSP Residual norm 3.139e-10
+   16 KSP Residual norm 2.069e-10
+   17 KSP Residual norm 1.462e-10
+   18 KSP Residual norm 9.534e-11
+   19 KSP Residual norm 6.418e-11
+   20 KSP Residual norm 4.814e-11
+   21 KSP Residual norm 3.438e-11
+   22 KSP Residual norm 2.306e-11
+   23 KSP Residual norm 1.669e-11
+   24 KSP Residual norm 1.301e-11
+   25 KSP Residual norm < 1.e-11
+   26 KSP Residual norm < 1.e-11
+   27 KSP Residual norm < 1.e-11
+   28 KSP Residual norm < 1.e-11
+   29 KSP Residual norm < 1.e-11
+   30 KSP Residual norm < 1.e-11
+   31 KSP Residual norm < 1.e-11
+   32 KSP Residual norm < 1.e-11
+   33 KSP Residual norm < 1.e-11
+   34 KSP Residual norm < 1.e-11
+   35 KSP Residual norm < 1.e-11
+   36 KSP Residual norm < 1.e-11
+    Linear Solver_122_ solve converged due to CONVERGED_ATOL iterations 36
+      Line search: Using full step: fnorm 1.195829016609e-04 gnorm 1.412566691661e-05
+  4 SNES Function norm 1.41257e-05
+    Residual norms for Solver_122_ solve.
+    0 KSP Residual norm 1.41257e-05
+    1 KSP Residual norm 3.13786e-09
+    2 KSP Residual norm 2.03645e-09
+    3 KSP Residual norm 1.40164e-09
+    4 KSP Residual norm 9.937e-10
+    5 KSP Residual norm 8.244e-10
+    6 KSP Residual norm 7.463e-10
+    7 KSP Residual norm 6.534e-10
+    8 KSP Residual norm 5.046e-10
+    9 KSP Residual norm 3.915e-10
+   10 KSP Residual norm 2.844e-10
+   11 KSP Residual norm 2.164e-10
+   12 KSP Residual norm 1.627e-10
+   13 KSP Residual norm 1.114e-10
+   14 KSP Residual norm 7.703e-11
+   15 KSP Residual norm 4.806e-11
+   16 KSP Residual norm 3.000e-11
+   17 KSP Residual norm 1.865e-11
+   18 KSP Residual norm 1.230e-11
+   19 KSP Residual norm < 1.e-11
+   20 KSP Residual norm < 1.e-11
+   21 KSP Residual norm < 1.e-11
+   22 KSP Residual norm < 1.e-11
+   23 KSP Residual norm < 1.e-11
+   24 KSP Residual norm < 1.e-11
+   25 KSP Residual norm < 1.e-11
+   26 KSP Residual norm < 1.e-11
+   27 KSP Residual norm < 1.e-11
+   28 KSP Residual norm < 1.e-11
+    Linear Solver_122_ solve converged due to CONVERGED_ATOL iterations 28
+      Line search: Using full step: fnorm 1.412566691661e-05 gnorm 3.913729422788e-07
+  5 SNES Function norm 3.91373e-07
+[0] [micromorphic] ref 5 xi 0.0 beta 0.1 l 0.5 km np 16: CONVERGED_FNORM_ABS its 5 (5546 s) W_int 3.39 W_v 'L': 2.714725172979513, 'R': 2.9069019308501973 peak 'L': 1.8400369270096038, 'R': 1.8260060513645961 floor bound 64.5

@@ -1,0 +1,12 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+[yield] z = 1: min 0.1004 p50 0.8665 max 59.04
+[yield] z = 7.5: min 0.1477 p50 0.8497 max 1.218
+[yield] z = 15: min 0.3072 p50 0.8616 max 1.221
+[yield] z = 28: min 0.3292 p50 0.8805 max 1.23
+probe eta_eff: [8.30772985e+22]
+probe edot: [3.76115214e-08]
+probe tau_y: [4.57692613e+08]
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref2_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln5_n1.2_tail1_blk_notchsections3d_yield.png
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/../results/micro_ref2_xi0_beta0.1_l1_production_ew1e-2_np16_notchblock3d_hb4.8_Lz32_Ln5_n1.2_tail1_blk_notchsections_yield.png

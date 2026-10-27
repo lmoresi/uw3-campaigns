@@ -1,0 +1,41 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+  0 SNES Function norm 1.62159
+  0 SNES Function norm 0.0802685
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 8.026848327190e-02 gnorm 1.053278275512e-02
+  1 SNES Function norm 0.0105328
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 9.477519716764e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  2 SNES Function norm 0.00947752
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 6.969572334444e-03
+      Line search: Quadratically determined step, lambda=2.7481200429271507e-01
+  3 SNES Function norm 0.00696957
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 6.276615345919e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  4 SNES Function norm 0.00627662
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 5.650059491564e-03
+      Line search: Quadratically determined step, lambda=1.0000000000000001e-01
+  5 SNES Function norm 0.00565006
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: gnorm after quadratic fit 4.335569624549e-03
+      Line search: Quadratically determined step, lambda=2.3727066121597692e-01
+  6 SNES Function norm 0.00433557
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.335569624549e-03 gnorm 2.414337191023e-03
+  7 SNES Function norm 0.00241434
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 2.414337191023e-03 gnorm 2.996008049602e-04
+  8 SNES Function norm 0.000299601
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 2.996008049602e-04 gnorm 4.449753720131e-05
+  9 SNES Function norm 4.44975e-05
+    Linear Solver_17_ solve converged due to CONVERGED_ITS iterations 1
+      Line search: Using full step: fnorm 4.449753720131e-05 gnorm 1.219590428883e-06
+ 10 SNES Function norm 1.21959e-06
+[micromorphic] ref 3 xi 0.005 beta 0.07 l 0.5 km np 1: CONVERGED_FNORM_ABS its 10 (499 s) W_int 3.18 W_v 'L': 2.9139732710582833, 'R': 2.8084018274701106 peak 'L': 1.7210409563564995, 'R': 1.671698234917248 floor bound 60.6

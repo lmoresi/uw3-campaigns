@@ -1,0 +1,8 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref4_xi0_beta0.1_l1_production_tight: W_v 'L': 3.395338317745283, 'R': 3.8181210914396564 peak 'L': 1.1823613976060987, 'R': 1.1713432109454143 floor bound 67.1
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+micro_ref4_xi0_beta0.1_l2_production_tight: W_v 'L': 3.1029647283715405, 'R': 3.619043141670655 peak 'L': 0.7668664727146932, 'R': 0.7616942177562105 floor bound 78.0

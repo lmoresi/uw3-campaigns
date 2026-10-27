@@ -1,0 +1,56 @@
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref1_xi0.01_c0.01_l1_P1: W_int 3.37 peak 'L': 1.2202932839993785, 'R': 0.9516426450931105
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref1_xi0.01_c1_l1_P1: W_int 4.97 peak 'L': 0.2134843664269232, 'R': 0.20971061566318444
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref1_xi0_c1_l1_P1: W_int 4.89 peak 'L': 0.27139856079536606, 'R': 0.26716167160831905
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref1_xi0_c1_l1_P1_smoke: W_int 4.89 peak 'L': 0.27139856075117985, 'R': 0.2671616715490162
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0.01_c0.5_l1_P1: W_int 4.90 peak 'L': 0.24813319311749055, 'R': 0.24641301710826458
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0.01_c1_l1_P1: W_int 4.89 peak 'L': 0.22714724819194454, 'R': 0.225985630006248
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0.01_c1_l1_P2: W_int 4.89 peak 'L': 0.22953537225252343, 'R': 0.2284873618394356
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0_c1_l0.5_P1: W_int 4.42 peak 'L': 0.731849642161882, 'R': 0.7148409145081239
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0_c1_l1_P1: W_int 4.91 peak 'L': 0.28944486008358894, 'R': 0.2866734648497565
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref2_xi0_c1_l1_P1_production: W_int 4.91 peak 'L': 0.28944586610863543, 'R': 0.2866744833332058
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref3_xi0.01_c1_l1_P1: W_int 4.92 peak 'L': 0.23572267421660525, 'R': 0.23402954669668088
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref3_xi0_c1_l0.5_P1: W_int 4.45 peak 'L': 0.7443191954131072, 'R': 0.7360880660996933
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref3_xi0_c1_l1_P1: W_int 4.93 peak 'L': 0.2983711526827927, 'R': 0.29707594933915676
+ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+(Not covered: ['temperature'] - will fail only if needed)
+✓ Units system active with automatic non-dimensionalization
+cosserat_ref3_xi0_c1_l1_P1_production: W_int 4.93 peak 'L': 0.2983686914170324, 'R': 0.2970750231905272

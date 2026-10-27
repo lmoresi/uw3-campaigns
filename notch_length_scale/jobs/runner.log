@@ -1,0 +1,736 @@
+[runner] 2026-10-09 13:34:19 smoke_micro_ref1_np2: queued {'np': 2}
+[runner] 2026-10-09 13:34:19 smoke_cosserat_ref1_np2: queued {'np': 2}
+[runner] 2026-10-09 13:34:19 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 13:34:19 measure_all: queued {'np': 1}
+[runner] 2026-10-09 13:34:19 micro_ref4_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 14:44:49 smoke_micro_ref1_np2: running {'np': 2, 'pid': 1699767}
+[runner] 2026-10-09 14:48:19 smoke_micro_ref1_np2: done {'rc': 0}
+[runner] 2026-10-09 14:48:19 smoke_cosserat_ref1_np2: running {'np': 2, 'pid': 1704282}
+[runner] 2026-10-09 14:53:19 smoke_cosserat_ref1_np2: done {'rc': 0}
+[runner] 2026-10-09 14:53:56 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 14:53:56 measure_all: queued {'np': 1}
+[runner] 2026-10-09 14:53:56 micro_ref4_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 14:53:56 measure_all: running {'np': 1, 'pid': 1709906}
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: [runner] adopted measure_all (pid 1709906)
+[runner] 2026-10-09 15:03:32 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 15:03:32 micro_ref4_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 15:04:02 migrate_ref4: queued {'np': 1}
+[runner] 2026-10-09 15:04:02 micro_ref4_l0.25_tight_np2: running {'np': 2, 'pid': 1711815}
+[runner] 2026-10-09 15:18:33 measure_all: done {'rc': 0}
+[runner] 2026-10-09 15:18:33 migrate_ref4: running {'np': 1, 'pid': 1714158}
+[runner] 2026-10-09 15:20:03 migrate_ref4: done {'rc': 0}
+[runner] 2026-10-09 15:20:33 measure_ref4: queued {'np': 1}
+[runner] 2026-10-09 15:20:33 measure_ref4: running {'np': 1, 'pid': 1714499}
+[runner] 2026-10-09 15:29:03 measure_ref4: done {'rc': 0}
+[runner] 2026-10-09 15:31:03 measure_cosserat: queued {'np': 1}
+[runner] 2026-10-09 15:31:03 measure_cosserat: running {'np': 1, 'pid': 1719518}
+[runner] 2026-10-09 15:43:03 measure_cosserat: done {'rc': 0}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.07_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.08_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.1_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 17:47:03 map_ref3_b0.06_xi0_l1: running {'np': 1, 'pid': 1749888}
+[runner] 2026-10-09 18:03:03 map_ref3_b0.06_xi0_l1: done {'rc': 0}
+[runner] 2026-10-09 18:03:03 map_ref3_b0.06_xi0.005_l1: running {'np': 1, 'pid': 1751858}
+[runner] 2026-10-09 18:18:03 map_ref3_b0.06_xi0.005_l1: done {'rc': 0}
+[runner] 2026-10-09 18:18:03 map_ref3_b0.06_xi0.01_l1: running {'np': 1, 'pid': 1753571}
+[runner] 2026-10-09 18:31:33 map_ref3_b0.06_xi0.01_l1: done {'rc': 0}
+[runner] 2026-10-09 18:31:33 map_ref3_b0.06_xi0.02_l1: running {'np': 1, 'pid': 1755124}
+[runner] 2026-10-09 18:44:03 map_ref3_b0.06_xi0.02_l1: done {'rc': 0}
+[runner] 2026-10-09 18:44:03 map_ref3_b0.07_xi0_l1: running {'np': 1, 'pid': 1756547}
+[runner] 2026-10-09 18:58:03 map_ref3_b0.07_xi0_l1: done {'rc': 0}
+[runner] 2026-10-09 18:58:03 map_ref3_b0.07_xi0.005_l1: running {'np': 1, 'pid': 1758067}
+[runner] 2026-10-09 19:12:03 map_ref3_b0.07_xi0.005_l1: done {'rc': 0}
+[runner] 2026-10-09 19:12:03 map_ref3_b0.07_xi0.01_l1: running {'np': 1, 'pid': 1759726}
+[runner] 2026-10-09 19:24:03 micro_ref4_l0.25_tight_np2: killed {'rc': 124}
+[runner] 2026-10-09 19:24:03 map_ref3_b0.07_xi0.02_l1: running {'np': 1, 'pid': 1761072}
+[runner] 2026-10-09 19:24:03 map_ref3_b0.08_xi0_l1: running {'np': 1, 'pid': 1761073}
+[runner] 2026-10-09 19:25:03 hangprobe_ref3_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 19:25:33 map_ref3_b0.07_xi0.01_l1: done {'rc': 0}
+[runner] 2026-10-09 19:25:33 map_ref3_b0.08_xi0.005_l1: running {'np': 1, 'pid': 1761366}
+[runner] 2026-10-09 19:36:03 map_ref3_b0.08_xi0_l1: done {'rc': 0}
+[runner] 2026-10-09 19:36:03 map_ref3_b0.08_xi0.01_l1: running {'np': 1, 'pid': 1762538}
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
+Abort(59) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 59) - process 0
+[runner] adopted map_ref3_b0.07_xi0.02_l1 (pid 1761072)
+[runner] adopted map_ref3_b0.08_xi0.005_l1 (pid 1761366)
+[runner] adopted map_ref3_b0.08_xi0.01_l1 (pid 1762538)
+[runner] 2026-10-09 19:36:32 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.08_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.06_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.06_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.06_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.06_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.07_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.07_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.07_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.07_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.08_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.08_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.08_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.08_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 map_ref3_b0.1_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:36:32 hangprobe_ref3_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 19:37:02 map_ref3_b0.07_xi0.02_l1: done {'rc': 0}
+[runner] 2026-10-09 19:39:02 map_ref3_b0.08_xi0.005_l1: done {'rc': 0}
+[runner] 2026-10-09 19:39:02 hangprobe_ref3_l0.25_tight_np2: running {'np': 2, 'pid': 1762946}
+[runner] 2026-10-09 19:39:32 hangprobe_ref3_l0.25_tight_np2: failed {'rc': 16}
+[runner] 2026-10-09 19:39:32 map_ref3_b0.08_xi0.02_l1: running {'np': 1, 'pid': 1763005}
+[runner] 2026-10-09 19:39:32 map_ref3_b0.1_xi0_l1: running {'np': 1, 'pid': 1763006}
+[runner] 2026-10-09 19:40:02 map_ref3_b0.08_xi0.02_l1: failed {'rc': 16}
+[runner] 2026-10-09 19:40:02 map_ref3_b0.1_xi0_l1: failed {'rc': 16}
+[runner] 2026-10-09 19:40:02 map_ref3_b0.1_xi0.005_l1: running {'np': 1, 'pid': 1763135}
+[runner] 2026-10-09 19:40:02 map_ref3_b0.1_xi0.01_l1: running {'np': 1, 'pid': 1763136}
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
+Abort(59) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 59) - process 0
+[runner] adopted map_ref3_b0.08_xi0.01_l1 (pid 1762538)
+[runner] 2026-10-09 19:40:30 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.06_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.06_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.06_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.06_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.07_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.07_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.07_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.07_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.1_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:40:30 hangprobe_ref3_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 19:40:30 hangprobe_ref3_l0.25_tight_np2: running {'np': 2, 'pid': 1763227}
+[runner] 2026-10-09 19:40:30 map_ref3_b0.08_xi0.02_l1: running {'np': 1, 'pid': 1763228}
+[runner] 2026-10-09 19:42:00 measure_ref4_l0.5: queued {'np': 1}
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
+Abort(59) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 59) - process 0
+[runner] adopted map_ref3_b0.08_xi0.01_l1 (pid 1762538)
+[runner] adopted map_ref3_b0.08_xi0.02_l1 (pid 1763228)
+[runner] 2026-10-09 19:56:14 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0_l1: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.005_l1: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.01_l1: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.02_l1: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.06_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.06_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.06_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.06_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.07_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.07_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.07_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.07_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.08_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.08_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.08_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.08_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 map_ref3_b0.1_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 hangprobe_ref3_l0.25_tight_np2: queued {'np': 2}
+[runner] 2026-10-09 19:56:14 measure_ref4_l0.5: queued {'np': 1}
+[runner] 2026-10-09 19:56:14 hangprobe_ref3_l0.25_tight_np2: running {'np': 2, 'pid': 1765433}
+[runner] 2026-10-09 19:57:44 map_ref3_b0.08_xi0.01_l1: done {'rc': 0}
+[runner] 2026-10-09 19:57:44 measure_ref4_l0.5: running {'np': 1, 'pid': 1765627}
+[runner] 2026-10-09 20:01:44 measure_ref4_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:01:44 map_ref3_b0.1_xi0_l1: running {'np': 1, 'pid': 1766133}
+[runner] 2026-10-09 20:03:14 map_ref3_b0.08_xi0.02_l1: done {'rc': 0}
+[runner] 2026-10-09 20:03:14 map_ref3_b0.1_xi0.005_l1: running {'np': 1, 'pid': 1766376}
+[runner] 2026-10-09 20:07:44 hangprobe_ref3_l0.25_tight_np1: queued {'np': 1}
+[runner] 2026-10-09 20:13:44 map_ref3_b0.1_xi0_l1: done {'rc': 0}
+[runner] 2026-10-09 20:13:44 hangprobe_ref3_l0.25_tight_np1: running {'np': 1, 'pid': 1767863}
+[runner] 2026-10-09 20:16:14 map_ref3_b0.1_xi0.005_l1: done {'rc': 0}
+[runner] 2026-10-09 20:16:14 map_ref3_b0.1_xi0.01_l1: running {'np': 1, 'pid': 1768163}
+[runner] 2026-10-09 20:24:14 hangprobe_ref3_l0.25_tight_np1: failed {'rc': -15}
+[runner] 2026-10-09 20:24:14 map_ref3_b0.1_xi0.02_l1: running {'np': 1, 'pid': 1769218}
+[runner] 2026-10-09 20:24:44 micro_ref4_l0.25_tight_np2_pinned: queued {'np': 2}
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
+Abort(59) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 59) - process 0
+[runner] adopted map_ref3_b0.1_xi0.01_l1 (pid 1768163)
+[runner] adopted map_ref3_b0.1_xi0.02_l1 (pid 1769218)
+[runner] 2026-10-09 20:25:41 check_micro_ref3_tight_np4: queued {'np': 4}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.07_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.07_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.07_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.07_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.08_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.08_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.08_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.08_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.1_xi0_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.1_xi0.005_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.1_xi0.01_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.1_xi0.02_l0.5: queued {'np': 1}
+[runner] 2026-10-09 20:25:41 micro_ref4_l0.25_production_np2: queued {'np': 2}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0_l0.5: running {'np': 1, 'pid': 1769641}
+[runner] 2026-10-09 20:25:41 map_ref3_b0.06_xi0.005_l0.5: running {'np': 1, 'pid': 1769642}
+[runner] 2026-10-09 20:27:41 map_ref3_b0.1_xi0.01_l1: done {'rc': 0}
+[runner] 2026-10-09 20:27:41 map_ref3_b0.06_xi0.01_l0.5: running {'np': 1, 'pid': 1769862}
+[runner] 2026-10-09 20:35:11 map_ref3_b0.1_xi0.02_l1: done {'rc': 0}
+[runner] 2026-10-09 20:35:11 map_ref3_b0.06_xi0.02_l0.5: running {'np': 1, 'pid': 1770488}
+[runner] 2026-10-09 20:41:11 map_ref3_b0.06_xi0.005_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:41:11 map_ref3_b0.06_xi0.01_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:41:11 map_ref3_b0.07_xi0_l0.5: running {'np': 1, 'pid': 1771040}
+[runner] 2026-10-09 20:41:11 map_ref3_b0.07_xi0.005_l0.5: running {'np': 1, 'pid': 1771041}
+[runner] 2026-10-09 20:46:11 map_ref3_b0.06_xi0.02_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:46:11 map_ref3_b0.07_xi0.01_l0.5: running {'np': 1, 'pid': 1771544}
+[runner] 2026-10-09 20:48:11 map_ref3_b0.06_xi0_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:48:11 map_ref3_b0.07_xi0.02_l0.5: running {'np': 1, 'pid': 1771709}
+[runner] 2026-10-09 20:55:11 map_ref3_b0.07_xi0.005_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:55:11 map_ref3_b0.08_xi0_l0.5: running {'np': 1, 'pid': 1772276}
+[runner] 2026-10-09 20:58:11 map_ref3_b0.07_xi0.01_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:58:11 map_ref3_b0.08_xi0.005_l0.5: running {'np': 1, 'pid': 1772518}
+[runner] 2026-10-09 20:59:11 map_ref3_b0.07_xi0.02_l0.5: done {'rc': 0}
+[runner] 2026-10-09 20:59:11 map_ref3_b0.08_xi0.01_l0.5: running {'np': 1, 'pid': 1772611}
+[runner] 2026-10-09 21:07:41 map_ref3_b0.08_xi0_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:07:41 map_ref3_b0.08_xi0.02_l0.5: running {'np': 1, 'pid': 1773294}
+[runner] 2026-10-09 21:08:11 map_ref3_b0.07_xi0_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:08:11 map_ref3_b0.1_xi0_l0.5: running {'np': 1, 'pid': 1773343}
+[runner] 2026-10-09 21:10:41 map_ref3_b0.08_xi0.005_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:10:41 map_ref3_b0.1_xi0.005_l0.5: running {'np': 1, 'pid': 1773543}
+[runner] 2026-10-09 21:11:11 map_ref3_b0.08_xi0.01_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:11:11 map_ref3_b0.1_xi0.01_l0.5: running {'np': 1, 'pid': 1773596}
+[runner] 2026-10-09 21:18:41 map_ref3_b0.08_xi0.02_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:18:41 map_ref3_b0.1_xi0.02_l0.5: running {'np': 1, 'pid': 1774214}
+[runner] 2026-10-09 21:19:41 map_ref3_b0.1_xi0_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:22:41 map_ref3_b0.1_xi0.01_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:22:41 micro_ref4_l0.25_production_np2: running {'np': 2, 'pid': 1774563}
+[runner] 2026-10-09 21:23:11 map_ref3_b0.1_xi0.005_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:29:11 map_ref3_b0.1_xi0.02_l0.5: done {'rc': 0}
+[runner] 2026-10-09 21:32:41 check_micro_ref3_tight_np4: running {'np': 4, 'pid': 1775810}
+[runner] 2026-10-09 21:34:11 window_check: queued {'np': 2}
+[runner] 2026-10-09 21:34:11 window_check: running {'np': 2, 'pid': 1776041}
+[runner] 2026-10-09 21:51:41 check_micro_ref3_tight_np4: done {'rc': 0}
+[runner] 2026-10-09 21:52:41 micro_ref5_l1_tight_np16: queued {'np': 16}
+[runner] 2026-10-09 21:52:41 micro_ref5_l0.5_tight_np16: queued {'np': 16}
+[runner] 2026-10-09 21:52:41 micro_ref5_l1_tight_np16: running {'np': 16, 'pid': 1867756}
+[runner] 2026-10-09 21:53:11 window_check: done {'rc': 0}
+[runner] 2026-10-09 21:53:11 micro_ref5_l1_tight_np16: failed {'rc': 59}
+[runner] 2026-10-09 21:53:11 micro_ref5_l0.5_tight_np16: running {'np': 16, 'pid': 1868043}
+[runner] 2026-10-09 21:53:41 micro_ref5_l0.5_tight_np16: failed {'rc': 59}
+[runner] 2026-10-09 22:26:11 micro_ref4_l0.25_production_np2: done {'rc': 0}
+[runner] 2026-10-10 00:01:19 micro_ref5_l1_tight_np16: queued {'np': 16}
+[runner] 2026-10-10 00:01:19 micro_ref5_l0.5_tight_np16: queued {'np': 16}
+[runner] 2026-10-10 00:01:19 micro_ref5_l1_tight_np16: running {'np': 16, 'pid': 1885093}
+[runner] 2026-10-10 01:23:19 micro_ref5_l1_tight_np16: done {'rc': 0}
+[runner] 2026-10-10 01:23:19 micro_ref5_l0.5_tight_np16: running {'np': 16, 'pid': 1940839}
+[runner] 2026-10-10 03:03:19 micro_ref5_l0.5_tight_np16: done {'rc': 0}
+[runner] 2026-10-10 03:04:20 window_check_ref5: queued {'np': 8}
+[runner] 2026-10-10 03:04:20 window_check_ref5: running {'np': 8, 'pid': 1997913}
+[runner] 2026-10-10 03:15:50 window_check_ref5: done {'rc': 0}
+[runner] 2026-10-10 04:31:33 measure_current: queued {'np': 8}
+[runner] 2026-10-10 04:31:33 measure_current: running {'np': 8, 'pid': 2144402}
+[runner] 2026-10-10 04:37:33 measure_current: done {'rc': 0}
+[runner] 2026-10-10 04:37:49 render_refinement: queued {'np': 1}
+[runner] 2026-10-10 04:37:49 render_refinement: running {'np': 1, 'pid': 2296364}
+[runner] 2026-10-10 04:38:03 render_refinement: queued {'np': 1}
+[runner] 2026-10-10 04:38:03 render_refinement: running {'np': 1, 'pid': 2296423}
+[runner] 2026-10-10 04:44:19 render_refinement: done {'rc': 0}
+[runner] 2026-10-10 04:44:33 render_refinement: done {'rc': 0}
+[runner] 2026-10-10 04:45:25 render_refinement_2: queued {'np': 1}
+[runner] 2026-10-10 04:45:25 render_refinement_2: running {'np': 1, 'pid': 2297590}
+[runner] 2026-10-10 04:45:55 render_refinement_2: failed {'rc': -15}
+[runner] 2026-10-10 04:46:25 render_refinement_3: queued {'np': 1}
+[runner] 2026-10-10 04:46:25 render_refinement_3: running {'np': 1, 'pid': 2297723}
+[runner] 2026-10-10 04:52:55 render_refinement_3: done {'rc': 0}
+[runner] 2026-10-10 04:53:25 render_refinement_4: queued {'np': 1}
+[runner] 2026-10-10 04:53:25 render_refinement_4: running {'np': 1, 'pid': 2298914}
+[runner] 2026-10-10 04:59:56 render_refinement_4: done {'rc': 0}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref1: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref2: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref3: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref1_l0.25: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref2_l0.25: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref3_l0.25: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref1_l0.5: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref2_l0.5: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref3_l0.5: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref1_l2: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref2_l2: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref3_l2: queued {'np': 4}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref1: running {'np': 4, 'pid': 2309886}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref2: running {'np': 4, 'pid': 2309887}
+[runner] 2026-10-10 05:58:38 fmgtable_plain_ref3: running {'np': 4, 'pid': 2309888}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref1_l0.25: running {'np': 4, 'pid': 2309889}
+[runner] 2026-10-10 05:58:38 fmgtable_micro_ref2_l0.25: running {'np': 4, 'pid': 2309890}
+[runner] 2026-10-10 06:02:08 fmgtable_plain_ref1: done {'rc': 0}
+[runner] 2026-10-10 06:02:08 fmgtable_micro_ref3_l0.25: running {'np': 4, 'pid': 2343132}
+[runner] 2026-10-10 06:02:38 fmgtable_micro_ref1_l0.25: done {'rc': 0}
+[runner] 2026-10-10 06:02:38 fmgtable_micro_ref1_l0.5: running {'np': 4, 'pid': 2350234}
+[runner] 2026-10-10 06:06:08 fmgtable_micro_ref1_l0.5: done {'rc': 0}
+[runner] 2026-10-10 06:06:08 fmgtable_micro_ref2_l0.5: running {'np': 4, 'pid': 2381556}
+[runner] 2026-10-10 06:06:38 fmgtable_plain_ref2: done {'rc': 0}
+[runner] 2026-10-10 06:06:38 fmgtable_micro_ref3_l0.5: running {'np': 4, 'pid': 2388123}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref1_l1: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref2_l1: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref3_l1: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 coss_ref4_l1_np8: queued {'np': 8}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref1_l0.5: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref2_l0.5: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 fmgtable_coss_ref3_l0.5: queued {'np': 4}
+[runner] 2026-10-10 06:13:38 coss_ref4_l0.5_np8: queued {'np': 8}
+[runner] 2026-10-10 06:20:08 fmgtable_micro_ref2_l0.5: done {'rc': 0}
+[runner] 2026-10-10 06:20:08 fmgtable_micro_ref1_l2: running {'np': 4, 'pid': 2411717}
+[runner] 2026-10-10 06:24:08 fmgtable_micro_ref1_l2: done {'rc': 0}
+[runner] 2026-10-10 06:24:08 fmgtable_micro_ref2_l2: running {'np': 4, 'pid': 2429251}
+[runner] 2026-10-10 06:28:38 fmgtable_micro_ref2_l0.25: done {'rc': 0}
+[runner] 2026-10-10 06:28:38 fmgtable_micro_ref3_l2: running {'np': 4, 'pid': 2441296}
+[runner] 2026-10-10 06:32:38 fmgtable_micro_ref2_l2: done {'rc': 0}
+[runner] 2026-10-10 06:32:38 fmgtable_coss_ref1_l1: running {'np': 4, 'pid': 2452743}
+[runner] 2026-10-10 06:36:08 fmgtable_coss_ref1_l1: done {'rc': 0}
+[runner] 2026-10-10 06:36:08 fmgtable_coss_ref2_l1: running {'np': 4, 'pid': 2470521}
+[runner] 2026-10-10 06:41:38 fmgtable_coss_ref2_l1: done {'rc': 0}
+[runner] 2026-10-10 06:41:38 fmgtable_coss_ref3_l1: running {'np': 4, 'pid': 2483465}
+[runner] 2026-10-10 07:00:08 fmgtable_micro_ref3_l2: done {'rc': 0}
+[runner] 2026-10-10 07:00:08 fmgtable_coss_ref1_l0.5: running {'np': 4, 'pid': 2494439}
+[runner] 2026-10-10 07:01:08 fmgtable_coss_ref3_l1: done {'rc': 0}
+[runner] 2026-10-10 07:01:08 fmgtable_coss_ref2_l0.5: running {'np': 4, 'pid': 2503444}
+[runner] 2026-10-10 07:03:08 fmgtable_coss_ref1_l0.5: done {'rc': 0}
+[runner] 2026-10-10 07:03:08 fmgtable_coss_ref3_l0.5: running {'np': 4, 'pid': 2520803}
+[runner] 2026-10-10 07:09:08 fmgtable_coss_ref2_l0.5: done {'rc': 0}
+[runner] 2026-10-10 07:11:08 fmgtable_micro_ref3_l0.25: killed {'rc': 124}
+[runner] 2026-10-10 07:11:08 coss_ref4_l1_np8: running {'np': 8, 'pid': 2533782}
+[runner] 2026-10-10 07:23:38 fmgtable_plain_ref3: done {'rc': 0}
+[runner] 2026-10-10 07:26:38 fmgtable_coss_ref3_l0.5: done {'rc': 0}
+[runner] 2026-10-10 07:26:38 coss_ref4_l0.5_np8: running {'np': 8, 'pid': 2555863}
+[runner] 2026-10-10 07:34:08 fmgtable_micro_ref3_l0.5: done {'rc': 0}
+[runner] 2026-10-10 07:45:08 coss_ref4_l1_np8: done {'rc': 0}
+[runner] 2026-10-10 07:58:38 coss_ref4_l0.5_np8: done {'rc': 0}
+[runner] 2026-10-10 07:59:08 coss_ref5_l1_np16: queued {'np': 16}
+[runner] 2026-10-10 07:59:08 coss_ref5_l0.5_np16: queued {'np': 16}
+[runner] 2026-10-10 07:59:08 coss_ref5_l1_np16: running {'np': 16, 'pid': 2614064}
+[runner] 2026-10-10 09:23:38 coss_ref5_l1_np16: done {'rc': 0}
+[runner] 2026-10-10 09:23:38 coss_ref5_l0.5_np16: running {'np': 16, 'pid': 2675858}
+[runner] 2026-10-10 10:36:09 coss_ref5_l0.5_np16: done {'rc': 0}
+[runner] 2026-10-10 10:36:39 measure_current_cosserat: queued {'np': 8}
+[runner] 2026-10-10 10:36:39 measure_current_cosserat: running {'np': 8, 'pid': 2736001}
+[runner] 2026-10-10 10:41:09 measure_current_cosserat: done {'rc': 0}
+[runner] 2026-10-10 10:42:59 render_refinement_cosserat: queued {'np': 1}
+[runner] 2026-10-10 10:42:59 render_refinement_cosserat: running {'np': 1, 'pid': 2810344}
+[runner] 2026-10-10 10:49:59 render_refinement_cosserat: done {'rc': 0}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.01: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.03: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.3: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.25_c0.01: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.25_c0.03: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.25_c0.1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.25_c0.3: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.25_c1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.5_c0.01: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.5_c0.03: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.5_c0.1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.5_c0.3: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.5_c1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l1_c0.01: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l1_c0.03: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l1_c0.1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l1_c0.3: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l1_c1: queued {'np': 4}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.01: running {'np': 4, 'pid': 3106127}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.03: running {'np': 4, 'pid': 3106128}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.1: running {'np': 4, 'pid': 3106129}
+[runner] 2026-10-11 10:12:56 cmap_l0.125_c0.3: running {'np': 4, 'pid': 3106130}
+[runner] 2026-10-11 10:22:56 cmap_l0.125_c0.3: done {'rc': 0}
+[runner] 2026-10-11 10:22:56 cmap_l0.125_c1: running {'np': 4, 'pid': 3120407}
+[runner] 2026-10-11 10:24:56 cmap_l0.125_c0.1: done {'rc': 0}
+[runner] 2026-10-11 10:24:56 cmap_l0.25_c0.01: running {'np': 4, 'pid': 3131654}
+[runner] 2026-10-11 10:28:26 cmap_l0.125_c1: done {'rc': 0}
+[runner] 2026-10-11 10:28:26 cmap_l0.25_c0.03: running {'np': 4, 'pid': 3147185}
+[runner] 2026-10-11 10:38:26 cmap_l0.125_c0.03: done {'rc': 0}
+[runner] 2026-10-11 10:38:26 cmap_l0.25_c0.1: running {'np': 4, 'pid': 3172748}
+[runner] 2026-10-11 10:40:26 cmap_l0.125_c0.01: done {'rc': 0}
+[runner] 2026-10-11 10:40:26 cmap_l0.25_c0.3: running {'np': 4, 'pid': 3184270}
+[runner] 2026-10-11 10:46:26 cmap_l0.25_c0.1: done {'rc': 0}
+[runner] 2026-10-11 10:46:56 cmap_l0.25_c0.3: done {'rc': 0}
+[runner] 2026-10-11 10:46:56 cmap_l0.25_c1: running {'np': 4, 'pid': 3207921}
+[runner] 2026-10-11 10:50:26 cmap_l0.25_c0.01: done {'rc': 0}
+[runner] 2026-10-11 10:50:26 cmap_l0.5_c0.01: running {'np': 4, 'pid': 3220078}
+[runner] 2026-10-11 10:52:26 cmap_l0.25_c1: done {'rc': 0}
+[runner] 2026-10-11 10:52:26 cmap_l0.5_c0.03: running {'np': 4, 'pid': 3231528}
+[runner] 2026-10-11 10:53:26 cmap_l0.25_c0.03: done {'rc': 0}
+[runner] 2026-10-11 10:53:26 cmap_l0.5_c0.1: running {'np': 4, 'pid': 3242618}
+[runner] 2026-10-11 10:54:56 cmap_l0.5_c0.3: running {'np': 4, 'pid': 3244452}
+[runner] 2026-10-11 11:00:26 cmap_l0.5_c0.1: done {'rc': 0}
+[runner] 2026-10-11 11:01:26 cmap_l0.5_c0.3: done {'rc': 0}
+[runner] 2026-10-11 11:01:26 cmap_l0.5_c1: running {'np': 4, 'pid': 3276179}
+[runner] 2026-10-11 11:02:26 cmap_l0.5_c0.03: done {'rc': 0}
+[runner] 2026-10-11 11:02:26 cmap_l1_c0.01: running {'np': 4, 'pid': 3285535}
+[runner] 2026-10-11 11:03:26 cmap_l1_c0.03: running {'np': 4, 'pid': 3286108}
+[runner] 2026-10-11 11:06:26 cmap_l0.5_c1: done {'rc': 0}
+[runner] 2026-10-11 11:06:26 cmap_l1_c0.1: running {'np': 4, 'pid': 3300168}
+[runner] 2026-10-11 11:12:56 cmap_l1_c0.03: done {'rc': 0}
+[runner] 2026-10-11 11:12:56 cmap_l1_c0.1: done {'rc': 0}
+[runner] 2026-10-11 11:12:56 cmap_l1_c0.3: running {'np': 4, 'pid': 3326190}
+[runner] 2026-10-11 11:12:56 cmap_l1_c1: running {'np': 4, 'pid': 3326191}
+[runner] 2026-10-11 11:16:26 cmap_l0.5_c0.01: done {'rc': 0}
+[runner] 2026-10-11 11:17:56 cmap_l1_c1: done {'rc': 0}
+[runner] 2026-10-11 11:18:26 cmap_l1_c0.3: done {'rc': 0}
+[runner] 2026-10-11 11:26:56 cmap_l1_c0.01: done {'rc': 0}
+[runner] 2026-10-11 11:44:26 cmatch_l0.14_c1: queued {'np': 4}
+[runner] 2026-10-11 11:44:26 cmatch_l0.236_c1: queued {'np': 4}
+[runner] 2026-10-11 11:44:26 cmatch_l0.39_c1: queued {'np': 4}
+[runner] 2026-10-11 11:44:26 cmatch_l0.5_c0.054: queued {'np': 4}
+[runner] 2026-10-11 11:44:26 cmatch_l1_c0.041: queued {'np': 4}
+[runner] 2026-10-11 11:44:26 cmatch_l0.14_c1: running {'np': 4, 'pid': 3406126}
+[runner] 2026-10-11 11:44:26 cmatch_l0.236_c1: running {'np': 4, 'pid': 3406127}
+[runner] 2026-10-11 11:44:26 cmatch_l0.39_c1: running {'np': 4, 'pid': 3406128}
+[runner] 2026-10-11 11:44:26 cmatch_l0.5_c0.054: running {'np': 4, 'pid': 3406129}
+[runner] 2026-10-11 11:49:26 cmatch_l0.236_c1: done {'rc': 0}
+[runner] 2026-10-11 11:49:26 cmatch_l0.39_c1: done {'rc': 0}
+[runner] 2026-10-11 11:49:26 cmatch_l1_c0.041: running {'np': 4, 'pid': 3431010}
+[runner] 2026-10-11 11:50:56 cmatch_l0.14_c1: done {'rc': 0}
+[runner] 2026-10-11 11:53:26 cmatch_l0.5_c0.054: done {'rc': 0}
+[runner] 2026-10-11 11:57:26 cmatch_l1_c0.041: done {'rc': 0}
+[runner] 2026-10-11 11:58:26 cmatch_l0.37_c1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.14_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.14_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.14_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.14_c1_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.236_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.236_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.236_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.236_c1_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.25_c0.1_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.25_c0.1_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.25_c0.1_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.25_c0.1_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.5_c0.054_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.5_c0.054_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.5_c0.054_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.5_c0.054_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.37_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.37_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.37_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_coss_l0.37_c1_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_micro_l1_ref1: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_micro_l1_ref2: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_micro_l1_ref3: queued {'np': 4}
+[runner] 2026-10-11 11:58:26 eff_micro_l0.25_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_micro_l0.5_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 eff_micro_l1_ref4: queued {'np': 8}
+[runner] 2026-10-11 11:58:26 cmatch_l0.37_c1: running {'np': 4, 'pid': 3475059}
+[runner] 2026-10-11 11:58:27 eff_coss_l0.14_c1_ref1: running {'np': 4, 'pid': 3475060}
+[runner] 2026-10-11 11:58:27 eff_coss_l0.14_c1_ref2: running {'np': 4, 'pid': 3475061}
+[runner] 2026-10-11 11:58:27 eff_coss_l0.14_c1_ref3: running {'np': 4, 'pid': 3475062}
+[runner] 2026-10-11 12:02:57 eff_coss_l0.14_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 12:02:57 eff_coss_l0.236_c1_ref1: running {'np': 4, 'pid': 3504033}
+[runner] 2026-10-11 12:03:57 cmatch_l0.37_c1: done {'rc': 0}
+[runner] 2026-10-11 12:03:57 eff_coss_l0.236_c1_ref2: running {'np': 4, 'pid': 3512608}
+[runner] 2026-10-11 12:06:27 eff_coss_l0.236_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 12:06:27 eff_coss_l0.236_c1_ref3: running {'np': 4, 'pid': 3535303}
+[runner] 2026-10-11 12:17:57 eff_coss_l0.236_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 12:17:57 eff_coss_l0.25_c0.1_ref1: running {'np': 4, 'pid': 3558654}
+[runner] 2026-10-11 12:23:27 eff_coss_l0.25_c0.1_ref1: done {'rc': 0}
+[runner] 2026-10-11 12:23:27 eff_coss_l0.25_c0.1_ref2: running {'np': 4, 'pid': 3581195}
+[runner] 2026-10-11 12:31:57 eff_coss_l0.14_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 12:31:57 eff_coss_l0.25_c0.1_ref3: running {'np': 4, 'pid': 3607150}
+[runner] 2026-10-11 12:34:27 eff_coss_l0.25_c0.1_ref2: done {'rc': 0}
+[runner] 2026-10-11 12:34:27 eff_coss_l0.5_c0.054_ref1: running {'np': 4, 'pid': 3625239}
+[runner] 2026-10-11 12:39:27 eff_coss_l0.5_c0.054_ref1: done {'rc': 0}
+[runner] 2026-10-11 12:39:27 eff_coss_l0.5_c0.054_ref2: running {'np': 4, 'pid': 3649366}
+[runner] 2026-10-11 12:46:57 eff_coss_l0.5_c0.054_ref2: done {'rc': 0}
+[runner] 2026-10-11 12:46:57 eff_coss_l0.5_c0.054_ref3: running {'np': 4, 'pid': 3666079}
+[runner] 2026-10-11 12:49:27 eff_coss_l0.236_c1_ref3: done {'rc': 0}
+[runner] 2026-10-11 12:49:27 eff_coss_l0.37_c1_ref1: running {'np': 4, 'pid': 3677317}
+[runner] 2026-10-11 12:52:27 eff_coss_l0.37_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 12:52:27 eff_coss_l0.37_c1_ref2: running {'np': 4, 'pid': 3700155}
+[runner] 2026-10-11 13:01:27 eff_coss_l0.37_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 13:01:27 eff_coss_l0.37_c1_ref3: running {'np': 4, 'pid': 3718880}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.25_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.5_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l1_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.14_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.236_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.25_c0.1_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.37_c1_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.5_c0.054_ref1: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.25_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.5_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l1_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.14_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.236_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.25_c0.1_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.37_c1_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.5_c0.054_ref2: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.25_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l0.5_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_micro_l1_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.14_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.236_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.25_c0.1_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.37_c1_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:06:57 cold_coss_l0.5_c0.054_ref3: queued {'np': 4}
+[runner] 2026-10-11 13:18:27 eff_coss_l0.25_c0.1_ref3: done {'rc': 0}
+[runner] 2026-10-11 13:18:27 eff_micro_l1_ref1: running {'np': 4, 'pid': 3738996}
+[runner] 2026-10-11 13:22:57 eff_coss_l0.5_c0.054_ref3: done {'rc': 0}
+[runner] 2026-10-11 13:22:57 eff_micro_l1_ref2: running {'np': 4, 'pid': 3751272}
+[runner] 2026-10-11 13:24:27 eff_micro_l1_ref1: done {'rc': 0}
+[runner] 2026-10-11 13:24:27 eff_micro_l1_ref3: running {'np': 4, 'pid': 3772320}
+[runner] 2026-10-11 13:29:27 eff_coss_l0.37_c1_ref3: done {'rc': 0}
+[runner] 2026-10-11 13:31:27 eff_micro_l1_ref2: done {'rc': 0}
+[runner] 2026-10-11 13:31:27 eff_coss_l0.14_c1_ref4: running {'np': 8, 'pid': 3799760}
+[runner] 2026-10-11 14:00:27 eff_micro_l1_ref3: done {'rc': 0}
+[runner] 2026-10-11 14:41:57 eff_coss_l0.14_c1_ref3: done {'rc': 0}
+[runner] 2026-10-11 14:41:57 eff_coss_l0.236_c1_ref4: running {'np': 8, 'pid': 3841458}
+[runner] 2026-10-11 15:26:28 eff_coss_l0.236_c1_ref4: done {'rc': 0}
+[runner] 2026-10-11 15:26:28 eff_coss_l0.25_c0.1_ref4: running {'np': 8, 'pid': 3888085}
+[runner] 2026-10-11 15:27:28 eff_coss_l0.14_c1_ref4: done {'rc': 0}
+[runner] 2026-10-11 15:27:28 eff_coss_l0.5_c0.054_ref4: running {'np': 8, 'pid': 3904186}
+[runner] 2026-10-11 16:15:58 eff_coss_l0.25_c0.1_ref4: done {'rc': 0}
+[runner] 2026-10-11 16:15:58 eff_micro_l0.25_ref4: running {'np': 8, 'pid': 3938393}
+[runner] 2026-10-11 16:19:28 eff_coss_l0.5_c0.054_ref4: done {'rc': 0}
+[runner] 2026-10-11 16:19:28 eff_micro_l0.5_ref4: running {'np': 8, 'pid': 3967686}
+[runner] 2026-10-11 17:21:58 eff_micro_l0.25_ref4: killed {'rc': 124}
+[runner] 2026-10-11 17:21:58 eff_micro_l1_ref4: running {'np': 8, 'pid': 3974415}
+[runner] 2026-10-11 17:28:28 eff_micro_l0.5_ref4: done {'rc': 0}
+[runner] 2026-10-11 17:28:28 eff_coss_l0.37_c1_ref4: running {'np': 8, 'pid': 4002495}
+[runner] 2026-10-11 18:00:58 eff_coss_l0.37_c1_ref4: done {'rc': 0}
+[runner] 2026-10-11 18:00:58 cold_micro_l0.25_ref1: running {'np': 4, 'pid': 4034931}
+[runner] 2026-10-11 18:00:58 cold_micro_l0.5_ref1: running {'np': 4, 'pid': 4034932}
+[runner] 2026-10-11 18:04:28 cold_micro_l0.5_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:04:28 cold_micro_l1_ref1: running {'np': 4, 'pid': 4063273}
+[runner] 2026-10-11 18:04:58 cold_micro_l0.25_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:04:58 cold_coss_l0.14_c1_ref1: running {'np': 4, 'pid': 4076454}
+[runner] 2026-10-11 18:07:58 cold_micro_l1_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:07:58 cold_coss_l0.236_c1_ref1: running {'np': 4, 'pid': 4097312}
+[runner] 2026-10-11 18:09:28 cold_coss_l0.14_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:09:28 cold_coss_l0.25_c0.1_ref1: running {'np': 4, 'pid': 4119159}
+[runner] 2026-10-11 18:11:58 cold_coss_l0.236_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:11:58 cold_coss_l0.37_c1_ref1: running {'np': 4, 'pid': 4141101}
+[runner] 2026-10-11 18:15:28 cold_coss_l0.37_c1_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:15:28 cold_coss_l0.5_c0.054_ref1: running {'np': 4, 'pid': 4163166}
+[runner] 2026-10-11 18:16:58 eff_micro_l1_ref4: done {'rc': 0}
+[runner] 2026-10-11 18:16:58 cold_micro_l0.25_ref2: running {'np': 4, 'pid': 4190695}
+[runner] 2026-10-11 18:16:59 cold_micro_l0.5_ref2: running {'np': 4, 'pid': 4190696}
+[runner] 2026-10-11 18:22:29 cold_coss_l0.25_c0.1_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:22:29 cold_micro_l1_ref2: running {'np': 4, 'pid': 20154}
+[runner] 2026-10-11 18:26:29 cold_coss_l0.5_c0.054_ref1: done {'rc': 0}
+[runner] 2026-10-11 18:26:29 cold_coss_l0.14_c1_ref2: running {'np': 4, 'pid': 44240}
+[runner] 2026-10-11 18:26:59 cold_micro_l0.5_ref2: done {'rc': 0}
+[runner] 2026-10-11 18:26:59 cold_coss_l0.236_c1_ref2: running {'np': 4, 'pid': 56090}
+[runner] 2026-10-11 18:31:29 cold_micro_l1_ref2: done {'rc': 0}
+[runner] 2026-10-11 18:31:29 cold_coss_l0.25_c0.1_ref2: running {'np': 4, 'pid': 70286}
+[runner] 2026-10-11 18:38:29 cold_micro_l0.25_ref2: done {'rc': 0}
+[runner] 2026-10-11 18:38:29 cold_coss_l0.37_c1_ref2: running {'np': 4, 'pid': 84788}
+[runner] 2026-10-11 18:47:29 cold_coss_l0.236_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 18:47:29 cold_coss_l0.5_c0.054_ref2: running {'np': 4, 'pid': 100197}
+[runner] 2026-10-11 18:52:59 cold_coss_l0.37_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 18:52:59 cold_micro_l0.25_ref3: running {'np': 4, 'pid': 115242}
+[runner] 2026-10-11 19:02:59 cold_coss_l0.14_c1_ref2: done {'rc': 0}
+[runner] 2026-10-11 19:02:59 cold_micro_l0.5_ref3: running {'np': 4, 'pid': 130743}
+[runner] 2026-10-11 19:55:29 cold_coss_l0.25_c0.1_ref2: done {'rc': 0}
+[runner] 2026-10-11 19:55:29 cold_micro_l1_ref3: running {'np': 4, 'pid': 153596}
+[runner] 2026-10-11 20:00:59 profile_pairs_ref3: queued {'np': 4}
+[runner] 2026-10-11 20:00:59 profile_pairs_ref4: queued {'np': 4}
+[runner] 2026-10-11 20:00:59 cold_coss_l0.5_c0.054_ref2: done {'rc': 0}
+[runner] 2026-10-11 20:00:59 profile_pairs_ref3: running {'np': 4, 'pid': 168956}
+[runner] 2026-10-11 20:02:59 profile_pairs_ref3: done {'rc': 0}
+[runner] 2026-10-11 20:02:59 profile_pairs_ref4: running {'np': 4, 'pid': 189705}
+[runner] 2026-10-11 20:07:59 profile_pairs_ref4: done {'rc': 0}
+[runner] 2026-10-11 20:07:59 cold_coss_l0.14_c1_ref3: running {'np': 4, 'pid': 216655}
+[runner] 2026-10-11 20:12:29 cold_micro_l0.25_ref3: killed {'rc': 124}
+[runner] 2026-10-11 20:12:29 cold_coss_l0.236_c1_ref3: running {'np': 4, 'pid': 217173}
+[runner] 2026-10-11 20:14:29 cold_micro_l0.5_ref3: done {'rc': 0}
+[runner] 2026-10-11 20:14:29 cold_coss_l0.25_c0.1_ref3: running {'np': 4, 'pid': 227660}
+[runner] 2026-10-11 20:36:29 cold_micro_l1_ref3: done {'rc': 0}
+[runner] 2026-10-11 20:36:29 cold_coss_l0.37_c1_ref3: running {'np': 4, 'pid': 240329}
+[runner] 2026-10-11 21:52:00 cold_coss_l0.37_c1_ref3: done {'rc': 0}
+[runner] 2026-10-11 21:52:00 cold_coss_l0.5_c0.054_ref3: running {'np': 4, 'pid': 259333}
+[runner] 2026-10-11 21:57:30 cold_coss_l0.25_c0.1_ref3: done {'rc': 0}
+[runner] 2026-10-11 22:04:30 peak_positions: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.2_l0.125: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.2_l0.25: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.2_l0.5: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.3_l0.125: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.3_l0.25: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b0.3_l0.5: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b1_l0.125: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b1_l0.25: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 stiffmap_b1_l0.5: queued {'np': 4}
+[runner] 2026-10-11 22:04:30 peak_positions: running {'np': 4, 'pid': 271903}
+[runner] 2026-10-11 22:06:30 peak_positions: done {'rc': 0}
+[runner] 2026-10-11 22:06:30 stiffmap_b0.2_l0.125: running {'np': 4, 'pid': 290550}
+[runner] 2026-10-11 22:07:30 smoke2d_after_3d_edits: queued {'np': 2}
+[runner] 2026-10-11 22:07:30 smoke3d_hb3_ref0: queued {'np': 2}
+[runner] 2026-10-11 22:22:30 stiffmap_b0.2_l0.125: done {'rc': 0}
+[runner] 2026-10-11 22:22:30 smoke2d_after_3d_edits: running {'np': 2, 'pid': 303424}
+[runner] 2026-10-11 22:22:30 smoke3d_hb3_ref0: running {'np': 2, 'pid': 303425}
+[runner] 2026-10-11 22:25:00 smoke2d_after_3d_edits: done {'rc': 0}
+[runner] 2026-10-11 22:27:30 cold_coss_l0.236_c1_ref3: done {'rc': 0}
+[runner] 2026-10-11 22:27:30 stiffmap_b0.2_l0.25: running {'np': 4, 'pid': 321803}
+[runner] 2026-10-11 22:39:00 stiffmap_b0.2_l0.25: done {'rc': 0}
+[runner] 2026-10-11 22:39:00 stiffmap_b0.2_l0.5: running {'np': 4, 'pid': 333521}
+[runner] 2026-10-11 22:47:00 stiffmap_b0.2_l0.5: done {'rc': 0}
+[runner] 2026-10-11 22:47:00 stiffmap_b0.3_l0.125: running {'np': 4, 'pid': 344796}
+[runner] 2026-10-11 22:53:30 smoke3d_hb3_ref0: killed {'rc': 124}
+[runner] 2026-10-11 22:53:30 stiffmap_b0.3_l0.25: running {'np': 4, 'pid': 345561}
+[runner] 2026-10-11 23:00:30 cold_coss_l0.5_c0.054_ref3: done {'rc': 0}
+[runner] 2026-10-11 23:00:30 stiffmap_b0.3_l0.5: running {'np': 4, 'pid': 357233}
+[runner] 2026-10-11 23:02:30 stiffmap_b0.3_l0.125: done {'rc': 0}
+[runner] 2026-10-11 23:02:30 stiffmap_b1_l0.125: running {'np': 4, 'pid': 367719}
+[runner] 2026-10-11 23:04:00 stiffmap_b0.3_l0.25: done {'rc': 0}
+[runner] 2026-10-11 23:04:00 stiffmap_b1_l0.25: running {'np': 4, 'pid': 378151}
+[runner] 2026-10-11 23:08:30 stiffmap_b0.3_l0.5: done {'rc': 0}
+[runner] 2026-10-11 23:08:30 stiffmap_b1_l0.5: running {'np': 4, 'pid': 389029}
+[runner] 2026-10-11 23:21:00 stiffmap_b1_l0.25: done {'rc': 0}
+[runner] 2026-10-11 23:21:30 stiffmap_b1_l0.125: done {'rc': 0}
+[runner] 2026-10-11 23:21:30 stiffmap_b1_l0.5: done {'rc': 0}
+[runner] 2026-10-11 23:35:30 cold_coss_l0.14_c1_ref3: done {'rc': 0}
+[runner] 2026-10-12 00:37:30 stiffmatch_b0.3_l0.138: queued {'np': 4}
+[runner] 2026-10-12 00:37:30 stiffmatch_b0.3_l0.272: queued {'np': 4}
+[runner] 2026-10-12 00:37:30 stiffmatch_b1_l0.148: queued {'np': 4}
+[runner] 2026-10-12 00:37:30 stiffmatch_b0.3_l0.138: running {'np': 4, 'pid': 488852}
+[runner] 2026-10-12 00:37:30 stiffmatch_b0.3_l0.272: running {'np': 4, 'pid': 488853}
+[runner] 2026-10-12 00:40:30 shift_stats_ref3: queued {'np': 4}
+[runner] 2026-10-12 00:47:30 stiffmatch_b0.3_l0.272: done {'rc': 0}
+[runner] 2026-10-12 00:47:30 shift_stats_ref3: running {'np': 4, 'pid': 500277}
+[runner] 2026-10-12 00:50:00 shift_stats_ref3: done {'rc': 0}
+[runner] 2026-10-12 00:50:00 stiffmatch_b1_l0.148: running {'np': 4, 'pid': 510765}
+[runner] 2026-10-12 00:51:30 stiffmatch_b0.3_l0.138: done {'rc': 0}
+[runner] 2026-10-12 01:06:30 stiffmatch_b1_l0.148: done {'rc': 0}
+[runner] 2026-10-12 02:39:01 shift_stats_ref3_v2: queued {'np': 4}
+[runner] 2026-10-12 02:39:01 shift_stats_ref3_v2: running {'np': 4, 'pid': 541560}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.138_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.138_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.138_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.138_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.138_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.138_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.138_ref4: queued {'np': 8}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.272_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.272_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.272_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.272_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.272_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b0.3_l0.272_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.272_ref4: queued {'np': 8}
+[runner] 2026-10-12 02:39:31 eff_micro_b1_l0.148_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b1_l0.148_ref1: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b1_l0.148_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b1_l0.148_ref2: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b1_l0.148_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 cold_micro_b1_l0.148_ref3: queued {'np': 4}
+[runner] 2026-10-12 02:39:31 eff_micro_b1_l0.148_ref4: queued {'np': 8}
+[runner] 2026-10-12 02:39:31 eff_micro_b0.3_l0.138_ref1: running {'np': 4, 'pid': 543621}
+[runner] 2026-10-12 02:41:31 shift_stats_ref3_v2: done {'rc': 0}
+[runner] 2026-10-12 02:41:31 cold_micro_b0.3_l0.138_ref1: running {'np': 4, 'pid': 552647}
+[runner] 2026-10-12 02:44:31 eff_micro_b0.3_l0.138_ref1: done {'rc': 0}
+[runner] 2026-10-12 02:44:31 eff_micro_b0.3_l0.138_ref2: running {'np': 4, 'pid': 592257}
+[runner] 2026-10-12 02:45:01 cold_micro_b0.3_l0.138_ref1: done {'rc': 0}
+[runner] 2026-10-12 02:45:01 cold_micro_b0.3_l0.138_ref2: running {'np': 4, 'pid': 594026}
+[runner] 2026-10-12 03:00:01 cold_micro_b0.3_l0.138_ref2: done {'rc': 0}
+[runner] 2026-10-12 03:00:01 eff_micro_b0.3_l0.138_ref3: running {'np': 4, 'pid': 608926}
+[runner] 2026-10-12 03:16:31 eff_micro_b0.3_l0.138_ref2: done {'rc': 0}
+[runner] 2026-10-12 03:16:31 cold_micro_b0.3_l0.138_ref3: running {'np': 4, 'pid': 623962}
+[runner] 2026-10-12 05:11:02 cold_micro_b0.3_l0.138_ref3: done {'rc': 0}
+[runner] 2026-10-12 05:11:02 eff_micro_b0.3_l0.272_ref1: running {'np': 4, 'pid': 643602}
+[runner] 2026-10-12 05:14:02 eff_micro_b0.3_l0.272_ref1: done {'rc': 0}
+[runner] 2026-10-12 05:14:02 cold_micro_b0.3_l0.272_ref1: running {'np': 4, 'pid': 664384}
+[runner] 2026-10-12 05:17:02 cold_micro_b0.3_l0.272_ref1: done {'rc': 0}
+[runner] 2026-10-12 05:17:02 eff_micro_b0.3_l0.272_ref2: running {'np': 4, 'pid': 685170}
+[runner] 2026-10-12 05:26:02 eff_micro_b0.3_l0.272_ref2: done {'rc': 0}
+[runner] 2026-10-12 05:26:02 cold_micro_b0.3_l0.272_ref2: running {'np': 4, 'pid': 699722}
+[runner] 2026-10-12 05:34:02 cold_micro_b0.3_l0.272_ref2: done {'rc': 0}
+[runner] 2026-10-12 05:34:02 eff_micro_b0.3_l0.272_ref3: running {'np': 4, 'pid': 714068}
+[runner] 2026-10-12 06:10:02 shift_stats_ref3_v3: queued {'np': 4}
+[runner] 2026-10-12 06:15:32 eff_micro_b0.3_l0.272_ref3: done {'rc': 0}
+[runner] 2026-10-12 06:15:32 shift_stats_ref3_v3: running {'np': 4, 'pid': 728420}
+[runner] 2026-10-12 06:18:32 shift_stats_ref3_v3: done {'rc': 0}
+[runner] 2026-10-12 06:18:32 cold_micro_b0.3_l0.272_ref3: running {'np': 4, 'pid': 740136}
+[runner] 2026-10-12 06:47:02 cold_micro_b0.3_l0.272_ref3: done {'rc': 0}
+[runner] 2026-10-12 06:47:02 eff_micro_b1_l0.148_ref1: running {'np': 4, 'pid': 753388}
+[runner] 2026-10-12 06:50:32 eff_micro_b1_l0.148_ref1: done {'rc': 0}
+[runner] 2026-10-12 06:50:32 cold_micro_b1_l0.148_ref1: running {'np': 4, 'pid': 774214}
+[runner] 2026-10-12 06:53:32 cold_micro_b1_l0.148_ref1: done {'rc': 0}
+[runner] 2026-10-12 06:53:32 eff_micro_b1_l0.148_ref2: running {'np': 4, 'pid': 794985}
+[runner] 2026-10-12 07:15:03 eff_micro_b1_l0.148_ref2: done {'rc': 0}
+[runner] 2026-10-12 07:15:03 cold_micro_b1_l0.148_ref2: running {'np': 4, 'pid': 810482}
+[runner] 2026-10-12 07:27:33 cold_micro_b1_l0.148_ref2: done {'rc': 0}
+[runner] 2026-10-12 07:27:33 eff_micro_b1_l0.148_ref3: running {'np': 4, 'pid': 825206}
+[runner] 2026-10-12 07:38:03 eff_micro_b0.3_l0.138_ref3: done {'rc': 0}
+[runner] 2026-10-12 07:38:03 cold_micro_b1_l0.148_ref3: running {'np': 4, 'pid': 836420}
+[runner] 2026-10-12 08:11:03 shift_stats_ref3_v4: queued {'np': 4}
+[runner] 2026-10-12 08:27:33 cold_micro_b1_l0.148_ref3: done {'rc': 0}
+[runner] 2026-10-12 08:27:33 shift_stats_ref3_v4: running {'np': 4, 'pid': 917839}
+[runner] 2026-10-12 08:30:33 shift_stats_ref3_v4: done {'rc': 0}
+[runner] 2026-10-12 09:12:33 eff_micro_b1_l0.148_ref3: done {'rc': 0}
+[runner] 2026-10-12 09:12:33 eff_micro_b0.3_l0.138_ref4: running {'np': 8, 'pid': 944722}
+[runner] 2026-10-12 11:20:04 eff_micro_b0.3_l0.138_ref4: done {'rc': 0}
+[runner] 2026-10-12 11:20:04 eff_micro_b0.3_l0.272_ref4: running {'np': 8, 'pid': 1094179}
+[runner] 2026-10-12 11:52:04 eff_micro_b0.3_l0.272_ref4: done {'rc': 0}
+[runner] 2026-10-12 11:52:04 eff_micro_b1_l0.148_ref4: running {'np': 8, 'pid': 1130086}
+[runner] 2026-10-12 12:18:34 eff_micro_b1_l0.148_ref4: done {'rc': 0}

@@ -1,0 +1,442 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 2.79205
+    1 KSP Residual norm 0.0153912
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0153912
+    1 KSP Residual norm 0.0108769
+    2 KSP Residual norm 0.0104375
+    3 KSP Residual norm 0.00918689
+    4 KSP Residual norm 0.0061774
+    5 KSP Residual norm 0.0037409
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0037409
+    1 KSP Residual norm 0.00293475
+    2 KSP Residual norm 0.00236932
+    3 KSP Residual norm 0.00204141
+    4 KSP Residual norm 0.00180797
+    5 KSP Residual norm 0.00158225
+    6 KSP Residual norm 0.00134376
+    7 KSP Residual norm 0.00103084
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00103084
+    1 KSP Residual norm 0.000911958
+    2 KSP Residual norm 0.000740037
+    3 KSP Residual norm 0.000611336
+    4 KSP Residual norm 0.000504215
+    5 KSP Residual norm 0.000436352
+    6 KSP Residual norm 0.000388273
+    7 KSP Residual norm 0.000344242
+    8 KSP Residual norm 0.000277399
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000277399
+    1 KSP Residual norm 0.000234409
+    2 KSP Residual norm 0.000183672
+    3 KSP Residual norm 0.000149375
+    4 KSP Residual norm 0.000120089
+    5 KSP Residual norm 0.000104893
+    6 KSP Residual norm 9.8762e-05
+    7 KSP Residual norm 8.94249e-05
+    8 KSP Residual norm 7.77591e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 7.77591e-05
+    1 KSP Residual norm 7.1402e-05
+    2 KSP Residual norm 6.45211e-05
+    3 KSP Residual norm 5.56746e-05
+    4 KSP Residual norm 4.42337e-05
+    5 KSP Residual norm 3.79013e-05
+    6 KSP Residual norm 3.19318e-05
+    7 KSP Residual norm 2.70876e-05
+    8 KSP Residual norm 2.19376e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 2.19376e-05
+    1 KSP Residual norm 1.85787e-05
+    2 KSP Residual norm 1.44673e-05
+    3 KSP Residual norm 1.10659e-05
+    4 KSP Residual norm 9.52507e-06
+    5 KSP Residual norm 7.64202e-06
+    6 KSP Residual norm 6.96723e-06
+    7 KSP Residual norm 6.32209e-06
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 6.32209e-06
+    1 KSP Residual norm 6.07087e-06
+    2 KSP Residual norm 5.55326e-06
+    3 KSP Residual norm 4.35944e-06
+    4 KSP Residual norm 3.53067e-06
+    5 KSP Residual norm 3.11355e-06
+    6 KSP Residual norm 2.51509e-06
+    7 KSP Residual norm 1.42481e-06
+  0 SNES Function norm 0.960604
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+/home/lmoresi/+Simulations/uw3-campaigns/notch_length_scale/drivers/coupled_notch.py:97: RuntimeWarning: [Solver_17_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  stokes.solve(zero_init_guess=False)
+  0 SNES Function norm 0.0117994
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0117994
+    1 KSP Residual norm 0.00113229
+    2 KSP Residual norm 0.000516406
+    3 KSP Residual norm 0.000435634
+    4 KSP Residual norm 0.000414525
+    5 KSP Residual norm 0.000395219
+    6 KSP Residual norm 0.000334205
+    7 KSP Residual norm 0.000243186
+    8 KSP Residual norm 0.000174235
+    9 KSP Residual norm 0.000138818
+   10 KSP Residual norm 0.000112987
+   11 KSP Residual norm 8.65333e-05
+   12 KSP Residual norm 6.76146e-05
+   13 KSP Residual norm 4.99931e-05
+   14 KSP Residual norm 3.84028e-05
+   15 KSP Residual norm 3.15835e-05
+   16 KSP Residual norm 2.68759e-05
+   17 KSP Residual norm 2.22528e-05
+   18 KSP Residual norm 1.81471e-05
+   19 KSP Residual norm 1.44645e-05
+   20 KSP Residual norm 1.06042e-05
+   21 KSP Residual norm 6.66476e-06
+   22 KSP Residual norm 4.17104e-06
+   23 KSP Residual norm 2.56465e-06
+   24 KSP Residual norm 1.52956e-06
+   25 KSP Residual norm 9.17409e-07
+   26 KSP Residual norm 5.29159e-07
+   27 KSP Residual norm 3.16036e-07
+   28 KSP Residual norm 2.06432e-07
+   29 KSP Residual norm 1.45454e-07
+   30 KSP Residual norm 1.10153e-07
+   31 KSP Residual norm 9.06694e-08
+   32 KSP Residual norm 7.96241e-08
+   33 KSP Residual norm 7.22651e-08
+   34 KSP Residual norm 6.56183e-08
+   35 KSP Residual norm 5.66733e-08
+   36 KSP Residual norm 4.61533e-08
+   37 KSP Residual norm 3.62838e-08
+   38 KSP Residual norm 2.7307e-08
+   39 KSP Residual norm 2.01262e-08
+   40 KSP Residual norm 1.44446e-08
+   41 KSP Residual norm 1.0204e-08
+   42 KSP Residual norm 7.13638e-09
+   43 KSP Residual norm 4.82602e-09
+   44 KSP Residual norm 3.34109e-09
+   45 KSP Residual norm 2.39315e-09
+   46 KSP Residual norm 1.79093e-09
+   47 KSP Residual norm 1.39833e-09
+   48 KSP Residual norm 1.09965e-09
+   49 KSP Residual norm 8.075e-10
+   50 KSP Residual norm 5.612e-10
+   51 KSP Residual norm 3.695e-10
+   52 KSP Residual norm 2.446e-10
+   53 KSP Residual norm 1.722e-10
+   54 KSP Residual norm 1.298e-10
+   55 KSP Residual norm 1.004e-10
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 55
+      Line search: Using full step: fnorm 1.179942338708e-02 gnorm 2.318508004100e-03
+  1 SNES Function norm 0.00231851
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.00231851
+    1 KSP Residual norm 0.000234384
+    2 KSP Residual norm 0.000132678
+    3 KSP Residual norm 0.000120038
+    4 KSP Residual norm 0.000109147
+    5 KSP Residual norm 9.99508e-05
+    6 KSP Residual norm 8.74154e-05
+    7 KSP Residual norm 6.85455e-05
+    8 KSP Residual norm 5.66144e-05
+    9 KSP Residual norm 4.90794e-05
+   10 KSP Residual norm 4.05483e-05
+   11 KSP Residual norm 3.25373e-05
+   12 KSP Residual norm 2.45628e-05
+   13 KSP Residual norm 1.82941e-05
+   14 KSP Residual norm 1.44741e-05
+   15 KSP Residual norm 1.15848e-05
+   16 KSP Residual norm 9.90849e-06
+   17 KSP Residual norm 8.82458e-06
+   18 KSP Residual norm 7.7873e-06
+   19 KSP Residual norm 6.81078e-06
+   20 KSP Residual norm 5.87518e-06
+   21 KSP Residual norm 4.94125e-06
+   22 KSP Residual norm 4.15488e-06
+   23 KSP Residual norm 3.38784e-06
+   24 KSP Residual norm 2.749e-06
+   25 KSP Residual norm 2.24088e-06
+   26 KSP Residual norm 1.81987e-06
+   27 KSP Residual norm 1.48449e-06
+   28 KSP Residual norm 1.19844e-06
+   29 KSP Residual norm 9.86029e-07
+   30 KSP Residual norm 7.93308e-07
+   31 KSP Residual norm 6.4107e-07
+   32 KSP Residual norm 5.00144e-07
+   33 KSP Residual norm 3.90241e-07
+   34 KSP Residual norm 2.98958e-07
+   35 KSP Residual norm 2.29625e-07
+   36 KSP Residual norm 1.7579e-07
+   37 KSP Residual norm 1.33193e-07
+   38 KSP Residual norm 9.98481e-08
+   39 KSP Residual norm 7.69917e-08
+   40 KSP Residual norm 6.1147e-08
+   41 KSP Residual norm 5.01835e-08
+   42 KSP Residual norm 4.24151e-08
+   43 KSP Residual norm 3.60523e-08
+   44 KSP Residual norm 3.06572e-08
+   45 KSP Residual norm 2.64349e-08
+   46 KSP Residual norm 2.27428e-08
+   47 KSP Residual norm 1.95085e-08
+   48 KSP Residual norm 1.66516e-08
+   49 KSP Residual norm 1.42489e-08
+   50 KSP Residual norm 1.23651e-08
+   51 KSP Residual norm 1.10374e-08
+   52 KSP Residual norm 1.00752e-08
+   53 KSP Residual norm 9.18642e-09
+   54 KSP Residual norm 8.33979e-09
+   55 KSP Residual norm 7.44672e-09
+   56 KSP Residual norm 6.59681e-09
+   57 KSP Residual norm 5.73869e-09
+   58 KSP Residual norm 4.8918e-09
+   59 KSP Residual norm 4.09957e-09
+   60 KSP Residual norm 3.35666e-09
+   61 KSP Residual norm 2.69734e-09
+   62 KSP Residual norm 2.10429e-09
+   63 KSP Residual norm 1.63965e-09
+   64 KSP Residual norm 1.24404e-09
+   65 KSP Residual norm 9.427e-10
+   66 KSP Residual norm 7.217e-10
+   67 KSP Residual norm 5.574e-10
+   68 KSP Residual norm 4.233e-10
+   69 KSP Residual norm 3.246e-10
+   70 KSP Residual norm 2.500e-10
+   71 KSP Residual norm 1.943e-10
+   72 KSP Residual norm 1.528e-10
+   73 KSP Residual norm 1.213e-10
+   74 KSP Residual norm 9.652e-11
+   75 KSP Residual norm 7.700e-11
+   76 KSP Residual norm 6.168e-11
+   77 KSP Residual norm 4.924e-11
+   78 KSP Residual norm 3.929e-11
+   79 KSP Residual norm 3.181e-11
+   80 KSP Residual norm 2.506e-11
+   81 KSP Residual norm 1.983e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 81
+      Line search: Using full step: fnorm 2.318508004100e-03 gnorm 6.030212757089e-04
+  2 SNES Function norm 0.000603021
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.000603021
+    1 KSP Residual norm 2.35946e-05
+    2 KSP Residual norm 1.2059e-05
+    3 KSP Residual norm 1.05153e-05
+    4 KSP Residual norm 9.78895e-06
+    5 KSP Residual norm 9.2316e-06
+    6 KSP Residual norm 8.0221e-06
+    7 KSP Residual norm 6.82509e-06
+    8 KSP Residual norm 5.61101e-06
+    9 KSP Residual norm 5.02756e-06
+   10 KSP Residual norm 4.37059e-06
+   11 KSP Residual norm 3.43012e-06
+   12 KSP Residual norm 2.63693e-06
+   13 KSP Residual norm 1.9674e-06
+   14 KSP Residual norm 1.48079e-06
+   15 KSP Residual norm 1.12567e-06
+   16 KSP Residual norm 8.6469e-07
+   17 KSP Residual norm 6.73751e-07
+   18 KSP Residual norm 5.38526e-07
+   19 KSP Residual norm 4.24097e-07
+   20 KSP Residual norm 3.57969e-07
+   21 KSP Residual norm 3.10455e-07
+   22 KSP Residual norm 2.69391e-07
+   23 KSP Residual norm 2.28061e-07
+   24 KSP Residual norm 1.94514e-07
+   25 KSP Residual norm 1.6701e-07
+   26 KSP Residual norm 1.40036e-07
+   27 KSP Residual norm 1.15378e-07
+   28 KSP Residual norm 9.45768e-08
+   29 KSP Residual norm 7.55429e-08
+   30 KSP Residual norm 5.98535e-08
+   31 KSP Residual norm 4.74124e-08
+   32 KSP Residual norm 3.83843e-08
+   33 KSP Residual norm 3.0837e-08
+   34 KSP Residual norm 2.52927e-08
+   35 KSP Residual norm 2.05357e-08
+   36 KSP Residual norm 1.67455e-08
+   37 KSP Residual norm 1.33067e-08
+   38 KSP Residual norm 1.02421e-08
+   39 KSP Residual norm 7.73521e-09
+   40 KSP Residual norm 6.08556e-09
+   41 KSP Residual norm 5.00959e-09
+   42 KSP Residual norm 4.27045e-09
+   43 KSP Residual norm 3.68423e-09
+   44 KSP Residual norm 3.26708e-09
+   45 KSP Residual norm 2.92716e-09
+   46 KSP Residual norm 2.6579e-09
+   47 KSP Residual norm 2.41797e-09
+   48 KSP Residual norm 2.19852e-09
+   49 KSP Residual norm 1.99706e-09
+   50 KSP Residual norm 1.82025e-09
+   51 KSP Residual norm 1.65609e-09
+   52 KSP Residual norm 1.50438e-09
+   53 KSP Residual norm 1.35434e-09
+   54 KSP Residual norm 1.20815e-09
+   55 KSP Residual norm 1.06763e-09
+   56 KSP Residual norm 9.338e-10
+   57 KSP Residual norm 8.042e-10
+   58 KSP Residual norm 6.760e-10
+   59 KSP Residual norm 5.578e-10
+   60 KSP Residual norm 4.525e-10
+   61 KSP Residual norm 3.626e-10
+   62 KSP Residual norm 2.886e-10
+   63 KSP Residual norm 2.262e-10
+   64 KSP Residual norm 1.773e-10
+   65 KSP Residual norm 1.363e-10
+   66 KSP Residual norm 1.069e-10
+   67 KSP Residual norm 8.262e-11
+   68 KSP Residual norm 6.496e-11
+   69 KSP Residual norm 5.095e-11
+   70 KSP Residual norm 4.047e-11
+   71 KSP Residual norm 3.171e-11
+   72 KSP Residual norm 2.518e-11
+   73 KSP Residual norm 1.902e-11
+   74 KSP Residual norm 1.499e-11
+   75 KSP Residual norm 1.171e-11
+   76 KSP Residual norm < 1.e-11
+   77 KSP Residual norm < 1.e-11
+   78 KSP Residual norm < 1.e-11
+    Linear Solver_17_ solve converged due to CONVERGED_RTOL iterations 78
+      Line search: Using full step: fnorm 6.030212757089e-04 gnorm 5.025945063555e-05
+  3 SNES Function norm 5.02595e-05
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 5.02595e-05
+    1 KSP Residual norm 1.16295e-06
+    2 KSP Residual norm 5.57108e-07
+    3 KSP Residual norm 4.44035e-07
+    4 KSP Residual norm 4.14499e-07
+    5 KSP Residual norm 3.96488e-07
+    6 KSP Residual norm 3.48335e-07
+    7 KSP Residual norm 2.73152e-07
+    8 KSP Residual norm 2.29719e-07
+    9 KSP Residual norm 2.0209e-07
+   10 KSP Residual norm 1.72946e-07
+   11 KSP Residual norm 1.36399e-07
+   12 KSP Residual norm 9.79687e-08
+   13 KSP Residual norm 6.56829e-08
+   14 KSP Residual norm 4.42231e-08
+   15 KSP Residual norm 3.30322e-08
+   16 KSP Residual norm 2.5714e-08
+   17 KSP Residual norm 2.04461e-08
+   18 KSP Residual norm 1.71734e-08
+   19 KSP Residual norm 1.44657e-08
+   20 KSP Residual norm 1.24867e-08
+   21 KSP Residual norm 1.09221e-08
+   22 KSP Residual norm 9.36768e-09
+   23 KSP Residual norm 7.82805e-09
+   24 KSP Residual norm 6.29039e-09
+   25 KSP Residual norm 5.05316e-09
+   26 KSP Residual norm 4.01541e-09
+   27 KSP Residual norm 3.1753e-09
+   28 KSP Residual norm 2.48135e-09
+   29 KSP Residual norm 1.93256e-09
+   30 KSP Residual norm 1.52239e-09
+   31 KSP Residual norm 1.21441e-09
+   32 KSP Residual norm 9.844e-10
+   33 KSP Residual norm 8.131e-10
+   34 KSP Residual norm 6.796e-10
+   35 KSP Residual norm 5.708e-10
+   36 KSP Residual norm 4.860e-10
+   37 KSP Residual norm 4.185e-10
+   38 KSP Residual norm 3.683e-10
+   39 KSP Residual norm 3.307e-10
+   40 KSP Residual norm 3.002e-10
+   41 KSP Residual norm 2.732e-10
+   42 KSP Residual norm 2.476e-10
+   43 KSP Residual norm 2.193e-10
+   44 KSP Residual norm 1.906e-10
+   45 KSP Residual norm 1.580e-10
+   46 KSP Residual norm 1.299e-10
+   47 KSP Residual norm 1.054e-10
+   48 KSP Residual norm 8.607e-11
+   49 KSP Residual norm 7.076e-11
+   50 KSP Residual norm 5.924e-11
+   51 KSP Residual norm 4.949e-11
+   52 KSP Residual norm 4.140e-11
+   53 KSP Residual norm 3.470e-11
+   54 KSP Residual norm 2.913e-11
+   55 KSP Residual norm 2.416e-11
+   56 KSP Residual norm 1.992e-11
+   57 KSP Residual norm 1.661e-11
+   58 KSP Residual norm 1.407e-11
+   59 KSP Residual norm 1.211e-11
+   60 KSP Residual norm 1.024e-11
+   61 KSP Residual norm < 1.e-11
+   62 KSP Residual norm < 1.e-11
+   63 KSP Residual norm < 1.e-11
+   64 KSP Residual norm < 1.e-11
+   65 KSP Residual norm < 1.e-11
+   66 KSP Residual norm < 1.e-11
+   67 KSP Residual norm < 1.e-11
+   68 KSP Residual norm < 1.e-11
+   69 KSP Residual norm < 1.e-11
+   70 KSP Residual norm < 1.e-11
+   71 KSP Residual norm < 1.e-11
+    Linear Solver_17_ solve converged due to CONVERGED_ATOL iterations 71
+      Line search: Using full step: fnorm 5.025945063555e-05 gnorm 4.011200151179e-07
+  4 SNES Function norm 4.0112e-07
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4649 of 4649 query points are not located on this rank (rank 5 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4995 of 4995 query points are not located on this rank (rank 6 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4727 of 4727 query points are not located on this rank (rank 8 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4755 of 4755 query points are not located on this rank (rank 10 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4849 of 4849 query points are not located on this rank (rank 4 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4811 of 4811 query points are not located on this rank (rank 2 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4749 of 4749 query points are not located on this rank (rank 0 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 5107 of 5107 query points are not located on this rank (rank 13 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4833 of 4833 query points are not located on this rank (rank 15 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4939 of 4939 query points are not located on this rank (rank 14 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4889 of 4889 query points are not located on this rank (rank 12 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4591 of 4591 query points are not located on this rank (rank 9 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4789 of 4789 query points are not located on this rank (rank 7 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4711 of 4711 query points are not located on this rank (rank 1 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4857 of 4857 query points are not located on this rank (rank 3 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/function/functions_unit_system.py:311: RuntimeWarning: evaluate() is rank-local: 4833 of 4833 query points are not located on this rank (rank 11 of 16), so their values were EXTRAPOLATED and are wrong — different ranks will disagree for the same query. Use global_evaluate() for points that may be owned elsewhere, or restrict the query to this rank's own coordinates (#606).
+  _warn_if_points_are_not_owned(extrapolated)
+[0] [micromorphic 3-D] ref 2 beta 0.1 l 1.0 km np 16: CONVERGED_FNORM_ABS its 4 (29607 s) mid-strike W 4.864 km, peak 0.275; W(z) 5.84 5.87 5.91 5.73 5.44 4.86 4.20 3.65 3.37 3.29 3.25

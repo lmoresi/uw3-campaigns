@@ -1,0 +1,104 @@
+........................                                                                   [100%]                                                                   [100%]                                                                   [100%]
+
+                                                                   [100%]=============================== warnings summary ===============================
+parallel/test_1017_custom_mg_parallel_mpi.py::test_legacy_path_serial_guard
+=============================== warnings summary ===============================
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/_pytest/python.py:157: DeprecationWarning: set_custom_mg is deprecated (legacy serial-only, single-field custom-MG path); use set_custom_fmg(coarse_meshes, builder=..., field_id=...) instead
+    result = testfunction(**testargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+parallel/test_1017_custom_mg_parallel_mpi.py::test_legacy_path_serial_guard
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/_pytest/python.py:157: DeprecationWarning: set_custom_mg is deprecated (legacy serial-only, single-field custom-MG path); use set_custom_fmg(coarse_meshes, builder=..., field_id=...) instead
+    result = testfunction(**testargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== MPI Information ================================
+rank: 3
+
+size: 4
+=============================== MPI Information ================================
+MPI version: 5.0
+rank: 2
+size: 4
+MPI library version: MPICH Version:      5.0.1
+MPICH Release date: Fri Apr 10 09:45:31 AM CDT 2026
+MPICH ABI:          18:1:6
+MPICH Device:       ch4:ucx ofi
+MPICH configure:    --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --disable-doc --disable-dependency-tracking --enable-cxx --enable-fortran --enable-f08 --enable-mpi-abi --with-wrapper-dl-type=none --disable-static --with-device=ch4:ucx,ofi --with-ucx=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-libfabric=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-hwloc=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-yaksa=embedded --with-pm=hydra:gforker
+MPICH CC:           x86_64-conda-linux-gnu-cc -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix   -O2
+MPICH CXX:          x86_64-conda-linux-gnu-c++ -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH F77:          x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH FC:           x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH features:     threadcomm
+
+MPI version: 5.0
+MPI vendor: MPICH 5.0.1
+mpi4py rc: 
+mpi4py config:
+MPI library version: MPICH Version:      5.0.1
+MPICH Release date: Fri Apr 10 09:45:31 AM CDT 2026
+MPICH ABI:          18:1:6
+MPICH Device:       ch4:ucx ofi
+MPICH configure:    --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --disable-doc --disable-dependency-tracking --enable-cxx --enable-fortran --enable-f08 --enable-mpi-abi --with-wrapper-dl-type=none --disable-static --with-device=ch4:ucx,ofi --with-ucx=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-libfabric=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-hwloc=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-yaksa=embedded --with-pm=hydra:gforker
+MPICH CC:           x86_64-conda-linux-gnu-cc -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix   -O2
+MPICH CXX:          x86_64-conda-linux-gnu-c++ -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH F77:          x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH FC:           x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH features:     threadcomm
+
+MPI vendor: MPICH 5.0.1
+mpi4py rc: 
+mpi4py config:
+=============================== warnings summary ===============================
+parallel/test_1017_custom_mg_parallel_mpi.py::test_legacy_path_serial_guard
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/_pytest/python.py:157: DeprecationWarning: set_custom_mg is deprecated (legacy serial-only, single-field custom-MG path); use set_custom_fmg(coarse_meshes, builder=..., field_id=...) instead
+    result = testfunction(**testargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== MPI Information ================================
+rank: 1
+size: 4
+MPI version: 5.0
+MPI library version: MPICH Version:      5.0.1
+MPICH Release date: Fri Apr 10 09:45:31 AM CDT 2026
+MPICH ABI:          18:1:6
+MPICH Device:       ch4:ucx ofi
+MPICH configure:    --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --disable-doc --disable-dependency-tracking --enable-cxx --enable-fortran --enable-f08 --enable-mpi-abi --with-wrapper-dl-type=none --disable-static --with-device=ch4:ucx,ofi --with-ucx=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-libfabric=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-hwloc=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-yaksa=embedded --with-pm=hydra:gforker
+MPICH CC:           x86_64-conda-linux-gnu-cc -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix   -O2
+MPICH CXX:          x86_64-conda-linux-gnu-c++ -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH F77:          x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH FC:           x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH features:     threadcomm
+
+MPI vendor: MPICH 5.0.1
+mpi4py rc: 
+mpi4py config:
+6 passed, 1 warning in 77.34s (0:01:17)
+6 passed, 1 warning in 77.46s (0:01:17)
+6 passed, 1 warning in 77.60s (0:01:17)
+
+=============================== warnings summary ===============================
+parallel/test_1017_custom_mg_parallel_mpi.py::test_legacy_path_serial_guard
+  /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/lib/python3.12/site-packages/_pytest/python.py:157: DeprecationWarning: set_custom_mg is deprecated (legacy serial-only, single-field custom-MG path); use set_custom_fmg(coarse_meshes, builder=..., field_id=...) instead
+    result = testfunction(**testargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== MPI Information ================================
+rank: 0
+size: 4
+MPI version: 5.0
+MPI library version: MPICH Version:      5.0.1
+MPICH Release date: Fri Apr 10 09:45:31 AM CDT 2026
+MPICH ABI:          18:1:6
+MPICH Device:       ch4:ucx ofi
+MPICH configure:    --prefix=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --disable-doc --disable-dependency-tracking --enable-cxx --enable-fortran --enable-f08 --enable-mpi-abi --with-wrapper-dl-type=none --disable-static --with-device=ch4:ucx,ofi --with-ucx=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-libfabric=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-hwloc=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev --with-yaksa=embedded --with-pm=hydra:gforker
+MPICH CC:           x86_64-conda-linux-gnu-cc -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix   -O2
+MPICH CXX:          x86_64-conda-linux-gnu-c++ -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH F77:          x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH FC:           x86_64-conda-linux-gnu-gfortran -I/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev/include -I/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/bld/rattler-build_mpich_1775872080/work=/usr/local/src/conda/mpich-5.0.1 -fdebug-prefix-map=/home/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sbls/.pixi/envs/dev=/usr/local/src/conda-prefix -O2
+MPICH features:     threadcomm
+
+MPI vendor: MPICH 5.0.1
+mpi4py rc: 
+mpi4py config:
+6 passed, 1 warning in 77.70s (0:01:17)

@@ -1,0 +1,24 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l1 '6km_cut': 4.263, '6km_outside': 4.385, '9km_cut': 4.285, '9km_outside': 4.617, '12km_cut': 4.285, '12km_outside': 4.609, '30km_cut': 4.293, '30km_outside': 4.293
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref4_xi0_beta0.1_l1_production_tight '6km_cut': 4.261, '6km_outside': 4.387, '9km_cut': 4.271, '9km_outside': 4.635, '12km_cut': 4.271, '12km_outside': 4.629, '30km_cut': 4.278, '30km_outside': 4.278
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l2 '6km_cut': 4.494, '6km_outside': 4.867, '9km_cut': 4.538, '9km_outside': 5.417, '12km_cut': 4.538, '12km_outside': 5.253, '30km_cut': 4.538, '30km_outside': 4.538
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref4_xi0_beta0.1_l2_production_tight '6km_cut': 4.517, '6km_outside': 4.876, '9km_cut': 4.571, '9km_outside': 5.439, '12km_cut': 4.571, '12km_outside': 5.28, '30km_cut': 4.571, '30km_outside': 4.571
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref3_xi0_beta0.1_l0.5 '6km_cut': 3.403, '6km_outside': 3.555, '9km_cut': 3.403, '9km_outside': 3.625, '12km_cut': 3.403, '12km_outside': 3.403, '30km_cut': 3.403, '30km_outside': 3.403
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+[0] micro_ref4_xi0_beta0.1_l0.5_production_tight '6km_cut': 3.392, '6km_outside': 3.555, '9km_cut': 3.393, '9km_outside': 3.632, '12km_cut': 3.393, '12km_outside': 3.393, '30km_cut': 3.393, '30km_outside': 3.393

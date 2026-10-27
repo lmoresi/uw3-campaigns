@@ -1,0 +1,25 @@
+[0] ℹ️ Dimensional coverage: ['length', 'time', 'mass']
+[0] (Not covered: ['temperature'] - will fail only if needed)
+[0] ✓ Units system active with automatic non-dimensionalization
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 2.79205
+    1 KSP Residual norm 0.0153912
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0153912
+    1 KSP Residual norm 0.0108769
+    2 KSP Residual norm 0.0104375
+    3 KSP Residual norm 0.00918689
+    4 KSP Residual norm 0.0061774
+    5 KSP Residual norm 0.0037409
+    Residual norms for Solver_17_ solve.
+    0 KSP Residual norm 0.0037409
+    1 KSP Residual norm 0.00293475
+    2 KSP Residual norm 0.00236932
+    3 KSP Residual norm 0.00204141
+    4 KSP Residual norm 0.00180797
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind and https://petsc.org/release/faq/
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
