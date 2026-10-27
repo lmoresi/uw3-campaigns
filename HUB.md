@@ -132,7 +132,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | second segments running since 2026-10-27 02:03 (jobs 2260-2262 from 140 / 130 / 160), recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
-| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (hyperion); kaiju `~/uw3/overlay-leakfix` | FIXED and VALIDATED on kaiju 2026-10-27 (30-step A/B at np 16: solution identical to 6e-10 in slip, RSS flat, timing unchanged); overlay-leakfix is the production overlay for new faulted runs; adversarial review and tier-A suites owed before a PR |
+| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (on box-faults-warm; kaiju's overlay-leakfix); PR branch from development to come (hyperion) | **PRIORITY (Louis 2026-10-27): propagate.** Hyperion: fix onto a development-based branch, tier-A serial + np 2/4 + parallel suite, adversarial review (sub-communicator cleanup; registry consumers), then the PR to development with kaiju's validation in the body |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -892,3 +892,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   library question (solver-side state) is hyperion's determinism probe. NOT a driver item.
 - 2026-10-27: thermal runs hit the wall at 02:03 (TA 143, TB 131, TA_age25 161) and restarted unchanged from 140,
   130, 160 (jobs 2260-2262).
+- 2026-10-27: **Louis: memory leak fixes are important to propagate; make it a priority.** Hyperion told to take
+  bugfix/faulted-rebuild-leak to a PR against development ahead of the coarse-solve design: cherry-pick the fix
+  onto a development-based branch (the box-faults-warm copy stays for kaiju's overlay), confirm the two
+  regression tests fail before and pass after on development, tier-A serial and np 2/4 plus the parallel
+  suite, the adversarial review (collective PETSc cleanup in Mesh construction on sub-communicators; consumers
+  of the Model registries' strong references), then the PR with the fixture and kaiju numbers and the review
+  posted. The laptop told to build its dev environment from 547c2e54. Kaiju already runs it for faulted work.
