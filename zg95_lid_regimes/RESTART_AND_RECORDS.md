@@ -175,3 +175,34 @@ The fault decisions jump on small differences in the state. Two uninterrupted ru
 differed only by a warm or cold first solve (vrms 1e-6) took different `keep_apart`
 shortenings at the next detection. Compare events only between runs with the same driver and
 library.
+
+### Known limitation: a segment restart that lands on a rebuild (kaiju, 2026-10-27)
+
+A segment restart reproduces the uninterrupted run only to the solver tolerance, and slip_max
+shows it most strongly when the first step after the restart is a rebuild. Measured: two
+restarts of `slab_fault_B1_crust1_fault` from its checkpoint 150, np 16, driver 0fb51f9, for
+30 steps:
+- One on overlay-leakfix (underworld3 547c2e54) and one on overlay-warmdiag (99259d35). They
+  agreed with each other to 6e-10 in slip and 5e-12 in vrms, so the path is deterministic.
+- Both took the path one would want. The checkpoint's own mesh (f0) was rebuilt, and V, P
+  restored onto it at match distance 0.00e+00 ("same mesh"). Step 151's rebuild (to F0 at
+  -18.40 deg / dip 78.9) then took the driver's ordinary rebuild path, warm-started from
+  f0's solution.
+- Yet against the uninterrupted run's step 151 (also a rebuild, from the same fault set):
+  - slip_max was 8.83 against 17.99;
+  - vrms was 158.987 against 158.907 (5e-4 relative);
+  - both solves took 1 Picard iteration at F0/F_ref 1.0.
+- The difference shrinks over the next steps: slip 19.5/21.5 at 152, 24.77/24.75 at 155,
+  30.59/30.55 at 160. It is still up to about 20% at 162, while vrms stays within 0.5%.
+- Rebuild steps, events and Newton iterations are unchanged; KSP means differ by one iteration
+  at 10 of 30 steps.
+- The rungs-8 run's segment restart at 151 showed the same effect: slip 29.0 against 23.9 on
+  the same step.
+
+So this is the restart drift described in section 5. The new solver starts from state a
+restart cannot reproduce, which gives about 5e-4 in vrms. A rebuild step converges in a single
+Picard iteration to uw_tol 1e-3, and slip_max, the largest velocity jump across the fault, is
+far more sensitive to that drift than vrms. Compare runs across a segment restart in vrms,
+events and trench history, not in slip_max at single steps near the restart. Reproducing the
+uninterrupted run's slip exactly needs that solver state at the checkpoint. It is the same
+library question as in section 5, now with hyperion.
