@@ -145,7 +145,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
-| Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | second segments running since 2026-10-27 02:03 (jobs 2260-2262 from 140 / 130 / 160), recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
+| Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (on box-faults-warm; kaiju's overlay-leakfix); PR branch from development to come (hyperion) | **PRIORITY (Louis 2026-10-27): propagate.** Hyperion: fix onto a development-based branch, tier-A serial + np 2/4 + parallel suite, adversarial review (sub-communicator cleanup; registry consumers), then the PR to development with kaiju's validation in the body |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
@@ -928,3 +928,13 @@ frozen as the hand-over state; they are not updated here after this date.
   returns at a different path. Hyperion asked to list every absolute-path dependency in its hand-over file (pixi
   env, cache and TMPDIR variables, ~/.bashrc lines, Simulations, worktree .git paths, the rescue directory).
   The "Machines and roles" recipe is marked pre-reimage.
+- 2026-10-28: **thermal runs, second segments complete** (kaiju): TA to 255, TB 246, TA_age25 266 at the 01:11 wall, no
+  failures, every step converged; third segments from 250/240/260 (jobs 2263-2265). At the latest checkpoints
+  (t 0.0011-0.0012): the slab reached the base at step 70-80 (t 0.0003-0.0004) and lies along it, spreading
+  toward the overriding side (crust 63-73 deg along the base); the plate keeps driving (v_plate peaked
+  1800-2350 at 40-50, fell to ~600 when the slab hit the base, now 720-1060), hinge moved only 5-6 deg, the
+  steep part below the trench (dip ~80) continuously fed, T_core 0.21-0.25; cold mass peaked 0.030-0.032 at
+  120-150 and is 0.016-0.025 as the draped slab warms; hot plumes rise on both flanks of the spreading slab,
+  one nearly to the surface on the overriding side (TA 250) where the hot top offers no lid; vrms 480-590.
+  Solver segment 2: Newton median 9-10 (4-18), 340-410 s/step median, cutbacks 5-6, pressure KSP 38-41.
+  Movies refreshed in figures_out/slab_movies/thermal_*.mp4; renders in figures_work/slab_control/thermal_*/.
