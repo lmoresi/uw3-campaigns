@@ -914,3 +914,8 @@ frozen as the hand-over state; they are not updated here after this date.
   reimage: Louis recreates /mnt/data/lmoresi if the second drive did not survive; the hub walks the new
   session through the "Machines and roles" recipe (pixi env dev, caches and env vars on /mnt/data,
   OMP_NUM_THREADS=1), the hourly ~/.claude mirror and the Simulations symlink still await Louis's approval.
+- 2026-10-27: the laptop's faulted-annulus environment is on underworld3 547c2e54 (bugfix/faulted-rebuild-leak;
+  env amr-dev, run scripts repointed). Smoke on the B1 checkpoint (step 60, 4 ranks, 3 steps, F0 formed and
+  rebuilt): step-63 checkpoint fields bit-identical to the previous library (c1107957, feature/box-faults, so
+  the switch also brings the rotated-solve residual reporting). The laptop moves to development when
+  hyperion's PR merges.
