@@ -130,9 +130,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
-| Thermal slab set (TA, TB, TA_age25, TA_Pe3) | kaiju jobs 2224, 2225, 2227, 2228 (n2-n5); scripts `~/campaigns/kaiju-launch/slab_thermal/`, runs `runs/slab_thermal_*` | launched 2026-10-26 at Louis's direct request in the kaiju session; 300 steps, 12 h wall |
+| Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | second segments running since 2026-10-27 02:03 (jobs 2260-2262 from 140 / 130 / 160), recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
-| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (hyperion); tests test_0077, parallel/test_0078 | FIXED 2026-10-26 on the fixture (53.7 -> 0.1 MB per rebuild serial, 56.0 -> 0.1 at np 2); kaiju to build overlay-leakfix and validate on the slab case at np 16 before production; adversarial review owed before a PR |
+| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (hyperion); kaiju `~/uw3/overlay-leakfix` | FIXED and VALIDATED on kaiju 2026-10-27 (30-step A/B at np 16: solution identical to 6e-10 in slip, RSS flat, timing unchanged); overlay-leakfix is the production overlay for new faulted runs; adversarial review and tier-A suites owed before a PR |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -874,3 +874,20 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   needs the adversarial review and the tier-A suites before a PR; the review also decides whether the
   collective cleanup inside Mesh construction is safe for meshes on sub-communicators. Hyperion is going back
   to the coarse-solve design.
+- 2026-10-27: **leak fix validated on kaiju; overlay-leakfix is the production overlay for faulted runs.** Two
+  30-step restarts of B1_crust1_fault from checkpoint 150 at np 16, overlay-leakfix (547c2e54) against
+  overlay-warmdiag (99259d35), same driver 0fb51f9, run side by side: slip within 6.3e-10, vrms 4.8e-12, events,
+  rebuild kinds, Newton and KSP its identical at every step. RSS per node at the rebuild steps 151-176: leakfix
+  13.6 -> 18.5 GB (jumps +2.7 once after the restart, then +0.49, 0.00, 0.17, 0.08; ~12 MB/rank, plateauing),
+  control 16.3 -> 50.5 GB (+6 to +7 per rebuild). Time: 30-step totals 879.9 vs 886.2 s; mesh build +0.3 s
+  (3 %) for the collective cleanup, invisible per step. A 300-step faulted run no longer needs memory segments.
+  **Finding on restarts** (both overlays, so the driver not the library): a segment restart that lands on a
+  rebuild is not bit-continuous: step 151 slip 8.8 against the baseline's 18.0 (vrms within 0.5 %), shrinking
+  over the next steps but slip up to 20 % apart at 162; the restart rebuilds from the checkpoint and
+  warm-starts from the checkpointed V,P, where the continuous run warm-started from the previous mesh, and
+  with one Picard iteration per step the answer depends on the guess. The rungs8 restart showed the same
+  (29.0 vs 23.9). The note's restart table (a restart on an ordinary step, exact to 3e-15) stands; this is the
+  other case and is recorded as an open driver item: restore onto the checkpoint mesh, then take the driver's
+  own rebuild transfer path.
+- 2026-10-27: thermal runs hit the wall at 02:03 (TA 143, TB 131, TA_age25 161) and restarted unchanged from 140,
+  130, 160 (jobs 2260-2262).
