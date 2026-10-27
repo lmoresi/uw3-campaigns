@@ -157,6 +157,8 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
+- **The information-flow proposal** (`INFORMATION-FLOW-PROPOSAL.md`, 2026-10-27): six
+  decisions at its end. It supersedes the Project 10 question below if adopted.
 - **Project 10**: cloud sessions cannot reach it. Either a laptop session annotates docs
   items on the hub's behalf, or docs items are tracked here only. Say which.
 - Carried over from `HUB.md`, unanswered as of 2026-10-27:
