@@ -1,7 +1,7 @@
 # How information should flow across Underworld: a proposal
 
-**Status**: proposal from the docs hub, 2026-10-27. Nothing below is adopted until Louis
-rules on it; the decisions it needs are listed at the end.
+**Status**: proposal from the docs hub, 2026-10-27. Nothing below is adopted until the
+team rules on it; the decisions it needs are listed at the end.
 
 ## The problem, as observed
 
@@ -45,7 +45,7 @@ is a fifth thing:
 
 | State | Example | Lifetime | Who writes it, from where |
 |---|---|---|---|
-| **Now** | which machine runs what, who holds the pen on a note, what waits on Louis | hours to days | agents, from anywhere |
+| **Now** | which machine runs what, who holds the pen on a note, what waits for team input | hours to days | agents, from anywhere |
 | **Learning** | "warm start after a rebuild wastes 20 Picard iterations because the switch is relative to the solve's own residual"; what did not work and why | weeks to months, then permanent as a record | agents and people, from anywhere |
 | **Reference** | how `add_rotated_freeslip_bc` works at v3.2 | until the code changes; versioned with it | people and agents, through PRs |
 | **Record** | a technical note with a DOI; a paper | permanent, citable | people, with agents' help |
@@ -61,7 +61,7 @@ that justified it is never lost.
 
 | State | Home | What stays there | What moves out, and when |
 |---|---|---|---|
-| Now | `HUB.md`, `DOCS-HUB.md` (hub files) | state tables, the waiting-on-Louis list, a log no older than two weeks | a log entry that records something learned becomes a journal entry the day it is written; older log lines are deleted, not archived |
+| Now | `HUB.md`, `DOCS-HUB.md` (hub files) | state tables, the waiting-for-team-input list, a log no older than two weeks | a log entry that records something learned becomes a journal entry the day it is written; older log lines are deleted, not archived |
 | Learning | **the journal** (new; see below) | dated, immutable entries; topic pages that index them and state the current conclusion | a topic whose conclusion has not changed for a quarter, and that the code relies on, becomes a reference page by PR; a cluster of entries becomes a technical note via `WRITING-PLAN.md` |
 | Reference | `underworld3/docs/` and docstrings | how the code works at a version, one governing page per topic, the authority map as router; capability guides as the bridge from the object to its page | nothing moves out; superseded pages are deleted in the PR that supersedes them |
 | Record | technical notes, papers | what the world may cite | nothing; a correction is a new version of the same deposit |
@@ -75,7 +75,7 @@ flow.
 This is the only new piece, and it replaces the wiki, the board, Discussions as a
 record, and the dated genres now sheltering in `docs/`.
 
-**Shape.** A git repository (`underworldcode/journal`, or whatever name Louis prefers)
+**Shape.** A git repository (`underworldcode/journal`, or whatever name the team prefers)
 built with MyST into a site in the same theme as underworldcode.org, linked from its
 header:
 
@@ -123,8 +123,8 @@ it already has a `development-note` type. But every type it has is `archival: tr
 a front-page post, its CI builds a PDF per article and runs the DOI tests, and its
 standing rests on nothing being there that is not finished. A hundred raw entries a
 quarter would slow its build and blur the line it draws well. A separate repository with
-the same theme and a cross-link costs one more repo and keeps the series clean. If Louis
-would rather have one site, the alternative is a `journal-entry` type with
+the same theme and a cross-link costs one more repo and keeps the series clean. If the
+team would rather have one site, the alternative is a `journal-entry` type with
 `archival: false`, its own stream, and a banner that says "working note, not reviewed",
 and the build excluded from the PDF and DOI steps.
 
@@ -179,7 +179,7 @@ hub files, and the notes `CONTRIBUTING.md`.
 
 ## Migration
 
-**Phase 0, Louis decides** (the list at the end).
+**Phase 0, the team decides** (the list at the end).
 
 **Phase 1, the journal exists (docs hub, one week).** Create the repository, the entry
 template, the index script, the MyST build and deploy. Migrate the nineteen wiki pages:
@@ -218,7 +218,7 @@ looks.
 - **Discussions.** I could not check from here whether the Discussions tab is in use; if
   it is, the `decision` entry replaces it as the record and the thread links the entry.
 
-## Decisions needed from Louis
+## Decisions needed from the team
 
 1. Journal as its own repository, or as a non-archival stream on the notes site?
 2. Public, or private with a published digest?

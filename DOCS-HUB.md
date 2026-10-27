@@ -2,7 +2,7 @@
 
 The docs hub session keeps this file current. It is the single point of truth for the
 documentation in `underworld3/docs`, the wiki, and the technical notes: what is in flight,
-who holds the pen, what is stale, and what waits on Louis. Read it before acting. Newest
+who holds the pen, what is stale, and what waits for team input. Read it before acting. Newest
 entries in the log at the bottom win over anything above them that they contradict.
 
 It is the documentation counterpart of `HUB.md` (the science hub). The science hub keeps
@@ -17,11 +17,11 @@ The hub is a Claude Code cloud session on `underworldcode/underworld3`, branch f
 transcripts. If it dies:
 
 1. Start a new cloud session on `underworldcode/underworld3` with this prompt:
-   > You are the docs hub for Louis Moresi's Underworld work: documentation, the wiki and
+   > You are the docs hub for the Underworld team's work: documentation, the wiki and
    > the technical notes. Read `DOCS-HUB.md` in lmoresi/uw3-campaigns (main) and follow it.
    > The previous hub was `<session id below>`; read its transcript (claude-code-remote
-   > `list_events`) only for detail this file lacks. Then confirm the state to Louis in a
-   > few lines.
+   > `list_events`) only for detail this file lacks. Then confirm the state to the team in
+   > a few lines.
 2. Attach `Underworld-Technical-Notes/underworldcode.org` (push) and `lmoresi/uw3-campaigns`
    (push) with `add_repo`; approve the cards. Without them the hub can read both repos
    through the anonymous git proxy but cannot push, list pull requests, or update this file.
@@ -46,12 +46,12 @@ Code cannot prove a trusted device (hyperion) are read through their transcripts
 |---|---|---|
 | Library documentation (MyST, Sphinx) | `underworldcode/underworld3` `docs/`, on `development`; merges by PR | attached, push to side branches |
 | Working notes (what we think is true now, with the dead ends) | `underworld3.wiki.git`, Home lists topic, benchmark, campaign and process pages | cloned read-only; push untested |
-| The plan | GitHub Project 10 "Underworld roadmap" (Area `docs` for this hub's items) | **not reachable**: Projects are GraphQL-only and GraphQL is blocked from cloud sessions (`gh project` answers "unknown owner type"). Annotations go through a laptop session or Louis. |
+| The plan | GitHub Project 10 "Underworld roadmap" (Area `docs` for this hub's items) | **not reachable**: Projects are GraphQL-only and GraphQL is blocked from cloud sessions (`gh project` answers "unknown owner type"). Annotations go through a laptop session or a team member. |
 | Technical notes (micro-preprints, DOIs) | `Underworld-Technical-Notes/underworldcode.org`, one branch per note `note/<slug>`, `WRITING-PLAN.md` for the programme, `CONTRIBUTING.md` for the house style | attached with push (2026-10-27, after Louis switched the session to Accept edits so the call prompted him instead of the classifier) |
 | Hub state, campaign scripts | `lmoresi/uw3-campaigns` (`HUB.md`, this file) | attached with push (2026-10-27) |
 | Machine knowledge | `underworld-community/uw3-hpc-install-run` | not attached |
 
-## Standing rules (Louis)
+## Standing rules (team)
 
 - The Style Charter (`docs/developer/UW3_STYLE_CHARTER.md`) wins over the surrounding
   prose and code. Match it, flag deviations, do not silently fix them.
@@ -62,10 +62,10 @@ Code cannot prove a trusted device (hyperion) are read through their transcripts
 - A wiki page graduates to `docs/` when it has stopped moving. A finding on a wiki page
   that `docs/` contradicts is a docs bug, filed as one.
 - Work on side branches of `development`, never `development` or `main`. Push after every
-  commit. Open PRs only when Louis asks. Commit messages end with
+  commit. Open PRs only when a team member asks. Commit messages end with
   "Underworld development team with AI support from Claude Code" and carry no
   Co-Authored-By line.
-- Technical notes: one branch per note; nobody pushes to `main`; a PR only when Louis asks;
+- Technical notes: one branch per note; nobody pushes to `main`; a PR only when a team member asks;
   IDs allocated only after fetching every branch and the open PRs (a fork PR is invisible
   to `ids_on_branches()`, which is how PR #58 collided with 2026-021); `metadata.yml
   status:` is canonical; the `myst.yml` toc block is generated. Prose follows
@@ -86,15 +86,15 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | Note | Branch, head date | Status | Pen | Waiting on |
 |---|---|---|---|---|
 | UWTN 2026-012 Benchmarking Stokes flow in annulus and spherical-shell geometries | `note/annulus-spherical-stokes-benchmarks`, 2026-08-13 | review (PR #11 per the laptop session) | unknown; untouched since August | a reviewer, or a decision to park |
-| UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel`, 2026-10-25 | draft | wombat workbench | 3 figures from hyperion (parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 (below) |
-| UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | Louis's read; metadata still says draft |
-| UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): Louis's merge, which records the DOI |
+| UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel`, 2026-10-25 | draft | wombat workbench | 3 figures from hyperion (parallel-pipeline, load-per-processor, band-through-the-boundary); team answers to Q1-Q4 (below) |
+| UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | a team read; metadata still says draft |
+| UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): a maintainer's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh`, 2026-10-26 | draft; pen with wombat from 2026-10-26 for the prose rework to the updated CONTRIBUTING | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; Louis's items (a), (c), (g); review of the trench section |
+| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh`, 2026-10-26 | draft; pen with wombat from 2026-10-26 for the prose rework to the updated CONTRIBUTING | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
 The other open pull requests on the notes repository, listed on 2026-10-27. Every one
-waits on Louis's merge or ruling; none has moved since September except #58, #60, #61.
+waits on a team merge or ruling; none has moved since September except #58, #60, #61.
 
 | PR | Branch | Opened or last touched | What it is |
 |---|---|---|---|
@@ -140,17 +140,17 @@ Measured here, not inherited.
 |---|---|---|
 | Restart-limitation documentation | kaiju session, branch `kaiju/restart-limitation` 1135f78, **unpushed** (kaiju has no GitHub credentials; fixes come as patches through a hub) | to collect as a patch and push; which branch of underworld3 it targets is unknown |
 | Docs follow-ups of the stress-transport fix | underworld3 `bugfix/backward-nodes-snapshot-order` (hyperion) | HUB.md lists "docs" among the follow-ups; not itemised |
-| Kaiju machine documentation | `underworld-community/uw3-hpc-install-run` PR #1 | open; machine knowledge, stays with the science hub unless Louis moves it |
+| Kaiju machine documentation | `underworld-community/uw3-hpc-install-run` PR #1 | open; machine knowledge, stays with the science hub unless the team moves it |
 | Status headers on seven design docs | `docs/developer/design/` | one-line `**Status:**` each after a git-history check; a docs PR |
 | Eight live pages missing from the toctrees | `docs/developer/index.md`, `docs/index.md` | add them; a docs PR, can ride with the status headers |
-| Changelog decision and October backfill | `CHANGES.md`, `docs/developer/CHANGELOG.md` | needs Louis's ruling on the two files, then a backfill from `git log --first-parent` |
+| Changelog decision and October backfill | `CHANGES.md`, `docs/developer/CHANGELOG.md` | needs a team ruling on the two files, then a backfill from `git log --first-parent` |
 | Docstring sweep after v3.2.0 | `scripts/docstring_sweep.py` | needs a machine with underworld3 built; this hub cannot run it |
 | Wiki graduation check | wiki topic pages vs `docs/developer/subsystems/` | a read, then either a docs PR or a note on the wiki page |
 | WRITING-PLAN reconciliation | `WRITING-PLAN.md` | record 018, 019, 020, 021, 022, 023 against the plan's M/F/original numbering; needs push access to the notes repo |
 
-## Waiting on Louis
+## Waiting for team input
 
-- **Eleven open pull requests on the notes repository** wait on you (table above). The
+- **Eleven open pull requests on the notes repository** wait on team input (table above). The
   two deposit PRs (#61, #55) are bookkeeping and cost nothing to merge; #55 has waited
   since September.
 - (done 2026-10-27) The split: Louis ruled it through the science hub, which froze its
