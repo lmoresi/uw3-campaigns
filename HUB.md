@@ -81,7 +81,17 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 - Show figures through GitHub links. Write useful machine knowledge back to
   underworld-community/uw3-hpc-install-run. If a container must be built, use conda PETSc.
 
-## Technical notes workflow (wombat notes-workbench proposal, adopted 2026-10-25)
+## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
+
+Louis: "The tech notes and documentation fixes are going to be handled via a different Hub since the
+day-to-day flow of that work is quite distinct." From 2026-10-27 this hub no longer coordinates the notes
+repo, its branches, reviews or workflow; the notes hub does (session id to be recorded here when known).
+What stays with this hub is the compute side: figure scripts and records produced on hyperion or kaiju
+(fault_mg/uwtn_*, parallel_addon/uwtn_*, kaiju figures_out/) are made on request and reach the notes by
+hyperion's pushes to underworld3 or Louis's rsync from kaiju, as before. The section and table below are
+frozen as the hand-over state; they are not updated here after this date.
+
+### (frozen) Technical notes workflow (wombat notes-workbench proposal, adopted 2026-10-25)
 
 1. One branch per note, `note/<slug>`, on Underworld-Technical-Notes/underworldcode.org. The branch is the
    note; the pen holder is recorded in the table below. Nobody pushes to main; a PR only when Louis asks.
@@ -126,7 +136,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
-| Technical notes (2026-018, 2026-020/021, 2026-022) | see "Technical notes workflow" table above | in progress |
+| Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
@@ -154,18 +164,8 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
   (3) a check run for the crust x1 + fault case with fewer rebuilds (-uw_rebuild_rungs 8)? Kaiju is idle.
-- Technical notes, answers needed (from the wombat workbench report, 2026-10-25):
-  - 2026-018: (1) title "Faults in parallel: partitioning the add-on once" OK? (2) re-measure the parallel
-    split-level iteration counts (13 Oct, before partition-once) on hyperion? (3) wall times 65/34/25 s
-    quoted, the 72/38/30 read as "before" and left out: correct? (4) software_version moves to a
-    development sha on merge.
-  - 2026-022: (a) three "route" passages (the weights-of-five/NaN clamp story, the nearest-node repair,
-    the zero pivot under rotated walls): keep as motivation or cut to rule plus reason?
-    (c) `stokes._rotated_freeslip_info` is a private attribute in a published note; (d) the restart
-    table needs a script (kaiju annulus runs); (f) link 018 from the parallel paragraph once 018 is
-    published; (g) check iterations.png alt text against the made figure (wombat rewrote it from the
-    figure; a look by Louis closes it). Done by the hub: (b) the 017 link reworded, (h) the
-    hierarchy sentence limited to what the figure measures; (e) software_version pinned by wombat.
+- (moved to the notes hub 2026-10-27) the technical-notes judgement items, the workbench tool go-ahead,
+  PREVIEW_TOKEN, PR #59 and the hub-push-test deletion.
 - Delete the empty branch `hub-push-test` on Underworld-Technical-Notes/underworldcode.org (points at
   36e15f7, already in note/faults-on-an-add-on-mesh): the hub's proxy refuses ref deletions and wombat
   treats a remote deletion as yours to approve. `git push origin --delete hub-push-test`.
@@ -899,3 +899,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   suite, the adversarial review (collective PETSc cleanup in Mesh construction on sub-communicators; consumers
   of the Model registries' strong references), then the PR with the fixture and kaiju numbers and the review
   posted. The laptop told to build its dev environment from 547c2e54. Kaiju already runs it for faulted work.
+- 2026-10-27: **Louis: technical notes and documentation move to a separate hub.** This hub stops coordinating
+  the notes repo (branches, reviews, workflow, Louis's judgement items); the notes section and table are frozen
+  as hand-over state. Compute-side figure production on hyperion and kaiju remains requestable here; the open
+  compute items for the notes are hyperion's (i) shipped records for fig_iterations and (j) the global peak
+  slip at np 8 for 2026-022, and the three 2026-018 figures (parallel-pipeline, load-per-processor,
+  band-through-the-boundary), all queued behind the leak-fix PR. The wombat notes sessions are told.
