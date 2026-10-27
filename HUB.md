@@ -122,7 +122,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9c7c1e7 (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing, crust particle sampling); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 2a4b21a (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing, crust particle sampling, restart limitation documented); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -881,13 +881,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   13.6 -> 18.5 GB (jumps +2.7 once after the restart, then +0.49, 0.00, 0.17, 0.08; ~12 MB/rank, plateauing),
   control 16.3 -> 50.5 GB (+6 to +7 per rebuild). Time: 30-step totals 879.9 vs 886.2 s; mesh build +0.3 s
   (3 %) for the collective cleanup, invisible per step. A 300-step faulted run no longer needs memory segments.
-  **Finding on restarts** (both overlays, so the driver not the library): a segment restart that lands on a
-  rebuild is not bit-continuous: step 151 slip 8.8 against the baseline's 18.0 (vrms within 0.5 %), shrinking
-  over the next steps but slip up to 20 % apart at 162; the restart rebuilds from the checkpoint and
-  warm-starts from the checkpointed V,P, where the continuous run warm-started from the previous mesh, and
-  with one Picard iteration per step the answer depends on the guess. The rungs8 restart showed the same
-  (29.0 vs 23.9). The note's restart table (a restart on an ordinary step, exact to 3e-15) stands; this is the
-  other case and is recorded as an open driver item: restore onto the checkpoint mesh, then take the driver's
-  own rebuild transfer path.
+  **Finding on restarts, corrected by kaiju 2026-10-27**: a segment restart that lands on a rebuild differs from
+  the uninterrupted run by a factor 2 in slip_max at step 151 (8.83 vs 17.99) at 5e-4 in vrms, shrinking over
+  the following steps (slip within 20 % at 162, vrms within 0.5 %). The driver already does the right thing
+  (restores V,P onto the checkpoint's own mesh at match distance 0, then the ordinary rebuild path; the two
+  overlays agree to 6e-10, so it is deterministic). It is the section-5 restart drift, the Stokes solver's own
+  state that a restart cannot rebuild (~5e-4 in vrms), shown by a one-Picard rebuild solve at uw_tol 1e-3 in
+  the most sensitive quantity. Written into RESTART_AND_RECORDS.md §5 as a known limitation (2a4b21a):
+  compare across a segment restart in vrms, events and trench history, not in slip_max at single steps. The
+  library question (solver-side state) is hyperion's determinism probe. NOT a driver item.
 - 2026-10-27: thermal runs hit the wall at 02:03 (TA 143, TB 131, TA_age25 161) and restarted unchanged from 140,
   130, 160 (jobs 2260-2262).
