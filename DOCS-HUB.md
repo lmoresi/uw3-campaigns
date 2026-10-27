@@ -47,7 +47,7 @@ Code cannot prove a trusted device (hyperion) are read through their transcripts
 | Library documentation (MyST, Sphinx) | `underworldcode/underworld3` `docs/`, on `development`; merges by PR | attached, push to side branches |
 | Working notes (what we think is true now, with the dead ends) | `underworld3.wiki.git`, Home lists topic, benchmark, campaign and process pages | cloned read-only; push untested |
 | The plan | GitHub Project 10 "Underworld roadmap" (Area `docs` for this hub's items) | **not reachable**: Projects are GraphQL-only and GraphQL is blocked from cloud sessions (`gh project` answers "unknown owner type"). Annotations go through a laptop session or Louis. |
-| Technical notes (micro-preprints, DOIs) | `Underworld-Technical-Notes/underworldcode.org`, one branch per note `note/<slug>`, `WRITING-PLAN.md` for the programme, `CONTRIBUTING.md` for the house style | cloned read-only; push and PR listing refused until attached |
+| Technical notes (micro-preprints, DOIs) | `Underworld-Technical-Notes/underworldcode.org`, one branch per note `note/<slug>`, `WRITING-PLAN.md` for the programme, `CONTRIBUTING.md` for the house style | attached with push (2026-10-27, after Louis switched the session to Accept edits so the call prompted him instead of the classifier) |
 | Hub state, campaign scripts | `lmoresi/uw3-campaigns` (`HUB.md`, this file) | attached with push (2026-10-27) |
 | Machine knowledge | `underworld-community/uw3-hpc-install-run` | not attached |
 
@@ -88,17 +88,32 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | UWTN 2026-012 Benchmarking Stokes flow in annulus and spherical-shell geometries | `note/annulus-spherical-stokes-benchmarks`, 2026-08-13 | review (PR #11 per the laptop session) | unknown; untouched since August | a reviewer, or a decision to park |
 | UWTN 2026-018 Faults in parallel: partitioning the add-on once | `note/faults-in-parallel`, 2026-10-25 | draft | wombat workbench | 3 figures from hyperion (parallel-pipeline, load-per-processor, band-through-the-boundary); Louis's answers Q1-Q4 (below) |
 | UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | Louis's read; metadata still says draft |
-| UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | the identifiers PR, if it is still open (cannot list PRs yet) |
+| UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): Louis's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
 | UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh`, 2026-10-26 | draft; pen with wombat from 2026-10-26 for the prose rework to the updated CONTRIBUTING | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; Louis's items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
-Other open notes PRs reported by the laptop session on 2026-10-26 and not yet verified
-here: #57 and #55 (2026-017), #53 (2026-007), #51 (2026-010), #22 (2026-015).
-Branches with no draft metadata beyond what is on `main`: `note/analytic-solutions`,
+The other open pull requests on the notes repository, listed on 2026-10-27. Every one
+waits on Louis's merge or ruling; none has moved since September except #58, #60, #61.
+
+| PR | Branch | Opened or last touched | What it is |
+|---|---|---|---|
+| #61 | `deposit/symbolic-fem-and-adjoint-forms-…` (bot) | 2026-10-26 | the deposit for UWTN 2026-020; merging it records the DOI |
+| #60 | `docs/workbench` | 2026-10-26 | the workbench: every note in one checkout, each branch built from its own files |
+| #58 | jcgraciosa `note/underworld3-v3-2-0` | 2026-10-26 | UWTN 2026-023 (above) |
+| #57 | `note/fault-mesh-banner` | 2026-10-02 | banner image for UWTN 2026-017 (published 2026-09-20 via #54) |
+| #55 | `deposit/putting-a-fault-in-a-mesh-…` (bot) | 2026-09-20 | **the deposit for UWTN 2026-017, open five weeks**: the note is live without its DOI recorded, the "reserved, not published" state `scripts/outstanding.py` exists to flag |
+| #53 | `note/time-derivatives-supg` | 2026-09-08 | update of UWTN 2026-007 (time derivatives) for the composing solvers |
+| #52 | `docs/examples-units` | 2026-09-07 | every example is dimensional, or says plainly that it is not |
+| #51 | `docs/version-history` | 2026-09-07 | an updated note says what changed, and where the old one is |
+| #24 | `docs/r1-scope` | 2026-08-17 | R1 scope: three approaches in order, and what the note leaves out (R1 published since as 2026-016; may be moot) |
+| #22 | `note/analytic-solutions` | 2026-08-19 | UWTN 2026-015, testing a solver against exact solutions; no draft metadata on the branch beyond `main`, so the article state needs a look |
+| #11 | `note/annulus-spherical-stokes-benchmarks` | 2026-09-08 | UWTN 2026-012 (above) |
+
+Branches with no open PR and no draft metadata beyond what is on `main`:
 `note/bc-unwrap-and-edits`, `note/binder-note`, `note/browser-note-abstract`,
-`note/browser-note-v1-1`, `note/fault-mesh-banner`, `note/time-derivatives-supg`. Each is
-either merged, abandoned, or a note whose article directory was never created; to triage.
+`note/browser-note-v1-1`. Each is either merged, abandoned, or a note whose article
+directory was never created; to triage.
 
 `WRITING-PLAN.md` still lists M2, M3, M4, F1-F5, C1, S1, S2 and the original numbered plan
 as not started; the fault notes being written (018, 022) are F3/M3 territory and the plan
@@ -135,12 +150,9 @@ Measured here, not inherited.
 
 ## Waiting on Louis
 
-- **Access for this hub**: attach `Underworld-Technical-Notes/underworldcode.org` (push).
-  `lmoresi/uw3-campaigns` was attached on 2026-10-27 (second attempt); the notes
-  repository was refused three times by the session's permission classifier, not by
-  GitHub. Without it notes PRs cannot be listed and `note/<slug>` branches cannot be
-  pushed from here. A session started with the repository selected at creation does not
-  go through that check.
+- **Eleven open pull requests on the notes repository** wait on you (table above). The
+  two deposit PRs (#61, #55) are bookkeeping and cost nothing to merge; #55 has waited
+  since September.
 - **Confirm the split**: this hub takes the "Technical notes workflow" section and table
   out of `HUB.md` (leaving a pointer), and the science hub stops carrying notes items.
   Then the hub tells the laptop notes sessions and the science hub its session id.
@@ -174,5 +186,6 @@ Measured here, not inherited.
   `main`; moved). Read `HUB.md`, the notes repository, the wiki and the July docs audit;
   measured the docs state above; built the docs with Sphinx 9.2 in the container. Found
   `HUB.md` stale on UWTN 2026-020 (merged and published 2026-10-25, listed as "review,
-  green"). This file drafted; its home is `lmoresi/uw3-campaigns` beside `HUB.md` once the
-  hub can push there.
+  green"). This file committed beside `HUB.md`. Both repositories attached by the end of
+  the day (the notes one needed the session in Accept-edits mode so the request reached
+  Louis); the open-PR table above is from the repository, not from a report.
