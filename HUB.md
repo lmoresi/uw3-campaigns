@@ -42,6 +42,10 @@ meaningful change, WIP included; results tables and probe scripts go in the bran
 checks every 3 h that hyperion's commits are on origin. Use it for
 **fast-turnaround parallel development jobs** (tests, probes, np 2-16, minutes, not days).
 No long campaigns.
+- **Reimage 2026-10-27: `/mnt/data` was backed up and that disk becomes the new root partition, so everything
+  below comes back at a different path.** After the reimage: find the restored tree, rebuild the pixi env in
+  place (not relocatable), re-point the cache and TMPDIR variables, run `git worktree repair` in each
+  worktree, discard the JIT cache. The paths below are the pre-reimage ones.
 - Everything lives on the second drive under `/mnt/data/lmoresi/`: the `underworld3` clone,
   `Simulations` (symlinked from `~/+Simulations` once Louis approves), the caches, and
   `claude-mirror`. Nothing of value goes on nvme0.
@@ -920,3 +924,7 @@ frozen as the hand-over state; they are not updated here after this date.
   rebuilt): step-63 checkpoint fields bit-identical to the previous library (c1107957, feature/box-faults, so
   the switch also brings the rotated-solve residual reporting). The laptop moves to development when
   hyperion's PR merges.
+- 2026-10-27: Louis: the /mnt/data backup is running; that disk becomes the new root partition, so hyperion's data
+  returns at a different path. Hyperion asked to list every absolute-path dependency in its hand-over file (pixi
+  env, cache and TMPDIR variables, ~/.bashrc lines, Simulations, worktree .git paths, the rescue directory).
+  The "Machines and roles" recipe is marked pre-reimage.
