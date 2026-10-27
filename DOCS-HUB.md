@@ -153,9 +153,10 @@ Measured here, not inherited.
 - **Eleven open pull requests on the notes repository** wait on you (table above). The
   two deposit PRs (#61, #55) are bookkeeping and cost nothing to merge; #55 has waited
   since September.
-- **Confirm the split**: this hub takes the "Technical notes workflow" section and table
-  out of `HUB.md` (leaving a pointer), and the science hub stops carrying notes items.
-  Then the hub tells the laptop notes sessions and the science hub its session id.
+- (done 2026-10-27) The split: Louis ruled it through the science hub, which froze its
+  notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
+  hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
+  the three 2026-018 figures, all queued behind the leak-fix PR.
 - **Project 10**: cloud sessions cannot reach it. Either a laptop session annotates docs
   items on the hub's behalf, or docs items are tracked here only. Say which.
 - Carried over from `HUB.md`, unanswered as of 2026-10-27:
@@ -189,3 +190,7 @@ Measured here, not inherited.
   green"). This file committed beside `HUB.md`. Both repositories attached by the end of
   the day (the notes one needed the session in Accept-edits mode so the request reached
   Louis); the open-PR table above is from the repository, not from a report.
+- 2026-10-27: Louis ruled the split through the science hub ("the day-to-day flow of that
+  work is quite distinct"); HUB.md froze its notes section and now names this hub. This
+  hub's session id recorded in HUB.md; the science hub and the two wombat notes sessions
+  messaged with it.
