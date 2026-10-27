@@ -132,7 +132,7 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
 | Thermal slab set (TA, TB, TA_age25, TA_Pe3) | kaiju jobs 2224, 2225, 2227, 2228 (n2-n5); scripts `~/campaigns/kaiju-launch/slab_thermal/`, runs `runs/slab_thermal_*` | launched 2026-10-26 at Louis's direct request in the kaiju session; 300 steps, 12 h wall |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
-| Memory leak per faulted-mesh rebuild | library, found on kaiju 2026-10-26; hyperion investigating (bugfix branch from feature/box-faults-warm) | open: a constant ~7.0 GB/node (0.44 GB/rank at np 16) per rebuild, fresh or old process alike, about one faulted mesh's full footprint: each rebuild appears to retain the previous child (or its DM/Mat/KSP) in full; drift between rebuilds 40-135 MB/node/step, also without a fault |
+| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (hyperion); tests test_0077, parallel/test_0078 | FIXED 2026-10-26 on the fixture (53.7 -> 0.1 MB per rebuild serial, 56.0 -> 0.1 at np 2); kaiju to build overlay-leakfix and validate on the slab case at np 16 before production; adversarial review owed before a PR |
 | Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
 
 ## Waiting on Louis
@@ -861,3 +861,16 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   unchanged with kaiju's numbers.
 - 2026-10-26: Louis: "dense" in the crust change means particles per cell, not a physical density affecting
   buoyancy. HUB wording tightened; the driver's option comment already says particles per cell.
+- 2026-10-26/27: **rebuild leak fixed on hyperion** (bugfix/faulted-rebuild-leak 547c2e54): a dropped faulted mesh is
+  freed, serial and parallel; growth per rebuild on the 20-rebuild fixture 53.7 -> 0.1 MB (np 1), 56.0 -> 0.1 MB
+  (np 2), matching kaiju's constant 7 GB/node per rebuild. Causes: the default Model's mesh and solver
+  registries held strong references (now weak; mesh variables stay owned, purged when their mesh dies); SymPy
+  caches held coordinate symbols that held their mesh (now weak); mesh variables kept their constructor
+  arguments including the mesh (discarded once used); in parallel petsc4py never ran its collective cleanup of
+  freed PETSc objects, so a new mesh now runs it on its own communicator. Regression tests test_0077 and
+  parallel/test_0078 (39.6 MB per rebuild before). Kaiju asked to build overlay-leakfix and run a 30-step
+  A/B against the baseline at np 16 (records to tolerance, RSS flat, step times) before it becomes the
+  production overlay. The fix touches core library behaviour (registries, caches, PETSc cleanup), so it
+  needs the adversarial review and the tier-A suites before a PR; the review also decides whether the
+  collective cleanup inside Mesh construction is safe for meshes on sub-communicators. Hyperion is going back
+  to the coarse-solve design.
