@@ -158,6 +158,11 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
+- **The fault-split integration** (`FAULT-SPLIT-INTEGRATION.md`, 2026-10-28): four
+  decisions at its end, the first being the push of `feature/fault-split-integration`
+  (candidate head d81a2588, in the hub's scratch worktree only) so the machines can
+  build it. Also pending: push `docs/fault-multigrid-guide` (ff1d244, the capability
+  guide) as its own branch or stack it on #861.
 - **Enable Pages on the journal**: `underworldcode/underworld3-journal`, Settings, Pages,
   source "GitHub Actions". The proxy refuses the hub the Pages API path. Until then the
   workflow's build job runs and its deploy job fails; the site is
@@ -222,3 +227,9 @@ Measured here, not inherited.
   only, the journal's frozen text word for word; the other 18 pages checked against their
   journal counterparts first), with Louis's approval. Phase 1 is complete except for the
   Pages switch and the two rule PRs.
+- 2026-10-28: Louis: the fault-split work must reach `development` because the notes
+  describe it. Mapped the nine branches (one root, two lineages, three small branches on
+  development), built the candidate head d81a2588 with two hand-resolved hunks, checked
+  both notes' recipes against it, wrote `FAULT-SPLIT-INTEGRATION.md`. The fault-multigrid
+  capability guide (ff1d244) documents what ships on development and names the rest as
+  branch work.
