@@ -145,6 +145,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
+| Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, all with crust sampled at 12 ppc) | kaiju `runs/slab_thermal_fault_*`, `runs/slab_thermal_TAc`; driver 2a4b21a, overlay-leakfix 547c2e54 | GO 2026-10-28 (Louis); compares surface velocity, plateness and rollback rate with and without the fault |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (on box-faults-warm; kaiju's overlay-leakfix); PR branch from development to come (hyperion) | **PRIORITY (Louis 2026-10-27): propagate.** Hyperion: fix onto a development-based branch, tier-A serial + np 2/4 + parallel suite, adversarial review (sub-communicator cleanup; registry consumers), then the PR to development with kaiju's validation in the body |
@@ -160,11 +161,8 @@ frozen as the hand-over state; they are not updated here after this date.
   warm-up, no recipe change; kaiju restarts past each wall with the recipe as launched. TA_Pe3 cancelled.
   Style, ruled 2026-10-26: "We want it to drive the plate, not worried about rollback per se." The thermal
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
-  **Faulted thermal cases: decision needed.** Kaiju's suggested recipe: the TA flags + -uw_crust_ppc 12 (12 particles per cell in the crust layer)
-  -uw_crust_refill_every 5 + the FAULT flags, from a fresh -uw_init slab (dense seeding applies only there).
-  The fit works on the thermal crust (smoke: F0 at -2.1 deg, dip 34 above the cap, slip 3750-4800 at a plate
-  converging at 2000-4000); the broken weak layer in the uniform-swarm runs is the proxy, which
-  -uw_crust_ppc fixes, so the existing thermal runs carry a broken weak crust.
+  Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
+  fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -938,3 +936,12 @@ frozen as the hand-over state; they are not updated here after this date.
   one nearly to the surface on the overriding side (TA 250) where the hot top offers no lid; vrms 480-590.
   Solver segment 2: Newton median 9-10 (4-18), 340-410 s/step median, cutbacks 5-6, pressure KSP 38-41.
   Movies refreshed in figures_out/slab_movies/thermal_*.mp4; renders in figures_work/slab_control/thermal_*/.
+- 2026-10-28: **Louis: the thermal runs are scientifically fine; run a similar set with the fault in place** to see
+  whether it changes the surface velocity, the surface plateness and the rollback rate (faster rollback would
+  help the fault-infrastructure demonstration). GO to kaiju: TAf, TBf, TA_age25f with -uw_crust_ppc 12
+  -uw_crust_refill_every 5 and the FAULT flags, plus TAc (TA with the crust sampling, no fault) as the fair
+  twin, since TA's weak layer was broken by the proxy; fresh -uw_init slab, np 16, 300 steps, overlay-leakfix,
+  driver 2a4b21a, hot top unchanged for comparability. Metrics per checkpoint for all seven thermal runs:
+  v_plate, a plateness measure (kaiju proposes and states it), hinge position and rate, tip depth; faulted
+  runs add fault geometry per rebuild, slip_max and the solver record. The redo-with-sampling decision is
+  thereby settled: TAc is the one redo, as the control.
