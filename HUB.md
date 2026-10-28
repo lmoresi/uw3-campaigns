@@ -175,6 +175,10 @@ frozen as the hand-over state; they are not updated here after this date.
   ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. STOPPING RULE (Louis, 2026-10-28): "Stop the faulted set once the slab is on the base ... we can always
   restart!" Each run ends at the first checkpoint after its tip reaches depth 0.95 plus one checkpoint interval
   (step ~80-90 by the thermal twins), with a full checkpoint so it can be continued.
+- Graded, relaxed base mesh (Louis, 2026-10-28): AGREED. The laptop designs and implements a lithosphere-graded
+  coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
+  the coarse base (smoothing and flips) to remove the refinement's triangle pattern seen in the movies; behind
+  flags, default off; 4-rank smoke on the TA line; mesh figures before/after; patch via the hub.
 - Cost levers under measurement (Louis, 2026-10-28): (A) resolution, is h 0.0156 everywhere needed for the TBL
   (plate ~8 cells); a lithosphere-graded base per the design ruling; (B) pressure iterations 40-60 per increment
   look high: the Schur rtol is ~0.033 x uw_tol (3e-5 against a 1e-3 nonlinear solve); kaiju runs a 10-step A/B
@@ -1008,3 +1012,8 @@ frozen as the hand-over state; they are not updated here after this date.
   too tight for a 1e-3 nonlinear solve (the notes record the Schur rtol as 0.033 x tol). Kaiju reports the
   mesh numbers and the solver settings and runs a tolerance A/B on two free nodes. Runs use 16 of 52 cores per
   node because of the coarse-solve null-mode limit (hyperion's item, paused).
+- 2026-10-28: Louis agrees with the graded refinement of the base and asks for mesh relaxation of the coarse base
+  to remove the triangle artefacts of regular refinement visible in the whole-annulus movies. Design and
+  implementation to the laptop (driver owner): graded coarse gmsh base, relaxed before the hierarchy is built so
+  the FMG levels stay nested and the fault ladder's placement is unchanged; the one-cell crust keeps h at the
+  surface; old checkpoints need not reload on the new base.
