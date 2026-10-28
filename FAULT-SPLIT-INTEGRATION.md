@@ -137,3 +137,44 @@ notes' re-pin.
    `feature/coarse-solve-nullspace` stays a measurement branch; the null-space work is
    a separate item. Journal entry: `2026-10-28-coarse-solve-null-space-first-petsc-defaults-not-mumps`.
 4. Reviews and fixes are real work and the laptop does them.
+
+## Progress (laptop session `session_01HxWvn5rMK67zasgirdXszQ`)
+
+**2026-10-28, validation of d81a2588 complete.** Tier A serial 1515 passed, 0 failed;
+parallel np 2 156 passed, 2 failed; np 4 187 passed, 2 failed; the fault and multigrid
+tests by name all pass. Both failures predate the head: `test_0078` reads
+`/proc/self/statm` (macOS; made portable on A) and `test_1063_constrained_freeslip_parallel[ti]`
+(37.7525 against 37.0780 at rtol 0.01, identical on development 7222caf3). UWTN 2026-022's
+fixture reproduces to ten digits in slip and exactly in iteration counts; the "Using it"
+recipe runs (serial 7 velocity iterations, slip 0.15916181; np 4 5 iterations, slip
+0.15916189) but its level count depends on the rank count because `base.adapt`'s
+intermediate levels are partition-dependent when `h_far` sits above the base's finest
+cell, on development too. Journal entry
+`2026-10-28-fault-split-integration-head-reproduces-uwtn-2026-022`.
+
+**Development moved 38 commits** (#846, #850 to #853) since the head's base: the root,
+the parallel lineage and box-faults-warm now conflict with it in `systems/solvers.py`,
+`systems/ddt.py` and `constitutive_models.py`; A, the warm-start switch and the
+diagnostics still merge clean. The laptop resolves a development merge on B's and C's
+branches before each opens.
+
+**A**: review 3's four fixes pushed with regression tests (a206fb17; a new parallel
+`test_0079` hangs on the unfixed branch as the review predicted); `test_0078` made
+portable (fcbc5f6e). Suites running, then the re-review and the PR. The laptop asked
+Louis directly whether `scripts/sessions/rebuild_leak/` (two probes, eight `.jsonl`
+run records) stays in A, against his 2026-10-15 ruling that keeps campaign drivers and
+run outputs out of underworld3; its proposal is README findings into
+`subsystems/model-orchestration.md`, the rest to uw3-campaigns.
+
+**B's review is done and B is not a quick PR.** Must-fix items reported: `test_1091`
+matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
+another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
+minutes; ThinSheet's `L` and `c_b` are built with the name-shared `uw.expression`, so
+a user's own `L` is reset to 1; rank-local raises before collectives in
+`split_tail_levels` and the manifold `build_rotation`. **Two items change solver
+behaviour for users with no fault and need Louis's ruling before B opens**: (i)
+`custom_mg` `drop_orphans=True` on every hierarchy discards coarse FAC patches and
+routes every rotated free-slip custom-FMG solve (annulus, shell) through
+`rotated_split_transfers`, with no benchmark evidence; (ii) a Jaumann default change
+(`objective_order` cayley) visible to Stokes users. The full list and B's plan follow
+once A is open.

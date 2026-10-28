@@ -239,3 +239,10 @@ Measured here, not inherited.
   level, MUMPS not the default (breaks on the Mac). `feature/fault-split-integration`
   pushed (d81a2588); `docs/fault-multigrid-guide` pushed and its PR opened; the ruling is
   the journal's first new entry.
+- 2026-10-28 (later): the laptop integration session validated d81a2588: suites green
+  but for two pre-existing failures, UWTN 2026-022's numbers reproduce to ten digits.
+  Development moved 38 commits under the head, so B and C each take a development
+  merge; B's review found two solver-default changes for non-fault users that need
+  Louis's ruling. Details in `FAULT-SPLIT-INTEGRATION.md`; journal entry written; the
+  recipe's partition-dependent level count sent to the notes session; `test_1063` is
+  #826 already; the adapt level-subsampling finding filed as a new issue.
