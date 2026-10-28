@@ -147,7 +147,7 @@ Measured here, not inherited.
 | Docstring sweep after v3.2.0 | `scripts/docstring_sweep.py` | needs a machine with underworld3 built; this hub cannot run it |
 | Wiki graduation check | wiki topic pages vs `docs/developer/subsystems/` | a read, then either a docs PR or a note on the wiki page |
 | WRITING-PLAN reconciliation | `WRITING-PLAN.md` | record 018, 019, 020, 021, 022, 023 against the plan's M/F/original numbering |
-| **Phase 1: the journal** (`INFORMATION-FLOW-PROPOSAL.md`) | built in this session at `/home/user/journal`, two commits, not yet on GitHub | DONE locally 2026-10-27/28: scaffold (`myst.yml`, `scripts/build_index.py`, entry template, Pages workflow), the wiki migrated (100 entries: 55 from commits, 45 dead ends; 18 pages; 72 figures), the week-44 digest, README with the three rules, the frozen-wiki Home text. BLOCKED on the repository existing (the GitHub App may not create repositories, in the organisation or a personal account: 403). Then: push, enable Pages (workflow source), apply the wiki freeze from a laptop, open the two rule PRs (already pushed: underworld3 `claude/trusting-hypatia-8ft8up`, CLAUDE.md journal paragraph plus the planning guide's Journal layer and entry rules; notes repo `docs/journal-rule`, one CONTRIBUTING convention), then the guide and subsystem PRs from `WIKI-INVENTORY.md`. |
+| **Phase 1: the journal** (`INFORMATION-FLOW-PROPOSAL.md`) | `underworldcode/underworld3-journal` (Louis created it 2026-10-28; the App may not create repositories), three commits on `main` | PUSHED 2026-10-28: scaffold (`myst.yml`, `scripts/build_index.py`, entry template, Pages workflow), the wiki migrated (100 entries: 55 from commits, 45 dead ends; 18 pages; 72 figures), the week-44 digest, README with the three rules, the frozen-wiki Home text. Rule PRs open: underworld3 #861 (CLAUDE.md journal paragraph; the planning guide's Journal layer and entry rules), notes #62 (one CONTRIBUTING convention). Still to do: Pages enabled by hand (the API path is blocked for the hub), the wiki freeze from a laptop, then the guide and subsystem PRs from `WIKI-INVENTORY.md` and the Friday digest. |
 
 ## Waiting for team input
 
@@ -158,12 +158,11 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
-- **Create the journal repository** `underworldcode/underworld3-journal`, public, empty (no README,
-  no licence file: the first push carries both). The hub cannot: GitHub answers 403 to
-  the App for repository creation in the organisation and in a personal account. Then
-  tell the hub, which attaches it and pushes the two commits, and in the repository's
-  Settings, Pages, set the source to "GitHub Actions" (the workflow is in the push). If
-  the hub's `POST /repos/.../pages` call is allowed it does that itself.
+- **Enable Pages on the journal**: `underworldcode/underworld3-journal`, Settings, Pages,
+  source "GitHub Actions". The proxy refuses the hub the Pages API path. Until then the
+  workflow's build job runs and its deploy job fails; the site is
+  <https://underworldcode.github.io/underworld3-journal/> once enabled.
+- **Merge or rule on** underworld3 #861 and notes #62, the two rule PRs.
 - **Freeze the wiki** from a laptop once the journal is on GitHub: replace `Home.md`
   with `templates/wiki-home-frozen.md` from the journal repository and push
   (`underworld3.wiki.git`; cloud sessions cannot push to a wiki).
