@@ -10,6 +10,17 @@ machines, campaigns and library fixes; this hub keeps the writing. Where a piece
 has both halves (a note that needs a figure from kaiju), the science hub owns the run and
 this hub owns the note, and the two hubs message each other rather than sharing a table.
 
+**Role (Louis, 2026-10-28).** This hub monitors and advises the sessions doing the
+work; it does not dispatch it. Louis works with individual sessions directly and hands
+them their tasks; the hub briefs a session only when asked. What the hub does on its
+own: keep this file current from what sessions and GitHub show it; settle a question
+that spans branches or sessions from the sources and record the answer once in the
+journal, with the closure lines; write the weekly digest; run the monthly graduation
+and closure pass; re-pin the notes when merges land; open the small docs PRs from the
+inventory. Check-ins read a session's transcript and record state; they do not steer.
+The science hub is different by design: it dispatches work across machines and
+monitors them all.
+
 ## Restarting the hub
 
 The hub is a Claude Code cloud session on `underworldcode/underworld3`, branch from
