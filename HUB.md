@@ -163,6 +163,11 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
+- Continental region on the overriding side (Louis, 2026-10-28): replace a fraction of the hot top with buoyant,
+  strong continental crust, same mantle-side physics with a justifiable cause. The laptop (driver owner) is
+  asked for the design from the existing `over` marker (extent, thickness, buoyancy, viscosity, lid; interaction
+  with the crust marker, detection and plateness; cost). Louis decides on the proposal; then implement, smoke,
+  patch via the hub.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -948,3 +953,6 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-28: faulted thermal set launched on kaiju (jobs 2277-2280, 12:27), 300 steps, np 16, 12 h wall,
   overlay-leakfix, driver 2a4b21a in its own pinned clone; the original thermal runs' third segments
   (2263-2265) continue on n2-n4. Steps 0-10 report next, then at each wall.
+- 2026-10-28: Louis proposes a continental crust region over part of the hot top on the overriding side (buoyant,
+  strong; "similar physics from the mantle point of view but a more justifiable cause"). Design requested from
+  the laptop against the driver's existing over marker; no run yet.
