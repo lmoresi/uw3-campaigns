@@ -245,4 +245,12 @@ Measured here, not inherited.
   merge; B's review found two solver-default changes for non-fault users that need
   Louis's ruling. Details in `FAULT-SPLIT-INTEGRATION.md`; journal entry written; the
   recipe's partition-dependent level count sent to the notes session; `test_1063` is
-  #826 already; the adapt level-subsampling finding filed as a new issue.
+  #826 already; the adapt level-subsampling finding filed as #865.
+- 2026-10-28 (evening): Louis's construction question for UWTN 2026-022 settled from
+  the code and the drivers: production uses the placed ladder with a hand-built split
+  chain (no bisection); adapt-and-cut is the automated library route the hierarchy
+  comparison was made on, and the note's two figures and construction text come from
+  it while its tables and trench figures come from the ladder. Journal entry
+  `2026-10-28-which-fault-mesh-construction-is-used-in-practice`; answers to the notes
+  session's five questions sent; the guide (PR #862) gained the paragraph. The ribbon
+  replay is the first library item after B and C.
