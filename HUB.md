@@ -172,8 +172,9 @@ frozen as the hand-over state; they are not updated here after this date.
   compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
 - Faulted thermal set solver: DECIDED 2026-10-28 (Louis: "we need this to be quicker ... a single fault, quite
   small"): all four runs stop at checkpoint 10 and restart with -uw_warm_newton_switch 1e-2 (Picard warm-up on
-  ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. If the projection is still
-  over ~3 days, Louis may stop the set at the step where the interesting phase ends rather than at 299.
+  ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. STOPPING RULE (Louis, 2026-10-28): "Stop the faulted set once the slab is on the base ... we can always
+  restart!" Each run ends at the first checkpoint after its tip reaches depth 0.95 plus one checkpoint interval
+  (step ~80-90 by the thermal twins), with a full checkpoint so it can be continued.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -993,3 +994,7 @@ frozen as the hand-over state; they are not updated here after this date.
   10, restart all four with -uw_warm_newton_switch 1e-2, everything else identical; report after 5 steps
   (its, s/step, projection, continuity across the restart) and, if still slow, where the time goes and the step at
   which the thermal set's interesting phase ended, as a candidate stopping point.
+- 2026-10-28: Louis: stop the faulted thermal set once the slab is on the base; a restart can continue it. Kaiju
+  told: run each to the first checkpoint after tip depth 0.95 plus one interval, full checkpoint, then the
+  comparison figures (v_plate, plateness, hinge, slip, solver record) over the common window against TAc and TA,
+  and the per-step cost before and after the Picard switch in the README.
