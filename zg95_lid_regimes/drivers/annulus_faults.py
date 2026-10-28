@@ -213,6 +213,10 @@ params = uw.Params(
                                 #   weaker one; two ribbons through one cell hang the mesher
     # solver and time stepping
     uw_tol=1.0e-3,
+    uw_pres_rtol=0.0,           # > 0: the Schur (pressure) KSP rtol, overriding the library's 0.1 x uw_tol (the
+                                #   rotated free-slip solve's solver._rotated_pres_rtol, and the native path's option)
+    uw_vel_rtol=0.0,            # > 0: the native path's inner velocity KSP rtol (0.033 x uw_tol); the rotated solve,
+                                #   which these drivers use, has no knob for its velocity rtol (0.033 x uw_tol)
     uw_picard=0,
     uw_newton_switch=1.0e-2,
     uw_warm_newton_switch=1.0,
@@ -798,6 +802,11 @@ class FaultedMesh:
         for name in self.names:
             s.add_fault_bc(0, boundary=name)
         s.tolerance = params.uw_tol
+        if params.uw_pres_rtol > 0:
+            s._rotated_pres_rtol = float(params.uw_pres_rtol)
+            s.petsc_options["fieldsplit_pressure_ksp_rtol"] = float(params.uw_pres_rtol)
+        if params.uw_vel_rtol > 0:
+            s.petsc_options["fieldsplit_velocity_ksp_rtol"] = float(params.uw_vel_rtol)
         s.consistent_jacobian = "continuation"
         s.newton_switch_rtol = params.uw_newton_switch
         set_custom_fmg(s, self.levels, field_id=0)
