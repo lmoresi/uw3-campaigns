@@ -146,7 +146,8 @@ Measured here, not inherited.
 | Changelog decision and October backfill | `CHANGES.md`, `docs/developer/CHANGELOG.md` | needs a team ruling on the two files, then a backfill from `git log --first-parent` |
 | Docstring sweep after v3.2.0 | `scripts/docstring_sweep.py` | needs a machine with underworld3 built; this hub cannot run it |
 | Wiki graduation check | wiki topic pages vs `docs/developer/subsystems/` | a read, then either a docs PR or a note on the wiki page |
-| WRITING-PLAN reconciliation | `WRITING-PLAN.md` | record 018, 019, 020, 021, 022, 023 against the plan's M/F/original numbering; needs push access to the notes repo |
+| WRITING-PLAN reconciliation | `WRITING-PLAN.md` | record 018, 019, 020, 021, 022, 023 against the plan's M/F/original numbering |
+| **Phase 1: the journal** (`INFORMATION-FLOW-PROPOSAL.md`) | built in this session at `/home/user/journal`, two commits, not yet on GitHub | DONE locally 2026-10-27/28: scaffold (`myst.yml`, `scripts/build_index.py`, entry template, Pages workflow), the wiki migrated (100 entries: 55 from commits, 45 dead ends; 18 pages; 72 figures), the week-44 digest, README with the three rules, the frozen-wiki Home text. BLOCKED on the repository existing (the GitHub App may not create repositories, in the organisation or a personal account: 403). Then: push, enable Pages (workflow source), apply the wiki freeze from a laptop, the CLAUDE.md and notes-CONTRIBUTING rule PRs, the guide and subsystem PRs from `WIKI-INVENTORY.md`. |
 
 ## Waiting for team input
 
@@ -157,8 +158,21 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
-- **The information-flow proposal** (`INFORMATION-FLOW-PROPOSAL.md`, 2026-10-27): six
-  decisions at its end. It supersedes the Project 10 question below if adopted.
+- **Create the journal repository** `underworldcode/journal`, public, empty (no README,
+  no licence file: the first push carries both). The hub cannot: GitHub answers 403 to
+  the App for repository creation in the organisation and in a personal account. Then
+  tell the hub, which attaches it and pushes the two commits, and in the repository's
+  Settings, Pages, set the source to "GitHub Actions" (the workflow is in the push). If
+  the hub's `POST /repos/.../pages` call is allowed it does that itself.
+- **Freeze the wiki** from a laptop once the journal is on GitHub: replace `Home.md`
+  with `templates/wiki-home-frozen.md` from the journal repository and push
+  (`underworld3.wiki.git`; cloud sessions cannot push to a wiki).
+- **Read the first digest** (`digests/2026-W44.md`) and say whether it is the page a
+  collaborator would read; the next one is Friday 31 October.
+- **The information-flow proposal** (`INFORMATION-FLOW-PROPOSAL.md`, 2026-10-27): the
+  go-ahead for Phase 1 was given 2026-10-27 and the journal is its own repository;
+  still open are public-or-private (built public, like the wiki), the board's fate,
+  and `docs/archive/` against journal entries for the dated trees (Phase 2).
 - **Project 10**: cloud sessions cannot reach it. Either a laptop session annotates docs
   items on the hub's behalf, or docs items are tracked here only. Say which.
 - Carried over from `HUB.md`, unanswered as of 2026-10-27:
@@ -198,3 +212,8 @@ Measured here, not inherited.
   the two wombat notes sessions were messaged with it (delivered). The science hub cannot
   be messaged from here (cloud to cloud needs a trusted device); it learns of this hub from
   HUB.md, or Louis tells it.
+- 2026-10-27/28: **Phase 1 started on the go-ahead.** The journal built locally and the
+  wiki migrated into it (see Open work); `WIKI-INVENTORY.md` and the proposal gained the
+  results-for-discussion and findings-as-examples points from the day's discussion
+  (to be folded into the proposal text). Repository creation refused to the App, so the
+  push waits on a team member creating `underworldcode/journal`.
