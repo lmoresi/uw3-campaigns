@@ -265,3 +265,10 @@ Measured here, not inherited.
   `2026-10-28-which-fault-mesh-construction-is-used-in-practice`; answers to the notes
   session's five questions sent; the guide (PR #862) gained the paragraph. The ribbon
   replay is the first library item after B and C.
+- 2026-10-29: the laptop reports A open as underworld3 #882 (suites green but #826),
+  B development-merged and reviewed, C local with B and A merged in. Louis's ruling
+  that every `scripts/sessions` file leaves B and C means **UWTN 2026-022 and 2026-018
+  may not cite `scripts/sessions/fault_mg/...` in underworld3**; the notes' own
+  `figures/src/` copies are the citable scripts until the originals land in
+  uw3-campaigns. Two journal entries from B's review. Details in
+  `FAULT-SPLIT-INTEGRATION.md`.

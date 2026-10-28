@@ -166,7 +166,47 @@ run records) stays in A, against his 2026-10-15 ruling that keeps campaign drive
 run outputs out of underworld3; its proposal is README findings into
 `subsystems/model-orchestration.md`, the rest to uw3-campaigns.
 
-**B's review is done and B is not a quick PR.** Must-fix items reported: `test_1091`
+**2026-10-29.** **A is open: underworld3 #882** (base development). Review 3's four
+findings fixed with fail-first tests, a fourth round found and fixed four more (a proxy
+callback re-pinning a mesh, stats temporaries' vectors, repeated and rank-0-only
+collections in the snapshot path, test tiers). Louis ruled library and docs only, so
+`scripts/sessions/rebuild_leak/` left the branch (kept in `~/+Simulations/rebuild_leak`
+on the laptop); the findings are in `subsystems/model-orchestration.md`. Suites: tier A
+serial 1494 passed, 0 failed; parallel np 2 164 passed, np 4 172 passed; the only
+failure is `test_1063[ti]` (#826), as on development. Issues left open from the
+reviews: #866, #867, #868. (Correction to the head's earlier parallel counts: np 2
+176 passed / 2 failed / 14 skipped; np 4 187 / 2 / 3.)
+
+**B** (`feature/fault-split-multigrid` 3ecbf6e7) is development-merged and reviewed
+twice; final suites running, then it opens. Louis's rulings of 2026-10-28 on B's
+review: (1) `objective_order` defaults to 1 for every solver as on development, and
+ThinSheet selects Cayley itself; (2) every `scripts/sessions` file leaves B and C,
+`scripts/sessions/fault_mg` included (`library_c.py` and the UWTN 2026-022 figure
+scripts; copies in `~/+Simulations/fault_split_mg_scripts` and
+`~/+Simulations/fault_split_c_scripts` on the laptop) **so the notes may not cite
+those underworld3 paths: the scripts go to uw3-campaigns when Louis says, and the
+notes' `figures/src/` already carries its own copies**; (3) `test_1081` and
+`test_1084` are tier C, reported and not gated. Measured on B: a rotated free-slip
+solve on an adapted annulus with custom FMG takes 18 velocity iterations serial and
+197 at np 4 on development, 3 and 4 on B (the per-level wall rotation), same answer;
+journal entry `2026-10-29-per-level-wall-rotation-...`. The development merge had
+dropped the base refusal of a rotated adjoint (#846) so a manifold ThinSheet solved the
+unrotated transpose; fixed in B (52ac7820).
+
+**C** (`feature/fault-split-integration`, laptop-local 4698938f, not yet pushed): B's
+new commits and A merged in (six conflicts resolved; development's ETD Maxwell-time
+code kept over the lineage's 9e97670b, which made the same repair; `test_1093`
+removed as a duplicate of development's `test_1053`). Its review found two must-fix
+(the faults-in-convection capability guide still said `picard=N` raises and gave the
+`newton_switch_rtol=1.0` workaround; the campaign drivers), both fixed; the should-fix
+items mostly filed. One finding in the hand-resolved `rotated_bc.py` hunk: the widened
+datum-only cold-start condition takes its reference from the lifted iterate, costing
+one extra increment on a linear datum-only solve (answer right); under continuation
+it may skip Picard, unmeasured. The hub's advice: leave the resolution, measure the
+continuation case, fix in its own small PR after C (journal entry
+`2026-10-29-datum-only-cold-start-reference-...`).
+
+**B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
 minutes; ThinSheet's `L` and `c_b` are built with the name-shared `uw.expression`, so
