@@ -36,6 +36,7 @@ transcripts. If it dies:
 | laptop (wombat), adjoint notes | `session_018wSha1nV5DddcThnCRoFab` ("CONTRIBUTING.md figure script placement"): holding; has the unpushed 2026-023 renumber for PR #58 |
 | laptop (wombat), run transcripts | `session_01Na7qBenCp67rDTZhFGTh5V` ("Sinking blob adjoint Taylor test"): `note/run-transcripts` (UWTN 2026-019) |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H`: holds a restart-limitation doc patch, unpushed (see Open work) |
+| laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"), opened by Louis 2026-10-28 for `FAULT-SPLIT-INTEGRATION.md` items 2 and 3; reports here |
 
 Messaging: the hub can message the laptop sessions. Sessions on machines whose Claude
 Code cannot prove a trusted device (hyperion) are read through their transcripts.
