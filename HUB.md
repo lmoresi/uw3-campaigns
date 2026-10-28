@@ -170,6 +170,13 @@ frozen as the hand-over state; they are not updated here after this date.
   neutral; units of rho alpha DeltaT), viscosity uw_over_eta x100-x1000 (applied to the yield stress too), and
   uw_over_lid 1 (the continent carries its own conductive lid, surface T 0; recommended) or 0 (isothermal,
   compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
+- **DECISION NEEDED (2-4 h window), faulted thermal set solver**: ordinary warm steps crawl in damped Newton
+  (15-23 its, 1300-2200 s) where rebuild steps with their Picard start converge in 3-7 its at 280-730 s; at
+  ~1800 s/step the set takes ~6 days per run. Kaiju recommends stopping all four at checkpoint 10 and
+  restarting with -uw_warm_newton_switch 1e-2 (a Picard warm-up on ordinary warm steps, as rebuild steps
+  already do), TAc included so the twin is fair. Louis declined this for the unfaulted runs; the faulted runs
+  are 3-4x their twin. Hub recommendation: accept; it is a solver path, not physics, and the converged solution
+  is the same within uw_tol.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -979,3 +986,9 @@ frozen as the hand-over state; they are not updated here after this date.
   yield, no buoyancy); that is very weak, and faulted models need not have it so weak: a crust-strength sweep
   (x0.1, x1) with and without the fault is the next test after the current faulted thermal set. A buoyant crust
   (signed deficit on the crust marker with an eclogite-style depth cut-off) was offered and not taken up.
+- 2026-10-28: faulted thermal set, steps 0-6: fault formation clean in all three (F0 at -0.4 deg, dip ~47 on the
+  straight initial slab, depth 0.150, 61 points; first rebuild 12 s; TA_age25f re-targeted at step 5 to dip 55);
+  slip 900-1300 from step 1; vrms 480-545 against TAc's 410-460 (the fault decouples the plate); step 0 identical
+  to TA, TAc reproduces TA's step 0. Cost: rebuild steps 3-7 its (Picard start) 280-730 s; ordinary warm steps
+  15-23 its, 1300-2200 s (the Newton crawl, twice as bad with the fault's jump in the plate); TAc 7-15 its,
+  ~500 s. Decision on -uw_warm_newton_switch 1e-2 put to Louis.
