@@ -1040,3 +1040,8 @@ frozen as the hand-over state; they are not updated here after this date.
   nonlinear solve can use; 1e-3 saves 28 % of Stokes time and 1e-2 47 % with the same answer; the mesh is uniform
   h 0.0156 (7.7 cells across the plate), refinement 4 too coarse, linear radial grading available now, a
   lithosphere size field not. -uw_pres_rtol patch and a faulted 1e-2 check requested; the running set unchanged.
+- 2026-10-28: the laptop lid-regime session (session_019aromUkeWWPzcL2Kb8365E) is INACTIVE: a follow-up on the
+  graded base (Annulus grades only linearly in radius via cellSizeOuter/cellSizeInner; refinement 4 too coarse;
+  -uw_pres_rtol coming) could not be delivered. The continent design request and the graded/relaxed base brief
+  were delivered earlier and are its open tasks. Resend the follow-up when the session is back or a new one is
+  named.
