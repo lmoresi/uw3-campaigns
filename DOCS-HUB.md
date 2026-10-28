@@ -90,7 +90,7 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | a team read; metadata still says draft |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): a maintainer's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
-| UWTN 2026-022 Faults on an add-on mesh | `note/faults-on-an-add-on-mesh`, 2026-10-26 | draft; pen with wombat from 2026-10-26 for the prose rework to the updated CONTRIBUTING | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
+| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26; the reworked prose (Louis's edits, one line per paragraph) sits on the wombat workbench, not yet on the branch | draft; pen with wombat from 2026-10-26 for the prose rework to the updated CONTRIBUTING | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
 The other open pull requests on the notes repository, listed on 2026-10-27. Every one
@@ -163,9 +163,6 @@ Measured here, not inherited.
   workflow's build job runs and its deploy job fails; the site is
   <https://underworldcode.github.io/underworld3-journal/> once enabled.
 - **Merge or rule on** underworld3 #861 and notes #62, the two rule PRs.
-- **Freeze the wiki** from a laptop once the journal is on GitHub: replace `Home.md`
-  with `templates/wiki-home-frozen.md` from the journal repository and push
-  (`underworld3.wiki.git`; cloud sessions cannot push to a wiki).
 - **Read the first digest** (`digests/2026-W44.md`) and say whether it is the page a
   collaborator would read; the next one is Friday 31 October.
 - **The information-flow proposal** (`INFORMATION-FLOW-PROPOSAL.md`, 2026-10-27): the
@@ -221,3 +218,7 @@ Measured here, not inherited.
   CI's build job green on the first run (MyST site builds in 15 s), deploy job failing
   with "Ensure GitHub Pages has been enabled" until Pages is switched on by hand. Rule
   PRs opened: underworld3 #861, notes #62.
+- 2026-10-28: **the wiki is frozen.** Wombat pushed `underworld3.wiki` dbb1d645 (Home.md
+  only, the journal's frozen text word for word; the other 18 pages checked against their
+  journal counterparts first), with Louis's approval. Phase 1 is complete except for the
+  Pages switch and the two rule PRs.
