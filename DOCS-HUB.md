@@ -215,4 +215,9 @@ Measured here, not inherited.
   wiki migrated into it (see Open work); `WIKI-INVENTORY.md` and the proposal gained the
   results-for-discussion and findings-as-examples points from the day's discussion
   (to be folded into the proposal text). Repository creation refused to the App, so the
-  push waits on a team member creating `underworldcode/underworld3-journal`.
+  push waited on a team member creating the repository.
+- 2026-10-28: **the journal is on GitHub** as `underworldcode/underworld3-journal` (Louis
+  chose the name so other developers browsing the organisation know what it is). Pushed,
+  CI's build job green on the first run (MyST site builds in 15 s), deploy job failing
+  with "Ensure GitHub Pages has been enabled" until Pages is switched on by hand. Rule
+  PRs opened: underworld3 #861, notes #62.
