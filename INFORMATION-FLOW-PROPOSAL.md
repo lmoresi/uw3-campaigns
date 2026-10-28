@@ -75,7 +75,7 @@ flow.
 This is the only new piece, and it replaces the wiki, the board, Discussions as a
 record, and the dated genres now sheltering in `docs/`.
 
-**Shape.** A git repository (`underworldcode/journal`, or whatever name the team prefers)
+**Shape.** A git repository (`underworldcode/underworld3-journal`, or whatever name the team prefers)
 built with MyST into a site in the same theme as underworldcode.org, linked from its
 header:
 

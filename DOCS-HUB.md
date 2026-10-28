@@ -158,7 +158,7 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
-- **Create the journal repository** `underworldcode/journal`, public, empty (no README,
+- **Create the journal repository** `underworldcode/underworld3-journal`, public, empty (no README,
   no licence file: the first push carries both). The hub cannot: GitHub answers 403 to
   the App for repository creation in the organisation and in a personal account. Then
   tell the hub, which attaches it and pushes the two commits, and in the repository's
@@ -216,4 +216,4 @@ Measured here, not inherited.
   wiki migrated into it (see Open work); `WIKI-INVENTORY.md` and the proposal gained the
   results-for-discussion and findings-as-examples points from the day's discussion
   (to be folded into the proposal text). Repository creation refused to the App, so the
-  push waits on a team member creating `underworldcode/journal`.
+  push waits on a team member creating `underworldcode/underworld3-journal`.
