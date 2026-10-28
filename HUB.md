@@ -145,7 +145,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
-| Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `runs/slab_thermal_fault_*`, `runs/slab_thermal_TAc`; driver 2a4b21a, overlay-leakfix; Picard switch from checkpoint 10/20 | STOPPED AT THE BASE 2026-10-29 (Louis's rule): TAc at 80 (on the base at 70), TA_age25f at 90 (base at 80), TAf at 100 (base at 90); TBf wall-restarted from 90 (tip 0.945), the watcher stops it ~110. Figures and README to figures_out/slab_thermal_fault/ when TBf stops |
+| Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; awaiting Louis's rsync |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
 | Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (on box-faults-warm; kaiju's overlay-leakfix); PR branch from development to come (hyperion) | **PRIORITY (Louis 2026-10-27): propagate.** Hyperion: fix onto a development-based branch, tier-A serial + np 2/4 + parallel suite, adversarial review (sub-communicator cleanup; registry consumers), then the PR to development with kaiju's validation in the body |
@@ -1067,3 +1067,16 @@ frozen as the hand-over state; they are not updated here after this date.
   on the base). Solver before/after the Picard switch: TAf 14.0 its, pres 56, 1225 s -> 6.2, 44, 418 s; TBf 15.7,
   56, 1551 -> 7.6, 52, 636; rebuilds TAf 9, TBf 6, TA_age25f 12. Wall time now set by the shrinking dt
   (~1.8e-6 vs 4.5e-6) as the faulted flow speeds up.
+- 2026-10-29: **faulted thermal set complete and delivered** (kaiju). Louis's question answered: the fault makes a
+  material difference to surface velocity and rollback, not to plateness. TAf vs its twin TAc at t 0.00024:
+  plate speed median 760 vs 594 (+28 %), peak 938 vs 736; hinge rate -4.9 vs -2.6 deg per 1e-4 t (1.9x), trenches
+  8-11 deg retreated at the stop vs 4.8; base arrival t 0.00022 vs 0.00024; plateness P10 ~0.10 in both, med/max
+  0.25 vs 0.32 (the fault speeds the near-trench part most). TBf, TA_age25f same pattern (TBf peak 1123, 1.7x TB;
+  hinge -5.0 / -4.1 vs -1.5 / -1.2). The crust sampling alone matters: TAc beats TA (base 0.00024 vs 0.00031, hinge
+  -2.6 vs -1.5), so the fault effect is measured against TAc. Fault: forms at -0.4 deg dip 47, follows the crust
+  base round the broad hinge to dip 18-23 by steps 40-60, depth at the 0.15 cap, slip_max peak 8000-9000 at
+  t 0.00017 settling 5000-7000, 11-12 rebuilds per run. Cost after the Picard switch: TAf 6.2 its / pres 39 /
+  371 s, TBf 8.0 / 38 / 525, TA_age25f 6.0 / 38 / 320, TAc 6.0 / 34 / 224; a faulted step ~1.5x the twin
+  (rebuilds + 15 % more pressure its), which -uw_pres_rtol 1e-2 would mostly remove. Plateness measure: P10 and
+  med/max over the plate surface from 170 deg behind the trench to 5 deg short of it. All runs end on complete
+  checkpoints; restarts possible for the post-arrival phase.
