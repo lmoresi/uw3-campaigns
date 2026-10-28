@@ -1017,3 +1017,14 @@ frozen as the hand-over state; they are not updated here after this date.
   implementation to the laptop (driver owner): graded coarse gmsh base, relaxed before the hierarchy is built so
   the FMG levels stay nested and the fault ladder's placement is unchanged; the one-cell crust keeps h at the
   surface; old checkpoints need not reload on the new base.
+- 2026-10-28: **Picard switch applied to the faulted thermal set** (TAc stopped at 20 -> job 2302; TAf at 10 -> 2304;
+  TA_age25f at 10 -> 2303; TBf hands over at its step-10 checkpoint; all at match distance 0; flag in ARGS, READMEs
+  record the handover). Faulted ordinary steps ~3x faster: TAf 4-8 its, mean 407 s (was ~1300); TA_age25f 4-8
+  its, 420 s (was 1000-1800); TAc 5-6 its, 317 s (was ~480). Nonlinear its now equal the twin's (5.5 vs 5.8);
+  the remaining 1.3x is per iteration (75-85 s vs 52 s), in the linear solves on the faulted mesh plus a rebuild
+  every 5 steps (11 s); kaiju splits it into velocity/pressure KSP at the step-20 checkpoints. Continuity across
+  the restart: vrms 498.9 -> 500.0 (TAf), 421.9 -> 438.8 (TA_age25f, mid-swing), 536.9 -> 565.3 (TAc, rising);
+  slip carries the documented restart sensitivity. Faults re-target at the broad-bend shallow dips (34, 38).
+  Projection: to the stop point (step ~90-100) ~10 h, one wall segment; even to 299 ~33 h, so the stop at the
+  base is a content choice (the unfaulted set's plate velocity recovered by steps 150-200 if that phase is
+  wanted). Tolerance A/B (jobs 2312 current, 2313 pressure rtol 1e-3) running; third variant waits for a node.
