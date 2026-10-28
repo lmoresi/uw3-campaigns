@@ -163,11 +163,13 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
-- Continental region on the overriding side (Louis, 2026-10-28): replace a fraction of the hot top with buoyant,
-  strong continental crust, same mantle-side physics with a justifiable cause. The laptop (driver owner) is
-  asked for the design from the existing `over` marker (extent, thickness, buoyancy, viscosity, lid; interaction
-  with the crust marker, detection and plateness; cost). Louis decides on the proposal; then implement, smoke,
-  patch via the hub.
+- Continental region on the overriding side (Louis, 2026-10-28): the laptop's design is in (below); **Louis
+  decides four values and one switch**: extent (arc length from the trench; recommended 0.5-1.0 layer depths,
+  a 7-15 % fraction of the overriding side, Andean margin with the hot top as back-arc beyond), thickness
+  (uw_over_comp_thick 0.07-0.1), buoyancy uw_over_dT negative (|dT| 0.5-0.7 out-floats its own lid, 0.3 is
+  neutral; units of rho alpha DeltaT), viscosity uw_over_eta x100-x1000 (applied to the yield stress too), and
+  uw_over_lid 1 (the continent carries its own conductive lid, surface T 0; recommended) or 0 (isothermal,
+  compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -956,3 +958,16 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-28: Louis proposes a continental crust region over part of the hot top on the overriding side (buoyant,
   strong; "similar physics from the mantle point of view but a more justifiable cause"). Design requested from
   the laptop against the driver's existing over marker; no run yet.
+- 2026-10-28: **continent design from the laptop** (driver 2a4b21a). The `over` marker already exists on the crust
+  swarm, independent of the slab marker: a surface layer uw_over_comp_thick (0.1) thick from uw_over_gap behind
+  the trench to uw_ridge_over; it multiplies viscosity AND yield stress by uw_over_eta and enters the body force
+  as a temperature DEFICIT uw_over_dT (positive = denser), gated off for negative values; no thermal state (the
+  hot-top Dirichlet still holds above it); advected, checkpointed, re-seedable at a restart. Smallest change:
+  allow uw_over_dT < 0 (buoyant); new uw_over_extent (arc length from uw_over_gap; 0 = to uw_ridge_over);
+  new uw_over_lid (1: the hot-top window excludes the continent, surface T 0, slab-state age uw_age_over flat
+  under it with tanh edges; the lid grows over ~100 steps on a restart). Interactions: crust and continent never
+  overlap at seeding; the crust law takes its trace from crust particles only; for the line/rate laws add a
+  refusal of candidates whose trench angle lies inside the continent; mobility and lid-depth metrics stay
+  comparable only for a small continent, else split the wall integral into oceanic and continental arcs.
+  Cost: <1 % of a step; laptop smoke 4 ranks, 12 steps, ~25 min (needs the exact TA flag line from kaiju,
+  requested); a TA + continent run costs the same as TA on kaiju.
