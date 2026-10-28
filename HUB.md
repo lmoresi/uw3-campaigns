@@ -179,11 +179,19 @@ frozen as the hand-over state; they are not updated here after this date.
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
   the coarse base (smoothing and flips) to remove the refinement's triangle pattern seen in the movies; behind
   flags, default off; 4-rank smoke on the TA line; mesh figures before/after; patch via the hub.
-- Cost levers under measurement (Louis, 2026-10-28): (A) resolution, is h 0.0156 everywhere needed for the TBL
-  (plate ~8 cells); a lithosphere-graded base per the design ruling; (B) pressure iterations 40-60 per increment
-  look high: the Schur rtol is ~0.033 x uw_tol (3e-5 against a 1e-3 nonlinear solve); kaiju runs a 10-step A/B
-  from TA checkpoint 100 (current / pressure rtol 1e-3 / inexact-Newton if available). Also pending from
-  hyperion: the coarse-solve null space that caps the runs at np 16 of 52 cores per node.
+- **Cost levers, measured (kaiju 2026-10-28), decisions for Louis:** (B) the rotated solve's pressure (Schur) KSP
+  runs at rtol 0.1 x uw_tol = 1e-4 inside a 1e-3 nonlinear solve (inner velocity 0.033 x tol; outer FGMRES 1 it;
+  the library marks the 0.1 margin TODO(MEASURE)). A/B, 10 steps from TA checkpoint 100, np 16: pressure rtol
+  1e-4 37 its/increment, 2675 s; 1e-3 25 its, 1933 s (-28 %); 1e-2 15 its, 1427 s (-47 %, +10 % nonlinear its);
+  solutions within 6e-5 in vrms/vsurf/mobility, all converged, outer still 1 it. Recommend -uw_pres_rtol 1e-3 for
+  everything new; 1e-2 to be checked on a faulted run (requested). The library default (0.1 x tol in
+  rotated_bc) should become tol: a solver default change with this as its evidence, for hyperion when back.
+  (A) the mesh is Annulus(cellSize 0.5, refinement 5), uniform h 0.0156: 126976 cells, ~511k P2 velocity and
+  64k pressure dofs; 7.7 cells across the plate, 5-6 across the slab core. Refinement 4 (h 0.031, 3.8 cells across
+  the plate, crust doubles) is too coarse. The library's Annulus grades only linearly in radius (cellSizeOuter /
+  cellSizeInner): 2x coarser at the base gives ~68k cells (53 %), 4x ~36k (28 %) at the same surface h; the
+  ruling's lithosphere-focused grading needs a gmsh size field (library or driver-built base). The laptop has
+  the graded+relaxed base task; linear radial grading is the quick first step.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -1028,3 +1036,7 @@ frozen as the hand-over state; they are not updated here after this date.
   Projection: to the stop point (step ~90-100) ~10 h, one wall segment; even to 299 ~33 h, so the stop at the
   base is a content choice (the unfaulted set's plate velocity recovered by steps 150-200 if that phase is
   wanted). Tolerance A/B (jobs 2312 current, 2313 pressure rtol 1e-3) running; third variant waits for a node.
+- 2026-10-28: kaiju answered the cost questions (see Waiting on Louis): pressure rtol 1e-4 is tighter than a 1e-3
+  nonlinear solve can use; 1e-3 saves 28 % of Stokes time and 1e-2 47 % with the same answer; the mesh is uniform
+  h 0.0156 (7.7 cells across the plate), refinement 4 too coarse, linear radial grading available now, a
+  lithosphere size field not. -uw_pres_rtol patch and a faulted 1e-2 check requested; the running set unchanged.
