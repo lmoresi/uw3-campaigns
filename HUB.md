@@ -137,7 +137,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 2a4b21a (crust fault law, renderer, checkpoint-traces fix, restart_table.py, kaiju figure folders, whole-annulus trace width, crust-base fault trace, -uw_addon_timing, crust particle sampling, restart limitation documented); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 762c5e7 (... crust particle sampling, restart limitation documented, -uw_pres_rtol / -uw_vel_rtol flags, defaults unchanged); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -1045,3 +1045,6 @@ frozen as the hand-over state; they are not updated here after this date.
   -uw_pres_rtol coming) could not be delivered. The continent design request and the graded/relaxed base brief
   were delivered earlier and are its open tasks. Resend the follow-up when the session is back or a new one is
   named.
+- 2026-10-28: -uw_pres_rtol and -uw_vel_rtol pushed (762c5e7, kaiju): the Schur pressure KSP tolerance of the
+  rotated solve settable from the driver; defaults unchanged (0.1 x tol) until Louis rules. Faulted 1e-2 check
+  queued on kaiju for a free node.
