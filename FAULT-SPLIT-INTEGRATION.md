@@ -122,12 +122,18 @@ when it is back from the reimage, owns review 3's fixes (A) and the review of B.
 science hub holds the machine sessions; this hub holds the head, the PR bodies and the
 notes' re-pin.
 
-## What needs a decision
+## Decisions (Louis, 2026-10-28)
 
-1. Push `feature/fault-split-integration` (d81a2588) to underworld3 now, so the head
-   survives this session and the machines can build it. The hub's standing rule is to
-   push only its own branch; this needs a yes.
-2. Stacked B and C, or one PR.
-3. The coarse-solve default (MUMPS against SVD), which decides whether
-   `feature/coarse-solve-nullspace` follows as D or stays a measurement branch.
-4. Who reviews B: a fresh session against the root's diff, or Louis.
+1. **Pushed**: `feature/fault-split-integration` is d81a2588 on underworld3. The work is
+   spun off to the laptop: build, suites, review 3's fixes on the leak, the review of
+   the root, and the PRs. Hyperion's reimage is slower than expected and is not waited
+   for.
+2. **Multiple PRs, resolved rapidly.** A, B, C as above. A documentation PR does not
+   wait for the full test suite before acceptance (the docs build is enough).
+3. **Coarse solve: not MUMPS as the default** (good on Linux, breaks on the Mac).
+   Deal with the rotation null space explicitly and let PETSc's defaults handle the
+   coarse level; a coarsest level that is too large is a hierarchy that was not built
+   coarse enough, which has happened before, not a case for a heavier solver.
+   `feature/coarse-solve-nullspace` stays a measurement branch; the null-space work is
+   a separate item. Journal entry: `2026-10-28-coarse-solve-null-space-first-petsc-defaults-not-mumps`.
+4. Reviews and fixes are real work and the laptop does them.

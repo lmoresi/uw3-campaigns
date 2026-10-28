@@ -158,11 +158,10 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
-- **The fault-split integration** (`FAULT-SPLIT-INTEGRATION.md`, 2026-10-28): four
-  decisions at its end, the first being the push of `feature/fault-split-integration`
-  (candidate head d81a2588, in the hub's scratch worktree only) so the machines can
-  build it. Also pending: push `docs/fault-multigrid-guide` (ff1d244, the capability
-  guide) as its own branch or stack it on #861.
+- **The fault-split integration** (`FAULT-SPLIT-INTEGRATION.md`): decided 2026-10-28,
+  spun off to the laptop's development session (build d81a2588, suites, review 3's
+  fixes, the root's review, PRs A, B, C in order). The hub tracks it here and re-pins
+  the notes when the merges land.
 - **Enable Pages on the journal**: `underworldcode/underworld3-journal`, Settings, Pages,
   source "GitHub Actions". The proxy refuses the hub the Pages API path. Until then the
   workflow's build job runs and its deploy job fails; the site is
@@ -233,3 +232,9 @@ Measured here, not inherited.
   both notes' recipes against it, wrote `FAULT-SPLIT-INTEGRATION.md`. The fault-multigrid
   capability guide (ff1d244) documents what ships on development and names the rest as
   branch work.
+- 2026-10-28: Louis's rulings on the integration: spin it off to the laptop (hyperion's
+  reimage is slow); multiple PRs resolved rapidly; docs PRs merge on the docs build, not
+  the full suite; coarse solve: handle the null space, PETSc defaults for the coarse
+  level, MUMPS not the default (breaks on the Mac). `feature/fault-split-integration`
+  pushed (d81a2588); `docs/fault-multigrid-guide` pushed and its PR opened; the ruling is
+  the journal's first new entry.
