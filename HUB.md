@@ -183,8 +183,11 @@ frozen as the hand-over state; they are not updated here after this date.
   runs at rtol 0.1 x uw_tol = 1e-4 inside a 1e-3 nonlinear solve (inner velocity 0.033 x tol; outer FGMRES 1 it;
   the library marks the 0.1 margin TODO(MEASURE)). A/B, 10 steps from TA checkpoint 100, np 16: pressure rtol
   1e-4 37 its/increment, 2675 s; 1e-3 25 its, 1933 s (-28 %); 1e-2 15 its, 1427 s (-47 %, +10 % nonlinear its);
-  solutions within 6e-5 in vrms/vsurf/mobility, all converged, outer still 1 it. Recommend -uw_pres_rtol 1e-3 for
-  everything new; 1e-2 to be checked on a faulted run (requested). The library default (0.1 x tol in
+  solutions within 6e-5 in vrms/vsurf/mobility, all converged, outer still 1 it. FAULTED CHECK DONE (TAf from checkpoint 20, 10 steps, Picard on): pressure its 52 -> 20, Stokes -57 %
+  (510 -> 218 s/step), nonlinear and Picard its identical step by step, answer within 7e-6 (vrms, vsurf, mobility,
+  slip_max), events identical. A faulted step at 1e-2 (~220 s) costs less than the unfaulted twin at the default
+  (~317 s): Louis's target met. Kaiju and the hub recommend -uw_pres_rtol 1e-2 for everything that follows;
+  the running faulted set stays at the default for its clean twin comparison. DECISION for Louis. The library default (0.1 x tol in
   rotated_bc) should become tol: a solver default change with this as its evidence, for hyperion when back.
   (A) the mesh is Annulus(cellSize 0.5, refinement 5), uniform h 0.0156: 126976 cells, ~511k P2 velocity and
   64k pressure dofs; 7.7 cells across the plate, 5-6 across the slab core. Refinement 4 (h 0.031, 3.8 cells across
@@ -1048,3 +1051,11 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-28: -uw_pres_rtol and -uw_vel_rtol pushed (b99c323 on the branch; kaiju's 762c5e7 re-recorded by git am): the Schur pressure KSP tolerance of the
   rotated solve settable from the driver; defaults unchanged (0.1 x tol) until Louis rules. Faulted 1e-2 check
   queued on kaiju for a free node.
+- 2026-10-28: **faulted pressure-tolerance check** (kaiju, jobs 2324/2325, TAf from checkpoint 20, 10 steps, np 16,
+  overlay-leakfix, Picard on, driver tree b99c323): -uw_pres_rtol 1e-2 against the default 1e-4: nonlinear its
+  identical step by step (72 in 10 steps, Picard 4-6), pressure its 46-57 -> 19-22, velocity 7.3-8.6 both, outer 1,
+  converged (rel_final 3.6e-4 both), Stokes 5104 -> 2175 s (-57 %), answer within 7.1e-6 in slip_max and 3e-6 in
+  the bulk metrics, events identical. The fault's extra cost was the Schur solve (52 vs 37 its at the default);
+  at 1e-2 a faulted step (218 s) is cheaper than the unfaulted twin at the default (317 s). Recommendation
+  1e-2 for everything that follows. Stop-at-base watcher running on the faulted set (tips 0.48 at step 20,
+  TAc 0.74 at 40).
