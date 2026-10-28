@@ -170,13 +170,10 @@ frozen as the hand-over state; they are not updated here after this date.
   neutral; units of rho alpha DeltaT), viscosity uw_over_eta x100-x1000 (applied to the yield stress too), and
   uw_over_lid 1 (the continent carries its own conductive lid, surface T 0; recommended) or 0 (isothermal,
   compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
-- **DECISION NEEDED (2-4 h window), faulted thermal set solver**: ordinary warm steps crawl in damped Newton
-  (15-23 its, 1300-2200 s) where rebuild steps with their Picard start converge in 3-7 its at 280-730 s; at
-  ~1800 s/step the set takes ~6 days per run. Kaiju recommends stopping all four at checkpoint 10 and
-  restarting with -uw_warm_newton_switch 1e-2 (a Picard warm-up on ordinary warm steps, as rebuild steps
-  already do), TAc included so the twin is fair. Louis declined this for the unfaulted runs; the faulted runs
-  are 3-4x their twin. Hub recommendation: accept; it is a solver path, not physics, and the converged solution
-  is the same within uw_tol.
+- Faulted thermal set solver: DECIDED 2026-10-28 (Louis: "we need this to be quicker ... a single fault, quite
+  small"): all four runs stop at checkpoint 10 and restart with -uw_warm_newton_switch 1e-2 (Picard warm-up on
+  ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. If the projection is still
+  over ~3 days, Louis may stop the set at the step where the interesting phase ends rather than at 299.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -992,3 +989,7 @@ frozen as the hand-over state; they are not updated here after this date.
   to TA, TAc reproduces TA's step 0. Cost: rebuild steps 3-7 its (Picard start) 280-730 s; ordinary warm steps
   15-23 its, 1300-2200 s (the Newton crawl, twice as bad with the fault's jump in the plate); TAc 7-15 its,
   ~500 s. Decision on -uw_warm_newton_switch 1e-2 put to Louis.
+- 2026-10-28: **Louis: the faulted set must be quicker; finalise soon.** GO to kaiju: stop 2277-2280 at checkpoint
+  10, restart all four with -uw_warm_newton_switch 1e-2, everything else identical; report after 5 steps
+  (its, s/step, projection, continuity across the restart) and, if still slow, where the time goes and the step at
+  which the thermal set's interesting phase ended, as a candidate stopping point.
