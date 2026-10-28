@@ -175,6 +175,11 @@ frozen as the hand-over state; they are not updated here after this date.
   ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. STOPPING RULE (Louis, 2026-10-28): "Stop the faulted set once the slab is on the base ... we can always
   restart!" Each run ends at the first checkpoint after its tip reaches depth 0.95 plus one checkpoint interval
   (step ~80-90 by the thermal twins), with a full checkpoint so it can be continued.
+- Cost levers under measurement (Louis, 2026-10-28): (A) resolution, is h 0.0156 everywhere needed for the TBL
+  (plate ~8 cells); a lithosphere-graded base per the design ruling; (B) pressure iterations 40-60 per increment
+  look high: the Schur rtol is ~0.033 x uw_tol (3e-5 against a 1e-3 nonlinear solve); kaiju runs a 10-step A/B
+  from TA checkpoint 100 (current / pressure rtol 1e-3 / inexact-Newton if available). Also pending from
+  hyperion: the coarse-solve null space that caps the runs at np 16 of 52 cores per node.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -998,3 +1003,8 @@ frozen as the hand-over state; they are not updated here after this date.
   told: run each to the first checkpoint after tip depth 0.95 plus one interval, full checkpoint, then the
   comparison figures (v_plate, plateness, hinge, slip, solver record) over the common window against TAc and TA,
   and the per-step cost before and after the Picard switch in the README.
+- 2026-10-28: Louis asks whether the mesh (h 0.0156 uniform, set by the one-cell crust, ~8 cells across the plate)
+  is needed for the TBL, and whether the 40-60 pressure iterations per increment come from an inner tolerance
+  too tight for a 1e-3 nonlinear solve (the notes record the Schur rtol as 0.033 x tol). Kaiju reports the
+  mesh numbers and the solver settings and runs a tolerance A/B on two free nodes. Runs use 16 of 52 cores per
+  node because of the coarse-solve null-mode limit (hyperion's item, paused).
