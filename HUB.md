@@ -170,6 +170,10 @@ frozen as the hand-over state; they are not updated here after this date.
   neutral; units of rho alpha DeltaT), viscosity uw_over_eta x100-x1000 (applied to the yield stress too), and
   uw_over_lid 1 (the continent carries its own conductive lid, surface T 0; recommended) or 0 (isothermal,
   compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
+- NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
+  models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
+  fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
+  compositional set: under crust x0.1 the fault was redundant; with crust x1 it doubled the retreat).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -971,3 +975,7 @@ frozen as the hand-over state; they are not updated here after this date.
   comparable only for a small continent, else split the wall integral into oceanic and continental arcs.
   Cost: <1 % of a step; laptop smoke 4 ranks, 12 steps, ~25 min (needs the exact TA flag line from kaiju,
   requested); a TA + continent run costs the same as TA on kaiju.
+- 2026-10-28: Louis: the subducting plate is thermal plus a thin crust that is weak only (x0.001 on viscosity and
+  yield, no buoyancy); that is very weak, and faulted models need not have it so weak: a crust-strength sweep
+  (x0.1, x1) with and without the fault is the next test after the current faulted thermal set. A buoyant crust
+  (signed deficit on the crust marker with an eclogite-style depth cut-off) was offered and not taken up.
