@@ -150,6 +150,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
+| TI-band push-down smoke (no-op check, L0-L3 strength sweep, cost rows, slip on a common probe, director check) | https://claude.ai/artifact/7mau5dPymUCYGPYJCCDnME |
 | Robust crust-fit proposal (parabola vs envelope trace vs flexure+envelope on 40 stored checkpoints; failure modes; locator/placement split; generality) | https://claude.ai/artifact/SgZjTP3MdeSxaGRNPup8hG |
 | Add-on mesh demo movie, envelope fit, rebuilt every step (30 frames, two fixed windows, per-step table) | https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3 |
 
@@ -160,7 +161,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 07667b2 (wall-stub, envelope locator, plate_metrics by arc; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 852c6aa (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -434,7 +435,22 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   footprint eta_1 = max(eta_min_b, min(eta_0, f_b tau_y/(2 gdot) + eta_reg_b)); director = nearest segment's
   normal; mask = whole band; slip by velocity-jump probe at +-(w/2 + h); band stress terms recorded separately.
   **TAf_env:** TAf rerun with the envelope locator (6-8 h, one node) approved by the hub for like-for-like physics,
-  since TAf's parabola fits failed late; it doubles as the locator A/B on the thermal set. Louis may cancel. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  since TAf's parabola fits failed late; it doubles as the locator A/B on the thermal set. Louis may cancel.
+  **Push-down smoke DONE 2026-10-29 (page 7mau5dPymUCYGPYJCCDnME; TAf checkpoint 40, 6 steps per level, chain 0):**
+  no-op check exact (TI band off = VP host, vrms to 1e-14, same Newton and residual). Levels (band stress as a
+  fraction of the host's mean yield; f_b / eta_reg_b = eta_min_b): L0 1e-2/0.1: 1.2-1.4 %, 13 Newton, 541 s; L1
+  3.3e-3/0.033: 0.42-0.50 %, 12.7 Newton, 629 s; L2 1.1e-3/0.011: warm starts failed at 42 and 43, not converged
+  (1800 s); L3 3.7e-4/0.0037: 0.05 %, 8-13 Newton, 691 s, all 6 steps (non-monotone, marginal). The f_b term is
+  ~70 % of the residual at every level. **L1 chosen** (deepest reliable). Cost, steps 41-46 (Newton / Stokes s):
+  split chain 2 one-step restart 6 / 175; TAf as run (other driver) 6.2 / 376; split chain 0 control 7.3 / 351;
+  TI chain 0 L1 12.7 / 629: chain 0 costs the split ~1.5x, TI ~1.8x the chain-0 split, mostly Newton. Slip on
+  the same probe (+-0.0196): split control 3030-3915 (its node jump 1226-2378 reads lower, the probe takes the
+  cells round the cut too); TI L0-L3 4340-7520, 1.6-2x the split, vrms 10-20 % higher: the band weakens a width w
+  of material, the split a line plus its bridge. Director check: eta_1/eta_0 median 0.0089, alignment 1.00,
+  no loss at the stub kink. **Series applied as f14c1ec, d580732, cd06325, 852c6aa (blobs verified); head 852c6aa.
+  TAti GO (hub) at L1, chain 0, envelope, on 852c6aa, one node.** TAf_env running (job 2390). Equivalence
+  (TI slips 1.6-2x the split) put to Louis; a slip-rate profile across the band from the smoke checkpoints asked
+  of kaiju to show whether w or the footprint is the knob. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1475,3 +1491,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-29: kaiju's TI path implemented (local, patch with the smoke) but any unsplit placed coarse MG level OOMs
   the first solve: library defect recorded for the dev hub; TI runs at -uw_chain 0 with a chain-0 split control.
   No-op checks (TI band off vs VP host, chain 0) running (2388/2389); push-down follows. TAf_env rerun approved.
+- 2026-10-29: TI push-down smoke done (page 7mau5dPymUCYGPYJCCDnME); four-commit TI series applied and pushed (head
+  852c6aa); TAti go at L1 on chain 0. TI slips 1.6-2x the split on a common probe: equivalence question to Louis.
