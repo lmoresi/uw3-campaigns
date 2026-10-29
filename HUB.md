@@ -598,7 +598,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parameters; same director), Jacobian test on hand-rolled, library and VP-host control, 5 steps from checkpoint
   5; and run the library's own yielding-TI example/test on the kaiju build as the regression check. A pass on
   the library model restarts the chain on it; a failure is a regression for the dev hub with the repro and the
-  test that should have caught it. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  test that should have caught it. **Louis to kaiju 2026-10-30 on the comparison page:** (1) legend incomplete and
+  tiny (fixed, page v2); (2) "what we know works is the split plus TI to the surface so the physics is not
+  actually as different as you assume. However, I suspect this means we did not add the TI damage to the surface
+  correctly"; (3) "all the models seem to do similar things" (kaiju corrected him: that figure is the locator
+  A/B, no TI run in it yet). **On (2) the code confirms it: the split's bridge from the cut's top to the surface
+  is an isotropic x uw_eta_w zone (undone by the host floor and eta_reg), copied from the library's zg95_annulus
+  example, which uses a TI bridge only in linear-viscous runs and falls back to isotropic with yield ("the TI
+  model has no yield stress without elasticity"). So NO faulted thermal run had TI damage to the surface; the
+  locked top is that isotropic bridge, which re-reads the buried-tip finding (the taper estimate stays as the
+  bound).** Kaiju implements -uw_bridge_ti (the bridge painted as a TI weak plane, director from the surface
+  stub, yielding as the TI band) behind a flag; hub ordered its smoke to wait for the TI law that passes the
+  Jacobian/regression checks, and asked kaiju to find the exact "split plus TI to the surface" configuration
+  in the library's scripts/tests (model class, elastic term or not, tangent, floor, regularisation) and use its
+  settings as the reference. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1673,3 +1686,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: Louis: the TI issues are a regression or a forgotten configuration; examples must be bundled with the
   technical notes (standing rule added; passed to the docs and dev hubs). Kaiju redirected to the library's TI VEP
   model and its own TI example as the reference before any further driver workaround.
+- 2026-10-30: Louis (to kaiju): the known-good configuration is the split plus TI to the surface; the driver's
+  bridge is isotropic (copied from the library example's yield fallback), so no faulted run had TI at the surface.
+  -uw_bridge_ti in implementation; smoke waits for the validated TI law; the reference configuration to be found
+  in the library's own scripts.
