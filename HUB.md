@@ -183,19 +183,17 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
-- Continental region on the overriding side (Louis, 2026-10-28): the laptop's design is in (below); **Louis
-  decides four values and one switch**: extent (arc length from the trench; recommended 0.5-1.0 layer depths,
-  a 7-15 % fraction of the overriding side, Andean margin with the hot top as back-arc beyond), thickness
-  (uw_over_comp_thick 0.07-0.1), buoyancy uw_over_dT negative (|dT| 0.5-0.7 out-floats its own lid, 0.3 is
-  neutral; units of rho alpha DeltaT), viscosity uw_over_eta x100-x1000 (applied to the yield stress too), and
-  uw_over_lid 1 (the continent carries its own conductive lid, surface T 0; recommended) or 0 (isothermal,
-  compositional only). Then the laptop implements (~40 lines), smokes at 4 ranks, patches via the hub.
-- Faulted thermal set solver: DECIDED 2026-10-28 (Louis: "we need this to be quicker ... a single fault, quite
-  small"): all four runs stop at checkpoint 10 and restart with -uw_warm_newton_switch 1e-2 (Picard warm-up on
-  ordinary warm steps), TAc included. Target: a faulted step close to the twin's cost. STOPPING RULE (Louis, 2026-10-28): "Stop the faulted set once the slab is on the base ... we can always
-  restart!" Each run ends at the first checkpoint after its tip reaches depth 0.95 plus one checkpoint interval
-  (step ~80-90 by the thermal twins), with a full checkpoint so it can be continued.
-- Graded, relaxed base mesh (Louis, 2026-10-28): AGREED. The laptop designs and implements a lithosphere-graded
+- Earth-like public demonstration setup (Louis to kaiju directly, 2026-10-29): TAKEN BY KAIJU (the laptop is
+  inactive; its continent design was passed to kaiju). Louis's words: an asthenosphere (viscous layering at 670
+  km, the simplest), a continental block in place of the outer BC over 1/3 of the box on the overriding side, the
+  MOR fixed at 9 o'clock as a small patch of the T = interior boundary condition (a limitation to revisit).
+  Branch kaiju/earth-setup 230f6c0 on 20b50e8, flags off by default: -uw_lm_eta/-uw_lm_depth 0.231/-uw_lm_ramp;
+  -uw_cont_extent, -uw_cont_age; -uw_top_hot 2 -uw_ridge_patch W. Smoke job 2344 (10 steps, np 16, TA thermal +
+  crust sampling + crust fault + Picard switch + pres_rtol 1e-2): lm_eta 30, continent 0.15 d behind the trench
+  to 120 deg, 0.05 thick, x100, neutral, age 0.000625; ridge patch 0.05. Patch to the hub after the smoke.
+  **Ruling still needed from Louis: -uw_pres_rtol 1e-2 as the standing setting** (kaiju used it here).
+- Graded, relaxed base mesh (Louis, 2026-10-28): AGREED; UNASSIGNED since the laptop went inactive (kaiju could
+  take it after the Earth setup). The laptop was to design and implement a lithosphere-graded
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
   the coarse base (smoothing and flips) to remove the refinement's triangle pattern seen in the movies; behind
   flags, default off; 4-rank smoke on the TA line; mesh figures before/after; patch via the hub.
@@ -1134,3 +1132,9 @@ frozen as the hand-over state; they are not updated here after this date.
   movies page; an Artifacts index is now a section of HUB.md. The slab_fault README's "each rebuild roughly halves
   the slip" corrected in the committed copy on zg95-annulus-for-kaiju (two regimes, median 1.55 over 46 rebuilds);
   kaiju to fix its figures_out copy.
+- 2026-10-29: Louis asked kaiju directly for an Earth-like public demonstration setup (670 km viscous layering,
+  a continental block over 1/3 of the overriding side in place of the hot top, the ridge fixed at 9 o'clock as a
+  T = interior patch); kaiju has it on kaiju/earth-setup with a 10-step smoke running. The laptop's continent
+  design (buoyancy sign gate, |dT| 0.5-0.7 to out-float the lid, own cold surface, fault-law exclusion, split
+  wall integrals) passed to kaiju. The continent task is closed on the laptop; the graded/relaxed base is
+  unassigned.
