@@ -539,7 +539,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   taper, surface-breaking fault of length L = interior crack of half-length L by the mirror wall; buried = half-
   length (L - d)/2, a lower bound): buried/surface-breaking mean slip TAf 0.42 (0.40-0.46), TBf 0.43 (0.19 at
   40-50, the stale fault), TA_age25f 0.43; integrated 0.36-0.37. The annulus split/outcropping-TI ratio
-  (0.38-0.44) is close to this. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  (0.38-0.44) is close to this. **TAti cost (2026-10-30, 2 h 45 in):** step 5; every step converged but 15-23
+  Newton (3-6 Picard then 12-18 Newton increments at ~100 s), 1400-2300 s/step, ~45 h to the base; band residual
+  0.35 %. Likely cause: hard sympy Min/Max kinks in the band law (eta_1 = max(eta_min, min(eta_0, eta_y))) where
+  the host yield uses the library's smooth softmin; chain 0 adds per-iteration cost. **Hub: no 45 h chain.** TAti
+  runs to its 12 h wall as the reference; kaiju implements the smooth band law behind -uw_ti_smooth (softmin +
+  softplus floor, the host's delta) and compares 5 steps from step 0 on the free node; if slip and vrms match to a
+  percent with Newton under ~10, TAti restarts from step 0 on the smoothed law with chained segments; else TAti
+  pauses for Louis's equivalence choice. TAf_env fine: step 43, tip 0.69, ~400 s/step, base in ~5 h. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1598,3 +1605,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: buried-TI smoke: no match (burying removes 23-42 % of the TI excess); the rest is the band's tips and
   width. Thermal-set bound: the buried split slipped at ~0.4-0.5 of a surface-breaking fault. Next smoke held
   for Louis (options recorded). TAti and TAf_env continue.
+- 2026-10-30: TAti far too slow (15-23 Newton, ~45 h to the base; hard Min/Max kinks in the band law suspected).
+  Hub: no chained 45 h run; smooth band law behind a flag tested against the first 5 steps on the free node, then
+  restart or pause. Recorded under the TI item.
