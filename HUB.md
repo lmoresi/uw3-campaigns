@@ -272,7 +272,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   speed falls from -870 at its trench-side edge to -190 at its far edge 120 deg away: at x1 viscosity, strong only
   through its 145 km thermal lid, it deforms internally over its width and does not move as a plate. If a rigid
   continent is wanted it needs a thicker lid (older uw_cont_age) or a compositional factor > 1, against the
-  "not inherently stronger" ruling. Whole-surface columns unchanged. Page v5.
+  "not inherently stronger" ruling. Whole-surface columns unchanged. Page v5. **Lid check (kaiju, offline on
+  smoke 4 step 19, page v6):** the lid flows viscously, it does not yield. Surface strain rate 240 at the
+  trench-side edge falling smoothly to 86 at the far edge (mean 149, not concentrated at the fault side); the
+  yield-limited rate at mid-lid is ~1.3e4 (1.8e3 in the thin edge), so 50-150x below yield; yield ratio >= 0.98
+  everywhere, yielding fraction 0. The FK law with deta 4e3 caps the coldest lid at 4000x the interior. Lid
+  present at step 19: T = 0.5 at 0.036-0.042 (105-120 km; 0.035-0.038 at step 0), thinning to 0.02 within 2 deg
+  of the trench-side edge. Either lever stiffens it: a compositional factor x10-100 on the continent (gated as
+  the markers are) or a thicker lid (older uw_cont_age).
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -1424,3 +1431,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-29: kaiju's key-clearing fix and plate_metrics.py (split into oceanic and continental arcs) applied as
   f217bdb and 07667b2, pushed; head 07667b2. Finding: the continent at x1 deforms internally (surface speed -870 to
   -190 across its 120 deg); added to the Earth go/no-go item for Louis.
+- 2026-10-29: kaiju's lid check: the continental lid flows viscously 50-150x below yield; either a compositional
+  factor or a thicker lid would stiffen it. Recorded under the Earth setup; Louis's go/no-go item unchanged.
