@@ -114,7 +114,8 @@ params = uw.Params(
     uw_comp_thick=0.1,
     uw_buoy_T=1.0,
     # the compositional overriding plate (stage 3): a layer uw_over_comp_thick thick from
-    # uw_over_gap behind the trench to its ridge, viscosity x uw_over_eta, deficit uw_over_dT
+    # uw_over_gap behind the trench to its ridge, viscosity x uw_over_eta, deficit uw_over_dT (negative: buoyant;
+    # a 0.05 d continent over a uniform lid of age 0.000625 is neutral at about -0.39)
     uw_over_dT=0.0,
     uw_over_eta=1.0,
     uw_over_comp_thick=0.1,
@@ -261,7 +262,7 @@ comp_on = params.uw_comp_dT > 0 or params.uw_comp_eta != 1
 if params.uw_fault_law == "crust" and not (crust_on or comp_on):
     raise ValueError("the crust fault law follows the base of the crust layer (uw_crust_weak < 1) "
                      "or, without one, the compositional slab's top (uw_comp_dT or uw_comp_eta)")
-over_on = params.uw_over_dT > 0 or params.uw_over_eta != 1
+over_on = params.uw_over_dT != 0 or params.uw_over_eta != 1   # a negative uw_over_dT is a buoyant block
 swarm_on = crust_on or comp_on or over_on
 crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
                else float(params.uw_cell) / 2 ** int(params.uw_refinement))
