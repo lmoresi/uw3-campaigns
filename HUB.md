@@ -359,7 +359,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   band can only approximate that.** So eta_1/w and f_b are not physical choices: take them as small as the solver
   tolerates (conditioning, Newton convergence) and report the residual band shear stress as the approximation
   error against zero; kaiju's 1-2 % of the mean yield stress is the starting point, to be pushed down in the smoke.
-  The remaining choices are w and the mask rule. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  SET 2026-10-29 (kaiju proposed, hub accepted): w = W = 0.008; crust factor linear in (1 - M) with M the whole
+  band (band | bridge zone), the same mask -uw_fault_precedence uses for the split since eec8682, not the 0.6 w
+  footprint; the push-down steps f_b, eta_reg_b and the in-band floor (eta_1 >= 0.1) together by factors of 3,
+  since band stress ~ f_b tau_y + eta_reg_b 2V/w, recording band stress (integrated, and as a fraction of the
+  host's mean yield at depth), slip, Newton and linear its, Stokes time, stopping when either solve degrades.
+  Nothing left for Louis on TI settings. Order: envelope fit smoke, Earth smoke 4 report, then TBti. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1369,3 +1374,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-29: Louis on the TI comparison: the split fault is frictionless (zero shear strength); the TI band
   approximates it. f_b and eta_1/w become "as small as the solver tolerates" with the residual band stress
   reported; recorded under the TI decision item; kaiju told.
+- 2026-10-29: TI settings set (mask = whole band as the split's precedence mask; joint push-down of f_b,
+  regularisation and floor). Envelope locator committed on kaiju (63f8d30 local, base 259ee09); 10-step smoke
+  from demo checkpoint 30 running (job 2372) with compare_smoke.py against the offline trace and a stored = placed
+  check from records. Rebuild threshold with the envelope: compare against the last built fault, 4 rungs, no
+  hysteresis (particle noise a third of the threshold). Earth smoke 4 still running.
