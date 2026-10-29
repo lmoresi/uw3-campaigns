@@ -150,6 +150,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
+| Robust crust-fit proposal (parabola vs envelope trace vs flexure+envelope on 40 stored checkpoints; failure modes; locator/placement split; generality) | https://claude.ai/artifact/SgZjTP3MdeSxaGRNPup8hG |
 
 ## Open work
 
@@ -216,6 +217,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **Crust-fit locator (2026-10-29): envelope trace (kaiju's recommendation) or flexure+envelope for the demo rerun
+  and the faulted runs?** Kaiju's offline results above. Hub's reading: the envelope wins on the evidence (40/40,
+  monotone, 100x more stable to particle dropout, no free parameters at their bounds); the flexure gives the
+  physical reading you asked for but its two parameters are not constrained by the hinge alone. Two sub-points:
+  the envelope's 30 deg floor on the near-surface slope overrides the data at 11 of 40 (data say 24-30 deg; the
+  parabola had placed 44-57), so the floor's value, or whether to have one, is a choice; and the demo's per-step
+  trace change (0.006-0.016) sits at the 4-rung rebuild threshold, which matters for production rebuild spacing,
+  not for the every-step demo.
 
 - Thermal slab + faults: the crust-base fault law is in (d0dca11, laptop); kaiju has it pinned. **Decision needed:
   which thermal cases take a fault, and when** (a fault forms only once the slab has reached the cap depth 0.15;
@@ -299,7 +309,24 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   still work there; the fit is today a special case for one slab in an annulus, a general case (new faults forming,
   several slabs, ultimately 3D) will be needed, not a priority, but "don't optimise the fitting so much that it is
   not possible to generalise." Kaiju folds both in: a flexural candidate tested offline beside the envelope trace,
-  and a generality section in the proposal. Earlier detail:
+  and a generality section in the proposal. **PROPOSAL READY 2026-10-29 (kaiju, offline on all 40 stored
+  crust-swarm checkpoints, nothing coded in the driver; artifact SgZjTP3MdeSxaGRNPup8hG).** Parabola 29/40 fits
+  (11 none, all from step 45 on), 27 monotone, trace moves 0.75 when 10 % of particles are dropped, stored != placed.
+  Envelope trace 40/40, all monotone, 0.0055 under the 10 % drop, stored = placed: subducted crust deeper than
+  1.25 thicknesses, marched up from the cap in 0.0025 depth steps, base = Gaussian-weighted 10th percentile toward
+  the incoming side in the connected run nearest the previous base, smoothed by a local quadratic; above 0.02 it
+  extends at its own top slope with a 30 deg floor (binds at 11/40 where the data say 24-30 deg); checked against
+  the particle trench (gap 0.04-0.10, tol 0.15); demo step change 0.006-0.016 against the 4-rung rebuild
+  threshold 0.016. Flexure (ct + A e^(-u/a) cos(u/a) on the envelope's base points to 0.07; trench at u = pi a/2 by
+  construction; straight cut to 2 thicknesses then the flexed base; hands to the envelope at 0.06, blended
+  0.05-0.07): 40/40, 0.014 under the drop, trenches within 0.5 deg of the envelope; but A and alpha poorly
+  determined from the hinge alone (A at its bound 18/40, jumps 0.05 to 0.8 between demo steps), 10-15 deg steeper
+  near-surface dip on young hinges, does not apply below the hinge, collision changes the bending; constraining
+  it needs the incoming plate's flat base in the fit or alpha tied to lid thickness. **Kaiju recommends** the
+  envelope trace as the locator behind -uw_fault_fit envelope, flexure as a hinge option once constrained, stored
+  geometry always the placed polyline. **Hub: kaiju implements the envelope behind the flag (default off, parabola
+  unchanged), smokes 10 steps from demo checkpoint 30 against the offline trace, patches; the demo rerun and the
+  production choice wait on Louis (below).** Earlier detail:
 - Crust-base fit, two driver items (kaiju 2026-10-29): the fit fails at about a third of late detections
   in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
   lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
@@ -1331,3 +1358,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   TODO(BUG) comment on TransverseIsotropicFlowModel recorded as a library one-liner for the dev hub. Louis to kaiju
   on the crust fit: try a flexural profile; keep the fit generalisable (several faults/slabs, continent at the
   trench, 3D); recorded under the crust-base fit decision.
+- 2026-10-29: kaiju's robust crust-fit proposal delivered (artifact SgZjTP3MdeSxaGRNPup8hG; scripts
+  kaiju-launch/crust_fit/, results figures_work/crust_fit/). Hub: implement the envelope behind -uw_fault_fit
+  (default off), smoke, patch; demo rerun and production choice to Louis. Earth smoke 4 (gap 0.75, extent 2.4315,
+  clone zg95-earth4 at 259ee09) running as job 2371; cont_extent comment 9df8bff rides the fit patch.
