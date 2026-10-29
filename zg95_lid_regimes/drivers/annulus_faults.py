@@ -1330,8 +1330,11 @@ class FaultedMesh:
         self.has_guess = True
 
     def _stokes_solve(self, from_rest):
+        # the TI VEP model is a viscoelastic class to the solver, which demands a timestep even with
+        # elasticity off (shear_modulus oo); it does not enter the law then
+        extra = {"timestep": 1.0} if params.uw_ti_model == "vep" and getattr(self, "ti", None) is not None else {}
         self.stokes.solve(zero_init_guess=from_rest, picard=params.uw_picard,
-                          verbose=bool(params.uw_verbose))
+                          verbose=bool(params.uw_verbose), **extra)
         return self.stokes._rotated_freeslip_info
 
     def solve(self):
