@@ -170,7 +170,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 67dd2c8 (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` fc491c6 (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -705,7 +705,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the comparison page (v4). **CONCLUSION: the annulus TI-split gap (~2x slip, vrms +15 %) and the TI band's Newton
   cost are SETTING-SPECIFIC** (the yielding T-dependent host beside the fault, the curved hinge, the deep tip in a
   yielding slab; in the linear box both solve in one pass). TAti vs TAf_env over the run is the physics answer.
-  **Hub: equivalence investigation CLOSED here; no further smokes.** 2423 finished identical to its control. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  **Hub: equivalence investigation CLOSED here; no further smokes.** 2423 finished identical to its control.
+  Five-patch series APPLIED as fc491c6 (b554cf4 -uw_ti_model vep; 3d82360 -uw_bridge_ti; 4c09942 VEP director
+  column + -uw_ti_model linear; 9974022 VEP timestep; 42a04fa -uw_fault_normal trace; blobs 3961971 -> afab640
+  verified; all default off; one hand-typed context line corrected by kaiju). Comparison page v5 carries the
+  equivalence paragraph. **TAti_smooth:** segment 2 (job 2407, n2) restarted from checkpoint 5 on the 1e-3
+  switches, supervisor v3; step 16 at 3 h 13; 10 of 11 steps converged this segment (step 7 failed, 16 Newton;
+  step 6 converged on redo); 1006 s/step, 9-20 Newton; dip 67 -> 33-41, slip 467 -> 1234; ~35 more steps to
+  TAf_env's base time, segment 2 ends ~19:43 at ~step 47, a short segment 3 finishes ~21:00-22:00. Supervisor v3
+  checks the pause trigger at segment ends only (kaiju checks by hand). Split + TI bridge smoke (2413) hung and
+  was cancelled; a rerun is still owed if ever wanted (the box says it will change nothing). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1802,3 +1811,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   under (dev-hub note); buried-tip bound RETRACTED (free-slip wall pins a dipping fault's end regardless); the
   annulus TI-split gap is setting-specific. Equivalence investigation closed; TAti vs TAf_env over the run is the
   answer. Surface-breaking feature request downgraded. Reference example flagged to the docs hub.
+- 2026-10-30: five-patch TI series applied (head fc491c6). TAti_smooth on segment 2 at step 16, converging bar one
+  step, base expected tonight. Comparison page v5. Only segment-boundary notes from kaiju until the base.
