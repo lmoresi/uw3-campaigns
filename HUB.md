@@ -157,7 +157,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 20b50e8 (... crust particle sampling, restart limitation documented, -uw_pres_rtol / -uw_vel_rtol flags, velocity ring -uw_vring; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` e5f661c (... crust particle sampling, restart limitation documented, -uw_pres_rtol / -uw_vel_rtol, velocity ring -uw_vring, Earth setup: -uw_lm_eta/-uw_lm_depth/-uw_lm_ramp, -uw_cont_extent, -uw_cont_age, -uw_top_hot 2 + -uw_ridge_patch, buoyant over-plate gate; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -185,15 +185,16 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
-- Earth-like public demonstration setup (Louis to kaiju directly, 2026-10-29): TAKEN BY KAIJU (the laptop is
-  inactive; its continent design was passed to kaiju). Louis's words: an asthenosphere (viscous layering at 670
-  km, the simplest), a continental block in place of the outer BC over 1/3 of the box on the overriding side, the
-  MOR fixed at 9 o'clock as a small patch of the T = interior boundary condition (a limitation to revisit).
-  Branch kaiju/earth-setup 230f6c0 on 20b50e8, flags off by default: -uw_lm_eta/-uw_lm_depth 0.231/-uw_lm_ramp;
-  -uw_cont_extent, -uw_cont_age; -uw_top_hot 2 -uw_ridge_patch W. Smoke job 2344 (10 steps, np 16, TA thermal +
-  crust sampling + crust fault + Picard switch + pres_rtol 1e-2): lm_eta 30, continent 0.15 d behind the trench
-  to 120 deg, 0.05 thick, x100, neutral, age 0.000625; ridge patch 0.05. Patch to the hub after the smoke.
-  **Ruling still needed from Louis: -uw_pres_rtol 1e-2 as the standing setting** (kaiju used it here).
+- Earth-like public demonstration setup (Louis to kaiju directly): driver options on the branch (8eb5644, e5f661c),
+  two smokes done, page https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw. **Choices for Louis**: (a) raise Ra
+  to restore upper-mantle speeds or accept the slower clock (the x30 lower mantle slows the circulation ~7x,
+  vrms 40-70 against TAf's ~440, because most of the annulus lies below 670); (b) continent buoyancy (-0.5 used,
+  -0.39 neutral for a 0.05 d block over a 0.000625 lid); (c) -uw_pres_rtol 1e-2 used, not yet ruled; (d) the ridge
+  is fixed in place (a limitation to revisit). Smoke 2 (slab 0.2, buoyant continent, 20 steps, t 0.00086): tip
+  crosses 670 at ~step 3, 1-3 Newton its, 35-85 s/step, fault forms once the crust reaches the cap, dip 35-30,
+  slip 350-500; the continent a dark low-strain block nearly stationary on the velocity ring, the ridge
+  spreading both ways, the plate trenchward at 150-250. Follow-up not done: splitting the mobility and lid-depth
+  wall integrals into oceanic and continental arcs.
 - Graded, relaxed base mesh (Louis, 2026-10-28): AGREED; UNASSIGNED since the laptop went inactive (kaiju could
   take it after the Earth setup). The laptop was to design and implement a lithosphere-graded
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
@@ -1168,3 +1169,7 @@ frozen as the hand-over state; they are not updated here after this date.
   TI zone but it is isotropic weakening; crust and fault weakening multiply (bounded by the floor); the TI tangent
   issue #457 biases cost comparisons; no test solves TI with rotated free-slip walls, so a smoke on one TBf state
   comes first. Louis decides settings before code is written.
+- 2026-10-29: Earth-setup patches pushed (8eb5644 + e5f661c; the second applied after kaiju corrected a hand-copied
+  line; tree equals kaiju/earth-setup). Smokes: earth_smoke (slab 0.35, neutral continent net heavy with its lid,
+  10 steps, vrms 60-67, 3-6 its, 100-180 s) and earth_smoke2 (slab 0.2, continent -0.5 buoyant, 20 steps, vrms
+  39-72, 1-3 its, 35-85 s). The x30 lower mantle slows the whole circulation ~7x. Choices listed for Louis.
