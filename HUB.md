@@ -218,6 +218,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Earth production run: GO/NO-GO (2026-10-29).** Plan above; the three bracketed choices default to the smoke
+  values (D 0.12 d, Ra 2.386e7, buoyancy -0.5) unless you change them; the plan assumes the envelope locator and
+  -uw_pres_rtol 1e-2 (recommended, not yet ruled as standing). A "go" with no changes launches it as written.
 - **Crust-fit locator (2026-10-29): envelope trace (kaiju's recommendation) or flexure+envelope for the demo rerun
   and the faulted runs?** Kaiju's offline results above. Hub's reading: the envelope wins on the evidence (40/40,
   monotone, 100x more stable to particle dropout, no free parameters at their bounds); the flexure gives the
@@ -254,6 +257,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   take -uw_fault_fit envelope once chosen. Correction: smoke 3 vrms was 209-389, not 210-348. Page v3
   https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw. The Earth setup now has all of Louis's rulings in and is
   ready for a production-length run once the locator and the remaining choices (D, Ra, buoyancy) are settled.
+  **Production plan drafted (kaiju 2026-10-29, page v4 top section, no run):** ~100 steps to the base (smoke 4's tip
+  0.21 -> 0.365 in 19 steps at ~0.010/step; TAf took 83 steps from 0.365 to the base), allow 100-130 with Louis's
+  stop rule; 177 -> 220 s/step, 5-8 h, one 12 h segment at np 16 exclusive on the leak-fix overlay; checkpoints
+  every 5 steps (20-26 frames); -uw_fault_fit envelope, detection every step, rebuild rungs 4, floor 30 recorded;
+  records per step (placed trench/dip, slip, vrms, plates, cost), per checkpoint (gap_check.py: continent edge,
+  gap, overlap, fault-continent distance), tip_depth.py; driver cdf44c1 + key-clearing 8ac52ed pinned. Full flag
+  line on the page with [D] 0.12, [Ra] 2.386e7, [buoyancy] -0.5 at the smoke values. Plateness split into
+  oceanic/continental arcs: hub asked kaiju to make it before the run (analysis only).
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -1400,3 +1411,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   passed (details under the crust-fit decision). Demo rerun and production locator still wait on Louis.
 - 2026-10-29: Earth smoke 4 done (gap 0.75 holds at 0.71-0.75 d over 20 steps, dynamics unchanged from smoke 3);
   recorded under the Earth-like setup decision; page v3. Kaiju corrected smoke 3's vrms range (209-389).
+- 2026-10-29: Earth production plan drafted by kaiju (page v4); recorded with a GO/NO-GO item for Louis. Kaiju asked
+  to split plate_metrics into oceanic and continental arcs before the run.
