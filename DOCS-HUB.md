@@ -160,6 +160,12 @@ Measured here, not inherited.
   `annulus_faults.py`, `box_fault.py`: "the base level k steps below the finest") are
   off by one against their own indexing; the code is right, the comment is not.
 
+- 2026-10-31, to the dev hub: #892 (the rotated path's FAC patch blocks run ILU(0)
+  where `custom_mg` configures LU) decides the production multigrid tail for faults;
+  see the journal entry of 2026-10-31 and `~/+Simulations/uwtn_2026_022_tail_sweep/`
+  on wombat. It is the fix that makes the August fault-patch design the one that
+  ships.
+
 ## Open work
 
 | What | Where | State |
@@ -342,3 +348,14 @@ Measured here, not inherited.
   parametrisations of the trace (3006/3498 against 3008/3496), so the note's counts are
   the figure's mesh. The tail sweep is nearly done; the notes session asked for each
   level's smoother (the FAC patch) to be recorded with it.
+- 2026-10-31: **the sweep reverses the tail ruling, pending Louis and a fix.** Recording
+  each level's smoother found that the FAC patch is installed only when the sole split
+  level is the finest (no chain ever had it) and that the rotated path runs the patch as
+  ILU(0), not the LU `custom_mg` configures (#892, on development too). With LU, the
+  welded base with the split finest takes 3 velocity iterations per linear solve at
+  every band ratio 6 to 25 on the yielding lid, 3 to 16 times fewer than any chain; with
+  today's library the lean chain at ratio about 8 is still best. Journal entry written;
+  topic page updated. For the dev hub: #892. For Louis: whether production moves to the
+  welded base with the FAC LU patch once #892 lands, which changes the drivers'
+  `uw_chain` default, both guides, and the note's multigrid section and panel (c).
+  Results: `~/+Simulations/uwtn_2026_022_tail_sweep/` on wombat; nothing pushed.

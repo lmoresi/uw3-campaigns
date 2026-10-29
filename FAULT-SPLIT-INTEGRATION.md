@@ -239,6 +239,18 @@ faults-in-convection guide on B and C (the chain's hosts). Merge order: #882, th
 development merge commit (the hub does this); kaiju's 30-step restart A/B can be built
 as an overlay from 4698938f now (the science hub's item).
 
+**2026-10-31, the tail sweep.** Louis commissioned a band-ratio sweep of the multigrid
+tail before any note result is published; the laptop ran it on the head. It found a
+library bug that changes the conclusion: the FAC patch smoother is installed only when
+the hierarchy's sole split level is the finest, so the split chains never had it, and on
+the rotated path the patch's blocks run ILU(0) where `custom_mg` configures LU (#892,
+same on development). With LU the welded base with the split finest takes 3 velocity
+iterations per linear solve at every band ratio 6 to 25 on the yielding lid, 3 to 16
+times fewer than any chain. Consequences for this plan: #892 is a fix for the dev hub's
+queue (after C or in it, Louis's call); the ribbon replay drops in priority if production
+moves off the chain; the convection and fault-multigrid guides and UWTN 2026-022's
+multigrid section wait on the ruling.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
