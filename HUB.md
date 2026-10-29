@@ -185,16 +185,15 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
-- Earth-like public demonstration setup: RULINGS 2026-10-29 (Louis). The continental crust is not inherently
-  stronger (compositionally weaker if anything, somewhat buoyant, thermally strong through its shallow geotherm):
-  uw_over_eta 1 or below, negative uw_over_dT, strength from the cold lid. The fault rheology ALWAYS wins
-  (entrained material is subducted; not this experiment's question). Crust and continental material at
-  significant depth have mantle rheology: factors off below a depth D, markers tracked (a distinct material
-  index for entrained crust). The mantle: do not stiffen the lower mantle; weaken the UPPER mantle through a
-  depth-dependent term with the lithosphere's viscosity anchored (the asthenosphere channel from the plate's base
-  to 670 km, lower mantle unchanged). Kaiju implements the mask, the depth gating and the channel setting, smokes
-  20 steps, delivers page and patch. Still Louis's: Ra if the channel does not restore the speed, the buoyancy
-  value, pres_rtol, the fixed ridge. Page so far https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw.
+- Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
+  upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
+  Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
+  speed; fault forms ~step 5, dip 55->36, slip 600-1400; 4-7 Newton its, 100-260 s/step; a bright shear ring at
+  the channel base; no crust/continent overlap, fault-to-continent 0.048 against the band's 0.016. Page v2
+  https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw. **Choices for Louis**: the marker gate depth D (kaiju proposes
+  0.12 d, the plate's thermal base and channel top; 0.05 d ~145 km is the alternative); Ra if the remaining speed
+  gap matters; the buoyancy value; pres_rtol; the fixed ridge; a distinct render colour for entrained material
+  (renderer change) if wanted.
 - Graded, relaxed base mesh (Louis, 2026-10-28): AGREED; UNASSIGNED since the laptop went inactive (kaiju could
   take it after the Earth setup). The laptop was to design and implement a lithosphere-graded
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
@@ -1180,3 +1179,6 @@ frozen as the hand-over state; they are not updated here after this date.
   only thermally); fault rheology always wins; crust and continent at depth have mantle rheology but stay tracked;
   weaken the upper mantle (asthenosphere channel, lithosphere anchored) instead of stiffening the lower mantle.
   Kaiju tasked.
+- 2026-10-29: Earth patch 1/2 pushed (fault precedence -uw_fault_precedence 1, DG0 band mask zeroing crust, continent
+  and slab factors in the band and zone; -uw_marker_rheo_depth D with tanh fade; both off by default; blob e2d2595
+  as kaiju's). Patch 2/2 (-uw_scaled, the units check, rebased) awaited. Smoke 3 results above.
