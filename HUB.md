@@ -207,6 +207,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   reimaged and out of the loop until Louis says otherwise. On #457 (closed by #493/#748): noted for the TI-fault
   comparison; kaiju's build is `feature/box-faults-warm` 99259d35, so whether those fixes are in it is the question,
   not the issue's state; kaiju will check its base. No new library defects beyond the list above.
+- 2026-10-29, to the dev hub, library one-liner: `constitutive_models.py:3639-3647` (at 547c2e54) still carries a
+  "TODO(BUG): the CONSISTENT (Newton) tangent of this model is inconsistent ... TI Newton runs at Picard pace
+  (#457)" comment on `TransverseIsotropicFlowModel`, written 2026-07-29 (04379583) before the #493 fix and never
+  removed. Kaiju confirmed both its builds contain 22aae82c (#493) and 0b6c9624 (#748). Stale comment to delete;
+  it misled kaiju's TI design report.
 - 2026-10-29, to the docs hub: nothing new; the compute side of the notes figures (fault_mg/uwtn_*,
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
@@ -288,7 +293,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   wall-stub is a stop-gap; kaiju designs a robust fit (anchored at the trench, lower envelope of the crust
   cluster to the cap, monotone in depth, smooth, deterministic between detections, stored = placed geometry),
   tests it offline on the stored checkpoints where the parabola failed and succeeded (artifact), then
-  implements behind a flag. The demo rerun waits for it. Earlier detail:
+  implements behind a flag. The demo rerun waits for it. **Louis, to kaiju directly, 2026-10-29:** (1) fit a
+  flexural profile through the crust and subduction zone, "close to the shape we expect to see"; (2) a continent
+  colliding with the subduction zone is a valid case, not to be avoided forever, and the fault detection must
+  still work there; the fit is today a special case for one slab in an annulus, a general case (new faults forming,
+  several slabs, ultimately 3D) will be needed, not a priority, but "don't optimise the fitting so much that it is
+  not possible to generalise." Kaiju folds both in: a flexural candidate tested offline beside the envelope trace,
+  and a generality section in the proposal. Earlier detail:
 - Crust-base fit, two driver items (kaiju 2026-10-29): the fit fails at about a third of late detections
   in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
   lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
@@ -317,8 +328,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   eta_1 0.2-0.3 at w = W = 0.008; eta_0 the host law without the crust factor. Run: TBti = TBf + TI flags, stopped at
   the base, against TBf and a TBc twin (TB predates the crust sampling); slip by a velocity-jump probe on both;
   cost compared from step 10. Decide: f_b, eta_1/w, w, the mask rule, and whether the #457 tangent fix comes first for a fair cost
-  comparison (dev hub 2026-10-29: #457 is CLOSED, fixed in #493 and #748; the question is whether kaiju's
-  library build `feature/box-faults-warm` carries them; kaiju asked to check).
+  comparison (RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
+  TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -1315,3 +1327,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   handed over the library-fix rows of "Open work" (hand-over section above, pointer row in the table); answered in
   this file's new "For the other hubs" section. #850-#854 merged (were listed open here); #457 closed (bears on
   the TI comparison; kaiju to check its build). Hubs coordinate through files: cloud-to-cloud messaging is refused.
+- 2026-10-29: kaiju: #457 fixes present in both library builds (finding only); TI design report corrected; stale
+  TODO(BUG) comment on TransverseIsotropicFlowModel recorded as a library one-liner for the dev hub. Louis to kaiju
+  on the crust fit: try a flexural profile; keep the fit generalisable (several faults/slabs, continent at the
+  trench, 3D); recorded under the crust-base fit decision.
