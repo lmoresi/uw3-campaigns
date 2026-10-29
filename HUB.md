@@ -241,7 +241,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (straight split fault, linear host, simple shear, tractions vs the frictionless answer). Result will be
   recorded here as a finding or cleared. **CLEARED 2026-10-30:** the probe (page 9Au3HFWLqkHt2geWohQpYa, script
   kaiju-launch/ti/split_probe/) shows the split contact frictionless at np 1 and 4; the normal-traction asymmetry
-  was the estimate's artefact and does not appear in a linear host. Close the "to check".
+  was the estimate's artefact and does not appear in a linear host. Close the "to check". **REOPENED 2026-10-30:**
+  a straight box cannot show it; on an arc or a kinked cut in the same box the per-node contact normals give a
+  normal-traction jump across the faces (+0.03/-0.14 of tau_inf on the arc) and one-face shear, and smoothed
+  normals remove both. Same signature as the annulus (-0.4/+0.3 of yield on a strongly curved polyline). This is
+  now a probable LIBRARY FINDING: the split contact's normals on a non-straight trace (per-node, default) partly
+  lock a frictionless contact; the smoothed trace normal (add_fault normal="trace") restores it. Repro:
+  kaiju-launch/ti/split_probe/ (arc and kinked cases). Annulus confirmation (job 2423) pending; bears on #889/#890
+  and every faulted annulus result.
+- 2026-10-30, to the dev hub, two more library notes from kaiju: (i) TransverseIsotropicVEPFlowModel used purely
+  viscous (mu = inf) demands a timestep and is unguarded at rest (tau_y/(2 gdot) -> NaN because
+  strainrate_inv_II_min defaults to 0), so a cold start from a checkpoint produces a garbage step; (ii) a split
+  run hung after a checkpoint with "evaluate() is rank-local" warnings (job 2413, after writing checkpoint 41), to
+  be reproduced before filing.
 - 2026-10-30, to the dev hub, FEATURE REQUEST (from the science hub, evidence on the probe page): surface-breaking
   split faults. `fault_split` refuses a cut that touches the domain boundary ("Only strictly interior faults, with
   both tips inside the mesh, are supported in this version"), so a subduction megathrust is necessarily a buried
@@ -628,7 +640,27 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (-uw_ti_model vep; director as a column, 4c09942) 5 steps from TAti_smooth checkpoint 5; 2413 the bridge smoke on
   the reference law (split + -uw_bridge_ti 1 -uw_ti_model linear, eta_1 = 1e-3 eta_0 over the bridge on the
   yielding host), TAf checkpoint 40, chain 0, 6 steps. Local commits b554cf4, 3d82360, 4c09942 on kaiju/ti-smooth
-  over 67dd2c8; patches with the results. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  over 67dd2c8; patches with the results. **RESULTS (kaiju, 2026-10-30):** tangent oracle: VP host 6.7e-11, hand
+  smooth band 8.0e-11, linear eta_1 = 0.01 eta_0 1.5e-10 (hand hard still running): the TI TANGENT IS CONSISTENT,
+  the stagnation is not a tangent bug. Library TI VEP model (2418): needs the director as a column and a dummy
+  timestep (any VE class demands one even at mu = inf), then stalled warm (1.1e-2) and the cold retry started at
+  NaN (tau_y/(2 gdot) at rest; strainrate_inv_II_min defaults to 0): dev-hub note. TI band on the REFERENCE
+  linear law (eta_1 = 1e-3 eta_0, 2419, from TAf 40): also hard, 7-19 Newton, step 42 unconverged warm and cold,
+  slip 5060-7500 like L1: the Newton difficulty comes with a 1e-3-anisotropic band on this mesh, not with yield
+  (the reference script's TI was a small constant-director patch on the cap; ours is the whole curved band with
+  per-cell DG0 directors). Split + TI BRIDGE on the reference law (2413): step 41 vrms 1181.4 vs control 1182.6,
+  slip 1126 vs 1350, clean convergence: **the bridge is NOT the restraint** (Louis's point 2 answered: adding TI
+  to the surface changes nothing here; job then hung after checkpoint 41 with "evaluate() is rank-local"
+  warnings). **NEW PRIME SUSPECT: the split's per-node contact normals on a curved trace.** Box probes (pure
+  shear, a = 0.12, h 1/48; peak slip, |tau|/tau_inf on the faces, sigma_nn): straight 0.2308, 0.21/0.21, 0/-0.01;
+  arc default normals 0.2205, 0.30/0.18, +0.03/-0.14; arc smoothed normals 0.2260, 0.22/0.18; kinked (2 x 20 deg)
+  default 0.2007, 0.34/0.13; kinked smoothed 0.2200, 0.21/0.18. With per-node normals a non-straight frictionless
+  contact is partly locked (one-face shear, a normal-traction jump the contact should not allow); smoothed
+  normals restore the straight behaviour (+2.5-10 % slip). The annulus cut is strongly curved (dip ~70 -> 18) on a
+  polyline with default normals. Running 2423: the split from 40 at chain 0 with -uw_fault_normal trace (the
+  library's smoothed normal of the stored polyline). Local commits b554cf4 (-uw_ti_model vep), 3d82360
+  (-uw_bridge_ti), 4c09942 (VEP director column, -uw_ti_model linear), 9974022 (VEP timestep), 42a04fa
+  (-uw_fault_normal trace), all default off; patches with 2423. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1711,3 +1743,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   cap above the cut, no yield in the TI part); library TI tests pass on kaiju's build (no regression); stagnation
   is our hand-written yielding eta_1. Smokes 2412 (TI VEP model) and 2413 (split + TI bridge on the reference law)
   running. Test/example gap for purely viscous yielding TI recorded for the dev and docs hubs.
+- 2026-10-30: TI tangent consistent (oracle 1e-10); TI VEP model unusable as is (dev-hub note); TI band hard to
+  converge even on the linear reference law; the TI bridge changes nothing (bridge cleared). New prime suspect: the
+  split's per-node contact normals on a curved trace partly lock the contact (box repro on arc and kinked cuts);
+  "to check" reopened as a probable library finding; annulus confirmation with smoothed normals running (2423).
