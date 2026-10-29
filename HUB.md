@@ -161,7 +161,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 852c6aa (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 4aa798c (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -228,7 +228,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   +0.3 of the host yield; estimated from each side's velocity and the smoothed log10 eta field, 0.25w off the cut),
   where a contact must transmit it equally. May be the per-side pressure interpolation in the estimate. A
   library-side face traction from the contact constraint's reaction would settle it; worth a probe when the
-  fault-split PRs are reviewed. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
+  fault-split PRs are reviewed. UPDATE 2026-10-30: the bridge-zone explanation of the split's restraint tested
+  negative, so the contact constraint is the prime suspect; the science hub has kaiju running a minimal box probe
+  (straight split fault, linear host, simple shear, tractions vs the frictionless answer). Result will be
+  recorded here as a finding or cleared. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
@@ -247,7 +250,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   leak-fix overlay, np 16 exclusive, 12 h, at most 130 steps, checkpoints every 5, stop_at_base.sh (EVERY=5) stops
   one checkpoint after the tip reaches 0.95. Settings: D 0.12, Ra 2.386e7, buoyancy -0.5, continent x1 (deforms),
   -uw_pres_rtol 1e-2 (go given without comment; recorded in the README as the setting used), -uw_fault_fit envelope.
-  Expected 100-130 steps, 5-8 h; reports at the first checkpoints and at the end with the page.
+  **COMPLETE 2026-10-30 (page v7, top section: ring movie, frames, table; files figures_out/earth/run1/):** stopped
+  by Louis's rule at checkpoint 80 (tip 0.952 at 75; t 0.00038); 81 steps all converged, 6.8 Newton, 225 s/step,
+  5.1 h, 20 rebuilds. Gap 0.76 -> 0.64 d (continent edge 19.3 -> 9.8 deg, trench -6.7), no overlap, fault-continent
+  0.62 -> 0.51. Trench rolls back to -6.7 by step 55 then stalls; hinge -4.2; vrms 219 -> 980 (55) -> 651. Fault
+  found at every detection; dip settles 37-42; the floor bound 13 of 81 (data down to 28); max trench gap 0.133
+  against tol 0.15 (close); slip median 1382, max 4131. One build refused at step 55 (2S placement assembly
+  failure), guard kept the previous fault, step 56 rebuilt normally. Plateness by arc: fore-arc strip P10 1.00
+  throughout; continent 0.16 (deforming, as accepted); incoming plate 0.85 at step 20 then 0.17-0.30 from step 30
+  as it speeds up to 1000-1340.
 - Crust-fit locator: **SETTLED 2026-10-29 by the go on the Earth plan, which named the envelope**; flexure stays an
   offline overlay option. (Earlier framing: envelope trace or flexure+envelope for the demo rerun and the faulted runs?) Kaiju's offline results above. Hub's reading: the envelope wins on the evidence (40/40,
   monotone, 100x more stable to particle dropout, no free parameters at their bounds); the flexure gives the
@@ -479,7 +490,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   test approved behind a flag (bridge-own floor and regularisation, defaults = host, the split unchanged): the
   chain-0 control from 40 with the bridge at the TI L1 values; plus an offline count of how much of each
   faulted thermal run's fault lay in the bridge zone, since a locked top biases those results. The bridge
-  rheology for production is then Louis's split-side choice.** (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  rheology for production is then Louis's split-side choice.** **Bridge test NEGATIVE (job 2399, page v5):** with
+  the bridge at 0.0333/0.0333 the jump rose only 5-12 % (below bridge 3251 vs 2900; body 2313 vs 2203; tip 704
+  vs 652; TI L1 6607/5549/1735), the top-0.04 face traction did not drop, the one-sided shear is unchanged. The
+  bridge is not the restraint; the contact constraint is the next suspect. Flag applied as 4aa798c (default
+  unchanged). Bridge share of fault length in the thermal set: TAf 20 % (9-25), TA_age25f 19 % (9-23), TBf 19 %
+  (9-65; 65 % at 40-50 = the stale near-tangent parabola fault). **Hub asked kaiju for a minimal library probe:**
+  a box with one straight split fault, linear host, wall-driven simple shear, np 1 and 4; slip, tangential and
+  normal face tractions against the analytic frictionless answer; also with the cut reaching the wall. If the
+  contact carries shear it is a library defect with a two-minute repro for the dev hub (#889/#890). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1529,3 +1548,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   override its weakening); the crust-beside-the-fault guess not supported. One-smoke test with a bridge-own floor
   approved behind a flag; bridge-zone share of the faulted thermal runs' faults to be counted. Normal-traction
   asymmetry on the faces passed to the dev hub as "to check".
+- 2026-10-30: Earth production run 1 complete at the base (81 steps, 5.1 h; page v7). Bridge test negative (the
+  split's restraint is not the bridge zone); flag applied as 4aa798c; minimal split-contact probe asked of kaiju;
+  dev-hub item updated. TAti (2398) and TAf_env (2390) continue.
