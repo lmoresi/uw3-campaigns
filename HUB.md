@@ -135,6 +135,17 @@ frozen as the hand-over state; they are not updated here after this date.
 | UWTN 2026-020 Symbolic FEM and adjoint forms | PR #59 | review, green | wombat adjoint session | Louis's merge | CI green |
 | UWTN 2026-021 Adjoint forms in practice | `note/discrete-adjoint` 87fbcb1 | draft, held | wombat adjoint session | the viscosity-floor example's result | |
 
+## Artifacts (results viewable in the Claude app)
+
+| Set | Artifact |
+|---|---|
+| Compositional slab controls (12 runs: README table, trench_retreat, 12 movies, contact sheet) | https://claude.ai/artifact/HoPEFDDYo4BdiMK8D8Ubvh |
+| Compositional slab with a crust fault (4 faulted runs + B1: table, trench_retreat, 5 movies, segments; correction banner on the slip-at-rebuild sentence) | https://claude.ai/artifact/9jQDCwSQLrKvGduwdgtVG4 |
+| Normal-crust fault movie (compositional) | https://claude.ai/artifact/DJctapP4niLphKaazzJeK9 |
+| Unfaulted thermal slabs (TA, TB, TA_age25 movies) | https://claude.ai/artifact/1pBxnBkYEkHm1RZMLc3F5A |
+| Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
+| Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
+
 ## Open work
 
 | What | Where | State |
@@ -1119,3 +1130,7 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-29: velocity-ring renderer option pushed (20b50e8; renderer blob identical to kaiju's a7d339a): -uw_vring H
   draws the surface tangential velocity as a ring outside the outer wall on whole-annulus strain frames, trenchward
   positive, -uw_vring_vmax at height H; off by default.
+- 2026-10-29: kaiju published the backfill artifacts (slab_control, slab_fault, addon_demo) and an unfaulted-thermal
+  movies page; an Artifacts index is now a section of HUB.md. The slab_fault README's "each rebuild roughly halves
+  the slip" corrected in the committed copy on zg95-annulus-for-kaiju (two regimes, median 1.55 over 46 rebuilds);
+  kaiju to fix its figures_out copy.
