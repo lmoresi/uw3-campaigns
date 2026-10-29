@@ -276,3 +276,8 @@ Measured here, not inherited.
   (4698938f), opening stacked on #889; the datum-only continuation case measured and
   not a must-fix (#883 follows C). Journal: the follow-up measurement supersedes the
   morning's finding, the first use of `status: superseded`.
+- 2026-10-29 (evening): all three fault-split PRs open and mergeable: A #882, B #889,
+  C #890 (stacked on B). Twenty-three issues filed from the three reviews. The hub's
+  remaining items: re-pin UWTN 2026-018 and 2026-022 to #890's development merge
+  commit; the fault-multigrid guide's "what ships" section moves the split-level
+  hierarchy from pending to available once B merges.

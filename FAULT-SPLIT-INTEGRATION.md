@@ -220,6 +220,21 @@ forcing: Picard skipped, converged in 10 Newton iterations, no stall), so the
 `ThinSheet.solve(picard=N)` is a TypeError (#876). **C is pushed at 4698938f** and
 opens stacked on #889 when its final suites finish.
 
+**2026-10-29, all three PRs open**, each with its adversarial review as its first
+comment, all mergeable, CI pending:
+
+| | PR | head | base | suites |
+|---|---|---|---|---|
+| A | #882 | `bugfix/faulted-rebuild-leak-dev` | development | green but #826 |
+| B | #889 | `feature/fault-split-multigrid` | development | green but #826 |
+| C | #890 | `feature/fault-split-integration` 4698938f | `feature/fault-split-multigrid`; retarget to development when #889 merges | tier A 1498 passed; np 2 180, np 4 191 passed; #826 only |
+
+Merge order: #882, then #889 after it takes development with #882 in, then #890
+retargeted. Issues left open by the three reviews: #866 to #868 (A), #869 to #881 (B),
+#883 to #888 (C). After #890 merges: the notes' `software_version` moves to its
+development merge commit (the hub does this); kaiju's 30-step restart A/B can be built
+as an overlay from 4698938f now (the science hub's item).
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
