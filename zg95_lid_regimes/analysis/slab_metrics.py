@@ -68,6 +68,10 @@ def main():
         uw_plate_depth=0.12,        # and below the plates
         uw_neck=0.05,               # the neck band below the plates that locates the hinge
         uw_out="",
+        # physical columns: a units run (-uw_scaled 1) carries its scales in its state; for
+        # any other run they follow from these two (one velocity kappa/d, one time d^2/kappa)
+        uw_depth=uw.Param(2900.0, units="km", description="layer depth d"),
+        uw_kappa=uw.Param(1.0e-6, units="m**2/s", description="thermal diffusivity"),
     )
     runs = [os.path.expanduser(r) for r in str(params.uw_runs).split(",")]
     r_o, r_i = annulus_radii()
@@ -87,6 +91,14 @@ def main():
                       "V": uw.discretisation.MeshVariable("V", mesh, 2, degree=2)}
             slab_marker = uw.discretisation.MeshVariable("slab", mesh, 1, degree=1)
         hinge_0 = float(p["uw_theta_trench"])
+        with open(states[0]) as f:
+            scales = json.load(f).get("scales")
+        source = "the run's units"
+        if scales is None:
+            d, kappa = params.uw_depth, params.uw_kappa
+            scales = {"cm_per_yr": float((kappa / d).to("cm/year").magnitude),
+                      "Myr": float((d ** 2 / kappa).to("Myr").magnitude), "km": float(d.to("km").magnitude)}
+            source = f"d {d}, kappa {kappa}"
         rows = []
         for sp in states:
             trench = np.nan
@@ -130,6 +142,17 @@ def main():
             ax.set_title(title, fontsize=9)
         if np.isfinite([m["trench"] for m in rows]).any():
             axes[0].plot(t, [m["trench"] for m in rows], "--", lw=1.0, label=label + " trench")
+        # the physical columns
+        for m, rt in zip(rows, rate):
+            m.update({"t_Myr": m["t"] * scales["Myr"], "v_plate_cm_yr": m["v_plate"] * scales["cm_per_yr"],
+                      "hinge_rate": float(rt),
+                      "hinge_rate_km_Myr": float(rt) * scales["km"] / scales["Myr"],
+                      "tip_depth_km": m["tip_depth"] * scales["km"], "chord_km": m["chord"] * scales["km"]})
+        print(f"  physical ({source}: one velocity {scales['cm_per_yr']:.4g} cm/yr, one time {scales['Myr']:.4g} Myr)")
+        print("  step   t(Myr)  v_plate(cm/yr)  hinge_rate(km/Myr)  tip_depth(km)  chord(km)")
+        for m in rows:
+            print(f"  {m['step']:4d} {m['t_Myr']:8.2f} {m['v_plate_cm_yr']:14.3f} {m['hinge_rate_km_Myr']:18.2f} "
+                  f"{m['tip_depth_km']:13.0f} {m['chord_km']:10.0f}")
         with open(os.path.join(run, "slab_metrics.json"), "w") as f:
             json.dump(rows, f, indent=1)
     for ax in axes:

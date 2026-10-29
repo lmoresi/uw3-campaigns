@@ -74,24 +74,29 @@ def lower_mantle_factor(depth, factor, top, ramp):
 
 
 def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1,
-                     asthenosphere=None, lower_mantle=None):
+                     asthenosphere=None, lower_mantle=None, eta_ref=None):
     """Temperature-dependent viscosity capped by a yield stress that grows with depth
     below the outer wall. ``weak`` (1 by default) multiplies both the viscosity and
     the yield stress, for a weak zone; ``yield_factor`` multiplies the yield stress
     alone (strain weakening); ``asthenosphere`` = (factor, top, bottom, ramp) multiplies
     the viscosity by ``factor`` in a depth channel (see ``asthenosphere_factor``);
     ``lower_mantle`` = (factor, top, ramp) multiplies it below ``top`` (see
-    ``lower_mantle_factor``). Returns eta(T) with those factors, the viscosity the yield
-    law caps."""
+    ``lower_mantle_factor``). ``eta_ref`` (a units run): the viscosity at the basal
+    temperature as an expression with units, which then also floors the viscosity;
+    ``tau0`` and ``tau1`` are then a stress and a stress per length, and the solver
+    non-dimensionalises all three. Returns eta(T) with those factors, the viscosity the
+    yield law caps."""
     depth = r_o - radius_of(stokes.mesh)
     eta_T = sympy.exp(sympy.log(deta) * (1 - T_sym))
     if asthenosphere is not None:
         eta_T = eta_T * asthenosphere_factor(depth, *asthenosphere)
     if lower_mantle is not None:
         eta_T = eta_T * lower_mantle_factor(depth, *lower_mantle)
+    if eta_ref is not None:
+        eta_T = eta_ref * eta_T
     stokes.constitutive_model = uw.constitutive_models.ViscoPlasticFlowModel
     stokes.constitutive_model.Parameters.shear_viscosity_0 = eta_T * weak
-    stokes.constitutive_model.Parameters.shear_viscosity_min = 1
+    stokes.constitutive_model.Parameters.shear_viscosity_min = 1 if eta_ref is None else eta_ref
     stokes.constitutive_model.Parameters.yield_stress = (tau0 + tau1 * depth) * weak * yield_factor
     stokes.constitutive_model.yield_softness = softness
     return eta_T

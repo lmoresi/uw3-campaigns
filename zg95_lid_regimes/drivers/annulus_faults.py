@@ -247,6 +247,43 @@ params = uw.Params(
     uw_ckpt_every=10,
 )
 
+# The scaled mode (-uw_scaled 1; off by default, and then nothing below changes): the
+# physical parameters are given as quantities and the solvers non-dimensionalise
+# themselves through the units system (docs/developer/design/UNITS_SIMPLIFIED_DESIGN_2025-11.md,
+# ND_UNITS_BOUNDARY_CONTRACT.md): the model's reference quantities are the layer depth,
+# the thermal diffusivity, the basal viscosity and the temperature drop, so one length is
+# d, one time d^2/kappa, one stress eta_ref kappa/d^2 and one temperature dT; Ra, tau0,
+# tau1 and H follow from the quantities and are printed, and -uw_ra, -uw_tau0, -uw_tau1 and
+# -uw_heating are not used. The fields (T in units of dT above the surface, V, the
+# geometry parameters in layer depths, the times uw_age_*, uw_heal_time ...) stay in
+# model units, which the boundary contract allows; the records gain physical columns.
+# The defaults reproduce TA's Ra 2.386e7, tau0 1.789e6, tau1 2.386e8 and H 1.4175 with
+# d 2900 km, kappa 1e-6 m^2/s, rho 3300 kg/m^3, alpha 3e-5 /K, g 9.81 m/s^2, dT 2500 K.
+SCALED = bool(uw.Params(uw_scaled=0).uw_scaled)
+units = None
+if SCALED:
+    units = uw.Params(
+        uw_depth=uw.Param(2900.0, units="km", description="layer depth d (the length scale)"),
+        uw_kappa=uw.Param(1.0e-6, units="m**2/s", description="thermal diffusivity"),
+        uw_eta_ref=uw.Param(2.481805627619447e21, units="Pa*s",
+                            description="viscosity at the basal temperature (the viscosity scale)"),
+        uw_dT=uw.Param(2500.0, units="K", description="temperature drop across the layer"),
+        uw_rho=uw.Param(3300.0, units="kg/m**3", description="reference density"),
+        uw_alpha=uw.Param(3.0e-5, units="1/K", description="thermal expansivity"),
+        uw_gravity=uw.Param(9.81, units="m/s**2", description="gravity"),
+        uw_yield_0=uw.Param(527.9370116303437, units="MPa", description="yield stress at the surface"),
+        uw_yield_grad=uw.Param(24.27975, units="MPa/km", description="yield stress gradient with depth"),
+        uw_heat_rate=uw.Param(13.297532104637336, units="K/Gyr",
+                              description="internal heating as a rate of temperature rise"),
+        uw_units_dt_local=0,    # 1: the step-size estimates computed here from model-unit coordinates
+                                #   (CHECK ONLY: the library's direction-aware crossing time and first
+                                #   accuracy estimate read dimensional mesh coordinates in a units model)
+    )
+    orchestration_model = uw.get_default_model()
+    orchestration_model.set_reference_quantities(
+        length=units.uw_depth, diffusivity=units.uw_kappa, viscosity=units.uw_eta_ref,
+        temperature=units.uw_dT)
+
 out = os.path.expanduser(params.uw_out)
 os.makedirs(out, exist_ok=True)
 r_o, r_i = annulus_radii()
@@ -320,15 +357,67 @@ def comp_factor_on(marker_sym, eta, mask=0, window=1):
     return 1 + (eta - 1) * clamp01(marker_sym) * window * (1 - mask)
 
 
-Ra = uw.expression(r"\mathrm{Ra}", params.uw_ra, "Rayleigh number on the basal viscosity")
-deta = uw.expression(r"\Delta\eta", params.uw_deta, "viscosity contrast across the layer")
-tau0 = uw.expression(r"\tau_0", params.uw_tau0, "yield stress at the surface")
-tau1 = uw.expression(r"\tau_1", params.uw_tau1, "yield stress gradient with depth")
-H = uw.expression(r"H", params.uw_heating, "internal heating rate")
+eta_ref = None
+if not SCALED:
+    Ra = uw.expression(r"\mathrm{Ra}", params.uw_ra, "Rayleigh number on the basal viscosity")
+    deta = uw.expression(r"\Delta\eta", params.uw_deta, "viscosity contrast across the layer")
+    tau0 = uw.expression(r"\tau_0", params.uw_tau0, "yield stress at the surface")
+    tau1 = uw.expression(r"\tau_1", params.uw_tau1, "yield stress gradient with depth")
+    H = uw.expression(r"H", params.uw_heating, "internal heating rate")
+    heating = params.uw_heating
+else:
+    # the physical parameters; the buoyancy of one unit of T (rho alpha g dT) takes Ra's
+    # place in the body force, and the solver's unwrap non-dimensionalises every one
+    deta = uw.expression(r"\Delta\eta", params.uw_deta, "viscosity contrast across the layer")
+    eta_ref = uw.expression(r"\eta_r", units.uw_eta_ref, "viscosity at the basal temperature")
+    kappa = uw.expression(r"\kappa", units.uw_kappa, "thermal diffusivity")
+    rho0 = uw.expression(r"\rho_0", units.uw_rho, "reference density")
+    alpha = uw.expression(r"\alpha", units.uw_alpha, "thermal expansivity")
+    gravity = uw.expression(r"g", units.uw_gravity, "gravity")
+    delta_T = uw.expression(r"\Delta T", units.uw_dT, "temperature drop across the layer")
+    Ra = rho0 * alpha * gravity * delta_T
+    tau0 = uw.expression(r"\tau_0", units.uw_yield_0, "yield stress at the surface")
+    tau1 = uw.expression(r"\tau_1", units.uw_yield_grad, "yield stress gradient with depth")
+    H = uw.expression(r"H", units.uw_heat_rate, "internal heating as a rate of temperature rise")
+
+    def _nd(value):
+        """A plain float in model units, through the library's crossing."""
+        return float(uw.non_dimensionalise(value))
+
+    def _solver_sees(expr):
+        """The number the solver's kernels see for ``expr`` (the unwrap the JIT uses)."""
+        return float(uw.function.expressions.unwrap_expression(expr, mode="nondimensional"))
+
+    def _phys(value, dims, unit):
+        """``value`` in model units as a float in ``unit`` (dims: Pint dimensionality)."""
+        return float(uw.dimensionalise(float(value), dims).to(unit).magnitude)
+
+    VEL, TIME, LEN, STRESS = ({"[length]": 1, "[time]": -1}, {"[time]": 1}, {"[length]": 1},
+                              {"[mass]": 1, "[length]": -1, "[time]": -2})
+    heating = _solver_sees(H)
+    # Ra from the quantities: their product is dimensionless but carries km^3 / m^3, which
+    # uw.non_dimensionalise does not reduce (it returns 0.02386 for TA's 2.386e7), so Pint's .to
+    _ra_q = (units.uw_rho * units.uw_alpha * units.uw_gravity * units.uw_dT
+             * units.uw_depth ** 3 / (units.uw_kappa * units.uw_eta_ref))
+    derived = {
+        "Ra": float(_ra_q.to("dimensionless").magnitude), "Ra_non_dimensionalise": _nd(_ra_q),
+        "Ra_solver": _solver_sees(Ra), "tau0": _solver_sees(tau0), "tau1": _solver_sees(tau1),
+        "H": heating, "deta": float(params.uw_deta), "eta_ref_solver": _solver_sees(eta_ref),
+        "kappa_solver": _solver_sees(kappa)}
+    scales = {"cm_per_yr": _phys(1.0, VEL, "cm/year"), "Myr": _phys(1.0, TIME, "Myr"),
+              "km": _phys(1.0, LEN, "km"), "MPa": _phys(1.0, STRESS, "MPa")}
+    uw.pprint("scaled run: reference quantities "
+              + ", ".join(f"{k} {getattr(units, k)}" for k in ("uw_depth", "uw_kappa", "uw_eta_ref", "uw_dT")))
+    uw.pprint("  derived (what the solver sees): " + ", ".join(f"{k} {v:.17g}" for k, v in derived.items()))
+    uw.pprint("  one model unit is: " + ", ".join(f"{v:.6g} {k}" for k, v in scales.items()))
+    uw.pprint(f"  plate age {params.uw_age_sub:g} = {_phys(params.uw_age_sub, TIME, 'Myr'):.4g} Myr, "
+              f"plate thickness 2 sqrt(age) = {_phys(2 * np.sqrt(params.uw_age_sub), LEN, 'km'):.4g} km; "
+              f"interior viscosity (T {params.uw_T_interior:g}) deta^{1 - params.uw_T_interior:g} eta_ref = "
+              f"{float(params.uw_deta) ** (1 - params.uw_T_interior):.4g} x eta_ref")
 
 adv = uw.systems.AdvDiffusion(base, T_b, V_b.sym, order=1)
 adv.constitutive_model = uw.constitutive_models.DiffusionModel
-adv.constitutive_model.Parameters.diffusivity = 1
+adv.constitutive_model.Parameters.diffusivity = kappa if SCALED else 1
 adv.f = H
 
 
@@ -378,6 +467,24 @@ trench_advect = bool(params.uw_trench_advect) or params.uw_fault_law == "rate"
 
 def onto(points):
     return clamp_radii(np.asarray(points, dtype=float), r_o, r_i, inset=1.0e-10)
+
+
+def model_xy(var):
+    """A mesh variable's DOF coordinates in model units (layer depths), the coordinates
+    the DM, evaluate and this driver's geometry work in: ``.coords``, which a units run
+    makes dimensional, so there ``.coords_nd``."""
+    return var.coords_nd if SCALED else var.coords
+
+
+def swarm_xy():
+    """The particles' coordinates in model units: ``crust_swarm.coords``, which a units run
+    makes dimensional (a Pint array in metres), so there the model-unit store its docstring
+    names, ``_particle_coordinates.data``: the swarm has no ``coords_nd``, and
+    uw.non_dimensionalise(crust_swarm.coords) raises TypeError ("only 0-dimensional arrays
+    can be converted to Python scalars", units.py:888)."""
+    if SCALED:
+        return np.asarray(crust_swarm._particle_coordinates.data, dtype=float)
+    return crust_swarm.coords
 
 
 def wrap(angle):
@@ -635,7 +742,7 @@ def crust_base_curve(faults, cap):
     in ten sit above the curve), which is the base. Needs the cloud to reach the cap.
     Collective. Returns the curve as a function of distance along its axis (increasing
     with depth) and the start of the fitted range, or None."""
-    xy = np.asarray(crust_swarm.coords, dtype=float)
+    xy = np.asarray(swarm_xy(), dtype=float)
     marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
     depth = r_o - np.hypot(xy[:, 0], xy[:, 1])
     sel = (marker > 0.5) & (depth > 1.25 * crust_thick) & (depth <= cap + 2.0 * crust_thick)
@@ -798,7 +905,7 @@ class FaultedMesh:
         self.over = (uw.discretisation.MeshVariable(f"over_{tag}", mesh, 1, degree=1, continuous=False)
                      if over_on else None)
         # Each fault's bridge: its band cells outside its split's upper tip.
-        centroids = np.asarray(self.zone.coords)
+        centroids = np.asarray(model_xy(self.zone))
         radius = np.hypot(centroids[:, 0], centroids[:, 1])
         bridge = np.zeros(len(centroids), dtype=bool)
         if band is None:
@@ -832,9 +939,12 @@ class FaultedMesh:
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
                                       r_o, weak, yield_factor, asthenosphere=asth,
                                       lower_mantle=((params.uw_lm_eta, params.uw_lm_depth, params.uw_lm_ramp)
-                                                    if params.uw_lm_eta != 1 else None))
+                                                    if params.uw_lm_eta != 1 else None),
+                                      eta_ref=eta_ref)
         if params.uw_eta_reg > 0:
-            s.constitutive_model.Parameters.plastic_rate_strengthening = params.uw_eta_reg
+            # in a units run a viscosity: uw_eta_reg times the basal viscosity
+            s.constitutive_model.Parameters.plastic_rate_strengthening = (
+                params.uw_eta_reg * eta_ref if SCALED else params.uw_eta_reg)
         buoyancy = params.uw_buoy_T * self.T.sym[0]
         if comp_on:                # the slab's fixed temperature deficit, carried by the particles
             buoyancy = buoyancy - params.uw_comp_dT * clamp01(self.slab.sym[0])
@@ -865,7 +975,7 @@ class FaultedMesh:
         self.edot_projection = uw.systems.Projection(mesh, self.edot_p)
         self.edot_projection.uw_function = cm._strainrate_inv_II * sympy.Max(
             0, 1 - eta_eff / (self.eta_T * weak))
-        self.diagnostics = AnnulusDiagnostics(T_b, self.v, eta_eff, self.eta_T, params.uw_heating)
+        self.diagnostics = AnnulusDiagnostics(T_b, self.v, eta_eff, self.eta_T, heating)
         self.t_build = time.perf_counter() - wall
         level_cells = [int(uw.utilities.gather_data(m.dm.getHeightStratum(0)[1], bcast=True).sum())
                        for m in self.levels + [mesh]]
@@ -907,9 +1017,9 @@ class FaultedMesh:
                 points = points + self.split_nudges(var)
             return np.asarray(uw.function.global_evaluate(source.sym, onto(points)))
 
-        self.v.array[:, 0, :] = at(self.v, V, self.v.coords).reshape(-1, 2)
+        self.v.array[:, 0, :] = at(self.v, V, model_xy(self.v)).reshape(-1, 2)
         if P is not None:
-            self.p.array[:, 0, 0] = at(self.p, P, self.p.coords).ravel()
+            self.p.array[:, 0, 0] = at(self.p, P, model_xy(self.p)).ravel()
         self.has_guess = True
 
     def _stokes_solve(self, from_rest):
@@ -920,13 +1030,13 @@ class FaultedMesh:
     def solve(self):
         wall = time.perf_counter()
         self.T.array[:, 0, 0] = np.asarray(
-            uw.function.global_evaluate(T_b.sym[0], onto(self.T.coords))).ravel()
+            uw.function.global_evaluate(T_b.sym[0], onto(model_xy(self.T)))).ravel()
         self.gamma.array[:, 0, 0] = np.asarray(
-            uw.function.global_evaluate(gamma_b.sym[0], onto(self.gamma.coords))).ravel()
+            uw.function.global_evaluate(gamma_b.sym[0], onto(model_xy(self.gamma)))).ravel()
         for name, (var, _, _) in markers.items():
             mine = getattr(self, name)
             mine.array[:, 0, 0] = np.asarray(
-                uw.function.global_evaluate(var.sym[0], onto(mine.coords))).ravel()
+                uw.function.global_evaluate(var.sym[0], onto(model_xy(mine)))).ravel()
         t_transfer = time.perf_counter() - wall
         start = "cold" if not self.has_guess else "warm"
         with warnings.catch_warnings(record=True) as caught:
@@ -961,10 +1071,10 @@ class FaultedMesh:
     def to_base(self, slips=None):
         slips = slips or {}
         V_b.array[:, 0, :] = np.asarray(
-            uw.function.global_evaluate(self.v.sym, onto(V_b.coords))).reshape(-1, 2)
+            uw.function.global_evaluate(self.v.sym, onto(model_xy(V_b)))).reshape(-1, 2)
         self.edot_projection.solve()
         edot = np.asarray(uw.function.global_evaluate(
-            self.edot_p.sym[0], onto(edot_p_b.coords))).ravel()
+            self.edot_p.sym[0], onto(model_xy(edot_p_b)))).ravel()
         edot_p_b.array[:, 0, 0] = np.maximum(edot, 0.0)
         if params.uw_fault_damage > 0:
             self.fault_damage(slips)
@@ -973,7 +1083,7 @@ class FaultedMesh:
         """The damage a fault does to its surroundings: at rate uw_fault_damage x its slip,
         within one band width of its line, from the trench to one band width past the
         tip, so the band ahead of the tip saturates and the next fit lengthens the fault."""
-        pts = np.asarray(fault_damage_b.coords)
+        pts = np.asarray(model_xy(fault_damage_b))
         rate = np.zeros(len(pts))
         for f in self.faults:
             spine, _ = self.pieces[f["name"]]
@@ -988,9 +1098,9 @@ class FaultedMesh:
         self.eta_projection.solve()
         self.ratio_projection.solve()
         log_eta_b.array[:, 0, 0] = np.asarray(
-            uw.function.global_evaluate(self.log_eta.sym[0], onto(log_eta_b.coords))).ravel()
+            uw.function.global_evaluate(self.log_eta.sym[0], onto(model_xy(log_eta_b)))).ravel()
         yield_ratio_b.array[:, 0, 0] = np.asarray(
-            uw.function.global_evaluate(self.yield_ratio.sym[0], onto(yield_ratio_b.coords))).ravel()
+            uw.function.global_evaluate(self.yield_ratio.sym[0], onto(model_xy(yield_ratio_b)))).ravel()
 
 
 def sample(th, dep, xy):
@@ -1119,7 +1229,7 @@ def write_solver_fields(faulted, step):
     faulted.mesh.write(os.path.join(out, files["mesh"]))
     for name, var in (("V", faulted.v), ("P", faulted.p)):
         values = var.array[:, 0, :]
-        xy = uw.utilities.gather_data((np.asarray(var.coords) + faulted.split_nudges(var)).ravel())
+        xy = uw.utilities.gather_data((np.asarray(model_xy(var)) + faulted.split_nudges(var)).ravel())
         vals = uw.utilities.gather_data(values.ravel())
         files[name] = f"annulus.solver_mesh.{name}.{step:05d}.h5"
         with uw.selective_ranks(0) as selected:
@@ -1140,7 +1250,7 @@ def read_solver_fields(faulted, files):
     for name, var in (("V", faulted.v), ("P", faulted.p)):
         with h5py.File(os.path.join(out, files[name]), "r") as h:
             xy, values = h["coords"][...], h["values"][...]
-        dist, idx = cKDTree(xy).query(np.asarray(var.coords) + faulted.split_nudges(var))
+        dist, idx = cKDTree(xy).query(np.asarray(model_xy(var)) + faulted.split_nudges(var))
         var.array[:, 0, :] = values[idx]
         worst = max(worst, float(dist.max()) if len(dist) else 0.0)
     faulted.has_guess = True
@@ -1152,7 +1262,7 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
     for var, picture, _ in markers.values():
         picture.array[:, 0, 0] = np.asarray(
-            uw.function.global_evaluate(var.sym[0], onto(picture.coords))).ravel()
+            uw.function.global_evaluate(var.sym[0], onto(model_xy(picture)))).ravel()
         mesh_vars.append(picture)
     if swarm_on:
         crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
@@ -1178,7 +1288,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
                            "traces": [faulted.pieces[f["name"]][1].tolist() for f in faulted.faults],
                            # what steers the next decisions (restored_decisions)
                            "decisions": dict(decisions, built=faulted.faults),
-                           "solver_checkpoint": solver_files, "checkpoint_files": needed},
+                           "solver_checkpoint": solver_files, "checkpoint_files": needed,
+                           **({"units": units.to_dict(), "derived": derived, "scales": scales} if SCALED else {})},
                           f, indent=1, default=str)
     write_records(records)
 
@@ -1456,14 +1567,14 @@ def refill_crust():
     cand = crust_layer_points(spacing, surface_only=True)
     is_crust = np.asarray(uw.function.global_evaluate(crust_var.sym[0], cand)).ravel() >= 0.5
     cand = cand[is_crust]
-    xy = np.asarray(crust_swarm.coords, dtype=float).reshape(-1, 2)
+    xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
     old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
     mine = xy[old["crust"] > 0.5]
     if len(mine) and len(cand):
         cand = cand[cKDTree(mine).query(cand)[0] > 0.75 * spacing]
     added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
     if added:
-        new_xy = np.asarray(crust_swarm.coords, dtype=float).reshape(-1, 2)[-added:]
+        new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
         nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
         for name, (var, _, _) in markers.items():
             if name == "crust":
@@ -1482,7 +1593,7 @@ def seed_swarm():
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
     for var, _, geometry in markers.values():
-        var.array[:, 0, 0] = geometry(crust_swarm.coords)
+        var.array[:, 0, 0] = geometry(swarm_xy())
         var._update()
 
 
@@ -1498,12 +1609,12 @@ def restore_swarm(path, index):
         if os.path.exists(os.path.join(path, f"annulus.crust_swarm.{name}.{index:05d}.h5")):
             var.read_timestep("annulus", "crust_swarm", name, index, outputPath=path)
         else:
-            var.array[:, 0, 0] = geometry(crust_swarm.coords)
+            var.array[:, 0, 0] = geometry(swarm_xy())
         var._update()
 
 
 if params.uw_init == "slab" and params.uw_restart < 0:     # a restart of a slab run reads its checkpoint
-    T_b.array[:, 0, 0] = slab_temperature(T_b.coords)
+    T_b.array[:, 0, 0] = slab_temperature(model_xy(T_b))
     V_b.array[:, 0, :] = 0.0
     if swarm_on:
         seed_swarm()
@@ -1607,8 +1718,10 @@ elif params.uw_restart >= 0:
     # pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
     faulted.warm_start(V_b)
     restart_transfer = "base_V"
-uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {params.uw_ra:.4g}, tau1/Ra "
-          f"{params.uw_tau1 / params.uw_ra:.3g}, tau0 {params.uw_tau0:.4g}, H {params.uw_heating:.4g}, "
+_ra, _tau0, _tau1, _H = ((derived["Ra_solver"], derived["tau0"], derived["tau1"], heating) if SCALED
+                         else (params.uw_ra, params.uw_tau0, params.uw_tau1, params.uw_heating))
+uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
+          f"{_tau1 / _ra:.3g}, tau0 {_tau0:.4g}, H {_H:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
           f"{len(faults)} fault(s); "
           + (f"ridge x{params.uw_ridge_weak:g} at {', '.join(f'{np.degrees(a):.1f}' for a in ridges)} deg "
@@ -1679,6 +1792,8 @@ def write_run_info():
             "petsc": ".".join(str(v) for v in PETSc.Sys.getVersion()), "argv": sys.argv,
             "params": params.to_dict(), "restart_from": int(params.uw_restart) if params.uw_restart >= 0 else None,
             "slurm_job": os.environ.get("SLURM_JOB_ID")}
+    if SCALED:
+        info.update({"units": units.to_dict(), "derived": derived, "scales": scales})
     path = os.path.join(out, "run_info.json")
     runs = []
     if os.path.exists(path):
@@ -1708,6 +1823,52 @@ def needs_rebuild(faults, built):
                 or abs(f["depth"] - g["depth"]) > 2 * S):
             return True
     return False
+
+
+def local_dt_estimates():
+    """CHECK ONLY (-uw_units_dt_local 1 in a units run): the two step-size estimates of the
+    time loop, the library's own (AdvDiffusion.estimate_dt: the accuracy step and the
+    direction-aware cell-crossing time), computed the library's way but from model-unit
+    coordinates. In a units run the library takes np.asarray(mesh.X.coords), which is
+    dimensional there (metres), as model units: the crossing time comes out 2.9e6 times
+    too long, and the first accuracy estimate evaluates the velocity at points outside
+    the mesh. Non-dimensional throughout; returns (dt_accuracy before uw_dt_mult, dt_adv)."""
+    from mpi4py import MPI
+    from underworld3.function.gradient_evaluation import compute_clement_gradient_at_nodes
+    from underworld3.meshing.smoothing import _tri_cells
+    from underworld3.systems.solvers import _centroid_velocities_nd
+    comm = uw.mpi.comm
+    coords = np.asarray(uw.non_dimensionalise(base.X.coords), dtype=float)
+    if coords.size and abs(np.hypot(coords[:, 0], coords[:, 1]).max() - r_o) > 1e-6 * r_o:
+        raise RuntimeError("non-dimensionalised mesh coordinates are not in layer depths")
+    # the accuracy step: the field's range over its largest rate of change
+    if adv._last_change_rate is not None:
+        dt_acc = _nd(adv.estimate_dt())
+    else:
+        values = np.asarray(adv.u.array).reshape(-1)
+        lo = comm.allreduce(float(values.min()) if values.size else np.inf, op=MPI.MIN)
+        hi = comm.allreduce(float(values.max()) if values.size else -np.inf, op=MPI.MAX)
+        n = coords.shape[0]
+        local = 0.0
+        if n:
+            grad = np.asarray(compute_clement_gradient_at_nodes(adv.u), dtype=float).reshape(n, -1)
+            vel = np.asarray(uw.function.evaluate(adv.V_fn, coords), dtype=float).reshape(n, -1)
+            local = float(np.abs((vel[:, :grad.shape[1]] * grad).sum(axis=1)).max())
+        rate = comm.allreduce(local, op=MPI.MAX)
+        dt_acc = 0.02 * (hi - lo) / rate if rate > 0.0 and hi > lo else np.inf
+    # the direction-aware crossing time
+    vel = _centroid_velocities_nd(adv.V_fn, base)
+    speed = np.linalg.norm(vel, axis=1)
+    tris = _tri_cells(base.dm)
+    centroids = coords[tris].mean(axis=1)
+    vhat = np.where(speed[:, None] > 0, vel / np.maximum(speed[:, None], 1.0e-30), 0.0)
+    proj = np.einsum("cvd,cd->cv", coords[tris] - centroids[:, None, :], vhat)
+    h = np.maximum(proj.max(axis=1) - proj.min(axis=1), 0.0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        per = np.where(speed > 0, h / speed, np.inf)
+    fin = per[np.isfinite(per)]
+    dt_adv = comm.allreduce(float(np.min(fin)) if len(fin) else np.inf, op=MPI.MIN)
+    return dt_acc, (dt_adv if np.isfinite(dt_adv) else 0.0)
 
 
 # ----------------------------------------------------------------------------- time loop
@@ -1788,9 +1949,19 @@ for k in range(k0, k0 + params.uw_steps):
     faulted.to_base(rec["slip"])
     t_to_base = time.perf_counter() - t_phase
     t_phase = time.perf_counter()
-    dt_accuracy = params.uw_dt_mult * float(adv.estimate_dt())
-    adv.estimate_dt(basis="resolution", direction_aware=True)
-    dt_crossing = adv.dt_adv
+    if not SCALED:
+        dt_accuracy = params.uw_dt_mult * float(adv.estimate_dt())
+        adv.estimate_dt(basis="resolution", direction_aware=True)
+        dt_crossing = adv.dt_adv
+    elif units.uw_units_dt_local:
+        dt_accuracy, dt_crossing = local_dt_estimates()
+        dt_accuracy *= params.uw_dt_mult
+    else:
+        # estimate_dt returns a time with units in a units run (float() of it would be its
+        # magnitude in seconds); dt_adv is non-dimensional
+        dt_accuracy = params.uw_dt_mult * _nd(adv.estimate_dt())
+        adv.estimate_dt(basis="resolution", direction_aware=True)
+        dt_crossing = adv.dt_adv
     dt = min(dt_accuracy, params.uw_courant * dt_crossing, params.uw_dt_max)
     adv.solve(timestep=dt)
     strain_adv.solve(timestep=dt)
@@ -2018,6 +2189,18 @@ for k in range(k0, k0 + params.uw_steps):
                    "fault_depth": faults[0]["depth"] if faults else 0.0})
     record.update({"step": step, "t": t, "dt": dt, "courant": dt / dt_crossing,
                    "t_stokes": round(t_stokes, 2), "t_step": round(time.perf_counter() - wall, 2)})
+    if SCALED:                 # the physical columns beside the dimensionless ones
+        def cm_yr(v):
+            return _phys(v, VEL, "cm/year")
+        record.update({
+            "t_Myr": _phys(t, TIME, "Myr"), "dt_Myr": _phys(dt, TIME, "Myr"),
+            "vrms_cm_yr": cm_yr(record["vrms"]), "vsurf_rms_cm_yr": cm_yr(record["vsurf_rms"]),
+            "slip_max_cm_yr": cm_yr(record["slip_max"]),
+            "slip_cm_yr": {k: cm_yr(v) for k, v in record["slip"].items()},
+            "plates_cm_yr": {k: [cm_yr(a), cm_yr(b)] for k, (a, b) in record["plates"].items()},
+            "trench_rate_cm_yr": {k: cm_yr(v) for k, v in record.get("trench_rate", {}).items()},
+            "lid_depth_km": _phys(record["lid_depth"], LEN, "km"),
+            "fault_depth_km": _phys(record["fault_depth"], LEN, "km")})
     solver = record["solver"] = dict(rec["solver"])
     solver.update({
         "kind": kind, "faults_before": faults_before, "faults_after": list(faulted.names),
@@ -2031,6 +2214,9 @@ for k in range(k0, k0 + params.uw_steps):
     records.append(record)
     described = " ".join(f"{f['name']}@{np.degrees(f['theta']):.1f}/{f['dip']:.0f}/{f['depth']:.2f}"
                          f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults) or "none"
+    if SCALED:
+        uw.pprint(f"      t {record['t_Myr']:.3f} Myr, vrms {record['vrms_cm_yr']:.4f} cm/yr, "
+                  f"vsurf_rms {record['vsurf_rms_cm_yr']:.4f} cm/yr, lid {record['lid_depth_km']:.0f} km")
     uw.pprint(f"step {step:5d} t {t:.5f} dt {dt:.2e} | vrms {record['vrms']:8.2f} "
               f"M {record['mobility']:.3f} lid {record['lid_depth']:.3f} T_mid {record['T_mid']:.3f} "
               f"slip {record['slip_max']:.2f} | faults {described} | "
