@@ -244,8 +244,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   was the estimate's artefact and does not appear in a linear host. Close the "to check". **REOPENED 2026-10-30:**
   a straight box cannot show it; on an arc or a kinked cut in the same box the per-node contact normals give a
   normal-traction jump across the faces (+0.03/-0.14 of tau_inf on the arc) and one-face shear, and smoothed
-  normals remove both. Same signature as the annulus (-0.4/+0.3 of yield on a strongly curved polyline). This is
-  now a probable LIBRARY FINDING: the split contact's normals on a non-straight trace (per-node, default) partly
+  normals remove both. Same signature as the annulus (-0.4/+0.3 of yield on a strongly curved polyline). UPDATE:
+  in the annulus (job 2423) smoothed normals change nothing (the trace turns ~1.3 deg per segment; the box needed
+  20 deg kinks), so this is a library NOTE for kinked traces, not the annulus mechanism; the annulus normal-traction
+  asymmetry stays unexplained and open. Earlier text: This was a probable LIBRARY FINDING: the split contact's normals on a non-straight trace (per-node, default) partly
   lock a frictionless contact; the smoothed trace normal (add_fault normal="trace") restores it. Repro:
   kaiju-launch/ti/split_probe/ (arc and kinked cases). Annulus confirmation (job 2423) pending; bears on #889/#890
   and every faulted annulus result.
@@ -263,6 +265,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-10-30, to the docs hub: a candidate bundled example for the fault notes is being written on kaiju
+  (kaiju-launch/ti/split_probe/): the frictionless mode-II crack in a box under pure shear, solved with the split
+  fault and with a TI band, against the analytic slip, with a README stating the pass criterion. It is the direct
+  check of UWTN 2026-017's split-vs-TI equivalence claim. It belongs in the library's scripts/sessions tree beside
+  the note; the hub will pass it on when kaiju reports.
 - 2026-10-30, to the docs hub and the dev hub (Louis's ruling, standing rules): examples are bundled with the
   technical notes, because a feature known to behave well (here the TI fault model under Newton) can regress or
   be misconfigured without a runnable example to show the reference behaviour. For the docs hub: each note
@@ -660,7 +667,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   polyline with default normals. Running 2423: the split from 40 at chain 0 with -uw_fault_normal trace (the
   library's smoothed normal of the stored polyline). Local commits b554cf4 (-uw_ti_model vep), 3d82360
   (-uw_bridge_ti), 4c09942 (VEP director column, -uw_ti_model linear), 9974022 (VEP timestep), 42a04fa
-  (-uw_fault_normal trace), all default off; patches with 2423. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  (-uw_fault_normal trace), all default off; patches with 2423. **2423 RESULT: trace-smoothed normals change
+  NOTHING in the annulus** (vrms, slip and Newton identical to 0.1 % over steps 41-43): the annulus trace turns
+  ~1.3 deg per segment where the box needed 20 deg kinks to lock; the box result stays a library note for kinked
+  traces, not our mechanism. **Eliminated:** contact friction, the bridge (isotropic floor and TI), contact
+  normals, the tangent, director discontinuity. **Left:** (a) how each realisation ends at depth (deep-tip band
+  ratio 2.8x; the footprint overhangs the trace end), (b) a 2-cell band at eta_1/eta_0 = 1e-3 may simply not equal
+  a zero-width frictionless crack at this resolution. **Hub approved the decisive box comparison:** split vs TI
+  band (unsplit placement, w = W, eta_w, trace director) on the straight-cut pure-shear probe against the crack
+  solution, with sweeps of eta_1/eta_0 (1e-2..1e-4) and w (W/2..2W) and a buried-vs-to-the-wall variant; written as
+  the reference example (script + README with the analytic answer and pass criterion), the candidate bundled
+  example for the fault notes (UWTN 2026-017's claim). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1750,3 +1767,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: director smoothness ruled out as the TI band's Newton trouble (DG0 director angle change between
   neighbouring footprint cells: median 0.07-0.66 deg, max 8.2 at the stub joint on a young fault, nothing over 5 on a
   mature one). Smooth-director smoke held. Waiting on 2423 (split with trace normals).
+- 2026-10-30: 2423: smoothed contact normals change nothing in the annulus; contact normals eliminated. Box
+  comparison split vs TI band against the crack solution approved and running, written as the reference example
+  for the fault notes (flagged to the docs hub).
