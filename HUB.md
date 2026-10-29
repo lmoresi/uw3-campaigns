@@ -85,6 +85,9 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   carry no Co-Authored-By line.
 - Show figures through GitHub links. Write useful machine knowledge back to
   underworld-community/uw3-hpc-install-run. If a container must be built, use conda PETSc.
+- **Every kaiju results delivery comes with a published artifact** (movies, key figures, the README table) viewable
+  in the Claude app; the hub puts the link in HUB.md and in the report to Louis (Louis, 2026-10-29: "anything
+  running on kaiju is difficult to view other than via the claude app / artefact browser").
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -1080,3 +1083,7 @@ frozen as the hand-over state; they are not updated here after this date.
   (rebuilds + 15 % more pressure its), which -uw_pres_rtol 1e-2 would mostly remove. Plateness measure: P10 and
   med/max over the plate surface from 170 deg behind the trench to 5 deg short of it. All runs end on complete
   checkpoints; restarts possible for the post-arrival phase.
+- 2026-10-29: Louis: kaiju results are hard to view except through the Claude app, so every report of results from
+  kaiju must come with an artifact. Standing rule added; kaiju told to publish one for the faulted thermal set
+  (movies and figures) and one each for slab_control, slab_fault and addon_demo. Existing artifact:
+  fault_B1_crust1_fault movie https://claude.ai/artifact/DJctapP4niLphKaazzJeK9.
