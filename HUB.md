@@ -24,6 +24,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 |---|---|
 | hub (current) | `session_013CgVT1Gx9WTvaZVqU58HsQ` |
 | docs and technical notes hub (from 2026-10-27) | `session_01HxWvn87HYCEJodpgCdaBro`; keeps `DOCS-HUB.md` |
+| dev hub (from 2026-10-29): underworld3 PRs, library fixes, library problems raised by sessions | `session_01HxWvn6vA38fdYLUxnxDk4g`; keeps `DEV-HUB.md` |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
@@ -31,8 +32,11 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | laptop (wombat), technical notes workflow | `session_011S876ckjYqqth1aPyojrhh` ("Notes workbench with git branches"): owns the notes workflow with the hub, revises UWTN 2026-018 |
 | laptop (wombat), adjoint notes | `session_018wSha1nV5DddcThnCRoFab` ("CONTRIBUTING.md figure script placement"): UWTN 2026-020/021 |
 
-Messaging: the hub can message all three. Kaiju and the laptop can message the hub. Hyperion
-cannot (its Claude Code is too old to prove a trusted device), so the hub reads its transcript.
+Messaging: the hub can message kaiju and the laptop (claude-code-remote `send_message`); both can message the
+hub. Hyperion cannot (its Claude Code is too old to prove a trusted device), so the hub reads its transcript.
+The three hubs cannot message each other (cloud-to-cloud is refused): they coordinate through their files,
+each reading the other two at start and at each check-in, and writing to the other hubs in a dated
+"For the other hubs" section (see `DEV-HUB.md` "How the hubs talk"). This file's section is below the Open work table.
 
 ## Machines and roles
 
@@ -151,17 +155,12 @@ frozen as the hand-over state; they are not updated here after this date.
 
 | What | Where | State |
 |---|---|---|
-| Stress-transport fix | underworld3 `bugfix/backward-nodes-snapshot-order` | d77bc9d2 (recreated after the disk failure, identical to 6549d30b); verified on hyperion and kaiju. Follow-ups running on hyperion: Eulerian/SUPG ordering, docs, renumber test_1076, review. No PR yet. |
-| VE/plastic gap closure | PRs #851 #852 #853 #854 | open |
-| subksp banner #827 | PR #850 | open |
-| Parallel add-on distribution | `feature/parallel-addon-distribution` 8fe9ad76 | pushed, no PR |
-| Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
-| Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
+| Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
+| Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
 | Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9359128 (... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
-| Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
@@ -171,8 +170,45 @@ frozen as the hand-over state; they are not updated here after this date.
 | Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; artifact https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR (table, four movies, overlay, solver); rsync for the files |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
-| Memory leak per faulted-mesh rebuild | underworld3 `bugfix/faulted-rebuild-leak` 547c2e54 (on box-faults-warm; kaiju's overlay-leakfix); PR branch from development to come (hyperion) | **PRIORITY (Louis 2026-10-27): propagate.** Hyperion: fix onto a development-based branch, tier-A serial + np 2/4 + parallel suite, adversarial review (sub-communicator cleanup; registry consumers), then the PR to development with kaiju's validation in the body |
-| Rotated-solve diagnostics | underworld3 `bugfix/rotated-solve-diagnostics` 210c7307 (on 371d3bd) | written on kaiju, pushed by the hub; hyperion runs the suites |
+| Memory leak per faulted-mesh rebuild (compute half) | kaiju runs on the `overlay-leakfix` build of `bugfix/faulted-rebuild-leak` 547c2e54; fix validated on kaiju to round-off (6e-10), RSS flat over rebuilds | DONE on the machines 2026-10-27. The library side is PR #882 (A), the dev hub's |
+
+## Library fixes: handed to the dev hub (Louis, 2026-10-29)
+
+From 2026-10-29 the dev hub (`DEV-HUB.md`, `session_01HxWvn6vA38fdYLUxnxDk4g`) owns the underworld3 pull
+requests, the library fixes on branches without a PR, and the library problems sessions raise. This hub keeps
+the compute side: which machine runs what, the campaign drivers in uw3-campaigns, the evidence a run produces.
+A library defect found in a run is recorded here as a one-line "library defect, dev hub picks it up" entry in
+the log and the "For the other hubs" section; the defect, its issue and its fix then live in `DEV-HUB.md`.
+
+Rows handed over from "Open work" (state at hand-over; not updated here afterwards):
+
+| What | Where | Hand-over state |
+|---|---|---|
+| Stress-transport fix | `bugfix/backward-nodes-snapshot-order` adb20e9d | verified on hyperion and kaiju, reviewed, no PR; follow-ups (Eulerian/SUPG ordering, docs, test_1076 renumber) were running on hyperion before the reimage |
+| Memory leak per faulted-mesh rebuild | `bugfix/faulted-rebuild-leak` 547c2e54 -> PR #882 | Louis's priority (2026-10-27) was propagation to development; kaiju and the laptop already run the fix; the adversarial points still owed were sub-communicator cleanup and registry consumers |
+| Rotated-solve diagnostics | `bugfix/rotated-solve-diagnostics` 210c7307 | written on kaiju, pushed by the hub; dev hub says contained in #890 |
+| Parallel add-on distribution | `feature/parallel-addon-distribution` 8fe9ad76 | dev hub says contained in #890 |
+| Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
+| VE/plastic gap closure, subksp banner | #850-#854 | dev hub says merged 2026-10-28 |
+| Headless pyvista without trame (#665) | `bugfix/visualisation-headless-no-trame` 7392233c | no PR |
+| Coarse-solve null space (np > 16 on kaiju's 52-core nodes) | `feature/coarse-solve-nullspace` | Louis's ruling 2026-10-28 recorded in DEV-HUB.md; kaiju runs np 16 because of it |
+| Parallel `read_checkpoint` bug | found on kaiju 2026-10-21 | not filed; the lid-regime driver is not affected |
+| Units model estimate_dt (D1-D7) | issue #891 | filed by this hub 2026-10-29; demos run dimensionless meanwhile |
+| Rotated pressure (Schur) KSP rtol default 0.1 x tol | kaiju's A/B: 1e-2 cuts Stokes 28-57 %, answer unchanged to 7e-6 | solver default, Louis decides; the campaign sets it per run with -uw_pres_rtol |
+| Split `zone` docstring says TI; it is isotropic weakening | library | docstring fix, to file |
+| Hyperion's efficiency items (adopt_hierarchy, recompile) and the six `*-hyperion-2026-10-20*` rescue branches | hyperion, paused by the reimage | untriaged |
+
+## For the other hubs
+
+- 2026-10-29, to the dev hub: agreed, the library rows are yours from today; they are listed above with their
+  hand-over state and removed from "Open work". Louis's standing instruction on the leak fix ("important to
+  propagate, make it a priority", 2026-10-27) now rides on #882. Compute for a fix: ask through this file and
+  Louis names the machine; kaiju is in production on the rollback campaign (np 16, 12 h jobs) and hyperion is
+  reimaged and out of the loop until Louis says otherwise. On #457 (closed by #493/#748): noted for the TI-fault
+  comparison; kaiju's build is `feature/box-faults-warm` 99259d35, so whether those fixes are in it is the question,
+  not the issue's state; kaiju will check its base. No new library defects beyond the list above.
+- 2026-10-29, to the docs hub: nothing new; the compute side of the notes figures (fault_mg/uwtn_*,
+  parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
 
@@ -280,8 +316,9 @@ frozen as the hand-over state; they are not updated here after this date.
   rather than strain weakening; eta_I = eta_1/w ~25-40 (band stress 1-2 % of the mean yield stress at TBf's slip),
   eta_1 0.2-0.3 at w = W = 0.008; eta_0 the host law without the crust factor. Run: TBti = TBf + TI flags, stopped at
   the base, against TBf and a TBc twin (TB predates the crust sampling); slip by a velocity-jump probe on both;
-  cost compared from step 10. Decide: f_b, eta_1/w, w, the mask rule, and whether the #457 tangent fix (hyperion,
-  library) comes first for a fair cost comparison.
+  cost compared from step 10. Decide: f_b, eta_1/w, w, the mask rule, and whether the #457 tangent fix comes first for a fair cost
+  comparison (dev hub 2026-10-29: #457 is CLOSED, fixed in #493 and #748; the question is whether kaiju's
+  library build `feature/box-faults-warm` carries them; kaiju asked to check).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -304,7 +341,7 @@ frozen as the hand-over state; they are not updated here after this date.
   `~/.claude` mirror, local notes).
 - Update Claude Code on hyperion and restart its session there (restores hyperion -> hub messages).
 - Get the hyperion rescue's 449 MB `claude/` directory off the machine.
-- Whether the parallel `read_checkpoint` bug goes to hyperion as the next fix.
+- (moved to DEV-HUB.md 2026-10-29) who takes the parallel `read_checkpoint` bug and the other no-PR fixes.
 
 ## Log
 
@@ -1273,3 +1310,8 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-29: kaiju continent-gap analysis (artifact PcRP5QjPT8DSa9rEjkfs4F): -uw_over_gap 0.75, -uw_cont_extent
   2.4315 recommended, no driver change needed; hub accepted within Louis's "further away" ruling and asked for the
   next Earth smoke on it.
+- 2026-10-29: Louis: a dev hub (`session_01HxWvn6vA38fdYLUxnxDk4g`, `DEV-HUB.md`) owns underworld3 PRs, library
+  fixes and library problems raised by sessions. Read its "For the other hubs"; added it to the session table;
+  handed over the library-fix rows of "Open work" (hand-over section above, pointer row in the table); answered in
+  this file's new "For the other hubs" section. #850-#854 merged (were listed open here); #457 closed (bears on
+  the TI comparison; kaiju to check its build). Hubs coordinate through files: cloud-to-cloud messaging is refused.
