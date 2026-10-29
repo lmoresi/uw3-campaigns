@@ -355,7 +355,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   eta_1 0.2-0.3 at w = W = 0.008; eta_0 the host law without the crust factor. Run: TBti = TBf + TI flags, stopped at
   the base, against TBf and a TBc twin (TB predates the crust sampling); slip by a velocity-jump probe on both;
   cost compared from step 10. Decide: f_b, eta_1/w, w, the mask rule, and whether the #457 tangent fix comes first for a fair cost
-  comparison (RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  comparison. **Louis 2026-10-29: the split fault is frictionless, zero shear strength on the slip surface; the TI
+  band can only approximate that.** So eta_1/w and f_b are not physical choices: take them as small as the solver
+  tolerates (conditioning, Newton convergence) and report the residual band shear stress as the approximation
+  error against zero; kaiju's 1-2 % of the mean yield stress is the starting point, to be pushed down in the smoke.
+  The remaining choices are w and the mask rule. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1362,3 +1366,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   kaiju-launch/crust_fit/, results figures_work/crust_fit/). Hub: implement the envelope behind -uw_fault_fit
   (default off), smoke, patch; demo rerun and production choice to Louis. Earth smoke 4 (gap 0.75, extent 2.4315,
   clone zg95-earth4 at 259ee09) running as job 2371; cont_extent comment 9df8bff rides the fit patch.
+- 2026-10-29: Louis on the TI comparison: the split fault is frictionless (zero shear strength); the TI band
+  approximates it. f_b and eta_1/w become "as small as the solver tolerates" with the residual band stress
+  reported; recorded under the TI decision item; kaiju told.
