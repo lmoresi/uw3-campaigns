@@ -159,7 +159,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` cdf44c1 (wall-stub, envelope locator; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 07667b2 (wall-stub, envelope locator, plate_metrics by arc; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -219,7 +219,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 ## Waiting on Louis
 
 - **Earth production run: GO/NO-GO (2026-10-29).** Plan above; the three bracketed choices default to the smoke
-  values (D 0.12 d, Ra 2.386e7, buoyancy -0.5) unless you change them; the plan assumes the envelope locator and
+  values (D 0.12 d, Ra 2.386e7, buoyancy -0.5) unless you change them; the continent deforms internally at x1
+  (above): accept, or thicken its lid / add a compositional factor before the run; the plan assumes the envelope locator and
   -uw_pres_rtol 1e-2 (recommended, not yet ruled as standing). A "go" with no changes launches it as written.
 - **Crust-fit locator (2026-10-29): envelope trace (kaiju's recommendation) or flexure+envelope for the demo rerun
   and the faulted runs?** Kaiju's offline results above. Hub's reading: the envelope wins on the evidence (40/40,
@@ -264,7 +265,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   records per step (placed trench/dip, slip, vrms, plates, cost), per checkpoint (gap_check.py: continent edge,
   gap, overlap, fault-continent distance), tip_depth.py; driver cdf44c1 + key-clearing 8ac52ed pinned. Full flag
   line on the page with [D] 0.12, [Ra] 2.386e7, [buoyancy] -0.5 at the smoke values. Plateness split into
-  oceanic/continental arcs: hub asked kaiju to make it before the run (analysis only).
+  oceanic/continental arcs: DONE 2026-10-29 (plate_metrics.py now in the repo at
+  zg95_lid_regimes/figures/kaiju/scripts/, 07667b2; key-clearing fix f217bdb; driver blob 59d2e6b). **Result for
+  Louis (smoke 4, step 19; signed median v, P10, med/max):** incoming oceanic plate +742, 0.88, 0.97; fore-arc
+  oceanic strip -947, 1.00, 0.99; continent -436, 0.14, 0.51 (smoke 3: -543, 0.14, 0.57). The continent's surface
+  speed falls from -870 at its trench-side edge to -190 at its far edge 120 deg away: at x1 viscosity, strong only
+  through its 145 km thermal lid, it deforms internally over its width and does not move as a plate. If a rigid
+  continent is wanted it needs a thicker lid (older uw_cont_age) or a compositional factor > 1, against the
+  "not inherently stronger" ruling. Whole-surface columns unchanged. Page v5.
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -1413,3 +1421,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   recorded under the Earth-like setup decision; page v3. Kaiju corrected smoke 3's vrms range (209-389).
 - 2026-10-29: Earth production plan drafted by kaiju (page v4); recorded with a GO/NO-GO item for Louis. Kaiju asked
   to split plate_metrics into oceanic and continental arcs before the run.
+- 2026-10-29: kaiju's key-clearing fix and plate_metrics.py (split into oceanic and continental arcs) applied as
+  f217bdb and 07667b2, pushed; head 07667b2. Finding: the continent at x1 deforms internally (surface speed -870 to
+  -190 across its 120 deg); added to the Earth go/no-go item for Louis.
