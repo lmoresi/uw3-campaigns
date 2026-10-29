@@ -85,6 +85,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   carry no Co-Authored-By line.
 - Show figures through GitHub links. Write useful machine knowledge back to
   underworld-community/uw3-hpc-install-run. If a container must be built, use conda PETSc.
+- **Examples are scaled and use the units system to non-dimensionalise at the solver level** (the written policy;
+  Louis 2026-10-29, "eat your own dog food"). The rollback drivers must adhere: a scaled mode is to be checked (not
+  re-run) first, with plate velocities then reported in cm/yr. Governing doc: underworld3
+  docs/developer/design/UNITS_SIMPLIFIED_DESIGN_2025-11.md.
 - **Every results delivery from a machine the hub schedules (kaiju, hyperion, any server run this way) comes with a
   published artifact** (movies, key figures, the README table) viewable in the Claude app, since Louis reaches
   those sessions only through the app; the hub puts the link in HUB.md and in the report to Louis. The exception
@@ -1096,3 +1100,10 @@ frozen as the hand-over state; they are not updated here after this date.
   (headline, comparison table at t 0.00024, four whole-annulus movies to each stop, overlay.png, solver.png).
   Movies also in figures_out/slab_movies/thermal_fault_*.mp4 and thermal_TAc.mp4. Backfill pages for slab_control,
   slab_fault and addon_demo to follow.
+- 2026-10-29: Louis: the rollback experiments should follow the policy that examples are scaled and non-dimensionalised
+  by the units system at the solver level; do not re-run, but check that a scaled version works, with plate
+  velocities in cm/yr. Kaiju (idle) tasked: a scaled mode behind a flag in annulus_faults.py with reference scales as
+  quantities, dimensionless numbers derived and printed, physical columns in the records, verified against the
+  dimensionless TA to round-off over 5 steps at np 4, plus a conversion table of the faulted-set headline numbers
+  (illustration: d 2900 km, kappa 1e-6 give one velocity unit ~1.1e-3 cm/yr, so v_plate 760 ~ 0.8 cm/yr and
+  t 0.00024 ~ 64 Myr). Any hand non-dimensionalisation the driver is forced into is a library finding.
