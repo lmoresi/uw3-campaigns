@@ -159,7 +159,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9359128 (... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` cdf44c1 (wall-stub, envelope locator; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -326,7 +326,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   envelope trace as the locator behind -uw_fault_fit envelope, flexure as a hinge option once constrained, stored
   geometry always the placed polyline. **Hub: kaiju implements the envelope behind the flag (default off, parabola
   unchanged), smokes 10 steps from demo checkpoint 30 against the offline trace, patches; the demo rerun and the
-  production choice wait on Louis (below).** Earlier detail:
+  production choice wait on Louis (below).** APPLIED 2026-10-29: e37bb84 (cont_extent comment) + cdf44c1
+  (envelope locator, -uw_fault_fit envelope, -uw_fault_top_dip_min 30, -uw_fault_trench_tol 0.15; parabola stays
+  the default; fault record carries locator, raw trace, trench gap, unfloored top dip, floored flag); blobs
+  0725bbe -> 984dd71 -> 320cb04 verified. Smoke (job 2372, TA_age25f from 30, 10 steps, rebuild every step):
+  trench -1.35 -> -2.98 deg at 0.15-0.24 deg/step, dip 43 -> 34.5, top dip from data 41 -> 33, floor never
+  bound, trench gap 0.06-0.08, 184-246 s/step, 5-7 Newton its, builds 11-12 s, 17 GB, +330-410 cells; the
+  driver's trace equals the offline envelope at all 10 steps (lateral difference 0.0000) and stored = placed
+  at every record. The parabola demo from the same checkpoint had the trench at -5.2 by step 38 and OOM'd after
+  39. Known wrinkle: switching -uw_fault_fit back to parabola mid-run keeps stale envelope keys in the fault
+  dict (harmless). Earlier detail:
 - Crust-base fit, two driver items (kaiju 2026-10-29): the fit fails at about a third of late detections
   in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
   lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
@@ -1379,3 +1388,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   from demo checkpoint 30 running (job 2372) with compare_smoke.py against the offline trace and a stored = placed
   check from records. Rebuild threshold with the envelope: compare against the last built fault, 4 rungs, no
   hysteresis (particle noise a third of the threshold). Earth smoke 4 still running.
+- 2026-10-29: envelope locator series applied (e37bb84, cdf44c1) and pushed; branch head cdf44c1. Smoke 2372
+  passed (details under the crust-fit decision). Demo rerun and production locator still wait on Louis.
