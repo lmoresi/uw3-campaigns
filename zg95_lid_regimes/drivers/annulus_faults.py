@@ -183,6 +183,10 @@ params = uw.Params(
     uw_ti_eta_reg=0.1,          # ti: the band's rate strengthening (added to its yield viscosity)
     uw_ti_eta_min=0.1,          # ti: the band's viscosity floor (the host's is 1)
     uw_ti_trace_inset=0.5,      # ti: the trace runs to this many rungs inside the wall: the band outcrops, no bridge
+    uw_ti_model="band",         # ti: "band" = eta_1 written here (ti_band_viscosity's law, -uw_ti_smooth); "vep" =
+                                #   the library's TransverseIsotropicVEPFlowModel (elasticity off) yielding eta_1 on the
+                                #   resolved shear itself: yield stress f_b tau_y on the footprint, rate strengthening
+                                #   eta_reg_b (its floor), its own softmin and tangent
     uw_ti_smooth=0,             # ti: 1 = the band's min and floor in the host's own smooth forms (_combine_yield's
                                 #   softmin, _apply_floor's smooth max, the host's delta) for Newton; 0 = hard Min/Max
     uw_bridge_eta_min=1.0,      # split: the bridge zone's own viscosity floor (the host's is 1; the zone's x uw_eta_w
@@ -1087,10 +1091,22 @@ def ti_band_viscosity(s, faulted, footprint, tag):
     else:
         eta_b = sympy.Max(params.uw_ti_eta_min, sympy.Min(eta_0, eta_y))
     eta_1 = eta_0 + fband.sym[0] * (eta_b - eta_0)
-    s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
-    s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
-    s.constitutive_model.Parameters.shear_viscosity_1 = eta_1
-    s.constitutive_model.Parameters.director = n
+    if params.uw_ti_model == "vep":
+        # the library's own yielding TI model: eta_1 = softmin(eta_0, tau_y / (2 gdot) + eta_reg_b) on the
+        # footprint (its _plastic_effective_viscosity resolves gdot through the director); 1e30 off it
+        s.constitutive_model = uw.constitutive_models.TransverseIsotropicVEPFlowModel
+        P = s.constitutive_model.Parameters
+        P.shear_viscosity_0 = eta_0
+        P.shear_viscosity_1 = eta_0
+        P.director = sympy.Matrix([[director.sym[0], director.sym[1]]])
+        P.yield_stress = fband.sym[0] * params.uw_ti_tau_frac * tau_y + (1 - fband.sym[0]) * 1.0e30
+        P.plastic_rate_strengthening = params.uw_ti_eta_reg
+        eta_1 = eta_0 + fband.sym[0] * (host._combine_yield(eta_0, eta_y) - eta_0)   # for the stress record
+    else:
+        s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
+        s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
+        s.constitutive_model.Parameters.shear_viscosity_1 = eta_1
+        s.constitutive_model.Parameters.director = n
     at_floor = sympy.Piecewise((1, eta_y < params.uw_ti_eta_min), (0, True))
     at_host = sympy.Piecewise((1, eta_y > eta_0), (0, True))
     return {"fband": fband.sym[0], "director": director, "fband_var": fband, "eta_1": eta_1, "gdot": gdot,
