@@ -1191,6 +1191,16 @@ class FaultedMesh:
         self.ti = None
         if TI and self.faults and params.uw_ti_check != 2:
             self.ti = ti_band_viscosity(s, self, footprint, tag)
+            # for the checkpoint's band record: eta_1/eta_0, and how much of the shear lies in the
+            # weak plane (gdot / edot_II: 1 where the director is the shear's own normal)
+            self.ti_ratio = uw.discretisation.MeshVariable(f"ti_ratio_{tag}", mesh, 1, degree=1)
+            self.ti_align = uw.discretisation.MeshVariable(f"ti_align_{tag}", mesh, 1, degree=1)
+            self.ti_projections = []
+            for var, fn in ((self.ti_ratio, self.ti["eta_1"] / self.host_cm.viscosity),
+                            (self.ti_align, self.ti["gdot"] / (self.host_cm._strainrate_inv_II + 1.0e-12))):
+                proj = uw.systems.Projection(mesh, var)
+                proj.uw_function = fn
+                self.ti_projections.append(proj)
         buoyancy = params.uw_buoy_T * self.T.sym[0]
         if comp_on:                # the slab's fixed temperature deficit, carried by the particles
             buoyancy = buoyancy - params.uw_comp_dT * clamp01(self.slab.sym[0])
@@ -1555,8 +1565,36 @@ def read_solver_fields(faulted, files):
     return float(uw.utilities.gather_data(worst, bcast=True).max())
 
 
+def write_ti_band(faulted, step):
+    """A TI band's record at a checkpoint: for every footprint cell (on rank 0), its centroid,
+    its director, eta_1/eta_0 and gdot/edot_II (the shear's share in the weak plane), from P1
+    projections on the solver mesh. Returns the file name, or None without a TI band."""
+    if getattr(faulted, "ti", None) is None:
+        return None
+    import h5py
+    for proj in faulted.ti_projections:
+        proj.solve()
+    var = faulted.ti["fband_var"]
+    on = np.asarray(var.array[:, 0, 0]) > 0.5
+    xy = np.asarray(model_xy(var))
+    pts = onto(xy) if len(xy) else xy
+    ratio = np.asarray(uw.function.global_evaluate(faulted.ti_ratio.sym[0], pts)).ravel()
+    align = np.asarray(uw.function.global_evaluate(faulted.ti_align.sym[0], pts)).ravel()
+    n = np.asarray(faulted.ti["director"].array[:, 0, :])
+    rows = np.c_[xy, n, ratio, align][on]
+    allrows = uw.utilities.gather_data(rows.ravel())
+    name = f"annulus.ti_band.{step:05d}.h5"
+    with uw.selective_ranks(0) as selected:
+        if selected:
+            with h5py.File(os.path.join(out, name), "w") as h:
+                h["cells"] = np.asarray(allrows).reshape(-1, 6)
+                h["cells"].attrs["columns"] = "x y n_x n_y eta1_over_eta0 gdot_over_edotII"
+    return name
+
+
 def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
+    write_ti_band(faulted, step)
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
     for var, picture, _ in markers.values():
         picture.array[:, 0, 0] = np.asarray(
