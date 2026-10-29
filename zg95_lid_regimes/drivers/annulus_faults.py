@@ -183,6 +183,9 @@ params = uw.Params(
     uw_ti_eta_reg=0.1,          # ti: the band's rate strengthening (added to its yield viscosity)
     uw_ti_eta_min=0.1,          # ti: the band's viscosity floor (the host's is 1)
     uw_ti_trace_inset=0.5,      # ti: the trace runs to this many rungs inside the wall: the band outcrops, no bridge
+    uw_bridge_eta_min=1.0,      # split: the bridge zone's own viscosity floor (the host's is 1; the zone's x uw_eta_w
+                                #   weakening is otherwise undone by it): 1 = unchanged
+    uw_bridge_eta_reg=10.0,     # split: the bridge zone's own rate strengthening (the host's uw_eta_reg, 10): 10 = unchanged
     uw_ti_check=0,              # ti, checks only: 1 the TI model with the band off (eta_1 = eta_0); 2 the host
                                 #   viscoplastic model alone on the same unsplit mesh (1 and 2 must agree)
     uw_addon_timing=0,          # measurement runs (addon_timing.py): > 0 times each faulted-mesh build and
@@ -1187,6 +1190,14 @@ class FaultedMesh:
             # in a units run a viscosity: uw_eta_reg times the basal viscosity
             s.constitutive_model.Parameters.plastic_rate_strengthening = (
                 params.uw_eta_reg * eta_ref if SCALED else params.uw_eta_reg)
+        bridge_own = params.uw_bridge_eta_min != 1.0 or params.uw_bridge_eta_reg != params.uw_eta_reg
+        if bridge_own and not SCALED:
+            # the split's bridge zone with its own floor and rate strengthening (the TI band has
+            # its own): the zone's x uw_eta_w weakening is otherwise held up by the host's 1 and 10
+            Z = self.zone.sym[0]
+            s.constitutive_model.Parameters.shear_viscosity_min = 1 + Z * (params.uw_bridge_eta_min - 1)
+            s.constitutive_model.Parameters.plastic_rate_strengthening = (
+                params.uw_eta_reg + Z * (params.uw_bridge_eta_reg - params.uw_eta_reg))
         self.host_cm = s.constitutive_model
         self.ti = None
         if TI and self.faults and params.uw_ti_check != 2:
