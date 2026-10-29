@@ -214,6 +214,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (#457)" comment on `TransverseIsotropicFlowModel`, written 2026-07-29 (04379583) before the #493 fix and never
   removed. Kaiju confirmed both its builds contain 22aae82c (#493) and 0b6c9624 (#748). Stale comment to delete;
   it misled kaiju's TI design report.
+- 2026-10-29, to the dev hub, library defect (kaiju, bears on the fault-split multigrid PRs #889/#890): custom_mg
+  `set_custom_fmg` with UNSPLIT `place_fault_ribbon_2d(split=False)` ladder levels as the coarse tail exhausts node
+  memory (170-377 GB at np 16, 127k cells) after "Setup solver" and before the first iteration; split ladder
+  levels and an unplaced coarse tail are fine. Not the TI model and not the patch smoother (reproduces with the
+  band off, with a plain VP host, with FAC disabled, and with one placed coarse level); points at the hierarchy or
+  transfer build (barycentric, cross_partition auto) between unsplit placed levels. Repro on kaiju:
+  runs/slab_ti_check2b (TAf checkpoint 40, -uw_fault_realisation ti -uw_ti_check 2), build 547c2e54. The science
+  hub works around it with -uw_chain 0 for the TI runs. Please file.
 - 2026-10-29, to the docs hub: the add-on mesh demo movie for UWTN 2026-022 is redone with the robust (envelope)
   fault fit, rebuilt every step, fixed windows, 30 frames: page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3,
   files on kaiju figures_out/addon_demo/mesh_movie/ (mp4, per-step json, README) for Louis's rsync. The per-step
@@ -415,7 +423,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   footprint; the push-down steps f_b, eta_reg_b and the in-band floor (eta_1 >= 0.1) together by factors of 3,
   since band stress ~ f_b tau_y + eta_reg_b 2V/w, recording band stress (integrated, and as a fraction of the
   host's mean yield at depth), slip, Newton and linear its, Stokes time, stopping when either solve degrades.
-  Nothing left for Louis on TI settings. Order: envelope fit smoke, Earth smoke 4 report, then TBti. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  Nothing left for Louis on TI settings. Order: envelope fit smoke, Earth smoke 4 report, then TBti.
+  **2026-10-29 hub changes:** TA family instead of TB (TAf and the crust-sampled twin TAc exist; TB has no twin).
+  **Library block:** any unsplit placed coarse MG level OOMs the first solve (defect recorded for the dev hub in
+  "For the other hubs"); TI runs therefore use -uw_chain 0 (band on the finest level, unplaced coarse tail), with a
+  split control at chain 0 (TAf restarted from 40, same steps) so the implementation cost is separated from the
+  missing coarse placement (one-step restart from TAf 40: split chain 2 13 GB / 6 Newton / 204 s; unsplit chain 0
+  12 GB / 9 Newton / 374 s). TI path (kaiju/ti-band on 07667b2, 53b5218 + d0a22c9, patch with the smoke): unsplit
+  placement to 0.5 rung inside the wall; host VP viscosity = eta_0 of a TransverseIsotropicFlowModel; on the
+  footprint eta_1 = max(eta_min_b, min(eta_0, f_b tau_y/(2 gdot) + eta_reg_b)); director = nearest segment's
+  normal; mask = whole band; slip by velocity-jump probe at +-(w/2 + h); band stress terms recorded separately.
+  **TAf_env:** TAf rerun with the envelope locator (6-8 h, one node) approved by the hub for like-for-like physics,
+  since TAf's parabola fits failed late; it doubles as the locator A/B on the thermal set. Louis may cancel. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1453,3 +1472,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Newton; no welds, refusals or rejected fits. Demo rerun (2375) on n3 at ~40 min.
 - 2026-10-29: demo movie delivered (job 2375; artifact 3NDYkgLksNA1yuQGdvVrZ3); Open work row closed; flagged to the
   docs hub in "For the other hubs". Kaiju moves to the TI comparison on the free node.
+- 2026-10-29: kaiju's TI path implemented (local, patch with the smoke) but any unsplit placed coarse MG level OOMs
+  the first solve: library defect recorded for the dev hub; TI runs at -uw_chain 0 with a chain-0 split control.
+  No-op checks (TI band off vs VP host, chain 0) running (2388/2389); push-down follows. TAf_env rerun approved.
