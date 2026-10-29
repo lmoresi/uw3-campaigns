@@ -256,7 +256,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   be misconfigured without a runnable example to show the reference behaviour. For the docs hub: each note
   carries a runnable example at the note's settings (UWTN 2026-018 for the TI/split fault multigrid is the first
   case). For the dev hub: a yielding-TI Newton example/test is the regression gate for #889/#890; kaiju is checking
-  the kaiju build against whatever exists now and will report whether a gap exists.
+  the kaiju build against whatever exists now and will report whether a gap exists. **Result (2026-10-30):
+  test_1066 and test_1052 pass on 547c2e54, no regression. GAP: no test or example exercises the purely viscous
+  yielding TI (TransverseIsotropicVEPFlowModel with finite yield_stress and no elastic term), and the library's
+  own annulus example falls back to an isotropic zone when yielding is on. Both a test and a bundled example are
+  owed; kaiju's smoke on the VEP model (job 2412) will say whether that path converges under Newton.**
 - 2026-10-29, to the docs hub: the add-on mesh demo movie for UWTN 2026-022 is redone with the robust (envelope)
   fault fit, rebuilt every step, fixed windows, 30 frames: page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3,
   files on kaiju figures_out/addon_demo/mesh_movie/ (mp4, per-step json, README) for Louis's rsync. The per-step
@@ -611,7 +615,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   stub, yielding as the TI band) behind a flag; hub ordered its smoke to wait for the TI law that passes the
   Jacobian/regression checks, and asked kaiju to find the exact "split plus TI to the surface" configuration
   in the library's scripts/tests (model class, elastic term or not, tangent, floor, regularisation) and use its
-  settings as the reference. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  settings as the reference. **FOUND (kaiju, page v3):** scripts/sessions/fault_mg/zg95_annulus.py --arm split:
+  plain TransverseIsotropicFlowModel, eta_0 = eta(T), eta_1 = 1e-3 eta_0 on the ladder's cap and last rungs above
+  the cut's tip, one constant director, frictionless contact, tol 1e-5, 3 Picard, Newton switch 1e-2, no floor,
+  no regularisation, no elastic term, and ONLY without yielding (with --yield0 > 0 it swaps to an isotropic zone;
+  "no yield stress without elasticity" means the plain TI model has no yield parameter). A purely viscous
+  yielding TI exists (TransverseIsotropicVEPFlowModel is viscoplastic whenever yield_stress is finite) but no
+  library test exercises it without elasticity (test_1052 uses elasticity). **Regression check: test_1066 (TI
+  tangent oracle) and test_1052 (VEP, TI VEP yield) pass on 547c2e54 (12 passed): NO REGRESSION; the stagnation
+  is the configuration, our hand-written yielding eta_1.** Tangent oracle on our cases: the VP host 6.7e-11;
+  hand hard / hand smooth / linear eta_1 pending. Running: 2412 the TI band on the library's TI VEP model
+  (-uw_ti_model vep; director as a column, 4c09942) 5 steps from TAti_smooth checkpoint 5; 2413 the bridge smoke on
+  the reference law (split + -uw_bridge_ti 1 -uw_ti_model linear, eta_1 = 1e-3 eta_0 over the bridge on the
+  yielding host), TAf checkpoint 40, chain 0, 6 steps. Local commits b554cf4, 3d82360, 4c09942 on kaiju/ti-smooth
+  over 67dd2c8; patches with the results. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1690,3 +1707,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   bridge is isotropic (copied from the library example's yield fallback), so no faulted run had TI at the surface.
   -uw_bridge_ti in implementation; smoke waits for the validated TI law; the reference configuration to be found
   in the library's own scripts.
+- 2026-10-30: reference configuration found (fault_mg/zg95_annulus.py --arm split: linear TI eta_1 = 1e-3 eta_0 on the
+  cap above the cut, no yield in the TI part); library TI tests pass on kaiju's build (no regression); stagnation
+  is our hand-written yielding eta_1. Smokes 2412 (TI VEP model) and 2413 (split + TI bridge on the reference law)
+  running. Test/example gap for purely viscous yielding TI recorded for the dev and docs hubs.
