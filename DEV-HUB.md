@@ -155,8 +155,8 @@ on wombat, summary.md b8705fab, at 799ef021) finds the following.
 That is 2-D only: about 32k block rows summed at ratio 25.
 
 **Plan.** Steps 1 to 4 wait for Louis's go; the proposed owner is the laptop integration
-session, which measured #892 and ran the sweep. The full text, ready to post on #892, is
-in this session's scratchpad; the classifier refused the post.
+session, which measured #892 and ran the sweep. The same plan is posted on #892
+(issuecomment-6505605906, 2026-10-31, on Louis's word).
 
 1. Confirm the scope on one fixture by reading the live block PC:
    - development, rotated path: expected `ilu`;
@@ -289,8 +289,7 @@ refuses deletions from here, so this needs a laptop or Louis.
 ## Waiting on Louis
 
 - **#892: go to brief the integration session with steps 1 to 4 of the plan** (the
-  PRIORITY section), and whether the plan may be posted on #892 (the classifier refused
-  the hub's post).
+  PRIORITY section).
 - After #892's fix and the re-measurement: the production multigrid tail for faults
   (welded base with the FAC LU patch, or the chain).
 - The public multigrid-levels accessor the docs hub asks for: yes or no, and where.
@@ -349,3 +348,4 @@ refuses deletions from here, so this needs a laptop or Louis.
   items into the intake table. Merge order gains D (the #892 fix) after #890.
 - 2026-10-31: Louis approved the "reach my other sessions" grant; the plan's summary was
   delivered to the notes session (wombat).
+- 2026-10-31: Louis: the plan goes on #892. Posted (issuecomment-6505605906).
