@@ -48,6 +48,7 @@ transcripts. If it dies:
 | laptop (wombat), run transcripts | `session_01Na7qBenCp67rDTZhFGTh5V` ("Sinking blob adjoint Taylor test"): `note/run-transcripts` (UWTN 2026-019) |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H`: holds a restart-limitation doc patch, unpushed (see Open work) |
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"), opened by Louis 2026-10-28 for `FAULT-SPLIT-INTEGRATION.md` items 2 and 3; reports here |
+| dev hub | `session_01HxWvn6vA38fdYLUxnxDk4g` ("Development issues hub"), from 2026-10-29; keeps `DEV-HUB.md`: the PR queue (A #882, B #889, C #890, and #861, #862), library fixes without a PR, problems sessions raise. `FAULT-SPLIT-INTEGRATION.md` and the notes' re-pin stay with this hub. Cloud to cloud cannot message; the hubs read each other's files and each keeps a "For the other hubs" section. |
 
 Messaging: the hub can message the laptop sessions. Sessions on machines whose Claude
 Code cannot prove a trusted device (hyperion) are read through their transcripts.
@@ -145,6 +146,23 @@ Measured here, not inherited.
 | Capability guides and skills | `.claude/skills/` are symlinks into `docs/developer/guides/`; a change to a solver, constitutive model, history scheme or boundary mechanism must update the guides that name it, in the same change (CLAUDE.md ruling on `development`). Nobody checks this across PRs today. |
 | v3.2.0 release documents | `release-notes/v3.2.0.md`, feature manifest, committee pre-read and feature table landed on `main` via the release branch; they are on `development` too. The technical note for the release is PR #58 above. |
 | Wiki | 19 pages; Home's lifecycle rule says a topic page graduates to `docs/` when it stops moving. No page has graduated yet. Candidates to check against `docs/`: Solvers and multigrid, Transport histories, Fault multigrid (each has a `docs/` counterpart that may now disagree). |
+
+## For the other hubs
+
+- 2026-10-30, to the dev hub: two items from the UWTN 2026-022 work that belong on the
+  PR side. (1) A public accessor for a mesh's multigrid levels: the production recipe
+  and the note's "Using it" code need `base._coarse_level_meshes()[:-1] + [base]`, and a
+  published note cannot name a private method; a `Mesh` property that returns the
+  levels coarsest to finest, on B or C or as a small PR before the note publishes.
+  (2) The faults-in-convection guide's prose on B and C says the chain ladders sit "on
+  the base levels one and two steps below the finest"; its own code and cell counts put
+  `2S` on the finest level and `4S` one down (journal entry
+  `2026-10-30-the-production-chain-puts-2s-on-the-finest-base-level-...`). One sentence
+  to fix before B merges. The drivers' comments in uw3-campaigns say the same wrong
+  thing; that is the science hub's file.
+- 2026-10-30, to the science hub: the drivers' chain comments (`annulus_fault.py`,
+  `annulus_faults.py`, `box_fault.py`: "the base level k steps below the finest") are
+  off by one against their own indexing; the code is right, the comment is not.
 
 ## Open work
 
@@ -295,3 +313,11 @@ Measured here, not inherited.
   corrected the hub's nesting wording: production widens the band with the level, so
   the chain nests along the spine only; vertex nesting was the rig's constant-width
   case. Journal correction entry written; the guide on PR #862 amended.
+- 2026-10-30 (later): the notes session found the chain's hosts off by one in the
+  journal, the guide prose, the drivers' comments and the figure's panel (c): the code
+  puts `2S` on the finest base level and `4S` one down; and the rig's band-ratio table
+  is confounded with cell aspect (three nodes across a fixed width). Both confirmed from
+  the drivers and the guide's cell counts; correction entry; the fault-multigrid topic
+  page gained a "Current understanding" section; the guide on #862 corrected; the
+  panel (c) redraw routed to the integration session under Louis's figure ask. Louis:
+  a dev hub now keeps `DEV-HUB.md` and the PR side; added to the table above.

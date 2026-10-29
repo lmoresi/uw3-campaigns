@@ -229,8 +229,12 @@ comment, all mergeable, CI pending:
 | B | #889 | `feature/fault-split-multigrid` | development | green but #826 |
 | C | #890 | `feature/fault-split-integration` 4698938f | `feature/fault-split-multigrid`; retarget to development when #889 merges | tier A 1498 passed; np 2 180, np 4 191 passed; #826 only |
 
-Merge order: #882, then #889 after it takes development with #882 in, then #890
-retargeted. Issues left open by the three reviews: #866 to #868 (A), #869 to #881 (B),
+From 2026-10-29 the PR side (merge order, CI, reviews, stacked bases) is tracked in
+`DEV-HUB.md`; this file keeps the map, the validation record and the notes' re-pin.
+Follow-ups the notes raised: a public accessor for a mesh's multigrid levels (the
+recipe cannot name `_coarse_level_meshes()`), and one prose sentence in the
+faults-in-convection guide on B and C (the chain's hosts). Merge order: #882, then
+#889 after it takes development with #882 in, then #890 retargeted. Issues left open by the three reviews: #866 to #868 (A), #869 to #881 (B),
 #883 to #888 (C). After #890 merges: the notes' `software_version` moves to its
 development merge commit (the hub does this); kaiju's 30-step restart A/B can be built
 as an overlay from 4698938f now (the science hub's item).
