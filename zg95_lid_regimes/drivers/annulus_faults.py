@@ -2215,6 +2215,8 @@ for k in range(k0, k0 + params.uw_steps):
             if faults:
                 f = faults[0]
                 moved = polyline_gap(poly, f["points"])
+                for key in ("raw", "trench_gap", "top_dip_data", "top_dip_floored", "particle_trench"):
+                    f.pop(key, None)                 # the record's keys describe the locator named in it
                 f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth, **info})
                 damage[f["name"]] = float(moved)
             else:
