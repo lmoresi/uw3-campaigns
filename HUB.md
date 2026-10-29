@@ -223,6 +223,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   transfer build (barycentric, cross_partition auto) between unsplit placed levels. Repro on kaiju:
   runs/slab_ti_check2b (TAf checkpoint 40, -uw_fault_realisation ti -uw_ti_check 2), build 547c2e54. The science
   hub works around it with -uw_chain 0 for the TI runs. Please file.
+- 2026-10-29, to the dev hub, TO CHECK (not a finding): on the split fault (rotated fault BC, add_fault_bc(0)),
+  kaiju's offline estimate of the NORMAL traction differs between the two faces below 0.08 deep (about -0.4 against
+  +0.3 of the host yield; estimated from each side's velocity and the smoothed log10 eta field, 0.25w off the cut),
+  where a contact must transmit it equally. May be the per-side pressure interpolation in the estimate. A
+  library-side face traction from the contact constraint's reaction would settle it; worth a probe when the
+  fault-split PRs are reviewed. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
+  yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
+  x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
+  bridge-own floor), but the library's split realisation has the same bridge design.
 - 2026-10-29, to the docs hub: the add-on mesh demo movie for UWTN 2026-022 is redone with the robust (envelope)
   fault fit, rebuilt every step, fixed windows, 30 frames: page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3,
   files on kaiju figures_out/addon_demo/mesh_movie/ (mp4, per-step json, README) for Louis's rsync. The per-step
@@ -457,7 +466,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   band taking the shear). Kaiju asked for the tangential traction on the split faces (zero if truly frictionless;
   else a library finding) and a crust/bridge overlay on the profile by depth band. **TAti RUNNING as job 2398**
   (852c6aa pinned in zg95-tati, L1, chain 0, envelope, precedence 1, pres_rtol 1e-2, checkpoints every 5, from
-  step 0, stop_at_base EVERY=5). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  step 0, stop_at_base EVERY=5). **Split restraint (kaiju, page v4, offline on the chain-0 control 42-45):**
+  geometric, the cut is LOCKED AT THE TOP by the bridge zone. Tangential traction estimate on the faces (2 eta
+  t.E.n from each side's own velocity, 0.25w off the cut, eta from the smoothed log10 eta): body 0.04-0.12 deep
+  1e-3 to 1e-2 of the host yield (median 1.1-1.3 % against 4.6-9 % in the host 2w away), i.e. close to free; top
+  0.04 under the bridge 0.1-1 of yield. Jump by depth band (split / TI L1): below the bridge 2900 / 6607; body
+  2203 / 5549; tip 652 / 1735; the split's one-sided host shear is present at every depth and the crust along
+  the same normals is the same in both runs (0.3-0.5 particles per probe), so the crust-beside-the-fault guess
+  is NOT supported. Mechanism: the bridge's x1e-3 weakening is undone by the global floor (1) and rate
+  strengthening (10), as the TI design report found; a crack locked at one end slips less along its length and
+  the host takes the rest; the TI band outcrops with its own floor (0.033) and has no lock. **Hub: one-smoke
+  test approved behind a flag (bridge-own floor and regularisation, defaults = host, the split unchanged): the
+  chain-0 control from 40 with the bridge at the TI L1 values; plus an offline count of how much of each
+  faulted thermal run's fault lay in the bridge zone, since a locked top biases those results. The bridge
+  rheology for production is then Louis's split-side choice.** (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1503,3 +1525,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-29: TAti launched (job 2398). Slip-rate profile: TI localised, split spread; the split is the restrained
   one. Kaiju asked to measure the tangential traction on the split faces and overlay crust/bridge on the profile.
   Three kaiju jobs in flight: Earth 2374, TAf_env 2390, TAti 2398.
+- 2026-10-29: kaiju: the split fault is locked at the top by the bridge zone (global floor and rate strengthening
+  override its weakening); the crust-beside-the-fault guess not supported. One-smoke test with a bridge-own floor
+  approved behind a flag; bridge-zone share of the faulted thermal runs' faults to be counted. Normal-traction
+  asymmetry on the faces passed to the dev hub as "to check".
