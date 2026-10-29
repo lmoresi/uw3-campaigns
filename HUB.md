@@ -150,6 +150,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
+| Split-contact probe (box, straight split fault, pure shear, mode-II crack reference; verdict frictionless) | https://claude.ai/artifact/9Au3HFWLqkHt2geWohQpYa |
 | TI-band push-down smoke (no-op check, L0-L3 strength sweep, cost rows, slip on a common probe, director check) | https://claude.ai/artifact/7mau5dPymUCYGPYJCCDnME |
 | Robust crust-fit proposal (parabola vs envelope trace vs flexure+envelope on 40 stored checkpoints; failure modes; locator/placement split; generality) | https://claude.ai/artifact/SgZjTP3MdeSxaGRNPup8hG |
 | Add-on mesh demo movie, envelope fit, rebuilt every step (30 frames, two fixed windows, per-step table) | https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3 |
@@ -231,7 +232,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault-split PRs are reviewed. UPDATE 2026-10-30: the bridge-zone explanation of the split's restraint tested
   negative, so the contact constraint is the prime suspect; the science hub has kaiju running a minimal box probe
   (straight split fault, linear host, simple shear, tractions vs the frictionless answer). Result will be
-  recorded here as a finding or cleared. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
+  recorded here as a finding or cleared. **CLEARED 2026-10-30:** the probe (page 9Au3HFWLqkHt2geWohQpYa, script
+  kaiju-launch/ti/split_probe/) shows the split contact frictionless at np 1 and 4; the normal-traction asymmetry
+  was the estimate's artefact and does not appear in a linear host. Close the "to check".
+- 2026-10-30, to the dev hub, FEATURE REQUEST (from the science hub, evidence on the probe page): surface-breaking
+  split faults. `fault_split` refuses a cut that touches the domain boundary ("Only strictly interior faults, with
+  both tips inside the mesh, are supported in this version"), so a subduction megathrust is necessarily a buried
+  crack whose top tip, 3 rungs inside the free-slip wall, tapers the slip to zero and halves it along the whole
+  fault against an outcropping band. Subduction needs a cut reaching a free-slip (rotated) boundary, with the
+  tip's constraint released at the wall. Bears on #889/#890 and on every faulted annulus result to date. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
@@ -498,7 +507,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (9-65; 65 % at 40-50 = the stale near-tangent parabola fault). **Hub asked kaiju for a minimal library probe:**
   a box with one straight split fault, linear host, wall-driven simple shear, np 1 and 4; slip, tangential and
   normal face tractions against the analytic frictionless answer; also with the cut reaching the wall. If the
-  contact carries shear it is a library defect with a two-minute repro for the dev hub (#889/#890). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  contact carries shear it is a library defect with a two-minute repro for the dev hub (#889/#890). **PROBE DONE
+  2026-10-30 (page 9Au3HFWLqkHt2geWohQpYa): the contact is FRICTIONLESS.** Unit box, 45 deg split fault a = 0.12,
+  linear host, pure shear by the walls' normal velocity (simple shear resolves to zero on 45 deg); peak slip
+  0.96-0.97 of the frictionless mode-II crack (0.93 at the measured far stress), identical at np 1 and 4; the
+  face shear-traction estimate halves with h (0.21 -> 0.10 of tau_inf), i.e. the O(h) error of the estimate;
+  normal traction continuous and equal to the library's reaction. **The annulus restraint is the BURIED UPPER
+  TIP:** the library refuses a cut touching the boundary ("only strictly interior faults ... supported"), so
+  the split's top tip sits 3 rungs (0.012) inside the wall, its slip tapers to zero there and is lower along the
+  whole length, and the host beside it shears to make up the difference; this matches every annulus measurement
+  (top traction, half the TI slip at every depth, one-sided shear, bridge test +5-12 %). The annulus face
+  traction (~1 % of yield) is within the method's error, not friction. The TI band outcrops. So TI vs split was
+  surface-breaking vs buried: **hub approved the like-for-like smoke (TI with -uw_ti_trace_inset 3, chain 0, L1,
+  from 40)** and an offline mode-II taper estimate of how much the buried tip cost the faulted thermal runs. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1551,3 +1572,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: Earth production run 1 complete at the base (81 steps, 5.1 h; page v7). Bridge test negative (the
   split's restraint is not the bridge zone); flag applied as 4aa798c; minimal split-contact probe asked of kaiju;
   dev-hub item updated. TAti (2398) and TAf_env (2390) continue.
+- 2026-10-30: split-contact probe: frictionless; the annulus restraint is the buried upper tip (library cannot cut
+  to the wall). Dev-hub "to check" cleared; feature request for surface-breaking split faults recorded. Like-for-
+  like TI smoke (buried band) and a taper estimate for the thermal set asked of kaiju.
