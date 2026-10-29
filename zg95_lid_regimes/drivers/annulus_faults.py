@@ -189,6 +189,9 @@ params = uw.Params(
                                 #   eta_reg_b (its floor), its own softmin and tangent
     uw_ti_smooth=0,             # ti: 1 = the band's min and floor in the host's own smooth forms (_combine_yield's
                                 #   softmin, _apply_floor's smooth max, the host's delta) for Newton; 0 = hard Min/Max
+    uw_bridge_ti=0,             # split: 1 = the bridge zone (the cut's top to the wall) is a TI weak plane, director
+                                #   along the fault, yielding by the TI band's law (uw_ti_*, -uw_ti_model) in place of
+                                #   the isotropic x uw_eta_w zone: the split plus TI to the surface (Louis, 2026-10-30)
     uw_bridge_eta_min=1.0,      # split: the bridge zone's own viscosity floor (the host's is 1; the zone's x uw_eta_w
                                 #   weakening is otherwise undone by it): 1 = unchanged
     uw_bridge_eta_reg=10.0,     # split: the bridge zone's own rate strengthening (the host's uw_eta_reg, 10): 10 = unchanged
@@ -1188,7 +1191,9 @@ class FaultedMesh:
             self.band_mask.array[:, 0, 0] = (band | bridge).astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
-        weak = (1 - (1 - params.uw_eta_w) * self.zone.sym[0]) * ridge_factor(
+        bridge_ti = bool(params.uw_bridge_ti) and not TI and bool(self.faults)
+        zone_iso = 0 if bridge_ti else self.zone.sym[0]   # a TI bridge carries no isotropic weakening
+        weak = (1 - (1 - params.uw_eta_w) * zone_iso) * ridge_factor(
             mesh, r_o, ridges, params.uw_ridge_width, params.uw_ridge_depth, params.uw_ridge_weak)
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
@@ -1223,6 +1228,9 @@ class FaultedMesh:
         self.ti = None
         if TI and self.faults and params.uw_ti_check != 2:
             self.ti = ti_band_viscosity(s, self, footprint, tag)
+        elif bridge_ti:            # the split plus a TI weak plane from the cut to the surface
+            self.ti = ti_band_viscosity(s, self, bridge, tag)
+        if self.ti is not None:
             # for the checkpoint's band record: eta_1/eta_0, and how much of the shear lies in the
             # weak plane (gdot / edot_II: 1 where the director is the shear's own normal)
             # cell means (DG0): a P1 projection averages a two-cell band with its neighbours
