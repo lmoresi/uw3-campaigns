@@ -1208,7 +1208,9 @@ class FaultedMesh:
             s.petsc_options["fieldsplit_velocity_ksp_rtol"] = float(params.uw_vel_rtol)
         s.consistent_jacobian = "continuation"
         s.newton_switch_rtol = params.uw_newton_switch
-        set_custom_fmg(s, self.levels, field_id=0)
+        # a painted (TI) band has no split topology for the finest level's strong patch to
+        # detect: key the patch on the band explicitly, as the library asks (custom_mg, #629)
+        set_custom_fmg(s, self.levels, field_id=0, fac_zone=(band if TI and self.faults else None))
         self.stokes = s
         self.has_guess = False
 
