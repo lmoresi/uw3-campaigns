@@ -150,6 +150,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
+| Thermal comparison page: TAf vs TAf_env locator A/B (TAti to be added) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
 | Split-contact probe (box, straight split fault, pure shear, mode-II crack reference; verdict frictionless) | https://claude.ai/artifact/9Au3HFWLqkHt2geWohQpYa |
 | TI-band push-down smoke (no-op check, L0-L3 strength sweep, cost rows, slip on a common probe, director check) | https://claude.ai/artifact/7mau5dPymUCYGPYJCCDnME |
 | Robust crust-fit proposal (parabola vs envelope trace vs flexure+envelope on 40 stored checkpoints; failure modes; locator/placement split; generality) | https://claude.ai/artifact/SgZjTP3MdeSxaGRNPup8hG |
@@ -558,7 +559,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   chain supervisor kaiju-launch/ti/TAti_smooth_chain.sh detached on the login node (runs stop_at_base EVERY=5 per
   segment, ends at the base, else submits the next 12 h segment from the last complete checkpoint, at most 5
   segments; log chain.log; stop = kill the supervisor then scancel). 2398 cancelled after step 6 (checkpoints 0, 5
-  kept; README says why). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  kept; README says why). **TAf_env DONE (job 2390): base at checkpoint 90, stopped after 100 (t 0.000255), 101
+  steps, 5.6 Newton, 340 s/step, 9.5 h, no refusals or welds. Locator A/B (page TAUT7fi5cM75zkbna7gm9R):** trench,
+  hinge and tip histories nearly overlie TAf (parabola) and TAf_env (envelope); plateness the same (P10 0.088 vs
+  0.096; TAc 0.119); t on base 0.000224 vs 0.000235 (TAc 0.000245); but slip median 6243 vs 4200 (late max
+  6000-9000 vs 4000-6000) and incoming plate 760 vs 686 (TAc 580): the parabola's late faults were stale or ran
+  along the surface and slipped more freely. Dips 31-37 in both. 25 % cheaper per step on the envelope. **The
+  envelope run is the reference for the thermal set from here; TAf's slip and plate speed are overstated by
+  ~50 % and ~10 %.** Both carry the buried tip (~0.42 of a surface-breaking fault). **TAti_smooth segment 1:** step
+  7 at 3 h; steps 0-5 as the smoke; after the rebuild at step 5 (trench +0.3, dip 67) step 6 did NOT converge (19
+  Newton, driver carries on) and step 7 took 17 Newton / 1765 s; ~2.7 steps/h, 3-4 segments (36-45 h). Hub's pause
+  trigger: two consecutive unconverged steps or more than two in any ten; kaiju to check whether the rebuild
+  Picard switch fires on the TI path (a cold Newton on the moved kink would explain the post-rebuild trouble). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1624,3 +1636,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   node-hours, node otherwise idle); hard-law 2398 stopped. Patch a00a10b pending in full form.
 - 2026-10-30: smooth band-law patch applied as 67dd2c8; TAti_smooth chained run live (segment 1 job 2405, supervisor
   on the login node). Branch head 67dd2c8.
+- 2026-10-30: TAf_env at the base; locator A/B: large-scale evolution and plateness independent of the locator, but
+  the parabola overstated slip ~50 % and plate speed ~10 %; envelope run is the thermal-set reference. TAti_smooth:
+  one unconverged step after the first rebuild; pause trigger set; rebuild Picard switch on the TI path to check.
