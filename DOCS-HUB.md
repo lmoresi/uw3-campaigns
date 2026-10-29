@@ -272,3 +272,7 @@ Measured here, not inherited.
   `figures/src/` copies are the citable scripts until the originals land in
   uw3-campaigns. Two journal entries from B's review. Details in
   `FAULT-SPLIT-INTEGRATION.md`.
+- 2026-10-29 (later): B open as #889 with the non-fault evidence in its body; C pushed
+  (4698938f), opening stacked on #889; the datum-only continuation case measured and
+  not a must-fix (#883 follows C). Journal: the follow-up measurement supersedes the
+  morning's finding, the first use of `status: superseded`.

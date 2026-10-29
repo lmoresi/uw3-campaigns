@@ -206,6 +206,20 @@ it may skip Picard, unmeasured. The hub's advice: leave the resolution, measure 
 continuation case, fix in its own small PR after C (journal entry
 `2026-10-29-datum-only-cold-start-reference-...`).
 
+**2026-10-29, later. B is open: underworld3 #889** (base development, review posted
+as its first comment). Its body carries the non-fault numbers, development against B,
+velocity iterations: adapted annulus np 1 18 to 3, np 4 197 to 4; adapted spherical
+shell (40,074 cells, custom FMG, np 1) 17 to 12; answers equal to 9 digits (annulus)
+and 2.4e-7 (shell). A plain refined Annulus or SphericalShell solves on GAMG on both
+builds, identically (the plain shell's velocity solve sits at its 200-iteration cap on
+both, pre-existing). B's suites: tier A serial 1497 passed; parallel np 2 168 passed,
+np 4 176 passed; the only failure #826. The datum-only continuation case was measured
+(a viscoplastic sheet on a sphere with a prescribed normal velocity as its only
+forcing: Picard skipped, converged in 10 Newton iterations, no stall), so the
+`rotated_bc.py` resolution stays and the reference fix is #883, a small PR after C;
+`ThinSheet.solve(picard=N)` is a TypeError (#876). **C is pushed at 4698938f** and
+opens stacked on #889 when its final suites finish.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
