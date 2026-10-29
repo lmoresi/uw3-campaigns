@@ -64,6 +64,10 @@ params = uw.Params(
     uw_window=150,              # steps of iteration history in the solver strip
     uw_solver_mesh="annulus.solver_mesh",   # the checkpointed solver mesh's file prefix (kaiju's driver)
     uw_trace_width=0.0,         # px: the fault trace on every panel of a whole-annulus frame (uw_zoom 0); 0 keeps the zoom widths
+    uw_vring=0.0,               # > 0 (whole-annulus strain frames): the surface horizontal velocity drawn as a ring outside the
+                                #   surface, trenchward positive (outward), uw_vring_vmax mapped to this height (layer depths)
+    uw_vring_vmax=0.0,          # the speed drawn at uw_vring's height; 0: each frame's own largest |v| (a movie wants a fixed one)
+    uw_vring_h=0.0156,          # the base mesh's cell size: velocity nodes within half of it of the outer wall are the surface
 )
 if params.uw_panels == "solver" and params.uw_zoom <= 0:
     params.uw_zoom = 0.5        # the solver panels are a window on the trench
@@ -169,6 +173,38 @@ def streamlines():
         initial_step_length=0.01, max_steps=400, terminal_speed=max(vmax * 1e-4, 1e-9)), vmax
 
 
+def velocity_ring(theta_0, z=0.02):
+    """The surface horizontal velocity as a ring around the annulus (uw_vring): the trench is
+    where the surface tangential velocity drops most steeply within 25 deg of theta_0; each
+    surface node's velocity is signed toward the trench along the shorter arc (trenchward
+    positive, so it changes sign at the ridge opposite), and drawn at r_o + gap + uw_vring x
+    v / vmax. Returns (ring, zero circle, top circle, vmax, trench angle)."""
+    xy = np.asarray(V.coords)[:, :2]
+    v = np.asarray(V.array).reshape(len(xy), -1)[:, :2]
+    r = np.hypot(xy[:, 0], xy[:, 1])
+    h = float(params.uw_vring_h)
+    surf = r > r_o - 0.5 * h
+    th = np.arctan2(xy[surf, 1], xy[surf, 0])
+    vt = (-v[surf, 0] * xy[surf, 1] + v[surf, 1] * xy[surf, 0]) / r[surf]
+    o = np.argsort(th)
+    th, vt = th[o], vt[o]
+    rel = (th - theta_0 + np.pi) % (2 * np.pi) - np.pi
+    near = np.abs(rel) < np.radians(25)
+    dv = np.gradient(vt, th)
+    theta_tr = float(th[near][np.argmin(dv[near])]) if near.any() else theta_0
+    v_tw = vt * np.sign((theta_tr - th + np.pi) % (2 * np.pi) - np.pi)
+    vmax = float(params.uw_vring_vmax) or float(np.abs(v_tw).max())
+    r0 = r_o + 0.06
+    rr = r0 + float(params.uw_vring) * v_tw / vmax
+    pts = np.c_[rr * np.cos(th), rr * np.sin(th), np.full(len(th), z)]
+    ring = pv.lines_from_points(np.vstack([pts, pts[:1]]))
+    c = np.linspace(0, 2 * np.pi, 721)
+    zero = pv.lines_from_points(np.c_[r0 * np.cos(c), r0 * np.sin(c), np.full(len(c), z)])
+    top = pv.lines_from_points(np.c_[(r0 + params.uw_vring) * np.cos(c), (r0 + params.uw_vring) * np.sin(c),
+                                     np.full(len(c), z)])
+    return ring, zero, top, vmax, theta_tr
+
+
 def place_camera(pl, theta_trench=None):
     """The whole annulus, or with ``uw_zoom`` a window on the trench, centred on the
     layer's mid-depth below it."""
@@ -188,7 +224,7 @@ def place_camera(pl, theta_trench=None):
     # the view sits low so the colour bar fits under the annulus
     pl.camera.focal_point = (0.0, -0.1 * r_o, 0.0)
     pl.camera.position = (0.0, -0.1 * r_o, 10.0)
-    pl.camera.parallel_scale = 1.18 * r_o
+    pl.camera.parallel_scale = 1.18 * r_o + (1.1 * (params.uw_vring + 0.06) if params.uw_vring > 0 else 0.0)
 
 
 def render_strain(index, state, trace, strm, vmax, bar, outline=()):
@@ -224,10 +260,21 @@ def render_strain(index, state, trace, strm, vmax, bar, outline=()):
               (pv_e, "log10 strain rate", "viridis", (e_lo, e_hi)),
               (pv_ep, "log10 plastic strain rate", "viridis", (e_lo, e_hi)),
               (pv_g, "plastic strain", "magma_r", (0.0, g_hi))]
+    vring = None
+    if params.uw_vring > 0 and params.uw_zoom <= 0:
+        vring = velocity_ring(float(state.get("params", {}).get("uw_theta_trench", 0.0)))   # the driver's angle is in radians
     for n, (pv_mesh, name, cmap, clim) in enumerate(fields):
         pl.subplot(0, n)
         pl.add_mesh(pv_mesh, scalars=name, cmap=cmap, clim=clim, lighting=False,
                     scalar_bar_args=dict(title=name, **bar))
+        if vring is not None and n < 2:
+            ring, zero, top, v_ring, _ = vring
+            pl.add_mesh(zero, color="#888888", line_width=1.0, lighting=False)
+            pl.add_mesh(top, color="#cccccc", line_width=1.0, lighting=False)
+            pl.add_mesh(ring, color="#2c3e50", line_width=2.5, lighting=False)
+            if n == 1:
+                pl.add_text(f"surface velocity ring: trenchward outward;\nouter grey circle = {v_ring:.0f}",
+                            position="upper_left", font_size=9, color="black")
         if n == 0:
             if strm.n_points > 0:
                 pl.add_mesh(strm, color="black", line_width=1.0, lighting=False)
