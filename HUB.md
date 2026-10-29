@@ -185,21 +185,16 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
-- Earth-like public demonstration setup (Louis to kaiju directly): driver options on the branch (8eb5644, e5f661c),
-  two smokes done, page https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw. **Choices for Louis**: (a) raise Ra
-  to restore upper-mantle speeds or accept the slower clock (the x30 lower mantle slows the circulation ~7x,
-  vrms 40-70 against TAf's ~440, because most of the annulus lies below 670); (b) continent buoyancy (-0.5 used,
-  -0.39 neutral for a 0.05 d block over a 0.000625 lid); (c) -uw_pres_rtol 1e-2 used, not yet ruled; (d) the ridge
-  is fixed in place (a limitation to revisit). Smoke 2 (slab 0.2, buoyant continent, 20 steps, t 0.00086): tip
-  crosses 670 at ~step 3, 1-3 Newton its, 35-85 s/step, fault forms once the crust reaches the cap, dip 35-30,
-  slip 350-500; the continent a dark low-strain block nearly stationary on the velocity ring, the ridge
-  spreading both ways, the plate trenchward at 150-250. Follow-up not done: splitting the mobility and lid-depth
-  wall integrals into oceanic and continental arcs. Overlap check (earth_smoke2): crust and continent particles
-  never overlap, fault trace 0.053 from the continent at step 19, but the continent's trenchward edge is drawn
-  from 3.7 to 0.9 deg of the trench in 19 steps and will reach it in a longer run; then the continent's x100
-  (viscosity and yield) meets the fault band and the crust and the factors multiply. Decide the precedence where
-  continent strength meets crust weakness and the fault band (the fault's own rheology wins; which of the other
-  two wins is open). Kaiju re-checks each checkpoint and flags the first step the distance drops below 2W.
+- Earth-like public demonstration setup: RULINGS 2026-10-29 (Louis). The continental crust is not inherently
+  stronger (compositionally weaker if anything, somewhat buoyant, thermally strong through its shallow geotherm):
+  uw_over_eta 1 or below, negative uw_over_dT, strength from the cold lid. The fault rheology ALWAYS wins
+  (entrained material is subducted; not this experiment's question). Crust and continental material at
+  significant depth have mantle rheology: factors off below a depth D, markers tracked (a distinct material
+  index for entrained crust). The mantle: do not stiffen the lower mantle; weaken the UPPER mantle through a
+  depth-dependent term with the lithosphere's viscosity anchored (the asthenosphere channel from the plate's base
+  to 670 km, lower mantle unchanged). Kaiju implements the mask, the depth gating and the channel setting, smokes
+  20 steps, delivers page and patch. Still Louis's: Ra if the channel does not restore the speed, the buoyancy
+  value, pres_rtol, the fixed ridge. Page so far https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw.
 - Graded, relaxed base mesh (Louis, 2026-10-28): AGREED; UNASSIGNED since the laptop went inactive (kaiju could
   take it after the Earth setup). The laptop was to design and implement a lithosphere-graded
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
@@ -1181,3 +1176,7 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-29: kaiju: Earth clone at e5f661c; crust/continent overlap check clear (0 shared particles, min distance
   0.073 -> 0.046 over 19 steps) but the continent is drawn toward the trench (3.7 -> 0.9 deg) and will reach it
   in a longer run, where its x100 would compound with the crust factor; a precedence rule is needed there too.
+- 2026-10-29: Louis rules on the Earth setup: continent not stronger (buoyant, weak or neutral composition, strong
+  only thermally); fault rheology always wins; crust and continent at depth have mantle rheology but stay tracked;
+  weaken the upper mantle (asthenosphere channel, lithosphere anchored) instead of stiffening the lower mantle.
+  Kaiju tasked.
