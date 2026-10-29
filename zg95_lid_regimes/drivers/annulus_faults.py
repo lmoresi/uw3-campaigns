@@ -176,6 +176,15 @@ params = uw.Params(
                                 #   point to the wall; the unfloored dip is recorded
     uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
                                 #   depths) from the particle trench
+    uw_fault_realisation="split",  # "split": the fault cut and split, a frictionless contact; "ti": the band painted
+                                #   transversely isotropic on the unsplit placed mesh (FaultedMesh, ti_band_viscosity)
+    uw_ti_tau_frac=1.0e-2,      # ti: the band's yield stress, this fraction of the host's (tau0 + tau1 depth), on the
+                                #   resolved fault-plane shear
+    uw_ti_eta_reg=0.1,          # ti: the band's rate strengthening (added to its yield viscosity)
+    uw_ti_eta_min=0.1,          # ti: the band's viscosity floor (the host's is 1)
+    uw_ti_trace_inset=0.5,      # ti: the trace runs to this many rungs inside the wall: the band outcrops, no bridge
+    uw_ti_check=0,              # ti, checks only: 1 the TI model with the band off (eta_1 = eta_0); 2 the host
+                                #   viscoplastic model alone on the same unsplit mesh (1 and 2 must agree)
     uw_addon_timing=0,          # measurement runs (addon_timing.py): > 0 times each faulted-mesh build and
                                 #   its first solve, counts every level's cells per rank, forces this many
                                 #   rebuilds of the same set after the first step, stops after the last
@@ -315,6 +324,9 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 crust_on = params.uw_crust_weak < 1
+TI = params.uw_fault_realisation == "ti"
+if TI and SCALED:
+    raise ValueError("-uw_fault_realisation ti is not set up for a units run (-uw_scaled 1)")
 comp_on = params.uw_comp_dT > 0 or params.uw_comp_eta != 1
 if params.uw_fault_law == "crust" and not (crust_on or comp_on):
     raise ValueError("the crust fault law follows the base of the crust layer (uw_crust_weak < 1) "
@@ -505,13 +517,13 @@ def wrap(angle):
 
 def fault_trace(fault, coarsening=1):
     """A fault's spine (from just above the outer wall to its tip) and the trace to cut
-    (more than three finest rungs inside the wall), at ``coarsening`` times the rung
+    (trace_inset() finest rungs inside the wall), at ``coarsening`` times the rung
     spacing; the dip angle phi is measured below the local horizontal from +theta. A
     fault with ``points`` (the crust-following law) is that polyline, already at the
     rung spacing with its surface end above the wall."""
     if "points" in fault:
         spine = np.asarray(fault["points"], dtype=float)[::coarsening]
-        return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - 3.0 * S]
+        return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - trace_inset() * S]
     theta_t, phi = fault["theta"], np.deg2rad(fault["dip"])
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
@@ -523,7 +535,14 @@ def fault_trace(fault, coarsening=1):
     block = 2 ** int(params.uw_chain)
     n = block * max(1, int(round(length / (block * S))))
     spine = np.array([top + down_dip * (length * i / n) for i in range(n + 1)])[::coarsening]
-    return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - 3.0 * S]
+    return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - trace_inset() * S]
+
+
+def trace_inset():
+    """How many rungs inside the wall a trace stops: three for the split (the cut cannot
+    reach the wall; the isotropic bridge covers the rest), uw_ti_trace_inset for a TI band,
+    which outcrops and is its own bridge."""
+    return float(params.uw_ti_trace_inset) if TI else 3.0
 
 
 def placed_ladders(host, faults, coarsening):
@@ -548,7 +567,7 @@ def placed_ladders(host, faults, coarsening):
             mesh, info = place_fault_ribbon_2d(
                 host, [(name, trace) for name, _, trace in pieces], width * widen,
                 spines=[(name, spine) for name, spine, _ in pieces], margin_rings=rings,
-                clearance=clearance, split=True, mesher=mesher, seams=seams)
+                clearance=clearance, split=not TI, mesher=mesher, seams=seams)
             if n:
                 uw.pprint(f"  placed with margin_rings {rings}, clearance {clearance}, width x{widen}, "
                           f"seams {seams}, mesher {mesher}")
@@ -1016,6 +1035,60 @@ def crust_envelope_points(faults):
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
+def ti_band_viscosity(s, faulted, footprint, tag):
+    """Swap the solver's viscoplastic host for a transversely isotropic model whose eta_0
+    is that host's viscosity and whose eta_1, on the footprint, yields on the resolved
+    fault-plane shear gdot = sqrt(|E n|^2 - (n.E n)^2):
+
+        eta_b = max(eta_min_b, min(eta_0, f_b (tau0 + tau1 depth) / (2 gdot) + eta_reg_b))
+        eta_1 = eta_0 + fband (eta_b - eta_0)
+
+    with f_b, eta_reg_b, eta_min_b = uw_ti_tau_frac, uw_ti_eta_reg, uw_ti_eta_min (the band's
+    own bounds, not the host's floor 1 and rate strengthening). The director is each cell's
+    nearest trace segment's normal. f_b -> 0 with small eta_reg_b, eta_min_b is the limit
+    of the frictionless split. -uw_ti_check 1 turns the band off (fband = 0). Returns the
+    expressions the residual-stress record integrates."""
+    mesh = faulted.mesh
+    host = s.constitutive_model
+    eta_0 = host.viscosity
+    fband = uw.discretisation.MeshVariable(f"fband_{tag}", mesh, 1, degree=0, continuous=False)
+    director = uw.discretisation.MeshVariable(f"director_{tag}", mesh, mesh.dim, degree=0, continuous=False)
+    cells = np.asarray(model_xy(fband))
+    on = np.asarray(footprint, dtype=bool) if params.uw_ti_check != 1 else np.zeros(len(cells), dtype=bool)
+    fband.array[:, 0, 0] = on.astype(float)
+    normals = np.tile([0.0, 1.0], (len(cells), 1))
+    for name, (spine, _) in faulted.pieces.items():
+        seg = np.diff(spine, axis=0)
+        a = spine[:-1]
+        L2 = np.maximum((seg ** 2).sum(axis=1), 1e-300)
+        idx = np.flatnonzero(on)
+        if not len(idx):
+            continue
+        w = np.clip(((cells[idx, None, :] - a[None]) * seg[None]).sum(axis=2) / L2[None], 0, 1)
+        d = np.linalg.norm(cells[idx, None, :] - (a[None] + w[..., None] * seg[None]), axis=2)
+        k = np.argmin(d, axis=1)
+        t_hat = seg[k] / np.sqrt(L2[k])[:, None]
+        normals[idx] = np.c_[-t_hat[:, 1], t_hat[:, 0]]
+    director.array[:, 0, :] = normals
+    n = sympy.Matrix([director.sym[0], director.sym[1]])
+    E = mesh.vector.strain_tensor(faulted.v.sym)
+    En = E * n
+    gdot = sympy.sqrt(sympy.Max((En.T * En)[0] - ((n.T * En)[0]) ** 2, 0) + 1.0e-12)
+    depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
+    tau_y = tau0 + tau1 * depth
+    eta_y = params.uw_ti_tau_frac * tau_y / (2 * gdot) + params.uw_ti_eta_reg
+    eta_b = sympy.Max(params.uw_ti_eta_min, sympy.Min(eta_0, eta_y))
+    eta_1 = eta_0 + fband.sym[0] * (eta_b - eta_0)
+    s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
+    s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
+    s.constitutive_model.Parameters.shear_viscosity_1 = eta_1
+    s.constitutive_model.Parameters.director = n
+    at_floor = sympy.Piecewise((1, eta_y < params.uw_ti_eta_min), (0, True))
+    at_host = sympy.Piecewise((1, eta_y > eta_0), (0, True))
+    return {"fband": fband.sym[0], "director": director, "fband_var": fband, "eta_1": eta_1, "gdot": gdot,
+            "tau_y": tau_y, "on_yield": 1 - at_floor - at_host, "at_floor": at_floor, "at_host": at_host}
+
+
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
     solver, the bridge zones and the P1 fields the renders read."""
@@ -1044,9 +1117,17 @@ class FaultedMesh:
             self.levels = levels[:len(levels) - chain] + mids if chain else levels
             self.mesh, info, self.pieces = placed_ladders(base, self.faults, 1)
             band = np.asarray(info["band"], dtype=bool)
+            # ti: the band's rheology is painted on the footprints (band cells within 0.6 w
+            # of the trace), the paint the library's own TI realisation uses
+            footprint = np.zeros_like(band)
+            for mask in info["footprints"].values():
+                footprint |= np.asarray(mask, dtype=bool)
+            self.width = float(info["width"])
         else:                  # no fault: the base mesh is the solver's mesh
             self.levels, self.mesh, self.pieces = levels[:-1], base, {}
             band = None
+            footprint = None
+            self.width = W
         mesh = self.mesh
         self.T = uw.discretisation.MeshVariable(f"T_{tag}", mesh, 1, degree=2)
         self.v = uw.discretisation.MeshVariable(f"V_{tag}", mesh, mesh.dim, degree=2)
@@ -1070,6 +1151,8 @@ class FaultedMesh:
         if band is None:
             band = bridge
         for name, (spine, trace) in self.pieces.items():
+            if TI:             # a TI band outcrops: it is its own bridge
+                break
             near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
@@ -1104,6 +1187,10 @@ class FaultedMesh:
             # in a units run a viscosity: uw_eta_reg times the basal viscosity
             s.constitutive_model.Parameters.plastic_rate_strengthening = (
                 params.uw_eta_reg * eta_ref if SCALED else params.uw_eta_reg)
+        self.host_cm = s.constitutive_model
+        self.ti = None
+        if TI and self.faults and params.uw_ti_check != 2:
+            self.ti = ti_band_viscosity(s, self, footprint, tag)
         buoyancy = params.uw_buoy_T * self.T.sym[0]
         if comp_on:                # the slab's fixed temperature deficit, carried by the particles
             buoyancy = buoyancy - params.uw_comp_dT * clamp01(self.slab.sym[0])
@@ -1111,7 +1198,7 @@ class FaultedMesh:
             buoyancy = buoyancy - params.uw_over_dT * clamp01(self.over.sym[0])
         s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
         free_slip_walls(s)
-        for name in self.names:
+        for name in self.names if not TI else []:
             s.add_fault_bc(0, boundary=name)
         s.tolerance = params.uw_tol
         if params.uw_pres_rtol > 0:
@@ -1130,7 +1217,7 @@ class FaultedMesh:
         self.eta_projection.uw_function = sympy.log(eta_eff) / sympy.log(10)
         self.ratio_projection = uw.systems.Projection(mesh, self.yield_ratio)
         self.ratio_projection.uw_function = eta_eff / self.eta_T
-        cm = s.constitutive_model
+        cm = self.host_cm      # the viscoplastic host (under a TI model too): its strain-rate invariant
         self.edot_projection = uw.systems.Projection(mesh, self.edot_p)
         self.edot_projection.uw_function = cm._strainrate_inv_II * sympy.Max(
             0, 1 - eta_eff / (self.eta_T * weak))
@@ -1142,7 +1229,8 @@ class FaultedMesh:
         # for the solver record of the step that solves on this mesh
         self.mesh_record = {"levels_cells": level_cells,
                             "band_cells_fraction": band_cells / max(level_cells[-1], 1),
-                            "split_pairs": None, "chain_welded": welded}
+                            "split_pairs": None, "chain_welded": welded,
+                            "realisation": params.uw_fault_realisation, "width": self.width}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
@@ -1153,6 +1241,8 @@ class FaultedMesh:
         fault (Plus at -n, Minus at +n, 0.1 rungs), so an evaluation on a faulted source
         takes each side's own slip."""
         nudge = np.zeros((var.array.shape[0], 2))
+        if TI:                 # an unsplit mesh: one copy of every DOF
+            return nudge
         _, sub = self.mesh.dm.createSubDM(var.field_id)
         sec = sub.getLocalSection()
         width = var.num_components
@@ -1213,10 +1303,15 @@ class FaultedMesh:
         self.has_guess = True
         slips = {}
         for name in self.names:
+            if TI:
+                slips[name] = self.ti_slip(name)
+                continue
             _, slip, _ = fault_slip(self.stokes, name, info)
             slips[name] = float(uw.utilities.gather_data(
                 np.abs(slip).max() if len(slip) else 0.0, bcast=True).max())
+        extra = {"ti": self.ti_stress()} if self.ti is not None else {}
         return {
+            **extra,
             "newton": info.get("nonlinear_iterations"),
             "vel_its": info.get("vel_its_last"),
             "pres_its": info.get("pres_its_last"),
@@ -1226,6 +1321,48 @@ class FaultedMesh:
             "solver": solver_record(info, attempts, start, caught,
                                     {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer}),
         }
+
+    def ti_slip(self, name):
+        """A TI band's slip-equivalent: the tangential velocity jump across the band,
+        probed at +-(w/2 + h) along the trace's normals between 0.01 deep and 0.01 above its
+        tip (the library prefers a probe to band strain rate x w once w nears h). The largest
+        jump, as the split's slip_max is. Collective."""
+        _, trace = self.pieces[name]
+        trace = np.asarray(trace, dtype=float)
+        depth = r_o - np.hypot(trace[:, 0], trace[:, 1])
+        seg = np.diff(trace, axis=0)
+        t_hat = seg / np.linalg.norm(seg, axis=1)[:, None]
+        mid = 0.5 * (trace[1:] + trace[:-1])
+        keep = (0.5 * (depth[1:] + depth[:-1]) > 0.01) & (0.5 * (depth[1:] + depth[:-1]) < depth.max() - 0.01)
+        if not keep.any():
+            return 0.0
+        mid, t_hat = mid[keep], t_hat[keep]
+        n_hat = np.c_[-t_hat[:, 1], t_hat[:, 0]]
+        d = 0.5 * self.width + float(params.uw_cell) / 2 ** int(params.uw_refinement)
+        pts = np.vstack([mid + d * n_hat, mid - d * n_hat])
+        vel = np.asarray(uw.function.global_evaluate(self.v.sym, onto(pts))).reshape(-1, 2)
+        jump = ((vel[:len(mid)] - vel[len(mid):]) * t_hat).sum(axis=1)
+        return float(np.abs(jump).max())
+
+    def ti_stress(self):
+        """The TI band's residual shear stress against zero (the frictionless split),
+        averaged over the footprint and given as fractions of the host's mean yield stress
+        there: the whole stress 2 eta_1 gdot, and the two terms of the yielding branch,
+        f_b tau_y and 2 eta_reg_b gdot, with the footprint fractions at the floor and at the
+        host's own viscosity. Collective."""
+        t = self.ti
+        mesh = self.mesh
+        vals = {k: float(uw.maths.Integral(mesh, t["fband"] * e).evaluate())
+                for k, e in (("area", 1), ("stress", 2 * t["eta_1"] * t["gdot"]), ("tau_y", t["tau_y"]),
+                             ("term_fb", t["on_yield"] * params.uw_ti_tau_frac * t["tau_y"]),
+                             ("term_reg", t["on_yield"] * 2 * params.uw_ti_eta_reg * t["gdot"]),
+                             ("at_floor", t["at_floor"]), ("at_host", t["at_host"]))}
+        ty = max(vals["tau_y"], 1e-300)
+        area = max(vals["area"], 1e-300)
+        return {"stress_frac": vals["stress"] / ty, "term_fb_frac": vals["term_fb"] / ty,
+                "term_reg_frac": vals["term_reg"] / ty, "floor_frac": vals["at_floor"] / area,
+                "host_frac": vals["at_host"] / area, "footprint_area": vals["area"],
+                "f_b": params.uw_ti_tau_frac, "eta_reg_b": params.uw_ti_eta_reg, "eta_min_b": params.uw_ti_eta_min}
 
     def to_base(self, slips=None):
         slips = slips or {}
