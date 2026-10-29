@@ -157,6 +157,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page: TAf vs TAf_env locator A/B (TAti to be added) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Fault realisations in the box: split vs TI band against the mode-II crack (the reference example; sweeps of eta_1/eta_0 and w; wall placement) | https://claude.ai/artifact/Em96SAdVik4gAdhJC5LV7x |
 | Split-contact probe (box, straight split fault, pure shear, mode-II crack reference; verdict frictionless) | https://claude.ai/artifact/9Au3HFWLqkHt2geWohQpYa |
 | TI-band push-down smoke (no-op check, L0-L3 strength sweep, cost rows, slip on a common probe, director check) | https://claude.ai/artifact/7mau5dPymUCYGPYJCCDnME |
 | Robust crust-fit proposal (parabola vs envelope trace vs flexure+envelope on 40 stored checkpoints; failure modes; locator/placement split; generality) | https://claude.ai/artifact/SgZjTP3MdeSxaGRNPup8hG |
@@ -261,7 +262,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   both tips inside the mesh, are supported in this version"), so a subduction megathrust is necessarily a buried
   crack whose top tip, 3 rungs inside the free-slip wall, tapers the slip to zero and halves it along the whole
   fault against an outcropping band. Subduction needs a cut reaching a free-slip (rotated) boundary, with the
-  tip's constraint released at the wall. Bears on #889/#890 and on every faulted annulus result to date. Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
+  tip's constraint released at the wall. Bears on #889/#890 and on every faulted annulus result to date.
+  **UPDATE 2026-10-30: lower priority.** The box reference shows a free-slip wall pins a dipping fault's end anyway
+  (v_n = 0 on both sides), so a band run to the wall slips only 6 % more than one stopped 3 rungs short; the
+  earlier "half the slip" estimate is withdrawn. Still useful for geometry (no bridge zone), not for slip.
+- 2026-10-30, to the dev hub, library note from the box reference (page Em96SAdVik4gAdhJC5LV7x, script
+  kaiju-launch/ti/split_probe/fault_realisations_box.py): a split fault placed by place_fault_ribbon_2d (the ladder)
+  slips 10-18 % below the frictionless crack and below the TI band (peak 0.80 at h 1/48, 0.86 at 1/96), where the
+  same cut made by Mesh.add_fault reaches 0.96. The ladder placement costs the split 10-15 %; worth a look in the
+  #889/#890 review (rung geometry at the cut, or the contact pairs the ladder produces). Also for the record: the tangential traction on the cut's body is 1e-3 to 1e-2 of
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
@@ -269,7 +278,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (kaiju-launch/ti/split_probe/): the frictionless mode-II crack in a box under pure shear, solved with the split
   fault and with a TI band, against the analytic slip, with a README stating the pass criterion. It is the direct
   check of UWTN 2026-017's split-vs-TI equivalence claim. It belongs in the library's scripts/sessions tree beside
-  the note; the hub will pass it on when kaiju reports.
+  the note; the hub will pass it on when kaiju reports. DONE: fault_realisations_box.py + README.md +
+  run_realisations.sh in kaiju-launch/ti/split_probe/ (page Em96SAdVik4gAdhJC5LV7x). Result: the TI band at
+  eta_1/eta_0 <= 1e-3, w = W reproduces the crack within 10 %; the ladder-placed split is 10-15 % under. UWTN
+  2026-017's equivalence claim holds in the box. The files reach the laptop by Louis's rsync; they want a home in
+  scripts/sessions beside the note.
 - 2026-10-30, to the docs hub and the dev hub (Louis's ruling, standing rules): examples are bundled with the
   technical notes, because a feature known to behave well (here the TI fault model under Newton) can regress or
   be misconfigured without a runnable example to show the reference behaviour. For the docs hub: each note
@@ -677,7 +690,22 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   band (unsplit placement, w = W, eta_w, trace director) on the straight-cut pure-shear probe against the crack
   solution, with sweeps of eta_1/eta_0 (1e-2..1e-4) and w (W/2..2W) and a buried-vs-to-the-wall variant; written as
   the reference example (script + README with the analytic answer and pass criterion), the candidate bundled
-  example for the fault notes (UWTN 2026-017's claim). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  example for the fault notes (UWTN 2026-017's claim). **BOX REFERENCE DONE (page Em96SAdVik4gAdhJC5LV7x;
+  kaiju-launch/ti/split_probe/fault_realisations_box.py + README):** both realisations ladder-placed as the driver
+  does, slip measured the same way, against the crack at the measured far stress, PASS = peak and mean within
+  10 %. TI band at eta_1/eta_0 <= 1e-3, w = W: mean 0.96-1.03 PASS (UWTN 2026-017's claim HOLDS); 1e-2: 0.94; w = W/2:
+  0.93; w = 2W: 1.15 (too compliant). Ladder-placed split: peak 0.80-0.86, mean 0.87, 10-18 % below the band and
+  below the crack, improving with h; a split cut by Mesh.add_fault reaches 0.96, so the LADDER PLACEMENT COSTS THE
+  SPLIT 10-15 % (dev-hub note). Wall placement as the annulus (spine through the wall, trace stopped 3 rungs in):
+  split 0.78, band 0.91 against the buried crack; a band run TO the wall slips only 6 % more than one stopped 3
+  rungs short. **RETRACTION (kaiju): a free-slip wall is not a mirror plane for a dipping fault** (v_n = 0 on
+  both sides pins the fault's end, since slip on a 45 deg fault has a wall-normal component), so the "buried tip
+  costs the split ~half its slip (0.42)" bound for TAf/TBf/TA_age25f is WITHDRAWN; opening the fault to the
+  surface gains little, consistent with the TI bridge changing nothing. Retraction notes on the TI page (v7) and
+  the comparison page (v4). **CONCLUSION: the annulus TI-split gap (~2x slip, vrms +15 %) and the TI band's Newton
+  cost are SETTING-SPECIFIC** (the yielding T-dependent host beside the fault, the curved hinge, the deep tip in a
+  yielding slab; in the linear box both solve in one pass). TAti vs TAf_env over the run is the physics answer.
+  **Hub: equivalence investigation CLOSED here; no further smokes.** 2423 finished identical to its control. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1770,3 +1798,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: 2423: smoothed contact normals change nothing in the annulus; contact normals eliminated. Box
   comparison split vs TI band against the crack solution approved and running, written as the reference example
   for the fault notes (flagged to the docs hub).
+- 2026-10-30: box reference done: TI band reproduces the crack (2026-017's claim holds), ladder-placed split 10-15 %
+  under (dev-hub note); buried-tip bound RETRACTED (free-slip wall pins a dipping fault's end regardless); the
+  annulus TI-split gap is setting-specific. Equivalence investigation closed; TAti vs TAf_env over the run is the
+  answer. Surface-breaking feature request downgraded. Reference example flagged to the docs hub.
