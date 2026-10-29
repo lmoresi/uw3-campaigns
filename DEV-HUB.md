@@ -42,8 +42,8 @@ the science hub was on 2026-10-27. So the three hubs coordinate through their fi
   date. The receiving hub records what it did about it in its own log.
 - Anything urgent goes through Louis.
 
-Laptop and machine sessions can be messaged once Louis approves the "reach my other
-sessions" grant for this session (not yet requested). Hyperion cannot be messaged by any
+Laptop and machine sessions can be messaged: Louis approved the "reach my other sessions"
+grant for this session on 2026-10-31 (it binds the session to his trusted devices). Hyperion cannot be messaged by any
 hub; it is read through its transcript, which needs a trusted device.
 
 ## Restarting the hub
@@ -347,3 +347,5 @@ refuses deletions from here, so this needs a laptop or Louis.
   Plan written above; posting it on #892 was refused by the classifier. Filed #893 (the
   unsplit-tail memory defect, from the science hub). Absorbed both hubs' "For the dev hub"
   items into the intake table. Merge order gains D (the #892 fix) after #890.
+- 2026-10-31: Louis approved the "reach my other sessions" grant; the plan's summary was
+  delivered to the notes session (wombat).
