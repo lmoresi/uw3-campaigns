@@ -185,6 +185,9 @@ frozen as the hand-over state; they are not updated here after this date.
   slab driving the plate in (v_plate 1800-2350) is the wanted behaviour; rollback is not the target.
   Faulted thermal cases: DECIDED 2026-10-28, see the faulted thermal set row (TAf, TBf, TA_age25f + the
   fault-free twin TAc with the same crust sampling; the existing TA/TB/TA_age25 stand as the scientific result).
+- Earth-like setup, RULED 2026-10-29 (Louis): start the continent further from the trench (it may be pulled in
+  once the slab is mature; too early would spoil the experiment); the smoke's 0.15 d gap closed 3 deg in 19
+  steps. Kaiju sets a larger gap (0.5-1.0 d proposed) with the third-of-the-box extent from where it starts.
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -238,7 +241,12 @@ frozen as the hand-over state; they are not updated here after this date.
   issue #891 (D1 the bug, D2-D7 listed in it; label bug). The demonstrations run dimensionless; physical units
   come from post-processing with the chosen scales (slab_metrics' -uw_depth/-uw_kappa columns); -uw_scaled
   stays on the branch as the check only.
-- **Crust-base fit, two driver items for Louis** (kaiju 2026-10-29): the fit fails at about a third of late detections
+- **Crust-base fit: RULED 2026-10-29 (Louis): "we just did not come up with a robust enough fitting model."** The
+  wall-stub is a stop-gap; kaiju designs a robust fit (anchored at the trench, lower envelope of the crust
+  cluster to the cap, monotone in depth, smooth, deterministic between detections, stored = placed geometry),
+  tests it offline on the stored checkpoints where the parabola failed and succeeded (artifact), then
+  implements behind a flag. The demo rerun waits for it. Earlier detail:
+- Crust-base fit, two driver items (kaiju 2026-10-29): the fit fails at about a third of late detections
   in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
   lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
   parabola cannot describe the broad thermal hinge: it meets the surface near-tangentially and is rejected when
@@ -1247,3 +1255,6 @@ frozen as the hand-over state; they are not updated here after this date.
   the chord above it to 0.02 above the wall, theta and dip recorded from that crossing (which also fixes the
   stored-vs-placed recording and should cut the late fit failures). Patch to the hub if the smoke passes; the
   demo reruns from checkpoint 30 on the fixed driver so every frame comes from one driver.
+- 2026-10-29: Louis: start the continent further from the trench; the crust-curve fitting needs a robust model, not
+  a patch. Kaiju tasked with both (design first for the fit, offline tests on stored checkpoints, artifact, then
+  flag, smoke, patch); the demo movie rerun waits for the robust fit.
