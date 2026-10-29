@@ -77,7 +77,9 @@ params = uw.Params(
     uw_ridge_patch=0.05,        # uw_top_hot 2 (a fixed ridge): only a patch of this half-width (arc, layer depths) at the
                                 #   antipode of the trench is held at T_interior, tanh ramps of uw_over_ramp; T = 0 elsewhere
     uw_cont_extent=0.0,         # > 0: the compositional overriding plate (the continent) ends this angle (radians) from the
-                                #   trench instead of at the overriding plate's ridge (2.094 = 1/3 of the annulus)
+                                #   trench (uw_theta_trench) instead of at the overriding plate's ridge. Measured from the
+                                #   trench, not from the continent's start: 1/3 of the annulus from the start at
+                                #   uw_over_gap is 2.094 + uw_over_gap / r_o (2.4315 for a 0.75 gap)
     uw_cont_age=0.0,            # > 0: a uniform thermal age (layer depths^2) under the continent in the slab state, in place
                                 #   of the ocean's ramp (0.000625: a 0.05 d, ~145 km, conductive lid)
     uw_lm_eta=1.0,              # a viscosity factor below uw_lm_depth (the 670 km step; 1 = none); Ra and the yield
