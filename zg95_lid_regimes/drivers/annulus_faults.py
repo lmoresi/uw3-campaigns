@@ -190,6 +190,8 @@ params = uw.Params(
                                 #   eta_reg_b (its floor), its own softmin and tangent
     uw_ti_smooth=0,             # ti: 1 = the band's min and floor in the host's own smooth forms (_combine_yield's
                                 #   softmin, _apply_floor's smooth max, the host's delta) for Newton; 0 = hard Min/Max
+    uw_fault_normal="node",     # split: the contact's normal: "node" = per-node from the cut facets (the default);
+                                #   "trace" = the library's smoothed normal of the fault's own polyline (normal="trace")
     uw_bridge_ti=0,             # split: 1 = the bridge zone (the cut's top to the wall) is a TI weak plane, director
                                 #   along the fault, yielding by the TI band's law (uw_ti_*, -uw_ti_model) in place of
                                 #   the isotropic x uw_eta_w zone: the split plus TI to the surface (Louis, 2026-10-30)
@@ -1255,7 +1257,9 @@ class FaultedMesh:
         s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
         free_slip_walls(s)
         for name in self.names if not TI else []:
-            s.add_fault_bc(0, boundary=name)
+            # on a curved or kinked trace the per-node normals partly lock a frictionless contact (box
+            # probe: one face carries shear, the normal traction jumps); "trace" smooths them
+            s.add_fault_bc(0, boundary=name, **({"normal": "trace"} if params.uw_fault_normal == "trace" else {}))
         s.tolerance = params.uw_tol
         if params.uw_pres_rtol > 0:
             s._rotated_pres_rtol = float(params.uw_pres_rtol)
