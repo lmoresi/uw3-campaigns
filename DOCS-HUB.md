@@ -291,3 +291,7 @@ Measured here, not inherited.
   repository only, nothing to underworld3); relayed to the notes session with its two
   forced differences (the note's own fixture; base 1/8 to 1/32, ratio 6.06 on every
   level).
+- 2026-10-30: the notes session's review of the figure (three drawing fixes, relayed)
+  corrected the hub's nesting wording: production widens the band with the level, so
+  the chain nests along the spine only; vertex nesting was the rig's constant-width
+  case. Journal correction entry written; the guide on PR #862 amended.
