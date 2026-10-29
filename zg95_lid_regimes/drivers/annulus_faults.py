@@ -183,6 +183,8 @@ params = uw.Params(
     uw_ti_eta_reg=0.1,          # ti: the band's rate strengthening (added to its yield viscosity)
     uw_ti_eta_min=0.1,          # ti: the band's viscosity floor (the host's is 1)
     uw_ti_trace_inset=0.5,      # ti: the trace runs to this many rungs inside the wall: the band outcrops, no bridge
+    uw_ti_smooth=0,             # ti: 1 = the band's min and floor in the host's own smooth forms (_combine_yield's
+                                #   softmin, _apply_floor's smooth max, the host's delta) for Newton; 0 = hard Min/Max
     uw_bridge_eta_min=1.0,      # split: the bridge zone's own viscosity floor (the host's is 1; the zone's x uw_eta_w
                                 #   weakening is otherwise undone by it): 1 = unchanged
     uw_bridge_eta_reg=10.0,     # split: the bridge zone's own rate strengthening (the host's uw_eta_reg, 10): 10 = unchanged
@@ -1080,7 +1082,10 @@ def ti_band_viscosity(s, faulted, footprint, tag):
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
     tau_y = tau0 + tau1 * depth
     eta_y = params.uw_ti_tau_frac * tau_y / (2 * gdot) + params.uw_ti_eta_reg
-    eta_b = sympy.Max(params.uw_ti_eta_min, sympy.Min(eta_0, eta_y))
+    if params.uw_ti_smooth:    # yield and floor exactly as the host does (Newton through smooth kinks)
+        eta_b = host._apply_floor(host._combine_yield(eta_0, eta_y), sympy.Float(params.uw_ti_eta_min))
+    else:
+        eta_b = sympy.Max(params.uw_ti_eta_min, sympy.Min(eta_0, eta_y))
     eta_1 = eta_0 + fband.sym[0] * (eta_b - eta_0)
     s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
     s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
