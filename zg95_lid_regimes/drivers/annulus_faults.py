@@ -84,6 +84,14 @@ params = uw.Params(
                                 #   stresses stay referenced to the upper mantle
     uw_lm_depth=0.231,          # layer depths (670 km of a 2900 km mantle)
     uw_lm_ramp=0.02,
+    uw_fault_precedence=0,      # 1: inside a fault's band (and its zone) the fault's own rheology alone: the crust,
+                                #   continent and compositional-slab factors are off there (Louis: "the fault
+                                #   rheology should always win")
+    uw_marker_rheo_depth=0.0,   # > 0: below this depth (layer depths) the crust and continent factors fade out
+                                #   (tanh, uw_marker_rheo_ramp); their markers are still advected, recorded and drawn,
+                                #   so entrained material is tracked without acting (Louis: "change the material
+                                #   index so we track it but it does not have a rheological influence")
+    uw_marker_rheo_ramp=0.02,
     uw_over_gap=0.0,            # the overriding plate starts this arc length (layer depths) from the trench
     uw_over_ramp=0.03,          # over which its age ramps up from the thin layer's
     # an imposed ridge (any state): a weak vertical seam through the lid at each ridge
@@ -288,18 +296,28 @@ def clamp01(sym):
     return sympy.Max(0, sympy.Min(1, sym))
 
 
-def crust_factor_on(mesh, crust_sym):
-    """The viscosity (and yield stress) factor of the crust proxy ``crust_sym`` on ``mesh``:
-    uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth."""
+def marker_rheo_window(mesh):
+    """1 above uw_marker_rheo_depth, fading to 0 below it (tanh, uw_marker_rheo_ramp): where a
+    marker's rheology acts; 1 everywhere when the gate is off."""
+    if params.uw_marker_rheo_depth <= 0:
+        return 1
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
-    window = (1 - sympy.tanh((depth - params.uw_crust_depth) / 0.05)) / 2
-    return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym) * window
+    return (1 - sympy.tanh((depth - params.uw_marker_rheo_depth) / params.uw_marker_rheo_ramp)) / 2
 
 
-def comp_factor_on(marker_sym, eta):
+def crust_factor_on(mesh, crust_sym, mask=0):
+    """The viscosity (and yield stress) factor of the crust proxy ``crust_sym`` on ``mesh``:
+    uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth (and below
+    uw_marker_rheo_depth), and 1 where ``mask`` (the fault band, uw_fault_precedence) is 1."""
+    depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
+    window = (1 - sympy.tanh((depth - params.uw_crust_depth) / 0.05)) / 2 * marker_rheo_window(mesh)
+    return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym) * window * (1 - mask)
+
+
+def comp_factor_on(marker_sym, eta, mask=0, window=1):
     """The viscosity (and yield stress) factor of a compositional layer: ``eta`` where
-    the marker is 1."""
-    return 1 + (eta - 1) * clamp01(marker_sym)
+    the marker is 1, times ``window`` (the depth gate), and 1 where ``mask`` is 1."""
+    return 1 + (eta - 1) * clamp01(marker_sym) * window * (1 - mask)
 
 
 Ra = uw.expression(r"\mathrm{Ra}", params.uw_ra, "Rayleigh number on the basal viscosity")
@@ -789,16 +807,24 @@ class FaultedMesh:
             near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
+        # the fault's band (uw_fault_precedence): every band cell, the zone included, where the
+        # fault's own rheology alone applies
+        self.band_mask = None
+        if params.uw_fault_precedence:
+            self.band_mask = uw.discretisation.MeshVariable(f"band_{tag}", mesh, 1, degree=0, continuous=False)
+            self.band_mask.array[:, 0, 0] = (band | bridge).astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
         weak = (1 - (1 - params.uw_eta_w) * self.zone.sym[0]) * ridge_factor(
             mesh, r_o, ridges, params.uw_ridge_width, params.uw_ridge_depth, params.uw_ridge_weak)
+        M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
-            weak = weak * crust_factor_on(mesh, self.crust.sym[0])
+            weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
         if comp_on:
-            weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta)
+            weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta, mask=M)
         if over_on:
-            weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta)
+            weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta, mask=M,
+                                         window=marker_rheo_window(mesh))
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
