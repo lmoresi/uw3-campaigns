@@ -449,8 +449,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   of material, the split a line plus its bridge. Director check: eta_1/eta_0 median 0.0089, alignment 1.00,
   no loss at the stub kink. **Series applied as f14c1ec, d580732, cd06325, 852c6aa (blobs verified); head 852c6aa.
   TAti GO (hub) at L1, chain 0, envelope, on 852c6aa, one node.** TAf_env running (job 2390). Equivalence
-  (TI slips 1.6-2x the split) put to Louis; a slip-rate profile across the band from the smoke checkpoints asked
-  of kaiju to show whether w or the footprint is the knob. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  (TI slips 1.6-2x the split) put to Louis. **Slip-rate profile (kaiju, page v3) REVERSES the width reading:** the
+  TI jump is localised (97-99 % within the +-0.6w footprint) while the split's is spread (53 % within +-0.6w, 75 %
+  within +-1w; the cut itself takes ~1330 of 2719, the rest is distributed shear in the host on the incoming side
+  from -2w to the cut). So a narrower band is not the lever; the TI plane simply passes about twice the motion,
+  and the question is what restrains the split (bridge zone, contact constraint, or the weak crust beside the
+  band taking the shear). Kaiju asked for the tangential traction on the split faces (zero if truly frictionless;
+  else a library finding) and a crust/bridge overlay on the profile by depth band. **TAti RUNNING as job 2398**
+  (852c6aa pinned in zg95-tati, L1, chain 0, envelope, precedence 1, pres_rtol 1e-2, checkpoints every 5, from
+  step 0, stop_at_base EVERY=5). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1493,3 +1500,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   No-op checks (TI band off vs VP host, chain 0) running (2388/2389); push-down follows. TAf_env rerun approved.
 - 2026-10-29: TI push-down smoke done (page 7mau5dPymUCYGPYJCCDnME); four-commit TI series applied and pushed (head
   852c6aa); TAti go at L1 on chain 0. TI slips 1.6-2x the split on a common probe: equivalence question to Louis.
+- 2026-10-29: TAti launched (job 2398). Slip-rate profile: TI localised, split spread; the split is the restrained
+  one. Kaiju asked to measure the tangential traction on the split faces and overlay crust/bridge on the profile.
+  Three kaiju jobs in flight: Earth 2374, TAf_env 2390, TAti 2398.
