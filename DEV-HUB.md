@@ -198,6 +198,28 @@ session, which measured #892 and ran the sweep. The same plan is posted on #892
    consumer runs is the general failure; #806 (solvers do not report the configuration
    they ran with) is its observability half.
 
+**Progress.**
+- **Step 1 done (integration session, 2026-10-31).** Live readback on test_1022's
+  composed stack and test_1017's Poisson band, serial, PETSc 3.25.0.
+  - Rotated path: SOR blocks at 891c9bb0^; unshifted ILU(0) from 891c9bb0, on
+    development bfd07b73 and on C 799ef021.
+  - Non-rotated paths (`custom_mg` 1302, 1375): LU with a nonzero shift on every build
+    since 891c9bb0.
+  - Coarse solves are as configured everywhere.
+  - So the fix's scope is the rotated path only. Records in `~/+Simulations/fac_892/`
+    on wombat.
+- **Found on the way, and B's doing rather than a C regression.** On C the rotated path
+  patches the finest level only.
+  - `rotated_bc.py` 2059-2066 at C (about 1942 on B): with `drop_orphans` (always
+    True since B), it sets `h.level_patch_rows = [None] * (n - 1) + [rows[-1]]`. That
+    discards every coarse FAC patch, unconditionally.
+  - `custom_mg.install` keeps the patch of any level the restriction left whole, so
+    the two paths disagree.
+  - It is the item `FAULT-SPLIT-INTEGRATION.md` flagged on B's review, unruled.
+  - Asked of the integration session: pin it in step 2's readback, and in step 4 measure
+    the coarse patch kept (rows remapped) against dropped, with LU blocks. D does not
+    change B's behaviour.
+
 ## Open pull requests (2026-10-29, `development` at bfd07b73)
 
 All fourteen target `development` except #890 (stacked on #889). "Blocked" below means the
@@ -346,6 +368,9 @@ refuses deletions from here, so this needs a laptop or Louis.
 - 2026-10-31: Louis approved the "reach my other sessions" grant; the plan's summary was
   delivered to the notes session (wombat).
 - 2026-10-31: Louis: the plan goes on #892. Posted (issuecomment-6505605906).
+- 2026-10-31: #892 step 1 reported: only the rotated path runs ILU; scope unchanged.
+  B's `drop_orphans` rotated path discards every coarse FAC patch; measurement of
+  kept against dropped added to step 4.
 - 2026-10-31: Louis: go on #892 steps 1 to 4, and yes to the levels accessor. Both
   briefed to the integration session (`session_01HxWvn5rMK67zasgirdXszQ`, wombat).
   Task A: `bugfix/fac-live-block-solver` from C 799ef021, step 1's scope result to the
