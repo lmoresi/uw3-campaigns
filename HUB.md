@@ -235,6 +235,17 @@ frozen as the hand-over state; they are not updated here after this date.
   Earth-like (viscosity, friction, slab sinking ~3 cm/yr, trench slip ~9 cm/yr); the plates are not (too slow
   at 0.8 cm/yr, too old and thick, cohesion ~5x high). Page https://claude.ai/artifact/TTiLccEcSv7iLJNV7ZH97n.
   **Decide**: file D1-D7 as issues now (D1 as a bug) or hand them to hyperion on its return.
+- **Crust-base fit, two driver items for Louis** (kaiju 2026-10-29): the fit fails at about a third of late detections
+  in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
+  lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
+  parabola cannot describe the broad thermal hinge: it meets the surface near-tangentially and is rejected when
+  it turns away or up. Worse, on successful detections in that phase the STORED theta and dip are the parabola's
+  near-tangent surface crossing (TBf steps 40-54: -22.5 deg, dip 12; TAf 40-64: -19.5, dip 18-19; TA_age25f 60-74:
+  -21, dip 18), while the trace actually placed always starts at the trench (-2.4 to -5.3 deg, depth 0.012-0.013),
+  so the dynamics and comparisons stand but every "fault at X deg, dip Y" quoted from faults[0] or theta_trench
+  in that phase is wrong (the "fault flattens to dip 18-23" in earlier reports is the parabola's crossing, not the
+  placed fault). Items: (1) fall back to the slab-top isotherm (T 0.5-0.6, trench side) when the crust fit fails;
+  (2) record the trench and dip from the placed trace, not from the parabola's crossing above the wall.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -1115,7 +1126,7 @@ frozen as the hand-over state; they are not updated here after this date.
   TAc 0.74 at 40).
 - 2026-10-29: **faulted thermal set stopped at the base** (kaiju): TAc 80, TA_age25f 90, TAf 100 (t ~0.00025-0.00027),
   TBf restarted from 90 to finish ~110. Character: the fault changes the dynamics: vrms 1300-1580 in the faulted
-  runs at steps 40-60 against TAc's 560-740; slip_max 6000-8600; the fault flattens to dip 18-19; the trench
+  runs at steps 40-60 against TAc's 560-740; slip_max 6000-8600; the stored dip 18-19 is the parabola's surface crossing, not the placed fault (see the crust-fit item); the trench
   retreats (TA_age25f -8.2 deg by step 90 against TAc's -4.8 at 80), the rollback Louis said would help the
   demonstration; plateness P10 0.06-0.12 during the descent in all runs (TA recovers to 0.6-0.7 once its slab sits
   on the base). Solver before/after the Picard switch: TAf 14.0 its, pres 56, 1225 s -> 6.2, 44, 418 s; TBf 15.7,
@@ -1127,8 +1138,8 @@ frozen as the hand-over state; they are not updated here after this date.
   8-11 deg retreated at the stop vs 4.8; base arrival t 0.00022 vs 0.00024; plateness P10 ~0.10 in both, med/max
   0.25 vs 0.32 (the fault speeds the near-trench part most). TBf, TA_age25f same pattern (TBf peak 1123, 1.7x TB;
   hinge -5.0 / -4.1 vs -1.5 / -1.2). The crust sampling alone matters: TAc beats TA (base 0.00024 vs 0.00031, hinge
-  -2.6 vs -1.5), so the fault effect is measured against TAc. Fault: forms at -0.4 deg dip 47, follows the crust
-  base round the broad hinge to dip 18-23 by steps 40-60, depth at the 0.15 cap, slip_max peak 8000-9000 at
+  -2.6 vs -1.5), so the fault effect is measured against TAc. Fault: forms at -0.4 deg dip 47; the stored dip 18-23 by steps 40-60 is the parabola's near-tangent
+  surface crossing, not the placed trace (which starts at the trench); depth at the 0.15 cap, slip_max peak 8000-9000 at
   t 0.00017 settling 5000-7000, 11-12 rebuilds per run. Cost after the Picard switch: TAf 6.2 its / pres 39 /
   371 s, TBf 8.0 / 38 / 525, TA_age25f 6.0 / 38 / 320, TAc 6.0 / 34 / 224; a faulted step ~1.5x the twin
   (rebuilds + 15 % more pressure its), which -uw_pres_rtol 1e-2 would mostly remove. Plateness measure: P10 and
@@ -1212,3 +1223,8 @@ frozen as the hand-over state; they are not updated here after this date.
   detections kept the old fault. Worth stating in the note where rebuild frequency is quoted. Rerun from
   TA_age25f checkpoint 30 (steps 31-60, trench -0.4 -> -4.4 deg, fit succeeding); rendering follows. Driver item
   for later: a fallback when the crust does not reach the cap (slab-top isotherm).
+- 2026-10-29: kaiju's crust-fit tallies and failure mode (see Waiting on Louis): the parabola, not the crust sampling,
+  is the limit on a broad thermal hinge, and the stored fault angle and dip in that phase are the parabola's
+  surface crossing rather than the placed trace. Earlier "dip 18-23" statements in this file and in reports are
+  corrected to that reading; the faulted-set dynamics and comparisons stand. Tallies are in the slab_thermal_fault
+  and addon_demo READMEs on kaiju.
