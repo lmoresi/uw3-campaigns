@@ -234,7 +234,10 @@ frozen as the hand-over state; they are not updated here after this date.
   528 MPa, tau1 24.3 MPa/km (0.75 rho g); plate age 933 Myr, 343 km thick. Verdict: the mantle side is
   Earth-like (viscosity, friction, slab sinking ~3 cm/yr, trench slip ~9 cm/yr); the plates are not (too slow
   at 0.8 cm/yr, too old and thick, cohesion ~5x high). Page https://claude.ai/artifact/TTiLccEcSv7iLJNV7ZH97n.
-  **Decide**: file D1-D7 as issues now (D1 as a bug) or hand them to hyperion on its return.
+  DECIDED (Louis 2026-10-29: "File as a bug, fall back to dimensionless for the demo"): filed as underworld3
+  issue #891 (D1 the bug, D2-D7 listed in it; label bug). The demonstrations run dimensionless; physical units
+  come from post-processing with the chosen scales (slab_metrics' -uw_depth/-uw_kappa columns); -uw_scaled
+  stays on the branch as the check only.
 - **Crust-base fit, two driver items for Louis** (kaiju 2026-10-29): the fit fails at about a third of late detections
   in the faulted thermal runs (TAf 8 of 21, TBf 9 of 23, TA_age25f 4 of 19; a failed fit keeps the old fault) not for
   lack of crust (one connected cluster of 566-698 particles reaching 0.18, below the 0.15 cap) but because one
@@ -1228,3 +1231,7 @@ frozen as the hand-over state; they are not updated here after this date.
   surface crossing rather than the placed trace. Earlier "dip 18-23" statements in this file and in reports are
   corrected to that reading; the faulted-set dynamics and comparisons stand. Tallies are in the slab_thermal_fault
   and addon_demo READMEs on kaiju.
+- 2026-10-29: Louis: file the units finding as a bug, the demo falls back to dimensionless. Filed
+  https://github.com/underworldcode/underworld3/issues/891 (estimate_dt's crossing time and first accuracy
+  estimate read dimensional coordinates as model units; D2-D7 listed in it). Kaiju told: demonstrations
+  dimensionless, physical columns by post-processing, -uw_scaled check-only.
