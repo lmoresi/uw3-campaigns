@@ -98,6 +98,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   those sessions only through the app; the hub puts the link in HUB.md and in the report to Louis. The exception
   is collaborative editing of a note, a document or code, which Louis does interactively on the laptop with the
   local filesystem (Louis, 2026-10-29).
+- **Examples travel with technical notes (Louis, 2026-10-30).** "This is why we need examples and why we should
+  bundle them with the technical notes." Said on the TI Newton stagnation: the TI model is known to behave well,
+  so a misbehaviour is a regression or a forgotten configuration, and a bundled, runnable example per note is
+  what catches both. A campaign that exercises a library feature checks it first against the library's own
+  example or test for that feature at its own settings; a feature with no runnable example is a gap to report to
+  the dev and docs hubs.
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -245,6 +251,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-10-30, to the docs hub and the dev hub (Louis's ruling, standing rules): examples are bundled with the
+  technical notes, because a feature known to behave well (here the TI fault model under Newton) can regress or
+  be misconfigured without a runnable example to show the reference behaviour. For the docs hub: each note
+  carries a runnable example at the note's settings (UWTN 2026-018 for the TI/split fault multigrid is the first
+  case). For the dev hub: a yielding-TI Newton example/test is the regression gate for #889/#890; kaiju is checking
+  the kaiju build against whatever exists now and will report whether a gap exists.
 - 2026-10-29, to the docs hub: the add-on mesh demo movie for UWTN 2026-022 is redone with the robust (envelope)
   fault fit, rebuilt every step, fixed windows, 30 frames: page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3,
   files on kaiju figures_out/addon_demo/mesh_movie/ (mp4, per-step json, README) for Louis's rsync. The per-step
@@ -578,7 +590,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   -snes_test_jacobian on the checkpoint-5 TI state (hard, smooth, and the VP host as control) and restarts the
   chain from checkpoint 5 with the Newton switches at 1e-3 (Picard carries the solve nearer tolerance) as the
   workaround. Supervisor v2 with the pause trigger is attached. Parallel non-determinism noted: Newton counts
-  differ run to run at equal vrms, a caveat on every cost row. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  differ run to run at equal vrms, a caveat on every cost row. **Louis 2026-10-30: "a regression or a forgotten
+  configuration - we know it behaves well."** Forgotten-configuration candidate: the driver's band builds a
+  user-written yield into shear_viscosity_1 of the plain TransverseIsotropicFlowModel, whereas the library's TI
+  VEP model yields on eta_1 itself with a validated tangent (kaiju's design report noted the model). Kaiju
+  redirected: rebuild the band on the library's TI VEP model (f_b tau_y, eta_reg_b, eta_min_b as its yield
+  parameters; same director), Jacobian test on hand-rolled, library and VP-host control, 5 steps from checkpoint
+  5; and run the library's own yielding-TI example/test on the kaiju build as the regression check. A pass on
+  the library model restarts the chain on it; a failure is a regression for the dev hub with the repro and the
+  test that should have caught it. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1650,3 +1670,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: TI Newton stagnation after rebuilds: the Picard switch fires; the tangent is suspect. Jacobian test and
   a 1e-3 Newton-switch restart from checkpoint 5 asked of kaiju; a library finding goes to the dev hub if the TI
   tangent fails the test.
+- 2026-10-30: Louis: the TI issues are a regression or a forgotten configuration; examples must be bundled with the
+  technical notes (standing rule added; passed to the docs and dev hubs). Kaiju redirected to the library's TI VEP
+  model and its own TI example as the reference before any further driver workaround.
