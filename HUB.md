@@ -165,6 +165,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
+| TI-in-the-ladder fault comparison (one run) | kaiju, design first | requested 2026-10-29 (Louis): the placed ribbon as a TI weak band with a non-linear weak rheology against the split fault, rollback numbers compared; the fault weakness takes precedence over the crust weakening (no double weakening); settings for equivalence to be discussed with Louis before the run |
 | Add-on mesh demonstration movie (fault refit and rebuilt every step, fixed window, 30 frames) | kaiju, from a strong-plate rollback checkpoint (TBf ~60-80 proposed), addon_demo/mesh_movie/ | requested 2026-10-29 (Louis), after the Earth smoke; demonstration only |
 | Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; artifact https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR (table, four movies, overlay, solver); rsync for the files |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
@@ -1143,3 +1144,9 @@ frozen as the hand-over state; they are not updated here after this date.
   established, the fault updated every timestep, ~30 frames, smoothly evolving meshes, the background (window)
   fixed so the untouched base mesh is evident. Kaiju tasked (TBf checkpoint proposed; flags to force a rebuild per
   step; checkpoint every step; fixed window; artifact).
+- 2026-10-29: Louis: one comparison run with the TI-in-the-ladder fault (non-linear weak rheology) against the split
+  fault, on rollback numbers; the fault weakness takes precedence over the crust weakening, and how the two combine
+  in the slipping-fault case is itself unclear. Kaiju to report the driver's TI realisation and rheology, how crust
+  and fault weakening combine today in both realisations, a precedence mask, equivalence settings (2026-017: band
+  strength is eta_1/w; eta_1/w ~0.1 matched a frictionless split), and a run plan (TBf's setup); Louis decides
+  the settings before the run.
