@@ -154,12 +154,8 @@ Measured here, not inherited.
   and the note's "Using it" code need `base._coarse_level_meshes()[:-1] + [base]`, and a
   published note cannot name a private method; a `Mesh` property that returns the
   levels coarsest to finest, on B or C or as a small PR before the note publishes.
-  (2) The faults-in-convection guide's prose on B and C says the chain ladders sit "on
-  the base levels one and two steps below the finest"; its own code and cell counts put
-  `2S` on the finest level and `4S` one down (journal entry
-  `2026-10-30-the-production-chain-puts-2s-on-the-finest-base-level-...`). One sentence
-  to fix before B merges. The drivers' comments in uw3-campaigns say the same wrong
-  thing; that is the science hub's file.
+  (2) Done 2026-10-30: the faults-in-convection guide exists only on C, and its prose on
+  the chain's hosts is corrected there at 799ef021 (#890); nothing on B.
 - 2026-10-30, to the science hub: the drivers' chain comments (`annulus_fault.py`,
   `annulus_faults.py`, `box_fault.py`: "the base level k steps below the finest") are
   off by one against their own indexing; the code is right, the comment is not.
@@ -321,3 +317,14 @@ Measured here, not inherited.
   page gained a "Current understanding" section; the guide on #862 corrected; the
   panel (c) redraw routed to the integration session under Louis's figure ask. Louis:
   a dev hub now keeps `DEV-HUB.md` and the PR side; added to the table above.
+- 2026-10-30 (night): panel (c) redrawn as the production chain (four panels, cells
+  162, 878, 3006, 3498 coarsest first; hashes with the notes session); the convection
+  guide's prose fixed on C (799ef021). **Louis: "I am very unsure at this point that we
+  recorded the best cases. This should be resolved before we publish any results."**
+  The notes session, on his word, commissioned a tail sweep from the integration
+  session (welded, lean chain, graded chain; ratios 6, 12, 25; the linear fixture at np
+  1 and 4, and the yielding-lid box at three spacings); results to
+  `~/+Simulations/uwtn_2026_022_tail_sweep/`. The 2026-10-29 tail ruling is marked
+  provisional above a ratio of about 8 in the journal (a `decision` entry with the
+  sweep's terms) and on the topic page; UWTN 2026-022 keeps its numbers with their
+  scope stated and publishes no tail result until the sweep reports.
