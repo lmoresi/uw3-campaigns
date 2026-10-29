@@ -334,3 +334,11 @@ Measured here, not inherited.
   whether the add-on alters the base answered: never; each ladder lives in a copy of a
   base level, the lean chain adds cells in the band to those copies and no levels;
   topic page and guide reworded. The public levels accessor is Louis's to decide.
+- 2026-10-31: the integration session measured the bare base counts the note had
+  assumed (162, 648, 2592 by regular refinement: confirmed) and the hierarchy's (162,
+  878, 3006, 3498; the child is 1.35 times the base finest); `count_cells.py` added
+  beside the figure and the README updated (new hash 5cb3228c…); reported to the notes
+  session directly. The fill differs by two cells between two numerically equal
+  parametrisations of the trace (3006/3498 against 3008/3496), so the note's counts are
+  the figure's mesh. The tail sweep is nearly done; the notes session asked for each
+  level's smoother (the FAC patch) to be recorded with it.
