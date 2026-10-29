@@ -570,7 +570,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   7 at 3 h; steps 0-5 as the smoke; after the rebuild at step 5 (trench +0.3, dip 67) step 6 did NOT converge (19
   Newton, driver carries on) and step 7 took 17 Newton / 1765 s; ~2.7 steps/h, 3-4 segments (36-45 h). Hub's pause
   trigger: two consecutive unconverged steps or more than two in any ten; kaiju to check whether the rebuild
-  Picard switch fires on the TI path (a cold Newton on the moved kink would explain the post-rebuild trouble). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  Picard switch fires on the TI path (a cold Newton on the moved kink would explain the post-rebuild trouble).
+  **Checked: the switch fires (step 6: 5 Picard to 9.2e-3, switch at 1e-2, then Newton 9.08e-3 -> 9.02e-3 and
+  given up; cold retry the same); Newton stagnates at ~1 % per iteration with 3-14 line-search cutbacks per step
+  while Picard converges steadily: an INCONSISTENT TANGENT is the suspect (the TI model's eta_1 depending on the
+  resolved shear through the director; #493/#748 covered the frozen-coefficient case). Hub: kaiju runs
+  -snes_test_jacobian on the checkpoint-5 TI state (hard, smooth, and the VP host as control) and restarts the
+  chain from checkpoint 5 with the Newton switches at 1e-3 (Picard carries the solve nearer tolerance) as the
+  workaround. Supervisor v2 with the pause trigger is attached. Parallel non-determinism noted: Newton counts
+  differ run to run at equal vrms, a caveat on every cost row. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1639,3 +1647,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: TAf_env at the base; locator A/B: large-scale evolution and plateness independent of the locator, but
   the parabola overstated slip ~50 % and plate speed ~10 %; envelope run is the thermal-set reference. TAti_smooth:
   one unconverged step after the first rebuild; pause trigger set; rebuild Picard switch on the TI path to check.
+- 2026-10-30: TI Newton stagnation after rebuilds: the Picard switch fires; the tangent is suspect. Jacobian test and
+  a 1e-3 Newton-switch restart from checkpoint 5 asked of kaiju; a library finding goes to the dev hub if the TI
+  tangent fails the test.
