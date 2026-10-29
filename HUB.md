@@ -253,6 +253,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **TI vs split equivalence (2026-10-30):** the buried tip explains about half the TI-split slip difference; the
+  rest is the band's blunt tips and through-width shear. Options: (a) stop here, report TAti vs TAf_env as the
+  implementation comparison with this characterisation (hub's recommendation: the brief was one comparison and
+  you want to finalise); (b) one more smoke with a narrower footprint and no tip overhang (small flag, ~1.5 h);
+  (c) treat the split as the reference and tune the TI band's L-level to match the split's slip rather than
+  frictionless. Also: the faulted thermal results are a lower bound (split slipped at ~0.4-0.5 of a
+  surface-breaking fault); whether that needs saying in the note is the docs hub's, the number is on the page.
+
 - Earth production run: **GO (Louis to kaiju, 2026-10-29: "Looks like we can go with this to get more steps. The
   continent is fine to deform, honestly. They do that, unless they are cratons.")** Launched as job 2374 (n2):
   runs/slab_earth_run1, launcher kaiju-launch/earth/production.sh, driver 07667b2 pinned in zg95-earth-prod,
@@ -519,7 +527,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (top traction, half the TI slip at every depth, one-sided shear, bridge test +5-12 %). The annulus face
   traction (~1 % of yield) is within the method's error, not friction. The TI band outcrops. So TI vs split was
   surface-breaking vs buried: **hub approved the like-for-like smoke (TI with -uw_ti_trace_inset 3, chain 0, L1,
-  from 40)** and an offline mode-II taper estimate of how much the buried tip cost the faulted thermal runs. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  from 40)** and an offline mode-II taper estimate of how much the buried tip cost the faulted thermal runs.
+  **Buried-TI smoke (job 2403, page v6): NO MATCH.** Jump over +-2w, steps 42-44 (0.012-0.04 / body / tip): split
+  2746 / 2096 / 491; TI L1 buried 3674 / 4066 / 1353; TI L1 outcropping 6340 / 5260 / 1500. Burying removes 42 % of
+  the TI excess near the top and 23 % in the body; the buried band still passes 1.3-2.8x the split. It is also
+  the hardest variant to solve (15-23 Newton, 620-1886 s; step 41 failed warm and cold; hit its wall in step 45).
+  What is left, most plausibly: the tips (the split's slip vanishes at one node; the band ends bluntly with its
+  footprint overhanging the trace end by half a rung, a softer process zone) and the band's own through-width
+  shear. A narrower footprint/overhang smoke would test the tips (needs a small flag). **Hub: held for Louis;
+  the one-comparison brief is served by TAti vs TAf_env plus this characterisation.** Thermal-set bound (mode-II
+  taper, surface-breaking fault of length L = interior crack of half-length L by the mirror wall; buried = half-
+  length (L - d)/2, a lower bound): buried/surface-breaking mean slip TAf 0.42 (0.40-0.46), TBf 0.43 (0.19 at
+  40-50, the stale fault), TA_age25f 0.43; integrated 0.36-0.37. The annulus split/outcropping-TI ratio
+  (0.38-0.44) is close to this. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1575,3 +1595,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: split-contact probe: frictionless; the annulus restraint is the buried upper tip (library cannot cut
   to the wall). Dev-hub "to check" cleared; feature request for surface-breaking split faults recorded. Like-for-
   like TI smoke (buried band) and a taper estimate for the thermal set asked of kaiju.
+- 2026-10-30: buried-TI smoke: no match (burying removes 23-42 % of the TI excess); the rest is the band's tips and
+  width. Thermal-set bound: the buried split slipped at ~0.4-0.5 of a surface-breaking fault. Next smoke held
+  for Louis (options recorded). TAti and TAf_env continue.
