@@ -183,7 +183,8 @@ params = uw.Params(
     uw_ti_eta_reg=0.1,          # ti: the band's rate strengthening (added to its yield viscosity)
     uw_ti_eta_min=0.1,          # ti: the band's viscosity floor (the host's is 1)
     uw_ti_trace_inset=0.5,      # ti: the trace runs to this many rungs inside the wall: the band outcrops, no bridge
-    uw_ti_model="band",         # ti: "band" = eta_1 written here (ti_band_viscosity's law, -uw_ti_smooth); "vep" =
+    uw_ti_model="band",         # ti: "linear" = eta_1 = uw_eta_w eta_0 (the library's zg95 split + TI bridge);
+                                #   "band" = eta_1 written here (ti_band_viscosity's law, -uw_ti_smooth); "vep" =
                                 #   the library's TransverseIsotropicVEPFlowModel (elasticity off) yielding eta_1 on the
                                 #   resolved shear itself: yield stress f_b tau_y on the footprint, rate strengthening
                                 #   eta_reg_b (its floor), its own softmin and tangent
@@ -1101,11 +1102,15 @@ def ti_band_viscosity(s, faulted, footprint, tag):
         P = s.constitutive_model.Parameters
         P.shear_viscosity_0 = eta_0
         P.shear_viscosity_1 = eta_0
-        P.director = sympy.Matrix([[director.sym[0], director.sym[1]]])
+        P.director = sympy.Matrix([director.sym[0], director.sym[1]])   # a column: the model forms E n
         P.yield_stress = fband.sym[0] * params.uw_ti_tau_frac * tau_y + (1 - fband.sym[0]) * 1.0e30
         P.plastic_rate_strengthening = params.uw_ti_eta_reg
         eta_1 = eta_0 + fband.sym[0] * (host._combine_yield(eta_0, eta_y) - eta_0)   # for the stress record
     else:
+        if params.uw_ti_model == "linear":
+            # the library's own split + TI bridge (scripts/sessions/fault_mg/zg95_annulus.py --arm split):
+            # eta_1 = uw_eta_w eta_0, no yield of its own, no floor; its tangent class is test_1066's
+            eta_1 = eta_0 * (1 - (1 - params.uw_eta_w) * fband.sym[0])
         s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
         s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
         s.constitutive_model.Parameters.shear_viscosity_1 = eta_1
