@@ -85,9 +85,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   carry no Co-Authored-By line.
 - Show figures through GitHub links. Write useful machine knowledge back to
   underworld-community/uw3-hpc-install-run. If a container must be built, use conda PETSc.
-- **Every kaiju results delivery comes with a published artifact** (movies, key figures, the README table) viewable
-  in the Claude app; the hub puts the link in HUB.md and in the report to Louis (Louis, 2026-10-29: "anything
-  running on kaiju is difficult to view other than via the claude app / artefact browser").
+- **Every results delivery from a machine the hub schedules (kaiju, hyperion, any server run this way) comes with a
+  published artifact** (movies, key figures, the README table) viewable in the Claude app, since Louis reaches
+  those sessions only through the app; the hub puts the link in HUB.md and in the report to Louis. The exception
+  is collaborative editing of a note, a document or code, which Louis does interactively on the laptop with the
+  local filesystem (Louis, 2026-10-29).
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -1087,3 +1089,6 @@ frozen as the hand-over state; they are not updated here after this date.
   kaiju must come with an artifact. Standing rule added; kaiju told to publish one for the faulted thermal set
   (movies and figures) and one each for slab_control, slab_fault and addon_demo. Existing artifact:
   fault_B1_crust1_fault movie https://claude.ai/artifact/DJctapP4niLphKaazzJeK9.
+- 2026-10-29: the artifact rule extends to hyperion and any server the hub runs as a pseudo-scheduler; the exception
+  is collaborative editing (notes, documents, code), done interactively on the laptop. Hyperion is told when it
+  is back.
