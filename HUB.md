@@ -1107,3 +1107,12 @@ frozen as the hand-over state; they are not updated here after this date.
   dimensionless TA to round-off over 5 steps at np 4, plus a conversion table of the faulted-set headline numbers
   (illustration: d 2900 km, kappa 1e-6 give one velocity unit ~1.1e-3 cm/yr, so v_plate 760 ~ 0.8 cm/yr and
   t 0.00024 ~ 64 Myr). Any hand non-dimensionalisation the driver is forced into is a library finding.
+- 2026-10-29: kaiju (now titled "kaiju: rollback experiments"): velocity-ring movies added to the faulted-thermal
+  artifact (v2): surface horizontal velocity as a ring, trenchward positive, 6000 drawn at 0.2 d; the plate
+  (700-1100) is a small offset, the big trenchward signal is the hot overriding surface drawn into the corner
+  flow. Renderer patch (-uw_vring H, -uw_vring_vmax; off by default; a7d339a on f46eaa3, the branch's renderer
+  is unchanged since) requested again: the patch body was missing from the message. **Why the stronger plate
+  (TBf) looks like TAf**: the yielded fraction is identical in all four runs (0.014-0.015 / 0.034-0.036) because
+  tau0 and tau1 were scaled with Ra by the same deta^0.25, so the yield/buoyancy ratio is common; a larger deta
+  stiffens the unyielded core, not the yielding plate. A more rigid, lower-strain-rate plate needs a higher
+  tau/Ra or less strain weakening (uw_weak_min). Louis is discussing that test with kaiju directly.
