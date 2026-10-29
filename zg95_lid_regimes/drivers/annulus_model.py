@@ -64,18 +64,31 @@ def ridge_factor(mesh, r_o, thetas, half_width, depth_cut, factor, ramp=0.02):
     return 1 - (1 - factor) * window
 
 
+def lower_mantle_factor(depth, factor, top, ramp):
+    """A viscosity factor ``factor`` below the depth ``top`` (layer depths; 670 km of a
+    2900 km mantle is 0.231), with a tanh step of width ``ramp``; 1 above. ``factor`` 1 is
+    no step."""
+    if factor == 1:
+        return 1
+    return 1 + (factor - 1) * (1 + sympy.tanh((depth - top) / ramp)) / 2
+
+
 def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1,
-                     asthenosphere=None):
+                     asthenosphere=None, lower_mantle=None):
     """Temperature-dependent viscosity capped by a yield stress that grows with depth
     below the outer wall. ``weak`` (1 by default) multiplies both the viscosity and
     the yield stress, for a weak zone; ``yield_factor`` multiplies the yield stress
     alone (strain weakening); ``asthenosphere`` = (factor, top, bottom, ramp) multiplies
-    the viscosity by ``factor`` in a depth channel (see ``asthenosphere_factor``).
-    Returns eta(T) with the channel factor, the viscosity the yield law caps."""
+    the viscosity by ``factor`` in a depth channel (see ``asthenosphere_factor``);
+    ``lower_mantle`` = (factor, top, ramp) multiplies it below ``top`` (see
+    ``lower_mantle_factor``). Returns eta(T) with those factors, the viscosity the yield
+    law caps."""
     depth = r_o - radius_of(stokes.mesh)
     eta_T = sympy.exp(sympy.log(deta) * (1 - T_sym))
     if asthenosphere is not None:
         eta_T = eta_T * asthenosphere_factor(depth, *asthenosphere)
+    if lower_mantle is not None:
+        eta_T = eta_T * lower_mantle_factor(depth, *lower_mantle)
     stokes.constitutive_model = uw.constitutive_models.ViscoPlasticFlowModel
     stokes.constitutive_model.Parameters.shear_viscosity_0 = eta_T * weak
     stokes.constitutive_model.Parameters.shear_viscosity_min = 1

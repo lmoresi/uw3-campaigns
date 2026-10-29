@@ -69,11 +69,21 @@ params = uw.Params(
     uw_ridge_over=3.14159,      # angle from the trench to the overriding plate's ridge (radians)
     uw_age_thin=2.0e-5,         # the age of the surface where there is no plate (a 0.009 d boundary layer)
     uw_over_plate=1,            # 0: no overriding plate, the thin boundary layer instead
-    uw_top_hot=0,               # 1: the surface on the overriding side is HELD at T_interior (no boundary
+    uw_top_hot=0,               # 2: a fixed ridge (uw_ridge_patch). 1: the surface on the overriding side is HELD at T_interior (no boundary
                                 #   layer grows there: at this Peclet number the thin layer thickens into a
                                 #   plate within the run), from uw_top_hot_start past the trench to the same
                                 #   distance short of the antipode, tanh ramps of uw_over_ramp
     uw_top_hot_start=0.06,
+    uw_ridge_patch=0.05,        # uw_top_hot 2 (a fixed ridge): only a patch of this half-width (arc, layer depths) at the
+                                #   antipode of the trench is held at T_interior, tanh ramps of uw_over_ramp; T = 0 elsewhere
+    uw_cont_extent=0.0,         # > 0: the compositional overriding plate (the continent) ends this angle (radians) from the
+                                #   trench instead of at the overriding plate's ridge (2.094 = 1/3 of the annulus)
+    uw_cont_age=0.0,            # > 0: a uniform thermal age (layer depths^2) under the continent in the slab state, in place
+                                #   of the ocean's ramp (0.000625: a 0.05 d, ~145 km, conductive lid)
+    uw_lm_eta=1.0,              # a viscosity factor below uw_lm_depth (the 670 km step; 1 = none); Ra and the yield
+                                #   stresses stay referenced to the upper mantle
+    uw_lm_depth=0.231,          # layer depths (670 km of a 2900 km mantle)
+    uw_lm_ramp=0.02,
     uw_over_gap=0.0,            # the overriding plate starts this arc length (layer depths) from the trench
     uw_over_ramp=0.03,          # over which its age ramps up from the thin layer's
     # an imposed ridge (any state): a weak vertical seam through the lid at each ridge
@@ -308,6 +318,10 @@ def hot_top_window(rel_arc, lib=np):
     uw_top_hot_start past the trench and the same distance short of the antipode, with
     tanh ramps; numpy or sympy."""
     start, ramp = float(params.uw_top_hot_start), max(float(params.uw_over_ramp), 1e-6)
+    if int(params.uw_top_hot) == 2:
+        # a fixed ridge: a patch of half-width uw_ridge_patch about the antipode of the trench
+        dist = np.pi * r_o - (lib.Abs(rel_arc) if lib is sympy else np.abs(rel_arc))
+        return (1 - lib.tanh((dist - float(params.uw_ridge_patch)) / ramp)) / 2
     far = np.pi * r_o - start
     return (1 + lib.tanh((rel_arc - start) / ramp)) * (1 + lib.tanh((far - rel_arc) / ramp)) / 4
 
@@ -789,7 +803,9 @@ class FaultedMesh:
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
                 if params.uw_asth < 1 else None)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
-                                      r_o, weak, yield_factor, asthenosphere=asth)
+                                      r_o, weak, yield_factor, asthenosphere=asth,
+                                      lower_mantle=((params.uw_lm_eta, params.uw_lm_depth, params.uw_lm_ramp)
+                                                    if params.uw_lm_eta != 1 else None))
         if params.uw_eta_reg > 0:
             s.constitutive_model.Parameters.plastic_rate_strengthening = params.uw_eta_reg
         buoyancy = params.uw_buoy_T * self.T.sym[0]
@@ -1252,6 +1268,10 @@ def slab_temperature(xy):
     elif params.uw_over_gap > 0:                          # the plate set back from the trench
         w = np.clip((np.abs(rel) * r_o - params.uw_over_gap) / max(params.uw_over_ramp, 1e-6), 0, 1)
         age_o = age_thin + (age_o - age_thin) * w
+    if params.uw_cont_age > 0:                            # the continent: a uniform, old lid
+        cont_end = float(params.uw_cont_extent) or ridge_o
+        in_cont = (rel * r_o >= float(params.uw_over_gap)) & (rel < cont_end)
+        age_o = np.where(in_cont, float(params.uw_cont_age), age_o)
     age_surface = np.maximum(np.where(rel >= 0, age_o, age_s), age_thin)
     T_plate = half_space(depth, age_surface)
     if params.uw_top_hot:                                 # no cooling at all where the surface is held hot
@@ -1363,7 +1383,7 @@ def over_marker(xy, thick):
     depth = np.maximum(r_o - r, 0.0)
     over = 1.0 if params.uw_dip < 90 else -1.0
     rel = over * wrap(theta - float(params.uw_theta_trench))
-    ridge_o = abs(float(params.uw_ridge_over))
+    ridge_o = float(params.uw_cont_extent) or abs(float(params.uw_ridge_over))
     plate = (rel * r_o >= float(params.uw_over_gap)) & (rel < ridge_o) & (depth < thick)
     return plate.astype(float)
 
