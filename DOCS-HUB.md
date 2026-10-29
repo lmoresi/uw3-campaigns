@@ -281,3 +281,13 @@ Measured here, not inherited.
   remaining items: re-pin UWTN 2026-018 and 2026-022 to #890's development merge
   commit; the fault-multigrid guide's "what ships" section moves the split-level
   hierarchy from pending to available once B merges.
+- 2026-10-29 (night): two more settled for UWTN 2026-022. The tail question (ratio-12
+  rule against production's `uw_chain = 2`) is a journal `decision` with closure lines:
+  the welded tail serves a linear rig at a modest ratio; production uses the lean
+  split chain because a yielding lid caps the welded velocity solve (measured in the
+  faults-in-convection guide). The ladder construction figure Louis asked for was
+  routed on his word to the laptop integration session and exists on wombat at
+  `~/+Simulations/uwtn_2026_022_ladder/` (script, PNG/PDF/SVG, README; notes
+  repository only, nothing to underworld3); relayed to the notes session with its two
+  forced differences (the note's own fixture; base 1/8 to 1/32, ratio 6.06 on every
+  level).
