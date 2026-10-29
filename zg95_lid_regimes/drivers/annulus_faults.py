@@ -170,6 +170,12 @@ params = uw.Params(
                                 #   wall (its shallowest point: the crust base on the incoming plate); deeper, no fault
     uw_weld_ok=0,               # 1: a refused chain level is welded and the build goes on (the old behaviour);
                                 #   0: the build is refused and the previous faults kept
+    uw_fault_fit="parabola",    # crust law locator: "parabola" (crust_fault_points) or "envelope" (the crust base
+                                #   marched up from the cap, crust_envelope_points)
+    uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
+                                #   point to the wall; the unfloored dip is recorded
+    uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
+                                #   depths) from the particle trench
     uw_addon_timing=0,          # measurement runs (addon_timing.py): > 0 times each faulted-mesh build and
                                 #   its first solve, counts every level's cells per rank, forces this many
                                 #   rebuilds of the same set after the first step, stops after the last
@@ -886,6 +892,128 @@ def crust_fault_points(faults):
     poly = resample_polyline(np.vstack([stub, inner]), S, 2 ** int(params.uw_chain))
     radius = np.hypot(poly[:, 0], poly[:, 1])
     return poly, theta_t, dip, float((r_o - radius).max())
+
+
+def wquantile(x, w, q):
+    """The q-quantile of x with weights w."""
+    o = np.argsort(x)
+    c = np.cumsum(w[o])
+    return float(np.interp(q * c[-1], c, x[o]))
+
+
+def crust_envelope_points(faults):
+    """The fault on the base of the crust layer, located without an assumed shape (the
+    parabola of crust_fault_points cannot follow a broad hinge). In x = arc length at the
+    wall: the subducted crust is the particles deeper than 1.25 crust thicknesses; the
+    incoming plate lies on the side where the crust at the wall is, relative to the crust
+    below cap/2, and the base faces it. Marching up from the cap in steps of 0.0025, the
+    base at each depth is the 10th percentile toward the incoming side of the subducted
+    crust in the run (gaps over 2 thicknesses split runs) nearest the base one step deeper,
+    the particles weighted by a Gaussian in depth (half a thickness); a depth with no crust
+    near the previous base is skipped, a gap over 0.03 or a march short of the cap gives no
+    fault. Smoothed by a local quadratic in depth (Gaussian, 0.015). Above its shallowest
+    point the base goes straight to the wall at its own slope over the top 0.03, dipping at
+    least uw_fault_top_dip_min; no fault if it meets the wall over uw_fault_trench_tol from
+    the particle trench (the overriding-side end of the crust at the wall). A stub to 0.02
+    above the wall; resampled at the rung spacing. Theta and dip are measured on that
+    placed polyline. Collective. Returns (points, theta, dip, depth, info) or None; info
+    carries the locator, its raw trace (x, depth before resampling), the trench gap and the
+    unfloored top dip. Tested offline on 40 stored checkpoints (kaiju-launch/crust_fit)."""
+    cap = fault_depth_cap()
+    ct = crust_thick
+    xy = np.asarray(swarm_xy(), dtype=float)
+    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+    keep = marker > 0.5
+    P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
+    depth = r_o - np.hypot(P[:, 0], P[:, 1])
+    theta = np.arctan2(P[:, 1], P[:, 0])
+    if faults:
+        hint = float(faults[0]["theta"])
+    else:                                            # the subducted cluster that goes deepest
+        sub = (depth > 1.25 * ct) & (depth <= cap + 2 * ct)
+        if sub.sum() < 12:
+            return None
+        o = np.argsort(theta[sub])
+        pieces = np.split(o, np.flatnonzero(np.diff(theta[sub][o]) > 0.03) + 1)
+        piece = max(pieces, key=lambda p: depth[sub][p].max())
+        hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
+    th = hint + wrap(theta - hint)
+    near = np.abs(th - hint) < 0.4
+    x, depth = r_o * th[near], depth[near]
+    sub = depth > 1.25 * ct
+    deep = sub & (depth > 0.5 * cap) & (depth <= cap + 2 * ct)
+    sh = depth < 0.5 * ct
+    if deep.sum() < 12 or sh.sum() < 4:
+        uw.pprint("  crust fault (envelope): no subducted crust below cap/2, or none at the wall")
+        return None
+    xd = np.sort(x[deep])
+    runs = np.split(xd, np.flatnonzero(np.diff(xd) > r_o * 0.03) + 1)
+    xdeep = float(np.median(min(runs, key=lambda r: np.abs(r - r_o * hint).min())))
+    inc = 1.0 if np.median(x[sh]) > xdeep else -1.0
+    h_z, h_s, dz, q = 0.5 * ct, 0.015, 0.0025, 0.1
+    zs = np.arange(cap, 1.25 * ct, -dz)
+    base = np.full(len(zs), np.nan)
+    prev = xdeep
+    for j, z in enumerate(zs):
+        sel = sub & (np.abs(depth - z) < 2.5 * h_z)
+        if sel.sum() < 3:
+            continue
+        xs, ws = x[sel], np.exp(-0.5 * ((depth[sel] - z) / h_z) ** 2)
+        o = np.argsort(xs)
+        xs, ws = xs[o], ws[o]
+        cut = np.flatnonzero(np.diff(xs) > 2 * ct) + 1
+        a, b = min(zip(np.r_[0, cut], np.r_[cut, len(xs)]), key=lambda ab: np.abs(xs[ab[0]:ab[1]] - prev).min())
+        if np.abs(xs[a:b] - prev).min() > 2 * ct:
+            continue
+        base[j] = wquantile(xs[a:b], ws[a:b], q if inc < 0 else 1 - q)
+        prev = base[j]
+    ok = np.isfinite(base)
+    zk, bk = zs[ok][::-1], base[ok][::-1]            # shallow to deep
+    if len(zk) < 6 or zk[-1] < cap - 0.03 or np.abs(np.diff(zk)).max() > 0.03 or zk[0] > 4 * ct:
+        uw.pprint(f"  crust fault (envelope): the crust base has a gap or misses the cap "
+                  f"({len(zk)} depths{f', {zk[0]:.3f}-{zk[-1]:.3f}' if len(zk) else ''})")
+        return None
+    zg = np.arange(zk[0], cap + 1e-9, dz)
+    sm = np.empty(len(zg))
+    for j, z in enumerate(zg):
+        w = np.exp(-0.5 * ((zk - z) / h_s) ** 2)
+        A = np.c_[np.ones_like(zk), zk - z, (zk - z) ** 2] * np.sqrt(w)[:, None]
+        sm[j] = np.linalg.lstsq(A, bk * np.sqrt(w), rcond=None)[0][0]
+    xsh = np.sort(x[sh])
+    runs = np.split(xsh, np.flatnonzero(np.diff(xsh) > 2 * ct) + 1)
+    run = min(runs, key=lambda r: np.abs(r - sm[0]).min())
+    xt = float(np.quantile(run, 0.01 if inc > 0 else 0.99))
+    top = zg <= zg[0] + 0.03
+    slope = np.polyfit(zg[top], sm[top], 1)[0]       # dx/dz; going up the base moves toward inc
+    top_dip = float(np.degrees(np.arctan2(1.0, max(-slope * inc, 1e-12))))
+    run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    xa = sm[0] + inc * run_len * zg[0]
+    gap = abs(xa - xt)
+    if gap > params.uw_fault_trench_tol:
+        uw.pprint(f"  crust fault (envelope): the base meets the wall {gap:.3f} from the particle trench")
+        return None
+    raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]       # (x, depth)
+    d = raw[1] - raw[0]
+    pol = np.vstack([raw[0] - d * (0.02 / d[1]), raw])
+    radius = r_o - pol[:, 1]
+    poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
+                             S, 2 ** int(params.uw_chain))
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(rp <= r_o))
+    w = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    info = {"locator": "envelope", "trench_gap": float(gap), "top_dip_data": top_dip,
+            "top_dip_floored": bool(top_dip < params.uw_fault_top_dip_min),
+            "particle_trench": float(xt / r_o), "raw": np.c_[raw[:, 0] / r_o, raw[:, 1]].round(6).tolist()}
+    uw.pprint(f"  crust fault (envelope): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
+              f"data {top_dip:.1f}{' (floored)' if info['top_dip_floored'] else ''}, trench gap {gap:.3f}")
+    return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
 class FaultedMesh:
@@ -2075,19 +2203,23 @@ for k in range(k0, k0 + params.uw_steps):
     elif params.uw_fault_law == "crust" and detect_now and params.uw_max_faults > 0:
         # one fault following the weak crust on the compositional slab's top, from the
         # trench down to the depth cap; it forms at the first detection and never retires
-        found = crust_fault_points(faults)
+        if params.uw_fault_fit == "envelope":
+            found = crust_envelope_points(faults)
+        else:
+            found = crust_fault_points(faults)
+            found = found + ({"locator": "parabola"},) if found is not None else None
         if found is None:
             uw.pprint("  crust fault: no slab top reaching the cap from the surface; the fault keeps its place")
         else:
-            poly, theta_t, dip, depth = found
+            poly, theta_t, dip, depth, info = found
             if faults:
                 f = faults[0]
                 moved = polyline_gap(poly, f["points"])
-                f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth})
+                f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth, **info})
                 damage[f["name"]] = float(moved)
             else:
                 faults.append({"name": f"F{next_id}", "points": poly.tolist(), "theta": theta_t,
-                               "dip": dip, "depth": depth})
+                               "dip": dip, "depth": depth, **info})
                 next_id += 1
                 events.append(f"formed {faults[0]['name']} on the crust at {np.degrees(theta_t):.1f} deg, "
                               f"dip {dip:.1f}, depth {depth:.3f}, {len(poly)} points")
