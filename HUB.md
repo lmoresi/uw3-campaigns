@@ -245,7 +245,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   edge 139.3 deg, ridge patch 178-182 clear). Surface points advected with checkpointed wall velocities keep
   0.30 d of gap after 100 steps in TAf/TA_age25f converging flow (g 0.5 keeps 0.15, g 1.0 keeps 0.58) and
   ~0.6 d in Earth-type flow (smoke3 closed 0.02-0.03 d in 19 steps; the method reproduces its 3 deg closure at
-  g 0.15). Hub accepted 0.75 within Louis's ruling; next Earth smoke runs with it.
+  g 0.15). Hub accepted 0.75 within Louis's ruling. **Smoke 4 DONE 2026-10-29 (job 2371, 20 steps, parabola
+  locator, driver 259ee09):** gap held at 0.71-0.75 d (continent edge 19.28 -> 16.88 deg, trench 0 -> -1.88
+  placed; smoke 3's 0.15 gap had closed to 0.10-0.12 over the same steps), dynamics as smoke 3 (vrms 219 -> 404,
+  ~5 % higher; fault at step 5, dip 55 -> 37, slip 1600-1800; plates +809/-849 at step 19), 177 s/step mean, 59
+  min, 22 GB, no welds; no crust particle within 0.01 of a continent particle, fault 0.6 from the continent (smoke
+  3: 0.05). Parabola's stored trench again ahead of the placed one (-2.44 vs -1.05 at step 15); later Earth runs
+  take -uw_fault_fit envelope once chosen. Correction: smoke 3 vrms was 209-389, not 210-348. Page v3
+  https://claude.ai/artifact/JqKKdhnbQgYR7QMW3sRxBw. The Earth setup now has all of Louis's rulings in and is
+  ready for a production-length run once the locator and the remaining choices (D, Ra, buoyancy) are settled.
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -1390,3 +1398,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hysteresis (particle noise a third of the threshold). Earth smoke 4 still running.
 - 2026-10-29: envelope locator series applied (e37bb84, cdf44c1) and pushed; branch head cdf44c1. Smoke 2372
   passed (details under the crust-fit decision). Demo rerun and production locator still wait on Louis.
+- 2026-10-29: Earth smoke 4 done (gap 0.75 holds at 0.71-0.75 d over 20 steps, dynamics unchanged from smoke 3);
+  recorded under the Earth-like setup decision; page v3. Kaiju corrected smoke 3's vrms range (209-389).
