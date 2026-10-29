@@ -1441,3 +1441,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   started on the second node. Both recorded above.
 - 2026-10-29: demo rerun launched as job 2375 (envelope, every step, 30 frames); renderer ready. Chain levels not
   checkpointed: finest level only, no rerun for them (hub decision).
+- 2026-10-29: Earth production (job 2374) progress at step 12: envelope formed F0 at step 0 (the initial crust already
+  reaches the cap; the parabola had waited to step 5), so the fault slips from step 1 and vrms is ~250 over steps
+  1-11 (smoke 4: 216 pre-fault); trench -0.36 -> -2.71 deg by step 11; dip 56-63 -> 32-34 by step 8; floor bound
+  once (step 9, 29.8); trench gap 0.003-0.063; 8 builds in 12 steps at 4 rungs (11-12 s each); 138-256 s/step, 3-7
+  Newton; no welds, refusals or rejected fits. Demo rerun (2375) on n3 at ~40 min.
