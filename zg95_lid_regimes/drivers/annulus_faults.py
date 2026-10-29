@@ -164,6 +164,10 @@ params = uw.Params(
     uw_chain=2,
     uw_band_widen=1,
     uw_rebuild_rungs=4,
+    uw_fault_surface_gap=2.0,   # crust law: the fit's up-dip end may stop this many crust thicknesses below the
+                                #   wall (its shallowest point: the crust base on the incoming plate); deeper, no fault
+    uw_weld_ok=0,               # 1: a refused chain level is welded and the build goes on (the old behaviour);
+                                #   0: the build is refused and the previous faults kept
     uw_addon_timing=0,          # measurement runs (addon_timing.py): > 0 times each faulted-mesh build and
                                 #   its first solve, counts every level's cells per rank, forces this many
                                 #   rebuilds of the same set after the first step, stops after the last
@@ -824,41 +828,61 @@ def crust_fault_points(faults):
     """The fault that follows the weak crust: the base of the crust layer when the run
     carries the crust marker (crust_base_curve; Sandiford & Moresi 2019, the fault is the
     base of the weak crust), else the compositional slab's top (slab_top_curve). The
-    fault is the fitted parabola itself all the way up, through the wall to 0.02 above
-    it, and down to the depth cap, resampled at the rung spacing. The surface is the
-    placement's business: the cut stops three rungs inside the wall (fault_trace) and
-    the ribbon's TI zone covers the rest. Collective. Returns the points and (theta,
-    dip, depth) in the fault's usual terms, or None."""
+    fault is the fitted parabola down to the depth cap from its up-dip end: walking up
+    from the fitted points, where it crosses the wall or, if first, its shallowest point
+    (within uw_fault_surface_gap crust thicknesses of the wall, else no fault: the base
+    of the crust on the incoming plate is a thickness deep). Above that end it is a
+    straight stub along the chord to 0.03 deep, out to 0.02 above the wall; resampled at
+    the rung spacing. Round a broad hinge the parabola can run just under the surface for
+    tens of degrees before it crosses (demo step 39: 0.005-0.022 deep from -5 to -30
+    deg), and a band round that arm leaves the domain. The surface is the placement's
+    business: the cut stops three rungs inside the wall (fault_trace) and the ribbon's TI
+    zone covers the rest. Collective. Returns the points and (theta, dip, depth) in the
+    fault's usual terms, theta and dip where the stub crosses the wall, or None."""
     cap = fault_depth_cap()
     got = crust_base_curve(faults, cap) if crust_on else slab_top_curve(faults, cap)
     if got is None:
         return None
     curve, s_lo = got
-    lift = r_o + 0.02
+
+    def depth(s):
+        return r_o - np.hypot(*curve(s))
+
     s_top, step = s_lo, 0.005
-    while np.hypot(*curve(s_top)) < lift and s_top > s_lo - 0.5:
+    while depth(s_top) > 0 and depth(s_top - step) < depth(s_top) and s_top > s_lo - 0.5:
         s_top -= step
-    if np.hypot(*curve(s_top)) < lift:
-        return None                                  # the parabola turns away from the wall
-    s_top = brentq(lambda s: np.hypot(*curve(s)) - lift, s_top, s_top + step)
+    if depth(s_top) <= 0:
+        s_top = brentq(depth, s_top, s_top + step)
+    elif depth(s_top) > params.uw_fault_surface_gap * crust_thick:
+        top = curve(s_top)
+        uw.pprint(f"  crust fault: the fit's shallowest point is {depth(s_top):.4f} deep at "
+                  f"{np.degrees(np.arctan2(top[1], top[0])):.1f} deg (gap "
+                  f"{params.uw_fault_surface_gap * crust_thick:.4f})")
+        return None                                  # the parabola turns away below the wall
     s_cap = s_lo
-    while r_o - np.hypot(*curve(s_cap)) < cap and s_cap < s_lo + 1.0:
+    while depth(s_cap) < cap and s_cap < s_lo + 1.0:
         s_cap += step
-    if r_o - np.hypot(*curve(s_cap)) < cap:
+    if depth(s_cap) < cap:
         return None                                  # the parabola turns up before the cap
-    s_cap = brentq(lambda s: (r_o - np.hypot(*curve(s))) - cap, s_cap - step, s_cap)
-    poly = resample_polyline(curve(np.linspace(s_top, s_cap, 400)), S, 2 ** int(params.uw_chain))
-    radius = np.hypot(poly[:, 0], poly[:, 1])
-    k = int(np.argmax(radius <= r_o))
-    w = (radius[k - 1] - r_o) / max(radius[k - 1] - radius[k], 1e-12)
-    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    s_cap = brentq(lambda s: depth(s) - cap, s_cap - step, s_cap)
+    inner = curve(np.linspace(s_top, s_cap, 400))
+    top = inner[0]
+    below = inner[np.argmin(np.abs(r_o - np.hypot(inner[:, 0], inner[:, 1]) - 0.03))]
+    down = below - top
+    down /= max(np.linalg.norm(down), 1e-12)
+
+    def up_to(radius):                                # distance up the chord from top to radius
+        b = top @ -down
+        return -b + np.sqrt(b * b - (top @ top - radius ** 2))
+
+    at_wall = top - up_to(r_o) * down
     theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
-    below = poly[np.argmin(np.abs(r_o - radius - 0.03))]
     r_hat = at_wall / np.linalg.norm(at_wall)
     t_hat = np.array([-r_hat[1], r_hat[0]])
-    down = below - at_wall
-    down /= max(np.linalg.norm(down), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    stub = top - np.outer(np.linspace(up_to(r_o + 0.02), 0.0, 20)[:-1], down)
+    poly = resample_polyline(np.vstack([stub, inner]), S, 2 ** int(params.uw_chain))
+    radius = np.hypot(poly[:, 0], poly[:, 1])
     return poly, theta_t, dip, float((r_o - radius).max())
 
 
@@ -878,6 +902,11 @@ class FaultedMesh:
             try:
                 mids.append(placed_ladders(host, self.faults, 2 ** k)[0])
             except (RuntimeError, ValueError) as err:
+                # not seen in ~300 faulted builds before demo step 39, where the welded mesh
+                # (a band along the surface) went out of memory in the next solve
+                if not params.uw_weld_ok:
+                    raise RuntimeError(f"chain level {2 ** k}S refused, build refused "
+                                       f"(-uw_weld_ok 1 welds it): {err}") from err
                 uw.pprint(f"  chain level {2 ** k}S refused ({str(err)[:80]}): welded")
                 mids.append(host)
                 welded.append(f"{2 ** k}S")
