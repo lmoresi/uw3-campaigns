@@ -404,6 +404,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: development CI green at fc67b650: test and all four shards, the Gadi and
+  Setonix HPC image builds. Tier C (report only) and one image push were still running.
 - 2026-10-31: #892 step 1 reported: only the rotated path runs ILU; scope unchanged.
   B's `drop_orphans` rotated path discards every coarse FAC patch; measurement of
   kept against dropped added to step 4.
