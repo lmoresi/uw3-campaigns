@@ -145,6 +145,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Unfaulted thermal slabs (TA, TB, TA_age25 movies) | https://claude.ai/artifact/1pBxnBkYEkHm1RZMLc3F5A |
 | Faulted thermal set (table, 4 movies, velocity-ring movies v2, overlay, solver) | https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR |
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
+| Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 
 ## Open work
 
@@ -166,7 +167,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
 | TI-in-the-ladder fault comparison (one run) | kaiju, design first | requested 2026-10-29 (Louis): the placed ribbon as a TI weak band with a non-linear weak rheology against the split fault, rollback numbers compared; the fault weakness takes precedence over the crust weakening (no double weakening); settings for equivalence to be discussed with Louis before the run |
-| Add-on mesh demonstration movie (fault refit and rebuilt every step, fixed window, 30 frames) | kaiju, from a strong-plate rollback checkpoint (TBf ~60-80 proposed), addon_demo/mesh_movie/ | job 2367 (TA_age25f from 30, rebuild every step) OOM-killed at step 40: the parabola met the wall tangentially, its above-wall segment ran along the surface to -34 deg (192 of 269 points outside the domain), the ladder was refused, the build fell back to welding (+3000 cells) and 186 GB. Steps 30-38 valid. Fix dbdfb44 (kaiju/fault-wall-stub): the fault starts where the parabola enters the wall, a straight stub above it, theta/dip from that crossing; smoke job 2368 through the breaking detection; then the demo reruns from checkpoint 30 on one driver |
+| Add-on mesh demonstration movie (fault refit and rebuilt every step, fixed window, 30 frames) | kaiju, from a strong-plate rollback checkpoint (TBf ~60-80 proposed), addon_demo/mesh_movie/ | job 2367 (TA_age25f from 30, rebuild every step) OOM-killed at step 40: the parabola met the wall tangentially, its above-wall segment ran along the surface to -34 deg (192 of 269 points outside the domain), the ladder was refused, the build fell back to welding (+3000 cells) and 186 GB. Steps 30-38 valid. Fix dbdfb44 (kaiju/fault-wall-stub): the fault starts where the parabola enters the wall, a straight stub above it, theta/dip from that crossing; smoke job 2368 through the breaking detection; then the demo reruns from checkpoint 30 on one driver | APPLIED 2026-10-29 as 259ee09 (kaiju d85c25c): up-dip end at the wall crossing or the fit's shallowest point (within -uw_fault_surface_gap 2 crust thicknesses, else no fault), straight stub above it, theta/dip from the stub's wall crossing; a refused chain level refuses the build (-uw_weld_ok 1 welds). Smokes from checkpoint 38: gap 0.01 rejected steps 40-41 (thinner than the crust); gap 2 rebuilt every step 39-43, trench -7.4 to -8.2 deg, dip ~11, 17 GB peak. Correction: the step-39 fit ran just under the surface (0.005-0.022 deep, -5 to -30 deg), not above it. Demo rerun still waits for the robust fit |
 | Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; artifact https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR (table, four movies, overlay, solver); rsync for the files |
 | Thermal slab set (TA, TB, TA_age25; TA_Pe3 cancelled) | kaiju runs `runs/slab_thermal_*`, scripts `~/campaigns/kaiju-launch/slab_thermal/` | third segments running since 2026-10-28 01:11 (jobs 2263-2265 from 250 / 240 / 260) to finish at 299; recipe unchanged, overlay-warmdiag; the crust weak layer is broken by the proxy in these runs (decision pending on a redo with -uw_crust_ppc 12) |
 | Slab faulted set (B1_crust0.1_nofault, B1_crust0.1_fault, B1_crust1_fault, C1_crust0.1_fault) | kaiju `~/campaigns/zg95/figures_out/slab_fault/` (3.0 MB, README, trench_retreat.png, frames, solver records; segment ledger kaiju-launch/slab_fault/SEGMENTS.md) | COMPLETE 2026-10-26: all four 0-299, records continuous, no KSP-cap hits; faulted runs in three segments each (leak), every restart at match distance 0; figures reach GitHub after Louis's rsync (Waiting on Louis) |
@@ -188,6 +189,12 @@ frozen as the hand-over state; they are not updated here after this date.
 - Earth-like setup, RULED 2026-10-29 (Louis): start the continent further from the trench (it may be pulled in
   once the slab is mature; too early would spoil the experiment); the smoke's 0.15 d gap closed 3 deg in 19
   steps. Kaiju sets a larger gap (0.5-1.0 d proposed) with the third-of-the-box extent from where it starts.
+  Kaiju's analysis (2026-10-29, nothing run): -uw_over_gap 0.75 with -uw_cont_extent 2.4315 (extent is an angle
+  from the trench, so 2.094 + g/2.2222 keeps a third of the box from the continent's start; starts 19.3 deg, far
+  edge 139.3 deg, ridge patch 178-182 clear). Surface points advected with checkpointed wall velocities keep
+  0.30 d of gap after 100 steps in TAf/TA_age25f converging flow (g 0.5 keeps 0.15, g 1.0 keeps 0.58) and
+  ~0.6 d in Earth-type flow (smoke3 closed 0.02-0.03 d in 19 steps; the method reproduces its 3 deg closure at
+  g 0.15). Hub accepted 0.75 within Louis's ruling; next Earth smoke runs with it.
 - Earth-like public demonstration setup: rulings implemented (fault precedence mask, marker depth gate; the
   upper-mantle channel via -uw_asth 0.1 from 0.12 to 0.231; lm_eta 1; continent x1, buoyant -0.5, lid age 0.000625).
   Smoke 3 (20 steps): vrms 210-348 against smoke 2's 40-72 and TAf's 440-540, so the channel restores most of the
@@ -1258,3 +1265,11 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-29: Louis: start the continent further from the trench; the crust-curve fitting needs a robust model, not
   a patch. Kaiju tasked with both (design first for the fit, offline tests on stored checkpoints, artifact, then
   flag, smoke, patch); the demo movie rerun waits for the robust fit.
+- 2026-10-29: kaiju's wall-stub patch d85c25c applied as 259ee09 on zg95-annulus-for-kaiju (blob fb70d26 -> 0725bbe
+  verified) and pushed. Kaiju corrected its earlier report: the step-39 fit ran just under the surface, not above
+  it, so the first crossing fix changed nothing (smoke 2368 OOM'd identically); the welded build was the failure
+  signal (no weld in ~300 earlier faulted builds). Smokes 2369/2370 above. Stop-gap only; robust fit design in
+  progress.
+- 2026-10-29: kaiju continent-gap analysis (artifact PcRP5QjPT8DSa9rEjkfs4F): -uw_over_gap 0.75, -uw_cont_extent
+  2.4315 recommended, no driver change needed; hub accepted within Louis's "further away" ruling and asked for the
+  next Earth smoke on it.
