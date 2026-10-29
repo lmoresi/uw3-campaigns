@@ -162,7 +162,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 4aa798c (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 67dd2c8 (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -553,7 +553,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the base instead of 45. **Hub: TAti RESTARTED from step 0 on the smooth law, chained 12 h segments afterany on
   the last checkpoint, stop watcher; 2398 stopped (its checkpoints kept as the hard-law reference). Reversible if
   Louis's equivalence choice changes the spec. The smooth form should become the TI default once every TI run is
-  on it (patch a00a10b, default off, to be applied when the full format-patch arrives).** (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  on it. Patch a00a10b APPLIED as 67dd2c8 (blob 7373694 verified), default off.** TAti_smooth: run dir
+  runs/slab_thermal_fault_TAti_smooth, segment 1 job 2405 (n2) from step 0, driver pinned in zg95-tati-smooth;
+  chain supervisor kaiju-launch/ti/TAti_smooth_chain.sh detached on the login node (runs stop_at_base EVERY=5 per
+  segment, ends at the base, else submits the next 12 h segment from the last complete checkpoint, at most 5
+  segments; log chain.log; stop = kill the supervisor then scancel). 2398 cancelled after step 6 (checkpoints 0, 5
+  kept; README says why). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1617,3 +1622,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   restart or pause. Recorded under the TI item.
 - 2026-10-30: smooth band law: same physics, a third off the cost; TAti restarted on it from step 0, chained (~30
   node-hours, node otherwise idle); hard-law 2398 stopped. Patch a00a10b pending in full form.
+- 2026-10-30: smooth band-law patch applied as 67dd2c8; TAti_smooth chained run live (segment 1 job 2405, supervisor
+  on the login node). Branch head 67dd2c8.
