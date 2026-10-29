@@ -219,6 +219,20 @@ frozen as the hand-over state; they are not updated here after this date.
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
   compositional set: under crust x0.1 the fault was redundant; with crust x1 it doubled the retreat).
+- **TI-fault comparison: settings for Louis to decide** (kaiju's design report, read-only, at kaiju
+  ~/campaigns/zg95/figures_work/ti_fault/TI_DESIGN_REPORT.md). Findings: the driver always splits (no realisation
+  switch); the library's TI band (FaultNetwork realisation "ti") has a constant linear eta_1 and its apply()
+  replaces the whole rheology, so it needs driver work; the TI VEP model yields only eta_1; the TI Newton tangent
+  is inconsistent (#457, Picard pace) so a cost comparison is biased against TI. The split's `zone` is isotropic
+  weakening (uw_eta_w on viscosity and yield in the top ~0.016), not TI as its docstring says. Crust and fault
+  weakening MULTIPLY today (1e-6 in crust-marked zone cells), masked in TBf by the viscosity floor and rate
+  strengthening (at most 10x in ~10 cells). Proposal: crust factor linear in (1 - M), M = zone (split) or the band
+  footprint (TI); a yielding band (eta_1 capped at f_b tau_y, f_b 1e-2, band regularisation 0.1, floor 0.1)
+  rather than strain weakening; eta_I = eta_1/w ~25-40 (band stress 1-2 % of the mean yield stress at TBf's slip),
+  eta_1 0.2-0.3 at w = W = 0.008; eta_0 the host law without the crust factor. Run: TBti = TBf + TI flags, stopped at
+  the base, against TBf and a TBc twin (TB predates the crust sampling); slip by a velocity-jump probe on both;
+  cost compared from step 10. Decide: f_b, eta_1/w, w, the mask rule, and whether the #457 tangent fix (hyperion,
+  library) comes first for a fair cost comparison.
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
   (2) try a Picard warm-up on ordinary steps (-uw_warm_newton_switch 1e-2, as rebuilds use) for the layered
   mantle, where ordinary warm steps start at F0 = F_ref and damped Newton crawls (step 17: 26 its, 20 cutbacks)?
@@ -1150,3 +1164,7 @@ frozen as the hand-over state; they are not updated here after this date.
   and fault weakening combine today in both realisations, a precedence mask, equivalence settings (2026-017: band
   strength is eta_1/w; eta_1/w ~0.1 matched a frictionless split), and a run plan (TBf's setup); Louis decides
   the settings before the run.
+- 2026-10-29: kaiju's TI-fault design report (see Waiting on Louis). Notable: the split's `zone` docstring calls it a
+  TI zone but it is isotropic weakening; crust and fault weakening multiply (bounded by the floor); the TI tangent
+  issue #457 biases cost comparisons; no test solves TI with rotated free-slip walls, so a smoke on one TBf state
+  comes first. Louis decides settings before code is written.
