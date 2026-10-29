@@ -194,7 +194,12 @@ frozen as the hand-over state; they are not updated here after this date.
   crosses 670 at ~step 3, 1-3 Newton its, 35-85 s/step, fault forms once the crust reaches the cap, dip 35-30,
   slip 350-500; the continent a dark low-strain block nearly stationary on the velocity ring, the ridge
   spreading both ways, the plate trenchward at 150-250. Follow-up not done: splitting the mobility and lid-depth
-  wall integrals into oceanic and continental arcs.
+  wall integrals into oceanic and continental arcs. Overlap check (earth_smoke2): crust and continent particles
+  never overlap, fault trace 0.053 from the continent at step 19, but the continent's trenchward edge is drawn
+  from 3.7 to 0.9 deg of the trench in 19 steps and will reach it in a longer run; then the continent's x100
+  (viscosity and yield) meets the fault band and the crust and the factors multiply. Decide the precedence where
+  continent strength meets crust weakness and the fault band (the fault's own rheology wins; which of the other
+  two wins is open). Kaiju re-checks each checkpoint and flags the first step the distance drops below 2W.
 - Graded, relaxed base mesh (Louis, 2026-10-28): AGREED; UNASSIGNED since the laptop went inactive (kaiju could
   take it after the Earth setup). The laptop was to design and implement a lithosphere-graded
   coarse base (h 0.0156 in the top ~0.2 d, 2-4x coarser below, FMG tail nested through the grading) and relaxes
@@ -1173,3 +1178,6 @@ frozen as the hand-over state; they are not updated here after this date.
   line; tree equals kaiju/earth-setup). Smokes: earth_smoke (slab 0.35, neutral continent net heavy with its lid,
   10 steps, vrms 60-67, 3-6 its, 100-180 s) and earth_smoke2 (slab 0.2, continent -0.5 buoyant, 20 steps, vrms
   39-72, 1-3 its, 35-85 s). The x30 lower mantle slows the whole circulation ~7x. Choices listed for Louis.
+- 2026-10-29: kaiju: Earth clone at e5f661c; crust/continent overlap check clear (0 shared particles, min distance
+  0.073 -> 0.046 over 19 steps) but the continent is drawn toward the trench (3.7 -> 0.9 deg) and will reach it
+  in a longer run, where its x100 would compound with the crust factor; a precedence rule is needed there too.
