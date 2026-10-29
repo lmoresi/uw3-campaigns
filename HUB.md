@@ -1747,3 +1747,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   converge even on the linear reference law; the TI bridge changes nothing (bridge cleared). New prime suspect: the
   split's per-node contact normals on a curved trace partly lock the contact (box repro on arc and kinked cuts);
   "to check" reopened as a probable library finding; annulus confirmation with smoothed normals running (2423).
+- 2026-10-30: director smoothness ruled out as the TI band's Newton trouble (DG0 director angle change between
+  neighbouring footprint cells: median 0.07-0.66 deg, max 8.2 at the stub joint on a young fault, nothing over 5 on a
+  mature one). Smooth-director smoke held. Waiting on 2423 (split with trace normals).
