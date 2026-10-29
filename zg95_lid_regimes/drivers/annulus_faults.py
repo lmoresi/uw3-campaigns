@@ -1193,8 +1193,9 @@ class FaultedMesh:
             self.ti = ti_band_viscosity(s, self, footprint, tag)
             # for the checkpoint's band record: eta_1/eta_0, and how much of the shear lies in the
             # weak plane (gdot / edot_II: 1 where the director is the shear's own normal)
-            self.ti_ratio = uw.discretisation.MeshVariable(f"ti_ratio_{tag}", mesh, 1, degree=1)
-            self.ti_align = uw.discretisation.MeshVariable(f"ti_align_{tag}", mesh, 1, degree=1)
+            # cell means (DG0): a P1 projection averages a two-cell band with its neighbours
+            self.ti_ratio = uw.discretisation.MeshVariable(f"ti_ratio_{tag}", mesh, 1, degree=0, continuous=False)
+            self.ti_align = uw.discretisation.MeshVariable(f"ti_align_{tag}", mesh, 1, degree=0, continuous=False)
             self.ti_projections = []
             for var, fn in ((self.ti_ratio, self.ti["eta_1"] / self.host_cm.viscosity),
                             (self.ti_align, self.ti["gdot"] / (self.host_cm._strainrate_inv_II + 1.0e-12))):
@@ -1567,8 +1568,8 @@ def read_solver_fields(faulted, files):
 
 def write_ti_band(faulted, step):
     """A TI band's record at a checkpoint: for every footprint cell (on rank 0), its centroid,
-    its director, eta_1/eta_0 and gdot/edot_II (the shear's share in the weak plane), from P1
-    projections on the solver mesh. Returns the file name, or None without a TI band."""
+    its director, eta_1/eta_0 and gdot/edot_II (the shear's share in the weak plane), as cell
+    means (DG0 projections) on the solver mesh. Returns the file name, or None without a TI band."""
     if getattr(faulted, "ti", None) is None:
         return None
     import h5py
