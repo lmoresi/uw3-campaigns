@@ -546,7 +546,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   runs to its 12 h wall as the reference; kaiju implements the smooth band law behind -uw_ti_smooth (softmin +
   softplus floor, the host's delta) and compares 5 steps from step 0 on the free node; if slip and vrms match to a
   percent with Newton under ~10, TAti restarts from step 0 on the smoothed law with chained segments; else TAti
-  pauses for Louis's equivalence choice. TAf_env fine: step 43, tip 0.69, ~400 s/step, base in ~5 h. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  pauses for Louis's equivalence choice. TAf_env fine: step 43, tip 0.69, ~400 s/step, base in ~5 h.
+  **Smooth band-law smoke (job 2404, steps 0-4, -uw_ti_smooth 1 = the host's _combine_yield softmin and
+  _apply_floor):** physics identical to 1e-5 (vrms, slip, residual 0.348 %); Newton mean 13 vs 19 (-35 %), Stokes
+  4940 vs 7173 s (-31 %); step 1 (first solve after the fault forms) still 21 Newton, steps 2-4 at 9-11. ~30 h to
+  the base instead of 45. **Hub: TAti RESTARTED from step 0 on the smooth law, chained 12 h segments afterany on
+  the last checkpoint, stop watcher; 2398 stopped (its checkpoints kept as the hard-law reference). Reversible if
+  Louis's equivalence choice changes the spec. The smooth form should become the TI default once every TI run is
+  on it (patch a00a10b, default off, to be applied when the full format-patch arrives).** (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1608,3 +1615,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-30: TAti far too slow (15-23 Newton, ~45 h to the base; hard Min/Max kinks in the band law suspected).
   Hub: no chained 45 h run; smooth band law behind a flag tested against the first 5 steps on the free node, then
   restart or pause. Recorded under the TI item.
+- 2026-10-30: smooth band law: same physics, a third off the cost; TAti restarted on it from step 0, chained (~30
+  node-hours, node otherwise idle); hard-law 2398 stopped. Patch a00a10b pending in full form.
