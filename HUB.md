@@ -157,7 +157,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Shear-band length scale | `feature/shear-band-length-scale` 114c472c | second adversarial review owed |
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP | underworld3 branches `*-hyperion-2026-10-20*`, uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` e5f661c (... crust particle sampling, restart limitation documented, -uw_pres_rtol / -uw_vel_rtol, velocity ring -uw_vring, Earth setup: -uw_lm_eta/-uw_lm_depth/-uw_lm_ramp, -uw_cont_extent, -uw_cont_age, -uw_top_hot 2 + -uw_ridge_patch, buoyant over-plate gate; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9359128 (... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Parallel `read_checkpoint` bug | found on kaiju, 2026-10-21 | not filed or fixed yet; the lid-regime driver is not affected |
@@ -215,6 +215,26 @@ frozen as the hand-over state; they are not updated here after this date.
   cellSizeInner): 2x coarser at the base gives ~68k cells (53 %), 4x ~36k (28 %) at the same surface h; the
   ruling's lithosphere-focused grading needs a gmsh size field (library or driver-built base). The laptop has
   the graded+relaxed base task; linear radial grading is the quick first step.
+- **Units-policy check done (kaiju): -uw_scaled reproduces the dimensionless TA to round-off (vrms 3e-13 over 5
+  steps at np 4; faulted path 6e-15 at step 0, 2e-8 after a rebuild), but only with a driver workaround for a
+  library bug, so the units route is not clean end to end.** Library findings for the normal route (failing
+  test, then fix; hyperion when back, or whoever Louis names): D1 BLOCKING: in a units model mesh.X.coords is
+  dimensional, and solvers.py:403 (direction-aware crossing time) and advection_diffusion_eulerian.py:682 (first
+  accuracy estimate) take it as model units: dt 3.4x too large from step 0 and V evaluated ~6e6 outside the
+  mesh, silently (the #267 trap of the boundary contract); the driver's -uw_units_dt_local 1 recomputes the
+  estimates on model-unit coordinates. D2: estimate_dt() returns a quantity in seconds, so float() of it is
+  seconds. D3: uw.non_dimensionalise(swarm.coords) raises TypeError (units.py:888); no public swarm coords_nd.
+  D4: a dimensionless unreduced product (km^3/m^3) comes out 1e9 wrong through non_dimensionalise and
+  unwrap(dimensional); Pint .to("dimensionless") is right. D5: Integral/BdIntegral.evaluate() return the
+  non-dimensional value labelled with physical units. D6: reference scales carry 1e-14 round-off. D7:
+  uw.Param(2900, units="km") with an int drops its units. **Physical reading** (d 2900 km, kappa 1e-6): one
+  velocity 1.088e-3 cm/yr, one time 266,500 Myr; TAf plate 0.83 cm/yr (peak 1.02), hinge retreat 20.6 km/Myr,
+  slab on the base at 58.6 Myr; TAc 0.65 / 11.1 / 64.0; TBf 1.02 / 21.0 / 72.0; TA_age25f 0.60 / 17.3 / 61.3;
+  slip 8.7-9.8 cm/yr; Ra 2.386e7 implies basal viscosity 2.48e21 Pa s, interior ~2e22, surface ~1e25; tau0
+  528 MPa, tau1 24.3 MPa/km (0.75 rho g); plate age 933 Myr, 343 km thick. Verdict: the mantle side is
+  Earth-like (viscosity, friction, slab sinking ~3 cm/yr, trench slip ~9 cm/yr); the plates are not (too slow
+  at 0.8 cm/yr, too old and thick, cohesion ~5x high). Page https://claude.ai/artifact/TTiLccEcSv7iLJNV7ZH97n.
+  **Decide**: file D1-D7 as issues now (D1 as a bug) or hand them to hyperion on its return.
 - NEXT TEST after the faulted thermal set (Louis, 2026-10-28): the crust at x0.001 is "very, very weak"; faulted
   models need not have it so weak. Run the faulted thermal recipe with -uw_crust_weak 0.1 and 1 against
   fault-free twins, so the fault's own contribution to surface velocity, plateness and rollback is readable (the
@@ -1182,3 +1202,13 @@ frozen as the hand-over state; they are not updated here after this date.
 - 2026-10-29: Earth patch 1/2 pushed (fault precedence -uw_fault_precedence 1, DG0 band mask zeroing crust, continent
   and slab factors in the band and zone; -uw_marker_rheo_depth D with tanh fade; both off by default; blob e2d2595
   as kaiju's). Patch 2/2 (-uw_scaled, the units check, rebased) awaited. Smoke 3 results above.
+- 2026-10-29: Earth patch 2/2 pushed (9359128): -uw_scaled (units mode; off by default; blobs fb70d26 /
+  0b0e4f9 / 53cf376 as kaiju's). Units check and library findings recorded under Waiting on Louis. Note the
+  check-only -uw_units_dt_local path uses mpi4py directly (measurement code, as with addon_timing).
+- 2026-10-29: demo movie: the first attempt (TBf from checkpoint 80, rebuild every step) built only 5 meshes in 30
+  steps because the crust-base fit FAILED at 26 of 30 detections ("no slab top reaching the cap from the
+  surface; the fault keeps its place"), and with no new fit needs_rebuild sees a gap of 0. Over the whole faulted
+  thermal set the fit failed from step 45 on in TBf and TAf (TA_age25f from 65): about a third of the late
+  detections kept the old fault. Worth stating in the note where rebuild frequency is quoted. Rerun from
+  TA_age25f checkpoint 30 (steps 31-60, trench -0.4 -> -4.4 deg, fit succeeding); rendering follows. Driver item
+  for later: a fallback when the crust does not reach the cap (slab-top isotherm).
