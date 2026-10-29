@@ -154,7 +154,7 @@ on wombat, summary.md b8705fab, at 799ef021) finds the following.
 
 That is 2-D only: about 32k block rows summed at ratio 25.
 
-**Plan.** Steps 1 to 4 wait for Louis's go; the proposed owner is the laptop integration
+**Plan.** Steps 1 to 4 are under way (Louis's go, 2026-10-31) with the laptop integration
 session, which measured #892 and ran the sweep. The same plan is posted on #892
 (issuecomment-6505605906, 2026-10-31, on Louis's word).
 
@@ -265,7 +265,7 @@ Contained in #890 already (nothing left to do but the merge): `feature/box-fault
 | An unsplit placed-ribbon coarse tail (`place_fault_ribbon_2d(split=False)`) exhausts node memory in `set_custom_fmg` (170-377 GB at np 16) | kaiju via the science hub, 2026-10-29 | #893 | filed by this hub 2026-10-31; bears on #889 and #890. Kaiju runs `-uw_chain 0` for the TI runs |
 | Stale `TODO(BUG)` on `TransverseIsotropicFlowModel` (`constitutive_models.py` about 3639) still says the TI Newton tangent is inconsistent (#457); fixed by #493 and #748, and it misled kaiju's TI design report | science hub, 2026-10-29 | none | a one-comment fix, rides on the next PR that touches the file |
 | Surface-breaking split faults: `fault_split` refuses a cut touching the boundary, so a megathrust is a buried crack whose top tip halves the slip against an outcropping band | science hub, 2026-10-30 (evidence on kaiju's probe page 9Au3HFWLqkHt2geWohQpYa) | #553 (open since August, same request) | evidence to add to #553; bears on every faulted annulus result |
-| A public accessor for a mesh's multigrid levels (the note and the recipe use the private `_coarse_level_meshes()`) | docs hub, 2026-10-30 | none | feature; on B, C or a small PR before UWTN 2026-022 publishes; Louis decides |
+| A public accessor for a mesh's multigrid levels (the note and the recipe use the private `_coarse_level_meshes()`) | docs hub, 2026-10-30 | none | **approved by Louis 2026-10-31**; briefed to the integration session as task B: `feature/mesh-multigrid-levels` from development, a read-only `Mesh` property (name to check against the Charter), its own PR, #889 and #890 untouched |
 | Split-fault normal traction differs between the faces | science hub, 2026-10-29 | none | **cleared** 2026-10-30 by kaiju's box probe: an artefact of the estimate |
 
 ## Issue queue (2026-10-29)
@@ -288,11 +288,8 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## Waiting on Louis
 
-- **#892: go to brief the integration session with steps 1 to 4 of the plan** (the
-  PRIORITY section).
 - After #892's fix and the re-measurement: the production multigrid tail for faults
   (welded base with the FAC LU patch, or the chain).
-- The public multigrid-levels accessor the docs hub asks for: yes or no, and where.
 - Confirm the role above (proposes and briefs on your go; never approves or merges).
 - Approvals on the queue, in the proposed order; #863 first, because it unblocks CI for
   #689 and #890.
@@ -349,3 +346,8 @@ refuses deletions from here, so this needs a laptop or Louis.
 - 2026-10-31: Louis approved the "reach my other sessions" grant; the plan's summary was
   delivered to the notes session (wombat).
 - 2026-10-31: Louis: the plan goes on #892. Posted (issuecomment-6505605906).
+- 2026-10-31: Louis: go on #892 steps 1 to 4, and yes to the levels accessor. Both
+  briefed to the integration session (`session_01HxWvn5rMK67zasgirdXszQ`, wombat).
+  Task A: `bugfix/fac-live-block-solver` from C 799ef021, step 1's scope result to the
+  hub before the fix. Task B: `feature/mesh-multigrid-levels` from development. No
+  PRs until Louis asks; D lands stacked on #890.
