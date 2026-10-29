@@ -219,31 +219,57 @@ session, which measured #892 and ran the sweep. The same plan is posted on #892
   - Asked of the integration session: pin it in step 2's readback, and in step 4 measure
     the coarse patch kept (rows remapped) against dropped, with LU blocks. D does not
     change B's behaviour.
+- **Steps 2 and 3 done** on `bugfix/fac-live-block-solver` (on C 799ef021).
+  - 44612397: the regression test, shown failing.
+  - 88212f75: the fix, one helper `custom_mg._set_up_fac_smoothers(pc, fac_keys)`,
+    called after setUp at both rotated sites and in
+    `_install_velocity_block_transfers`.
+  - 3e5d9880: the test pins the FAC levels per install.
+  - `tests/parallel/test_1090_mg_live_configuration_parallel.py` reads every level's
+    live objects on four paths (rotated saddle, rotated thin sheet, velocity block,
+    scalar top level), composite and plain ASM. Before the fix the two rotated
+    composite cases fail; after it, 8 of 8 pass serial, np 2 and np 4.
+- **B's coarse-patch rule settled by measurement.** With LU blocks on the composed stack,
+  the coarse patch kept (rows remapped) and dropped give the same iterations and slip
+  (57/18 velocity, 3 last, 16 pressure at S 0.010; 55/18 at S 0.005). No production
+  hierarchy has a coarse patch anyway: H0's coarse pairs are native refinements, which
+  the cover gate declines; the chains skip FAC on split coarse levels; and in parallel
+  FAC is built on the finest level only. The rule stands; no box arm needed.
+- **Step 4 running** on wombat: tier A+B, `tests/parallel` at np 2 and 4, the tail
+  sweep's H0 arms (expected 66/65/67 linear; 7 per increment on the box), then rotated
+  free-slip without a fault and the PC_FAILED watch. D then merges development
+  (fc67b650) and targets development directly.
 
-## Open pull requests (2026-10-29, `development` at bfd07b73)
+## Open pull requests (2026-10-31, `development` at fc67b650)
 
-All fourteen target `development` except #890 (stacked on #889). "Blocked" below means the
-approval rule only; no PR has a human approval yet.
+**Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
+admin, which Louis ordered):
+- #863: c6ee62cf.
+- #882 (A): 24923e5d.
+- #889 (B): 4dff48b3. After A merged, B conflicted with development in
+  `scripts/test.sh` only, because #863 had moved every line to `batch <shard>`. The hub
+  merged development into B (5e8d8d51), putting test_108*/test_109* on shard 3, and waited
+  for B's sharded CI to pass.
+- #890 (C): fc67b650. Retargeted to development; it merged clean. Development now
+  differs from C's tested head only by #863's four files.
+
+All ten remaining PRs target `development`. "Blocked" means the approval rule only.
 
 | PR | Author | What | CI | Waits on |
 |---|---|---|---|---|
-| #863 | lmoresi | Shard the CI test batches (closes #730) | green; sharded run 28.7 min against 96 min | **approval and merge first**: the unsharded test job now hits its 120-minute cap (#689 and #890 were cancelled at 2h00) |
-| #882 | lmoresi | A: the faulted-rebuild leak freed, serial and parallel | green (66 min) | approval. Four review rounds in the PR. Suites green except #826 (pre-existing) |
-| #889 | lmoresi | B: split-level fault multigrid, thin-sheet solver, sheet extrusion | green | approval. It changes rotated free-slip custom-FMG solves without a fault (per-level wall rotation, orphan coarse patches dropped): evidence in the body (adapted annulus 18 to 3 velocity iterations serial, 197 to 4 at np 4, same answer), no recorded ruling. The other default question (`objective_order`) was ruled 2026-10-28 |
-| #890 | lmoresi | C: add-on partitioned once, custom MG on empty ranks, rotated-solve switch and record | test cancelled at 2h | #889 merges, retarget to `development`, re-run CI after #863 |
 | #780 | lmoresi | Refuse an expression re-declaration that changes its contents (fixes #767) | green (80 min) | approval; mergeable, nothing outstanding per the last comment |
 | #861 | lmoresi | Journal replaces the wiki: CLAUDE.md and planning guide | green | approval (docs hub's rule PR) |
-| #862 | lmoresi | Fault multigrid capability guide | green | approval (docs hub; merges on the docs build per Louis) |
-| #689 | gthyagi | CitcomS predictor-corrector DDt manager | test cancelled at 2h | re-run CI after #863; gthyagi addressed the last ruling on 2026-10-29 |
+| #862 | lmoresi | Fault multigrid capability guide | green | approval (docs hub). It says the split fault "needs the chain of split ladders" past a ratio of about 12, measured on ILU blocks (#892); sessions read guides as skills, so a one-line caveat first |
+| #689 | gthyagi | CitcomS predictor-corrector DDt manager | test cancelled at 2h | a CI re-run (sharded now that #863 is in); gthyagi addressed the last ruling on 2026-10-29 |
 | #800 | lmoresi | Forward-from-nodes history; semi-Lagrangian schemes by trace and launch | test cancelled | **conflicts with `development`**; untouched since 2026-10-12. Needs a development merge and an owner |
-| #855 | gthyagi, draft | Collective evaluation of prescribed rotated wall data | green | gthyagi to mark ready; lands before #857 |
-| #856 | gthyagi, draft | Boundary names consistent across ranks | green | lands after #858 (otherwise a rank-local raise can become a hang) |
-| #857 | gthyagi, draft | Opt-in annulus pressure, wall and traction recovery | green | after #855; a mathematical review of the ~1,400-line recovery algorithm, not yet assigned |
-| #858 | gthyagi, draft | Submesh injection across parent ownership | green | gthyagi to mark ready; the disagreement guard asked for in review is in |
-| #859 | gthyagi, draft | Point evaluation near exact-cell faces | green | gthyagi to mark ready |
+| #855 | gthyagi | Collective evaluation of prescribed rotated wall data | green | marked ready 2026-10-29; his fixes to the review are not re-reviewed; lands before #857 |
+| #856 | gthyagi | Boundary names consistent across ranks | green | lands after #858 (otherwise a rank-local raise can become a hang) |
+| #857 | gthyagi | Opt-in annulus pressure, wall and traction recovery | green | marked ready, but the mathematical review of the ~1,400-line recovery algorithm is outstanding (gthyagi says so); after #855 |
+| #858 | gthyagi | Submesh injection across parent ownership | green | marked ready; the disagreement guard asked for in review is in, not re-reviewed |
+| #859 | gthyagi | Point evaluation near exact-cell faces | green | marked ready; not re-reviewed |
 
-**Proposed merge order.** #863, then #882, #889, #890 (retargeted), then D (the #892 fix,
-once it exists and its benchmarks are in), then #780, #861, #862,
+**Proposed merge order.** D (the #892 fix, when its benchmarks are in), then #780, #861,
+#862 (after its caveat),
 then gthyagi's set as he marks them ready (#855 then #857; #858 then #856; #859), then
 #689 after a green re-run. #800 after someone takes it.
 
@@ -263,7 +289,7 @@ Branches with commits that no open PR contains. Compared with `git cherry` again
 | `feature/tidal-shell` fc35972a | 2 not in #890 | Box-fault driver: strike angle, slip sign | science study branch; science hub |
 | hyperion rescue branches `*-hyperion-2026-10-20*` (six) | 1-21 each | WIP saved before the disk failure | untriaged |
 
-Contained in #890 already (nothing left to do but the merge): `feature/box-faults`,
+Merged with #890 (fc67b650): `feature/box-faults`,
 `feature/box-faults-warm`, `bugfix/custom-mg-empty-rank`,
 `feature/parallel-addon-distribution`, `bugfix/rotated-solve-diagnostics`,
 `bugfix/warm-start-newton-switch`. Superseded: `bugfix/faulted-rebuild-leak` and
@@ -300,8 +326,7 @@ Label drift, ready to apply per the planning guide (waiting on Louis's go):
 - #758, #759, #782: `fixed-in-PR` but fixed by #852, merged 2026-10-28. Relabel
   `fixed-in-development` with the merge comment.
 - #827: no label, fixed by #850, merged 2026-10-28. Label `fixed-in-development`.
-- #573 appears to duplicate #730 (CI sharding); #863 addresses both. Close as a duplicate,
-  or label `fixed-in-PR` with #730.
+- (done 2026-10-31) #730 and #573 labelled `fixed-in-development` with #863's merge.
 
 ## Branch hygiene
 
@@ -313,11 +338,8 @@ refuses deletions from here, so this needs a laptop or Louis.
 - After #892's fix and the re-measurement: the production multigrid tail for faults
   (welded base with the FAC LU patch, or the chain).
 - Confirm the role above (proposes and briefs on your go; never approves or merges).
-- Approvals on the queue, in the proposed order; #863 first, because it unblocks CI for
-  #689 and #890.
-- #889's change to rotated free-slip custom-FMG solves without a fault: accept on the
-  evidence in its body, or ask for more. (Recorded in `FAULT-SPLIT-INTEGRATION.md` as
-  needing your ruling; no ruling recorded since.)
+- The next merges: #780, #861, and #862 after its caveat; whether the hub re-reviews
+  gthyagi's fixes on #855, #858, #859.
 - An owner for #800 (conflicts with `development`, idle since 2026-10-12) and for the
   mathematical review of #857.
 - Go-ahead for the label fixes listed under "Issue queue".
@@ -326,6 +348,15 @@ refuses deletions from here, so this needs a laptop or Louis.
 - The rotated pressure rtol default (kaiju's evidence, in HUB.md).
 
 ## For the other hubs
+
+- 2026-10-31, to the docs hub: A, B and C are on development (A 24923e5d, B 4dff48b3, C
+  fc67b650). Re-pin UWTN 2026-018 and 2026-022 to fc67b650. The fault-multigrid guide's
+  "what ships" section can move the split-level hierarchy to available. #862's chain
+  sentence rests on ILU blocks (#892), so a caveat is wanted before it merges.
+- 2026-10-31, to the science hub: the leak fix and the fault-split work are on development
+  fc67b650, so kaiju's next build can come from development instead of the
+  box-faults-warm and leakfix overlays. #892's fix (LU blocks on the rotated path) is
+  coming as D; the drivers' `uw_chain` default waits on its re-measurement and Louis.
 
 - 2026-10-29, to the science hub: per Louis's scope ruling, the library-fix rows of
   `HUB.md` "Open work" are tracked here from today (stress-transport fix, leak fix, rotated
@@ -368,6 +399,11 @@ refuses deletions from here, so this needs a laptop or Louis.
 - 2026-10-31: Louis approved the "reach my other sessions" grant; the plan's summary was
   delivered to the notes session (wombat).
 - 2026-10-31: Louis: the plan goes on #892. Posted (issuecomment-6505605906).
+- 2026-10-31: Louis: merge #863, #882, #889, #890 in order ("let's get the solvers all
+  working on the most efficient path"). Done: c6ee62cf, 24923e5d, 4dff48b3 (after a
+  development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
+  #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
+  measurement.
 - 2026-10-31: #892 step 1 reported: only the rotated path runs ILU; scope unchanged.
   B's `drop_orphans` rotated path discards every coarse FAC patch; measurement of
   kept against dropped added to step 4.
