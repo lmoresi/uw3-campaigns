@@ -240,6 +240,43 @@ session, which measured #892 and ran the sweep. The same plan is posted on #892
   free-slip without a fault and the PC_FAILED watch. D then merges development
   (fc67b650) and targets development directly.
 
+- **Step 4 done; D is ready for its PR** (`bugfix/fac-live-block-solver` 20b42937,
+  development fc67b650 merged in; a guide caveat at faults-in-convection.md:71 to follow).
+  - Tier A+B serial pass. `tests/parallel` at np 2 and 4 pass except
+    `test_1063[ti]`, which is #826 and pre-existing.
+  - The tail sweep's H0 arms reproduce the LU arms exactly (A 66/65/67; B 7 per
+    increment, no caps).
+  - Rotated free-slip without a fault: identical to C, to 13 digits.
+  - No `PC_FAILED` or zero pivot anywhere.
+  - Its review fixed the docstring and tiers (a998181f), and filed #894.
+- **Block size.** `fac_block_rows` caps only blocks from a keyed `fac_zone`; a split
+  fault's structural patch is one block per rank (up to 19,679 rows). Cutting it along
+  strike measured worse in 2-D: 67 velocity its for one block against 85-180 at caps
+  8000-500, and 116 s against 140 s. So one block stays, and #895 is now a 3-D question
+  only.
+
+**Solver-efficiency queue (Louis, 2026-10-31: "get the solvers all working on the most
+efficient path").** Owner: the integration session, in this order.
+1. D (#892): PR when Louis asks; merge on green CI.
+2. #894: with an interface law, the rotated Newton loop's velocity multigrid smooths
+   iterate 0's operator for the whole solve. That costs 26-32 velocity its per iterate
+   against 3, in every rate-law fault run. Test first, then the fix, including the
+   thin-sheet path; then a rate-law benchmark on the box at np 4.
+3. #896: the parallel cover gate drops the structural patch (640 its against 68 at np 2,
+   h_b/S 24). Diagnose summed against unique rows first, then check the production
+   shapes at np 16, where the add-on partition gathers each fault onto one rank.
+4. #892 step 6: the 3-D and parallel cost of one LU block per rank (#895).
+5. #892 step 5: the re-measurement, then Louis's production-tail ruling.
+
+**Held: the slip coarse space** (`feature/fault-slip-coarse-space`, on Louis's
+2026-10-30 request; design note 30d4be49; 13 tests at np 1, 2 and 4). It is a two-level
+Schwarz slip correction for the cut structural block, opt-in and 2-D only. In 2-D it
+loses to one block: 79-87 its serial against 67, and 9 per increment on the box against
+7. The hub recommends it stays on its branch, with the design note and the roadmap draft
+as the record, until step 4's 3-D measurement shows one block is unaffordable. It is
+stacked on `feature/fac-structural-segments`, a measurement-knob branch not meant for
+merge.
+
 ## Open pull requests (2026-10-31, `development` at fc67b650)
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
@@ -315,6 +352,11 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | Surface-breaking split faults: `fault_split` refuses a cut touching the boundary, so a megathrust is a buried crack whose top tip halves the slip against an outcropping band | science hub, 2026-10-30 (evidence on kaiju's probe page 9Au3HFWLqkHt2geWohQpYa) | #553 (open since August, same request) | evidence to add to #553; bears on every faulted annulus result |
 | A public accessor for a mesh's multigrid levels (the note and the recipe use the private `_coarse_level_meshes()`) | docs hub, 2026-10-30 | none | **approved by Louis 2026-10-31**; briefed to the integration session as task B: `feature/mesh-multigrid-levels` from development, a read-only `Mesh` property (name to check against the Charter), its own PR, #889 and #890 untouched |
 | Split-fault normal traction differs between the faces | science hub, 2026-10-29 | none | **cleared** 2026-10-30 by kaiju's box probe: an artefact of the estimate |
+| Rotated Newton loop with an interface law keeps iterate 0's finest-smoother operator | D's review, 2026-10-31 | #894 | efficiency queue item 2 |
+| A split fault's structural FAC block is one LU per rank | the #892 benchmarks, 2026-10-31 | #895 | one block wins in 2-D (measured); open for 3-D, efficiency queue item 4 |
+| The parallel cover gate drops the structural patch at np 2 (640 its against 68) | slip-coarse-space testing, 2026-10-31 | #896 | efficiency queue item 3 |
+| `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
+| `remesh()` leaves the multigrid levels stale | the levels-accessor review | none | not reproduced; the integration session reproduces it or drops it |
 
 ## Issue queue (2026-10-29)
 
@@ -404,6 +446,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: D's step 4 complete and D ready for a PR. Filed #895, then corrected it
+  after the segment sweep. #894, #896 and #897 filed by the integration session. The
+  efficiency queue was set and sent to it, and the slip coarse space held.
 - 2026-10-31: development CI green at fc67b650: test and all four shards, the Gadi and
   Setonix HPC image builds. Tier C (report only) and one image push were still running.
 - 2026-10-31: #892 step 1 reported: only the rotated path runs ILU; scope unchanged.
