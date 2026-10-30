@@ -277,6 +277,67 @@ as the record, until step 4's 3-D measurement shows one block is unaffordable. I
 stacked on `feature/fac-structural-segments`, a measurement-knob branch not meant for
 merge.
 
+## 3-D add-on mesh (Louis, 2026-10-31: "We really do need the 3D option for the add-on mesh. These are things we keep failing to complete despite making efforts to do so.")
+
+**Survey (2026-10-31, read-only, at development fc67b650; key claims re-checked by the
+hub).** The 3-D analogue of 2-D production exists in substance, but it has never been
+taken to the finish.
+
+- `place_fault_ribbon` (`place_surface.py:8995`) places the structured ladder into the
+  base's finest level and labels its mid-surface from the ladder's own vertices (the
+  `cut=False` equivalent), then splits.
+- Against `place_fault_ribbon_2d` it lacks: the add-on partition, tail adoption, a route
+  through `Mesh.add_fault`, a realisation switch, an outcrop cap, and any solve or parallel
+  test.
+- `FaultNetwork.build(width=)` in 3-D solves both realisations (`test_0863`), but builds
+  its own unit box and refuses a supplied base (`meshing/fault_network.py:358`).
+- No test combines 3-D rotated free-slip walls, a split fault and custom multigrid.
+- The 3-D sheet replay onto add-on levels has no test.
+- **#900:** every 3-D parallel fault test is a `ptest_*` file, and CI runs none of them.
+
+**Why the attempts stalled (the survey's reading, which the hub accepts):**
+- Each push built the mesh piece, then deferred the solver to 2-D. Louis's 2026-09-03
+  ruling said "the preconditioner question is deferred to 2-D", and the 2-D wrappers then
+  gained partitioning, tail adoption, chains, caps and wall rotation while the 3-D ones
+  stayed at their August state.
+- The October effort went down the adapt-and-sheet route, which production does not use,
+  and hit the bisection-child volume guard.
+- A cavity fix sat a month on a side branch. The science campaigns went around the
+  add-on route with gmsh boxes. The 3-D parallel tests are dark.
+
+**Plan (one route: the base-finest-copy ladder, mirroring 2-D production).**
+- M0, prerequisites:
+  - #900, so the 3-D parallel tests run and progress cannot silently regress;
+  - the 3-D solve experiments on the fixtures that exist (`test_0863`'s 3-D band, the
+    extruded plate): one LU block per rank, capped blocks, inexact block solves (a few
+    GMRES iterations with ILU(k) or a shift), and split levels without the patch. Record
+    time and memory against block rows (#895).
+- M1: `place_fault_ribbon` brought to parity with the 2-D wrapper:
+  - a supplied 3-D base (a copy of its finest level);
+  - `partition_addon`, and `adopt_hierarchy` keyed on the footprint;
+  - a route through `Mesh.add_fault`;
+  - the realisation switch: split, or TI painted on the footprint with the grid normal as
+    director;
+  - a serial solve test.
+- M2: the 3-D rig test. A box base with `refinement=2`, a blind interior sheet, rotated
+  free-slip on every wall, both realisations, custom FMG with the FAC patch, and
+  iteration, slip and leak bounds. It joins tier B.
+- M3: the same at np 4 as `tests/parallel/test_*.py`, so CI runs it; #671's partitions
+  checked.
+- M4: a curved base (spherical shell) and the outcrop (a 3-D ladder cap, or the
+  `surface_trace` that `place_sheet(setback=)` returns).
+- A 2S split ladder level only if Louis's 2-D ruling is the chain.
+
+**Rules for this one, so it finishes:**
+- One owner with no other duties.
+- No change of route without a dead-end journal entry and Louis's ruling.
+- Each milestone lands on development by its own small PR, with its test.
+- 3-D is measured alongside 2-D, not deferred to it (asks Louis to retire the 09-03
+  deferral).
+- Housekeeping on the way: re-measure the two-level placement at the default clearance;
+  close #626 if #638's ladder and #664's `embed=` realise it; correct the
+  topic page's "2-D, 3-D and parallel" claim.
+
 ## Open pull requests (2026-10-31, `development` at fc67b650)
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
@@ -446,6 +507,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: Louis: the 3-D add-on mesh is needed. Survey done (read-only agent,
+  claims re-checked); the plan is in its section. Filed #900 (39 dark `ptest_*`
+  files, including every 3-D parallel fault test).
 - 2026-10-31: D's step 4 complete and D ready for a PR. Filed #895, then corrected it
   after the segment sweep. #894, #896 and #897 filed by the integration session. The
   efficiency queue was set and sent to it, and the slip coarse space held.
