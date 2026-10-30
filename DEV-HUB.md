@@ -282,7 +282,15 @@ efficient path").** Owner: the integration session, in this order.
    - Reviewed, including a 3-D split box; suites green.
    - **Still owed:** the np 16 production shapes, which need kaiju (requested of the
      science hub below).
-4. #892 step 6: the 3-D and parallel cost of one LU block per rank (#895).
+4. **Scaling past np 16 (#901, #902)** caps every kaiju fault run at 16 of a node's 52
+   cores. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+   filed 2026-10-31.
+   - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
+     are slower. Louis's 10-28 ruling applies; the prototype is on
+     `feature/coarse-solve-nullspace`.
+   - #902: at np 32/52 the nested custom-MG interpolation fails on preallocation and the
+     ranks deadlock.
+4b. #892 step 6: the 3-D and parallel cost of one LU block per rank (#895).
 5. #892 step 5: the re-measurement, then Louis's production-tail ruling.
 
 **Held: the slip coarse space** (`feature/fault-slip-coarse-space`, on Louis's
@@ -532,6 +540,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: Louis asked why kaiju is capped at np 16. The cause is two library defects
+  from kaiju's 10-23/24 scaling study, never filed; now #901 and #902.
 - 2026-10-31: the integration session fixed #894 and #896 on branches stacked on D
   (tests first, reviewed), filed #898 and #899, and pushed D's guide caveat. Correction:
   #894 never touched the zg95 campaigns, which use frictionless contact. Kaiju's np 16
