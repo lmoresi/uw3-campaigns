@@ -257,14 +257,31 @@ session, which measured #892 and ran the sweep. The same plan is posted on #892
 
 **Solver-efficiency queue (Louis, 2026-10-31: "get the solvers all working on the most
 efficient path").** Owner: the integration session, in this order.
-1. D (#892): PR when Louis asks; merge on green CI.
-2. #894: with an interface law, the rotated Newton loop's velocity multigrid smooths
-   iterate 0's operator for the whole solve. That costs 26-32 velocity its per iterate
-   against 3, in every rate-law fault run. Test first, then the fix, including the
-   thin-sheet path; then a rate-law benchmark on the box at np 4.
-3. #896: the parallel cover gate drops the structural patch (640 its against 68 at np 2,
-   h_b/S 24). Diagnose summed against unique rows first, then check the production
-   shapes at np 16, where the add-on partition gathers each fault onto one rank.
+1. **D (#892): ready for its PR** (`bugfix/fac-live-block-solver` 24e754fe, with the
+   guide caveat).
+2. **#894: fixed** on `bugfix/rotated-interface-operator-refresh` 12e5fc0c, stacked on D.
+   - The fix: the interface-law sum is built once and refreshed in place, so the KSP
+     keeps one Mat, as on the contact path.
+   - `test_1088` (tier B, serial and parallel) failed first. The mesh-owned tail was
+     stale too; GAMG never was.
+   - On the box at np 4 with a rate-strengthening law: D capped 746 of 772 velocity
+     sub-solves and missed the 60-minute limit; the fix takes 160 s with none capped.
+   - **Scope correction:** the zg95 convection drivers use frictionless contact
+     (`add_fault_bc(0)`), and their "rate" setting places faults by strain rate. So the
+     campaigns were never affected. The users are the fault-cycle scripts, the tidal
+     shell and the thin-sheet cycle.
+   - Reviewed; suites green.
+3. **#896: fixed** on `bugfix/fac-cover-gate-partition` f7914a92, stacked on D.
+   - The cause was not double-counted halos. Fine rows whose coarse node sits on another
+     rank were classed as patch, because the add-on partition gathers the fault onto one
+     rank while the coarse levels keep the base partition. One collective scatter now
+     classifies every row the same way.
+   - `test_1106` failed first.
+   - np 2 drops from 640 velocity its to 73 (serial 67). np 4 factors 15,870 block rows
+     instead of 19,126.
+   - Reviewed, including a 3-D split box; suites green.
+   - **Still owed:** the np 16 production shapes, which need kaiju (requested of the
+     science hub below).
 4. #892 step 6: the 3-D and parallel cost of one LU block per rank (#895).
 5. #892 step 5: the re-measurement, then Louis's production-tail ruling.
 
@@ -417,7 +434,8 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | A split fault's structural FAC block is one LU per rank | the #892 benchmarks, 2026-10-31 | #895 | one block wins in 2-D (measured); open for 3-D, efficiency queue item 4 |
 | The parallel cover gate drops the structural patch at np 2 (640 its against 68) | slip-coarse-space testing, 2026-10-31 | #896 | efficiency queue item 3 |
 | `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
-| `remesh()` leaves the multigrid levels stale | the levels-accessor review | none | not reproduced; the integration session reproduces it or drops it |
+| `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
+| The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
 
 ## Issue queue (2026-10-29)
 
@@ -451,6 +469,13 @@ refuses deletions from here, so this needs a laptop or Louis.
 - The rotated pressure rtol default (kaiju's evidence, in HUB.md).
 
 ## For the other hubs
+
+- 2026-10-31, to the science hub, a compute request (Louis names the machine): the #896 fix
+  needs the production shapes at np 16. Run kaiju's annulus fault case (frictionless
+  contact) on `bugfix/fac-cover-gate-partition` f7914a92 (public, so an anonymous clone
+  works) against development fc67b650, a few steps from a checkpoint. Record the
+  finest-level patch rows per rank, the velocity iterations per increment and the slip.
+  A patch that was being declined at np 16 would show as a large drop in iterations.
 
 - 2026-10-31, to the docs hub: A, B and C are on development (A 24923e5d, B 4dff48b3, C
   fc67b650). Re-pin UWTN 2026-018 and 2026-022 to fc67b650. The fault-multigrid guide's
@@ -507,6 +532,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: the integration session fixed #894 and #896 on branches stacked on D
+  (tests first, reviewed), filed #898 and #899, and pushed D's guide caveat. Correction:
+  #894 never touched the zg95 campaigns, which use frictionless contact. Kaiju's np 16
+  check of #896 is requested of the science hub.
 - 2026-10-31: Louis: the 3-D add-on mesh is needed. Survey done (read-only agent,
   claims re-checked); the plan is in its section. Filed #900 (39 dark `ptest_*`
   files, including every 3-D parallel fault test).
