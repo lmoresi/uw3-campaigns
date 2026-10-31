@@ -282,8 +282,16 @@ efficient path").** Owner: the integration session, in this order.
    - Reviewed, including a 3-D split box; suites green.
    - **Still owed:** the np 16 production shapes, which need kaiju (requested of the
      science hub below).
-4. **Scaling past np 16 (#901, #902)** caps every kaiju fault run at 16 of a node's 52
-   cores. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+4. **Scaling past np 16 (#901, #902), now the integration session's active task**
+   (Louis 2026-10-31: "52 failing altogether is not something we can leave
+   uninvestigated ... no 3D problems would be accessible at all"). It caps every kaiju
+   fault run at 16 of a node's 52 cores.
+   - #902 is first reproduced on the laptop, oversubscribed at np 32 with a small mesh.
+   - For #901, development still picks SVD whenever there are rotation modes (annulus,
+     shell). The options to measure, per Louis's direction, are recorded on #901: the
+     mode removed explicitly with redundant LU, GAMG as the coarse solve, a coarser
+     bottom level, and telescope. The winner becomes a default chosen by the null modes,
+     not a new option. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
      are slower. Louis's 10-28 ruling applies; the prototype is on
@@ -478,6 +486,17 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-10-31, to the science hub, a compute request (Louis: np 16 cannot be the ceiling):
+  - a kaiju scaling check on current development fc67b650: np 16, 32 and 52 on one free
+    node, 5 steps from a rollback checkpoint (TAf at step 20), production recipe;
+  - record whether the custom FMG builds or falls back (#902), coarse time per Newton
+    iteration (#901), and step time;
+  - in the meantime, whether three 16-rank jobs per node would put the idle cores to
+    work for the campaign.
+  Louis has also proposed the rollback experiment as the standing fault-efficiency rig:
+  frozen recipe, two checkpoints (TAf 20; TBf with rollback established), 10 steps, the
+  usual records. Spec to follow once he confirms it.
+
 - 2026-10-31, to the science hub, a compute request (Louis names the machine): the #896 fix
   needs the production shapes at np 16. Run kaiju's annulus fault case (frictionless
   contact) on `bugfix/fac-cover-gate-partition` f7914a92 (public, so an anonymous clone
@@ -540,6 +559,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: Louis: np 52 must be investigated; SVD's slowness is why we went to
+  redundant LU; the coarse level is not coarse enough; consider GAMG as the coarse solve.
+  The hub found development still picks SVD whenever there are rotation modes. #901 and
+  #902 are the integration session's active task; kaiju's scaling check is requested.
 - 2026-10-31: Louis asked why kaiju is capped at np 16. The cause is two library defects
   from kaiju's 10-23/24 scaling study, never filed; now #901 and #902.
 - 2026-10-31: the integration session fixed #894 and #896 on branches stacked on D
