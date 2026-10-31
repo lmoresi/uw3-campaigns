@@ -178,7 +178,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Slab control set (12 of 12) | kaiju `~/campaigns/zg95/figures_out/slab_control/` (5.9 MB, README with the table) | COMPLETE 2026-10-26; layered_mantle stopped at its 12 h wall at step 128 (records to 120, t 0.0045) |
 | Rebuild-spacing comparison (rungs 8 vs 4) | kaiju `addon_demo/rungs8/` (README, overlay.png, trench-cost.png, json, records, scripts) | COMPLETE 2026-10-26: 29 vs 47 rebuilds, 7639 vs 8471 s, trench and slip unchanged; in the note |
 | Crust particle sampling (-uw_crust_ppc, -uw_crust_refill_every): particles per cell in the crust layer, NOT a material density | zg95-annulus-for-kaiju 9c7c1e7 (kaiju, Louis's request); both off by default | done 2026-10-26, smoke-tested on the thermal recipe |
-| Production multigrid tail for split faults: uw_chain 0 vs default at np 16 on development | kaiju, idle node, from TAf 40 / TAf_env 50, a few steps; records vel its per Newton increment, step time, peak slip, finest-level FAC patch rows per rank | REQUESTED 2026-11-01 (Louis via the notes session). RULING: with #912 (cc839425) the FAC patch blocks run LU on the rotated route; the production tail is the welded base + the split S level with the LU patch on the finest level (uw_chain 0); the drivers' default changes only after kaiju confirms it at np 16 (#892 comment). Wombat fixture: 022 box np 4, LU patch 7 vel its per increment at band ratios 8/16/25 vs 28-76 on the lean chain. Supersedes the #896 D-vs-A check (development now carries #914). Needs 54ad91b's yield_stress_min on development |
+| Production multigrid tail for split faults: uw_chain 0 vs default at np 16 on development | kaiju, idle node, from TAf 40 / TAf_env 50, a few steps; records vel its per Newton increment, step time, peak slip, finest-level FAC patch rows per rank | REQUESTED 2026-11-01 (Louis via the notes session). RULING: with #912 (cc839425) the FAC patch blocks run LU on the rotated route; the production tail is the welded base + the split S level with the LU patch on the finest level (uw_chain 0); the drivers' default changes only after kaiju confirms it at np 16 (#892 comment). Wombat fixture: 022 box np 4, LU patch 7 vel its per increment at band ratios 8/16/25 vs 28-76 on the lean chain. Supersedes the #896 D-vs-A check (development now carries #914). Needs 54ad91b's yield_stress_min on development. STARTED 2026-11-01: build development 25d62812 (has #912, #914; also the dev hub's E build), TAf 40, np 16, 4 steps, chain 0 (job 2475) then 2 (2477). First result: on chain 0 the finest level (6 of 7) carries the FAC patch, and in this partition ALL of it is on one rank (rank 4: 3584 owned / 3736 subdomain rows; 15 ranks none), from a hook printing patch rows per level and rank at multigrid configuration. #896 D-vs-A cancelled as superseded. The dev hub's chain 2-vs-0 at TAf 20 / TBf 70 (10 steps) stays queued behind its scaling runs |
 | TI-in-the-ladder fault comparison (one run) | kaiju, design first | requested 2026-10-29 (Louis): the placed ribbon as a TI weak band with a non-linear weak rheology against the split fault, rollback numbers compared; the fault weakness takes precedence over the crust weakening (no double weakening); settings for equivalence to be discussed with Louis before the run |
 | Add-on mesh demonstration movie (fault refit and rebuilt every step, fixed window, 30 frames) | kaiju figures_out/addon_demo/mesh_movie/ (demo-mesh-envelope.mp4, .json, README.md); page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3 | COMPLETE 2026-10-29 (job 2375, TA_age25f steps 31-60 on 07667b2, envelope, rebuild every step): 30/30 fits, no welds, 17.9 GB; windows centred at -3.21 deg (slab: -21.0 to 22.6 deg to depth 1.0, tip at 0.87 by step 60; trench: -8.75 to 2.33 deg to 0.24); trench -1.35 -> -5.07 deg; placed dip 32-43 (floor never bound; data 30.9-41.4); fit change 0.003-0.012/step (0.19-0.76 of the 4-rung threshold; production would rebuild every 2-4 steps); rebuild 16.0-16.6 s (build 11.1-11.7, transfer 1.9, to base 2.9) against 131-248 s steps, ~8 %; +524-624 cells on 126,976. The parabola from the same start (2367) OOM'd at step 40. For UWTN 2026-022: the notes hub's to use; files reach the laptop by Louis's rsync |
 | Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; artifact https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR (table, four movies, overlay, solver); rsync for the files |
@@ -276,6 +276,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, two observations from kaiju: (i) the finest-level FAC patch at np 16 on development
+  25d62812 (chain 0, TAf 40) is installed but entirely on one rank (rank 4 holds all 3584 owned rows; 15 ranks
+  none), so the patch solve is serial in effect at np 16; whether that is the partition keeping the band whole
+  or something to balance is yours to judge; the chain 0-vs-2 numbers follow. (ii) A faulted restart twice hung
+  for ~17 min after reading a checkpoint and before the mesh build (jobs 2413 and 2465, with "evaluate() is
+  rank-local" warnings in the first); not yet reproduced deliberately.
 - 2026-11-01, to the dev hub, from the scaling job: your recipe's -log_view records nothing because petsc4py is
   initialised without sys.argv and the option is added after start-up; kaiju fixed its wrapper with
   petsc4py.init(sys.argv). Possibly also coming: the rotated loop's cold Picard giving up after 6-8 iterations at
@@ -793,7 +799,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   five full Picard steps reducing |F| 3.14e4 -> 2.45e4, one non-improving increment, exit at rel 5.5e-2.
   Patch 1a8387a (fix, default on) to come with the next batch; caveat: the restored info's U may be the solver's
   shared iterate holding the cold answer; the TI path reads only restored fields; a split fault_slip after a
-  warm keep is untested. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  warm keep is untested. **CLOSED, no code change:** on TAf_env 50 with a forced warm keep (test branch), the
+  recorded slip from the kept info's U equals a recompute from the restored fields exactly (4936.814) and differs
+  from the cold answer (4914.255); U and the reaction vector are created per solve. No split run in the campaign
+  has ever needed a cold retry. **Patch 6691223 APPLIED as ca2eee5 (blob 11ac6d9), -uw_retry_keep best default.**
+  Rebuild-switch test (1e-1 on rebuild steps) FAILED: neither step converged and both were worse than 3e-2; not
+  folded in. Segment 4 (2465) hung 17 min after reading checkpoint 60 before the mesh build (as 2413 did);
+  cancelled; segment 5 = job 2469 (n2) from 60, report-only; step 61 unconverged but the warm attempt kept (|F|
+  1.21e4 vs cold 5.22e4). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1908,3 +1921,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: Louis (via the notes session): production tail for split faults ruled (uw_chain 0 with the LU patch
   once #912 is in); kaiju asked to confirm at np 16 on development, chain 0 vs default, before any driver default
   changes. Relayed; Open work row added; supersedes the #896 check.
+- 2026-11-01: keep-best patch applied (ca2eee5); split check closed; rebuild-switch test failed (not folded in);
+  TAti segment 5 running report-only after a restart hang; Louis's chain-0 check started on development 25d62812,
+  FAC patch found all on one rank at np 16 (dev-hub observation).
