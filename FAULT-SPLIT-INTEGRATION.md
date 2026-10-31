@@ -251,6 +251,23 @@ queue (after C or in it, Louis's call); the ribbon replay drops in priority if p
 moves off the chain; the convection and fault-multigrid guides and UWTN 2026-022's
 multigrid section wait on the ruling.
 
+**2026-10-31 to 2026-11-01, merged and ruled.** A #882, B #889 and C #890 merged to
+`development` on 2026-10-31; D, the #892 fix, merged as #912 (cc839425) with
+`test_1090_mg_live_configuration_parallel` reading back every level's live smoother;
+`Mesh.multigrid_levels` merged as #915 (25d62812) and retires the private accessor in
+the note and the guides. `development` is 25d62812. Louis ruled the tail on #892
+(issuecomment-6550186134): the welded base with the split $S$ level on top and the FAC
+LU patch on that finest level; the chain of split ladders is the measured alternative;
+the drivers' `uw_chain` default changes after kaiju's np 16 annulus run; whether split
+coarse levels stay an option is not decided. The corrected history (the LU blocks never
+ran on the rotated path; 891c9bb0 made composite and LU the defaults in one commit) is
+a journal finding of 2026-11-01, the ruling a decision entry with its closure lines; the
+2026-10-29 and 2026-10-30 tail decisions are superseded. What this plan still owes: the
+re-pin of UWTN 2026-022 (rides the notes session's rewrite) and of UWTN 2026-018 (the
+wombat workbench's pen; a `development` sha is available now); the guides are rewritten
+on #862 today. The ribbon replay is off the list unless split coarse levels stay an
+option.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7

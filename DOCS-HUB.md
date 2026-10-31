@@ -103,7 +103,7 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | a team read; metadata still says draft |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): a maintainer's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
-| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **not to publish until the tail sweep reports**; pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
+| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **the tail hold is lifted** (Louis's ruling 2026-11-01); being rewritten on the workbench, unsaved until Louis asks: the multigrid section names the smoother, the chain paragraph becomes the welded tail, the recipe moves to `Mesh.multigrid_levels` (#915), panel (c) redrawn as the welded hierarchy, re-pinned to `development`; pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
 The other open pull requests on the notes repository, listed on 2026-10-27. Every one
@@ -154,6 +154,7 @@ Measured here, not inherited.
   and the note's "Using it" code need `base._coarse_level_meshes()[:-1] + [base]`, and a
   published note cannot name a private method; a `Mesh` property that returns the
   levels coarsest to finest, on B or C or as a small PR before the note publishes.
+  **Done: `Mesh.multigrid_levels`, #915 (25d62812).**
   (2) Done 2026-10-30: the faults-in-convection guide exists only on C, and its prose on
   the chain's hosts is corrected there at 799ef021 (#890); nothing on B.
 - 2026-10-30, to the science hub: the drivers' chain comments (`annulus_fault.py`,
@@ -165,6 +166,15 @@ Measured here, not inherited.
   see the journal entry of 2026-10-31 and `~/+Simulations/uwtn_2026_022_tail_sweep/`
   on wombat. It is the fix that makes the August fault-patch design the one that
   ships.
+  **Closed 2026-11-01: fixed by #912 (cc839425); Louis ruled the tail on #892.** The
+  two guides describe it as of today's push to #862; the journal has the decision and
+  the corrected history (its finding entry is the plan's step 7). Still with the dev
+  hub: whether split coarse levels stay an option (`custom_mg.py:1556`), and the
+  non-rotated path's block solver.
+- 2026-11-01, to the science hub: the production tail is the welded base with the split
+  finest level and the FAC LU patch (Louis on #892). The drivers' `uw_chain` default
+  changes after kaiju's np 16 annulus run, which the notes session has asked you for;
+  the 2026-10-30 item on the drivers' chain comments is moot once that lands.
 
 ## Open work
 
@@ -190,10 +200,12 @@ Measured here, not inherited.
   notes section (HUB.md b7b791d). Compute-side figure production stays requestable there:
   hyperion's (i) fig_iterations records and (j) global peak slip at np 8 for 2026-022, and
   the three 2026-018 figures, all queued behind the leak-fix PR.
-- **The fault-split integration** (`FAULT-SPLIT-INTEGRATION.md`): decided 2026-10-28,
-  spun off to the laptop's development session (build d81a2588, suites, review 3's
-  fixes, the root's review, PRs A, B, C in order). The hub tracks it here and re-pins
-  the notes when the merges land.
+- **The fault-split integration** (`FAULT-SPLIT-INTEGRATION.md`): A #882, B #889 and
+  C #890 merged on 2026-10-31, with the #892 fix (#912) and `Mesh.multigrid_levels`
+  (#915); `development` is 25d62812. Left: UWTN 2026-022's re-pin rides the notes
+  session's rewrite; UWTN 2026-018's `software_version` can move to a `development`
+  sha now (the wombat workbench holds its pen); the drivers' default after kaiju's
+  np 16 run.
 - **Enable Pages on the journal**: `underworldcode/underworld3-journal`, Settings, Pages,
   source "GitHub Actions". The proxy refuses the hub the Pages API path. Until then the
   workflow's build job runs and its deploy job fails; the site is
@@ -359,3 +371,19 @@ Measured here, not inherited.
   welded base with the FAC LU patch once #892 lands, which changes the drivers'
   `uw_chain` default, both guides, and the note's multigrid section and panel (c).
   Results: `~/+Simulations/uwtn_2026_022_tail_sweep/` on wombat; nothing pushed.
+- 2026-11-01: **the tail is ruled; A, B, C, the #892 fix and the levels accessor are on
+  `development`.** The notes session relayed the corrected history of #892 (the LU
+  blocks never ran on the rotated path; 891c9bb0 made composite and LU the defaults in
+  one commit; not a regression from a working state), Louis's ruling on #892
+  (issuecomment-6550186134: welded base + split S level + FAC LU patch; the chain is
+  the alternative; the drivers' default after kaiju's np 16 run), #912 (cc839425) and
+  #915 (25d62812), and that 022's hold is lifted and it is being rewritten on the
+  workbench. Done here: journal decision entry with its closure lines and a finding
+  entry for the history (the dev hub plan's step 7), the 2026-10-29 and 2026-10-30
+  decisions marked superseded, the topic page's current understanding rewritten;
+  `development` merged into `docs/fault-multigrid-guide` (#862; the index table
+  conflict resolved, the convection guide added to the toctree it was missing from),
+  the fault-multigrid guide's chain paragraph replaced by the ruled tail and its block
+  rule rewritten, the faults-in-convection guide's hierarchy section, code and table
+  rewritten to the welded tail with the chain as the labelled alternative. The dev
+  hub's `PRIORITY` section read (a5e2cc8).
