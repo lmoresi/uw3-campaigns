@@ -349,9 +349,15 @@ efficient path").** Owner: the integration session, in this order.
        - Side finding filed as **#907**: a rotated solve whose PC fails returns v = 0
          with only a warning. The proposed collective raise is a behaviour change for
          callers, so it waits for Louis.
-       - The review also found a development defect: the velocity MG is set up twice on a
-         first rotated solve, so every coarse factorisation is paid twice and the SVD
-         timings above include a double factorisation. Fixed on the branch.
+       - The review also found a development defect: the rotated coarse PC is set up twice
+         on a first solve, because an SOR loop re-assembled level 0. Fixed on the branch
+         (5a30a08e, `test_1113` counts setups). Only SVD paid twice, since redundant LU
+         factors lazily: the shell's 207 s of SVD coarse work is about 105 s with one
+         factorisation.
+       - The GAMG variant is in (9db23e56): `set_custom_fmg(..., coarse_solve="gamg")`,
+         explicit only, on the rotated and standard routes. It has the near-null space and
+         the verified rotations. `test_1114` (np 2 and 4) gives the gathered LU's answer to
+         1e-8. Guide paragraph added.
      - GAMG coarse with an LU base: GAMG's base is at most 6 % of its coarse work. Its
        cost is its 15-40 V-cycles per geometric coarse solve. **Louis: keep it for one
        case**, a coarsest accessible mesh too large for a gathered redundant LU. It goes in
