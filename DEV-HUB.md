@@ -661,6 +661,15 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: **merged on green CI:** #912 D (cc839425) and #913 the #894 fix (afdfe591).
+  #916 got development merged in (98a63833, clean), because three PRs touched
+  `rotated_bc.py`, and its CI is re-running. #914 fails `test_1106` at np 2 on Linux (4772
+  against 4780 patch rows). #915 fails `test_1016::test_a_coarsening_hierarchy` (PETSc
+  error 63) and `test_0023`'s power-mean hash. Both went back to the integration session.
+  The merge commits carry no proxy footer; only bodies and comments do. Louis wants the
+  original attribution only, and the hub proposed that the integration session (his own
+  credentials, no proxy) post GitHub text and strip the footers, pending his allowing
+  writes there.
 - 2026-10-31: **PRs opened by the hub** (bodies and reviews from the integration session):
   - #912: D (#892);
   - #913: the #894 fix, stacked on D;
