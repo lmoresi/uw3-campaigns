@@ -275,6 +275,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, from the scaling job: your recipe's -log_view records nothing because petsc4py is
+  initialised without sys.argv and the option is added after start-up; kaiju fixed its wrapper with
+  petsc4py.init(sys.argv). Possibly also coming: the rotated loop's cold Picard giving up after 6-8 iterations at
+  rel 0.1 while still converging (line-search-stall exit), to be confirmed by kaiju.
 - 2026-11-01, to the dev hub, three library notes from kaiju: (i) the Newton switch is clamped to
   max(newton_switch_rtol, tolerance), so a switch below the solver tolerance silently means pure Picard; it cost
   the science hub a day of a stalled TI run before kaiju read it in the library. Worth a warning when the clamp
@@ -758,7 +762,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   chain's unconverged steps (so those were close to the answer).** Resumed from checkpoint 50 as job 2452 (n2,
   11-01 07:24) with -uw_warm_newton_switch 3e-2 -uw_rebuild_newton_switch 3e-2 -uw_newton_switch 3e-2; ~30 steps,
   ~7 h, likely one segment. Supervisor v4: trigger counts only steps after 50, read every 10 min mid-segment,
-  kaiju watching chain.log. Build overlay-leakfix 547c2e54, driver a00a10b. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  kaiju watching chain.log. Build overlay-leakfix 547c2e54, driver a00a10b. **TRIGGER 11-01 08:54:** steps 61 and
+  62 (after the rebuild at detection step 60; steps 51-60 all converged) failed consecutively: warm Newton
+  crawled 2.6e-2 -> 2.0e-2 / 1.3e-2, the cold retry stopped after 6-8 Picard its at 0.12 / 0.056, and **the
+  driver kept the cold result unconditionally even though it was worse (a bug in FaultedMesh.solve)**; vrms
+  1409 -> 1326, slip 6362 -> 3862 at step 61, partly rebuild, partly the unconverged answer. **Hub: stop 2452,
+  keep checkpoint 60 (last fully converged); fix = keep whichever attempt ends with the lower residual (default
+  on, both attempts recorded); resume from 60 on 3e-2 with the trigger report-only and an unconverged column;
+  test cold-into-Newton at 1e-1 on rebuild steps (2 steps from 60) alongside and fold it in at the next
+  checkpoint if clean. Audit for the page: every earlier failed step's warm and cold residuals and which was
+  kept. Cold retry stopping at rel 0.1 after 6-8 its (line-search-stall exit?) to confirm: a dev-hub note if so.**
+  Scaling: B np32 running; -log_view was empty because petsc4py started without sys.argv (fixed in the wrapper
+  with petsc4py.init(sys.argv); the dev hub's recipe has the same gap); A/B np16 rerunning. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1864,3 +1879,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   resumed from checkpoint 50 at 3e-2 switches (job 2452, both diagnostic steps converged, ~7 h to the base).
   Patches 54ad91b applied (chain comment; yield_stress_min = -oo for development). Dev-hub notes: the clamp, the
   #759 refusal, node packing (2 per node now, throughput test later). Scaling job on four builds queued.
+- 2026-11-01: TAti trigger at steps 61-62 after a rebuild; driver bug found (cold retry kept even when worse than the
+  warm attempt). Stop, fix (keep the better attempt), resume from 60 report-only; rebuild-switch test alongside;
+  audit of earlier failed steps for the page. -log_view gap noted for the dev hub.
