@@ -684,6 +684,9 @@ refuses deletions from here, so this needs a laptop or Louis.
 - 2026-10-31: **the PRs are blocked.** `gh pr create` is refused by the integration
   session's permission settings. The hub does not open them in its place; that is put to
   Louis.
+- 2026-10-31: Louis: the hub opens the PRs from here (the integration session sends its
+  reviewed bodies). Kaiju gets GitHub credentials when Louis can arrange them; until then
+  the 3-D session's commits come through the hub as patches.
 - 2026-10-31: Louis: null modes belong in the mesh metadata. They were implemented in April
   and bypassed by the rotated path's own detection (#906's cause). The integration session
   was briefed to make the rotated path read them.
