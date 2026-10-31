@@ -188,6 +188,9 @@ params = uw.Params(
                                 #   the library's TransverseIsotropicVEPFlowModel (elasticity off) yielding eta_1 on the
                                 #   resolved shear itself: yield stress f_b tau_y on the footprint, rate strengthening
                                 #   eta_reg_b (its floor), its own softmin and tangent
+    uw_retry_keep="best",       # after a failed warm start and its cold retry, keep the attempt with the smaller final
+                                #   residual ("best"; the warm iterate restored), or the cold one always ("last", before
+                                #   2026-11-01: TAti_smooth step 61 kept a cold 0.12 over a warm 2.0e-2)
     uw_ti_smooth=0,             # ti: 1 = the band's min and floor in the host's own smooth forms (_combine_yield's
                                 #   softmin, _apply_floor's smooth max, the host's delta) for Newton; 0 = hard Min/Max
     uw_fault_normal="node",     # split: the contact's normal: "node" = per-node from the cut facets (the default);
@@ -695,9 +698,12 @@ def nonlinear_record(info):
 
 def solver_record(info, attempts, start, caught, wall):
     """The step's "solver" sub-record: the nonlinear numbers summed over the attempts (the
-    first attempt's F0, the last one's final state), the last attempt's linear solves,
-    the preconditioner fallbacks among the warnings caught, and the solve's wall times."""
-    rec = dict(attempts[-1])
+    first attempt's F0, the kept attempt's final state: the cold retry's unless the warm one ended
+    closer, -uw_retry_keep), the kept attempt's linear solves, the preconditioner fallbacks among
+    the warnings caught, and the solve's wall times."""
+    kept = next((a for a in attempts if a.get("kept")), attempts[-1])
+    rec = dict(kept)
+    rec["kept"] = None if len(attempts) == 1 else ("warm" if kept is attempts[0] else "cold")
     rec["F0"] = attempts[0]["F0"]
     for key in ("nonlinear_its", "picard_its", "newton_its", "line_search_cutbacks"):
         values = [a[key] for a in attempts]
@@ -1359,9 +1365,22 @@ class FaultedMesh:
             attempts = [nonlinear_record(info)]
             if not info.get("converged") and self.has_guess:
                 uw.pprint("  the warm start did not converge: solving from rest")
+                warm = (info, np.array(self.v.array), np.array(self.p.array))
                 self.stokes.newton_switch_rtol = params.uw_newton_switch
                 info = self._stokes_solve(from_rest=True)
                 attempts.append(nonlinear_record(info))
+                F_w, F_c = attempts[0]["F_final"], attempts[1]["F_final"]
+                if (params.uw_retry_keep == "best" and not info.get("converged")
+                        and F_w is not None and F_c is not None and F_w < F_c):
+                    # the cold retry ended further from the answer: keep the warm iterate (TAti_smooth step
+                    # 61, 2026-11-01: warm |F| 1.25e4 at rel 2.0e-2, cold 5.2e4 at rel 0.12, the cold kept)
+                    info = warm[0]
+                    self.v.array[...] = warm[1]
+                    self.p.array[...] = warm[2]
+                    self.stokes._rotated_freeslip_info = info
+                    uw.pprint(f"  the cold retry ended worse (|F| {F_c:.3e} > {F_w:.3e}): the warm iterate kept")
+                for a, kept in zip(attempts, (info is warm[0], info is not warm[0])):
+                    a["kept"] = kept
         for w in caught:           # put the warnings back where they would have gone
             warnings.showwarning(w.message, w.category, w.filename, w.lineno)
         self.stokes.newton_switch_rtol = params.uw_warm_newton_switch
