@@ -98,6 +98,9 @@ def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yie
     stokes.constitutive_model.Parameters.shear_viscosity_0 = eta_T * weak
     stokes.constitutive_model.Parameters.shear_viscosity_min = 1 if eta_ref is None else eta_ref
     stokes.constitutive_model.Parameters.yield_stress = (tau0 + tau1 * depth) * weak * yield_factor
+    # no floor: tau0 > 0 and weak, yield_factor are bounded below by positive factors, so the yield stress
+    # stays positive; the library refuses an unstated floor on a yield stress that reads fields (#759)
+    stokes.constitutive_model.Parameters.yield_stress_min = -sympy.oo
     stokes.constitutive_model.yield_softness = softness
     return eta_T
 
