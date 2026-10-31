@@ -330,6 +330,9 @@ efficient path").** Owner: the integration session, in this order.
      - Step 3 (GAMG only as `mg_coarse`, SVD at its base): same answer at 4-10 times the
        pinned LU's cost at this size. It remains the candidate only if bottom levels
        outgrow a gathered LU.
+     - Added at Louis's request (2026-10-31, "just so we know"): the same GAMG coarse
+       solve with LU at GAMG's base instead of SVD, rotations handled there, with the
+       coarse cost split into GAMG's base solve and its own cycles.
      - Step 4, telescope: not needed (the gathered LU is about 1 % of the solve). Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
