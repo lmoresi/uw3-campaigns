@@ -286,7 +286,18 @@ efficient path").** Owner: the integration session, in this order.
    (Louis 2026-10-31: "52 failing altogether is not something we can leave
    uninvestigated ... no 3D problems would be accessible at all"). It caps every kaiju
    fault run at 16 of a node's 52 cores.
-   - #902 is first reproduced on the laptop, oversubscribed at np 32 with a small mesh.
+   - **#902 explained:** a PETSc defect. `DMPlexComputeInterpolatorNested` skips
+     preallocation on a rank that owns no rows or columns but still fills from its cells.
+     The owner raises "new nonzero", and the other ranks hang inside the collective. It is
+     reached through `Mesh._get_coords_for_basis` on every custom-MG level, and the notch
+     draft 02 shows it in 3-D at np 16.
+     - The fix (in progress): coordinates per cell from the reference element matrix, no
+       parallel matrix. A forced-partition test at np 2. The rank-local catch-and-retry
+       taken out. A petsc4py reproducer and draft PETSc issue go to Louis for the
+       external report.
+     - **Louis's rule: the laptop works at np <= 8 or with forced partitions; np >= 16
+       checks belong to kaiju.** The fix's np 32/52 check goes to the science hub once
+       pushed.
    - For #901, development still picks SVD whenever there are rotation modes (annulus,
      shell). Louis's order (posted on #901):
      1. a coarser bottom level (SVD is fine if the coarse level is coarse enough);
@@ -455,6 +466,7 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | The parallel cover gate drops the structural patch at np 2 (640 its against 68) | slip-coarse-space testing, 2026-10-31 | #896 | efficiency queue item 3 |
 | `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
 | `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
+| Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **01** (independent coarse meshes uncoloured, NaN at np >= 12) and **04** (a false PETSc error on every custom-P FMG solve, the #827 class) need checking on development after #890 changed custom_mg: 04 serially on the laptop, 01 in kaiju's scaling job |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
 
 ## Issue queue (2026-10-29)
@@ -563,6 +575,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: #902's mechanism found: a PETSc preallocation defect on ranks that own
+  nothing. The fix is in progress; np >= 16 checks go to kaiju. Triaged the six notch
+  drafts: filed #903 and #904, posted the evidence on #771.
 - 2026-10-31: Louis: np 52 must be investigated; SVD's slowness is why we went to
   redundant LU; the coarse level is not coarse enough; consider GAMG as the coarse solve.
   The hub found development still picks SVD whenever there are rotation modes. #901 and
