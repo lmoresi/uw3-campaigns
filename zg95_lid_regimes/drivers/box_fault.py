@@ -142,8 +142,9 @@ class FaultedMesh:
         wall = time.perf_counter()
         self.x_trench = x_trench
         # The multigrid hierarchy carries the fault through its coarse levels (C on the
-        # ladder): the ladder at 2**k times the rung spacing on the base level k steps
-        # below the finest, each split along its own rungs, so the coarse spaces contain
+        # ladder): the ladder at 2**k times the rung spacing on the base level levels[n - k],
+        # k - 1 steps below the finest (k = 1 is the finest base level), each split along
+        # its own rungs, so the coarse spaces contain
         # the slip. Welded coarse levels cannot represent it: the velocity solve then
         # caps once Newton starts on a mobilising lid.
         chain = int(params.uw_chain)

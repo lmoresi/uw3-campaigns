@@ -229,8 +229,9 @@ class FaultedMesh:
         self.dip = float(params.uw_dip if dip is None else dip)
         self.fault_depth = float(params.uw_fault_depth if fault_depth is None else fault_depth)
         # C on the ladder: the ladder at 2**k times the rung spacing on the base level
-        # k steps below the finest, each split along its own rungs (the guide
-        # faults-in-convection; welded coarse levels cap the velocity solve).
+        # levels[n - k], k - 1 steps below the finest (k = 1 is the finest base level),
+        # each split along its own rungs (the guide faults-in-convection; welded coarse
+        # levels cap the velocity solve).
         chain = int(params.uw_chain)
         mids = []
         for k in range(chain, 0, -1):
