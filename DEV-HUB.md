@@ -296,8 +296,18 @@ efficient path").** Owner: the integration session, in this order.
        taken out. A petsc4py reproducer and draft PETSc issue go to Louis for the
        external report.
      - **Louis's rule: the laptop works at np <= 8 or with forced partitions; np >= 16
-       checks belong to kaiju.** The fix's np 32/52 check goes to the science hub once
-       pushed.
+       checks belong to kaiju.**
+     - **Fix pushed:** `bugfix/custom-mg-many-ranks` 96d39f7b, from development.
+       - UW3's own copy of PETSc's same-plex interpolator in the Cython layer (Louis
+         chose this over patching the PETSc build). It matches PETSc's matrix exactly
+         on tri, quad, tet and hex, P1-P3, at np 1 and 4.
+       - #886: the builder's verdict is agreed across ranks.
+       - `test_1107` and `test_1108` hang on development and pass on the branch.
+       - Serial tier A+B: 2803 passed. Parallel at np 2: only #826.
+       - The np 16/32/52 check is with the science hub.
+     - The PETSc upstream reproducer and draft (the guard has been in PETSc since v3.24.0
+       and is still on main) are on wombat in
+       `~/+Simulations/fac_892/mg_np32_902/petsc_upstream/`, for Louis to file.
    - For #901, development still picks SVD whenever there are rotation modes (annulus,
      shell). Louis's order (posted on #901):
      1. a coarser bottom level (SVD is fine if the coarse level is coarse enough);
@@ -466,7 +476,8 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | The parallel cover gate drops the structural patch at np 2 (640 its against 68) | slip-coarse-space testing, 2026-10-31 | #896 | efficiency queue item 3 |
 | `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
 | `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
-| Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **01** (independent coarse meshes uncoloured, NaN at np >= 12) and **04** (a false PETSc error on every custom-P FMG solve, the #827 class) need checking on development after #890 changed custom_mg: 04 serially on the laptop, 01 in kaiju's scaling job |
+| Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **04** is already fixed on development by #827 (a820ff0a); **01** is in kaiju's scaling job (`set_custom_fmg` still does not co-locate independent coarse levels; orphans are now dropped, not injected) |
+| `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
 
 ## Issue queue (2026-10-29)
@@ -502,6 +513,17 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-10-31 (update), to the science hub, the **#902 fix is ready for kaiju**:
+  `bugfix/custom-mg-many-ranks` 96d39f7b (public; from development fc67b650). Please run
+  it in the same scaling job as the request below. That job compares development and this
+  branch:
+  1. The faulted annulus (production recipe, frictionless split fault, custom-P FMG) at
+     np 16, 32 and 52, 5 steps from TAf 20. Done when np 32 and 52 complete on the branch
+     and match np 16 (#902's criterion). On development, record whether they fail.
+  2. Notch draft 01 (independent coarse meshes at np >= 12): record convergence and the
+     orphan counts that `restrict_unreached` drops at install.
+  3. In every run: coarse time per Newton iteration (#901), step time, iterations per
+     increment, slip.
 - 2026-10-31, to the science hub, a compute request (Louis: np 16 cannot be the ceiling):
   - a kaiju scaling check on current development fc67b650: np 16, 32 and 52 on one free
     node, 5 steps from a rollback checkpoint (TAf at step 20), production recipe;
@@ -575,6 +597,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: the #902 fix pushed (96d39f7b) and routed to kaiju through the science
+  hub. #905 filed. Notch draft 04 found already fixed.
 - 2026-10-31: #902's mechanism found: a PETSc preallocation defect on ranks that own
   nothing. The fix is in progress; np >= 16 checks go to kaiju. Triaged the six notch
   drafts: filed #903 and #904, posted the evidence on #771.
