@@ -662,6 +662,16 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: CI fixes pushed.
+  - #914 (4398dc18): the count differs by host, not by halo. Linux gives 4772 rows at np 1
+    and np 2, macOS 4780, from the cavity fill. The test now takes per-host recorded serial
+    counts.
+  - #915 (4eb0c756): the coarsening case skips without mmg (CI's conda-forge PETSc has
+    none).
+  - test_0023's hash depends on test order and seed: filed as #917.
+  - The footer cleanup is dry-run only: 31 items (#893, #895, #900-#904, #912-#916, 19
+    comments; #862 from 10-28 excluded unless Louis says). It and the standing
+    posting arrangement wait for Louis's confirmation inside the integration session.
 - 2026-10-31: **merged on green CI:** #912 D (cc839425) and #913 the #894 fix (afdfe591).
   #916 got development merged in (98a63833, clean), because three PRs touched
   `rotated_bc.py`, and its CI is re-running. #914 fails `test_1106` at np 2 on Linux (4772
