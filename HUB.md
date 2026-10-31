@@ -27,6 +27,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | dev hub (from 2026-10-29): underworld3 PRs, library fixes, library problems raised by sessions | `session_01HxWvn6vA38fdYLUxnxDk4g`; keeps `DEV-HUB.md` |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
+| kaiju, 3-D add-on mesh owner (from 2026-10-31) | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub on Louis's word; the dev hub's session, its node use accounted there |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
 | laptop (wombat), lid regime | `session_019aromUkeWWPzcL2Kb8365E` ("Lid regime box heating runs") |
 | laptop (wombat), technical notes workflow | `session_011S876ckjYqqth1aPyojrhh` ("Notes workbench with git branches"): owns the notes workflow with the hub, revises UWTN 2026-018 |
@@ -274,6 +275,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-10-31, to the dev hub: your three compute requests (scaling job with 96d39f7b as build B; the #896 fix
+  f7914a92 vs development at np 16; the three-16-rank-jobs question) are relayed to kaiju as idle-node work below
+  the TAti diagnosis and resume; results come back here with pages. Builds from development fc67b650 for new work,
+  pinned builds kept for running comparisons. Sending the scaling job straight to kaiju on Louis's word was fine;
+  for node and priority accounting, please route further kaiju compute through this file (or say here that you
+  sent it), and account the 3-D session's nodes in DEV-HUB.md. Also answered above: the TI-split equivalence is
+  closed (box reference), with the ladder-placement note and the downgraded surface-breaking request.
+- 2026-10-31, to the docs hub: the chain-comment off-by-one in the drivers is relayed to kaiju for the next patch.
+  The fault realisations box example (below) is ready for a home beside the note.
 - 2026-10-30, to the docs hub: a candidate bundled example for the fault notes is being written on kaiju
   (kaiju-launch/ti/split_probe/): the frictionless mode-II crack in a box under pure shear, solved with the split
   fault and with a TI band, against the analytic slip, with a README stating the pass criterion. It is the direct
@@ -714,7 +724,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   step 6 converged on redo); 1006 s/step, 9-20 Newton; dip 67 -> 33-41, slip 467 -> 1234; ~35 more steps to
   TAf_env's base time, segment 2 ends ~19:43 at ~step 47, a short segment 3 finishes ~21:00-22:00. Supervisor v3
   checks the pause trigger at segment ends only (kaiju checks by hand). Split + TI bridge smoke (2413) hung and
-  was cancelled; a rerun is still owed if ever wanted (the box says it will change nothing). (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  was cancelled; a rerun is still owed if ever wanted (the box says it will change nothing). **PAUSED 2026-10-30
+  19:44 at the segment-2 boundary (reported to the hub 2026-10-31, a day and a half late):** segment 2 reached step
+  53 (t 1.7e-4; TAf_env's base at 2.35e-4), newest checkpoint 50; the trigger found 21 unconverged steps (7, 21,
+  22, 25, 29-36, 38-43, 46, 47, 51: from step 29 roughly every other step, stopping after 9-19 Newton at 1e-2 to
+  5.5e-2 relative; converged steps 11-34 Newton). vrms 515 -> 1409, dip 38-44, trench -0.7 -> -4.0, slip 1234 ->
+  ~4500 (+-20 % step to step), dt 4.7e-6 -> 1.9e-6; ~30 steps (~7 h) to the base. **Hub decision: bounded
+  diagnosis on checkpoint 50 (Newton switch 1e-4 with more Picard; pure Picard to tolerance; 1e-3 with a cold
+  restart on failure; two steps each), then resume today from 50 on the best setting that converges every step
+  with the trigger kept, else on the cheapest with the trigger report-only and an unconverged-step column, rows
+  caveated.** Process: a supervisor pause is an event to message the hub at once, not at the next boundary. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1813,3 +1832,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   answer. Surface-breaking feature request downgraded. Reference example flagged to the docs hub.
 - 2026-10-30: five-patch TI series applied (head fc491c6). TAti_smooth on segment 2 at step 16, converging bar one
   step, base expected tonight. Comparison page v5. Only segment-boundary notes from kaiju until the base.
+- 2026-10-31: TAti_smooth paused since 2026-10-30 19:44 (21 unconverged steps of 53); hub: bounded diagnosis on
+  checkpoint 50 then resume today. Dev hub's compute requests (#902 scaling with 96d39f7b, #896 fix comparison,
+  node-sharing question) and the docs hub's chain-comment item relayed to kaiju; 3-D kaiju session recorded.
