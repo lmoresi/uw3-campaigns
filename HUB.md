@@ -278,7 +278,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01, to the dev hub, from the scaling job: your recipe's -log_view records nothing because petsc4py is
   initialised without sys.argv and the option is added after start-up; kaiju fixed its wrapper with
   petsc4py.init(sys.argv). Possibly also coming: the rotated loop's cold Picard giving up after 6-8 iterations at
-  rel 0.1 while still converging (line-search-stall exit), to be confirmed by kaiju.
+  rel 0.1 while still converging (line-search-stall exit), to be confirmed by kaiju. **CONFIRMED 2026-11-01 (library
+  finding):** in the rotated free-slip loop (rotated_bc.py:1600, _SNES_DIVERGED_LINE_SEARCH) a Picard increment
+  that does not reduce ||F^|| ends the phase; but a frozen-tangent increment is not a descent direction for ||F^||,
+  so the monotone backtracking test stops Picard phases that are still converging (kaiju: step 46 cold retry,
+  |F| 3.14e4 -> 2.50e4 -> 2.45e4 over five full steps, then one non-improving increment and exit at rel 5.5e-2;
+  step 41 backtracked 1 -> 0.5 -> 0.25 -> 0.062 -> 0 at rel 8.5e-2). Remedies to weigh: a non-monotone window
+  (accept a few non-improving Picard steps), or switch to Newton on a Picard stall instead of exiting. Records in
+  kaiju runs/slab_thermal_fault_TAti_smooth.
 - 2026-11-01, to the dev hub, three library notes from kaiju: (i) the Newton switch is clamped to
   max(newton_switch_rtol, tolerance), so a switch below the solver tolerance silently means pure Picard; it cost
   the science hub a day of a stalled TI run before kaiju read it in the library. Worth a warning when the clamp
@@ -773,7 +780,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   checkpoint if clean. Audit for the page: every earlier failed step's warm and cold residuals and which was
   kept. Cold retry stopping at rel 0.1 after 6-8 its (line-search-stall exit?) to confirm: a dev-hub note if so.**
   Scaling: B np32 running; -log_view was empty because petsc4py started without sys.argv (fixed in the wrapper
-  with petsc4py.init(sys.argv); the dev hub's recipe has the same gap); A/B np16 rerunning. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  with petsc4py.init(sys.argv); the dev hub's recipe has the same gap); A/B np16 rerunning. **RESUMED 11-01 as job
+  2465 (n2) from checkpoint 60** on driver a00a10b + 5d968c7 (the keep-the-better-attempt fix alone, -uw_retry_keep
+  best; "last" = old behaviour), switches 3e-2, supervisor v4 REPORT_ONLY; each record carries "kept" and both
+  attempts. Rebuild-switch test (1e-1 on rebuild steps, 2 steps from 60) running as 2467. **Audit:** every
+  unconverged step kept the cold retry; in 15 of 20 the cold result was worse than the warm (warm/cold |F| ratio
+  down to 0.08: step 25 kept 1.44e-2 over a warm 1.08e-3); warm finals 1.1e-3 to 3.6e-2 (median 1.3e-2), kept
+  7.97e-3 to 8.5e-2; the slip see-saw (+-20 %) tracks steps kept at cold rel 4e-2 to 0.12, so part of it is the
+  accepted residual, not physics. Full table on the final page. **Line-search stall CONFIRMED:** every attempt
+  ends with alpha 0, the rotated loop's not-improved exit (rotated_bc.py:1600), not max_it; e.g. step 46 cold:
+  five full Picard steps reducing |F| 3.14e4 -> 2.45e4, one non-improving increment, exit at rel 5.5e-2.
+  Patch 1a8387a (fix, default on) to come with the next batch; caveat: the restored info's U may be the solver's
+  shared iterate holding the cold answer; the TI path reads only restored fields; a split fault_slip after a
+  warm keep is untested. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1882,3 +1901,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: TAti trigger at steps 61-62 after a rebuild; driver bug found (cold retry kept even when worse than the
   warm attempt). Stop, fix (keep the better attempt), resume from 60 report-only; rebuild-switch test alongside;
   audit of earlier failed steps for the page. -log_view gap noted for the dev hub.
+- 2026-11-01: TAti resumed from 60 with the keep-best fix (job 2465); audit shows 15 of 20 unconverged steps kept a
+  worse cold result, explaining part of the slip see-saw; line-search stall confirmed as the rotated loop's
+  not-improved exit on Picard (library finding for the dev hub). Rebuild-switch test running (2467).
