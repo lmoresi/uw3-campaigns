@@ -316,7 +316,21 @@ efficient path").** Owner: the integration session, in this order.
         (`mg_coarse`), with SVD at GAMG's base. It replaces geometric MG nowhere ("worth
         investigating, not wedded");
      4. telescope only if a gathered solve still dominates.
-     The winner becomes a default chosen by the null modes, not a new option. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+     The winner becomes a default chosen by the null modes, not a new option.
+   - **#901 results** (laptop, np 1 and 4; `bugfix/rotated-fmg-coarse-solve` 0502a9f7,
+     from development; review running; kaiju hash to follow):
+     - Step 1: the annulus bottom level can drop from 600 to about 40 cells with
+       unchanged iterations (SVD setup 69 s to 0.012 s). Cell shape degrades at 22. The
+       shell cannot go below its 614-cell gmsh base.
+     - Step 2, **now the default on the branch:** the rotations are restricted to the
+       bottom level, one unknown per mode is pinned, the modes are projected out, and the
+       system is solved by redundant LU. Same iterations and the same answer as SVD.
+       Annulus 600 cells: 144 s to 0.76 s wall. Shell 614 cells: 216 s to 7.1 s.
+       `test_1111` and `test_1112` fail on development and pass on the branch.
+     - Step 3 (GAMG only as `mg_coarse`, SVD at its base): same answer at 4-10 times the
+       pinned LU's cost at this size. It remains the candidate only if bottom levels
+       outgrow a gathered LU.
+     - Step 4, telescope: not needed (the gathered LU is about 1 % of the solve). Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
      are slower. Louis's 10-28 ruling applies; the prototype is on
@@ -477,6 +491,7 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
 | `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
 | Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **04** is already fixed on development by #827 (a820ff0a); **01** is in kaiju's scaling job (`set_custom_fmg` still does not co-locate independent coarse levels; orphans are now dropped, not injected) |
+| Rotated free slip on a spherical shell with the default `normal=None`: facet-averaged normals violate all three rotations by 0.008-0.016, so none is detected. The answer carries an undetermined rigid rotation (v_rms 4.47 against 1.77) and takes 83 velocity its against 18. The annulus is unaffected; CLAUDE.md recommends `normal=None` | the #901 work | #906 | **decision for Louis** (options on the issue): project out a discretisation-level rotation (the hub's lean: it imposes zero net rotation and keeps the discrete no-flux), or the analytic normal where the mesh declares a surface, or document it |
 | `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
 
@@ -597,6 +612,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: #901: explicit null modes with redundant LU are the default on
+  `bugfix/rotated-fmg-coarse-solve`, 19-190 times cheaper than SVD at equal iterations.
+  #906 filed: shells with the default normal carry a rigid rotation. #902's branch at
+  b1481152 after review round 2; the kaiju check on 96d39f7b still holds.
 - 2026-10-31: the #902 fix pushed (96d39f7b) and routed to kaiju through the science
   hub. #905 filed. Notch draft 04 found already fixed.
 - 2026-10-31: #902's mechanism found: a PETSc preallocation defect on ranks that own
