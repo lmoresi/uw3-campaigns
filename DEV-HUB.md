@@ -291,8 +291,9 @@ efficient path").** Owner: the integration session, in this order.
      shell). Louis's order (posted on #901):
      1. a coarser bottom level (SVD is fine if the coarse level is coarse enough);
      2. the null space handled explicitly with a direct solve (the 10-28 ruling);
-     3. an investigation of GAMG below the geometric coarse level with SVD at its base
-        ("worth investigating, not wedded");
+     3. an investigation of GAMG ONLY as the coarse-level solve of the geometric FMG
+        (`mg_coarse`), with SVD at GAMG's base. It replaces geometric MG nowhere ("worth
+        investigating, not wedded");
      4. telescope only if a gathered solve still dominates.
      The winner becomes a default chosen by the null modes, not a new option. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
