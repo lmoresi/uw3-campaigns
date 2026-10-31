@@ -346,8 +346,10 @@ efficient path").** Owner: the integration session, in this order.
          first rotated solve, so every coarse factorisation is paid twice and the SVD
          timings above include a double factorisation. Fixed on the branch.
      - GAMG coarse with an LU base: GAMG's base is at most 6 % of its coarse work. Its
-       cost is its 15-40 V-cycles per geometric coarse solve, so it is set aside unless
-       bottom levels outgrow a gathered LU. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+       cost is its 15-40 V-cycles per geometric coarse solve. **Louis: keep it for one
+       case**, a coarsest accessible mesh too large for a gathered redundant LU. It goes in
+       as an explicit, tested, non-default `coarse="gamg"` variant (rtol 1e-2, LU base,
+       near-null space attached), documented in the multigrid guide. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
      are slower. Louis's 10-28 ruling applies; the prototype is on
