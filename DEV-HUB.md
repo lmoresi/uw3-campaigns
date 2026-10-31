@@ -288,10 +288,13 @@ efficient path").** Owner: the integration session, in this order.
    fault run at 16 of a node's 52 cores.
    - #902 is first reproduced on the laptop, oversubscribed at np 32 with a small mesh.
    - For #901, development still picks SVD whenever there are rotation modes (annulus,
-     shell). The options to measure, per Louis's direction, are recorded on #901: the
-     mode removed explicitly with redundant LU, GAMG as the coarse solve, a coarser
-     bottom level, and telescope. The winner becomes a default chosen by the null modes,
-     not a new option. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+     shell). Louis's order (posted on #901):
+     1. a coarser bottom level (SVD is fine if the coarse level is coarse enough);
+     2. the null space handled explicitly with a direct solve (the 10-28 ruling);
+     3. an investigation of GAMG below the geometric coarse level with SVD at its base
+        ("worth investigating, not wedded");
+     4. telescope only if a gathered solve still dominates.
+     The winner becomes a default chosen by the null modes, not a new option. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
      are slower. Louis's 10-28 ruling applies; the prototype is on
