@@ -346,8 +346,9 @@ efficient path").** Owner: the integration session, in this order.
          run-to-run noise). On a forced-singular coarse level (#306's case), plain LU fails
          at iteration 0 while A-prime converges to SVD's answer within 7.5e-9. Awaiting
          Louis's ruling.
-       - Side finding, to file: a rotated solve whose PC fails returns no exception and
-         leaves v = 0 with only a warning.
+       - Side finding filed as **#907**: a rotated solve whose PC fails returns v = 0
+         with only a warning. The proposed collective raise is a behaviour change for
+         callers, so it waits for Louis.
        - The review also found a development defect: the velocity MG is set up twice on a
          first rotated solve, so every coarse factorisation is paid twice and the SVD
          timings above include a double factorisation. Fixed on the branch.
@@ -516,6 +517,7 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | `solver.set_custom_fmg` lacks the module function's FAC keywords | slip-coarse-space review | #897 | rides with the next PR that touches the solver method |
 | `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
 | Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **04** is already fixed on development by #827 (a820ff0a); **01** is in kaiju's scaling job (`set_custom_fmg` still does not co-locate independent coarse levels; orphans are now dropped, not injected) |
+| A rotated free-slip solve whose preconditioner fails returns v = 0 with only a warning (reason -11 at iteration 0, no exception) | #901's review | #907 | filed; proposed: a collective raise naming the reason unless the caller opts in. Louis to approve the behaviour change |
 | Rotated free slip on a spherical shell with the default `normal=None`: facet-averaged normals violate all three rotations by 0.008-0.016, so none is detected. The answer carries an undetermined rigid rotation (v_rms 4.47 against 1.77) and takes 83 velocity its against 18. The annulus is unaffected; CLAUDE.md recommends `normal=None` | the #901 work | #906 | **Louis: null modes belong in the mesh metadata.** They are already there (`Mesh.nullspace_rotations`, since 2026-04-07, set by the annulus, shell and segmented constructors) but the rotated path ignores them: it rebuilds the rotations and filters them by a 1e-8 constraint test, which is the failure. The integration session is to make the rotated path read the declared modes (stacked on #901), then measure facet normals against the analytic normal on the shell for Louis's remaining choice |
 | `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
