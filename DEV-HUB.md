@@ -662,6 +662,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: **#914 merged** (dbb4d720) and **#915 merged** (25d62812) on green CI;
+  both were clean against development after #916. All five of the day's PRs are in; #896
+  is relabelled fixed-in-development. Still held for kaiju: #902
+  (`bugfix/custom-mg-many-ranks`) and #901 (`bugfix/rotated-fmg-coarse-solve`).
 - 2026-10-31: **#916 merged** (70b0f777) after green CI on its development merge;
   development was green at afdfe591 before it. #892, #894 and #907 relabelled
   fixed-in-development. Their "Fixed by" comments are drafted for the integration session
