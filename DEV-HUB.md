@@ -341,7 +341,13 @@ efficient path").** Owner: the integration session, in this order.
        - So the null-mode class may be unneeded. The null space stays handled where it is
          singular, at the outer level.
        - Hub's proposal for Louis, **A-prime**: always redundant LU, plus a nonzero factor
-         shift as the zero-pivot insurance, and delete the class. Being measured.
+         shift as the zero-pivot insurance, and delete the class. **Measured: equal to
+         plain redundant LU on all eight fixtures** (six bit-identical, two within
+         run-to-run noise). On a forced-singular coarse level (#306's case), plain LU fails
+         at iteration 0 while A-prime converges to SVD's answer within 7.5e-9. Awaiting
+         Louis's ruling.
+       - Side finding, to file: a rotated solve whose PC fails returns no exception and
+         leaves v = 0 with only a warning.
        - The review also found a development defect: the velocity MG is set up twice on a
          first rotated solve, so every coarse factorisation is paid twice and the SVD
          timings above include a double factorisation. Fixed on the branch.
