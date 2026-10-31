@@ -73,6 +73,7 @@ GitHub, or in session transcripts. If it dies:
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
+| kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
 
 ## Access (measured 2026-10-29)
 
@@ -660,6 +661,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: the 3-D owner session created on kaiju (`session_01HxWvn87Vw8gzXsEHJ7iF8u`)
+  with the full brief; the kaiju scaling job sent to the rollback session.
 - 2026-10-31: **Louis's rulings, "agreed on all counts":**
   - #901 is A-prime;
   - open PRs for D, then the #894 and #896 fixes, and the accessor; the hub merges on
