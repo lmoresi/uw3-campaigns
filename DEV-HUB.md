@@ -524,6 +524,10 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | `remesh()` leaves the multigrid levels stale (`dm_hierarchy[-1]` and the coarse-level cache); `adapt()` after a remesh raises, or takes the old mesh as its finest level | the levels-accessor review | #898 | reproduced and filed with the probe |
 | Six never-filed drafts in uw3-campaigns `notch_length_scale/issue_drafts/` (notch session, 2026-10-28) | the notch session | see state | triaged 2026-10-31: **02** is #902; **03** filed as #903 (a missing label returns vertex 0; checked in code); **05** filed as #904 (refuse mixed SI and non-dimensional expressions); **06** posted on #771; **04** is already fixed on development by #827 (a820ff0a); **01** is in kaiju's scaling job (`set_custom_fmg` still does not co-locate independent coarse levels; orphans are now dropped, not injected) |
 | A rotated free-slip solve whose preconditioner fails returns v = 0 with only a warning (reason -11 at iteration 0, no exception) | #901's review | #907 | filed; proposed: a collective raise naming the reason unless the caller opts in. Louis to approve the behaviour change |
+| A degree-2 mesh with a rank holding no cells: the FVM cell-size error is ignored | #902 review round 3 | #908 | filed |
+| A collective behind a rank-local guard in `Mesh.remesh` | #902 review round 3 | #909 | filed |
+| A warm solve on the fast path fails at iteration 0 with no cause (16 of 26 serial runs; pressure sub-KSP DTOL, then NaN) | #907 review | #910 | filed |
+| A solve past round-off (tol 1e-11) fails its last linear solve, so a time loop now rebuilds its KSP every step (2x on a 39k-dof FMG solve); the fix belongs in the Newton stopping test | #907 review | #911 | filed |
 | Rotated free slip on a spherical shell with the default `normal=None`: facet-averaged normals violate all three rotations by 0.008-0.016, so none is detected. The answer carries an undetermined rigid rotation (v_rms 4.47 against 1.77) and takes 83 velocity its against 18. The annulus is unaffected; CLAUDE.md recommends `normal=None` | the #901 work | #906 | **Louis: null modes belong in the mesh metadata.** They are already there (`Mesh.nullspace_rotations`, since 2026-04-07, set by the annulus, shell and segmented constructors) but the rotated path ignores them: it rebuilds the rotations and filters them by a 1e-8 constraint test, which is the failure. The integration session is to make the rotated path read the declared modes (stacked on #901), then measure facet normals against the analytic normal on the shell for Louis's remaining choice |
 | `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
@@ -560,6 +564,17 @@ refuses deletions from here, so this needs a laptop or Louis.
 - The rotated pressure rtol default (kaiju's evidence, in HUB.md).
 
 ## For the other hubs
+
+- 2026-10-31, to the science hub: on Louis's word ("dispatch parallel runs on kaiju since
+  the laptop can't cope and hyperion is out of action"), the dev hub sent the #901/#902
+  scaling job straight to the kaiju session. It runs on free nodes only, and must not
+  displace production jobs. The builds:
+  - A: development fc67b650;
+  - B: `bugfix/custom-mg-many-ranks` 57d87783 (#902);
+  - C: `test/kaiju-scaling-902-901` 94a5c965 (#902 plus #901, a test build).
+  The case is the faulted annulus, 5 steps from TAf 20, at np 16, 32 and 52. This
+  supersedes the two scaling requests below. Louis also confirmed the rollback rig, and
+  put the 3-D add-on mesh work on kaiju under its own session.
 
 - 2026-10-31 (update), to the science hub, the **#902 fix is ready for kaiju**:
   `bugfix/custom-mg-many-ranks` 96d39f7b (public; from development fc67b650). Please run
@@ -645,6 +660,27 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: **Louis's rulings, "agreed on all counts":**
+  - #901 is A-prime;
+  - open PRs for D, then the #894 and #896 fixes, and the accessor; the hub merges on
+    green CI;
+  - #907 approved;
+  - the rollback rig confirmed;
+  - a dedicated 3-D owner, with the 3 September defer-to-2-D ruling retired;
+  - #900 goes to the 3-D owner;
+  - the PETSc report for #902 is his to file.
+  **Parallel runs go to kaiju, and so does the 3-D investigation.**
+- 2026-10-31: branches ready, held without PRs:
+  - #902: `bugfix/custom-mg-many-ranks` 57d87783, 3 review rounds. Filed #908 and #909.
+  - #901: `bugfix/rotated-fmg-coarse-solve` 77de8d81, A-prime plus the GAMG variant plus
+    the double-setup fix, 2 rounds. One recorded change: level 0's LU uses the inode
+    kernel at every np, so the #906 default-normal shell at np 1 goes from 83 to 112 its.
+  - #907: `bugfix/rotated-solve-raises-on-failure` 295398cb, 3 rounds. It raises only on
+    a cold start whose first solve fails hard; a failure after an accepted step warns, as
+    test_0022 needs. Filed #910 and #911.
+- 2026-10-31: **the PRs are blocked.** `gh pr create` is refused by the integration
+  session's permission settings. The hub does not open them in its place; that is put to
+  Louis.
 - 2026-10-31: Louis: null modes belong in the mesh metadata. They were implemented in April
   and bypassed by the rotated path's own detection (#906's cause). The integration session
   was briefed to make the rotated path read them.
