@@ -333,7 +333,21 @@ efficient path").** Owner: the integration session, in this order.
      - Added at Louis's request (2026-10-31, "just so we know"): the same GAMG coarse
        solve with LU at GAMG's base instead of SVD, rotations handled there, with the
        coarse cost split into GAMG's base solve and its own cycles.
-     - Step 4, telescope: not needed (the gathered LU is about 1 % of the solve). Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
+     - Step 4, telescope: not needed (the gathered LU is about 1 % of the solve).
+     - **Review result (it overturns the default).** Plain redundant LU on the rotated
+       coarse level gives SVD's answer and iterations on every fixture, including the
+       faulted annulus at np 1 and 4. The coarse operators are near-singular (condition
+       about 1e-5 to 1e-8), not singular, and #306's zero pivot does not reproduce.
+       - So the null-mode class may be unneeded. The null space stays handled where it is
+         singular, at the outer level.
+       - Hub's proposal for Louis, **A-prime**: always redundant LU, plus a nonzero factor
+         shift as the zero-pivot insurance, and delete the class. Being measured.
+       - The review also found a development defect: the velocity MG is set up twice on a
+         first rotated solve, so every coarse factorisation is paid twice and the SVD
+         timings above include a double factorisation. Fixed on the branch.
+     - GAMG coarse with an LU base: GAMG's base is at most 6 % of its coarse work. Its
+       cost is its 15-40 V-cycles per geometric coarse solve, so it is set aside unless
+       bottom levels outgrow a gathered LU. Found 2026-10-23/24, handed to hyperion, unfiled and unowned since the reimage;
    filed 2026-10-31.
    - #901: the rotated annulus's coarse level is a dense SVD on one rank, so more ranks
      are slower. Louis's 10-28 ruling applies; the prototype is on
