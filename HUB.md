@@ -171,7 +171,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` fc491c6 (wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 54ad91b (chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -275,6 +275,21 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, three library notes from kaiju: (i) the Newton switch is clamped to
+  max(newton_switch_rtol, tolerance), so a switch below the solver tolerance silently means pure Picard; it cost
+  the science hub a day of a stalled TI run before kaiju read it in the library. Worth a warning when the clamp
+  acts. (ii) development 1dc500ea (#759) refuses a yield stress that reads fields without a stated floor; every
+  zg95 driver died at its first build on fc67b650 until yield_stress_min = -oo was stated (54ad91b on the campaign
+  branch; a local commit on TAf's driver for the scaling job). Drivers moving to development need this; the TI
+  VEP path may need its own floor (untested). (iii) node packing on kaiju (your question): 52 cores / 188 GB per
+  node (378 on n3), a 16-rank TAf job peaks ~22 GB, so three fit (48 cores, ~66 GB) if launchers drop
+  --exclusive/--mem=0 for --mem=60G and socket binding; the OOM history was the TI chain-level defect, not
+  packing; the coarse SVD limits a job's speed, not the count; the risk is memory bandwidth (the third job
+  straddles sockets). Kaiju recommends 2 per node (one per socket) now and 3 only after a throughput test at
+  1/2/3 per node, which the hub has approved after the scaling queue. Scaling job state: four builds (A dev
+  fc67b650, B 96d39f7b, C 94a5c965 which carries 57d87783 not 96d39f7b, D f7914a92 for #896), singleton queue
+  devhub_scaling excluding n1; A np16 rerunning after the yield-floor refusal (job 2451); then B/C at 16/32/52,
+  A at 32, then #896 D vs A at np 16 from TAf 40. Page to follow.
 - 2026-10-31, to the dev hub: your three compute requests (scaling job with 96d39f7b as build B; the #896 fix
   f7914a92 vs development at np 16; the three-16-rank-jobs question) are relayed to kaiju as idle-node work below
   the TAti diagnosis and resume; results come back here with pages. Builds from development fc67b650 for new work,
@@ -733,7 +748,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   diagnosis on checkpoint 50 (Newton switch 1e-4 with more Picard; pure Picard to tolerance; 1e-3 with a cold
   restart on failure; two steps each), then resume today from 50 on the best setting that converges every step
   with the trigger kept, else on the cheapest with the trigger report-only and an unconverged-step column, rows
-  caveated.** Process: a supervisor pause is an event to message the hub at once, not at the next boundary. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
+  caveated.** Process: a supervisor pause is an event to message the hub at once, not at the next boundary.
+  **DIAGNOSED AND RESUMED 2026-10-31/11-01 (kaiju):** root cause: the library clamps the Newton switch to
+  max(newton_switch_rtol, tolerance) and uw_tol = 1e-3, so the "1e-3 switches" were PURE PICARD, never Newton;
+  late in the run Picard stalls at 1.3-1.7e-2 (just above the 1e-2 cold switch), so neither phase reached
+  Newton. Variants on checkpoint 50 (2 steps): pure Picard (switch 1e-4 clamped) step 51 NOT converged;
+  warm 1e-3 + cold restart into Newton at 3e-2 converged after the retry (1469 s); **Newton switches at 3e-2
+  everywhere: both steps converged first time, 13 and 16 its, 616 + 739 s, vrms and slip within 1e-4 of the
+  chain's unconverged steps (so those were close to the answer).** Resumed from checkpoint 50 as job 2452 (n2,
+  11-01 07:24) with -uw_warm_newton_switch 3e-2 -uw_rebuild_newton_switch 3e-2 -uw_newton_switch 3e-2; ~30 steps,
+  ~7 h, likely one segment. Supervisor v4: trigger counts only steps after 50, read every 10 min mid-segment,
+  kaiju watching chain.log. Build overlay-leakfix 547c2e54, driver a00a10b. (#457: RESOLVED 2026-10-29: #457 is closed, fixed in #493 and #748, and both kaiju builds, 99259d35 and
   the 547c2e54 leak-fix overlay, contain 22aae82c and 0b6c9624; the "tangent fix first" question drops. Kaiju's
   TI design report corrected. A stale TODO(BUG) comment in the library had misled it: dev hub one-liner below).
 - Slab recipe decisions: (1) continue layered_mantle from checkpoint 120 (333 s/step, 12 h buys ~130 steps)?
@@ -1835,3 +1860,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-10-31: TAti_smooth paused since 2026-10-30 19:44 (21 unconverged steps of 53); hub: bounded diagnosis on
   checkpoint 50 then resume today. Dev hub's compute requests (#902 scaling with 96d39f7b, #896 fix comparison,
   node-sharing question) and the docs hub's chain-comment item relayed to kaiju; 3-D kaiju session recorded.
+- 2026-11-01: TAti_smooth root cause: Newton switch clamped to the tolerance, so the 1e-3 runs were pure Picard;
+  resumed from checkpoint 50 at 3e-2 switches (job 2452, both diagnostic steps converged, ~7 h to the base).
+  Patches 54ad91b applied (chain comment; yield_stress_min = -oo for development). Dev-hub notes: the clamp, the
+  #759 refusal, node packing (2 per node now, throughput test later). Scaling job on four builds queued.
