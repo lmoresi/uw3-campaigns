@@ -662,6 +662,13 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-10-31: the notes session posted the four "Fixed by" comments from Louis's account
+  (no footer); the integration session posted none. **#892 step 5 dispatched** on merged
+  development 25d62812:
+  - the tail sweep's H0 against H1 arms on the laptop (np <= 4);
+  - the production-scale twin on kaiju's rollback rig, after the scaling job: uw_chain 2
+    against uw_chain 0 with the LU FAC patch, TAf 20 and TBf, 10 steps, np 16.
+  Together they are the evidence for Louis's production-tail ruling.
 - 2026-10-31: **#914 merged** (dbb4d720) and **#915 merged** (25d62812) on green CI;
   both were clean against development after #916. All five of the day's PRs are in; #896
   is relabelled fixed-in-development. Still held for kaiju: #902
