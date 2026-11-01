@@ -2241,6 +2241,27 @@ def git_head(path):
     return None
 
 
+CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
+                "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
+                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_wall_normal", "uw_wall_check",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_rungs", "uw_spacing", "uw_dt_mult",
+                "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
+
+
+def write_choices(explicit, effective, info):
+    """Append this start's choices block to <out>/README.md: each knob the results depend on, its value, and
+    whether the launch line set it or the default was taken (Louis's rule, 2026-11-01). Rank 0 only."""
+    rows = [f"| {k} | {getattr(params, k)} | {'set' if k in explicit else 'default'} |"
+            for k in CHOICE_KNOBS if hasattr(params, k)]
+    eff = [f"| {k} | {v} | derived / hard-coded |" for k, v in effective.items()]
+    block = "\n".join([
+        "", f"## Choices ({info['started']}, driver {info['driver_commit']}, underworld3 {info['uw3_commit']}, "
+            f"np {info['mpi_ranks']}, restart from {info['restart_from']})",
+        "", "| knob | value | set on the launch line or default |", "|---|---|---|", *rows, *eff, ""])
+    with open(os.path.join(out, "README.md"), "a") as f:
+        f.write(block + "\n")
+
+
 def write_run_info():
     """Where and with what this run (or restart) ran, appended to <out>/run_info.json."""
     import datetime
@@ -2268,6 +2289,19 @@ def write_run_info():
             "slurm_job": os.environ.get("SLURM_JOB_ID")}
     if SCALED:
         info.update({"units": units.to_dict(), "derived": derived, "scales": scales})
+    # the choices this run depends on: which knobs the launch line set (the rest are defaults taken), and the
+    # effective values the library derives or the driver hard-codes (Louis, 2026-11-01: every such choice is stated)
+    explicit = sorted({a.lstrip("-") for a in sys.argv[1:] if a.startswith("-uw_")})
+    pres = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 else 0.1 * float(params.uw_tol)
+    effective = {"pressure_rtol": pres, "pressure_rtol_source": "uw_pres_rtol" if float(params.uw_pres_rtol) > 0
+                 else "library default 0.1 x uw_tol",
+                 "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
+                 "fault_seams": str(params.uw_fault_seams),
+                 "fault_mesher": "ladder" if params.uw_fault_seams == "gather" else "network",
+                 "fault_partition": FAULT_PARTITION, "wall_normal": str(params.uw_wall_normal),
+                 "placement_attempts": "margin_rings 1/1/2/1, clearance 0.7, width x1/x1.25/x1/x1.5"}
+    info.update({"explicit": explicit, "effective": effective})
+    write_choices(explicit, effective, info)
     path = os.path.join(out, "run_info.json")
     runs = []
     if os.path.exists(path):
