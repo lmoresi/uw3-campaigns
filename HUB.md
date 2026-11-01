@@ -173,7 +173,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 54ad91b (chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` ee38b39 (-uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -298,7 +298,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   points in a velocity-sized vector, ADD over the point SF as _sum_facet_normals_across_ranks does, take every
   nonzero point, evaluate the analytic normal at its coordinate); regression test: an annulus with analytic-normal
   free-slip walls at an np where a wall vertex's owner holds none of its facets (TAc's mesh at np 32), max |v.n| on
-  the walls, failing first. Repro (5 min, no solve): BUILD=C N=32 SRC=TAc CKPT=20 STEPS=1
+  the walls, failing first. **Rank-count sweep (kaiju, wall_vn.py, TAf 20 faulted step unless noted): np 16 clean;
+  np 24 three nodes (inner 202.5 and 247.5 deg, v.n ~10,480; outer 102.9, 3272); np 32 two faulted / three on TAc;
+  np 40 three (inner 270 and 292.5, ~10,900; outer 218.6, 6543); np 52 one (outer 64.3, 2722, too small to set dt,
+  which is why np 52 matched np 16). EVERY count except 16 is affected. The inner-wall spikes sit at multiples of
+  22.5 deg, the coarse mesh's 16 inner-wall vertices: a hint for the regression test. PRODUCTION IS CLEAN: all
+  campaign runs are np 16 and their latest checkpoints have |v.n| <= 1.1e-12 on both walls (TAf 100, TAf_env 100,
+  TBf 110, TAc 80, TAti_smooth 75, Earth run1 80), across many rebuilds, so np 16 is the clean partition, not luck
+  at one step.** Repro (5 min, no solve): BUILD=C N=32 SRC=TAc CKPT=20 STEPS=1
   APPTAINERENV_UW_LABEL_CHECK=1 APPTAINERENV_UW_LABEL_CHECK_EXIT=1 kaiju-launch/scaling/scale.sh; with a solve,
   wall_vn.py on the run dir; runs/scale_labelcheck_TAc_C_np{32,16}. Bears on every rotated free-slip result at a
   partition with such a vertex, and on #889/#890. Driver mitigation: -uw_wall_check 1 (433696b, kaiju/wall-vn-record,
@@ -2042,3 +2049,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: wall-spike mechanism confirmed: the rotated route's analytic-normal path builds its node set from each
   rank's own labelled facets only, so a wall vertex whose owner holds none of its facets is never constrained.
   Finding with fix and test recorded for the dev hub, ready to file. Driver record column -uw_wall_check coming.
+- 2026-11-01: -uw_wall_check patch applied (ee38b39, default on; validated: TAc np 32 flags 3 nodes, np 16 clean).
+  Rank sweep: every count except 16 has unconstrained wall nodes (np 52's too small to set dt); inner spikes at the
+  coarse mesh's 22.5-deg vertices. All production runs (np 16) verified clean to 1e-12 at their latest checkpoints.
