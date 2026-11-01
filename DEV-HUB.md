@@ -433,6 +433,39 @@ time, peak memory per rank, slip against reference.
 **Done when:** every row has a measurement. Then Louis rules whether split coarse levels
 are deleted, kept as an option, or kept for named cases.
 
+## Can the patch be an iterative solve? (Louis, 2026-11-01)
+
+Louis: "Any way we can write the add on as an iterative solve that scales better? Does it
+require the full accuracy of LU? ... particularly relevant if we break the fault into
+patches that we must then solve as a coarse problem. Are there known strategies?"
+
+**The hub's reading of the evidence.** The patch must capture two things: the local
+stiffness contrast across the thin band (local, anisotropic) and coherent slip along the
+whole fault (a global low-energy mode a welded coarse level cannot hold). One LU block gets
+both. ILU(0) failed (344 against 67) as a poor approximation of a near-singular block, not
+because inexactness is fatal. Cutting along strike (85-180) broke the slip coherence, and
+the slip coarse space put most of it back (79-87). So the two-level form, local solves plus
+a slip coarse problem, is already shown in 2-D.
+
+**Known strategies:** two-level Schwarz with a problem-adapted coarse space (our slip space
+by hand; GenEO automatically, in PETSc as PCHPDDM); deflation of the slip modes
+(PCDEFLATION); line relaxation across the structured band (rung-line blocks); inexact
+block solves (inner Krylov with ILU(k) or AMG); the fault as a DD interface (FETI/BDDC,
+the contact literature; PCBDDC); compressed direct (BLR LU, which runs into the no-MUMPS
+default).
+
+**Experiments approved (Louis, 2026-11-01), 2-D, on kaiju**, the 022 fixture at ratios
+24/48/97 plus the box at np 4, one LU block as the reference:
+1. inexact block solves: FGMRES with ILU(1), ILU(2), GAMG at block rtol 1e-1 to 1e-3, caps
+   5 and 10; on the single block and on cut blocks;
+2. rung-line blocks plus the slip coarse space, against rung lines alone, cut blocks plus
+   coarse space, and one block;
+3. PCHPDDM (GenEO) on the patch, if the PETSc build has HPDDM (being checked on kaiju's
+   image); coarse-space size against the hand-built slip space.
+The winners go to the 3-D rig ahead of hand-building 3-D slip columns. Owner: the
+integration session writes the probes, "kaiju: dev runs" runs them. Records:
+`~/+Simulations/fac_892/iterative_patch/`; scripts on uw3-campaigns `addon-matrix-2026-11`.
+
 ## 3-D add-on mesh (Louis, 2026-10-31: "We really do need the 3D option for the add-on mesh. These are things we keep failing to complete despite making efforts to do so.")
 
 **Survey (2026-10-31, read-only, at development fc67b650; key claims re-checked by the
@@ -712,6 +745,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: Louis asked whether the patch can be iterative, and approved three 2-D
+  experiments on kaiju (section above). Dispatched. Model switched to Fable 5.1 in the hub.
 - 2026-11-01: #919 fixed on `bugfix/addon-partition-static-mark-919` (test 66206593, fix
   18e57147), validating on the kaiju runner, held without a PR. #921 filed. The faulted
   annulus slab runs cost 1.43-1.72 times the Stokes time of their unfaulted twins, from
