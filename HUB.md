@@ -174,7 +174,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` ee38b39 (-uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` fa3accc (-uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -435,7 +435,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 - -uw_pres_rtol 1e-2 as the campaign default: **DECIDED 2026-11-01 (Louis: "Feel free to try the lax pressure
   tolerance")**; kaiju sends the default patch; running jobs keep their pinned drivers, new runs take 1e-2; the
-  library default stays with the dev hub. (Earlier text:) Measured twice: the
+  library default stays with the dev hub. Patch 8ac3ed6 APPLIED as fa3accc. (Earlier text:) Measured twice: the
   10-28 cost-lever A/B (-28 to -57 % Stokes, answer to 7e-6) and today's time budget on development (2.3x faster,
   vrms to 6 figures, slip within 0.05). The pressure solve at 1e-4 is 41-47 inner velocity solves per Newton
   increment and the whole reason a 16-core step takes 450 s. Driver change only; the library's rotated-path
@@ -2075,3 +2075,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: Louis: go on the lax pressure tolerance; -uw_pres_rtol 1e-2 becomes the campaign default (patch coming
   from kaiju). The notes session asks for the annulus band ratio h_b/S on f8 and each arm's level cell counts, to
   reconcile 022's box sweep (LU patch 4-11x better) with the annulus (equal work); relayed to kaiju.
+- 2026-11-01: pres_rtol default patch applied (fa3accc; head). Band ratio for 022: h_b/S = 3.9 on the annulus (0.0156 /
+  0.004), below the box sweep's 7.9-24.8, which reconciles equal annulus work with the box's 4-11x; hierarchies on
+  chain page v4; relayed to the notes session. Notes session asks what pressure tolerance the addon_demo trench
+  runs and the restart-table runs actually used; relayed to kaiju.
