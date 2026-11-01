@@ -158,6 +158,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Dev hub's production-tail comparison: chain 2 vs 0, 10 steps from TAf 20 and TBf 70, np 16, development 25d62812 | https://claude.ai/artifact/BWgDzWDzzjDJXQWqVb1jrs |
 | Dev hub's #902/#901 scaling check on kaiju (A dev fc67b650, B 96d39f7b, C 94a5c965; np 16/32/52; wall caveats) | https://claude.ai/artifact/ACJ6diJRBCGoBGvCa6aCxM |
 | Solver time budget and warm/cold, chain 0 vs 2 (stacked per-step budget; pres_rtol lever; cold/rebuild/warm starts) | https://claude.ai/artifact/LvNXEPD4QNkKtr2V7jDYH2 |
 | uw_chain 0 vs 2 at np 16 on development 25d62812 (Louis's production-tail check; patch rows per level and rank) | https://claude.ai/artifact/LiYdWdF3J5pnVPtTU7aDfy |
@@ -280,6 +281,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, your production-tail comparison is DONE (page BWgDzWDzzjDJXQWqVb1jrs; development
+  25d62812, np 16, 10 steps from TAf 20 and from TBf 70 in rollback, chain 2 vs 0, jobs 2471-2474): no failures,
+  caps, cold retries or unconverged steps on either arm (worst velocity increment 8-12 against a cap of 200);
+  identical Newton counts step for step and the same answer at step 10 (vrms 904.46 / 1385.34, slip 3990.9 /
+  7265.0, mobility) to the printed figures; velocity work chain 0 vs 2 in F-cycles per velocity solve 7.9 vs 8.2
+  (TAf 20) and 8.6 vs 9.9 (TBf 70), last-application its 6.1 vs 7.9 and 7.4 vs 8.9; Stokes per step 544 vs 499 s
+  (+9 %) and 385 vs 399 s (-4 %), inside the +-10 % spread; pressure its per increment the same (52, 30); chain 0's
+  applied multigrid carries the FAC patch (3114/3264 and 3468/3616 rows) on the one rank that owns the fault,
+  28 / 20 s per step; chain 2's has none; walls clean at np 16 in all four. Same conclusion as the TAf 40 check:
+  at h_b/S = 3.9 the tails are a wash on speed and the case for chain 0 is robustness. Fault-across-partitions
+  runs (overlay F) now starting, then node packing.
 - 2026-11-01, to the dev hub, your #902/#901 scaling check is DONE (page ACJ6diJRBCGoBGvCa6aCxM, kaiju). **#902
   closed on kaiju:** development fc67b650 at np 32 fails the custom FMG build ("opportunistic custom-P FMG build
   failed (error code 98)"), falls back, and makes no step in 20 min; with the fix (B 96d39f7b, C 94a5c965) np 32
@@ -2086,3 +2098,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: TAti_smooth at the base; TI-vs-split comparison COMPLETE (page v6): same large-scale subduction (base
   time, plate speed, plateness within a few %), TI rollback ~20 % less, TI 2.7x the split's step cost with a third
   of its steps unconverged after rebuilds. Open work row closed.
+- 2026-11-01: dev hub's production-tail comparison done (page BWgDzWDzzjDJXQWqVb1jrs): chain 0 holds on TAf 20 and
+  TBf 70 (same answer, a wash on speed, robustness case); recorded for the dev hub. Fault-across-partitions runs
+  starting.
