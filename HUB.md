@@ -2132,3 +2132,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   require mesher="network" (the ladder only takes gather), so conform changes the mesher too; and on development
   25d62812 gather at np > 1 first runs addon_partition.partition_addon (band region on one rank, load diffused to
   10 %) so the placement moves nothing, while on 99259d35 the placement itself gathered. 022 now describes it so.
+- 2026-11-01: kaiju's first conform arms (2794-2798) failed at placement ("seams='ligament' needs mesher='network'":
+  the library's message says ligament for conform too, a wording bug for the dev hub); no step wasted. Fix:
+  -uw_fault_seams conform selects the network mesher and refuses chain levels (they do not nest), so the conform arm
+  is chain 0 only and the comparison is placement+mesher. Mesh record gains "partition" (gather via
+  addon_partition.partition_addon on development; gather by the placement on 99259d35; conform; serial). Patch is
+  now 3f2cc34 (replaces the unsent b987b6a), sent only if the conform smoke 2808 builds in parallel with the band on
+  more than one rank (the network mesher deadlocked with ligament seams on 18 Oct). Kaiju noted two pinning slips
+  (a commit in a clone with a running job; a re-clone under a job), neither affecting a result; one fresh clone per
+  commit from now on.
