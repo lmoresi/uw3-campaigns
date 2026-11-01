@@ -455,15 +455,21 @@ band exceeding 75 % of the level) and the chain's growth are the same thing.
 - **Production rule for split faults:** S = h_b/k, k in {1, 2}. Extra slip resolution comes
   from refining the base under the fault corridor (`refine_lines`), which goes through the
   multigrid cleanly, not from a finer ladder on an unchanged base.
-- The 022 fixture at ratios 24-97 is a solver stress test, not a production regime.
+- The 022 note's own sweep is ratios 6-25 (h_b 1/32); row 3's 48 and 97 are that fixture
+  with more rungs and are not in the note. Both are solver stress tests above the
+  production ratio. **Production itself runs at ratio 3.9** (S 0.004 on h_b 0.0156,
+  refinement 5; corrected by the notes session from "about 8", which was refinement 4).
+  So the ruled arms for the annulus are S = 0.0156 and 0.0078 against today's 0.004.
 - At ratio 1-2 the LU block is a thin strip, which bears on rows 1 and 6 (3-D cost) and
   lowers the stakes of the iterative-patch experiments.
 - TI bands keep their own width (a modelling quantity, eta_1/w), and are for fault
   networks rather than cross-scale problems.
 
 **Dispatched to measure before the drivers change (matrix row 7, kaiju):**
-- the box and the annulus rig at S = h_b and h_b/2 against today's S: slip profile,
-  trench behaviour, iterations and cost;
+- the box and the annulus rig at S = h_b and h_b/2 against today's S (annulus: 0.0156 and
+  0.0078 against 0.004): slip profile, trench behaviour, iterations and cost, plus the FAC
+  block size and its solve time, since the one-rank patch (3584 rows, 21-28 s a step at
+  np 16) should shrink with the ratio;
 - base refinement under the corridor (one and two rings) at ratio 1-2 against the fine
   ladder at the same effective slip resolution.
 If the physics is unchanged, the drivers' default S changes and UWTN 2026-022's scope
