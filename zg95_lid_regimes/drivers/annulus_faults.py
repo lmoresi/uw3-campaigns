@@ -273,8 +273,12 @@ params = uw.Params(
                                 #   weaker one; two ribbons through one cell hang the mesher
     # solver and time stepping
     uw_tol=1.0e-3,
-    uw_pres_rtol=0.0,           # > 0: the Schur (pressure) KSP rtol, overriding the library's 0.1 x uw_tol (the
-                                #   rotated free-slip solve's solver._rotated_pres_rtol, and the native path's option)
+    uw_pres_rtol=1.0e-2,        # > 0: the Schur (pressure) KSP rtol, overriding the library's 0.1 x uw_tol (the
+                                #   rotated free-slip solve's solver._rotated_pres_rtol, and the native path's option);
+                                #   0 = the library's. 1e-2 (Louis, 2026-11-01): kaiju A/B 2026-10-28, -28 to -57 %
+                                #   Stokes time, the answer to 7e-6; kaiju budget 2026-11-01 (TAf 40, np 16), 2.3x, vrms
+                                #   to 6 figures, slip within 0.05 (12-22 pressure its per increment against 41-47).
+                                #   A run's README records the value it used; pinned running drivers keep theirs
     uw_vel_rtol=0.0,            # > 0: the native path's inner velocity KSP rtol (0.033 x uw_tol); the rotated solve,
                                 #   which these drivers use, has no knob for its velocity rtol (0.033 x uw_tol)
     uw_picard=0,
