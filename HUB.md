@@ -279,6 +279,30 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, LIBRARY FINDING READY TO FILE (rotated free-slip, analytic-normal path, parallel):
+  **a wall node is never constrained when its owning rank holds none of the labelled wall facets at it.**
+  Mechanism (rotated_bc.py, _boundary_velocity_nodes and build_rotation; in 94a5c965 and still on development
+  25d62812): with an analytic normal (add_rotated_freeslip_bc(0, "Upper", normal=unit_r), as the annulus drivers
+  do) each rank builds its node list from the closures of the facets in its OWN UW_Boundaries stratum and does
+  nothing else; the cross-rank reduction (_sum_facet_normals_across_ranks) and the support-1 candidate set
+  (_local_boundary_candidates) run only on the geometric path (normal=None), whose docstring already names this
+  case ("a rank can OWN a node every one of whose labelled facets lives on a neighbour"). Each labelled facet
+  lives on one rank, so a wall vertex owned by a rank that holds none of its facets is listed by nobody;
+  build_rotation on every other rank skips it as not owned; no Q block, no normal row; the node is a free point on
+  a free-slip wall and the solve converges with a jet through the wall. Labels are correct. No-solve test
+  (label_check_hook.py wrapping _boundary_velocity_nodes; TAc 20, build C, no fault): np 16 0 of 1792 outer / 1024
+  inner owned wall points missing; np 32 exactly the three spike nodes: (-2.0022, -0.9642) owner 14, facet on 10;
+  (-0.4677, -1.1292) owner 13, facet on 12; (1.2222, 0) owner 23, facets on 5 and 22. Solving gives v.n 7926 /
+  12146 / 10385 at exactly those points, 1e-13 elsewhere. Partition-specific (np 16 none, np 32 three; np 24/40
+  queued). **Suggested fix:** complete the node SET across ranks on the analytic path too (mark labelled-closure
+  points in a velocity-sized vector, ADD over the point SF as _sum_facet_normals_across_ranks does, take every
+  nonzero point, evaluate the analytic normal at its coordinate); regression test: an annulus with analytic-normal
+  free-slip walls at an np where a wall vertex's owner holds none of its facets (TAc's mesh at np 32), max |v.n| on
+  the walls, failing first. Repro (5 min, no solve): BUILD=C N=32 SRC=TAc CKPT=20 STEPS=1
+  APPTAINERENV_UW_LABEL_CHECK=1 APPTAINERENV_UW_LABEL_CHECK_EXIT=1 kaiju-launch/scaling/scale.sh; with a solve,
+  wall_vn.py on the run dir; runs/scale_labelcheck_TAc_C_np{32,16}. Bears on every rotated free-slip result at a
+  partition with such a vertex, and on #889/#890. Driver mitigation: -uw_wall_check 1 (433696b, kaiju/wall-vn-record,
+  patch coming) records max |v.n| per wall and warns. Earlier entries (superseded) follow.
 - 2026-11-01, to the dev hub, LIBRARY DEFECT, CONFIRMED on the unfaulted case (parallel rotated free-slip at wall
   nodes shared between ranks): TAc checkpoint 20, base mesh only, rotated free-slip, np 32, one step: three wall
   nodes break the constraint with v.n almost all of |v| (inner wall (-0.4677, -1.1292) v.n 12146, shared by ranks
@@ -2015,3 +2039,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   at 2-3 shared wall nodes (library defect, dev-hub entry upgraded). Kaiju's labelling test given the go; a wall
   |v.n| check becomes a standing record column. Dev hub's fault-across-partitions test on overlay F (25d62812 +
   96d39f7b, local merge) at rank counts whose walls check clean.
+- 2026-11-01: wall-spike mechanism confirmed: the rotated route's analytic-normal path builds its node set from each
+  rank's own labelled facets only, so a wall vertex whose owner holds none of its facets is never constrained.
+  Finding with fix and test recorded for the dev hub, ready to file. Driver record column -uw_wall_check coming.
