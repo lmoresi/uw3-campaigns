@@ -268,6 +268,18 @@ wombat workbench's pen; a `development` sha is available now); the guides are re
 on #862 today. The ribbon replay is off the list unless split coarse levels stay an
 option.
 
+**2026-11-01, the np 16 condition met.** Kaiju ran the production annulus on
+`development` 25d62812, welded against lean chain (Louis on #892,
+issuecomment-6550915680): 5.9 against 7.7 velocity iterations per Newton increment,
+448 against 467 s of Stokes per step, the same Newton counts and answers; both arms the
+same 465-row finest patch, so the difference is the coarse levels alone and smaller
+than the fixtures'. The whole patch and its 105 split pairs sit on one rank (#895). The
+drivers' `uw_chain` default moves to 0 when the campaign builds move to `development`
+(science hub). UWTN 2026-022 is rewritten and unsaved on the workbench with this
+paragraph in its multigrid section; its recipe ran verbatim on 25d62812 (2 velocity
+iterations, peak slip 0.1595055, one 4772-row LU block, a figure queried with the dev
+hub against the 2000-row cap).
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7

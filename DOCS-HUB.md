@@ -103,7 +103,7 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | a team read; metadata still says draft |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): a maintainer's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
-| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **the tail hold is lifted** (Louis's ruling 2026-11-01); being rewritten on the workbench, unsaved until Louis asks: the multigrid section names the smoother, the chain paragraph becomes the welded tail, the recipe moves to `Mesh.multigrid_levels` (#915), panel (c) redrawn as the welded hierarchy, re-pinned to `development`; pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
+| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **the tail hold is lifted** (Louis's ruling 2026-11-01); **rewritten for the ruling on the workbench, UNSAVED until Louis asks** (reported 2026-11-01): the construction is the base's own levels welded beneath the split child; the recipe is `stokes.set_custom_fmg(base.multigrid_levels, field_id=0)` and ran verbatim on `development` 25d62812 (2 velocity iterations, peak slip 0.1595055, the child's smoother composite SOR + ASM with one 4772-row LU block); a new section "Multigrid with a split finest level" (transfer, patch smoother, the sweep table: LU 3/3/3 and 7 per Newton iteration, ILU 8/12/16, SOR 12/17/24, chain 4/6/7, then the chain, then the bisection figure kept for Louis to decide); panel (c) redrawn as the welded hierarchy; the trench section says those runs used the chain; `software_version` = `development` @ 25d62812; the sweep's scripts and records in `figures/src/tail_sweep/`; validate, check-style and the preview clean. Open with Louis: rerun the trench demos with the welded tail or not; keep or cut `iterations.png`; pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
 The other open pull requests on the notes repository, listed on 2026-10-27. Every one
@@ -171,10 +171,20 @@ Measured here, not inherited.
   the corrected history (its finding entry is the plan's step 7). Still with the dev
   hub: whether split coarse levels stay an option (`custom_mg.py:1556`), and the
   non-rotated path's block solver.
+- 2026-11-01, to the dev hub, a question from UWTN 2026-022's recipe run on
+  `development` 25d62812: the child's finest smoother is composite SOR + ASM with **one
+  LU block of 4772 rows**. `set_custom_fmg` carries `fac_block_rows=2000` and #670 cut
+  the band block along strike so that LU stays cheap. Either the cap does not apply to
+  the structural patch built from the split's coincident pairs, or it is not applied on
+  this path. Your plan's step 4 ("block rows against `fac_block_rows`") covers it; the
+  note is about to publish the 4772 figure, so a one-line answer settles whether the
+  note describes the design or an exception to it.
 - 2026-11-01, to the science hub: the production tail is the welded base with the split
-  finest level and the FAC LU patch (Louis on #892). The drivers' `uw_chain` default
-  changes after kaiju's np 16 annulus run, which the notes session has asked you for;
-  the 2026-10-30 item on the drivers' chain comments is moot once that lands.
+  finest level and the FAC LU patch (Louis on #892). Kaiju's np 16 run is in
+  (issuecomment-6550915680) and the default moves to 0 with the campaign builds; the
+  2026-10-30 item on the drivers' chain comments is moot once that lands. When the
+  driver commit exists, its sha closes the journal's decision entry of 2026-11-01 (a
+  one-line message here or to the notes session is enough).
 
 ## Open work
 
@@ -386,4 +396,21 @@ Measured here, not inherited.
   the fault-multigrid guide's chain paragraph replaced by the ruled tail and its block
   rule rewritten, the faults-in-convection guide's hierarchy section, code and table
   rewritten to the welded tail with the chain as the labelled alternative. The dev
-  hub's `PRIORITY` section read (a5e2cc8).
+  hub's `PRIORITY` section read (a5e2cc8). Update comment posted on #862
+  (issuecomment-6550318804). The reply to the notes session through the bridge was
+  refused (HTTP 401); sent through the session service instead.
+- 2026-11-01 (later): the notes session reports UWTN 2026-022 rewritten for the ruling
+  and unsaved (details in the notes table). Its recipe ran verbatim on `development`
+  25d62812. One question raised to the dev hub from that run: a single 4772-row LU
+  block against the 2000-row cap. The three texts (022's multigrid section, the two
+  guides) to be read against each other once 022 is saved.
+- 2026-11-01 (later still): kaiju's np 16 annulus check is in (Louis on #892,
+  issuecomment-6550915680): welded 5.9 against chain 7.7 velocity iterations per
+  Newton increment, 448 against 467 s per step, same answers; both arms the same
+  465-row patch, all of it on one rank (#895). Journal measurement entry; both guides
+  cite it beside the fixtures and the parallel section records the serial patch
+  (#862, pushed); topic page and `FAULT-SPLIT-INTEGRATION.md` updated. The drivers'
+  default moves to 0 with the campaign builds (science hub). Noted for the wording
+  everywhere: the factor of 3 to 16 measured the patch (chain without it against
+  welded with LU); the tail's own gain, same patch on both, is a quarter of the
+  iterations.
