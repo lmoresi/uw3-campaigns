@@ -433,7 +433,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **-uw_pres_rtol 1e-2 as the campaign default (2026-11-01, hub recommends YES now).** Measured twice: the
+- -uw_pres_rtol 1e-2 as the campaign default: **DECIDED 2026-11-01 (Louis: "Feel free to try the lax pressure
+  tolerance")**; kaiju sends the default patch; running jobs keep their pinned drivers, new runs take 1e-2; the
+  library default stays with the dev hub. (Earlier text:) Measured twice: the
   10-28 cost-lever A/B (-28 to -57 % Stokes, answer to 7e-6) and today's time budget on development (2.3x faster,
   vrms to 6 figures, slip within 0.05). The pressure solve at 1e-4 is 41-47 inner velocity solves per Newton
   increment and the whole reason a 16-core step takes 450 s. Driver change only; the library's rotated-path
@@ -2070,3 +2072,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: dev hub's scaling check done (page ACJ6diJRBCGoBGvCa6aCxM): #902 closed on kaiju (np 32/52 build and
   match np 16 with the fix; development fails at np 32); #901 coarse cost 6-9x lower, ~5 % per step; strong scaling
   ~1.5x from 16 to 52. Recorded for the dev hub. TAti_smooth at step 81, ~6 steps from the base.
+- 2026-11-01: Louis: go on the lax pressure tolerance; -uw_pres_rtol 1e-2 becomes the campaign default (patch coming
+  from kaiju). The notes session asks for the annulus band ratio h_b/S on f8 and each arm's level cell counts, to
+  reconcile 022's box sweep (LU patch 4-11x better) with the annulus (equal work); relayed to kaiju.
