@@ -394,6 +394,59 @@ as the record, until step 4's 3-D measurement shows one block is unaffordable. I
 stacked on `feature/fac-structural-segments`, a measurement-knob branch not meant for
 merge.
 
+## DECISION: the add-on is the line (Louis, 2026-11-02)
+
+Louis, after the integration session's evidence comparison (his words): "OK - let's go with
+the working-hypothesis that the add-on is the most promising and the one worth investing in.
+1) Add minimal additional nodes to implement the fault slip
+  1a) Any refinement around the fault can be separated out from (1)
+  1b) We original said the fault would carry its own resolution (it comes triangulated /
+      as a divided line) and this is how we create the ladder. No S parameter defines the
+      along-strike resolution.
+2) We will try all the math tricks to make the SOLVE efficient in 2D and 3D
+3) We can consider the parallel decomposition of this problem to make it efficient."
+
+**The evidence he saw (all 2-D, velocity iterations).**
+- Add-on H0 (welded base, split S level, FAC patch), patch allowed: 66-67 at h_b/S 24, 48
+  and 97; pair 68; TI 66-94; junction 77-90; viscous box 125.
+- Split levels H1: 166, 302, 725; pair 231-287; TI 230-342; viscous box 388; at an 8S
+  junction gap the 4S ladder cannot be placed at all.
+- H1's limit is structural: every coarse level must hold a coarser copy of the fault, which
+  in 3-D means surgery on every level. H0's failures were defaults: #918, #921, #892.
+- H0's weakness is the one gathered LU on one rank. Serial smoke at ratio 24 against LU's
+  67: ILU(1) blocks at rtol 1e-2, 71; 2000-row pieces plus slip coarse space, 79-85;
+  one-rung strips plus coarse space, 135.
+
+**What this closes.**
+- Split coarse levels (the chain, `custom_mg.py:1556`) are not developed further. They stay
+  in the library as they are until Louis says otherwise.
+- The S ruling is superseded by 1b: the fault carries its own resolution, as a divided
+  line; the ladder's rungs are the fault's own points; no S parameter defines along-strike
+  resolution. S survives only in the drivers (trace sampling, width = 2S) and should go.
+- Row 7 as a "which S" sweep is moot; its arms still measure how the solver behaves as the
+  fault's division changes, which is useful for (2).
+- Refinement around the fault (1a) is a separate question from the fault's nodes (1).
+
+**First measurement for (1), mesh only** (022 base, h_b 1/32, 5313 P2 nodes):
+
+| fault division | ladder (`place_fault_ribbon_2d`, width 2x segment) | bare cut (`add_fault`) |
+|---|---|---|
+| 13 segments (about h_b) | +14 vertices / +33 P2 | +16 / +37 |
+| 26 segments | +143 / +523 | +14 / +29 |
+| 53 segments | +344 / +1273 | +14 / +29 |
+
+At a matched division the ladder is already minimal (the split's duplicates plus 2
+vertices). The bare cut ignores the fault's division: it pulls base vertices onto the
+line, so its slip is resolved at h_b whatever the fault gives, which fails 1b. The
+placement API already takes the trace's own points as rungs.
+
+**The programme that follows (2) and (3):** the iterative-patch experiments on kaiju
+(inexact blocks, pieces plus slip coarse space), then the 3-D single-block cost (row 1),
+then the distribution of the patch across ranks (row 2), all on conda-forge PETSc.
+
+**Open:** Louis to confirm "one element, in mesh units" for the split tip, which the hub
+reported from his message of 2026-11-02 but which he has not stated in those words.
+
 ## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
 
 Louis: "Overall, the add on is so much simpler conceptually and in terms of data copies and
@@ -844,6 +897,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: **Louis's decision: the add-on is the line** (section above), with his
+  three-point plan. Split coarse levels stop. The S ruling is superseded by "the fault
+  carries its own resolution". First node-count measurement recorded.
 - 2026-11-02: **correction.** The hub had relayed "refine the base under the fault corridor"
   as part of Louis's ruling; it was the hub's own inference. Louis rejected it, and row 7's
   refined arms were dropped. Louis also: the split tip is one element below the surface
