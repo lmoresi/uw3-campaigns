@@ -317,6 +317,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-01, to the dev hub, addendum to your k-partitions row from round 2's gather arms (overlay F, TAf 40, np
+  16, depth cap 0.45 so the fault deepens 0.15 -> 0.45 at step 42, 3 steps): chain 0's finest-level patch grows from
+  3584 to 7010 owned rows (231 node pairs, still one rank), Stokes 390 / 368 / 341 s per step; chain 2 (no patch)
+  400 / 459 / 523 s; Newton 6/6/6 vs 6/6/7; vrms differs ~0.6 % at step 43 (the ladders change the rebuilt mesh, so
+  not bit-identical); peak memory 21.2 vs 23.2 GB. **A longer fault favours chain 0 by 20-35 % per step even with
+  its LU patch serial on one rank**; at the short fault the two were a wash. This is the one-rank-patch baseline to
+  hold against a spread patch once conform or a seam-aware ladder exists.
 - 2026-11-01, to the dev hub, the analytic-normal wall-node defect: CONFIRMED CONFINED to the analytic path. With
   normal=None (the geometric, cross-rank-summed normal) TAc 20 at np 32 is clean (max |v.n| 1e-8) and gives the same
   answer as the analytic np 16 reference to the printed figures; so the fix is to make the analytic path complete its
@@ -2238,3 +2245,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (recommend yes); interim rule: np != 16 runs set geometric explicitly. Serial network-mesher repro: a fault
   reaching the wall cannot be placed by the network mesher at all; conform unusable for surface-reaching faults in
   2-D. Both for the dev hub.
+- 2026-11-01: round-2 gather arms: a longer fault (depth 0.45) favours chain 0 by 20-35 % per step even with the
+  serial patch; recorded for the dev hub. Node-packing test running (1/2/3 jobs per node on n7).
