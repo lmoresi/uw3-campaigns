@@ -90,6 +90,10 @@ GitHub, or in session transcripts. If it dies:
 
 ## Standing rules (team)
 
+- **Solver strategies run on conda-forge PETSc as shipped** (Louis, 2026-11-01: "Adding
+  packages adds a large technical overhead"). MUMPS, superlu_dist, hypre, mmg and parmmg
+  are in; HPDDM, SLEPc and anything needing a PETSc rebuild are out.
+
 - **Wombat (the laptop) does no parallel or load-bearing work** (Louis, 2026-11-01, after
   memory pressure killed applications). It is for editing, building and short serial
   checks of a single test file only, after checking `memory_pressure`. Every parallel run,
@@ -479,13 +483,10 @@ integration session writes the probes, "kaiju: dev runs" runs them.
   piece, so at strip width 1 its dimension is the rung count (320-1280 here; in 3-D the
   rungs on the sheet). Tiny local solves move the cost into the coarse problem, and the
   strip width trades one against the other.
-- Experiment 3: wombat's PETSc has neither HPDDM nor SLEPc. Kaiju's image is being checked.
-  PCHPDDM also makes one subdomain per rank, while the add-on partition gathers each
-  fault onto one, so a real probe needs the patch spread over ranks and a python PC
-  wrapping PCHPDDM on the patch submatrix (`-pc_hpddm_harmonic_overlap`, since we have no
-  Neumann matrices). If absent, a PETSc rebuild with `--download-slepc --download-hpddm`
-  is 30-60 min on kaiju; not started. Records:
-`~/+Simulations/fac_892/iterative_patch/`; scripts on uw3-campaigns `addon-matrix-2026-11`.
+- **Experiment 3 cancelled (Louis's rule above).** Neither wombat's nor kaiju's PETSc has
+  HPDDM or SLEPc; a rebuild would be about an hour of a node plus a day of probe code. The
+  hand-built slip space is our coarse space. Added instead: hypre BoomerAMG as a block
+  solver in experiment 1, which is in conda-forge PETSc and needs no code.
 
 ## 3-D add-on mesh (Louis, 2026-10-31: "We really do need the 3D option for the add-on mesh. These are things we keep failing to complete despite making efforts to do so.")
 
@@ -766,6 +767,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: Louis: strategies must run on conda-forge PETSc as shipped. Experiment 3
+  (PCHPDDM) cancelled; a hypre arm added to experiment 1.
 - 2026-11-01: Louis asked whether the patch can be iterative, and approved three 2-D
   experiments on kaiju (section above). Dispatched. Model switched to Fable 5.1 in the hub.
 - 2026-11-01: #919 fixed on `bugfix/addon-partition-static-mark-919` (test 66206593, fix
