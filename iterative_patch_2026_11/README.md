@@ -20,13 +20,16 @@ The cover gate is forced open (`UW_FAC_COVER=1.01`, see #918).
 **Files:**
 - `patch_probe.py`: the patch spec (block solver, cutting, slip coarse space) and the record helpers;
 - `iterative_patch_linear.py`, `iterative_patch_box.py`: the two drivers;
-- `kaiju_commands.sh`: 164 jobs plus an HPDDM check, one independent job per line.
+- `kaiju_commands.sh`: 164 jobs plus an HPDDM check, one independent job per line;
+- `kaiju_commands_hypre.sh`: experiment 1's hypre BoomerAMG arms, 40 jobs.
 
 ## Experiment 1: inexact block solves
 
-Each block's `preonly` + LU is replaced by FGMRES with one of three preconditioners: ILU(1), ILU(2) or GAMG. It runs either to a block rtol of 1e-1, 1e-2 or 1e-3 (cap 200), or for exactly 5 or 10 steps (convergence test `skip`). The same arms run on one structural block (cut 0) and on pieces of 2000 rows (cut 1).
+Each block's `preonly` + LU is replaced by FGMRES with one of four preconditioners: ILU(1), ILU(2), GAMG or hypre BoomerAMG. It runs either to a block rtol of 1e-1, 1e-2 or 1e-3 (cap 200), or for exactly 5 or 10 steps (convergence test `skip`). The same arms run on one structural block (cut 0) and on pieces of 2000 rows (cut 1).
 
 No library code changes. The block KSPs read their options when the ASM sets up, inside `_set_up_fac_smoothers`, under the per-solve prefix `rotfs<N>_fieldsplit_vel_mg_levels_<l>_sub_1_sub_`. `patch_probe.configure_patch` writes those keys for the next few solve counts. `UW_FAC_SUB_PC` picks the block PC.
+
+The BoomerAMG arms run on kaiju only, because wombat's PETSc has no hypre.
 
 Two cautions for reading the results:
 - An FGMRES block solve is a nonlinear function of its right-hand side, so the level smoother changes between applications. The outer velocity KSP is FGMRES and tolerates that.
@@ -38,11 +41,21 @@ The structural patch is cut into strips 1, 2, 4 or 8 rung spacings long (`UW_FAC
 
 The slip coarse space has one column per piece that carries slip. So m = 1 makes its dimension the rung count: 320-1280 here, and in 3-D the number of rung columns on the sheet. This is the cost to weigh against the tiny local solves.
 
-## Experiment 3: PCHPDDM (GenEO)
+## Experiment 3: PCHPDDM (GenEO), ruled out
 
-The first step is to check for HPDDM and SLEPc, both of which PCHPDDM needs. On wombat (PETSc 3.25.0, custom build) neither is present. Kaiju's image is checked by the last line of `kaiju_commands.sh`.
+Louis ruled on 2026-11-01: "I prefer strategies that use the basic conda forge petsc. Adding packages adds a large technical overhead." So this experiment is not run.
 
-A design point for the run itself: PCHPDDM decomposes by MPI rank, one subdomain per process, and the add-on partition gathers each fault's patch onto one rank. So the probe needs the patch spread across ranks (seams `conform`) or redistributed for the solve.
+- **Why it needed a build.** PCHPDDM needs HPDDM and SLEPc, and neither PETSc we have carries them:
+  - wombat: PETSc 3.25.0, custom build;
+  - kaiju's image: PETSc 3.25.0, with `hasExternalPackage("hpddm")` False, `PC.setType("hpddm")` raising, and no SLEPc. It carries an unmatched slepc4py 3.24.3, plus MUMPS, superlu_dist, hypre, mmg and parmmg.
+- **What a build would take.**
+  - PETSc reconfigured with `--download-slepc --download-hpddm`. That needs C++11 and LAPACK, then a full rebuild: about 30-60 min on a Xeon Gold 6230R node, plus petsc4py.
+  - The probe itself: a python PC member wrapping KSP + PCHPDDM on the patch submatrix, about a day of work. PCHPDDM makes one subdomain per MPI rank, and the add-on gathers each fault's patch onto one rank, so the patch would also have to be spread across ranks, with seams `conform` or by redistributing it. With no Neumann matrices it would use `-pc_hpddm_harmonic_overlap`.
+- **The standing rule.** Every solver strategy runs on conda-forge PETSc as shipped:
+  - in: MUMPS, superlu_dist, hypre, and anything in PETSc proper;
+  - out: HPDDM, SLEPc and anything needing a rebuild;
+  - also out: PCBDDC, which needs MATIS (unassembled subdomain matrices) that our assembled, rotated, Galerkin patch block does not have.
+- **The consequence.** The hand-built slip coarse space is our coarse space. Re-propose GenEO only with new information, such as conda-forge shipping HPDDM.
 
 ## Known strategies
 
