@@ -131,6 +131,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
   template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
   if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
+- **Kaiju launcher setting for independent runs (2026-11-01, measured):** three 16-rank jobs per node, --mem=60G,
+  no --exclusive, core binding, no socket pinning (pinning has no effect); 2.1x node throughput. Timing studies and
+  cost comparisons stay exclusive (a shared node slows each job ~1.45x whether two or three share it). Page
+  1CFNXD4TpQLX5jfeTdMN8k v2.
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -2259,3 +2263,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: node-packing test done (3 jobs per node = 2.1x node throughput; page 1CFNXD4TpQLX5jfeTdMN8k); one
   socket-pinning test approved before packing becomes standard. Kaiju's science-hub queue is empty. Open: the
   uw_chain and wall-normal defaults (Louis), the wall-node and network-mesher findings (dev hub).
+- 2026-11-01: socket-pinning test: no effect (2 pinned 838/833 s vs 835/822 unpinned; 3 jobs 827/838/706 vs
+  841/845/708); the ~1.45x per-job slowdown on a shared node is node-wide (clock, memory system), not placement; a
+  third job costs nothing more per job; the third job's ~15 % speed advantage unexplained. Packing becomes the
+  standing launcher setting for independent runs. Kaiju's queue is empty; waiting on Louis's two held defaults.
