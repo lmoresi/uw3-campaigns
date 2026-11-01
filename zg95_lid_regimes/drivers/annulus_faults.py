@@ -188,6 +188,8 @@ params = uw.Params(
                                 #   the library's TransverseIsotropicVEPFlowModel (elasticity off) yielding eta_1 on the
                                 #   resolved shear itself: yield stress f_b tau_y on the footprint, rate strengthening
                                 #   eta_reg_b (its floor), its own softmin and tangent
+    uw_wall_check=1,            # 1: every solve records the free-slip constraint as solved (max |v.n| per wall, nodes
+                                #   above 1e-8 |v|max) in the step's solver record, and warns when it is broken
     uw_retry_keep="best",       # after a failed warm start and its cold retry, keep the attempt with the smaller final
                                 #   residual ("best"; the warm iterate restored), or the cold one always ("last", before
                                 #   2026-11-01: TAti_smooth step 61 kept a cold 0.12 over a warm 2.0e-2)
@@ -1394,6 +1396,10 @@ class FaultedMesh:
             slips[name] = float(uw.utilities.gather_data(
                 np.abs(slip).max() if len(slip) else 0.0, bcast=True).max())
         extra = {"ti": self.ti_stress()} if self.ti is not None else {}
+        rec = solver_record(info, attempts, start, caught,
+                            {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer})
+        if params.uw_wall_check:
+            rec["wall_vn"] = self.wall_constraint()
         return {
             **extra,
             "newton": info.get("nonlinear_iterations"),
@@ -1402,9 +1408,32 @@ class FaultedMesh:
             "converged": bool(info.get("converged")),
             "slip": slips,
             "slip_max": max(slips.values()) if slips else 0.0,
-            "solver": solver_record(info, attempts, start, caught,
-                                    {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer}),
+            "solver": rec,
         }
+
+    def wall_constraint(self):
+        """The free-slip constraint as solved: the largest |v.n| over the velocity nodes on each wall (n radial: exact
+        at a vertex, whose nodal normal is the measure-weighted mean of its two facets', and at a chord's midpoint),
+        and how many node entries exceed 1e-8 of the largest |v| (a node shared between ranks counts on each). Kaiju, 2026-11-01: at np 32 a few wall nodes shared between
+        ranks came out with v.n ~ |v| (the constraint row missing) while every other node held 1e-13; it showed only
+        as a smaller dt. Collective."""
+        xy = np.asarray(self.v.coords, dtype=float)
+        v = np.asarray(self.v.array, dtype=float).reshape(-1, 2)
+        r = np.hypot(xy[:, 0], xy[:, 1])
+        vn = np.abs((v * xy).sum(1) / np.maximum(r, 1e-30))
+        vmax = float(uw.utilities.gather_data(np.hypot(v[:, 0], v[:, 1]).max() if len(v) else 0.0, bcast=True).max())
+        out = {"v_max": vmax}
+        tol = 1e-4 * (r_o - r_i)                          # the faceted walls' mid-side nodes sit ~2e-5 inside
+        for name, rw in (("inner", r_i), ("outer", r_o)):
+            on = np.abs(r - rw) < tol
+            m = float(uw.utilities.gather_data(vn[on].max() if on.any() else 0.0, bcast=True).max())
+            n = int(uw.utilities.gather_data(int((vn[on] > 1e-8 * vmax).sum()), bcast=True).sum())
+            out[name] = {"vn_max": m, "n_above": n}
+        if out["inner"]["n_above"] or out["outer"]["n_above"]:
+            uw.pprint(f"  WALL CONSTRAINT VIOLATED: |v.n| max inner {out['inner']['vn_max']:.3e} "
+                      f"({out['inner']['n_above']} nodes), outer {out['outer']['vn_max']:.3e} "
+                      f"({out['outer']['n_above']} nodes), |v| max {vmax:.3e}")
+        return out
 
     def ti_slip(self, name):
         """A TI band's slip-equivalent: the tangential velocity jump across the band,
