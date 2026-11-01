@@ -202,7 +202,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 9378e11 (-uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 094e4f3 (-uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -317,6 +317,23 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-01, to the dev hub, the analytic-normal wall-node defect: CONFIRMED CONFINED to the analytic path. With
+  normal=None (the geometric, cross-rank-summed normal) TAc 20 at np 32 is clean (max |v.n| 1e-8) and gives the same
+  answer as the analytic np 16 reference to the printed figures; so the fix is to make the analytic path complete its
+  node set across ranks as the geometric path does, and production can use the geometric normal meanwhile (kaiju's
+  -uw_wall_normal geometric, 094e4f3). The 1e-8 residual is the check measuring radial v.n against a facet-normal
+  constraint, not a violation.
+- 2026-11-01, to the dev hub, SERIAL REPRO of the network-mesher failure (kaiju-launch/scaling/network_repro/
+  {network_repro.py, taf40_fault.json}; overlay F, np 1, no solve; TAf 40's restored crust fault, 213 spine / 54
+  trace points, W 0.008): ladder BUILT (127,705 cells, 52.5 s); network with the driver's spine (through the wall to
+  0.02 above) FAILED in 1 s ("an embedded spine lies outside the resolved ribbon faces (trim its ends inside the
+  caps)"); network with the spine trimmed to the trace FAILED in 4.8 s ("the ribbon's cavity reached the domain wall;
+  the volume must be interior, with clearance to spare"). **So the network mesher cannot place a fault that reaches
+  the outer wall, in serial too: conform (via the network mesher) is unusable for surface-reaching faults in 2-D**,
+  i.e. every crust-law fault (trace 3 rungs below the surface). The ladder's outcrop/cap handling has no network
+  counterpart. The parallel "meshed to no triangles" is the same input failing with a different message. The
+  k-partitions question stays unmeasurable in the annulus until the network path handles an outcropping fault or
+  the ladder learns conform.
 - 2026-11-01, to the dev hub, LIBRARY FINDING: **conform has never been usable in the annulus; the network mesher's
   2-D assembly fails on the crust fault.** Kaiju's conform validation (job 2808: driver 3f2cc34, overlay F b5ea0980
   = development 25d62812 + 96d39f7b, TAf 40, np 16, chain 0, -uw_fault_seams conform so mesher=network): all four
@@ -511,6 +528,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **Driver default for the free-slip wall normal: geometric (the library default, normal=None) instead of the
+  analytic unit_r (2026-11-01, hub recommends YES).** Kaiju: TAc 20, one step, build C: with the geometric normal np
+  32 is clean (max |v.n| 1e-8, 0 nodes) where the analytic normal gave v.n 12,146 at three nodes; the answer is the
+  same as the analytic np 16 reference to the printed figures (vrms 565.33, mobility 1.380, dt 4.44e-6, Newton 5)
+  and identical at np 16 and 32. So the drivers had a working parallel option all along; the library's own
+  guidance (CLAUDE.md: leave normal=None) says the same. One-word default change; the constrained normal at wall
+  vertices changes by round-off only. Meanwhile every new run at np other than 16 sets -uw_wall_normal geometric
+  explicitly.
 
 - -uw_pres_rtol 1e-2 as the campaign default: **DECIDED 2026-11-01 (Louis: "Feel free to try the lax pressure
   tolerance")**; kaiju sends the default patch; running jobs keep their pinned drivers, new runs take 1e-2; the
@@ -2207,3 +2233,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: seams-record patch 3f2cc34 applied as 9378e11 (blobs e402259 -> d5c4a74 exact) and pushed; default
   gather unchanged, conform fails loudly, every build records seams, partition mechanism, band cells per rank and
   band ranks. Next from kaiju: the wall-normal switch, the choices record, the serial mesher repro.
+- 2026-11-01: wall-normal switch and choices record applied (0dbd4ce, 3f8f39c -> head 094e4f3; blobs 70876bf, 728f1a4,
+  90aeec4 exact). Geometric normal fixes the np 32 defect with the same answer: default change put to Louis
+  (recommend yes); interim rule: np != 16 runs set geometric explicitly. Serial network-mesher repro: a fault
+  reaching the wall cannot be placed by the network mesher at all; conform unusable for surface-reaching faults in
+  2-D. Both for the dev hub.
