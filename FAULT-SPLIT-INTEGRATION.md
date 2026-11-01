@@ -277,8 +277,9 @@ within ±10 % (441 against 410 s, 448 against 467 s in the earlier pair), the Ne
 counts and answers the same. The patch's LU runs on one rank for 21 to 28 s a step
 while 15 wait, 5 to 6 % of the solve (#895). The welded tail is no worse and has one
 hierarchy fewer to build; the drivers' `uw_chain` default moves to 0 when the campaign
-builds move to `development` (science hub). Why the annulus shows none of the box's
-gain is open (band ratio asked for). UWTN 2026-022 is rewritten and unsaved on the
+builds move to `development` (science hub). The annulus shows none of the box's gain
+because its band ratio is 3.9, below the sweep table's smallest (6.06); the patch's
+gain appears only at the larger ratios (kaiju's chain page v4). UWTN 2026-022 is rewritten and unsaved on the
 workbench with the corrected annulus paragraph in its multigrid section; its recipe
 ran verbatim on 25d62812 (2 velocity iterations, peak slip 0.1595055; the structural
 patch is one LU block per rank with no row cap, the 2000-row cap being for `fac_zone`

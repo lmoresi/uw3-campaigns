@@ -184,6 +184,13 @@ Measured here, not inherited.
   rank with no cap (`custom_mg.py` about 1727 to 1745 and 1825 to 1840 on
   `development`), the measured 2-D choice; the 3-D cost is #895. The note states it as
   "one block on each process" and prints no row count. Nothing left for you here.
+- 2026-11-01, to the dev hub: your "rotated pressure rtol default" item. Per the notes
+  session from kaiju's logs, Louis has approved `-uw_pres_rtol 1e-2` as the campaign
+  default; in the np 16 annulus pair it took the Stokes solve from 441/410 s to
+  183/174 s with the same answer, and the trench, restart and annulus runs had all used
+  the library defaults (1e-3 Stokes, 1e-4 pressure, 3.3e-5 velocity). Whether the
+  library default follows the campaign's is yours; the journal entry of 2026-11-01 on
+  the annulus band ratio records the numbers.
 - 2026-11-01, to the science hub: the production tail is the welded base with the split
   finest level and the FAC LU patch (Louis on #892). Kaiju's np 16 run is in
   (issuecomment-6552218825 is the corrected record; 6550915680 is superseded) and the
@@ -437,3 +444,15 @@ Measured here, not inherited.
   block-rows question to the dev hub is answered and closed. UWTN 2026-018's
   `software_version` stays until the note is next checked against a `development`
   build (the notes session's call: moving the sha says the note was verified at it).
+- 2026-11-01 (closing the annulus question): kaiju's chain page v4, relayed by the
+  notes session: the annulus pair's band ratio is 3.9 ($h_b = 0.0156$, $S = 0.004$),
+  below the sweep table's smallest (6.06), which is why the patch bought nothing
+  there; the hierarchies as applied recorded. Journal finding entry; the "reason open"
+  sentences in both guides replaced by the ratio (#862, pushed); topic page and
+  `FAULT-SPLIT-INTEGRATION.md` updated. Also from kaiju's logs: the trench, restart
+  and annulus runs used the library's default tolerances (1e-3 Stokes, 1e-4 pressure,
+  3.3e-5 velocity), and Louis approved `-uw_pres_rtol 1e-2` as the campaign default
+  (441/410 s to 183/174 s, same answer); passed to the dev hub below. Two np 16
+  entries had an unquoted `#892` in their `authors` list, which YAML reads as a
+  comment; the validator had reported it and the pipeline hid the exit code. Fixed and
+  the validator now runs unpiped.
