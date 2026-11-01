@@ -240,6 +240,9 @@ params = uw.Params(
                                 #   (the band's region moved onto one rank and carved there; every campaign run to
                                 #   2026-11-01) or "conform" (#670, 2-D: meshed through the seam, each rank its own
                                 #   side). The mesh record carries the mode and the band's cells per rank
+    uw_split_inset=3.0,         # how many rungs inside the outer wall the split's cut stops (3: 0.012 at S = 0.004).
+                                #   Louis, 2026-11-02: the inset is one element because the surface DOFs cannot be
+                                #   rotated, not a physical depth (the unit, a rung or a base cell, is his to set)
     uw_fault_depth_max=0.25,
     uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
                                 #    lid depth of the last record plus uw_fault_lid_margin, so a
@@ -583,10 +586,10 @@ def fault_trace(fault, coarsening=1):
 
 
 def trace_inset():
-    """How many rungs inside the wall a trace stops: three for the split (the cut cannot
+    """How many rungs inside the wall a trace stops: uw_split_inset for the split (the cut cannot
     reach the wall; the isotropic bridge covers the rest), uw_ti_trace_inset for a TI band,
     which outcrops and is its own bridge."""
-    return float(params.uw_ti_trace_inset) if TI else 3.0
+    return float(params.uw_ti_trace_inset) if TI else float(params.uw_split_inset)
 
 
 def placed_ladders(host, faults, coarsening):
@@ -2243,7 +2246,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_rungs", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
