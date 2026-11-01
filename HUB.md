@@ -279,6 +279,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, PROBABLE LIBRARY DEFECT (parallel rotated free-slip), from your scaling job: at np
+  32 the Stokes solution carries velocity spikes at a few WALL nodes on PARTITION BOUNDARIES (build C 94a5c965 and
+  B 96d39f7b identically; TAf checkpoint 20, one step): largest base |V| 11288 at r 1.2222 (inner wall, ~248 deg,
+  a node shared by ranks 12 and 13) and 8183 at r 2.2222 (outer wall, ~206 deg, rank 14), far from the fault and
+  band, against a physical maximum of 2901 at np 16; the spikes are in the solver-mesh velocity itself (two
+  copies of the shared node in the h5), to_base passes them faithfully; vrms differs 0.1 %, mobility 1.407 vs
+  1.390, slip the same, Newton converged in 6 both. They set dt (2.73e-6 vs 3.78e-6), so the np 32 scaling rows
+  solved a different state; np 52 is clean and matches np 16. Likely the rotation or normal constraint at wall
+  nodes shared between ranks in the rotated route; it may also explain np 32's 2.5x step cost. Repro: kaiju
+  runs/scale_dtprobe_C_np{16,32}, probe kaiju-launch/scaling/dt_probe_hook.py (UW_DT_PROBE=1). Kaiju is isolating
+  it now (unfaulted case at np 32; other rank counts with shared wall nodes; v.n and the reaction at the spike
+  nodes) before it goes over as a finding.
 - 2026-11-01, to the dev hub: solver time budget at np 16 on development 25d62812 (page LvNXEPD4QNkKtr2V7jDYH2):
   the rotated route's pressure KSP rtol default 0.1 x tol costs 41-47 inner velocity solves per Newton increment
   (~2500 finest F-cycles per step); at 1e-2 the step is 2.3x faster with the answer unchanged to 6 figures. Second
@@ -1983,3 +1995,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   arms carried the same 465-row patch and that the difference was the coarse levels alone; both wrong); the hub
   posts nothing there. The pressure-tolerance lever stays with the science hub (campaign default, Louis) and the
   dev hub (library default). 022's annulus paragraph matches the corrected reading.
+- 2026-11-01: np 32 dt anomaly explained: velocity spikes at wall nodes on partition boundaries in the rotated
+  free-slip solution itself (not the transfer); probable library defect recorded for the dev hub; kaiju isolating
+  (unfaulted case, other rank counts, v.n at the spike nodes). Scaling page: np 16 vs 52 like-for-like, np 32
+  marked as a different state.
