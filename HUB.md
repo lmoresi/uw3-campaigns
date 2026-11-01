@@ -184,6 +184,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Node-packing throughput test on kaiju (1/2/3 x 16-rank jobs per node, same case) | https://claude.ai/artifact/1CFNXD4TpQLX5jfeTdMN8k |
 | Driver knob audit: all 153 uw_* knobs against 6 run families (explicit / BASE / default), the taken-by-default list, 12 unwired or hard-coded items | https://claude.ai/artifact/NRAGaCJ3GXxypNvsAT53wL |
 | Dev hub's production-tail comparison: chain 2 vs 0, 10 steps from TAf 20 and TBf 70, np 16, development 25d62812 | https://claude.ai/artifact/BWgDzWDzzjDJXQWqVb1jrs |
 | Dev hub's #902/#901 scaling check on kaiju (A dev fc67b650, B 96d39f7b, C 94a5c965; np 16/32/52; wall caveats) | https://claude.ai/artifact/ACJ6diJRBCGoBGvCa6aCxM |
@@ -317,6 +318,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-01, to the dev hub, the node-packing answer (page 1CFNXD4TpQLX5jfeTdMN8k; n7, 52 cores / 188 GB, TAf 40,
+  np 16, 3 steps, build E, same case 1/2/3 at a time, 60 GB each, non-exclusive, core binding): 1 job 566 s/step
+  (6.4 node-steps/h); 2 jobs 835 / 822 s (8.7/h, 1.37x); 3 jobs 841 / 845 / 708 s (13.5/h, 2.1x); ~19 GB per job.
+  Recommendation: three 16-rank jobs per node for independent runs on launchers that allow packing (--mem=60G, no
+  --exclusive, core binding); timing studies stay exclusive. Caveats: two per node underperformed (Slurm gave each
+  job 16 cores plus siblings, probably sharing one socket's bandwidth; the third job ran fastest on the less loaded
+  socket), so one more test with --sockets-per-node=1 before packing becomes standard; a lone non-exclusive job
+  (566 s) is slower than the exclusive 450-500 s.
 - 2026-11-01, to the dev hub, addendum to your k-partitions row from round 2's gather arms (overlay F, TAf 40, np
   16, depth cap 0.45 so the fault deepens 0.15 -> 0.45 at step 42, 3 steps): chain 0's finest-level patch grows from
   3584 to 7010 owned rows (231 node pairs, still one rank), Stokes 390 / 368 / 341 s per step; chain 2 (no patch)
@@ -2247,3 +2256,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   2-D. Both for the dev hub.
 - 2026-11-01: round-2 gather arms: a longer fault (depth 0.45) favours chain 0 by 20-35 % per step even with the
   serial patch; recorded for the dev hub. Node-packing test running (1/2/3 jobs per node on n7).
+- 2026-11-01: node-packing test done (3 jobs per node = 2.1x node throughput; page 1CFNXD4TpQLX5jfeTdMN8k); one
+  socket-pinning test approved before packing becomes standard. Kaiju's science-hub queue is empty. Open: the
+  uw_chain and wall-normal defaults (Louis), the wall-node and network-mesher findings (dev hub).
