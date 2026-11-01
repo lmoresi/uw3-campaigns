@@ -419,6 +419,7 @@ time, peak memory per rank, slip against reference.
 | # | Case | What could break H0 | Where, who |
 |---|---|---|---|
 | 1 | 3-D: a blind sheet in a box, then a dipping sheet in a shell | One LU per rank on a thick 2-D layer grows faster than in 2-D (#895). The alternative (3-D split coarse levels) is unbuilt. Measure one block, capped blocks, inexact blocks, and the held slip coarse space if a single block fails | kaiju 3-D session, M0(b) then M2 |
+|   | *Sequencing (2026-11-01).* The integration session's view, given to Louis: the gather-to-one-rank, single-LU form looks doomed in 3-D and at scale, and the two-level form (bounded blocks plus the slip coarse space) is the candidate. Its only evidence is 2-D (79-85 its against 66 for one block), and the slip coarse space refuses 3-D today. **So measure before building:** (a) the 3-D single-block cost as the band refines, which is cheap, M0(b); (b) bounded blocks without a coarse space, which shows the loss the coarse space must recover; (c) only if (a) is prohibitive, build the 3-D slip columns (a smooth per-direction column) and run the deciding 3-D sheet at np 16-64, with the fault spread over ranks (`seams="conform"`) rather than gathered | |
 | 2 | Parallel: a long fault crossing k partitions, k = 1, 2, 4, 8 | The patch becomes one block per rank crossed, like the cut blocks that lost in 2-D (79-87 against 67). The add-on partition gathers one fault onto one rank at np 16 today | kaiju rollback rig, after the scaling job; needs #902's fix for np > 16 |
 |   | *Row 2 baseline, np 16 (kaiju budget v3, jobs 2480-2488, via the science hub):* H0's finest patch (3584 rows) sits on the one rank holding the fault. Its solve is 21-28 s of a 410-441 s Stokes solve (5-6 %), while 15 ranks wait (max/min 165-178). Velocity work is equal to the chain (8.65 against 8.74 F-cycles per solve), and times are a wash within the ±10 % spread. So at production scale H0 is not yet a speed win, only simpler; the imbalance is what row 2 must measure as the fault spreads | |
 | 3 | Cover gate: a small domain with a fine band (patch above 75 % of the level) | The global 0.75 gate declines the patch and falls back to whole-level SOR, silently. The 022 fixture is already 63 % at ratio 24 | integration session, laptop |
@@ -711,6 +712,11 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: #919 fixed on `bugfix/addon-partition-static-mark-919` (test 66206593, fix
+  18e57147), validating on the kaiju runner, held without a PR. #921 filed. The faulted
+  annulus slab runs cost 1.43-1.72 times the Stokes time of their unfaulted twins, from
+  per-solve set-up and the rebuild, not nonlinear work. A `-log_view` split on kaiju is
+  offered to Louis.
 - 2026-11-01: rows 4 and 5's remaining 24 np 4 arms sent to the kaiju runner. The
   drivers and the row 4 checkpoint are on uw3-campaigns branch `addon-matrix-2026-11`
   (06684d9), with a 2.6 MB `.h5` fixture force-added. Library at
