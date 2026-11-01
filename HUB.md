@@ -1979,3 +1979,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: budget/chain pages corrected (v3/v2): same mesh in both arms, patch table misattributed, velocity
   work equal on the totals; chain 0 vs 2 is a wash on speed, chain 0 wins on robustness. pres_rtol 2.3x unchanged.
   np 32 dt anomaly suspected in the to_base transfer, probe running.
+- 2026-11-01: the notes session posts the correction on underworld3 #892 itself (its earlier kaiju comment said both
+  arms carried the same 465-row patch and that the difference was the coarse levels alone; both wrong); the hub
+  posts nothing there. The pressure-tolerance lever stays with the science hub (campaign default, Louis) and the
+  dev hub (library default). 022's annulus paragraph matches the corrected reading.
