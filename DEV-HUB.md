@@ -415,6 +415,7 @@ time, peak memory per rank, slip against reference.
 | 2 | Parallel: a long fault crossing k partitions, k = 1, 2, 4, 8 | The patch becomes one block per rank crossed, like the cut blocks that lost in 2-D (79-87 against 67). The add-on partition gathers one fault onto one rank at np 16 today | kaiju rollback rig, after the scaling job; needs #902's fix for np > 16 |
 |   | *Row 2 baseline, np 16 (kaiju budget v3, jobs 2480-2488, via the science hub):* H0's finest patch (3584 rows) sits on the one rank holding the fault. Its solve is 21-28 s of a 410-441 s Stokes solve (5-6 %), while 15 ranks wait (max/min 165-178). Velocity work is equal to the chain (8.65 against 8.74 F-cycles per solve), and times are a wash within the ±10 % spread. So at production scale H0 is not yet a speed win, only simpler; the imbalance is what row 2 must measure as the fault spreads | |
 | 3 | Cover gate: a small domain with a fine band (patch above 75 % of the level) | The global 0.75 gate declines the patch and falls back to whole-level SOR, silently. The 022 fixture is already 63 % at ratio 24 | integration session, laptop |
+|   | *Row 3 measured (2026-11-01, the 022 linear fixture, np 1 and 2):* at h_b/S 48 and 97 the patch-plus-halo is 76 % and 86 % of the finest level. **The gate declines it silently**: whole-level SOR takes 909 and 1487 velocity its, against 66 with the gate forced open and 302 and 725 for H1, with slip off by 7e-5 at ratio 97. The 0.75 threshold separates by size, but a uniform level is 100 % subdomain with no background, while a fault level keeps 14-38 % background. **Proposed fix (Louis to rule):** decline only when the background outside the subdomain is under 2 % of the level, and log the verdict either way. The single structural LU block reaches 61,360 rows (86 % of the level) at ratio 97, which bears on row 1 | |
 | 4 | Interface laws: friction, viscous, rate-and-state | Not yet measured on the welded tail with LU blocks (after #894's refresh) | integration session, the box at np 4 |
 | 5 | Fault networks: junctions, several faults per rank, TI and unsplit bands | Overlapping patches, block coupling at junctions, TI's zone blocks against the structural block | integration session (2-D); 3-D session later |
 | 6 | Memory of the LU fill per rank | 3-D especially; the largest block and the fill per rank | kaiju (with 1 and 2) |
@@ -701,6 +702,12 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: #906 pushed and held (`bugfix/rotated-nullspace-from-mesh` 964dc3ce, 4
+  commits, the SVD-count commit last so it drops after #901). Matrix row 3 done: the
+  cover gate declines large patches silently (14-22 times the iterations). A structural
+  gate plus a log line is proposed, for Louis's ruling. Seen in every np > 1 log since
+  step 5: a `split_tail_levels` warning about snapping that inverts a cell on add-on
+  level 0, possibly only the mesh's unused own tail. Unchecked.
 - 2026-11-01: the 022 recipe ran verbatim on development 25d62812 (2 velocity its, peak
   slip 0.1595055, one LU block of 4772 rows). Row 2's np 16 baseline recorded: equal
   velocity work, the patch all on one rank (5-6 % of Stokes, 15 ranks waiting). The 3-D
