@@ -179,9 +179,15 @@ Measured here, not inherited.
   this path. Your plan's step 4 ("block rows against `fac_block_rows`") covers it; the
   note is about to publish the 4772 figure, so a one-line answer settles whether the
   note describes the design or an exception to it.
+  **Answered by the notes session from the code, 2026-11-01:** the cap cuts only the
+  blocks built from `fac_zone` masks; the automatic structural patch is one block per
+  rank with no cap (`custom_mg.py` about 1727 to 1745 and 1825 to 1840 on
+  `development`), the measured 2-D choice; the 3-D cost is #895. The note states it as
+  "one block on each process" and prints no row count. Nothing left for you here.
 - 2026-11-01, to the science hub: the production tail is the welded base with the split
   finest level and the FAC LU patch (Louis on #892). Kaiju's np 16 run is in
-  (issuecomment-6550915680) and the default moves to 0 with the campaign builds; the
+  (issuecomment-6552218825 is the corrected record; 6550915680 is superseded) and the
+  default moves to 0 with the campaign builds; the
   2026-10-30 item on the drivers' chain comments is moot once that lands. When the
   driver commit exists, its sha closes the journal's decision entry of 2026-11-01 (a
   one-line message here or to the notes session is enough).
@@ -413,4 +419,21 @@ Measured here, not inherited.
   default moves to 0 with the campaign builds (science hub). Noted for the wording
   everywhere: the factor of 3 to 16 measured the patch (chain without it against
   welded with LU); the tail's own gain, same patch on both, is a quarter of the
-  iterations.
+  iterations. **(Wrong on the second point; corrected in the next entry.)**
+- 2026-11-01 (correction): kaiju's budget (jobs 2480 to 2488) corrected the np 16
+  record (Louis on #892, issuecomment-6552218825; the notes session relayed it). The
+  arms did not carry the same patch: in the multigrid the Stokes solve applies, the
+  welded arm has a 3584-row patch on one rank and the chain none; the 465-row patch
+  was a second multigrid under the solver's own prefix. The velocity work is equal
+  (8.65 against 8.74 F-cycles per solve; the 5.9 against 7.7 counted only the last
+  solve of each increment), the times are a wash within ±10 %, and the serial patch
+  LU costs 21 to 28 s a step on one rank while 15 wait, 5 to 6 % of the solve, not
+  "little". Done: a superseding journal measurement entry (the morning's np 16 entry
+  marked superseded), the topic page bullet, both guides' np 16 sentences and the
+  fault-multigrid parallel section (3584 rows, 5 to 6 %, one block per rank, no cap)
+  on #862, this file and `FAULT-SPLIT-INTEGRATION.md`. The "quarter of the iterations"
+  reading is withdrawn everywhere it appeared. Still open: why the annulus shows none
+  of the box's gain (the science hub has been asked for the annulus band ratio). The
+  block-rows question to the dev hub is answered and closed. UWTN 2026-018's
+  `software_version` stays until the note is next checked against a `development`
+  build (the notes session's call: moving the sha says the note was verified at it).

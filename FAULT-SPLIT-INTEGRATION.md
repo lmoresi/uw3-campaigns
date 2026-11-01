@@ -268,17 +268,21 @@ wombat workbench's pen; a `development` sha is available now); the guides are re
 on #862 today. The ribbon replay is off the list unless split coarse levels stay an
 option.
 
-**2026-11-01, the np 16 condition met.** Kaiju ran the production annulus on
-`development` 25d62812, welded against lean chain (Louis on #892,
-issuecomment-6550915680): 5.9 against 7.7 velocity iterations per Newton increment,
-448 against 467 s of Stokes per step, the same Newton counts and answers; both arms the
-same 465-row finest patch, so the difference is the coarse levels alone and smaller
-than the fixtures'. The whole patch and its 105 split pairs sit on one rank (#895). The
-drivers' `uw_chain` default moves to 0 when the campaign builds move to `development`
-(science hub). UWTN 2026-022 is rewritten and unsaved on the workbench with this
-paragraph in its multigrid section; its recipe ran verbatim on 25d62812 (2 velocity
-iterations, peak slip 0.1595055, one 4772-row LU block, a figure queried with the dev
-hub against the 2000-row cap).
+**2026-11-01, the np 16 run, as corrected.** Kaiju ran the production annulus on
+`development` 25d62812, welded against lean chain, and then budgeted it (Louis on
+#892, issuecomment-6552218825; the first comment, 6550915680, is superseded). The
+welded arm carries a 3584-row finest patch on one rank and the chain none; the
+velocity work is equal (8.65 against 8.74 F-cycles per solve), the Stokes time a wash
+within ±10 % (441 against 410 s, 448 against 467 s in the earlier pair), the Newton
+counts and answers the same. The patch's LU runs on one rank for 21 to 28 s a step
+while 15 wait, 5 to 6 % of the solve (#895). The welded tail is no worse and has one
+hierarchy fewer to build; the drivers' `uw_chain` default moves to 0 when the campaign
+builds move to `development` (science hub). Why the annulus shows none of the box's
+gain is open (band ratio asked for). UWTN 2026-022 is rewritten and unsaved on the
+workbench with the corrected annulus paragraph in its multigrid section; its recipe
+ran verbatim on 25d62812 (2 velocity iterations, peak slip 0.1595055; the structural
+patch is one LU block per rank with no row cap, the 2000-row cap being for `fac_zone`
+blocks only, which the note states as "one block on each process").
 
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
