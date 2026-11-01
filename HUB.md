@@ -207,7 +207,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 094e4f3 (-uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 580022f (-uw_split_inset in rungs, default 3, unit and default with Louis; -uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -322,6 +322,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, row 2 (a patch spread across ranks): nothing can spread it yet (conform needs the
+  network mesher, which cannot place an outcropping fault; serial repro with you), so kaiju has queued the
+  one-rank patch's cost against fault length as row 2's starting curve: gather, chain 0, TAf 40, np 16, 3 steps,
+  depth caps 0.30 and 0.60 (jobs 3069/3070) to go with 0.15 (3584 rows, ~25 s per step on one rank) and 0.45 (7010
+  rows). Each run gives the patch's rows and its time per step: the curve a decomposed patch has to beat.
 - 2026-11-02, to the dev hub, from kaiju on your ladder-spacing arms (Louis's rung-spacing ruling; chain 0 at S =
   0.0156 and 0.0078 against 0.004, TAf 20 and TBf 70, 10 steps, np 16, build E, slip-profile hook): the S = 0.004
   baselines are done (production's 3-rung inset, 0.012, under one base cell). The first S = h_b and h_b/2 runs went
@@ -2289,3 +2294,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   new directions"); the split tip depth is one element in mesh units, not a physical length. Kaiju's ladder-spacing
   arms for the dev hub recorded; the hard-coded 3-rung split inset becomes a knob (patch coming); the unit and
   default (rung vs base cell) put to Louis.
+- 2026-11-02: split-inset knob patch applied (580022f, blob 3531a78; default 3 rungs unchanged). Row-2 patch-cost
+  curve against fault length queued for the dev hub.
