@@ -383,6 +383,44 @@ as the record, until step 4's 3-D measurement shows one block is unaffordable. I
 stacked on `feature/fac-structural-segments`, a measurement-knob branch not meant for
 merge.
 
+## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
+
+Louis: "Overall, the add on is so much simpler conceptually and in terms of data copies and
+manipulation that I consider it much nicer as an approach. But I need to understand if it
+can actually replace the split levels approach in all cases - including in 3d!" "The add-on"
+is the welded base under one split child, with the FAC LU patch on the finest level
+(`uw_chain 0`).
+
+**Ruled so far (2026-11-01).** The production tail for split faults is the welded base
+plus the split S level with the FAC LU patch. The drivers' `uw_chain` default changes only
+once kaiju's np 16 annulus run on development confirms it, because #914 is unchecked at
+np 16. Whether split coarse levels stay as an option (`custom_mg.py:1556`) waits on this
+matrix.
+
+**Evidence so far (all 2-D, development 25d62812):**
+- **The 022 linear fixture:** H0 takes 66/65/67 velocity its at 80/160/320 rungs (np 1)
+  and 74/72/71 at np 4. H1 (the chain) takes 83/118/166 and 103/154/200.
+- **The 022 yielding-lid box, np 4:** H0 takes 187-195 velocity its over a solve at every
+  spacing; H1 takes 690-1440, 3.5-7.7 times as many and 3.6-8.9 times the time. No caps,
+  and peak slip agrees to 1e-5.
+- **Kaiju's annulus at np 16:** 5.9 against 7.7 velocity its per increment (#892
+  issuecomment-6550915680).
+
+**Test matrix (3-D first).** H0 against the alternative: velocity its, setup and solve
+time, peak memory per rank, slip against reference.
+
+| # | Case | What could break H0 | Where, who |
+|---|---|---|---|
+| 1 | 3-D: a blind sheet in a box, then a dipping sheet in a shell | One LU per rank on a thick 2-D layer grows faster than in 2-D (#895). The alternative (3-D split coarse levels) is unbuilt. Measure one block, capped blocks, inexact blocks, and the held slip coarse space if a single block fails | kaiju 3-D session, M0(b) then M2 |
+| 2 | Parallel: a long fault crossing k partitions, k = 1, 2, 4, 8 | The patch becomes one block per rank crossed, like the cut blocks that lost in 2-D (79-87 against 67). The add-on partition gathers one fault onto one rank at np 16 today | kaiju rollback rig, after the scaling job; needs #902's fix for np > 16 |
+| 3 | Cover gate: a small domain with a fine band (patch above 75 % of the level) | The global 0.75 gate declines the patch and falls back to whole-level SOR, silently. The 022 fixture is already 63 % at ratio 24 | integration session, laptop |
+| 4 | Interface laws: friction, viscous, rate-and-state | Not yet measured on the welded tail with LU blocks (after #894's refresh) | integration session, the box at np 4 |
+| 5 | Fault networks: junctions, several faults per rank, TI and unsplit bands | Overlapping patches, block coupling at junctions, TI's zone blocks against the structural block | integration session (2-D); 3-D session later |
+| 6 | Memory of the LU fill per rank | 3-D especially; the largest block and the fill per rank | kaiju (with 1 and 2) |
+
+**Done when:** every row has a measurement. Then Louis rules whether split coarse levels
+are deleted, kept as an option, or kept for named cases.
+
 ## 3-D add-on mesh (Louis, 2026-10-31: "We really do need the 3D option for the add-on mesh. These are things we keep failing to complete despite making efforts to do so.")
 
 **Survey (2026-10-31, read-only, at development fc67b650; key claims re-checked by the
@@ -662,6 +700,12 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: Louis ruled the production tail: welded base plus split S plus FAC LU; the
+  `uw_chain` default waits on kaiju's np 16 confirmation. He asked whether the add-on can
+  replace split coarse levels everywhere, 3-D included: the question and its test matrix
+  are now a section. Step 5 on the laptop: H0 flat, H1 3.5-7.7 times as many its. The
+  notes session stripped the proxy footer from 31 items and fixed the label drift (#758,
+  #759, #782, #827). It posts on Louis's account; edits and deletes still go to Louis.
 - 2026-10-31: the notes session posted the four "Fixed by" comments from Louis's account
   (no footer); the integration session posted none. **#892 step 5 dispatched** on merged
   development 25d62812:
