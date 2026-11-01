@@ -1958,3 +1958,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: Louis's solver questions answered (page LvNXEPD4QNkKtr2V7jDYH2): the Schur pressure solve at rtol 1e-4 is
   the cost; 1e-2 gives 2.3x with the answer unchanged; chain 0 and 2 behave the same warm and cold; the coarse SVD is
   3-4 %. Hub recommends -uw_pres_rtol 1e-2 as the campaign default now; passed to the dev hub for the library default.
+- 2026-11-01: the notes session found three points to reconcile on the budget page before UWTN 2026-022 cites it:
+  chain 0's 21-28 s FAC patch per step is too dear for a 503-row LU (likely the 3584-row f0 patch, i.e. the arms
+  were not on the same mesh in steps 41-43); the "-24 % velocity iterations" is a last-application figure while
+  total F-cycles per step are nearly equal (2489 vs 2527); solve times were quoted as step times. Relayed to
+  kaiju; the budget page is provisional until it replies.
