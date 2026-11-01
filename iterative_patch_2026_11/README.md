@@ -20,7 +20,7 @@ The cover gate is forced open (`UW_FAC_COVER=1.01`, see #918).
 **Files:**
 - `patch_probe.py`: the patch spec (block solver, cutting, slip coarse space) and the record helpers;
 - `iterative_patch_linear.py`, `iterative_patch_box.py`: the two drivers;
-- `kaiju_commands.sh`: 163 jobs plus an HPDDM check, one independent job per line.
+- `kaiju_commands.sh`: 164 jobs plus an HPDDM check, one independent job per line.
 
 ## Experiment 1: inexact block solves
 
