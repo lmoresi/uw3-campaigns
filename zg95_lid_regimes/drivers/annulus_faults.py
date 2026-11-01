@@ -163,7 +163,10 @@ params = uw.Params(
     # the fault band
     uw_spacing=0.004,
     uw_eta_w=1.0e-3,
-    uw_chain=2,
+    uw_chain=0,                 # split ladder levels below the finest (0: welded coarse levels, only the finest
+                                #   split). 0 assumes underworld3 development's FAC patch on LU (#912, cc839425):
+                                #   kaiju 2026-11-01, 5.9 against 7.7 velocity its per increment, the same answer; on
+                                #   a build without #912 (overlay-leakfix 547c2e54) chain 0 was ~1.5x slower: use 2
     uw_band_widen=1,
     uw_rebuild_rungs=4,
     uw_fault_surface_gap=2.0,   # crust law: the fit's up-dip end may stop this many crust thicknesses below the

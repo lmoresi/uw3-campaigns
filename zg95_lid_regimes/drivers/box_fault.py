@@ -61,7 +61,10 @@ params = uw.Params(
     uw_fault_depth=0.35,        # depth of the fault's lower tip
     uw_spacing=0.004,           # ladder rung spacing (the band is two rungs wide)
     uw_eta_w=1.0e-3,            # weak-bridge factor on viscosity and yield stress
-    uw_chain=2,                 # split ladder levels below the finest (0: welded coarse levels)
+    uw_chain=0,                 # split ladder levels below the finest (0: welded coarse levels, only the finest
+                                #   split). 0 assumes underworld3 development's FAC patch on LU (#912, cc839425):
+                                #   kaiju 2026-11-01, 5.9 against 7.7 velocity its per increment, the same answer; on
+                                #   a build without #912 (overlay-leakfix 547c2e54) chain 0 was ~1.5x slower: use 2
     uw_band_widen=1,            # 1: each chain level's band is two of its own rungs wide
     uw_fac=0,                   # 1: strong patch smoother on the band cells (multigrid finest level)
     uw_migrate=0,               # 1: the trench moves with the overriding plate
