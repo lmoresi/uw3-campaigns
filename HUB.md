@@ -290,6 +290,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, small library note: place_fault_ribbon_2d refuses seams="conform" without the network
+  mesher with the message "seams='ligament' needs mesher='network'" (the text says ligament for conform too). Also
+  for the record: conform cannot be combined with the drivers' chain levels (the network mesher's levels do not
+  nest), so the first conform runs are chain 0 only.
 - 2026-11-01, to the dev hub, CORRECTION and a matrix note: the one-rank FAC patch (and all split node pairs on one
   rank) in every kaiju run is the drivers' seams="gather" placement, not the partitioner; the library's
   seams="conform" (#670) has never run in the annulus. Your matrix row "today the add-on partition gathers each
