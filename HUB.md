@@ -113,7 +113,24 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   every run took the library's 1e-4 unexamined) and the TI configuration. Rule: each run's README states the value
   of every solver and placement knob the driver exposes as a choice; the hub keeps a knob table (default, value per
   run family, chosen or taken) current; a library capability the driver never wires is a gap to report to the dev
-  hub, with a test owed. Kaiju is doing the first audit from the launch lines and Params blocks.
+  hub, with a test owed. **First audit DONE 2026-11-01 (page NRAGaCJ3GXxypNvsAT53wL; data knob_audit.json on kaiju):**
+  153 knobs x 6 families (compositional, compositional_fault, thermal, faulted_thermal, earth_run1, TAti_smooth),
+  each value explicit / BASE / default from the last segment's argv. Taken by default and it matters: uw_tol 1e-3
+  never set (and through the library it fixes the pressure rtol 1e-4 and inner velocity 3.3e-5); pressure rtol
+  1e-4 in every family but Earth run 1 and TAti (1e-2), so cross-family timings mix the two; uw_chain 2 everywhere
+  faulted but TAti; Newton switches 1e-2 and 0 Picard everywhere but TAti, warm switch 1.0 in the compositional
+  runs, TA/TB and the first 10-20 steps of TAf/TBf/TA_age25f/TAc; the cold-retry rule kept a worse cold attempt
+  before 5d968c7; uw_dt_mult 20 only from BASE (driver default 3); courant, dt_max, spacing, yield_softness
+  defaults everywhere; TAf_env is NOT a clean control for TAti (fault precedence 0/1, pressure rtol, checkpoint
+  interval, switches differ). Unwired or hard-coded (12): seams gather + ladder mesher in every attempt (ligament
+  and conform never tried); margin_rings 1 and clearance 0.7 against the library's 2 and 0.3; the free-slip
+  normal is the analytic unit_r, not the library default normal=None (the geometric, measure-weighted, cross-rank
+  normal its docstring recommends), and the analytic path is where the np 32 wall-node defect lives; rotated
+  velocity rtol fixed at 0.033 x tol; consistent_jacobian fixed at "continuation"; solver.strategy never set; the
+  FAC patch tunable only by UW_FAC_* env vars; yield smoother sqrt, qdegree 3, advection order 1. To make the rule
+  bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
+  template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
+  if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -167,6 +184,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Driver knob audit: all 153 uw_* knobs against 6 run families (explicit / BASE / default), the taken-by-default list, 12 unwired or hard-coded items | https://claude.ai/artifact/NRAGaCJ3GXxypNvsAT53wL |
 | Dev hub's production-tail comparison: chain 2 vs 0, 10 steps from TAf 20 and TBf 70, np 16, development 25d62812 | https://claude.ai/artifact/BWgDzWDzzjDJXQWqVb1jrs |
 | Dev hub's #902/#901 scaling check on kaiju (A dev fc67b650, B 96d39f7b, C 94a5c965; np 16/32/52; wall caveats) | https://claude.ai/artifact/ACJ6diJRBCGoBGvCa6aCxM |
 | Solver time budget and warm/cold, chain 0 vs 2 (stacked per-step budget; pres_rtol lever; cold/rebuild/warm starts) | https://claude.ai/artifact/LvNXEPD4QNkKtr2V7jDYH2 |
@@ -290,6 +308,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, the driver-side knob audit (page NRAGaCJ3GXxypNvsAT53wL) and what it says about the
+  library: the annulus drivers use the analytic wall normal (unit_r) everywhere, the path with the wall-node defect,
+  where the library default and docstring recommend normal=None; kaiju is testing normal=None at np 32 (if clean,
+  the fix for the analytic path is to complete its node set as the geometric path does, and production could switch
+  meanwhile). Also from the audit, as library-facing notes: uw_vel_rtol does nothing on the rotated route (its
+  velocity rtol is fixed at 0.033 x tol), the pressure factor 0.1 is still the unmeasured TODO now measured twice,
+  the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
+  through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
+  now on the comparison page.
 - 2026-11-01, to the dev hub, small library note: place_fault_ribbon_2d refuses seams="conform" without the network
   mesher with the message "seams='ligament' needs mesher='network'" (the text says ligament for conform too). Also
   for the record: conform cannot be combined with the drivers' chain levels (the network mesher's levels do not
@@ -2156,3 +2183,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   science hub (11-01): the production tail is ruled, kaiju's np 16 record is on #892 (issuecomment-6552218825,
   corrected), the default moves to 0 with the campaign builds, and the driver commit's sha closes the journal's
   2026-11-01 decision entry when it exists; the chain-comment item is moot once chain 0 lands.
+- 2026-11-01: knob audit delivered (153 knobs x 6 families); run_info resolved params and README choices block
+  approved; normal=None test at np 32 requested; TAf_env-not-a-clean-control caveat to the comparison page; the
+  unwired list passed to the dev hub.
