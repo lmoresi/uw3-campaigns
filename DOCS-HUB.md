@@ -456,3 +456,16 @@ Measured here, not inherited.
   entries had an unquoted `#892` in their `authors` list, which YAML reads as a
   comment; the validator had reported it and the pipeline hid the exit code. Fixed and
   the validator now runs unpiped.
+- 2026-11-01 (why the patch is on one rank): Louis's addendum on #892
+  (issuecomment-6557052460), relayed by the notes session: the patch is on one rank by
+  construction, because the drivers' default `seams="gather"` placement runs
+  `partition_addon` first, which gives the band's region to one rank and balances the
+  rest to within 10 %; not because the fault happens to lie in one partition. The
+  serial patch cost at np 16 is the placement's, not the welded tail's.
+  `seams="conform"` would divide it (needs `mesher="network"`; never run here; the
+  dev hub's k-partitions test is its first run). Verified in the code
+  (`place_surface.py` 7291, 9325). Done: journal finding entry; topic page; the
+  fault-multigrid guide's parallel section restated by route (adapt-and-cut inherits
+  the base's partition; the placement repartitions and chooses the rank), the
+  "planned fix" sentence replaced since `partition_addon` is that fix; the convection
+  guide's one phrase; `FAULT-SPLIT-INTEGRATION.md`. #862 pushed.

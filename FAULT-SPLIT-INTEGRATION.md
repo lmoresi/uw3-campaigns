@@ -275,7 +275,11 @@ welded arm carries a 3584-row finest patch on one rank and the chain none; the
 velocity work is equal (8.65 against 8.74 F-cycles per solve), the Stokes time a wash
 within ±10 % (441 against 410 s, 448 against 467 s in the earlier pair), the Newton
 counts and answers the same. The patch's LU runs on one rank for 21 to 28 s a step
-while 15 wait, 5 to 6 % of the solve (#895). The welded tail is no worse and has one
+while 15 wait, 5 to 6 % of the solve (#895); it is on one rank by construction, because
+the default `seams="gather"` placement runs `partition_addon` and gives the band's
+region to one rank at any rank count, so the cost belongs to the placement, not to the
+welded tail (Louis on #892, issuecomment-6557052460); `seams="conform"` would divide
+it and has never run in these models. The welded tail is no worse and has one
 hierarchy fewer to build; the drivers' `uw_chain` default moves to 0 when the campaign
 builds move to `development` (science hub). The annulus shows none of the box's gain
 because its band ratio is 3.9, below the sweep table's smallest (6.06); the patch's
