@@ -2145,3 +2145,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   more than one rank (the network mesher deadlocked with ligament seams on 18 Oct). Kaiju noted two pinning slips
   (a commit in a clone with a running job; a re-clone under a job), neither affecting a result; one fresh clone per
   commit from now on.
+- 2026-11-01 check-in on the other hubs' files. Dev hub to the science hub (10-31): the unsplit-tail memory defect is
+  filed as #893; the surface-breaking split request belongs on #553 (open since August); the drivers' uw_chain
+  default waits on #892 and Louis (now: on the build move). Dev hub history note on #892: on the rotated path the LU
+  block solve was never in effect from the day it became the default (891c9bb0, 2026-09-03); every fault result on a
+  rotated solve since then ran ILU(0) blocks. Dev hub has filed #918 (silent cover gate), #919 (addon_partition
+  static mark, fix held), #920 (rotated path's max_it 50 ignores snes_max_it), #921 (structural rows left out of the
+  patch with fac_zone on a TI band). Not yet visible in DEV-HUB.md: the analytic-normal wall-node finding and the
+  Picard line-search stall; both stand in this file's "For the other hubs" for its next read. Docs hub to the
+  science hub (11-01): the production tail is ruled, kaiju's np 16 record is on #892 (issuecomment-6552218825,
+  corrected), the default moves to 0 with the campaign builds, and the driver commit's sha closes the journal's
+  2026-11-01 decision entry when it exists; the chain-comment item is moot once chain 0 lands.
