@@ -188,6 +188,8 @@ params = uw.Params(
                                 #   the library's TransverseIsotropicVEPFlowModel (elasticity off) yielding eta_1 on the
                                 #   resolved shear itself: yield stress f_b tau_y on the footprint, rate strengthening
                                 #   eta_reg_b (its floor), its own softmin and tangent
+    uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
+                                #   "geometric" (the library default: facet normals summed across ranks)
     uw_wall_check=1,            # 1: every solve records the free-slip constraint as solved (max |v.n| per wall, nodes
                                 #   above 1e-8 |v|max) in the step's solver record, and warns when it is broken
     uw_retry_keep="best",       # after a failed warm start and its cold retry, keep the attempt with the smaller final
@@ -1290,7 +1292,7 @@ class FaultedMesh:
         if over_on:
             buoyancy = buoyancy - params.uw_over_dT * clamp01(self.over.sym[0])
         s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
-        free_slip_walls(s)
+        free_slip_walls(s, params.uw_wall_normal)
         for name in self.names if not TI else []:
             # on a curved or kinked trace the per-node normals partly lock a frictionless contact (box
             # probe: one face carries shear, the normal traction jumps); "trace" smooths them

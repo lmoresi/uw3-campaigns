@@ -105,11 +105,16 @@ def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yie
     return eta_T
 
 
-def free_slip_walls(stokes):
-    """Rotated strong free-slip on both walls, constrained to the exact radial normal,
-    and the pressure gauge an enclosed domain needs. The rigid-rotation gauge is
-    removed by the rotated solve."""
-    unit_r = stokes.mesh.CoordinateSystem.unit_e_0
+def free_slip_walls(stokes, normal="analytic"):
+    """Rotated strong free-slip on both walls and the pressure gauge an enclosed domain
+    needs. The rigid-rotation gauge is removed by the rotated solve. ``normal``:
+    "analytic" constrains to the exact radial normal (unit_r); "geometric" leaves the
+    library's default (normal=None), the measure-weighted facet normal summed across
+    ranks. Kaiju, 2026-11-01: on the analytic path a wall node whose owning rank holds
+    none of its labelled facets gets no constraint (np 24/32/40/52)."""
+    if normal not in ("analytic", "geometric"):
+        raise ValueError(f"wall normal must be analytic or geometric, not {normal!r}")
+    unit_r = stokes.mesh.CoordinateSystem.unit_e_0 if normal == "analytic" else None
     stokes.add_rotated_freeslip_bc(0, "Upper", normal=unit_r)
     stokes.add_rotated_freeslip_bc(0, "Lower", normal=unit_r)
     stokes.petsc_use_pressure_nullspace = True
