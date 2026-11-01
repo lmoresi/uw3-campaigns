@@ -426,6 +426,7 @@ time, peak memory per rank, slip against reference.
 | 4 | Interface laws: friction, viscous, rate-and-state | Not yet measured on the welded tail with LU blocks (after #894's refresh) | integration session, the box at np 4 |
 |   | *Row 4 so far (the box, np 4, S 0.004):* viscous law (η_f 555.7): H0 125 against H1 388 velocity its, same 29 Newton its, same slip. Coulomb and rate-and-state are re-running: they hit the rotated loop's 50-iteration cap in the Picard phase under both hierarchies, with no linear trouble. Side finding, filed as **#920**: the rotated path's `max_it=50` ignores a user's `snes_max_it`, at both call sites (`rotated_bc` and `fault_contact.py:522`) | |
 | 5 | Fault networks: junctions, several faults per rank, TI and unsplit bands | Overlapping patches, block coupling at junctions, TI's zone blocks against the structural block | integration session (2-D); 3-D session later |
+|   | *Row 5, np 1 (np 4 arms on kaiju):* H0's structural patch handles every network case at 66-90 velocity its once the gate lets it through, against H1's 230. H1 cannot place its 4S ladder at an 8S junction gap at all. **The defaults fail twice:** the 0.75 gate declines the pair and the TI case (#918); and with `fac_zone` keyed to a TI band, the split fault's structural rows are left out of the patch (820 its against 94 with the union), because `UW_FAC_STRUCTURAL` defaults to 0 while the `set_custom_fmg` docstring says they are "unioned in automatically". `ti zone both` at np 4 ran past an hour where np 1 takes 15 s: a possible parallel hang, under watch on kaiju | |
 | 6 | Memory of the LU fill per rank | 3-D especially; the largest block and the fill per rank | kaiju (with 1 and 2) |
 
 **Done when:** every row has a measurement. Then Louis rules whether split coarse levels
@@ -710,6 +711,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: rows 4 and 5's remaining 24 np 4 arms sent to the kaiju runner. The
+  drivers and the row 4 checkpoint are on uw3-campaigns branch `addon-matrix-2026-11`
+  (06684d9), with a 2.6 MB `.h5` fixture force-added. Library at
+  `bugfix/rotated-nullspace-from-mesh` 964dc3ce.
 - 2026-11-01: Louis: memory pressure on wombat killed applications; no parallel or
   load-bearing work there. The laptop sessions were told; the integration session's np 4
   row-4 run was still going and was told to stop. The kaiju dev-runner session was created
