@@ -463,7 +463,28 @@ default).
 3. PCHPDDM (GenEO) on the patch, if the PETSc build has HPDDM (being checked on kaiju's
    image); coarse-space size against the hand-built slip space.
 The winners go to the 3-D rig ahead of hand-building 3-D slip columns. Owner: the
-integration session writes the probes, "kaiju: dev runs" runs them. Records:
+integration session writes the probes, "kaiju: dev runs" runs them.
+
+**Launched 2026-11-01:** 164 jobs on the kaiju runner. Library `probe/iterative-patch`
+8f94ee21 (the slip-coarse-space branch with development merged, plus one probe knob,
+`UW_FAC_STRIP_WIDTH`; not for merge). Scripts: `iterative_patch_2026_11/` on
+`addon-matrix-2026-11`; its README answers the strategies question.
+- Experiment 1 needed no library code: the block KSPs read the options database under the
+  per-solve prefix. Smoke at ratio 24, FGMRES + ILU(1), block rtol 1e-2: 71 velocity its
+  against LU's 67, about 20 block its per application. Caveat: an FGMRES block solve is
+  nonlinear in its right-hand side, which the level's GMRES smoother does not tolerate; a
+  stall there is part of the answer.
+- Experiment 2 smoke, rung strips of 1 with the coarse space: 135 its against 67, with
+  362 blocks of 180 rows. **Design point:** the slip coarse space has one column per
+  piece, so at strip width 1 its dimension is the rung count (320-1280 here; in 3-D the
+  rungs on the sheet). Tiny local solves move the cost into the coarse problem, and the
+  strip width trades one against the other.
+- Experiment 3: wombat's PETSc has neither HPDDM nor SLEPc. Kaiju's image is being checked.
+  PCHPDDM also makes one subdomain per rank, while the add-on partition gathers each
+  fault onto one, so a real probe needs the patch spread over ranks and a python PC
+  wrapping PCHPDDM on the patch submatrix (`-pc_hpddm_harmonic_overlap`, since we have no
+  Neumann matrices). If absent, a PETSc rebuild with `--download-slepc --download-hpddm`
+  is 30-60 min on kaiju; not started. Records:
 `~/+Simulations/fac_892/iterative_patch/`; scripts on uw3-campaigns `addon-matrix-2026-11`.
 
 ## 3-D add-on mesh (Louis, 2026-10-31: "We really do need the 3D option for the add-on mesh. These are things we keep failing to complete despite making efforts to do so.")
