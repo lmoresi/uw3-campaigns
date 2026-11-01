@@ -433,9 +433,41 @@ time, peak memory per rank, slip against reference.
 | 5 | Fault networks: junctions, several faults per rank, TI and unsplit bands | Overlapping patches, block coupling at junctions, TI's zone blocks against the structural block | integration session (2-D); 3-D session later |
 |   | *Row 5, np 1 (np 4 arms on kaiju):* H0's structural patch handles every network case at 66-90 velocity its once the gate lets it through, against H1's 230. H1 cannot place its 4S ladder at an 8S junction gap at all. **The defaults fail twice:** the 0.75 gate declines the pair and the TI case (#918); and with `fac_zone` keyed to a TI band, the split fault's structural rows are left out of the patch (820 its against 94 with the union), because `UW_FAC_STRUCTURAL` defaults to 0 while the `set_custom_fmg` docstring says they are "unioned in automatically". Filed as **#921** (proposed: union the structural rows whenever the finest level is split, and keep #670's default for painted bands; Louis to rule). `ti zone both` at np 4 ran past an hour where np 1 takes 15 s: a possible parallel hang, under watch on kaiju | |
 | 6 | Memory of the LU fill per rank | 3-D especially; the largest block and the fill per rank | kaiju (with 1 and 2) |
+| 7 | Ladder at base resolution: S = h_b and h_b/2 against today's S, and base refinement under the corridor at ratio 1-2 | If slip or trench behaviour changes, the ladder was doing physical work after all | kaiju runner (box, 022 fixture), kaiju rollback rig (annulus) |
 
 **Done when:** every row has a measurement. Then Louis rules whether split coarse levels
 are deleted, kept as an option, or kept for named cases.
+
+## Ruling: the ladder matches the base mesh (Louis, 2026-11-01)
+
+Louis: "For split nodes, the ladder is to improve how we cut the mesh and this works best
+when the ladder and the base mesh have similar resolution." The rung spacing S is a mesh
+structure parameter, not a physical length. "TI fault is more complicated but I think we
+will use that less for these cross-scale problems and more for fault networks."
+
+**Why the band ratio hurt.** The sweep varied h_b/S from 6 to 97 with the width tied to 2S,
+so the ladder's element count along the fault grew while the welded base stayed put. Every
+band unknown with no coarse counterpart is a mode the coarse correction cannot touch; the
+patch must kill it exactly, and its block grows with the ratio. Row 3's gate failure (the
+band exceeding 75 % of the level) and the chain's growth are the same thing.
+
+**Consequences:**
+- **Production rule for split faults:** S = h_b/k, k in {1, 2}. Extra slip resolution comes
+  from refining the base under the fault corridor (`refine_lines`), which goes through the
+  multigrid cleanly, not from a finer ladder on an unchanged base.
+- The 022 fixture at ratios 24-97 is a solver stress test, not a production regime.
+- At ratio 1-2 the LU block is a thin strip, which bears on rows 1 and 6 (3-D cost) and
+  lowers the stakes of the iterative-patch experiments.
+- TI bands keep their own width (a modelling quantity, eta_1/w), and are for fault
+  networks rather than cross-scale problems.
+
+**Dispatched to measure before the drivers change (matrix row 7, kaiju):**
+- the box and the annulus rig at S = h_b and h_b/2 against today's S: slip profile,
+  trench behaviour, iterations and cost;
+- base refinement under the corridor (one and two rings) at ratio 1-2 against the fine
+  ladder at the same effective slip resolution.
+If the physics is unchanged, the drivers' default S changes and UWTN 2026-022's scope
+statement gains a line.
 
 ## Can the patch be an iterative solve? (Louis, 2026-11-01)
 
@@ -767,6 +799,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-01: Louis ruled the ladder matches the base mesh for split faults (section
+  above); row 7 added and dispatched. Hub briefed Louis on GenEO and on why the band ratio
+  hurts.
 - 2026-11-01: Louis: strategies must run on conda-forge PETSc as shipped. Experiment 3
   (PCHPDDM) cancelled; a hypre arm added to experiment 1.
 - 2026-11-01: Louis asked whether the patch can be iterative, and approved three 2-D
