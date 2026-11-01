@@ -2127,3 +2127,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   never wired in. Louis: "disappointing to discover it is not used and has been forgotten ... not-using to
   not-considered and then to not-available"; recorded choices become a standing rule; kaiju audits every exposed
   knob against production values; round-2 k-partitions runs with conform queued; seams-record patch coming.
+- 2026-11-01: the notes session posts the gather addendum on #892 (its earlier comment gave "the fault lies inside one
+  partition"); the hub posts nothing. From its code reading, relayed to kaiju for round 2: seams other than gather
+  require mesher="network" (the ladder only takes gather), so conform changes the mesher too; and on development
+  25d62812 gather at np > 1 first runs addon_partition.partition_addon (band region on one rank, load diffused to
+  10 %) so the placement moves nothing, while on 99259d35 the placement itself gathered. 022 now describes it so.
