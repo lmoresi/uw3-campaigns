@@ -1962,4 +1962,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   chain 0's 21-28 s FAC patch per step is too dear for a 503-row LU (likely the 3584-row f0 patch, i.e. the arms
   were not on the same mesh in steps 41-43); the "-24 % velocity iterations" is a last-application figure while
   total F-cycles per step are nearly equal (2489 vs 2527); solve times were quoted as step times. Relayed to
-  kaiju; the budget page is provisional until it replies.
+  kaiju; the budget page is provisional until it replies. **RESOLVED (budget page v3, chain page v2):** (1) the
+  chain page's patch table was misattributed: each solve configures two multigrids; the applied one
+  (rotfs1_fieldsplit_vel_) has on chain 0 a finest-level patch of 3584 owned / 3736 subdomain rows on rank 4 and
+  on chain 2 NO patch; the 465/503-row patch belongs to the solver's own prefix, applied 50 times in 3 steps. Both
+  arms solved steps 41-43 on the same rebuilt mesh f8, so the budget stands; chain 0 = welded base + patched
+  finest level (patch 21/28/25 s per step, ~10 block applications per F-cycle at ~1 ms, rank 4 alone), chain 2 =
+  split ladders, no patch, cheaper finest cycles (0.057 vs 0.085 s). (2) On the totals there is NO difference in
+  velocity work: 8.65 vs 8.74 F-cycles per velocity solve (7.92 vs 8.50 at pres_rtol 1e-2); the -24 % holds for
+  the last application of each increment only. (3) Wording fixed. **Hub's reading: on the annulus at np 16 the
+  two tails are a wash (solve 442 vs 409 s in the budget runs, 448 vs 467 on the chain page, within the +-10 %
+  run-to-run spread); the case for chain 0 is robustness (no ladder surgery on coarse levels, no refusals or
+  welding), not speed; the FAC patch on one rank is its cost.** np 32 dt anomaly: the Stokes answer differs 0.1 %
+  in vrms but dt is 28 % smaller; kaiju suspects an outlier in the base velocity that to_base transfers back,
+  not a different solve; probe running.
+- 2026-11-01: budget/chain pages corrected (v3/v2): same mesh in both arms, patch table misattributed, velocity
+  work equal on the totals; chain 0 vs 2 is a wash on speed, chain 0 wins on robustness. pres_rtol 2.3x unchanged.
+  np 32 dt anomaly suspected in the to_base transfer, probe running.
