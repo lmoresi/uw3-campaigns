@@ -103,7 +103,7 @@ Moved from `HUB.md` on 2026-10-27 and corrected against the repository.
 | UWTN 2026-019 A transcript for every run | `note/run-transcripts`, 2026-10-06 | draft; the laptop session reported it "ready for review" on 2026-10-07 | wombat (adjoint Taylor session) | a team read; metadata still says draft |
 | UWTN 2026-020 Symbolic FEM and adjoint forms | merged to `main` 2026-10-25 (PR #59) | **published** 2026-10-25, v1.0.0; a `deposit/symbolic-fem-and-adjoint-forms-…` branch exists, so the deposit has run | — | **PR #61** (Deposit: symbolic-fem-and-adjoint-forms, github-actions, opened 2026-10-26): a maintainer's merge, which records the DOI |
 | UWTN 2026-021 Model derivatives and their uses | `note/model-derivatives-and-their-uses`, 2026-10-26 (older copy on `note/discrete-adjoint`, same id and title) | draft, held | wombat adjoint session | the viscosity-floor example's result; the laptop session calls it ready to publish, the metadata says draft |
-| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **the tail hold is lifted** (Louis's ruling 2026-11-01); **rewritten for the ruling on the workbench, UNSAVED until Louis asks** (reported 2026-11-01): the construction is the base's own levels welded beneath the split child; the recipe is `stokes.set_custom_fmg(base.multigrid_levels, field_id=0)` and ran verbatim on `development` 25d62812 (2 velocity iterations, peak slip 0.1595055, the child's smoother composite SOR + ASM with one 4772-row LU block); a new section "Multigrid with a split finest level" (transfer, patch smoother, the sweep table: LU 3/3/3 and 7 per Newton iteration, ILU 8/12/16, SOR 12/17/24, chain 4/6/7, then the chain, then the bisection figure kept for Louis to decide); panel (c) redrawn as the welded hierarchy; the trench section says those runs used the chain; `software_version` = `development` @ 25d62812; the sweep's scripts and records in `figures/src/tail_sweep/`; validate, check-style and the preview clean. Open with Louis: rerun the trench demos with the welded tail or not; keep or cut `iterations.png`; pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
+| UWTN 2026-022 Faults and patch-refinement of the mesh (retitled by Louis 2026-10-28; was "Faults on an add-on mesh") | `note/faults-on-an-add-on-mesh`, 2026-10-26 on GitHub; on the wombat workbench, UNSAVED as of 2026-10-30: the ladder rewrite of the construction, recipe, multigrid, moving-fault and limits sections, the redrawn ladder figure folded in (hashes verified; scale paragraph: the S ladder adds 906 cells to the base finest's 2592, 2S adds 414, 4S adds 230 to 648), validate and check-style clean | draft; **the tail hold is lifted** (Louis's ruling 2026-11-01); **rewritten for the ruling on the workbench, UNSAVED until Louis asks** (reported 2026-11-01): the construction is the base's own levels welded beneath the split child; the recipe is `stokes.set_custom_fmg(base.multigrid_levels, field_id=0)` and ran verbatim on `development` 25d62812 (2 velocity iterations, peak slip 0.1595055, the child's smoother composite SOR + ASM with one 4772-row LU block); a new section "Multigrid with a split finest level" (transfer, patch smoother, the sweep table: LU 3/3/3 and 7 per Newton iteration, ILU 8/12/16, SOR 12/17/24, chain 4/6/7, then the chain, then the bisection figure kept for Louis to decide); panel (c) redrawn as the welded hierarchy; the trench section says those runs used the chain; `software_version` = `development` @ 25d62812; the sweep's scripts and records in `figures/src/tail_sweep/`; validate, check-style and the preview clean. Open with Louis: rerun the trench demos with the welded tail or not; keep or cut `iterations.png`. 2026-11-02 (unsaved): the ladder step now says "The fault is given as a divided line, and its points become the spine of a structured band. The spacing of the points is the rung spacing S." (Louis's 1b); pen with wombat | wombat (prose), hyperion (figure records), science hub (numbers) | kaiju's addon_demo figures via Louis's rsync; hyperion's fig_iterations records and global peak slip; review items (a), (c), (g); review of the trench section |
 | UWTN 2026-023 Underworld3 v3.2.0 release note (was 2026-021) | PR #58, jcgraciosa's fork `note/underworld3-v3-2-0` | draft | jcgraciosa | the two-line renumber (committed as 22ffc81 in the wombat adjoint session's scratch worktree, unpushed: that session may not push to the fork); then telling jcgraciosa why his branch changed |
 
 The other open pull requests on the notes repository, listed on 2026-10-27. Every one
@@ -198,6 +198,15 @@ Measured here, not inherited.
   2026-10-30 item on the drivers' chain comments is moot once that lands. When the
   driver commit exists, its sha closes the journal's decision entry of 2026-11-01 (a
   one-line message here or to the notes session is enough).
+- 2026-11-02, to the science hub: Louis's decision (the add-on is the line, `DEV-HUB.md`
+  e6832e0; journal decision entry of 2026-11-02) puts two items on the drivers:
+  `uw_chain` defaults to 0, and the trace is placed at its own division, with no
+  `uw_spacing` resampling and the band width not derived from an $S$. Both guides now
+  say the fault's points are the rungs.
+- 2026-11-02, to the dev hub: the decision entry you asked the notes session to draft
+  is committed (journal, with light edits; the 2026-11-01 decision stays live and this
+  one settles its open item). Its "where enforced" leaves you `custom_mg.py:1556`
+  naming itself the alternative and naming the add-on.
 
 ## Open work
 
@@ -469,3 +478,19 @@ Measured here, not inherited.
   the base's partition; the placement repartitions and chooses the rank), the
   "planned fix" sentence replaced since `partition_addon` is that fix; the convection
   guide's one phrase; `FAULT-SPLIT-INTEGRATION.md`. #862 pushed.
+- 2026-11-02: **Louis's decision, the add-on is the line** (`DEV-HUB.md` e6832e0). The
+  notes session, asked by the dev hub, drafted the journal decision entry and sent it
+  here to commit; checked against e6832e0 (his words, the evidence table, the mesh
+  counts, the two attribution points: "S = h_b or h_b/2" and corridor refinement were
+  the dev hub's, not his; the split tip's "one element" awaits his word) and
+  committed with light edits. The 2026-11-01 tail decision stays live; this entry
+  settles its open item (split coarse levels: kept as they are, not developed
+  further) and narrows its Allowed line. Done here: topic page (new first bullet, the
+  open item closed, the ribbon replay retired); the fault-multigrid guide gains
+  ruling 4 (the fault carries its own resolution; no $S$ parameter; refinement around
+  the fault separate; split levels not developed further), ruling 3's 2:1 clause
+  marked as the chain's, the production paragraph and the split-level section
+  updated; the convection guide's recipe takes the trace's own points and a width,
+  and its "not decided" sentence is closed (#862 pushed). For the science hub: the
+  drivers' `uw_chain` to 0 and the trace placed at its own division without
+  `uw_spacing`. For the dev hub: `custom_mg.py:1556` to name itself the alternative.

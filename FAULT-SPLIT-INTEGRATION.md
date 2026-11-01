@@ -289,6 +289,16 @@ ran verbatim on 25d62812 (2 velocity iterations, peak slip 0.1595055; the struct
 patch is one LU block per rank with no row cap, the 2000-row cap being for `fac_zone`
 blocks only, which the note states as "one block on each process").
 
+**2026-11-02, the add-on is the line.** Louis's decision (`DEV-HUB.md` e6832e0; journal
+decision entry of 2026-11-02): the add-on (the welded base's own levels, one split level,
+the FAC LU patch) is what is developed; the fault carries its own resolution as a divided
+line whose points are the rungs, with no $S$ parameter; refinement around the fault is a
+separate question; split coarse levels are not developed further and stay in the library
+as they are. For this plan: the ribbon replay is retired; the chain remains in the
+drivers until the science hub moves `uw_chain` to 0 and drops `uw_spacing`; the work
+that follows is on the patch's cost (iterative blocks, the 3-D single block, the patch
+divided across ranks), tracked by the dev hub.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
