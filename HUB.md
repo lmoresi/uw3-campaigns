@@ -279,7 +279,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
-- 2026-11-01, to the dev hub, PROBABLE LIBRARY DEFECT (parallel rotated free-slip), from your scaling job: at np
+- 2026-11-01, to the dev hub, LIBRARY DEFECT, CONFIRMED on the unfaulted case (parallel rotated free-slip at wall
+  nodes shared between ranks): TAc checkpoint 20, base mesh only, rotated free-slip, np 32, one step: three wall
+  nodes break the constraint with v.n almost all of |v| (inner wall (-0.4677, -1.1292) v.n 12146, shared by ranks
+  12/13; inner wall (1.2222, 0) v.n 10385; outer wall (-2.0022, -0.9642) v.n 7926), each a jet through the wall
+  with the interior nodes beside it raised; the faulted TAf at np 32 shows the first and third. At np 16 |v.n| <=
+  4e-13 on every wall node including the 57 shared ones; at np 32 only 2-3 of ~75 shared wall nodes fail. So the
+  constraint is MISSING at those nodes, not slightly wrong: a vertex absent from the wall label on its owning rank,
+  or absent from the rotated route's constrained-row set. Not the faults, not to_base. Repro:
+  kaiju-launch/scaling/scale.sh SRC=TAc CKPT=20 BUILD=C N=32 STEPS=1 APPTAINERENV_UW_DT_PROBE=1, then wall_vn.py on
+  the run dir (runs/scale_wallspike_*). Kaiju runs the no-solve labelling test next (distribute at np 32; for each
+  bad vertex on its owner: in the wall label? velocity row constrained?) and reports which; Louis asked the
+  question directly. Every rotated run's walls are now checked with wall_vn.py; a max |v.n| column is coming to
+  the solver record. Earlier (superseded) entry follows. PROBABLE LIBRARY DEFECT (parallel rotated free-slip), from your scaling job: at np
   32 the Stokes solution carries velocity spikes at a few WALL nodes on PARTITION BOUNDARIES (build C 94a5c965 and
   B 96d39f7b identically; TAf checkpoint 20, one step): largest base |V| 11288 at r 1.2222 (inner wall, ~248 deg,
   a node shared by ranks 12 and 13) and 8183 at r 2.2222 (outer wall, ~206 deg, rank 14), far from the fault and
@@ -1999,3 +2011,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   free-slip solution itself (not the transfer); probable library defect recorded for the dev hub; kaiju isolating
   (unfaulted case, other rank counts, v.n at the spike nodes). Scaling page: np 16 vs 52 like-for-like, np 32
   marked as a different state.
+- 2026-11-01: wall spikes confirmed on the unfaulted base mesh at np 32: the rotated free-slip constraint is missing
+  at 2-3 shared wall nodes (library defect, dev-hub entry upgraded). Kaiju's labelling test given the go; a wall
+  |v.n| check becomes a standing record column. Dev hub's fault-across-partitions test on overlay F (25d62812 +
+  96d39f7b, local merge) at rank counts whose walls check clean.
