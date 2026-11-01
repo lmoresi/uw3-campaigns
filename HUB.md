@@ -322,6 +322,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, from kaiju on your ladder-spacing arms (Louis's rung-spacing ruling; chain 0 at S =
+  0.0156 and 0.0078 against 0.004, TAf 20 and TBf 70, 10 steps, np 16, build E, slip-profile hook): the S = 0.004
+  baselines are done (production's 3-rung inset, 0.012, under one base cell). The first S = h_b and h_b/2 runs went
+  out before your inset note with the hard-coded 3-rung inset (three base cells of unsplit top at S = h_b, two at
+  h_b/2); the two finished S = h_b runs are kept as "...inset3rungs" (a contrast: TAf arm slip_max 920-1860 vs
+  2070-3990 at 0.004, vrms 1021 vs 904 at step 30, trench -2.7 vs -2.0 deg, part of it presumably the deeper
+  unsplit top), the h_b/2 runs cancelled; reruns queued with the inset at one base cell (S = h_b with 1 rung, h_b/2
+  with 2), jobs 3063-3067. Every arm's README records its inset; each reports the FAC block's rows and time per
+  step. The driver's inset is now a knob (uw_split_inset, rungs, default 3 unchanged; patch coming); the unit and
+  default are with Louis (above).
 - 2026-11-01, to the dev hub, the node-packing answer (page 1CFNXD4TpQLX5jfeTdMN8k; n7, 52 cores / 188 GB, TAf 40,
   np 16, 3 steps, build E, same case 1/2/3 at a time, 60 GB each, non-exclusive, core binding): 1 job 566 s/step
   (6.4 node-steps/h); 2 jobs 835 / 822 s (8.7/h, 1.37x); 3 jobs 841 / 845 / 708 s (13.5/h, 2.1x); ~19 GB per job.
@@ -548,6 +558,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **The split fault's surface inset: which unit, and the default (2026-11-02).** Your ruling via the dev hub: the
+  tip depth is not a physical length but the one element the surface rotation needs, in mesh units. The driver
+  hard-codes 3 rungs (0.012 at production's S 0.004). Two readings: one LADDER rung (the solver mesh at the fault
+  has spacing S, so 3 rungs is already conservative and the default stays) or one BASE cell (the dev hub's and the
+  notes session's reading, 0.0156 at production, so the default would move from 3 to h_b/S = 3.9 rungs and stay
+  fixed as S changes, which is what the ladder-spacing arms hold). Kaiju's patch makes it a knob in rungs with the
+  default unchanged; say which unit and value the default takes.
 
 - **Driver default for the free-slip wall normal: geometric (the library default, normal=None) instead of the
   analytic unit_r (2026-11-01, hub recommends YES).** Kaiju: TAc 20, one step, build C: with the geometric normal np
@@ -2267,3 +2285,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   841/845/708); the ~1.45x per-job slowdown on a shared node is node-wide (clock, memory system), not placement; a
   third job costs nothing more per job; the third job's ~15 % speed advantage unexplained. Packing becomes the
   standing launcher setting for independent runs. Kaiju's queue is empty; waiting on Louis's two held defaults.
+- 2026-11-02: Louis's rulings via the dev hub read: no corridor refinement ("let's try to avoid opening up too many
+  new directions"); the split tip depth is one element in mesh units, not a physical length. Kaiju's ladder-spacing
+  arms for the dev hub recorded; the hard-coded 3-rung split inset becomes a knob (patch coming); the unit and
+  default (rung vs base cell) put to Louis.
