@@ -1,4 +1,4 @@
-# Add-on matrix, rows 3-5 (2-D)
+# Add-on matrix, rows 3-5 and 7 (2-D)
 
 The dev hub's question is in DEV-HUB.md, under "Can the add-on replace split coarse levels everywhere?". These are rows 3-5 in 2-D. H0 is the welded base, then the split S level with the FAC LU patch, which is the production tail ruled on 2026-11-01. H1 is the lean chain of split ladders. Both fixtures are the UWTN 2026-022 tail sweep's.
 
@@ -11,9 +11,13 @@ The dev hub's question is in DEV-HUB.md, under "Can the add-on replace split coa
 | `row4_interface_laws.py` | 4 | problem B (the yielding-lid box at the faults-in-convection guide's hard state) with a viscous, Coulomb or rate-and-state law on the split fault |
 | `row5_networks.py` | 5 | problem A's box with a stop-short junction, two close parallel faults, or a TI band beside the split fault |
 | `kaiju_commands.sh` | 4, 5 | the np 4 arms, one independent job per line |
+| `row7_linear.py`, `row7_box.py` | 7 | problems A and B, H0 only, the ladder at a given S, in the base or in a base refined under the fault corridor |
+| `row7_common.py` | 7 | the corridor refinement, the slip profile in fixed coordinates, the FAC block timer |
+| `collect_row7.py` | 7 | the row 7 tables against the references |
+| `kaiju_commands_row7.sh` | 7 | 29 jobs at np 1 (problem A) and 21 at np 4 (problem B) |
 | `data/box_state_02000/` | 4 | the input row 4 reads: checkpoint 2000 of the fixed-trench fault run `stagnant_tau1x1.00_fault_x2.0_dip45` (state JSON, mesh and T). It is force-added, because the repository ignores `*.h5`. |
 
-`row4_interface_laws.py` imports `box_model` from `../zg95_lid_regimes/drivers`.
+`row4_interface_laws.py` and `row7_box.py` import `box_model` from `../zg95_lid_regimes/drivers`.
 
 ## Laws in row 4
 
@@ -24,6 +28,43 @@ Neither the sweep driver nor the guide uses a law other than frictionless, so th
 - **Rate-and-state:** f0 = 0.3, a = 0.020, b = 0.010 (test_0846's set), V0 = 1e-2 V_free, Dc = 1e-3, sigma_n from the reaction.
 
 The rotated loop's cap is raised to 200 by wrapping `rotated_bc.solve_rotated_freeslip`, because `snes_max_it` cannot reach it (underworld3 #920). At the default cap of 50, Coulomb and rate-and-state stop in the Picard phase at rel 2e-2.
+
+## Row 7: does a finer ladder do physical work?
+
+Louis, 2026-11-01: the ladder cuts the mesh best when it and the base have similar resolution. S is a mesh parameter, not a physical length, and slip resolution should come from refining the base under the fault corridor. Row 7 asks two things:
+1. whether a finer ladder changes the answer;
+2. whether a refined corridor at h_loc/S = 1-2 gives the same answer as the fine ladder at the same S.
+
+Both fixtures have h_b = 1/32. The production annulus runs at h_b/S 3.9 (S 0.004 on h_b 0.0156).
+
+| fixture | today's S | h_b/S | the row 7 S values |
+|---|---|---|---|
+| A (the 022 fixture, L = 0.4123) | the note's sweep, 80-320 rungs | 6-24 | 13, 26, 53, 80, 106, 160, 211, 320 and 640 rungs: h_b/S 1-48 |
+| B (the box, `tail_sweep_box.py`) | 0.004 | 7.9 | h_b, h_b/2, h_b/4, 0.004, h_b/16: h_b/S 1-16 |
+
+**The corridor.** `refine_lines` is a gmsh size field on `Annulus` only, and it is on `feature/adaptive-convection`, not development. Row 7 therefore refines with the nested NVB `mesh.adapt`:
+- the base refined k times inside the corridor, whose half-width is `rings` × h_b (1 or 2) around the fault, so h_loc = h_b / 2^k there, plus NVB's graded closure ring;
+- the levels are the base's, then one per doubling, then the child, all welded, then the ladder at S, split;
+- the arms pair each k with h_loc/S = 1 and 2, and with 1.5 at the S of the note's 80 and 320 rungs and of today's box 0.004, so every refined arm has an unrefined arm at the same S.
+
+**The box's tip and bridge move with S in the fixture.** The fixture splits the fault from three rung spacings below the surface, and the weak bridge is the band cells above that tip. At S = h_b, the tip would sit at depth 0.10 rather than 0.012.
+- `row7_box.py` holds the tip physical by default: `-uw_tip 0.012` puts the split's upper end at the first spine point at least 0.012 deep, at any S.
+- `-uw_tip 3S` keeps the fixture's rule. The unrefined arms run both ways.
+- The bridge stays the band cells above the tip, so it is 2S wide. A weak zone cannot be narrower than the band it lives in.
+
+**What each record holds:**
+- the slip profile in fixed physical coordinates (problem A: from the fault's end at (0.30, 0.45); B: down dip from the surface);
+- problem A: the velocity on a line across the fault's midpoint;
+- problem B: the surface velocity and the vertical velocity at depth 0.05;
+- the Newton and velocity iterations, the set-up and solve times;
+- the FAC patch's rows, its blocks' rows, their LU set-up, refactorisation and solve time (`row7_common.FacBlockTimer`);
+- the peak resident memory per rank.
+
+`collect_row7.py records` compares every arm against the finest unrefined arm. For problem B the velocity iterations come from the log, summed over every application.
+
+The cover gate is forced open (`UW_FAC_COVER=1.01`, #918) in every row 7 arm.
+
+Row 7 runs on the same build as rows 4-5, and ahead of the remaining iterative-patch probes.
 
 ## Build
 

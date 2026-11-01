@@ -21,7 +21,14 @@ The cover gate is forced open (`UW_FAC_COVER=1.01`, see #918).
 - `patch_probe.py`: the patch spec (block solver, cutting, slip coarse space) and the record helpers;
 - `iterative_patch_linear.py`, `iterative_patch_box.py`: the two drivers;
 - `kaiju_commands.sh`: 164 jobs plus an HPDDM check, one independent job per line;
-- `kaiju_commands_hypre.sh`: experiment 1's hypre BoomerAMG arms, 40 jobs.
+- `kaiju_commands_hypre.sh`: experiment 1's hypre BoomerAMG arms, 40 jobs;
+- `kaiju_commands_ratio12.sh`: experiments 1 and 2 at h_b/S 1-2, 90 jobs (below).
+
+## The regime (Louis, 2026-11-01)
+
+Louis ruled that the ladder and the base should have similar resolution, and that slip resolution comes from refining the base under the fault corridor (add-on matrix row 7). So h_b/S 24-97 is a solver stress test, not the production regime; the production annulus runs at h_b/S 3.9.
+
+`kaiju_commands_ratio12.sh` adds the production regime to both experiments: problem A at 16 and 24 rungs (h_b/S 1.21 and 1.82), and the box at S = h_b/2 (h_b/S 1.91), with every arm of the two experiments. The patch there is under 2000 rows, so cut 1 is the same as cut 0, and it runs only with the slip coarse space.
 
 ## Experiment 1: inexact block solves
 
