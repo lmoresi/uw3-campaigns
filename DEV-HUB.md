@@ -433,7 +433,7 @@ time, peak memory per rank, slip against reference.
 | 5 | Fault networks: junctions, several faults per rank, TI and unsplit bands | Overlapping patches, block coupling at junctions, TI's zone blocks against the structural block | integration session (2-D); 3-D session later |
 |   | *Row 5, np 1 (np 4 arms on kaiju):* H0's structural patch handles every network case at 66-90 velocity its once the gate lets it through, against H1's 230. H1 cannot place its 4S ladder at an 8S junction gap at all. **The defaults fail twice:** the 0.75 gate declines the pair and the TI case (#918); and with `fac_zone` keyed to a TI band, the split fault's structural rows are left out of the patch (820 its against 94 with the union), because `UW_FAC_STRUCTURAL` defaults to 0 while the `set_custom_fmg` docstring says they are "unioned in automatically". Filed as **#921** (proposed: union the structural rows whenever the finest level is split, and keep #670's default for painted bands; Louis to rule). `ti zone both` at np 4 ran past an hour where np 1 takes 15 s: a possible parallel hang, under watch on kaiju | |
 | 6 | Memory of the LU fill per rank | 3-D especially; the largest block and the fill per rank | kaiju (with 1 and 2) |
-| 7 | Ladder at base resolution: S = h_b and h_b/2 against today's S, and base refinement under the corridor at ratio 1-2 | If slip or trench behaviour changes, the ladder was doing physical work after all | kaiju runner (box, 022 fixture), kaiju rollback rig (annulus) |
+| 7 | Ladder at base resolution: S = h_b and h_b/2 against today's S (unrefined arms only; the corridor-refinement arms were the hub's addition and are dropped) | If slip or trench behaviour changes, the ladder was doing physical work after all | kaiju runner (box, 022 fixture), kaiju rollback rig (annulus) |
 
 **Done when:** every row has a measurement. Then Louis rules whether split coarse levels
 are deleted, kept as an option, or kept for named cases.
@@ -452,9 +452,22 @@ patch must kill it exactly, and its block grows with the ratio. Row 3's gate fai
 band exceeding 75 % of the level) and the chain's growth are the same thing.
 
 **Consequences:**
-- **Production rule for split faults:** S = h_b/k, k in {1, 2}. Extra slip resolution comes
-  from refining the base under the fault corridor (`refine_lines`), which goes through the
-  multigrid cleanly, not from a finer ladder on an unchanged base.
+- **Production rule for split faults:** S = h_b/k, k in {1, 2}.
+- **Correction (2026-11-02).** The hub's earlier line "extra slip resolution comes from
+  refining the base under the fault corridor" was the hub's inference, not Louis's ruling,
+  and it was relayed as his. Louis: "I don't really know where that came from. We have the
+  MMPDE that can gather points near the fault, but that's not at all the same as
+  mesh-splitting refinements. The idea of cutting the mesh to make the fault is that we
+  probably don't need a lot of refinement - it's a discontinuity so we need to represent
+  it efficiently. The ladder is to allow us to compute stresses and slip-rates accurately.
+  Some refinement will be needed to compute near-fault stress lobes, but that is a
+  different question. Let's try to avoid opening up too many new directions." Row 7's 32
+  corridor-refinement arms were dropped; its 18 unrefined arms run.
+- **The split tip is not a physical length (Louis, 2026-11-02).** The fault is the same
+  object whatever the implementation. The split stopping short of the surface is an
+  implementation detail: surface DOFs cannot be rotated, so at least one element sits
+  between the tip and the surface, and damage carries the rest of the fault. So the tip
+  depth is one element, in mesh units, not a depth to be fixed in physical units.
 - The 022 note's own sweep is ratios 6-25 (h_b 1/32); row 3's 48 and 97 are that fixture
   with more rungs and are not in the note. Both are solver stress tests above the
   production ratio. **Production itself runs at ratio 3.9** (S 0.004 on h_b 0.0156,
@@ -470,8 +483,7 @@ band exceeding 75 % of the level) and the chain's growth are the same thing.
   0.0078 against 0.004): slip profile, trench behaviour, iterations and cost, plus the FAC
   block size and its solve time, since the one-rank patch (3584 rows, 21-28 s a step at
   np 16) should shrink with the ratio;
-- base refinement under the corridor (one and two rings) at ratio 1-2 against the fine
-  ladder at the same effective slip resolution.
+- (dropped 2026-11-02: the corridor-refinement arms, see the correction above.)
 If the physics is unchanged, the drivers' default S changes and UWTN 2026-022's scope
 statement gains a line.
 
@@ -490,8 +502,9 @@ h_b = 1/32 in both fixtures; the box's S today is 0.004 (ratio 7.9).
   the weak bridge is the band above the tip, so both are tied to S. Row 7 holds the tip
   at depth 0.012 by default (the unrefined arms also run the 3S rule), and the bridge
   stays 2S wide because it is the band cells. At S = h_b the bridge is therefore wider.
-  **For Louis:** whether the split tip depth and the bridge width should be set in
-  physical units in the drivers, independent of S, now that S is a mesh parameter.
+  **Answered by Louis (2026-11-02):** the tip depth is not a physical length; it is the
+  one element the surface rotation needs, so it is set in mesh units. The bridge is the
+  band cells above it.
 - Smoke (serial counts only): A at 26 rungs with one corridor level took 70 its and a
   2122-row block; at 53 rungs with two levels, 122 its. The welded refined levels carry no
   slip, so corridor refinement may cost iterations. The kaiju grid decides.
@@ -826,6 +839,13 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: **correction.** The hub had relayed "refine the base under the fault corridor"
+  as part of Louis's ruling; it was the hub's own inference. Louis rejected it, and row 7's
+  refined arms were dropped. Louis also: the split tip is one element below the surface
+  because surface DOFs cannot be rotated, not a physical depth. His direction on the
+  method: the add-on (welded base plus a patch) is "a separate, patched-on problem that can
+  be viewed mathematically", more likely to take an iterative, independently distributed
+  solver; the split copy is "much more limited to the anticipated physical solution".
 - 2026-11-01: Louis ruled the ladder matches the base mesh for split faults (section
   above); row 7 added and dispatched. Hub briefed Louis on GenEO and on why the band ratio
   hurts.
