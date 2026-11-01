@@ -317,6 +317,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-01, to the dev hub, LIBRARY FINDING: **conform has never been usable in the annulus; the network mesher's
+  2-D assembly fails on the crust fault.** Kaiju's conform validation (job 2808: driver 3f2cc34, overlay F b5ea0980
+  = development 25d62812 + 96d39f7b, TAf 40, np 16, chain 0, -uw_fault_seams conform so mesher=network): all four
+  placement attempts raised "place_thin_volume assembly failed: RuntimeError: the ribbon assembly meshed to no
+  triangles" (place_surface.py:6051 via _place_thin_volume_2d:7352), in the rank-0 CAD step (_occ_assembly_2d with
+  the spines embedded) before any partition or seam handling, on the first build (the restored TAf 40 fault, depth
+  0.15, dip 25, on f0). Not parallel, not conform: the network mesher does not mesh this fault geometry. (The 18 Oct
+  ligament+network deadlock was a four-band set; here one fault fails outright.) Kaiju is extracting the trace and
+  running the placement in serial as the minimal repro (trace file + script to follow). Consequence for your
+  k-partitions row: with today's tools a fault cannot be spread across ranks in the annulus (gather via
+  addon_partition always one rank; conform needs the network mesher, which fails at assembly), so "does a split
+  patch lose its advantage across partitions" is unmeasurable here until one of those changes. Gather validation
+  2807 passed and the record fields (seams, partition, band_ranks, band_cells_per_rank) read correctly; the
+  -uw_fault_seams patch goes on the campaign branch as is (default gather; conform fails loudly).
 - 2026-11-01, to the dev hub, small library note: place_fault_ribbon_2d refuses seams="conform" without the network
   mesher with the message "seams='ligament' needs mesher='network'" (the text says ligament for conform too). Also
   for the record: conform cannot be combined with the drivers' chain levels (the network mesher's levels do not
@@ -2186,3 +2200,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: knob audit delivered (153 knobs x 6 families); run_info resolved params and README choices block
   approved; normal=None test at np 32 requested; TAf_env-not-a-clean-control caveat to the comparison page; the
   unwired list passed to the dev hub.
+- 2026-11-01: conform validation failed at the network mesher's assembly ("meshed to no triangles") before any
+  parallel work: conform has never been usable in the annulus; k-partitions question unmeasurable for now. Gather
+  validation passed with the new record fields; patch 3f2cc34 to be sent as is; serial repro for the dev hub
+  requested.
