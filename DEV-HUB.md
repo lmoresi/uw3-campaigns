@@ -475,6 +475,27 @@ band exceeding 75 % of the level) and the chain's growth are the same thing.
 If the physics is unchanged, the drivers' default S changes and UWTN 2026-022's scope
 statement gains a line.
 
+**Row 7 as queued (50 jobs, kaiju; scripts `addon_matrix_2026_11/row7_*` at b1c2db6).**
+h_b = 1/32 in both fixtures; the box's S today is 0.004 (ratio 7.9).
+- A, the 022 fixture, unrefined: 13 to 640 rungs (ratio 1 to 48). B, the box: S = h_b,
+  h_b/2, h_b/4, 0.004, h_b/16.
+- Corridor refinement: `refine_lines` exists only for Annulus on a feature branch (a gmsh
+  size field, not on development), so the arms use nested NVB `mesh.adapt` with a
+  distance-to-fault metric: k refinement levels in a corridor of half-width 1 or 2 base
+  cells, each paired with an unrefined arm at the same S. The refined levels are welded.
+- Records: the slip profile in physical coordinates, surface velocities (box) or the
+  velocity across the fault midpoint (A), Newton and velocity its, times, peak RSS, and
+  the FAC block's rows and time split into LU set-up, refactorisations and solves.
+- **A geometry coupling to note:** the box fixture splits from 3S below the surface and
+  the weak bridge is the band above the tip, so both are tied to S. Row 7 holds the tip
+  at depth 0.012 by default (the unrefined arms also run the 3S rule), and the bridge
+  stays 2S wide because it is the band cells. At S = h_b the bridge is therefore wider.
+  **For Louis:** whether the split tip depth and the bridge width should be set in
+  physical units in the drivers, independent of S, now that S is a mesh parameter.
+- Smoke (serial counts only): A at 26 rungs with one corridor level took 70 its and a
+  2122-row block; at 53 rungs with two levels, 122 its. The welded refined levels carry no
+  slip, so corridor refinement may cost iterations. The kaiju grid decides.
+
 ## Can the patch be an iterative solve? (Louis, 2026-11-01)
 
 Louis: "Any way we can write the add on as an iterative solve that scales better? Does it
