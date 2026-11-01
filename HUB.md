@@ -2079,3 +2079,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   0.004), below the box sweep's 7.9-24.8, which reconciles equal annulus work with the box's 4-11x; hierarchies on
   chain page v4; relayed to the notes session. Notes session asks what pressure tolerance the addon_demo trench
   runs and the restart-table runs actually used; relayed to kaiju.
+- 2026-11-01: tolerance provenance for 022 (kaiju, from logs): the addon_demo trench runs and the restart-table runs
+  all used the library defaults, outer 1e-3, pressure 1e-4, inner velocity 3.3e-5 (no -uw_pres_rtol anywhere; the
+  rungs8 build counts are records.json's n_built and may differ from "rebuilds" by the initial build). Relayed to
+  the notes session.
