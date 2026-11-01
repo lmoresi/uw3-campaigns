@@ -705,8 +705,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   measurement.
 - 2026-11-01: the `split_tail_levels` warning is a defect, benign today:
   `addon_partition._moved_wrap` marks the moved base finest non-static, so a replay is
-  attempted only at np > 1. It is a one-line fix. It and the silent cover gate are drafted
-  as issues; the notes session is filing them on Louis's authority.
+  attempted only at np > 1. It is a one-line fix. Filed by the notes session as **#919**; the
+  silent cover gate as **#918**, cross-referenced to #896. Both are labelled bug and added to
+  Project 10.
 - 2026-11-01: #906 pushed and held (`bugfix/rotated-nullspace-from-mesh` 964dc3ce, 4
   commits, the SVD-count commit last so it drops after #901). Matrix row 3 done: the
   cover gate declines large patches silently (14-22 times the iterations). A structural
