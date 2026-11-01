@@ -158,6 +158,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page: TAf vs TAf_env locator A/B (TAti to be added) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Dev hub's #902/#901 scaling check on kaiju (A dev fc67b650, B 96d39f7b, C 94a5c965; np 16/32/52; wall caveats) | https://claude.ai/artifact/ACJ6diJRBCGoBGvCa6aCxM |
 | Solver time budget and warm/cold, chain 0 vs 2 (stacked per-step budget; pres_rtol lever; cold/rebuild/warm starts) | https://claude.ai/artifact/LvNXEPD4QNkKtr2V7jDYH2 |
 | uw_chain 0 vs 2 at np 16 on development 25d62812 (Louis's production-tail check; patch rows per level and rank) | https://claude.ai/artifact/LiYdWdF3J5pnVPtTU7aDfy |
 | Fault realisations in the box: split vs TI band against the mode-II crack (the reference example; sweeps of eta_1/eta_0 and w; wall placement) | https://claude.ai/artifact/Em96SAdVik4gAdhJC5LV7x |
@@ -279,6 +280,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield (near-free), but the top 0.04 under the isotropic bridge zone carries 0.1-1 of yield, because the bridge's
   x1e-3 weakening is overridden by the global floor and rate strengthening. Driver-side (the science hub tests a
   bridge-own floor), but the library's split realisation has the same bridge design.
+- 2026-11-01, to the dev hub, your #902/#901 scaling check is DONE (page ACJ6diJRBCGoBGvCa6aCxM, kaiju). **#902
+  closed on kaiju:** development fc67b650 at np 32 fails the custom FMG build ("opportunistic custom-P FMG build
+  failed (error code 98)"), falls back, and makes no step in 20 min; with the fix (B 96d39f7b, C 94a5c965) np 32
+  and 52 build and complete; np 52 matches np 16 (step-21 vrms 634.62 vs 634.58, slip 2070.8 vs 2071.5, identical
+  Newton counts 6/6/9/7/7, velocity its per increment within one). **#901 (C vs B):** coarse cost per Newton
+  iteration 6-9x lower (0.32 vs 2.83 s at np 16; 0.85 vs 5.51 s at np 52), not flat with np (per application
+  0.10 -> 0.24 ms C, 0.89 -> 1.54 ms B); the coarse level is 3-4 % of a step so the step gains ~5 % (487 vs 513 s at
+  np 16, 339 vs 366 s at np 52); the SVD's double set-up on A and B shows (0.47-0.97 s), C's redundant LU ~0.
+  np 32 rows marked different state (wall spikes, dt 2.73e-6 vs 3.78e-6); np 52 has one unconstrained outer-wall
+  node (v.n 2722) too small to set dt, caveated; np 16 vs 52 is the like-for-like pair. Strong scaling 16 -> 52
+  ~1.5x per step (Schur-bound); memory 19 / 32 / 46-47 GB per node at 16 / 32 / 52. The orphan counts
+  restrict_unreached drops are not printed by these builds, so none reported. Your production-tail comparison
+  (build E, TAf 20 / TBf 70, chain 2 vs 0, 10 steps, np 16) is running (job 2471, first of 4); then the
+  fault-across-partitions runs (overlay F, np 16, depth caps 0.15/0.30/0.45, chain 0 vs 2); then node packing.
 - 2026-11-01, to the dev hub, LIBRARY FINDING READY TO FILE (rotated free-slip, analytic-normal path, parallel):
   **a wall node is never constrained when its owning rank holds none of the labelled wall facets at it.**
   Mechanism (rotated_bc.py, _boundary_velocity_nodes and build_rotation; in 94a5c965 and still on development
@@ -2052,3 +2067,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-01: -uw_wall_check patch applied (ee38b39, default on; validated: TAc np 32 flags 3 nodes, np 16 clean).
   Rank sweep: every count except 16 has unconstrained wall nodes (np 52's too small to set dt); inner spikes at the
   coarse mesh's 22.5-deg vertices. All production runs (np 16) verified clean to 1e-12 at their latest checkpoints.
+- 2026-11-01: dev hub's scaling check done (page ACJ6diJRBCGoBGvCa6aCxM): #902 closed on kaiju (np 32/52 build and
+  match np 16 with the fix; development fails at np 32); #901 coarse cost 6-9x lower, ~5 % per step; strong scaling
+  ~1.5x from 16 to 52. Recorded for the dev hub. TAti_smooth at step 81, ~6 steps from the base.
