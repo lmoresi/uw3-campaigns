@@ -234,6 +234,10 @@ params = uw.Params(
     uw_dip_max=140.0,
     uw_bl_T=0.7,
     uw_fault_depth_min=0.06,
+    uw_fault_seams="gather",    # the placement's seam handling for a band that straddles a partition seam: "gather"
+                                #   (the band's region moved onto one rank and carved there; every campaign run to
+                                #   2026-11-01) or "conform" (#670, 2-D: meshed through the seam, each rank its own
+                                #   side). The mesh record carries the mode and the band's cells per rank
     uw_fault_depth_max=0.25,
     uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
                                 #    lid depth of the last record plus uw_fault_lid_margin, so a
@@ -333,6 +337,20 @@ out = os.path.expanduser(params.uw_out)
 os.makedirs(out, exist_ok=True)
 r_o, r_i = annulus_radii()
 S = float(params.uw_spacing)
+if str(params.uw_fault_seams) not in ("gather", "conform"):
+    raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
+try:                                   # which mechanism puts a gathered fault on one rank (the record says)
+    import underworld3.utilities.addon_partition  # noqa: F401  (development: the add-on is partitioned first)
+    _addon_partition = True
+except ImportError:
+    _addon_partition = False
+FAULT_PARTITION = ("serial" if uw.mpi.size == 1 else
+                   "conform: meshed across the seams in place" if params.uw_fault_seams != "gather" else
+                   "gather via addon_partition.partition_addon (the band's region on one rank first)"
+                   if _addon_partition else "gather by the placement (the region moved onto one rank)")
+if params.uw_fault_seams != "gather" and int(params.uw_chain) > 0:
+    raise ValueError("-uw_fault_seams conform places with the network mesher, whose levels do not nest: "
+                     "run it with -uw_chain 0")
 W = 2.0 * S
 
 base = annulus_mesh(params.uw_cell, params.uw_refinement)
@@ -584,8 +602,13 @@ def placed_ladders(host, faults, coarsening):
     # the last resort, on the finest level only (a chain level that refuses is welded).
     # (the network mesher with ligament seams DEADLOCKED in parallel on a four-band set,
     # 2026-10-18: one rank raised inside the CAD call, the others waited; not retried)
-    attempts = [(1, 0.7, 1.0, "gather", "ladder"), (1, 0.7, 1.25, "gather", "ladder"),
-                (2, 0.7, 1.0, "gather", "ladder"), (1, 0.7, 1.5, "gather", "ladder")]
+    seams = str(params.uw_fault_seams)      # "gather" (one rank carves a straddling band) or "conform" (2-D: the
+                                             # band meshed through the partition seam, each rank its own side)
+    # the ladder only takes "gather"; any other seam mode needs the network mesher (place_fault_ribbon_2d),
+    # whose levels do not nest: conform runs with -uw_chain 0 only (checked at start-up)
+    mesher = "ladder" if seams == "gather" else "network"
+    attempts = [(1, 0.7, 1.0, seams, mesher), (1, 0.7, 1.25, seams, mesher),
+                (2, 0.7, 1.0, seams, mesher), (1, 0.7, 1.5, seams, mesher)]
     for n, (rings, clearance, widen, seams, mesher) in enumerate(attempts):
         try:
             mesh, info = place_fault_ribbon_2d(
@@ -1299,16 +1322,24 @@ class FaultedMesh:
         self.t_build = time.perf_counter() - wall
         level_cells = [int(uw.utilities.gather_data(m.dm.getHeightStratum(0)[1], bcast=True).sum())
                        for m in self.levels + [mesh]]
-        band_cells = int(uw.utilities.gather_data(int(band.sum()) if band is not None else 0, bcast=True).sum())
+        band_per_rank = [int(c) for c in uw.utilities.gather_data(
+            int(band.sum()) if band is not None else 0, bcast=True)]
+        band_cells = int(sum(band_per_rank))
         # for the solver record of the step that solves on this mesh
         self.mesh_record = {"levels_cells": level_cells,
                             "band_cells_fraction": band_cells / max(level_cells[-1], 1),
                             "split_pairs": None, "chain_welded": welded,
-                            "realisation": params.uw_fault_realisation, "width": self.width}
+                            "realisation": params.uw_fault_realisation, "width": self.width,
+                            # where the fault lives: with seams "gather" every band sits on one rank, so its FAC
+                            # patch solve is serial there (kaiju, 2026-11-01)
+                            "seams": str(params.uw_fault_seams), "partition": FAULT_PARTITION,
+                            "band_cells_per_rank": band_per_rank,
+                            "band_ranks": sum(1 for c in band_per_rank if c)}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
-                  f"built in {self.t_build:.1f} s")
+                  f"built in {self.t_build:.1f} s; band on {self.mesh_record['band_ranks']} rank(s), seams "
+                  f"{params.uw_fault_seams} ({FAULT_PARTITION})")
 
     def split_nudges(self, var):
         """Offsets that put each split copy of ``var``'s DOFs on its own side of its
