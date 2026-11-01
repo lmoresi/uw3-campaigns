@@ -468,6 +468,11 @@ band exceeding 75 % of the level) and the chain's growth are the same thing.
   implementation detail: surface DOFs cannot be rotated, so at least one element sits
   between the tip and the surface, and damage carries the rest of the fault. So the tip
   depth is one element, in mesh units, not a depth to be fixed in physical units.
+  **Driver consequence (notes session, 2026-11-02):** `annulus_faults.py`'s `trace_inset()`
+  returns 3.0 rungs for a split, which is 0.012 at S 0.004, under one base cell of 0.0156,
+  but three base cells at S = h_b. The inset should be set in base cells (one), not rungs,
+  if the default S changes. Row 7's annulus arms hold it at one base cell so the slip
+  comparison is not confounded.
 - The 022 note's own sweep is ratios 6-25 (h_b 1/32); row 3's 48 and 97 are that fixture
   with more rungs and are not in the note. Both are solver stress tests above the
   production ratio. **Production itself runs at ratio 3.9** (S 0.004 on h_b 0.0156,
