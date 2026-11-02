@@ -1005,6 +1005,13 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: **#919's review found a HIGH regression in the second fix** (7c0c62ff): marking
+  the moved base finest static made it the base of the next partition, so the first
+  level's parents were resolved through the base's own earlier move and the provenance
+  transfer would be wrong at np > 1 on a mesh-owned tail. Neither test saw it (test_1132
+  checked only the classification; test_1106 uses explicit levels). Third fix c7e6fa3b: the
+  base never moves inside `partition_addon`. test_1132 now asserts every cell's centroid
+  lies in the parent its record names at np > 1. Held; kaiju confirms before labelling.
 - 2026-11-02: HDF5 error 76 is OMPIO (#922 corrected); #923 filed for the kaiju-only
   parallel failures; #919 adds no failures against the development baseline.
 - 2026-11-02: kaiju report 2 recorded (section "Kaiju results"). #919 fixed at 7c0c62ff. The
