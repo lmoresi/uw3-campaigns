@@ -37,6 +37,7 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 | placement attempts | margin_rings 1/1/2/1, clearance 0.7, width x1/x1.25/x1/x1.5 | hard-coded, taken | the library's defaults are margin_rings 2, clearance 0.3; never compared. |
 | `uw_rebuild_rungs` | 4 | measured 2026-10-26 (rungs 8 vs 4: 29 vs 47 rebuilds, -10 % wall, trench and slip unchanged) | with the envelope the per-step trace change is 0.19-0.76 of the threshold, so production rebuilds every 2-4 steps. |
 | `uw_weld_ok` | 0 (a refused chain level refuses the build) | fixed 2026-10-29 | the silent weld put a band along the surface and OOM'd (186 GB). |
+| restart and the rung spacing | a restored crust-law polyline is sampled at the WRITING run's S until a detection re-fits it | found 2026-11-02 (kaiju); fix in test | a restart that changes `uw_spacing` therefore changes only the band width and the inset until the first re-fit, which confounded the first ladder-spacing arms. Rule (hub, 2026-11-02): the driver re-samples a restored polyline at the run's S automatically when the checkpoint's S differs, and leaves it alone otherwise so existing restarts stay bit-identical; the knob is an override for tests. |
 
 ## Model
 
