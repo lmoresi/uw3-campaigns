@@ -194,6 +194,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
 | Node-packing throughput test on kaiju (1/2/3 x 16-rank jobs per node, same case) | https://claude.ai/artifact/1CFNXD4TpQLX5jfeTdMN8k |
 | Driver knob audit: all 153 uw_* knobs against 6 run families (explicit / BASE / default), the taken-by-default list, 12 unwired or hard-coded items | https://claude.ai/artifact/NRAGaCJ3GXxypNvsAT53wL |
 | Dev hub's production-tail comparison: chain 2 vs 0, 10 steps from TAf 20 and TBf 70, np 16, development 25d62812 | https://claude.ai/artifact/BWgDzWDzzjDJXQWqVb1jrs |
@@ -597,7 +598,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   or less likely to break.** No evidence on record (3 was a placement margin in the first driver); kaiju tests
   inset 1/2/3 offline on all stored faults (placement successes, refusals, welds) and one 3-step smoke at 1 vs 3
   (slip near the top, face traction, vrms, Newton, build time, bridge coverage); if 1 places as reliably with the
-  same answer, 1 rung becomes the default. Earlier framing: Your ruling via the dev hub: the
+  same answer, 1 rung becomes the default. **TEST DONE (page T37Y3MMpYyfgQZbCmuk5YQ): half met.** History: 3.0 S
+  arrived bare in the first box driver (b38c1b9, 15 Oct), no comment, no failure behind it. Placement: 80 stored
+  faults x 3 insets x 3 levels, 720 placements: finest level 80/80 at every inset, first attempt, same time; 2S
+  80/80; 4S at 1 rung 2 refused (Earth run 1, "the fault touches the domain boundary") and 4 fell back, so 1 rung
+  is safe with chain 0 (now the default) and occasionally refuses with chain 2. Smoke (TAf 40, chain 0, 3 steps,
+  development): the cut's top at 0.0048 (1 rung) vs 0.0126 (3); slip +11-16 % in the top 0.02, +6-9 % at 0.04-0.08;
+  slip_max 6546 vs 5878; vrms 1380.09 vs 1358.92; normal traction in the top 0.04 ~1.6 % less compressive; Newton
+  6/9/6 vs 6/7/6; build time equal; the 1-rung bridge still reaches the surface (66 cells to 0.0083). **So the inset
+  is a physics choice worth ~10 % in slip: 3 rungs locks a little more of the top.** If the inset only stands in
+  for the unrotatable surface DOFs, 1 rung (with chain 0) best approximates a fault reaching the surface. Default
+  is Louis's; the patch is one line. Earlier framing: Your ruling via the dev hub: the
   tip depth is not a physical length but the one element the surface rotation needs, in mesh units. The driver
   hard-codes 3 rungs (0.012 at production's S 0.004). Two readings: one LADDER rung (the solver mesh at the fault
   has spacing S, so 3 rungs is already conservative and the default stays) or one BASE cell (the dev hub's and the
@@ -2348,3 +2359,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02: build move accepted (job 3154 passes); kaiju's series applied: choices block points at DECISIONS.md,
   uw_chain default 0 (b440b88); its ledger patch reconciled by hand into the hub's ledger edits; head bf18312.
   Journal closure sha passed to the docs hub.
+- 2026-11-02: split-inset test done: 1 rung places as reliably as 3 with chain 0 (not with chain 2 at 4S), but the
+  answer differs by ~10 % in slip (3 rungs locks more of the top); no evidence ever stood behind 3. Default to Louis.
