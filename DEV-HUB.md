@@ -1058,6 +1058,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: Louis switched "kaiju: dev runs" and "kaiju: 3-D add-on mesh" to Auto; the
+  runner was told to release its six held jobs. The 3-D session is working.
 - 2026-11-02: **Louis: stop hedging; polish the add-on, land 3-D, decompose only if
   needed.** The matrix becomes a three-phase programme (section above). #918 and #921's
   defaults are approved on the recorded evidence.
