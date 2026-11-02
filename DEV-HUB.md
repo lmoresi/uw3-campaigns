@@ -459,6 +459,76 @@ the 0.012 arm at S = h_b (0.84 h_b deep), already in the grid. Seven solve arms 
 and 2el across S); every record carries the inset in rungs, down dip and in depth, and the
 slip and leak of the four pairs nearest the tip. Row 7 is 25 jobs.
 
+## Kaiju results, 2026-11-02 (rows 4, 5, 7; builds 964dc3ce, np 4 unless stated)
+
+**Row 7, problem A** (linear 022 fixture, h_b 1/32, np 1; reference 640 rungs):
+
+| h_b/S | vel its | peak slip | slip dev max / rms | block rows | block solve s | solve s |
+|---|---|---|---|---|---|---|
+| 0.99 | 66 | 0.16074 | 9.0 % / 2.7 % | 1382 | 0.33 | 5.9 |
+| 1.97 | 69 | 0.16030 | 6.9 % / 1.9 % | 1992 | 0.55 | 6.3 |
+| 4.02 | 70 | 0.15955 | 4.8 % / 0.8 % | 3422 | 1.14 | 7.3 |
+| 8.03 | 66 | 0.15941 | 3.7 % / 0.5 % | 5996 | 2.11 | 8.4 |
+| 24.25 | 67 | 0.15921 | 2.1 % / 0.2 % | 15854 | 7.02 | 15.2 |
+| 48.51 | 65 | 0.15912 | reference | 31046 | 20.5 | 32.0 |
+
+Iterations flat at 64-70. At ratio 1-2 the slip is within 2-3 % rms, the block 8-11 times
+smaller and its solve 13-21 times cheaper than at 24. (The corridor-refinement arms that
+had started before the cut gained no slip accuracy and cost iterations: 70 to 217.)
+
+**Row 7, problem B** (the yielding-lid box, tip held at 0.012; reference S 0.00195):
+
+| h_b/S | Newton | vel its | peak slip | slip dev max / rms | surface vx dev | block rows | block total s | solve s |
+|---|---|---|---|---|---|---|---|---|
+| 0.96 | 43 | 4609 | 426.3 | 50 % / 32 % | 118 % | 1401 | 18 | 394 |
+| 1.91 | 37 | 3594 | 338.1 | 16 % / 7.4 % | 44 % | 2071 | 27 | 336 |
+| 4.06 | 40 | 3729 | 327.7 | 7.5 % / 2.5 % | 10 % | 3901 | 58 | 378 |
+| 7.88 | 42 | 4122 | 323.4 | 5.8 % / 0.9 % | 8 % | 6631 | 127 | 486 |
+| 16.0 | 38 | 3295 | 321.7 | reference | reference | 13007 | 254 | 570 |
+
+The box converges in S much more slowly than the linear fixture, because its weak bridge
+is the band cells above the tip (2S wide) and at S = h_b the bridge is 0.065 wide and the
+tip cannot be shallower than 0.026: the geometry changes with the ladder. Iterations do
+not grow with ratio; block cost grows linearly with the rung count.
+
+**Row 7, the one-element tip ("if it works"): it works at every S.** Every 1el arm converges
+in the same 35-42 Newton steps as deeper tips; the frame on the first interior pair is the
+fault's to 6 digits; the no-opening leak is at rounding; the peak slip is within 1 % of the
+0.012 tip at the same S. A shallower tip changes the surface velocity by about 25 %
+against the 0.012 reference, as expected, since the fault reaches closer.
+
+**Row 4** (interface laws, the box, np 4):
+
+| law | h_b/S | H0 its | H1 its | Newton H0/H1 | t_solve H0/H1 s | slip |
+|---|---|---|---|---|---|---|
+| viscous | 7.9 | 128 | 394 | 30/30 | 514/655 | 77.36 |
+| Coulomb | 7.9 | 308 | 843 | 77/77 | 853/1281 | 7.99 |
+| rate-state | 7.9 | 269 | 703 | 75/70 | 814/1332 | 6.63 |
+| viscous | 15.5 | 114 | 483 | 27/27 | 389/929 | 76.91 |
+| Coulomb | 15.5 | 247 | 971 | 70/71 | 852/1476 | 7.36 |
+| rate-state | 15.5 | 214 | 834 | 65/70 | 695/1518 | 6.13 |
+
+H0 takes 2.6-4.5 times fewer velocity iterations, falling with ratio where H1's rise; Newton
+counts and slip are the same.
+
+**Row 5** (networks, h_b/S 24, np 4): junction (gap 8 / 24) H0 89 / 87 against H1 261;
+pair H0 913 with the 0.75 gate, 80 with the gate open, H1 276; TI band H0 1033 gated, 131
+open, H1 338. The gate (#918) is the only thing standing between H0 and a 2-3 times win on
+networks. TI zone reruns pending.
+
+**#919:** fixed by 7c0c62ff (test_1132 passes at np 1, 2 and 4). The runner also saw
+test_1062, 1064, 1069, 1078 and 1079 fail at the earlier commit; a development baseline is
+running to separate them from #919. test_1062 also fails at 7c0c62ff ("evaluate() is
+rank-local: 58 of 58 points not located on rank 0"), probably pre-existing.
+
+**Hierarchy patch summary:** done, `feature/mg-hierarchy-patch-summary` 04b7a76f, held.
+`hierarchy.patch_summary` holds per level the blocks, owned and subdomain rows, the largest
+block and each rank's block sizes, from one allgather at install; reading it is not
+collective. No default change. Drivers read it (campaigns ed513c1).
+
+**Tier A+B on kaiju** is still spoiled by HDF5 error 76 even with node-local mesh dirs; the
+runner is stracing it. #922's cross-host diagnosis may not be the whole story.
+
 ## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
 
 Louis: "Overall, the add on is so much simpler conceptually and in terms of data copies and
@@ -909,6 +979,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: kaiju report 2 recorded (section "Kaiju results"). #919 fixed at 7c0c62ff. The
+  patch summary branch is held.
 - 2026-11-02: kaiju runner's interim report 1 (via the integration session).
   - **#919:** the first fix (18e57147) did not fix it: a base with no add-on levels moves the
     base mesh itself, which carries no `_mg_static`. New fix 7c0c62ff: `partition_addon`
