@@ -484,9 +484,11 @@ needed.
   (`UW_FAC_STRUCTURAL=1 UW_FAC_COVER=1.01`); serial converges in 94 its. No rank-asymmetric
   collective found by reading `custom_mg.build`'s zone path, so it is either PCASM set-up
   with overlapping cross-rank blocks or a non-converging solve. Needs stacks
-  (`faulthandler.dump_traceback_later` on every rank). #921 makes this union the default
-  for a zone keyed on a split level, so it is held until the hang is found; #918 stands on
-  its own. The pair case (zone none) passed at np 4: 80 its, all 31,326 block rows on one
+  (`faulthandler.dump_traceback_later` on every rank). Filed as **#925**. Hypothesis from
+  the code: a seam-halo row can sit in another rank's zone block and in the fault rank's
+  structural block, and basic ASM sums both corrections, which would stall convergence
+  rather than deadlock. #921 makes this union the default for a zone keyed on a split
+  level, so it is held until #925 is found; #918 stands on its own. The pair case (zone none) passed at np 4: 80 its, all 31,326 block rows on one
   rank.
 - **No branch adds a real failure.** tests/parallel fails the baseline's set everywhere
   (#923), plus error-76 casualties; tier A+B has 16 host failures common to every branch
@@ -495,7 +497,11 @@ needed.
   branch's parallel run had error-76 failures inside the tests' spawned serial reference
   runs; the near-alone baseline had none. Load tracks it; the spawned children may not
   inherit the job environment (unchecked). Error-76 failures are infrastructure, and their
-  casualties need a low-load rerun before any verdict.
+  casualties need a low-load rerun before any verdict. **Settled from the code:**
+  `tests/parallel/serial_reference.py` drops every `OMPI_*` variable from the spawned child,
+  so the children never saw `OMPI_MCA_io=^ompio` and all ran OMPIO; ROMIO under load is
+  untested. A small PR (approved by the hub, test infrastructure) keeps the MCA component
+  selections in the child while dropping the job-identity variables.
 - **#923:** test_1078's serial value on kaiju equals its parallel one: a per-host baseline,
   not partition dependence.
 - **The runner is sandboxed again** (no apptainer, Slurm unreachable); nothing builds or
