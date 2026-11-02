@@ -2260,6 +2260,8 @@ def write_choices(explicit, effective, info):
     block = "\n".join([
         "", f"## Choices ({info['started']}, driver {info['driver_commit']}, underworld3 {info['uw3_commit']}, "
             f"np {info['mpi_ranks']}, restart from {info['restart_from']})",
+        "", "Each value's status and evidence: see zg95_lid_regimes/DECISIONS.md (the drivers are not part of "
+            "underworld3, so their decisions are recorded there). A run that changes a decision says so here.",
         "", "| knob | value | set on the launch line or default |", "|---|---|---|", *rows, *eff, ""])
     with open(os.path.join(out, "README.md"), "a") as f:
         f.write(block + "\n")
