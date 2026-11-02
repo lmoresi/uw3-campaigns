@@ -26,7 +26,7 @@ The cover gate is forced open (`UW_FAC_COVER=1.01`, see #918).
 
 ## The regime (Louis, 2026-11-01)
 
-Louis ruled that the ladder and the base should have similar resolution, and that slip resolution comes from refining the base under the fault corridor (add-on matrix row 7). So h_b/S 24-97 is a solver stress test, not the production regime; the production annulus runs at h_b/S 3.9.
+Louis: "For split nodes, the ladder is to improve how we cut the mesh and this works best when the ladder and the base mesh have similar resolution." (The refinement of the base under the fault corridor that an earlier version of this note attached to that ruling was not his, and was dropped.) So h_b/S 24-97 is a solver stress test, not the production regime; the production annulus runs at h_b/S 3.9.
 
 `kaiju_commands_ratio12.sh` adds the production regime to both experiments: problem A at 16 and 24 rungs (h_b/S 1.21 and 1.82), and the box at S = h_b/2 (h_b/S 1.91), with every arm of the two experiments. The patch there is under 2000 rows, so cut 1 is the same as cut 0, and it runs only with the slip coarse space.
 
@@ -47,6 +47,36 @@ Two cautions for reading the results:
 The structural patch is cut into strips 1, 2, 4 or 8 rung spacings long (`UW_FAC_STRIP_WIDTH`, LU blocks), each with and without the slip coarse space. The comparisons are pieces of 2000 rows with the coarse space (the earlier 79-85), and one LU block.
 
 The slip coarse space has one column per piece that carries slip. So m = 1 makes its dimension the rung count: 320-1280 here, and in 3-D the number of rung columns on the sheet. This is the cost to weigh against the tiny local solves.
+
+## Results on the box (kaiju, 2026-11-02)
+
+Kaiju runs 3331 (probe overlay 53924f82, campaigns 1fda846: the fixed-step and strip arms) and 3332 (8f94ee21: the rtol arms, 4 h limit), problem B at np 4. Solve time in seconds. Every converged arm matches its LU reference in Newton count (42 at S 0.004, 44 at S 0.015625; one arm 43) and in peak slip (323.44 and 369.55).
+
+**Experiment 1, inexact block solves:**
+
+| arm | S 0.004, cut 0 | S 0.004, cut 1 | S 0.015625, cut 0 |
+|---|---|---|---|
+| LU (reference) | 603 | 433 | 516 |
+| ILU(2), 5 steps | 1299 | 1404 | 766 |
+| ILU(2), 10 steps | 1918 | 1956 | 1065 |
+| ILU(1), 5 / 10 steps | over 1 h | over 1 h | 830 / 945 |
+| GAMG, 5 / 10 steps | 1750 / 2102 | 2089 / 2058 | 931 / 869 |
+| hypre, 5 / 10 steps | 2360 / 2179 | 2248 / 2981 | 923 / 1207 |
+| GAMG, rtol 1e-1 / 1e-2 (cap 200) | 7303 / 12532 | 6578 / - | - |
+| ILU(1), rtol 1e-1 / 1e-2 (cap 200) | 9349 / 11889 | - | - |
+
+GAMG at rtol 1e-3 was cancelled at 4 h. The fastest inexact solve took 1.48 to 3.2 times LU's time. The rule set beforehand was LU unless an inexact solve came within about 10 %, so **LU stays the FAC block solver**. The knobs that varied the FAC smoother for this experiment are removed from the library (underworld3 `feature/fac-block-solver-lu`). Problem A's arms were not collected; the question was closed on the box.
+
+**Experiment 2, strips of N rung spacings (LU blocks), with and without the slip coarse space.** This is evidence for phase 3 (decomposing the add-on problem, if 3-D needs it), not a default:
+
+| strip | S 0.004: no slip space / slip space | S 0.015625: no slip space / slip space |
+|---|---|---|
+| 1 | 1153 / 1002 | 610 / 667 |
+| 2 | 1045 / 881 | 597 / 616 |
+| 4 | 806 / 789 | 547 / 543 |
+| 8 | 571 / 632 | 497 / 482 |
+
+Strips of 8 come within 7 % of the single LU block (571 against 603; 482 against 516), so cutting the structural block along strike costs little time at that length. Bounding the block's size this way is #895's lever.
 
 ## Experiment 3: PCHPDDM (GenEO), ruled out
 
