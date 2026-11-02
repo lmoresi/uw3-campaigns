@@ -69,7 +69,8 @@ def table_A(recs):
 
 
 def table_B(recs):
-    unref = [r for r in recs if r["depth"] == 0 and r["tip_rule"] == "0.012"]
+    unref = [r for r in recs if r["depth"] == 0 and r["tip_rule"] == "0.012"
+             and not r.get("tip_exact") and (r.get("bridge") or {}).get("rule", "band") != "smooth"]
     ref = min(unref or recs, key=lambda r: r["S"])
     rp, rs, rv = ref["slip_profile"], ref["surface_vx"], ref["vy_at_depth_0.05"]
     print(f"\nProblem B (h_b = {ref['h_b']:.5f}); reference: unrefined, S {ref['S']:.5f}, "
@@ -117,6 +118,38 @@ def table_tip(recs):
               f"{r.get('vel_its_all_applications', '?')} |")
 
 
+def table_geometry_held(recs):
+    """The box with the tip and the bridge held physical: each family (tip depth,
+    bridge width) against its own finest S."""
+    held = [r for r in recs if r.get("tip_exact") or (r.get("bridge") or {}).get("rule") == "smooth"]
+    if not held:
+        return
+    print("\nThe box with the geometry held: the tip exactly at its depth, the bridge a smooth "
+          "zone of fixed width; each family against its own finest S\n")
+    print("| tip | bridge width | S | h_b/S | inset el | Newton | vel its (apps) | peak slip | "
+          "slip max / rms | surface vx max | vy(0.95) max | block rows | solve s |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    fam = {}
+    for r in held:
+        fam.setdefault((round(r["tip_depth"], 4), r["bridge"]["width"]), []).append(r)
+    for key in sorted(fam):
+        group = fam[key]
+        ref = min(group, key=lambda r: r["S"])
+        rp, rs, rv = ref["slip_profile"], ref["surface_vx"], ref["vy_at_depth_0.05"]
+        for r in sorted(group, key=lambda r: -r["S"]):
+            pmax, prms = rel_diff(r["slip_profile"]["s"], r["slip_profile"]["V"], rp["s"], rp["V"])
+            smax, _ = rel_diff(r["surface_vx"]["x"], r["surface_vx"]["vx"], rs["x"], rs["vx"])
+            vmax, _ = rel_diff(r["vy_at_depth_0.05"]["x"], r["vy_at_depth_0.05"]["vy"], rv["x"], rv["vy"])
+            t = r.get("tip") or {}
+            print(f"| {key[0]:.4f} | {key[1]:g} | {r['S']:.5f} | {r['h_b_over_S']:.2f} | "
+                  f"{t.get('inset_elements', float('nan')):.2f} | "
+                  f"{r['newton_iterations']}{'' if r['converged'] else ' (unconverged)'} | "
+                  f"{r.get('vel_its_all_applications', '?')} ({r.get('vel_applications', '?')}) | "
+                  f"{r['peak_slip']:.2f} | {'ref' if r is ref else f'{pmax:.4f} / {prms:.4f}'} | "
+                  f"{'ref' if r is ref else f'{smax:.4f}'} | {'ref' if r is ref else f'{vmax:.4f}'} | "
+                  f"{max(r['fac_blocks']['block_rows'], default=0)} | {r['t_solve_s']} |")
+
+
 if __name__ == "__main__":
     recs = load(sys.argv[1] if len(sys.argv) > 1 else "records")
     A = [r for r in recs if r["problem"].startswith("A")]
@@ -124,5 +157,9 @@ if __name__ == "__main__":
     if A:
         table_A(A)
     if B:
-        table_B(B)
+        legacy = [r for r in B if not r.get("tip_exact")
+                  and (r.get("bridge") or {}).get("rule") != "smooth"]
+        if legacy:
+            table_B(legacy)
         table_tip(B)
+        table_geometry_held(B)

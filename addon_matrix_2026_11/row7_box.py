@@ -61,6 +61,8 @@ params = uw.Params(
     uw_rings=1,               # corridor half-width in base cells h_b
     uw_tip="0.012",           # the split's upper tip depth, "3S" (the fixture's rule) or "1el" (k elements)
     uw_mesh_only=0,           # 1: stop after the placement, with the tip record
+    uw_tip_exact=0,           # 1: sample the spine at S from the tip, so the tip is at the asked depth
+    uw_bridge_width=0.0,      # > 0: the weak bridge a smooth zone this wide (physical), not 2S of band cells
     uw_max_it=200,            # the rotated loop's cap (its default 50; #920)
     uw_out="records/B7.json",
 )
@@ -113,6 +115,18 @@ else:
     inset_asked = None
     tip_depth_asked = 3.0 * S if tip_rule == "3S" else float(tip_rule)
     trace = spine[spine[:, 1] <= 1.0 - tip_depth_asked]
+if int(params.uw_tip_exact):
+    # the spine sampled at S from the tip itself, up past y = 1.02 and down to the
+    # fault's depth, so the tip is at the asked depth at every S (the fixture samples
+    # from y = 1.02 down, and its tip is the first spine point below the depth)
+    if tip_depth_asked is None:
+        raise ValueError("-uw_tip_exact needs a tip depth or 3S, not an element inset")
+    tip_point = surface_point + down_dip * (tip_depth_asked / np.sin(dip))
+    k_up = int(np.ceil((1.02 - tip_point[1]) / np.sin(dip) / S))
+    k_down = max(1, int(round((float(p["uw_fault_depth"]) - tip_depth_asked) / np.sin(dip) / S)))
+    spine = tip_point + (np.arange(-k_up, k_down + 1) * S)[:, None] * down_dip
+    trace = spine[k_up:]
+    n_fine = len(spine) - 1
 
 wall = time.perf_counter()
 base = box_mesh(p["uw_width"], p["uw_cell"], p["uw_refinement"])
@@ -158,10 +172,28 @@ ab = b - a
 s = np.clip(((c - a) @ ab) / (ab @ ab), 0.0, 1.0)
 d = np.linalg.norm(c - (a + s[:, None] * ab), axis=1)
 bridge = (d < S) & (c[:, 1] > trace[0, 1] - S)
-zone.array[:, 0, 0] = bridge.astype(float)
+bridge_width = float(params.uw_bridge_width)
+s_tip = float((trace[0] - surface_point) @ down_dip)
+if bridge_width > 0:
+    # a smooth zone of physical width w across the fault (a super-Gaussian in the
+    # distance from it) from the surface down to the tip (a tanh of width w/4 along
+    # it), sampled at the quadrature points, so its width does not follow S
+    xs, ys = mesh.X
+    along = (xs - surface_point[0]) * down_dip[0] + (ys - surface_point[1]) * down_dip[1]
+    across = (xs - surface_point[0]) * n_fault[0] + (ys - surface_point[1]) * n_fault[1]
+    chi = (sympy.exp(-(2 * across / bridge_width) ** 6)
+           * (1 + sympy.tanh((s_tip - along) / (bridge_width / 4))) / 2)
+    cc = c - surface_point
+    chi_c = (np.exp(-(2 * (cc @ n_fault) / bridge_width) ** 6)
+             * (1 + np.tanh((s_tip - cc @ down_dip) / (bridge_width / 4))) / 2)
+    bridge = chi_c > 0.5
+    zone.array[:, 0, 0] = chi_c
+else:
+    chi = None
+    zone.array[:, 0, 0] = bridge.astype(float)
 
 stokes = uw.systems.Stokes(mesh, velocityField=v, pressureField=pr)
-weak = 1 - (1 - float(p["uw_eta_w"])) * zone.sym[0]
+weak = 1 - (1 - float(p["uw_eta_w"])) * (zone.sym[0] if chi is None else chi)
 set_viscoplastic(stokes, T.sym[0], float(p["uw_deta"]), float(p["uw_tau0"]), float(p["uw_tau1"]),
                  float(p["uw_yield_softness"]), weak)
 stokes.constitutive_model.Parameters.yield_stress_min = -sympy.oo
@@ -223,7 +255,9 @@ record = {
     "depth": depth, "rings": rings, "corridor_half_width": rings * H_B if depth else 0.0,
     "h_local": h_local, "h_local_over_S": h_local / S, "h_corridor_realised": h_corridor,
     "tip_rule": tip_rule, "tip_depth_asked": tip_depth_asked, "inset_asked_elements": inset_asked,
-    "tip": tip, "pairs_near_tip": near_tip,
+    "tip": tip, "pairs_near_tip": near_tip, "tip_exact": int(params.uw_tip_exact),
+    "bridge": {"rule": "smooth" if bridge_width > 0 else "band cells (2S)",
+               "width": bridge_width if bridge_width > 0 else 2 * S, "length_down_dip": s_tip},
     "tip_depth": float(1.0 - trace[0, 1]), "trace_points": int(len(trace)),
     "bridge_cells": int(uw.mpi.comm.allreduce(int(bridge.sum()))),
     "level_cells": [rc.n_cells(m) for m in levels] + [rc.n_cells(mesh)],

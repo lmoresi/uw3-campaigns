@@ -2,7 +2,7 @@
 # The add-on matrix row 7 (dev hub, 2026-11-01), for the kaiju dev runner: does a finer
 # ladder do physical work? H0 only, the ladder in the base as it is. (The corridor-
 # refinement arms were dropped on 2026-11-02: Louis did not propose them.) Every line
-# is an independent job (25: 9 at np 1, 16 at np 4); run each from this directory with the underworld3 overlay built from bugfix/rotated-nullspace-from-mesh @
+# is an independent job (35: 9 at np 1, 26 at np 4); run each from this directory with the underworld3 overlay built from bugfix/rotated-nullspace-from-mesh @
 # 964dc3ce (the rows 4-5 build). OMP_NUM_THREADS=1 for every rank. Row 7 runs ahead of
 # the remaining iterative-patch probes. Tabulate with: python collect_row7.py records
 set -u
@@ -47,3 +47,19 @@ mpirun -np 4 python -u row7_box.py -uw_spacing 0.03125 -uw_depth 0 -uw_rings 1 -
 mpirun -np 4 python -u row7_box.py -uw_spacing 0.015625 -uw_depth 0 -uw_rings 1 -uw_tip 2el -uw_out records/B7_s0.015625_d0_tip2el.json > logs/B7_s0.015625_d0_tip2el.log 2>&1
 mpirun -np 4 python -u row7_box.py -uw_spacing 0.004 -uw_depth 0 -uw_rings 1 -uw_tip 2el -uw_out records/B7_s0.004_d0_tip2el.json > logs/B7_s0.004_d0_tip2el.log 2>&1
 mpirun -np 4 python -u row7_box.py -uw_spacing 0.001953125 -uw_depth 0 -uw_rings 1 -uw_tip 2el -uw_out records/B7_s0.001953125_d0_tip2el.json > logs/B7_s0.001953125_d0_tip2el.log 2>&1
+
+# the geometry held while S varies (dev hub, 2026-11-02): is the box's slow convergence
+# in S the weak bridge and the tip riding on S? The tip exactly at depth 0.026 (the spine
+# sampled from the tip; at least one element at every S, 1.1 at h_b) and the bridge a
+# smooth zone of physical width, 0.008 (the reference arms' 2S) or 0.0654 (2 h_b, resolved
+# at every S). Each family is compared with its own finest S (collect_row7.py).
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.03125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.008 -uw_out records/B7_s0.03125_d0_tipx0.026_bw0.008.json > logs/B7_s0.03125_d0_tipx0.026_bw0.008.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.015625 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.008 -uw_out records/B7_s0.015625_d0_tipx0.026_bw0.008.json > logs/B7_s0.015625_d0_tipx0.026_bw0.008.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.0078125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.008 -uw_out records/B7_s0.0078125_d0_tipx0.026_bw0.008.json > logs/B7_s0.0078125_d0_tipx0.026_bw0.008.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.004 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.008 -uw_out records/B7_s0.004_d0_tipx0.026_bw0.008.json > logs/B7_s0.004_d0_tipx0.026_bw0.008.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.001953125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.008 -uw_out records/B7_s0.001953125_d0_tipx0.026_bw0.008.json > logs/B7_s0.001953125_d0_tipx0.026_bw0.008.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.03125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.0654 -uw_out records/B7_s0.03125_d0_tipx0.026_bw0.0654.json > logs/B7_s0.03125_d0_tipx0.026_bw0.0654.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.015625 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.0654 -uw_out records/B7_s0.015625_d0_tipx0.026_bw0.0654.json > logs/B7_s0.015625_d0_tipx0.026_bw0.0654.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.0078125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.0654 -uw_out records/B7_s0.0078125_d0_tipx0.026_bw0.0654.json > logs/B7_s0.0078125_d0_tipx0.026_bw0.0654.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.004 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.0654 -uw_out records/B7_s0.004_d0_tipx0.026_bw0.0654.json > logs/B7_s0.004_d0_tipx0.026_bw0.0654.log 2>&1
+mpirun -np 4 python -u row7_box.py -uw_spacing 0.001953125 -uw_depth 0 -uw_rings 1 -uw_tip 0.026 -uw_tip_exact 1 -uw_bridge_width 0.0654 -uw_out records/B7_s0.001953125_d0_tipx0.026_bw0.0654.json > logs/B7_s0.001953125_d0_tipx0.026_bw0.0654.log 2>&1

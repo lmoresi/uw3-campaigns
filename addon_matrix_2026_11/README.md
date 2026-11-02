@@ -14,7 +14,7 @@ The dev hub's question is in DEV-HUB.md, under "Can the add-on replace split coa
 | `row7_linear.py`, `row7_box.py` | 7 | problems A and B, H0 only, the ladder at a given S |
 | `row7_common.py` | 7 | the slip profile in fixed coordinates, the FAC block timer |
 | `collect_row7.py` | 7 | the row 7 tables against the references |
-| `kaiju_commands_row7.sh` | 7 | 9 jobs at np 1 (problem A) and 16 at np 4 (problem B) |
+| `kaiju_commands_row7.sh` | 7 | 9 jobs at np 1 (problem A) and 26 at np 4 (problem B) |
 | `data/box_state_02000/` | 4 | the input row 4 reads: checkpoint 2000 of the fixed-trench fault run `stagnant_tau1x1.00_fault_x2.0_dip45` (state JSON, mesh and T). It is force-added, because the repository ignores `*.h5`. |
 
 `row4_interface_laws.py` and `row7_box.py` import `box_model` from `../zg95_lid_regimes/drivers`.
@@ -67,6 +67,21 @@ So those 32 arms were dropped. The drivers keep the option at its default of 0.
 - The top pair's frame normal (the measure-weighted normal of its Plus facets) matches the fault's normal to 12 digits in every arm.
 - At one element the tip's shortest edge is 0.54-0.68 S: that is the band cell clipped by the surface.
 - Whether one element works in the solve (convergence, and the slip on the pairs next to the tip) is what the `1el` arms on kaiju answer. `pairs_near_tip` records the four pairs nearest the surface.
+
+**On kaiju, one element works at every S:**
+- Newton 35-42, the same as the deeper tips;
+- the frame is exact, and the leak is at rounding;
+- the peak slip is within 1% of the 0.012 tip at the same S.
+
+**Geometry held (dev hub, 2026-11-02).** The box converges more slowly in S than problem A. The bridge (2S of band cells) and the tip (a spine point) both move with S. The hold-geometry arms fix both:
+- `-uw_tip_exact 1` samples the spine at S from the tip, so the tip lies at the asked depth.
+- `-uw_bridge_width w` makes the bridge a smooth zone of physical width w, sampled at the quadrature points: a super-Gaussian across the fault, and a tanh of width w/4 at the tip.
+
+The tip is held at 0.026, which is at least one element at every S (1.1 at h_b). At 0.012 it would be 0.52 elements at S = h_b; that placed cleanly in a serial check, but it falls below Louis's one element. There are two widths:
+- 0.008, the reference arms' 2S;
+- 0.0654 (2 h_b), which every S resolves.
+
+Each family is compared with its own finest S. If both converge in S as problem A does, the box's slow convergence is the geometry riding on S, not the ladder.
 
 **What each record holds:**
 - the slip profile in fixed physical coordinates (problem A: from the fault's end at (0.30, 0.45); B: down dip from the surface);
