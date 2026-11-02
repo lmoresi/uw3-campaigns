@@ -394,6 +394,59 @@ as the record, until step 4's 3-D measurement shows one block is unaffordable. I
 stacked on `feature/fac-structural-segments`, a measurement-knob branch not meant for
 merge.
 
+## PROGRAMME: polish the add-on, land 3-D, then decompose if needed (Louis, 2026-11-02)
+
+Louis: "I'd like to stop hedging bets. If this is the best choice we should try to polish it
+up so that it works for all the cases we need, we should land 3D and then see if that
+add-on problem needs to be decomposed separately."
+
+The matrix stops being a comparison and becomes a programme in three phases. No more
+alternative-hierarchy arms; the chain is measured only as the baseline it already is.
+
+**Phase 1: polish the add-on in 2-D so it works for every case we need.** Owner: the
+integration session (code), the kaiju runner (runs).
+1. Land the defaults the measurements already justify, each as a small PR from
+   development, test first, in this order:
+   - #918, the cover gate decides on structure (background under 2 %), logged either way;
+   - #921, the split fault's structural rows are always in the patch when the finest
+     level is split;
+   - #919 (third fix c7e6fa3b) once kaiju confirms;
+   - the hierarchy patch summary (04b7a76f), so drivers stop making MPI calls;
+   - #920 (`snes_max_it` reaches the rotated loop).
+   #918 and #921 are solver-default changes: Louis's go is given by this section, with
+   the row 3 and row 5 numbers as the evidence; the PR bodies cite them.
+2. The patch solver: pick the block solver from experiment 1's results when they land
+   (LU stays unless an inexact solve matches it within about 10 % on the box, where it
+   is currently 3 min per Newton step). Record the choice as the default and delete the
+   losing knobs (`UW_FAC_SUB_PC`, strip width, the probe-only options).
+3. Solver tolerances: the pressure (Schur) rtol default, 0.1 x tol today, with kaiju's
+   evidence for 1e-2 (28-57 % of Stokes time, same answer to 7e-6): one PR, Louis's
+   evidence already seen; the drivers stop setting it per run.
+4. Ladder: the fault's own division sets the rungs (1b); S goes from the drivers' trace
+   sampling; the split inset is one element; the weak-zone width is a model parameter in
+   physical units (pending the geometry-held check, which is queued). One driver PR
+   through the science hub.
+5. Cases that must work, each with a test: frictionless, viscous, Coulomb, rate-and-state;
+   a junction, a pair, a TI band beside a split; the annulus with rotated walls at np 16;
+   a fault across partitions (row 2, once kaiju runs it).
+Done when: every case has a passing test on development, the defaults carry no probe
+knobs, and the guides say what ships.
+
+**Phase 2: land 3-D.** Owner: the kaiju 3-D session (M1-M3 of its plan), with the runner.
+The 2-D defaults from phase 1 are what it builds on; it does not re-open them. Milestone
+order unchanged: `place_fault_ribbon` parity, the 3-D rig test, np 4 in CI, then the shell
+and the outcrop. The 3-D single-block cost at the fault's own resolution is measured as
+part of M2, not before it.
+
+**Phase 3: decompose the add-on problem only if phase 2 shows the need.** The slip coarse
+space, strips, and the fault across ranks (point 3 of the decision) are held until a 3-D
+measurement says one block per rank is unaffordable. Experiment 2's results are kept as
+the evidence base for that day; no further work on them now.
+
+**What stops:** alternative hierarchies, the band-ratio sweeps beyond what phase 1 needs,
+GenEO and any strategy outside conda-forge PETSc, corridor refinement, and new matrix
+rows. New findings go to issues, and into phase 1 only if they block a listed case.
+
 ## DECISION: the add-on is the line (Louis, 2026-11-02)
 
 Louis, after the integration session's evidence comparison (his words): "OK - let's go with
@@ -1005,6 +1058,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: **Louis: stop hedging; polish the add-on, land 3-D, decompose only if
+  needed.** The matrix becomes a three-phase programme (section above). #918 and #921's
+  defaults are approved on the recorded evidence.
 - 2026-11-02: **#919's review found a HIGH regression in the second fix** (7c0c62ff): marking
   the moved base finest static made it the base of the next partition, so the first
   level's parents were resolved through the base's own earlier move and the provenance
