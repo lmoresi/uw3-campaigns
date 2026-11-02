@@ -245,9 +245,12 @@ params = uw.Params(
                                 #   side). The mesh record carries the mode and the band's cells per rank
     uw_resample_restored="auto",  # restart: re-sample restored crust-law polylines at this run's S when it differs from
                                 #   the checkpoint's ("auto"); "force" or "never" for tests
-    uw_split_inset=3.0,         # how many rungs inside the outer wall the split's cut stops (3: 0.012 at S = 0.004).
-                                #   Louis, 2026-11-02: the inset is one element because the surface DOFs cannot be
-                                #   rotated, not a physical depth (the unit, a rung or a base cell, is his to set)
+    uw_split_inset=1.0,         # how many rungs inside the outer wall the split's cut stops. 1 (Louis, 2026-11-02: "logical
+                                #   set back based on the purpose, appears to be safe"): the inset is one element because the
+                                #   surface DOFs cannot be rotated, not a physical depth. 3 before (no recorded reason). Kaiju
+                                #   test (page T37Y3MMpYyfgQZbCmuk5YQ): 1 rung placed all 80 stored faults on the finest and 2S
+                                #   levels, but refused 2 of 80 at the 4S chain level, so a chain 2 run should set 2 or 3;
+                                #   slip is ~10 % higher than at 3 (the cut reaches 0.005 instead of 0.013 below the surface)
     uw_fault_depth_max=0.25,
     uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
                                 #    lid depth of the last record plus uw_fault_lid_margin, so a
