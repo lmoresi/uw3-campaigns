@@ -328,6 +328,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub and the docs hub: Louis has approved the campaign's build move to development (today).
+  New kaiju runs build from the development head of the day and record it; the uw_chain driver default goes to 0 in
+  the same commit (your #892 ruling's condition met). The docs hub's journal entry closes on that commit's sha,
+  which I record here when kaiju sends the patch.
 - 2026-11-02, to the dev hub, Louis on the wall-normal defect: "I'm still puzzled how this could go so wrong and be
   undetected previously. Geometrical / analytic is an obvious work-around, but in cases where there is no such
   value available, is there a latent bug." The hub's answer for your intake: the latent bug is on the
@@ -627,6 +631,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   frictionless. Also: the faulted thermal results are a lower bound (split slipped at ~0.4-0.5 of a
   surface-breaking fault); whether that needs saying in the note is the docs hub's, the number is on the page.
 
+- **Build move: GO (Louis, 2026-11-02).** New campaign runs build from current development (the leak fix, A/B/C,
+  #912 and #914 are on it); the pinned leak-fix overlay 547c2e54 is retired for new work; running comparisons and
+  restarts keep their pinned builds; every README records its build. The driver default `uw_chain` goes to 0 in the
+  same commit (kaiju's held patch). Acceptance: the one-step TAf 40 check at np 16 on the fresh development build
+  (walls clean, answer to the printed figures against the 25d62812 chain-0 run). Ledger updated.
 - Earth production run: **GO (Louis to kaiju, 2026-10-29: "Looks like we can go with this to get more steps. The
   continent is fine to deform, honestly. They do that, unless they are cratons.")** Launched as job 2374 (n2):
   runs/slab_earth_run1, launcher kaiju-launch/earth/production.sh, driver 07667b2 pinned in zg95-earth-prod,
@@ -2329,3 +2338,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hub: the geometric path is the safe one; a parallel test at an orphan-vertex partition and a post-solve
   constraint check in the rotated route); (3) the drivers are not underworld3: decisions must be findable, so
   zg95_lid_regimes/DECISIONS.md is created (e8015a6) and is a standing rule.
+- 2026-11-02: Louis: go on the build move. Kaiju told: build from current development for new runs, retire the
+  leak-fix overlay for new work, send the uw_chain 0 default patch with the ledger pointer, run the one-step
+  acceptance check. Recorded for the dev and docs hubs; ledger to be updated with the commit.
