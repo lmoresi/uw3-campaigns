@@ -135,6 +135,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   no --exclusive, core binding, no socket pinning (pinning has no effect); 2.1x node throughput. Timing studies and
   cost comparisons stay exclusive (a shared node slows each job ~1.45x whether two or three share it). Page
   1CFNXD4TpQLX5jfeTdMN8k v2.
+- **The drivers are not underworld3; their decisions live beside them (Louis, 2026-11-02).** "We treat the driver
+  for the fault runs as something that is fundamentally part of underworld. But it isn't ... we need to make sure
+  these decisions are recorded in places that other claudes and human users can pick them up." The ledger is
+  `zg95_lid_regimes/DECISIONS.md` on the campaign branch (e8015a6): every knob the drivers choose, its value, status
+  (ruled / measured / taken) and evidence, dated, with the open questions; each run's README choices block points to
+  it; the hub updates it whenever a decision changes. HUB.md remains the day-to-day record and the pages the figures.
 
 ## Technical notes and documentation: handed to a separate hub (Louis, 2026-10-27)
 
@@ -322,6 +328,24 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, Louis on the wall-normal defect: "I'm still puzzled how this could go so wrong and be
+  undetected previously. Geometrical / analytic is an obvious work-around, but in cases where there is no such
+  value available, is there a latent bug." The hub's answer for your intake: the latent bug is on the
+  ANALYTIC-normal path (a user supplies `normal=`), which skips the cross-rank completion of the node set; the
+  GEOMETRIC path (`normal=None`, the library default and the one used when no analytic value exists) completes it
+  and is correct, so a user without an analytic normal is safe and a user with one is exposed at any partition
+  with an orphan wall vertex. Undetected because (i) the tests run at np 1-4 on meshes where every owned wall
+  vertex has a labelled facet on its owner, (ii) np 16 on the production annulus happens to have none, and (iii)
+  nothing checked v.n after the solve: the defect showed only as a smaller dt. Two asks: a parallel regression test
+  with an analytic normal at a partition that has an orphan wall vertex (TAc's mesh at np 32 is one; a box at
+  some np will be another), and a post-solve check of the constraint residual in the rotated route itself (max
+  |v.n| over constrained nodes, warning when it exceeds a tolerance), so this class cannot pass silently again.
+  Also: the drivers' decisions now live in zg95_lid_regimes/DECISIONS.md (campaign branch), Louis's ruling; the
+  library-facing rulings in it (pressure rtol, wall normal, chain, inset) are the ones your matrix should cite.
+- 2026-11-02, to the docs hub: the campaign drivers' decisions ledger exists at zg95_lid_regimes/DECISIONS.md on
+  the campaign branch (Louis 2026-11-02: decisions recorded where other Claudes and people find them; the drivers
+  are not part of underworld3). The journal and UWTN 2026-022 can point to it for every knob the drivers chose
+  (pressure rtol, chain, inset, seams, wall normal, locator) instead of to hub transcripts or pages.
 - 2026-11-02, to the dev hub, row 2 (a patch spread across ranks): nothing can spread it yet (conform needs the
   network mesher, which cannot place an outcropping fault; serial repro with you), so kaiju has queued the
   one-rank patch's cost against fault length as row 2's starting curve: gather, chain 0, TAf 40, np 16, 3 steps,
@@ -564,7 +588,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **The split fault's surface inset: which unit, and the default (2026-11-02).** Your ruling via the dev hub: the
+- **The split fault's surface inset (2026-11-02): Louis asks for 1 rung if possible and whether 3 is more accurate
+  or less likely to break.** No evidence on record (3 was a placement margin in the first driver); kaiju tests
+  inset 1/2/3 offline on all stored faults (placement successes, refusals, welds) and one 3-step smoke at 1 vs 3
+  (slip near the top, face traction, vrms, Newton, build time, bridge coverage); if 1 places as reliably with the
+  same answer, 1 rung becomes the default. Earlier framing: Your ruling via the dev hub: the
   tip depth is not a physical length but the one element the surface rotation needs, in mesh units. The driver
   hard-codes 3 rungs (0.012 at production's S 0.004). Two readings: one LADDER rung (the solver mesh at the fault
   has spacing S, so 3 rungs is already conservative and the default stays) or one BASE cell (the dev hub's and the
@@ -2296,3 +2324,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   default (rung vs base cell) put to Louis.
 - 2026-11-02: split-inset knob patch applied (580022f, blob 3531a78; default 3 rungs unchanged). Row-2 patch-cost
   curve against fault length queued for the dev hub.
+- 2026-11-02: Louis: (1) automate the inset at 1 rung if possible, evidence for 3? (kaiju tests 1/2/3); (2) the
+  wall-normal defect: how undetected, latent bug when no analytic normal exists? (answer and two asks to the dev
+  hub: the geometric path is the safe one; a parallel test at an orphan-vertex partition and a post-solve
+  constraint check in the rotated route); (3) the drivers are not underworld3: decisions must be findable, so
+  zg95_lid_regimes/DECISIONS.md is created (e8015a6) and is a standing rule.
