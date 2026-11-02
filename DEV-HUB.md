@@ -510,7 +510,7 @@ needed.
 - **#923:** test_1078's serial value on kaiju equals its parallel one: a per-host baseline,
   not partition dependence. test_1064 spherical3d at np 2 is different: its 3.4e-4 gap
   persists at tol 1e-8 against a serial child on the same host, so that one is real
-  partition dependence (commented on #923).
+  partition dependence: filed as **#931** (not phase 1); #923 keeps test_1062 and test_1078.
 - **The runner is sandboxed again** (no apptainer, Slurm unreachable); nothing builds or
   runs until Louis lifts it from a kaiju terminal. Held behind it: #921 2328b4ca, the LU
   branch 61233c84, tier A+B shard 4, and the #921 stack run.
