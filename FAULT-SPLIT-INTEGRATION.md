@@ -299,6 +299,16 @@ drivers until the science hub moves `uw_chain` to 0 and drops `uw_spacing`; the 
 that follows is on the patch's cost (iterative blocks, the 3-D single block, the patch
 divided across ranks), tracked by the dev hub.
 
+**2026-11-02 (later), the drivers' default and the conform limit.** `uw_chain` defaults
+to 0 in the three drivers (b440b88 on `zg95-annulus-for-kaiju`, with the build move to
+`development` 25d62812; acceptance kaiju job 3154), so every line of the 2026-11-01 tail
+decision's "where enforced" has a commit; the drivers' ledger
+`zg95_lid_regimes/DECISIONS.md` (bf18312) is the citation. The trace placed at its own
+division without `uw_spacing` is still to do. Dividing the patch across ranks
+(`seams="conform"`) is blocked for wall-reaching faults: the network mesher it needs
+cannot place one (serial repro on kaiju, `HUB.md` 29cd738) and the ladder takes only
+gather; the k-partitions test waits on one of the two changing, the dev hub's call.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7

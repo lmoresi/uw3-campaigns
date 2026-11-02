@@ -202,7 +202,9 @@ Measured here, not inherited.
   e6832e0; journal decision entry of 2026-11-02) puts two items on the drivers:
   `uw_chain` defaults to 0, and the trace is placed at its own division, with no
   `uw_spacing` resampling and the band width not derived from an $S$. Both guides now
-  say the fault's points are the rungs.
+  say the fault's points are the rungs. **`uw_chain` 0 is done** (b440b88, acceptance
+  job 3154; received 2026-11-02 through the notes session and recorded in the journal);
+  the trace item remains.
 - 2026-11-02, to the dev hub: the decision entry you asked the notes session to draft
   is committed (journal, with light edits; the 2026-11-01 decision stays live and this
   one settles its open item). Its "where enforced" leaves you `custom_mg.py:1556`
@@ -494,3 +496,18 @@ Measured here, not inherited.
   and its "not decided" sentence is closed (#862 pushed). For the science hub: the
   drivers' `uw_chain` to 0 and the trace placed at its own division without
   `uw_spacing`. For the dev hub: `custom_mg.py:1556` to name itself the alternative.
+- 2026-11-02 (later): two closures from the science hub through the notes session,
+  both verified on `lmoresi/uw3-campaigns`. (1) The drivers default to `uw_chain 0`
+  (b440b88 on `zg95-annulus-for-kaiju`, the three drivers; build moved to
+  `development` 25d62812; acceptance kaiju job 3154: vrms 1358.9188, slip 5877.77,
+  Newton 6, walls clean to 1e-12, equal to the chain-0 reference), and the drivers'
+  decisions ledger `zg95_lid_regimes/DECISIONS.md` (bf18312) is the citable record
+  per Louis's ruling. That closes the last "where enforced" line of the 2026-11-01
+  tail decision: journal measurement entry; topic page; both guides state the default
+  as done and cite the ledger. (2) `seams="conform"` cannot place a wall-reaching
+  fault in 2-D (the network mesher's cavity reaches the domain wall; serial repro on
+  kaiju, `HUB.md` 29cd738), and the ladder takes only gather, so the patch cannot be
+  divided across ranks in the trench models and the k-partitions test cannot run there
+  until one changes: journal dead-end entry; the fault-multigrid guide's parallel
+  section and closing paragraph rewritten from "never run here, first run pending" to
+  the limit; topic page. #862 pushed.
