@@ -194,6 +194,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Recipe v2 production proposal: the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs (TAf-v2 ~4.8 h, Earth run 2 ~4.4 h, TAc-v2 ~3.0 h, one exclusive node each) | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
 | Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
 | Node-packing throughput test on kaiju (1/2/3 x 16-rank jobs per node, same case) | https://claude.ai/artifact/1CFNXD4TpQLX5jfeTdMN8k |
@@ -668,7 +669,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   96d39f7b, no PR yet), the analytic-normal node set (np != 16), and #906 (geometric normal with a fault); the open
   PR queue (#780, #861, #862, gthyagi's set) is unrelated to the rollback runs and waits on Louis's approvals.
   **For Louis: pick the baseline set when kaiju's page is in; the merge to main goes ahead after the acceptance
-  unless you say otherwise.**
+  unless you say otherwise.** **BLOCKED 2026-11-02 evening: the kaiju session now runs in a filesystem sandbox**
+  (~/campaigns read-only: driver clones, run dirs, launchers; the Slurm controller does not resolve through the
+  sandbox's proxy, so squeue and sbatch fail). Kaiju can pin no clone, submit no job, launch nothing; it built and
+  compiled the spacing patch in a temporary clone and wrote the proposal page. This is a settings change on
+  Louis's side, for Louis to lift. Until then: the spacing patch (b21c264) is HELD by the hub, saved, not applied;
+  the whole-recipe acceptance and the merge to main wait; the baseline set waits on both. Correction to the spacing
+  evidence: velocity iterations per increment did NOT change with S (TBf 7.34 / 7.54 / 7.22; TAf 6.08 / 5.93 / 6.24);
+  the gain is fewer Newton increments over 10 steps (79 / 71 / 65 on TBf) and the 3.2x smaller serial patch, -14 %
+  per step net. The ledger row says so.
 
 - Rung spacing default: **DECIDED 2026-11-02, one base cell** (Louis: "1 base cell is efficient in terms of solver
   iteration which I thought quite positive", and accepting that the one-rung inset is then one base cell deep so a
@@ -2493,3 +2502,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   experiments. Kaiju: S default, whole-recipe acceptance, baseline proposal page. Hub: merge the campaign branch to
   main after the acceptance. Dev hub: #902 PR, analytic node set, #906 named as the library items that widen the
   experiments; np 16 needs nothing more.
+- 2026-11-02: kaiju sandboxed (read-only ~/campaigns, no Slurm): acceptance and launches blocked; for Louis. Spacing
+  patch b21c264 held unapplied in the hub's scratchpad until the acceptance; proposal page CDy2RR1fLhBUyPXtUMftNr
+  recorded. Correction: velocity its per increment unchanged with S; the gain is Newton increments and the patch.
