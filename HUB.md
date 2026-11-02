@@ -329,6 +329,22 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, your ladder-spacing arms were CONFOUNDED and are rerunning (kaiju): a restart rebuilds
+  each crust-law fault from the polyline stored in the checkpoint, already sampled at the writing run's S (0.004),
+  and re-samples at the new S only when a detection re-fits; in the S = h_b and h_b/2 arms no re-fit happened in 10
+  steps (TAf kept 79 pairs vs 87; TBf 103 vs 109), so those arms changed only the band width W = 2S and the inset,
+  not the rung spacing (patch rows 3198 vs 3114 TAf; 3856/3560 vs 3468 TBf). Relabelled "...rungs0.004" with a
+  README note; as a band-width/inset contrast they show TBf 70 slip_max 7015 (W = 2 h_b, inset 1 base cell) and
+  7081 (W = h_b, inset 2) vs 7265 at production, slip at 0.04-0.08 within 1 %, the top 0.02 lower (cut starts at
+  0.0172 vs 0.0127), cost equal. Fix: re-sample restored polylines at the run's S (driver 81db298, rerunning as
+  jobs 3378-3381: S = h_b inset 1 rung, S = h_b/2 inset 2, TAf 20 and TBf 70, 10 steps); the hub asked for it to be
+  automatic when the checkpoint's S differs from the run's and a no-op otherwise.
+- 2026-11-02, to the dev hub, row 2's starting curve (the one-rank FAC patch against fault length; gather, chain 0,
+  TAf 40, np 16, overlay F, detection every step; node pairs / owned rows / LU time per step on the one rank while 15
+  wait): depth 0.15: 105 / 3584 / 22-26 s; 0.30: 163 / 5010 / 19-26 s; 0.45: 231 / 7010 / 30-34 s; 0.60: 307 / 9278 /
+  43-54 s. The patch grows about linearly with fault length and its serial solve time with it: 10-12 % of a 420 s
+  step at depth 0.60, growing with the fault. That is the number a decomposed patch has to beat. Run dirs
+  runs/scale_kpatch_* and runs/scale_kpart2_*_gather_depth0.45_chain0.
 - 2026-11-02, to the dev hub and the docs hub: Louis has approved the campaign's build move to development (today).
   New kaiju runs build from the development head of the day and record it; the uw_chain driver default goes to 0 in
   the same commit (your #892 ruling's condition met). The docs hub's journal entry closes on that commit's sha:
@@ -2361,3 +2377,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Journal closure sha passed to the docs hub.
 - 2026-11-02: split-inset test done: 1 rung places as reliably as 3 with chain 0 (not with chain 2 at 4S), but the
   answer differs by ~10 % in slip (3 rungs locks more of the top); no evidence ever stood behind 3. Default to Louis.
+- 2026-11-02: kaiju's ladder-spacing arms were confounded (restored polylines keep the checkpoint's S); relabelled and
+  rerunning with re-sampling on restart (hub: automatic when S differs, no-op otherwise). Row-2 curve: the one-rank
+  patch grows linearly with fault length, 10-12 % of a step at depth 0.60. Both recorded for the dev hub.
