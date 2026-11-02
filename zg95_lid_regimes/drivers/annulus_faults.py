@@ -161,7 +161,14 @@ params = uw.Params(
     uw_dip=45.0,
     uw_fault_depth=0.35,
     # the fault band
-    uw_spacing=0.004,
+    uw_spacing=0.0,             # the ladder's rung spacing S. 0 (the default): one base cell, uw_cell / 2**uw_refinement, so S
+                                #   follows the refinement (0.0156 at refinement 5). Louis (2026-11-02): S matched to the base
+                                #   mesh; 0.004 before (ratio 3.9). Kaiju arms (page 7cbuaxBnoZrfjdPioMHroT, chain 0, np 16):
+                                #   the serial FAC patch 3.2x smaller and 2.3-4.5x cheaper, 14 % less per step on the
+                                #   rollback state, vrms within 0.3 %; velocity iterations per increment unchanged (7.2-7.5),
+                                #   the gain is fewer Newton increments (65 against 79 over 10 steps) and the patch. With
+                                #   S = h_b the 1-rung inset is one base cell deep (the cut's top ~0.020 below the surface),
+                                #   so the early-slab near-surface slip is 10-18 % lower than the old recipe's
     uw_eta_w=1.0e-3,
     uw_chain=0,                 # split ladder levels below the finest (0: welded coarse levels, only the finest
                                 #   split). 0 assumes underworld3 development's FAC patch on LU (#912, cc839425):
@@ -349,7 +356,13 @@ if SCALED:
 out = os.path.expanduser(params.uw_out)
 os.makedirs(out, exist_ok=True)
 r_o, r_i = annulus_radii()
-S = float(params.uw_spacing)
+def effective_spacing(p):
+    """The rung spacing a parameter set means: uw_spacing, or one base cell (uw_cell / 2**uw_refinement) when 0."""
+    sp = float(p.get("uw_spacing", 0.0) or 0.0)
+    return sp if sp > 0 else float(p.get("uw_cell", 0.5)) / 2 ** int(p.get("uw_refinement", 4))
+
+
+S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": params.uw_cell, "uw_refinement": params.uw_refinement})
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
@@ -2189,7 +2202,7 @@ if params.uw_restart >= 0:
     # it, and every build places its ladder on those points, so a restart at a different -uw_spacing re-samples them
     # at this run's S before the first build (otherwise the old rungs last until the next re-fit). An unchanged S
     # leaves them alone, so restarts of existing runs stay bit-identical. -uw_resample_restored force|never: tests.
-    S_saved = float((state.get("params") or {}).get("uw_spacing", S))
+    S_saved = effective_spacing(state.get("params") or {}) if (state.get("params") or {}) else S
     mode = str(params.uw_resample_restored)
     if mode == "force" or (mode == "auto" and abs(S_saved - S) > 1e-9 * S):
         n_resampled = 0
@@ -2324,6 +2337,8 @@ def write_run_info():
     effective = {"pressure_rtol": pres, "pressure_rtol_source": "uw_pres_rtol" if float(params.uw_pres_rtol) > 0
                  else "library default 0.1 x uw_tol",
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
+                 "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
+                 else "one base cell (uw_cell / 2**uw_refinement)",
                  "fault_seams": str(params.uw_fault_seams),
                  "fault_mesher": "ladder" if params.uw_fault_seams == "gather" else "network",
                  "fault_partition": FAULT_PARTITION, "wall_normal": str(params.uw_wall_normal),
