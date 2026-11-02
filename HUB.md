@@ -329,6 +329,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub: Louis has ruled the campaign drivers' wall normal to the geometric (library default,
+  normal=None) path, "the computed normal is probably the correct default", and the split inset to 1 rung (the one
+  element the surface rotation needs; the test showed 3 rungs was a ~10 % physics choice with no evidence behind
+  it). The analytic-normal node-set defect stays yours to fix; the campaign no longer depends on it.
 - 2026-11-02, to the dev hub, your ladder-spacing arms were CONFOUNDED and are rerunning (kaiju): a restart rebuilds
   each crust-law fault from the polyline stored in the checkpoint, already sampled at the writing run's S (0.004),
   and re-samples at the new S only when a detection re-fits; in the S = h_b and h_b/2 arms no re-fit happened in 10
@@ -610,8 +614,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **The split fault's surface inset (2026-11-02): Louis asks for 1 rung if possible and whether 3 is more accurate
-  or less likely to break.** No evidence on record (3 was a placement margin in the first driver); kaiju tests
+- Split inset: **DECIDED 2026-11-02, 1 rung** (Louis: "logical set back based on the purpose, appears to be safe");
+  kaiju sends the default patch with the chain-2/4S caveat; the faulted thermal set and Earth run 1 (at 3 rungs)
+  understate slip by ~10 % against the new default, to be said wherever they are cited. Earlier: Louis asks for 1
+  rung if possible and whether 3 is more accurate or less likely to break. No evidence on record (3 was a placement margin in the first driver); kaiju tests
   inset 1/2/3 offline on all stored faults (placement successes, refusals, welds) and one 3-step smoke at 1 vs 3
   (slip near the top, face traction, vrms, Newton, build time, bridge coverage); if 1 places as reliably with the
   same answer, 1 rung becomes the default. **TEST DONE (page T37Y3MMpYyfgQZbCmuk5YQ): half met.** History: 3.0 S
@@ -632,6 +638,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fixed as S changes, which is what the ladder-spacing arms hold). Kaiju's patch makes it a knob in rungs with the
   default unchanged; say which unit and value the default takes.
 
+- Wall normal: **DECIDED 2026-11-02, geometric** (Louis: "the computed normal is probably the correct default");
+  kaiju sends the default patch. Earlier framing follows.
 - **Driver default for the free-slip wall normal: geometric (the library default, normal=None) instead of the
   analytic unit_r (2026-11-01, hub recommends YES).** Kaiju: TAc 20, one step, build C: with the geometric normal np
   32 is clean (max |v.n| 1e-8, 0 nodes) where the analytic normal gave v.n 12,146 at three nodes; the answer is the
@@ -2380,3 +2388,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02: kaiju's ladder-spacing arms were confounded (restored polylines keep the checkpoint's S); relabelled and
   rerunning with re-sampling on restart (hub: automatic when S differs, no-op otherwise). Row-2 curve: the one-rank
   patch grows linearly with fault length, 10-12 % of a step at depth 0.60. Both recorded for the dev hub.
+- 2026-11-02: Louis rules: split inset 1 rung; wall normal geometric. Kaiju sends both default patches with the ledger
+  rows and a one-step acceptance; recorded for the dev hub.
