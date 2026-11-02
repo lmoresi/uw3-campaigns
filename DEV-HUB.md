@@ -500,8 +500,13 @@ needed.
   casualties need a low-load rerun before any verdict. **Settled from the code:**
   `tests/parallel/serial_reference.py` drops every `OMPI_*` variable from the spawned child,
   so the children never saw `OMPI_MCA_io=^ompio` and all ran OMPIO; ROMIO under load is
-  untested. A small PR (approved by the hub, test infrastructure) keeps the MCA component
-  selections in the child while dropping the job-identity variables.
+  untested. The test-side fix is `bugfix/serial-reference-keeps-mca-selection` a79d5236
+  (tests only, held): `_child_env` keeps the user's Open MPI selections with their
+  parameters (io and its sub-frameworks, mtl, btl, pml, ucx) and drops the rest; the review
+  found that selections without their parameters aborted the child's MPI_Init on OMPI 5.0.10,
+  and two more spawn sites with their own scrub (test_0855, test_1079), now on the helper.
+  test_1138 pins it. The runner validates it under mpirun, then reruns the error-76
+  casualties with ROMIO reaching the children; #922's library side stays open.
 - **#923:** test_1078's serial value on kaiju equals its parallel one: a per-host baseline,
   not partition dependence.
 - **The runner is sandboxed again** (no apptainer, Slurm unreachable); nothing builds or
