@@ -21,7 +21,7 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 | Newton switches (`uw_newton_switch`, `uw_warm_newton_switch`, `uw_rebuild_newton_switch`) | 1e-2 (TI runs: 3e-2) | taken for the split runs; measured for TI | the library clamps the switch to max(switch, tolerance), so a switch below `uw_tol` means pure Picard (this cost a day on TAti, 2026-10-31). TI at 3e-2 converges where 1e-2 and 1e-3 stalled. The warm switch is measured against the rest-state residual, so warm steps run 5-6 Picard iterations before Newton (budget page; a lever not yet taken). |
 | `uw_retry_keep` | best | fixed 2026-11-01 (bug) | a failed warm start's cold retry was kept even when worse; 15 of TAti's first 20 failures kept a worse answer. |
 | `consistent_jacobian` | "continuation" | hard-coded, taken | never compared with the alternatives in production. |
-| `uw_chain` (split ladders on coarse MG levels) | 2 today; 0 ruled for production once the builds carry #912 | ruled 2026-10-31 (#892): the production tail is the welded base + split finest level + FAC LU patch | measured 2026-11-01 at np 16 on development (TAf 40; TAf 20 and TBf 70, 10 steps): same answer; a wash on speed at the production band ratio 3.9 (within +-10 %); chain 0 20-35 % faster at fault depth 0.45; chain 0 avoids coarse-level ladder refusals and welding (the demo OOM). The default moves to 0 when the campaign's builds move to development: on the leak-fix overlay (no #912) chain 0 is ~1.5x slower. |
+| `uw_chain` (split ladders on coarse MG levels) | 0 from the build move (2026-11-02); 2 before | ruled 2026-10-31 (#892): the production tail is the welded base + split finest level + FAC LU patch; Louis 2026-11-02: go on the build move, so the default changes with it | measured 2026-11-01 at np 16 on development (TAf 40; TAf 20 and TBf 70, 10 steps): same answer; a wash on speed at the production band ratio 3.9 (within +-10 %); chain 0 20-35 % faster at fault depth 0.45; chain 0 avoids coarse-level ladder refusals and welding (the demo OOM). The default moves to 0 when the campaign's builds move to development: on the leak-fix overlay (no #912) chain 0 is ~1.5x slower. |
 | TI band (`-uw_fault_realisation ti`) | L1 strength (f_b 3.3e-3, eta_reg 0.033, floor 0.033), w = 2S, whole-band mask, smooth law | measured 2026-10-30 | the split is frictionless, so the band is pushed toward that limit: deepest level that converges. TI costs ~2.7x the split per step; a third of TAti's steps did not converge (the rotated loop's line-search exit ends converging Picard phases: library finding with the dev hub). |
 
 ## Fault placement and geometry
@@ -48,6 +48,12 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 | `uw_dt_mult` | 20 | set campaign-wide in slab_case.sh (driver default 3) | taken once, never revisited. |
 | units | dimensionless; `-uw_scaled` check only | ruled 2026-10-29 ("file as a bug, fall back to dimensionless for the demo") | underworld3 #891. |
 
+## Builds
+
+| decision | value | status | evidence / ruling |
+|---|---|---|---|
+| library build for new runs | current development (head of the day, recorded per run) | ruled 2026-11-02 (Louis: "go ahead with the build move") | the leak fix, the fault-split work (A/B/C), #912 (FAC LU on the rotated route) and #914 are on development; the pinned leak-fix overlay 547c2e54 served every result from 2026-10-27 to 2026-11-01 and stays for restarts of those runs. Acceptance: one-step TAf 40 at np 16, walls clean, answer to the printed figures against the 25d62812 chain-0 run. Results from here are on a different library than the thermal and Earth sets (which were also at pressure rtol 1e-4): a documented discontinuity. |
+
 ## Machine
 
 | setting | value | status | evidence |
@@ -59,5 +65,4 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 
 - The inset's unit and default (1 rung if possible: Louis 2026-11-02; test pending).
 - The wall normal default (geometric recommended).
-- The build move to development, which brings `uw_chain` 0.
 - Levers measured but not taken: a warm Newton switch measured against the warm iterate's own residual; an inexact inner velocity solve; the crust-strength sweep.
