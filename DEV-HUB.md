@@ -449,6 +449,15 @@ sure about units. 1 is normalised by the element size." So the inset is one loca
 length at the tip, a condition to be tested, not a settled rule: if one element does not
 work (the rotated frame fails, or slip at the tip misbehaves), the measurement says what
 does.
+*Row 7 implements it (2026-11-02)* as the band cell at the tip, one rung spacing down dip
+(`-uw_tip 1el`): 0.8-1.3 S in depth, since the spine never meets the surface at a rung. In
+20 mesh-only placements across five S and four tip rules, no pair point lies on the
+surface and the top pair's frame normal matches the fault's to 12 digits, so the rotated
+assembly cannot refuse. At S = h_b and h_b/2 the one-element tip coincides with the
+existing 0.012 arm. If Louis meant the base cell h_b rather than the band cell, that is
+the 0.012 arm at S = h_b (0.84 h_b deep), already in the grid. Seven solve arms added (1el
+and 2el across S); every record carries the inset in rungs, down dip and in depth, and the
+slip and leak of the four pairs nearest the tip. Row 7 is 25 jobs.
 
 ## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
 
