@@ -14,8 +14,15 @@ The split starts below the bridge: the fixture puts the split's upper tip three 
 spacings under the surface, so the tip depth and the weak bridge move with S. Row 7
 holds them physical by default: ``uw_tip`` a depth (0.012, today's 3 x 0.004) puts the
 tip at the first spine point at least that deep, at every S; ``uw_tip 3S`` keeps the
-fixture's rule. The bridge is the band cells above the tip, as in the fixture, so it
-is 2S wide: a weak zone cannot be narrower than the band it lives in.
+fixture's rule. ``uw_tip 1el`` (or ``2el``, ...) is Louis's inset (2026-11-02, relayed:
+"One element ... if it works. I am not sure about units. 1 is normalised by the element
+size."): the tip at the first spine point at least k local elements down dip from where
+the fault meets the surface. The local element is the band cell, a rung spacing S
+along the fault. Every arm records the inset it got, measured on the placed mesh in
+rung spacings, down dip and in depth (``tip_topology``), the top pair's frame normal
+against the fault's, and the pairs next to the tip with their slip. ``-uw_mesh_only 1`` stops after
+the placement with that record. The bridge is the band cells above the tip, as in the
+fixture, so it is 2S wide: a weak zone cannot be narrower than the band it lives in.
 
     depth 0      the ladder at S in the base
     depth k > 0  the base refined k times (nested NVB, mesh.adapt) in the corridor of
@@ -52,7 +59,8 @@ params = uw.Params(
     uw_spacing=0.004,         # rung spacing S requested (today's 0.004)
     uw_depth=0,               # corridor refinement levels (0: the base as it is)
     uw_rings=1,               # corridor half-width in base cells h_b
-    uw_tip="0.012",           # the split's upper tip depth, or "3S" (the fixture's rule)
+    uw_tip="0.012",           # the split's upper tip depth, "3S" (the fixture's rule) or "1el" (k elements)
+    uw_mesh_only=0,           # 1: stop after the placement, with the tip record
     uw_max_it=200,            # the rotated loop's cap (its default 50; #920)
     uw_out="records/B7.json",
 )
@@ -95,8 +103,16 @@ n_fine = block * max(1, int(round(length / (block * float(params.uw_spacing)))))
 S = length / n_fine
 spine = np.array([top + down_dip * (length * i / n_fine) for i in range(n_fine + 1)])
 tip_rule = str(params.uw_tip)
-tip_depth_asked = 3.0 * S if tip_rule == "3S" else float(tip_rule)
-trace = spine[spine[:, 1] <= 1.0 - tip_depth_asked]
+n_fault = np.array([np.sin(dip), np.cos(dip)])          # the fault's unit normal
+if tip_rule.endswith("el"):
+    # k local elements (rung spacings) down dip from the surface crossing
+    inset_asked = float(tip_rule[:-2])
+    trace = spine[(spine - surface_point) @ down_dip >= inset_asked * S - 1e-12]
+    tip_depth_asked = None
+else:
+    inset_asked = None
+    tip_depth_asked = 3.0 * S if tip_rule == "3S" else float(tip_rule)
+    trace = spine[spine[:, 1] <= 1.0 - tip_depth_asked]
 
 wall = time.perf_counter()
 base = box_mesh(p["uw_width"], p["uw_cell"], p["uw_refinement"])
@@ -113,6 +129,20 @@ wall = time.perf_counter()
 mesh, _info = place_fault_ribbon_2d(host, [("Trench", trace)], 2 * S, spines=[("Trench", spine)],
                                     margin_rings=1, clearance=0.7, split=True, mesher="ladder")
 t_place = time.perf_counter() - wall
+tip = rc.tip_topology(mesh, "Trench", surface_point, down_dip, n_fault, S)
+uw.pprint(f"TIP rule {tip_rule} S {S:.6f}: " + json.dumps(tip))
+if int(params.uw_mesh_only):
+    with uw.selective_ranks(0) as selected:
+        if selected:
+            out = os.path.expanduser(params.uw_out)
+            os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+            with open(out, "w") as f:
+                json.dump({"problem": "B (mesh only)", "S": S, "h_b": H_B, "h_b_over_S": H_B / S,
+                           "tip_rule": tip_rule, "inset_asked_elements": inset_asked,
+                           "tip_depth_asked": tip_depth_asked, "tip": tip,
+                           "level_cells": [rc.n_cells(m) for m in levels] + [rc.n_cells(mesh)],
+                           "t_place_s": round(t_place, 2)}, f, indent=1)
+    sys.exit(0)
 
 T = uw.discretisation.MeshVariable("Tp", mesh, 1, degree=2)
 v = uw.discretisation.MeshVariable("Vp", mesh, 2, degree=2)
@@ -162,6 +192,7 @@ info = stokes._rotated_freeslip_info
 blocks = timer.record()
 
 profile = rc.slip_profile(stokes, "Trench", info, surface_point, down_dip)
+near_tip = rc.top_pairs(stokes, "Trench", info, surface_point, down_dip, n_fault)
 
 # the surface velocity at the top nodes, and the vertical velocity at depth 0.05
 vc = np.asarray(v.coords)
@@ -191,7 +222,8 @@ record = {
     "h_b": H_B, "h_b_over_S": H_B / S,
     "depth": depth, "rings": rings, "corridor_half_width": rings * H_B if depth else 0.0,
     "h_local": h_local, "h_local_over_S": h_local / S, "h_corridor_realised": h_corridor,
-    "tip_rule": tip_rule, "tip_depth_asked": tip_depth_asked,
+    "tip_rule": tip_rule, "tip_depth_asked": tip_depth_asked, "inset_asked_elements": inset_asked,
+    "tip": tip, "pairs_near_tip": near_tip,
     "tip_depth": float(1.0 - trace[0, 1]), "trace_points": int(len(trace)),
     "bridge_cells": int(uw.mpi.comm.allreduce(int(bridge.sum()))),
     "level_cells": [rc.n_cells(m) for m in levels] + [rc.n_cells(mesh)],

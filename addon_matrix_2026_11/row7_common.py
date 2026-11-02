@@ -69,6 +69,118 @@ def cell_sizes_near(mesh, polyline, radius):
             "max": float(allv.max()), "cells": int(len(allv))}
 
 
+def tip_topology(mesh, boundary, surface_point, t_hat, n_fault, h_element, surface_y=1.0, max_steps=8):
+    """The split fault's upper tip in the placed mesh, against the surface y = surface_y.
+
+    The tip is the unpaired vertex of the fault's Plus facets nearest the surface (the
+    split stops there, so the vertex is not duplicated). Measured at the tip: its depth,
+    its distance down dip from ``surface_point`` (where the fault meets the surface),
+    the lengths of its edges (the local element size), and its distance to the surface
+    in edges. Measured on the pairs: the topmost pair point, and how many pair points
+    lie on the surface (the rotated assembly refuses a node that carries both a wall
+    block and a pair block). The pairs are rank-local (the split keeps a fault
+    rank-interior); the result is gathered so every rank holds it."""
+    dm = mesh.dm
+    dim = mesh.dim
+    csec = dm.getCoordinateSection()
+    cvec = np.asarray(dm.getCoordinatesLocal().array)
+    v0, v1 = dm.getDepthStratum(0)
+    t_hat = np.asarray(t_hat, dtype=float)
+    surface_point = np.asarray(surface_point, dtype=float)
+
+    def x_of(q):
+        if v0 <= q < v1:
+            off = csec.getOffset(q)
+            return cvec[off:off + dim]
+        return np.mean([x_of(int(c)) for c in dm.getTransitiveClosure(q)[0] if v0 <= c < v1], axis=0)
+
+    pairs = mesh._fault_point_pairs.get(boundary, {})
+    paired = {int(k) for k in pairs} | {int(v) for v in pairs.values()}
+    plus = f"{boundary}Plus"
+    closure, facets = set(), []
+    if dm.hasLabel(plus) and dm.getLabel(plus).getStratumSize(mesh.boundaries[plus].value) > 0:
+        fS, fE = dm.getHeightStratum(1)
+        for f in dm.getLabel(plus).getStratumIS(mesh.boundaries[plus].value).getIndices():
+            if fS <= int(f) < fE:
+                facets.append(int(f))
+                closure.update(int(c) for c in dm.getTransitiveClosure(int(f))[0] if v0 <= c < v1)
+    ends = [q for q in closure if q not in paired]
+
+    local = None
+    if ends:
+        tip = max(ends, key=lambda q: x_of(q)[1])
+        xt = np.array(x_of(tip), dtype=float)
+        edges = [int(e) for e in dm.getSupport(tip)]
+        lengths = [float(np.linalg.norm(x_of(int(a)) - x_of(int(b))))
+                   for a, b in (dm.getCone(e) for e in edges)]
+        # breadth-first over edges from the tip until a vertex lies on the surface
+        steps, seen, front = None, {tip}, [tip]
+        for k in range(1, max_steps + 1):
+            nxt = []
+            for q in front:
+                for e in dm.getSupport(q):
+                    for w in (int(c) for c in dm.getCone(e)):
+                        if w not in seen:
+                            seen.add(w)
+                            nxt.append(w)
+            if any(x_of(w)[1] >= surface_y - 1e-9 for w in nxt):
+                steps = k
+                break
+            front = nxt
+        local = {"x": [float(c) for c in xt], "depth": float(surface_y - xt[1]),
+                 "down_dip": float((xt - surface_point) @ t_hat),
+                 "edge_lengths": lengths, "edges_to_surface": steps}
+
+    plus_points = [int(q) for q in pairs.values()]
+    pair_y = [float(x_of(q)[1]) for q in plus_points]
+    top_y = max(pair_y) if pair_y else -np.inf
+    on_surface = sum(y >= surface_y - 1e-9 for y in pair_y)
+    frame_dot = None
+    if plus_points:
+        top = plus_points[int(np.argmax(pair_y))]
+        acc = np.zeros(dim)
+        for f in facets:
+            if top in (int(c) for c in dm.getTransitiveClosure(f)[0]):
+                a, b = (x_of(int(c)) for c in dm.getCone(f))
+                acc += np.array([-(b - a)[1], (b - a)[0]])     # |f| times the unit normal
+        frame_dot = float(abs(acc @ np.asarray(n_fault, dtype=float)) / (np.linalg.norm(acc) + 1e-30))
+
+    gathered = uw.mpi.comm.allgather((local, top_y, on_surface, frame_dot))
+    tips = [g[0] for g in gathered if g[0] is not None]
+    tip = max(tips, key=lambda t: -t["depth"]) if tips else None
+    top_rank = int(np.argmax([g[1] for g in gathered]))
+    out = {"pair_points_on_surface": int(sum(g[2] for g in gathered)),
+           "top_pair_depth": float(surface_y - gathered[top_rank][1]),
+           "top_pair_frame_dot": gathered[top_rank][3], "h_element": float(h_element)}
+    if tip is not None:
+        L = tip["edge_lengths"]
+        out.update({"tip_x": tip["x"], "tip_depth": tip["depth"], "tip_down_dip": tip["down_dip"],
+                    "inset_elements": tip["down_dip"] / h_element,
+                    "inset_elements_depth": tip["depth"] / h_element,
+                    "tip_edge_min_mean_max": [min(L), float(np.mean(L)), max(L)] if L else None,
+                    "tip_edges_to_surface": tip["edges_to_surface"]})
+    return out
+
+
+def top_pairs(stokes, boundary, info, origin, t_hat, n_fault, count=4):
+    """The ``count`` pairs nearest ``origin`` along ``t_hat`` (the tip's end of the
+    fault): their distance s, the slip V and the leak (oriented as in
+    ``slip_profile``), and |n . n_fault|, the pair's frame normal against the fault's."""
+    coords, jumps, normals = fault_pair_jumps(stokes, boundary, info, gather=True)
+    if not len(coords):
+        return []
+    t_hat = np.asarray(t_hat, dtype=float)
+    n_hat = np.array([-t_hat[1], t_hat[0]])
+    N = np.asarray(normals)[:, :2]
+    J = np.asarray(jumps)[:, :2] * np.sign(N @ n_hat)[:, None]
+    s = (np.asarray(coords)[:, :2] - np.asarray(origin)) @ t_hat
+    _, first = np.unique(np.round(s, 9), return_index=True)
+    first = first[np.argsort(s[first])][:count]
+    return [{"s": float(s[i]), "x": [float(c) for c in np.asarray(coords)[i, :2]],
+             "V": float(J[i] @ t_hat), "leak": float(J[i] @ n_hat),
+             "frame_dot": float(abs(N[i] @ np.asarray(n_fault, dtype=float)))} for i in first]
+
+
 def slip_profile(stokes, boundary, info, origin, t_hat):
     """The slip along the fault in fixed physical coordinates, all ranks, sorted: s the
     distance from ``origin`` along ``t_hat``, V the tangential jump oriented to the

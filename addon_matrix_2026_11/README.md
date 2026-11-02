@@ -14,7 +14,7 @@ The dev hub's question is in DEV-HUB.md, under "Can the add-on replace split coa
 | `row7_linear.py`, `row7_box.py` | 7 | problems A and B, H0 only, the ladder at a given S |
 | `row7_common.py` | 7 | the slip profile in fixed coordinates, the FAC block timer |
 | `collect_row7.py` | 7 | the row 7 tables against the references |
-| `kaiju_commands_row7.sh` | 7 | 9 jobs at np 1 (problem A) and 9 at np 4 (problem B) |
+| `kaiju_commands_row7.sh` | 7 | 9 jobs at np 1 (problem A) and 16 at np 4 (problem B) |
 | `data/box_state_02000/` | 4 | the input row 4 reads: checkpoint 2000 of the fixed-trench fault run `stagnant_tau1x1.00_fault_x2.0_dip45` (state JSON, mesh and T). It is force-added, because the repository ignores `*.h5`. |
 
 `row4_interface_laws.py` and `row7_box.py` import `box_model` from `../zg95_lid_regimes/drivers`.
@@ -50,7 +50,23 @@ So those 32 arms were dropped. The drivers keep the option at its default of 0.
 **The box's tip and bridge move with S in the fixture.** The fixture splits the fault from three rung spacings below the surface, and the weak bridge is the band cells above that tip. At S = h_b, the tip would sit at depth 0.10 rather than 0.012.
 - `row7_box.py` holds the tip physical by default: `-uw_tip 0.012` puts the split's upper end at the first spine point at least 0.012 deep, at any S.
 - `-uw_tip 3S` keeps the fixture's rule, and the unrefined arms run both ways.
+- `-uw_tip 1el` (or `2el`) is the inset Louis gave (2026-11-02, relayed by the hub): "One element ... if it works. I am not sure about units. 1 is normalised by the element size." The tip is the first spine point at least k rung spacings S down dip from where the fault meets the surface. The rung spacing is the band cell's length along the fault.
 - The bridge stays the band cells above the tip, so it is 2S wide. A weak zone cannot be narrower than the band it lives in.
+
+**The tip as placed** (`-uw_mesh_only 1`, serial, 2026-11-02). Every arm's record carries the same measures under `tip`. The spine starts at y = 1.02 and is sampled at S, so it does not meet the surface at a rung. An inset of k elements therefore lands between k and k + 1 rungs down dip.
+
+| S | h_b/S | 1el: tip depth, inset in S (down dip / depth) | 2el | 0.012 | 3S |
+|---|---|---|---|---|---|
+| 0.03270 | 0.96 | 0.0263, 1.14 / 0.80 | 0.0494, 2.14 / 1.51 | = 1el | 0.1188, 5.14 / 3.63 |
+| 0.01635 | 1.91 | 0.0147, 1.27 / 0.90 | 0.0263, 2.27 / 1.61 | = 1el | 0.0494, 4.27 / 3.02 |
+| 0.00770 | 4.06 | 0.0072, 1.32 / 0.94 | 0.0127, 2.32 / 1.64 | = 2el | 0.0235, 4.32 / 3.06 |
+| 0.00396 | 7.88 | 0.0052, 1.86 / 1.32 | 0.0080, 2.86 / 2.03 | 0.0136, 4.86 / 3.44 | = 0.012 |
+| 0.00195 | 16.0 | 0.0021, 1.51 / 1.07 | 0.0035, 2.51 / 1.78 | 0.0131, 9.51 / 6.73 | 0.0062, 4.51 / 3.19 |
+
+- No pair point lies on the surface in any arm, so the rotated assembly's wall-and-pair refusal cannot fire.
+- The top pair's frame normal (the measure-weighted normal of its Plus facets) matches the fault's normal to 12 digits in every arm.
+- At one element the tip's shortest edge is 0.54-0.68 S: that is the band cell clipped by the surface.
+- Whether one element works in the solve (convergence, and the slip on the pairs next to the tip) is what the `1el` arms on kaiju answer. `pairs_near_tip` records the four pairs nearest the surface.
 
 **What each record holds:**
 - the slip profile in fixed physical coordinates (problem A: from the fault's end at (0.30, 0.45); B: down dip from the surface);

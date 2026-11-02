@@ -3,7 +3,9 @@
     python collect_row7.py records            # every A7_* and B7_* record in records/
 
 References: problem A, the unrefined ladder at the most rungs (h_b/S 48); problem B,
-the unrefined ladder at the smallest S with the tip held at 0.012 (h_b/S 16). Each arm's
+the unrefined ladder at the smallest S with the tip held at 0.012 (h_b/S 16). The box's
+tip table lists every arm's inset, measured in the tip's own edge lengths, and the pair
+next to the tip: its frame normal against the fault's, its slip and its leak. Each arm's
 slip profile is compared at its own pair positions against the reference interpolated
 there; the box's surface velocity and its vertical velocity at depth 0.05 likewise.
 For the box, the velocity iterations are summed over every application in the log
@@ -67,7 +69,7 @@ def table_A(recs):
 
 
 def table_B(recs):
-    unref = [r for r in recs if r["depth"] == 0 and r["tip_rule"] != "3S"]
+    unref = [r for r in recs if r["depth"] == 0 and r["tip_rule"] == "0.012"]
     ref = min(unref or recs, key=lambda r: r["S"])
     rp, rs, rv = ref["slip_profile"], ref["surface_vx"], ref["vy_at_depth_0.05"]
     print(f"\nProblem B (h_b = {ref['h_b']:.5f}); reference: unrefined, S {ref['S']:.5f}, "
@@ -83,7 +85,7 @@ def table_B(recs):
         fb = r["fac_blocks"]
         smoothers = r.get("level_smoothers") or [{}]
         rss = max(r["peak_rss_raw_per_rank"]) / (2 ** 20 if r["rss_unit"] == "bytes" else 2 ** 10)
-        tip = f"{r['tip_depth']:.4f}" + (" (3S)" if r["tip_rule"] == "3S" else "")
+        tip = f"{r['tip_depth']:.4f} ({r['tip_rule']})"
         print(f"| {r['depth']} | {r['rings'] if r['depth'] else '-'} | {r['S']:.5f} | "
               f"{r['h_b_over_S']:.2f} | {r['h_local_over_S']:.2f} | {tip} | "
               f"{r['newton_iterations']}{'' if r['converged'] else ' (unconverged)'} | "
@@ -91,6 +93,28 @@ def table_B(recs):
               f"{r['peak_slip']:.2f} | {pmax:.4f} / {prms:.4f} | {smax:.4f} | {vmax:.4f} | "
               f"{smoothers[-1].get('asm_rows')} | {max(fb['block_rows'], default=0)} | "
               f"{fb.get('t_block_total_s_rank_max', float('nan')):.2f} | {r['t_solve_s']} | {rss:.0f} |")
+
+
+def table_tip(recs):
+    """Does a one-element inset work at every S? The tip as placed, and the pair next to it."""
+    print("\nThe box's split tip: the inset in rung spacings S, the band cell's length along the "
+          "fault (down dip / in depth); the tip's shortest edge over S\n")
+    print("| S | h_b/S | rule | tip depth | inset el (dip / depth) | min edge/S | edges to surface | "
+          "pairs on surface | first pair depth | frame n.n_f | first pair V | leak | peak slip | "
+          "Newton | vel its |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for r in sorted(recs, key=lambda r: (-r["S"], str(r["tip_rule"]))):
+        t = r.get("tip") or {}
+        near = (r.get("pairs_near_tip") or [{}])[0]
+        get = lambda d, k, f: (format(d[k], f) if d.get(k) is not None else "-")
+        print(f"| {r['S']:.5f} | {r['h_b_over_S']:.2f} | {r['tip_rule']} | {get(t, 'tip_depth', '.4f')} | "
+              f"{get(t, 'inset_elements', '.2f')} / {get(t, 'inset_elements_depth', '.2f')} | "
+              f"{(t['tip_edge_min_mean_max'][0] / r['S']) if t.get('tip_edge_min_mean_max') else float('nan'):.2f} | "
+              f"{t.get('tip_edges_to_surface', '-')} | {t.get('pair_points_on_surface', '-')} | "
+              f"{get(t, 'top_pair_depth', '.4f')} | {get(t, 'top_pair_frame_dot', '.6f')} | "
+              f"{get(near, 'V', '.2f')} | {get(near, 'leak', '.1e')} | "
+              f"{r['peak_slip']:.2f} | {r['newton_iterations']}{'' if r['converged'] else ' (unconverged)'} | "
+              f"{r.get('vel_its_all_applications', '?')} |")
 
 
 if __name__ == "__main__":
@@ -101,3 +125,4 @@ if __name__ == "__main__":
         table_A(A)
     if B:
         table_B(B)
+        table_tip(B)
