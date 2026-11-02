@@ -521,7 +521,11 @@ counts and slip are the same.
 **Row 5** (networks, h_b/S 24, np 4): junction (gap 8 / 24) H0 89 / 87 against H1 261;
 pair H0 913 with the 0.75 gate, 80 with the gate open, H1 276; TI band H0 1033 gated, 131
 open, H1 338. The gate (#918) is the only thing standing between H0 and a 2-3 times win on
-networks. TI zone reruns pending.
+networks. **TI zone reruns (np 4):** a TI zone alone 1179 its; TI zone plus the fault's band
+as a second zone 439; the structural patch alone with the gate open 131; H1 338. Same peak
+slip (0.13293) throughout. That is #921's point at np 4: without the split's structural
+rows the patch is 3-9 times worse. (The "zone plus structural" arm was invalid: a job-line
+`UW_FAC_COVER=0.75` overrode the zone path's gate; corrected arm queued.)
 
 **#919:** fixed by 7c0c62ff (test_1132 passes at np 1, 2 and 4). The runner also saw
 test_1062, 1064, 1069, 1078 and 1079 fail at the earlier commit; a development baseline is
@@ -900,6 +904,11 @@ refuses deletions from here, so this needs a laptop or Louis.
 - The rotated pressure rtol default (kaiju's evidence, in HUB.md).
 
 ## For the other hubs
+
+- 2026-11-02, to the science hub, for uw3-hpc-install-run's kaiju notes: "`OMPI_MCA_io=^ompio`
+  in every job with several UW3 processes per node; under OMPIO, H5Fcreate/H5Fflush fail
+  intermittently (PETSc error 76, #922)." Also a node-local `UW_MESH_CACHE_DIR` per job.
+  The dev runner already sets both.
 
 - 2026-10-31, to the science hub: on Louis's word ("dispatch parallel runs on kaiju since
   the laptop can't cope and hyperion is out of action"), the dev hub sent the #901/#902
