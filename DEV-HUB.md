@@ -490,6 +490,13 @@ The box converges in S much more slowly than the linear fixture, because its wea
 is the band cells above the tip (2S wide) and at S = h_b the bridge is 0.065 wide and the
 tip cannot be shallower than 0.026: the geometry changes with the ladder. Iterations do
 not grow with ratio; block cost grows linearly with the rung count.
+*Geometry-held check queued (10 np 4 arms, campaigns 1bcab15):* two driver options, both
+off by default, `-uw_tip_exact` (the spine sampled from the tip, so the tip is at the
+asked depth at every S) and `-uw_bridge_width w` (a smooth zone of physical width w at
+the quadrature points, independent of the band cells). Tip held at 0.026 (1.1 elements at
+S = h_b). Two bridge families, 0.008 and 0.0654 (2 h_b), each against its own finest S. If
+the 0.008 family still converges slowly while the 0.0654 one converges like problem A, the
+remaining error is a sub-cell zone, not the ladder.
 
 **Row 7, the one-element tip ("if it works"): it works at every S.** Every 1el arm converges
 in the same 35-42 Newton steps as deeper tips; the frame on the first interior pair is the
