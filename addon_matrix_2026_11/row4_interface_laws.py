@@ -67,6 +67,8 @@ params = uw.Params(
     uw_fac_lu=0,              # 1: the FAC patch blocks solved by LU, as custom_mg intends
     uw_law="coulomb",         # frictionless, viscous, coulomb or ratestate
     uw_max_it=50,             # the rotated loop's cap (its default 50; snes_max_it does not reach it)
+    uw_cap_by="wrap",         # wrap: replace the loop's max_it (any build); snes: set
+                              # snes_max_it on the solver (underworld3 with #920's fix)
 )
 V_FREE = 323.4                # frictionless peak slip at S 0.004 (sweep records, H0 and H1)
 TAU_MID = 20250.0 + 911250.0 * 0.175   # tau0 + tau1 z at mid-fault depth
@@ -212,7 +214,9 @@ n0 = rotated_bc._ROT_SOLVE_COUNT
 for i in range(1, 4):
     opts[f"rotfs{n0 + i}_fieldsplit_vel_ksp_converged_reason"] = None
 
-if int(params.uw_max_it) != 50:
+if str(params.uw_cap_by) == "snes":
+    stokes.petsc_options["snes_max_it"] = int(params.uw_max_it)
+elif int(params.uw_max_it) != 50:
     _rotated_capped = rotated_bc.solve_rotated_freeslip
     rotated_bc.solve_rotated_freeslip = lambda *a, **k: _rotated_capped(
         *a, **{**k, "max_it": int(params.uw_max_it)})
@@ -311,6 +315,7 @@ record = {
     "t_base_s": round(t_base, 2), "t_place_s": round(t_place, 2), "t_solve_s": round(t_solve, 2),
     "np": uw.mpi.size,
     "law": law, "law_params": law_params, "max_it": int(params.uw_max_it),
+    "cap_by": str(params.uw_cap_by),
     "rnorm_rel_history": [round(float(x) / float(info.get("ref") or 1.0), 6)
                           for x in (info.get("rnorm_history") or [])],
     # ru_maxrss is bytes on macOS (kilobytes on Linux)
