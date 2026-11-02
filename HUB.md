@@ -329,6 +329,27 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, LIBRARY FINDING (kaiju; the same defect as your #906 in a new guise): on the closed
+  annulus with GEOMETRIC normals (normal=None) and a placed fault, the solution is the correct flow plus an
+  arbitrary RIGID ROTATION. Least-squares rigid rotation fitted to the solver-mesh velocity at TAf 40 step 41:
+  analytic normal omega 0.04 (rms|v| 1337.1); geometric inset 1 omega -1543 (rms|v| 3104.5, 1358.7 after removing
+  omega x r); geometric inset 3 omega -4743 (8682.4, 1337.1 after removal = the analytic answer exactly). Slip is
+  unchanged; vrms carries the rotation. Mechanism (no-solve hook recording the library's normals,
+  kaiju-launch/scaling/normal_check_hook.py): the placement inserts band vertices along the base mesh's wall
+  edges, 4e-6 to 1.4e-5 inside the circle (on the chord), where the geometric normal is the chord's normal, up to
+  0.17 deg from radial; on the unfaulted mesh every wall node is a base vertex (measure-weighted mean of two
+  chords = radial) or a chord midpoint (radial), so omega x r is exactly tangent and rigid rotation is an exact
+  null mode the route removes; with the fault the mode is INEXACT, _rotated_velocity_null_modes's verified-mode
+  test rejects it, and the nearly singular mode is left to the solver, which returns an arbitrary amount. The 19
+  "violating" nodes are where that rotation is not tangent to the faceted wall; every node has labelled
+  facets; the normals are geometrically right. Not placement labelling, not the fault. Fixes: (i) always remove
+  the rigid-rotation mode on a closed circular boundary (the declared Mesh.nullspace_rotations, as #906 says,
+  rather than the 1e-8 verified test) or pin the net rotation; (ii) have the placement project new wall
+  vertices onto the circle; (iii) driver stopgap, subtract the fitted omega x r after each solve; and the
+  analytic-path node-set fix would make analytic safe at all np and sidestep this. Repro runs: kaiju
+  scale_isolate_geometric_inset3_TAf_ck40, scale_normalcheck_*; scripts rot.py, viol.py beside the scaling
+  scripts. **Campaign consequence: the analytic normal stays the driver default (clean at np 16); Louis's
+  geometric ruling is held on this mechanism until #906 or the analytic node set is fixed.**
 - 2026-11-02, to the dev hub: Louis has ruled the campaign drivers' wall normal to the geometric (library default,
   normal=None) path, "the computed normal is probably the correct default", and the split inset to 1 rung (the one
   element the surface rotation needs; the test showed 3 rungs was a ~10 % physics choice with no evidence behind
@@ -656,7 +677,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   is isolating (inset 3 with geometric; the violating nodes' positions, ownership, band/base, on-circle or chord,
   the computed normal against radial, their labelled facets; the unfaulted base at np 16 from the same checkpoint).
   The geometric default does not go in until understood; the analytic normal stays the default at np 16 (clean),
-  and np != 16 runs are on hold or explicit. Earlier framing follows.
+  and np != 16 runs are on hold or explicit. **SOLVED the same day:** the geometric normal with a fault admits an
+  arbitrary rigid rotation (an inexact null mode the route's verified test rejects), because the placement's
+  wall vertices sit on chords with non-radial normals; the flow itself is identical to the analytic answer once the
+  rotation is removed. A library finding (the #906 class), recorded for the dev hub above. Inset-1 confirmation
+  (job 3455) PASSED: vrms 1380.09, slip 6545.55, walls clean, equal to the smoke. Earlier framing follows.
 - **Driver default for the free-slip wall normal: geometric (the library default, normal=None) instead of the
   analytic unit_r (2026-11-01, hub recommends YES).** Kaiju: TAc 20, one step, build C: with the geometric normal np
   32 is clean (max |v.n| 1e-8, 0 nodes) where the analytic normal gave v.n 12,146 at three nodes; the answer is the
@@ -2414,3 +2439,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   ad69d1d, ledger de55653); head 99049b5. The ledger records the inset ruled, the restart rule, and the wall normal
   as ruled geometric but held on job 3447. Confirmation run 3455 (analytic + inset 1) and the wall-normal isolation
   pending from kaiju.
+- 2026-11-02: wall-normal failure solved: geometric normals + placed wall vertices on chords make rigid rotation an
+  inexact null mode, left to the solver (omega -1543 / -4743; flow identical after removal). Library finding for the
+  dev hub (the #906 class). Analytic stays the default; Louis's geometric ruling held on the mechanism. Inset-1
+  confirmation passed.
