@@ -444,8 +444,11 @@ placement API already takes the trace's own points as rungs.
 (inexact blocks, pieces plus slip coarse space), then the 3-D single-block cost (row 1),
 then the distribution of the patch across ranks (row 2), all on conda-forge PETSc.
 
-**Open:** Louis to confirm "one element, in mesh units" for the split tip, which the hub
-reported from his message of 2026-11-02 but which he has not stated in those words.
+**The split tip (Louis, 2026-11-02, confirmed):** "One element ... if it works. I am not
+sure about units. 1 is normalised by the element size." So the inset is one local element
+length at the tip, a condition to be tested, not a settled rule: if one element does not
+work (the rotated frame fails, or slip at the tip misbehaves), the measurement says what
+does.
 
 ## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
 
@@ -520,7 +523,7 @@ band exceeding 75 % of the level) and the chain's growth are the same thing.
   object whatever the implementation. The split stopping short of the surface is an
   implementation detail: surface DOFs cannot be rotated, so at least one element sits
   between the tip and the surface, and damage carries the rest of the fault. So the tip
-  depth is one element, in mesh units, not a depth to be fixed in physical units.
+  depth is one local element length ("if it works"), not a depth fixed in physical units.
   **Driver consequence (notes session, 2026-11-02):** `annulus_faults.py`'s `trace_inset()`
   returns 3.0 rungs for a split, which is 0.012 at S 0.004, under one base cell of 0.0156,
   but three base cells at S = h_b. The inset should be set in base cells (one), not rungs,
