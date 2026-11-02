@@ -213,7 +213,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 580022f (-uw_split_inset in rungs, default 3, unit and default with Louis; -uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` bf18312 (uw_chain default 0 in b440b88; builds from development 25d62812; DECISIONS.md ledger; -uw_split_inset in rungs, default 3, unit and default with Louis; -uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -330,8 +330,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   now on the comparison page.
 - 2026-11-02, to the dev hub and the docs hub: Louis has approved the campaign's build move to development (today).
   New kaiju runs build from the development head of the day and record it; the uw_chain driver default goes to 0 in
-  the same commit (your #892 ruling's condition met). The docs hub's journal entry closes on that commit's sha,
-  which I record here when kaiju sends the patch.
+  the same commit (your #892 ruling's condition met). The docs hub's journal entry closes on that commit's sha:
+  **b440b88** on lmoresi/uw3-campaigns zg95-annulus-for-kaiju (uw_chain defaults to 0 in annulus_faults.py,
+  annulus_fault.py and box_fault.py; acceptance passed, kaiju job 3154).
 - 2026-11-02, to the dev hub, Louis on the wall-normal defect: "I'm still puzzled how this could go so wrong and be
   undetected previously. Geometrical / analytic is an obvious work-around, but in cases where there is no such
   value available, is there a latent bug." The hub's answer for your intake: the latent bug is on the
@@ -635,7 +636,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   #912 and #914 are on it); the pinned leak-fix overlay 547c2e54 is retired for new work; running comparisons and
   restarts keep their pinned builds; every README records its build. The driver default `uw_chain` goes to 0 in the
   same commit (kaiju's held patch). Acceptance: the one-step TAf 40 check at np 16 on the fresh development build
-  (walls clean, answer to the printed figures against the 25d62812 chain-0 run). Ledger updated.
+  (walls clean, answer to the printed figures against the 25d62812 chain-0 run). **ACCEPTANCE PASSED (kaiju job
+  3154): step 41 vrms 1358.9188, slip 5877.77, mobility 1.2870, Newton 6, walls 1e-12; equal to the reference to the
+  printed figures; README reads underworld3 25d62812, uw_chain 0 default.** Driver commit for the default: b440b88;
+  branch head bf18312. Development's head on 2 Nov is still 25d62812 (#912, #914, the leak fix via #882).
 - Earth production run: **GO (Louis to kaiju, 2026-10-29: "Looks like we can go with this to get more steps. The
   continent is fine to deform, honestly. They do that, unless they are cratons.")** Launched as job 2374 (n2):
   runs/slab_earth_run1, launcher kaiju-launch/earth/production.sh, driver 07667b2 pinned in zg95-earth-prod,
@@ -2341,3 +2345,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02: Louis: go on the build move. Kaiju told: build from current development for new runs, retire the
   leak-fix overlay for new work, send the uw_chain 0 default patch with the ledger pointer, run the one-step
   acceptance check. Recorded for the dev and docs hubs; ledger to be updated with the commit.
+- 2026-11-02: build move accepted (job 3154 passes); kaiju's series applied: choices block points at DECISIONS.md,
+  uw_chain default 0 (b440b88); its ledger patch reconciled by hand into the hub's ledger edits; head bf18312.
+  Journal closure sha passed to the docs hub.
