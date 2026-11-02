@@ -444,6 +444,34 @@ pushed, held without PRs. Kaiju validation waits on the runner's holds.**
 | #920 max_it | `bugfix/rotated-max-it-920` 92a330cf | `snes_max_it` reaches the rotated loop through one hook at both call sites. Review found the loop never tested the residual after its last increment, and that caps of 0 and negatives crashed; fixed, PETSc's meanings kept. test_1136; 5 of 6 cases fail on development. Filed #924 (the loop ignores snes_rtol/atol/stol). | No |
 | pressure rtol | `feature/rotated-pressure-rtol-default` e6b8be58 | the rotated pressure sub-KSP from 0.1 x tol to a fixed 1e-2; `_rotated_pres_rtol` overrides. Serial checks on top of kaiju's A/B: same Newton counts, answers within 2.5e-6, slip to 7 figures. | **Needs Louis's explicit yes.** It loosens a solver default against the guardrail policy in `subsystems/solvers.md` and the Citcom margin principle. The branch restates that principle (the velocity sub-solve keeps the 0.033 margin; the pressure tolerance is a preconditioner-quality trade), which is design text for Louis to accept or reject. The programme's item 3 was the hub's text, not his words. |
 
+**Item 2 decided (2026-11-02): LU stays as the FAC block solver.** Kaiju runs on the box at
+np 4 (runner report 4). Every converged arm matches LU's Newton count and peak slip; none
+comes within the 10 % bound on time:
+
+| arm | S 0.004, one block | S 0.004, cut blocks | S 0.0156, one block |
+|---|---|---|---|
+| LU (reference) | 603 s | 433 s | 516 s |
+| ILU(2), 5 steps | 1299 (2.15x) | 1404 (3.2x) | 766 (1.48x) |
+| ILU(1), 5/10 steps | timed out (1 h) | timed out | 830 / 945 |
+| GAMG, 5/10 steps | 1750 / 2102 | 2089 / 2058 | 931 / 869 |
+| hypre, 5/10 steps | 2360 / 2179 | 2248 / 2981 | 923 / 1207 |
+| GAMG or ILU(1) to rtol 1e-1 / 1e-2 | 7303-12532 | 6578 | |
+
+So the patch does need LU's accuracy in this regime; "does it require LU?" is answered
+no in principle (all converge to the same answer) and yes in practice (nothing else is
+within 1.5x). The 2-D strips (experiment 2, closed) are evidence for phase 3 only: LU on
+strips of 8 rungs is within 7 % of one block (571 against 603; 482 against 516), the #895
+lever if 3-D needs a bounded block.
+
+The PR: `feature/fac-block-solver-lu` 968b274b, from development. It removes
+`UW_FAC_SUB_PC`, `UW_FAC_WHOLE`, `UW_FAC_MODE`, `UW_FAC_ASM_TYPE`, `UW_FAC_OVERLAP` and
+`UW_FAC_LEVELS`; each measured answer stays as a comment on the code that ships it.
+test_1090 fails on development with the old knobs set. Review running. The remaining
+TODO(MEASURE) knobs (`UW_FAC_PATCH`, `UW_FAC_SEGMENTS`, `UW_FAC_BLOCK_ROWS`,
+`UW_MG_SMOOTH_ITS`, `UW_CUSTOM_MG_DISABLE_FAC`, `UW_CUSTOM_MG_DISABLE_NESTED_NATIVE`) go in
+one more small PR after item 1 lands; Louis's "no probe knobs" covers them, no ruling
+needed.
+
 Campaign note: on these branches `UW_FAC_COVER` and `UW_FAC_STRUCTURAL` do nothing, so the
 drivers' st0/st1 and cover A/B pairs would run identical configurations. Item 2 waits on
 experiment 1; item 4 starts once item 1's defaults settle.
@@ -740,6 +768,10 @@ h_b = 1/32 in both fixtures; the box's S today is 0.004 (ratio 7.9).
   slip, so corridor refinement may cost iterations. The kaiju grid decides.
 
 ## Can the patch be an iterative solve? (Louis, 2026-11-01)
+
+**Answered 2026-11-02: LU stays.** See the programme's item 2 for the table. Nothing inexact
+came within 1.5x of LU on the box; strips of 8 rungs with LU are within 7 % (the phase-3
+lever).
 
 Louis: "Any way we can write the add on as an iterative solve that scales better? Does it
 require the full accuracy of LU? ... particularly relevant if we break the fault into
@@ -1074,6 +1106,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: item 2 decided on kaiju's results: LU stays as the block solver; the probe
+  knobs go. The iterative-patch question is closed.
 - 2026-11-02: phase 1 items 1 and 3 built and reviewed (table in the programme). Two
   decisions for Louis: the #918 rule as shipped (split levels only), and the pressure rtol
   default. #924 filed.
