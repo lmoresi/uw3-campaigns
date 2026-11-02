@@ -73,7 +73,7 @@ GitHub, or in session transcripts. If it dies:
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
-| kaiju, dev runner | `session_01HxWvn65HBbkFbSxnYfNuxR` ("kaiju: dev runs"), created by the dev hub 2026-11-01. It runs suites, benchmarks and parallel checks of library branches for the integration session and the hub, on free nodes. **Its messages to this hub are refused (untrusted device)**, so it reports to the integration session, which forwards |
+| kaiju, dev runner | `session_01HxWvn9ik2HHt9ANKndJRDr` ("kaiju: dev runs 2"), created 2026-11-02 in Auto, replacing `...65HBbkFbSxnYfNuxR`, which locked itself out of its permissions and is archived. It runs suites, benchmarks and parallel checks of library branches on free nodes, in the held-queue order; it reports to the hub or, if refused, to the integration session |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
 
 ## Access (measured 2026-10-29)
@@ -98,7 +98,7 @@ GitHub, or in session transcripts. If it dies:
   memory pressure killed applications). It is for editing, building and short serial
   checks of a single test file only, after checking `memory_pressure`. Every parallel run,
   sweep, benchmark and full suite goes to kaiju: library runs through "kaiju: dev runs"
-  (`session_01HxWvn65HBbkFbSxnYfNuxR`), campaign runs through the science hub.
+  (`session_01HxWvn9ik2HHt9ANKndJRDr`), campaign runs through the science hub.
 
 - Work on side branches, never `development` or `main`. Push after every commit. Open PRs
   only when Louis asks. Run an adversarial review before every PR.
@@ -1106,6 +1106,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: the kaiju runner locked itself out of its permissions; replaced by "kaiju: dev
+  runs 2" (Auto, same environment, the held queue carried over). The old session is archived.
 - 2026-11-02: item 2 decided on kaiju's results: LU stays as the block solver; the probe
   knobs go. The iterative-patch question is closed.
 - 2026-11-02: phase 1 items 1 and 3 built and reviewed (table in the programme). Two
