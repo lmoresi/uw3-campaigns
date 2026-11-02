@@ -194,6 +194,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
 | Node-packing throughput test on kaiju (1/2/3 x 16-rank jobs per node, same case) | https://claude.ai/artifact/1CFNXD4TpQLX5jfeTdMN8k |
 | Driver knob audit: all 153 uw_* knobs against 6 run families (explicit / BASE / default), the taken-by-default list, 12 unwired or hard-coded items | https://claude.ai/artifact/NRAGaCJ3GXxypNvsAT53wL |
@@ -329,6 +330,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub, your ladder-spacing item is DONE (page 7cbuaxBnoZrfjdPioMHroT; reruns re-sampled at
+  each S; chain 0, development 25d62812, np 16, 10 steps from TAf 20 and TBf 70; S = 0.0156 with inset 1 rung and
+  0.0078 with inset 2, i.e. one base cell in both, against production's 0.004 with 3 rungs). Matching S to the base
+  shrinks the serial FAC patch 2-3x (3114-3468 owned rows -> 1580-1870 -> 952-1070; node pairs 87-109 -> 41-51 ->
+  19-25) and its solve 2.3-4.5x (22-26 s -> 9-14 -> 5-8 per step); same-node step cost (TBf, n3) 388 -> 346 (-11 %)
+  -> 335 s (-14 %). Answer, TBf 70 (mature rollback): vrms within 0.3 %, slip_max -2.5 % (h_b/2) and -4 % (h_b), slip
+  from 0.02 down within ~5 %, trench unchanged. TAf 20 (early slab): slip_max at step 30 -10 % and -18 %, vrms -3 %
+  and -1.5 %, trench -1.98 / -1.68 vs -2.04 deg; most of the difference is at the top where the cut now starts one
+  base cell (~0.020) down. The confounded arms are kept and relabelled. Whether S should become h_b by default is
+  Louis's.
 - 2026-11-02, to the dev hub, LIBRARY FINDING (kaiju; the same defect as your #906 in a new guise): on the closed
   annulus with GEOMETRIC normals (normal=None) and a placed fault, the solution is the correct flow plus an
   arbitrary RIGID ROTATION. Least-squares rigid rotation fitted to the solver-mesh velocity at TAf 40 step 41:
@@ -638,6 +649,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **Rung spacing default (2026-11-02): should S become one base cell (0.0156) instead of 0.004?** Evidence on page
+  7cbuaxBnoZrfjdPioMHroT: the serial FAC patch shrinks 3x and its solve up to 4.5x, the step 14 % cheaper on the
+  same node; mature rollback (TBf) answer within 0.3 % in vrms and 4 % in slip_max, trench unchanged; an early slab
+  (TAf 20) loses 10-18 % of slip_max and the trench moves 0.06-0.36 deg, mostly because the cut's top sits one base
+  cell (~0.020) down instead of 0.005. Hub's reading: the cost case is modest at np 16 (the patch is 5 % of a step)
+  and the near-surface answer changes more than the chain or tolerance choices did, so the choice is physics (how
+  finely the fault's slip near the surface is resolved) more than cost; h_b/2 (inset 2 rungs = one base cell) is
+  the compromise with half the patch and the smaller change. No change until you rule; the knob is recorded.
 
 - Restart rule (restored polylines re-sampled at the run's S when the checkpoint's S differs; no-op otherwise):
   **PASSED 2026-11-02:** unchanged S bit-identical to the first acceptance (vrms 1358.918800, slip 5877.766414, to
@@ -2443,3 +2463,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   inexact null mode, left to the solver (omega -1543 / -4743; flow identical after removal). Library finding for the
   dev hub (the #906 class). Analytic stays the default; Louis's geometric ruling held on the mechanism. Inset-1
   confirmation passed.
+- 2026-11-02: dev hub's ladder-spacing arms done (re-sampled reruns): S = h_b shrinks the serial patch 3x and the
+  step 14 % with the mature answer within 0.3 % vrms / 4 % slip and the early slab's slip 10-18 % lower (cut deeper).
+  Recorded for the dev hub; the rung-spacing default put to Louis. Kaiju's queue is empty.
