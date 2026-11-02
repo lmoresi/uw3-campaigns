@@ -432,6 +432,22 @@ integration session (code), the kaiju runner (runs).
 Done when: every case has a passing test on development, the defaults carry no probe
 knobs, and the guides say what ships.
 
+**Phase 1 status (2026-11-02): items 1 and 3 built, reviewed (2-3 adversarial rounds each),
+pushed, held without PRs. Kaiju validation waits on the runner's holds.**
+
+| Item | Branch | What ships | Differs from the programme? |
+|---|---|---|---|
+| #918 cover gate | `bugfix/fac-cover-gate-structure-918` faf80fe2 | A level carrying a split fault declines only above 98 % patch+halo; every other level keeps 0.75. Verdict on `hierarchy.fac_gate`, printed under verbose. `UW_FAC_COVER` removed. | **Yes.** The hub's "2 % background" rule, applied to every level, failed review on routes the fixture never touched: wide unsplit adapt children would take 95-98 % patches (one LU over nearly the whole level), and a cut on a refined base gives a 100 % uniform pair that SOR converges in 4-8 its. So the rule ships on split levels only. A placed band fine enough would still decline (about h_b/S 200 on a 1/16 base); bounding the block is #895, item 2 |
+| #921 structural rows | `bugfix/fac-zone-structural-921` 945504bf, stacked on #918 | A split finest level adds its structural rows to a keyed zone under the 98 % gate; an unsplit level keys on the zone alone (#670). `UW_FAC_STRUCTURAL` removed. test_1135: 4940 of 4940 rows were missing before. | No |
+| #919 | c7e6fa3b | unchanged; first in the runner's queue | No |
+| patch summary | `feature/mg-hierarchy-patch-summary` a46bf3f1 | review fixes: serial batch, exact zone-row union at np > 1, record made after set-up and cleared at build, private helpers | No |
+| #920 max_it | `bugfix/rotated-max-it-920` 92a330cf | `snes_max_it` reaches the rotated loop through one hook at both call sites. Review found the loop never tested the residual after its last increment, and that caps of 0 and negatives crashed; fixed, PETSc's meanings kept. test_1136; 5 of 6 cases fail on development. Filed #924 (the loop ignores snes_rtol/atol/stol). | No |
+| pressure rtol | `feature/rotated-pressure-rtol-default` e6b8be58 | the rotated pressure sub-KSP from 0.1 x tol to a fixed 1e-2; `_rotated_pres_rtol` overrides. Serial checks on top of kaiju's A/B: same Newton counts, answers within 2.5e-6, slip to 7 figures. | **Needs Louis's explicit yes.** It loosens a solver default against the guardrail policy in `subsystems/solvers.md` and the Citcom margin principle. The branch restates that principle (the velocity sub-solve keeps the 0.033 margin; the pressure tolerance is a preconditioner-quality trade), which is design text for Louis to accept or reject. The programme's item 3 was the hub's text, not his words. |
+
+Campaign note: on these branches `UW_FAC_COVER` and `UW_FAC_STRUCTURAL` do nothing, so the
+drivers' st0/st1 and cover A/B pairs would run identical configurations. Item 2 waits on
+experiment 1; item 4 starts once item 1's defaults settle.
+
 **Phase 2: land 3-D.** Owner: the kaiju 3-D session (M1-M3 of its plan), with the runner.
 The 2-D defaults from phase 1 are what it builds on; it does not re-open them. Milestone
 order unchanged: `place_fault_ribbon` parity, the 3-D rig test, np 4 in CI, then the shell
@@ -1058,6 +1074,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: phase 1 items 1 and 3 built and reviewed (table in the programme). Two
+  decisions for Louis: the #918 rule as shipped (split levels only), and the pressure rtol
+  default. #924 filed.
 - 2026-11-02: Louis switched "kaiju: dev runs" and "kaiju: 3-D add-on mesh" to Auto; the
   runner was told to release its six held jobs. The 3-D session is working.
 - 2026-11-02: **Louis: stop hedging; polish the add-on, land 3-D, decompose only if
