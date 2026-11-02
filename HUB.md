@@ -332,7 +332,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02, to the dev hub: Louis has ruled the campaign drivers' wall normal to the geometric (library default,
   normal=None) path, "the computed normal is probably the correct default", and the split inset to 1 rung (the one
   element the surface rotation needs; the test showed 3 rungs was a ~10 % physics choice with no evidence behind
-  it). The analytic-normal node-set defect stays yours to fix; the campaign no longer depends on it.
+  it). The analytic-normal node-set defect stays yours to fix; the campaign no longer depends on it. UPDATE the same
+  day: the geometric normal FAILS the outer-wall constraint when a fault is present (v.n 8 at 19 node entries,
+  vrms doubled; clean without a fault), so the campaign does still depend on the analytic path at np 16 for now;
+  kaiju is isolating whether the placement leaves the band's new wall vertices off the circle or unlabelled (a
+  placement-side gap) or whether the geometric path itself misbehaves at the band; a finding follows either way.
 - 2026-11-02, to the dev hub, your ladder-spacing arms were CONFOUNDED and are rerunning (kaiju): a restart rebuilds
   each crust-law fault from the polyline stored in the checkpoint, already sampled at the writing run's S (0.004),
   and re-samples at the new S only when a detection re-fits; in the S = h_b and h_b/2 arms no re-fit happened in 10
@@ -614,6 +618,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- Restart rule (restored polylines re-sampled at the run's S when the checkpoint's S differs; no-op otherwise):
+  **PASSED 2026-11-02:** unchanged S bit-identical to the first acceptance (vrms 1358.918800, slip 5877.766414, to
+  ~1e-10); S = h_b re-samples 2 polylines (15 pairs at f8), walls clean. Goes in with the inset-1 default (series
+  split; the wall normal held).
 - Split inset: **DECIDED 2026-11-02, 1 rung** (Louis: "logical set back based on the purpose, appears to be safe");
   kaiju sends the default patch with the chain-2/4S caveat; the faulted thermal set and Earth run 1 (at 3 rungs)
   understate slip by ~10 % against the new default, to be said wherever they are cited. Earlier: Louis asks for 1
@@ -639,7 +647,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   default unchanged; say which unit and value the default takes.
 
 - Wall normal: **DECIDED 2026-11-02, geometric** (Louis: "the computed normal is probably the correct default");
-  kaiju sends the default patch. Earlier framing follows.
+  **HELD ON EVIDENCE the same day:** the one-step acceptance with the geometric normal AND a fault (TAf 40, np 16,
+  driver 06e3afd) FAILS: the fault slips identically (slip_max 6545.5 vs the analytic inset-1 smoke's 6545.6) but
+  the OUTER wall breaks the constraint (v.n up to 8.19 at 19 node entries, |v|max 9215 vs 5792), vrms doubles
+  (3103.5 vs 1380.1), mobility 1.238 vs 1.299; inner wall clean. The geometric normal was clean on the unfaulted
+  base at np 16 and 32, so the failure needs a fault, probably where the band or bridge meets the outer wall (the
+  placement's new wall vertices off the circle, or a facet unlabelled, skewing the geometric nodal normal). Kaiju
+  is isolating (inset 3 with geometric; the violating nodes' positions, ownership, band/base, on-circle or chord,
+  the computed normal against radial, their labelled facets; the unfaulted base at np 16 from the same checkpoint).
+  The geometric default does not go in until understood; the analytic normal stays the default at np 16 (clean),
+  and np != 16 runs are on hold or explicit. Earlier framing follows.
 - **Driver default for the free-slip wall normal: geometric (the library default, normal=None) instead of the
   analytic unit_r (2026-11-01, hub recommends YES).** Kaiju: TAc 20, one step, build C: with the geometric normal np
   32 is clean (max |v.n| 1e-8, 0 nodes) where the analytic normal gave v.n 12,146 at three nodes; the answer is the
@@ -2390,3 +2407,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   patch grows linearly with fault length, 10-12 % of a step at depth 0.60. Both recorded for the dev hub.
 - 2026-11-02: Louis rules: split inset 1 rung; wall normal geometric. Kaiju sends both default patches with the ledger
   rows and a one-step acceptance; recorded for the dev hub.
+- 2026-11-02: acceptance of the two new defaults: the restart rule and inset 1 pass; the geometric wall normal FAILS
+  with a fault present (outer-wall constraint broken, vrms doubled) though clean without one. Series split: restart
+  rule + inset 1 go in now; the geometric default is held on evidence pending kaiju's isolation.
