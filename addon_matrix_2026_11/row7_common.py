@@ -85,6 +85,25 @@ def patch_rows_global(item):
             "block_rows_per_rank": per_rank}
 
 
+def finest_patch(hierarchy):
+    """The finest level's FAC patch summed over the ranks. Read from the hierarchy's
+    own record (``hierarchy.patch_summary``, underworld3 04b7a76f and later), which
+    makes no collective call. On an older build, fall back to ``patch_rows_global``
+    on its rank-local rows (one allgather, on every rank)."""
+    summary = getattr(hierarchy, "patch_summary", None)
+    if summary is not None:
+        last = summary[-1] if summary else None
+        if last is None:
+            return {"taken": False, "patch_owned_rows": 0, "subdomain_rows": 0,
+                    "block_rows_per_rank": [], "source": "hierarchy.patch_summary"}
+        return {"taken": True, "patch_owned_rows": last["owned_rows"],
+                "subdomain_rows": last["subdomain_rows"],
+                "block_rows_per_rank": last["block_rows_per_rank"],
+                "source": "hierarchy.patch_summary"}
+    rows = getattr(hierarchy, "level_patch_rows", None)
+    return {**patch_rows_global(rows[-1] if rows else None), "source": "patch_rows_global"}
+
+
 def tip_topology(mesh, boundary, surface_point, t_hat, n_fault, h_element, surface_y=1.0, max_steps=8):
     """The split fault's upper tip in the placed mesh, against the surface y = surface_y.
 

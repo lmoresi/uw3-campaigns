@@ -227,8 +227,9 @@ record = {
     "fac_gate": gate, "spec": spec, "patch": patch,
     "block_work_again": patch_probe.reduce_work(block_work) if block_work else None,
     "t_setup_s_est": round(t_solve_first - t_solve_again, 2),
-    "peak_rss_mb_per_rank": [round(m / 2 ** 20, 1) for m in uw.mpi.comm.allgather(
-        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
+    # ru_maxrss is bytes on macOS, kilobytes on Linux
+    "peak_rss_mb_per_rank": [round(m / (2 ** 20 if sys.platform == "darwin" else 2 ** 10), 1)
+        for m in uw.mpi.comm.allgather(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
     "petsc": ".".join(str(i) for i in PETSc.Sys.getVersion()),
 }
 uw.pprint("RECORD " + json.dumps(record))

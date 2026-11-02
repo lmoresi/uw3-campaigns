@@ -36,7 +36,7 @@ last = h.level_patch_rows[-1]
 rows = int(h.transfers[-1].getSize()[0])          # the finest level's reduced rows
 rec = {"cover_max": float(os.environ.get("UW_FAC_COVER", 0.75)), "taken": last is not None,
        "level_rows": rows}
-_patch = rc.patch_rows_global(last)       # one collective on every rank
+_patch = rc.finest_patch(h)       # the hierarchy's record (no collective on new builds)
 if _patch["taken"]:
     rec["patch_owned_rows"] = _patch["patch_owned_rows"]
     rec["subdomain_rows"] = _patch["subdomain_rows"]

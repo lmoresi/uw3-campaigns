@@ -229,7 +229,7 @@ record = {
     "level_ops_velocity": level_ops, "level_smoothers": smoothers,
     # rank-local in the hierarchy, so read with one collective on every rank
     # (one allreduce per local block hung at np 4 on kaiju: the counts differ)
-    "patch": rc.patch_rows_global(last),
+    "patch": rc.finest_patch(h),
     "converged": info.get("converged"), "ksp_its": info.get("ksp_its"),
     "vel_its_last": info.get("vel_its_last"),
     "vel_its_last_again": info2.get("vel_its_last"),
@@ -238,8 +238,9 @@ record = {
     "peak_slip": peaks,
     "t_base_s": round(t_base, 2), "t_place_s": round(t_place, 2), "t_fmg_s": round(t_fmg, 2),
     "t_solve_first_s": round(t_solve_first, 2), "t_solve_again_s": round(t_solve_again, 2),
-    "peak_rss_mb_per_rank": [round(m / 2 ** 20, 1) for m in uw.mpi.comm.allgather(
-        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
+    # ru_maxrss is bytes on macOS, kilobytes on Linux
+    "peak_rss_mb_per_rank": [round(m / (2 ** 20 if sys.platform == "darwin" else 2 ** 10), 1)
+        for m in uw.mpi.comm.allgather(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
     "np": uw.mpi.size,
 }
 uw.pprint("RECORD " + json.dumps(record))

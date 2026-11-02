@@ -314,8 +314,8 @@ record = {
     "rnorm_rel_history": [round(float(x) / float(info.get("ref") or 1.0), 6)
                           for x in (info.get("rnorm_history") or [])],
     # ru_maxrss is bytes on macOS (kilobytes on Linux)
-    "peak_rss_mb_per_rank": [round(x / 2 ** 20, 1) for x in uw.mpi.comm.allgather(
-        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
+    "peak_rss_mb_per_rank": [round(x / (2 ** 20 if sys.platform == "darwin" else 2 ** 10), 1)
+        for x in uw.mpi.comm.allgather(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)],
     "petsc": ".".join(str(i) for i in PETSc.Sys.getVersion()),
 }
 uw.pprint("RECORD " + json.dumps(record))

@@ -154,7 +154,7 @@ _last = _pr[-1] if _pr else None
 gate = {"cover_max": float(os.environ.get("UW_FAC_COVER", 0.75)),
         "taken": any(uw.mpi.comm.allgather(_last is not None)),
         "level_rows": level_ops[-1]["rows"] if level_ops else None}
-_patch = rc.patch_rows_global(_last)       # one collective on every rank
+_patch = rc.finest_patch(_h)       # the hierarchy's record (no collective on new builds)
 if _patch["taken"]:
     gate["patch_owned_rows"] = _patch["patch_owned_rows"]
     gate["subdomain_rows"] = _patch["subdomain_rows"]
