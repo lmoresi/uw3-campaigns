@@ -472,6 +472,36 @@ TODO(MEASURE) knobs (`UW_FAC_PATCH`, `UW_FAC_SEGMENTS`, `UW_FAC_BLOCK_ROWS`,
 one more small PR after item 1 lands; Louis's "no probe knobs" covers them, no ruling
 needed.
 
+**Kaiju validation (report 6, 2026-11-02).**
+- **#918 confirmed** on its motivating cases: row 3 at 640 and 1280 rungs, declined before
+  (909/1083/1487 its), taken now (65/74/68), same slip.
+- **#920 confirmed:** row 4 Coulomb and rate-and-state identical through `snes_max_it`.
+- **#919 c7e6fa3b:** test_1132 passes at np 1/2/4 and fails first on 7c0c62ff (3076 cells
+  outside their parent at np 2; a raise, once a SIGSEGV, at np 4). Verdict after the
+  error-76 casualties pass at low load.
+- **#921 BLOCKED by a pre-existing parallel hang.** A TI zone plus the structural rows hangs
+  at np 4 (silent from 12-18 s), on #921 and on development with the old knobs
+  (`UW_FAC_STRUCTURAL=1 UW_FAC_COVER=1.01`); serial converges in 94 its. No rank-asymmetric
+  collective found by reading `custom_mg.build`'s zone path, so it is either PCASM set-up
+  with overlapping cross-rank blocks or a non-converging solve. Needs stacks
+  (`faulthandler.dump_traceback_later` on every rank). #921 makes this union the default
+  for a zone keyed on a split level, so it is held until the hang is found; #918 stands on
+  its own. The pair case (zone none) passed at np 4: 80 its, all 31,326 block rows on one
+  rank.
+- **No branch adds a real failure.** tests/parallel fails the baseline's set everywhere
+  (#923), plus error-76 casualties; tier A+B has 16 host failures common to every branch
+  (12 trame ImportErrors and four others) plus environment noise.
+- **#922 corrected again:** ROMIO does NOT prevent error 76. With about 35 jobs at once, every
+  branch's parallel run had error-76 failures inside the tests' spawned serial reference
+  runs; the near-alone baseline had none. Load tracks it; the spawned children may not
+  inherit the job environment (unchecked). Error-76 failures are infrastructure, and their
+  casualties need a low-load rerun before any verdict.
+- **#923:** test_1078's serial value on kaiju equals its parallel one: a per-host baseline,
+  not partition dependence.
+- **The runner is sandboxed again** (no apptainer, Slurm unreachable); nothing builds or
+  runs until Louis lifts it from a kaiju terminal. Held behind it: #921 2328b4ca, the LU
+  branch 61233c84, tier A+B shard 4, and the #921 stack run.
+
 Campaign note: on these branches `UW_FAC_COVER` and `UW_FAC_STRUCTURAL` do nothing, so the
 drivers' st0/st1 and cover A/B pairs would run identical configurations. Item 2 waits on
 experiment 1; item 4 starts once item 1's defaults settle.
@@ -592,8 +622,13 @@ off by default, `-uw_tip_exact` (the spine sampled from the tip, so the tip is a
 asked depth at every S) and `-uw_bridge_width w` (a smooth zone of physical width w at
 the quadrature points, independent of the band cells). Tip held at 0.026 (1.1 elements at
 S = h_b). Two bridge families, 0.008 and 0.0654 (2 h_b), each against its own finest S. If
-the 0.008 family still converges slowly while the 0.0654 one converges like problem A, the
-remaining error is a sub-cell zone, not the ladder.
+**Result (kaiju report 6):** with the tip and bridge held in physical units, the box converges
+like problem A. At h_b/S 1-2 the slip profile is within 1.4-2.5 % rms and the peak slip
+within 1 % of the reference, for both bridge widths, against 32 % / 7.4 % when the geometry
+moved with S. So the earlier spread was geometry, not resolution. **The bridge (weak-zone)
+width is a model parameter in physical units**: it moves the peak slip by 11 % (320 against
+356 for 0.008 against 0.0654). The slip max is not monotone in S (up to 18 % at ratio 4 at
+a few nodes near the tip) while the rms is. The driver PR goes through the science hub.
 
 **Row 7, the one-element tip ("if it works"): it works at every S.** Every 1el arm converges
 in the same 35-42 Newton steps as deeper tips; the frame on the first interior pair is the
@@ -1106,6 +1141,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: kaiju report 6. #918 and #920 confirmed; #921 blocked by a pre-existing np 4
+  hang in the zone-plus-structural union; the geometry-held box converges like problem A, so
+  the bridge width is a physical model parameter; error 76 is load, not OMPIO; the runner
+  is sandboxed again.
 - 2026-11-02: the kaiju runner locked itself out of its permissions; replaced by "kaiju: dev
   runs 2" (Auto, same environment, the held queue carried over). The old session is archived.
 - 2026-11-02: item 2 decided on kaiju's results: LU stays as the block solver; the probe
