@@ -330,6 +330,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the drivers' margin_rings 1 / clearance 0.7 differ from the library's 2 / 0.3, and the FAC patch is tunable only
   through UW_FAC_* environment variables. TAf_env is not a clean control for TAti (several knobs differ), a caveat
   now on the comparison page.
+- 2026-11-02, to the dev hub: Louis wants the fault recipe and the library changes pushed so the annulus rollback
+  experiments restart. For the library, what the experiments need: at np 16, nothing beyond development 25d62812
+  (accepted). To run wider: the #902 fix as a PR (bugfix/custom-mg-many-ranks 96d39f7b: without it development's
+  custom FMG fails at np 32), the analytic-normal node-set completion (the np != 16 wall-node defect), and #906 (the
+  declared rotation null modes, which is also the geometric-normal-with-fault finding). Please put those three in
+  your queue with the rollback restart as the reason, and say in DEV-HUB.md what each waits on. The campaign's
+  recipe v2 defaults (chain 0, pres_rtol 1e-2, envelope, inset 1 rung, S = one base cell, analytic normal) are in
+  zg95_lid_regimes/DECISIONS.md; the campaign branch merges to uw3-campaigns main after the acceptance.
 - 2026-11-02, to the dev hub, your ladder-spacing item is DONE (page 7cbuaxBnoZrfjdPioMHroT; reruns re-sampled at
   each S; chain 0, development 25d62812, np 16, 10 steps from TAf 20 and TBf 70; S = 0.0156 with inset 1 rung and
   0.0078 with inset 2, i.e. one base cell in both, against production's 0.004 with 3 rungs). Matching S to the base
@@ -650,7 +658,22 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Rung spacing default (2026-11-02): should S become one base cell (0.0156) instead of 0.004?** Evidence on page
+- **Recipe v2 and the restart of the rollback experiments (Louis, 2026-11-02: "I want to start pushing the changes to
+  the fault recipe and library so that I can start running the annulus rollback experiments again").** Plan: (1)
+  kaiju lands the last default (S = one base cell), runs the whole-recipe acceptance on one commit, and the hub
+  merges the campaign branch into uw3-campaigns main (74 commits, 198 files, no conflicts with main's hub files) so
+  the recipe is where people look; (2) kaiju proposes the baseline set on recipe v2 (TAf-v2, Earth run 2, TAc-v2 if
+  cheap) with costs, and Louis picks; (3) library: at np 16 nothing is pending (development 25d62812 passed the
+  acceptance); the items that widen the experiments are the dev hub's #902 fix (np > 16 custom FMG, branch
+  96d39f7b, no PR yet), the analytic-normal node set (np != 16), and #906 (geometric normal with a fault); the open
+  PR queue (#780, #861, #862, gthyagi's set) is unrelated to the rollback runs and waits on Louis's approvals.
+  **For Louis: pick the baseline set when kaiju's page is in; the merge to main goes ahead after the acceptance
+  unless you say otherwise.**
+
+- Rung spacing default: **DECIDED 2026-11-02, one base cell** (Louis: "1 base cell is efficient in terms of solver
+  iteration which I thought quite positive", and accepting that the one-rung inset is then one base cell deep so a
+  young fault's near-surface slip is 10-18 % lower than the old recipe: "I think this is OK"). Kaiju sends the
+  default derived from the refinement, with the iteration counts in the ledger. Earlier framing: Evidence on page
   7cbuaxBnoZrfjdPioMHroT: the serial FAC patch shrinks 3x and its solve up to 4.5x, the step 14 % cheaper on the
   same node; mature rollback (TBf) answer within 0.3 % in vrms and 4 % in slip_max, trench unchanged; an early slab
   (TAf 20) loses 10-18 % of slip_max and the trench moves 0.06-0.36 deg, mostly because the cut's top sits one base
@@ -2466,3 +2489,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02: dev hub's ladder-spacing arms done (re-sampled reruns): S = h_b shrinks the serial patch 3x and the
   step 14 % with the mature answer within 0.3 % vrms / 4 % slip and the early slab's slip 10-18 % lower (cut deeper).
   Recorded for the dev hub; the rung-spacing default put to Louis. Kaiju's queue is empty.
+- 2026-11-02: Louis rules S = one base cell and wants the recipe and library changes pushed to restart the rollback
+  experiments. Kaiju: S default, whole-recipe acceptance, baseline proposal page. Hub: merge the campaign branch to
+  main after the acceptance. Dev hub: #902 PR, analytic node set, #906 named as the library items that widen the
+  experiments; np 16 needs nothing more.
