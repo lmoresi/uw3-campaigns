@@ -508,7 +508,9 @@ needed.
   test_1138 pins it. The runner validates it under mpirun, then reruns the error-76
   casualties with ROMIO reaching the children; #922's library side stays open.
 - **#923:** test_1078's serial value on kaiju equals its parallel one: a per-host baseline,
-  not partition dependence.
+  not partition dependence. test_1064 spherical3d at np 2 is different: its 3.4e-4 gap
+  persists at tol 1e-8 against a serial child on the same host, so that one is real
+  partition dependence (commented on #923).
 - **The runner is sandboxed again** (no apptainer, Slurm unreachable); nothing builds or
   runs until Louis lifts it from a kaiju terminal. Held behind it: #921 2328b4ca, the LU
   branch 61233c84, tier A+B shard 4, and the #921 stack run.
@@ -526,9 +528,17 @@ failures beyond the baseline; PRs being opened from the laptop.**
   unsplit 0.75); confirmed on row 3 and test_1134 passes on Linux.
 - **#921 held on #925.** The stacks (job 3537, dumps at 300/600/900 s) show no deadlock and
   no mismatched collective: ranks 0, 2 and 3 wait in MPI on rank 1, which stays in native
-  code outside MPI throughout. That rules out the double-correction idea. Leading guess: a
-  large uncapped structural LU on rank 1. Next: per-rank PETSc event tracing. No code
-  until then.
+  code outside MPI throughout. **Corrected by the traced run (job 3627):** not a giant LU
+  (3-5 factorisations per rank) and not a deadlock. The outer rotated KSP never finishes
+  its first iteration: 31 of 33 velocity solves inside the Schur application run to
+  max_it 200 and reduce the residual only 10-20 times, with rank 1 holding most of the
+  patch blocks (224k MatSolves against 26k on rank 0). A preconditioner that works at np
+  1 (94 its) and fails at np 4 fits double correction: basic ASM summing two blocks'
+  corrections on the same rows at np > 1 only. Probe queued (no code):
+  `probe_925_block_multiplicity.py` counts how many blocks hold each row; serially every
+  row is held once. If rows are held more than once at np > 1, the fix is a partition of
+  unity over the union, making the blocks disjoint before the overlap layer (RASM itself
+  was measured to stall in August).
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
