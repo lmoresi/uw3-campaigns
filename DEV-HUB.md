@@ -73,7 +73,7 @@ GitHub, or in session transcripts. If it dies:
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
-| kaiju, dev runner | `session_01HxWvn65HBbkFbSxnYfNuxR` ("kaiju: dev runs"), created by the dev hub 2026-11-01. It runs suites, benchmarks and parallel checks of library branches for the integration session and the hub, on free nodes |
+| kaiju, dev runner | `session_01HxWvn65HBbkFbSxnYfNuxR` ("kaiju: dev runs"), created by the dev hub 2026-11-01. It runs suites, benchmarks and parallel checks of library branches for the integration session and the hub, on free nodes. **Its messages to this hub are refused (untrusted device)**, so it reports to the integration session, which forwards |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
 
 ## Access (measured 2026-10-29)
@@ -909,6 +909,25 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: kaiju runner's interim report 1 (via the integration session).
+  - **#919:** the first fix (18e57147) did not fix it: a base with no add-on levels moves the
+    base mesh itself, which carries no `_mg_static`. New fix 7c0c62ff: `partition_addon`
+    marks the moved finest static when the mesh owns no tail. Serial passes; np 2 and 4
+    queued. The rest of the parallel suite passed at np 2 and 4.
+  - **Rows 4-5 at 964dc3ce:** all 12 row 4 arms and 9 of 12 row 5 arms done. The three TI
+    zone "hangs" were the driver's own diagnostic (one allreduce per rank-local patch
+    block, with block counts differing by rank); fixed, reruns queued. Louis asked why
+    drivers make raw MPI calls on library internals: the hierarchy exposes its patch only
+    as rank-local index arrays. **Approved by the hub as a non-default addition:** a
+    collective-safe summary on the hierarchy (global rows and blocks per level, made once
+    at set-up), so no driver sums them itself.
+  - **Row 7:** all 18 unrefined arms done; the 7 tip arms submitted. Tables to follow.
+  - **Iterative patch:** most arms done; four probe-driver defects fixed (53924f82). The
+    inexact-block arms on the box converge but take about 3 min per Newton step (43
+    steps), running to completion under a 4 h limit.
+  - **#922 filed:** generated mesh files are not safe across hosts on NFS (scratch names
+    unique by pid only; 102 of 2000 creates failed in a stress test). Workaround: a
+    node-local `UW_MESH_CACHE_DIR` per job.
 - 2026-11-02: **Louis's decision: the add-on is the line** (section above), with his
   three-point plan. Split coarse levels stop. The S ruling is superseded by "the fault
   carries its own resolution". First node-count measurement recorded.
