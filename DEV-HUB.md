@@ -533,8 +533,18 @@ rank-local: 58 of 58 points not located on rank 0"), probably pre-existing.
 block and each rank's block sizes, from one allgather at install; reading it is not
 collective. No default change. Drivers read it (campaigns ed513c1).
 
-**Tier A+B on kaiju** is still spoiled by HDF5 error 76 even with node-local mesh dirs; the
-runner is stracing it. #922's cross-host diagnosis may not be the whole story.
+**HDF5 error 76 on kaiju, cause found:** Open MPI's OMPIO. With many UW3 processes on one
+node, H5Fcreate/H5Fflush through MPI-IO fail intermittently, even on COMM_SELF and
+node-local dirs. With `OMPI_MCA_io=^ompio` (ROMIO) zero failures in two runs, against 13
+and 1 under OMPIO. #922 is corrected and retitled. **Defaults question for Louis:** prefer
+ROMIO, write the rank-0 mesh file without MPI-IO, or document the environment setting.
+
+**#919:** `tests/parallel` fails the identical set at 7c0c62ff and at development 25d62812,
+so the branch adds no failures; review running. Those pre-existing failures (test_1062,
+test_1078, test_1064 spherical at np 2) pass in CI on 25d62812 and fail only in the kaiju
+HPC container: filed as **#923** (type:testing). All three compare against a serial value
+recorded on another host; whether the container's own serial value matches its parallel
+one is the open question.
 
 ## Can the add-on replace split coarse levels everywhere? (Louis, 2026-11-01)
 
@@ -986,6 +996,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: HDF5 error 76 is OMPIO (#922 corrected); #923 filed for the kaiju-only
+  parallel failures; #919 adds no failures against the development baseline.
 - 2026-11-02: kaiju report 2 recorded (section "Kaiju results"). #919 fixed at 7c0c62ff. The
   patch summary branch is held.
 - 2026-11-02: kaiju runner's interim report 1 (via the integration session).
