@@ -515,10 +515,13 @@ needed.
 
 **Kaiju report 7 (2026-11-02): five branches validated against development 25d62812, no
 failures beyond the baseline; PRs being opened from the laptop.**
-- Ready and going to PR: #919 c7e6fa3b (verdict posted on the issue), #920 92a330cf, the
-  patch summary a46bf3f1, the LU block solver 61233c84 (test_1090 at np 1/2/4, tier A+B
-  identical to baseline), and the #922 test fix a79d5236 (24 low-load reruns had no error
-  76 once the children got ROMIO; the high-concurrency result is still to come).
+- **PRs open (from the laptop, on Louis's direct yes, no footer):** #926 (#919, c7e6fa3b),
+  #927 (#920, 92a330cf), #928 (patch summary, a46bf3f1), #929 (LU block solver, 61233c84;
+  squash suggested, since 52d6d593 leaves a tier C test broken until 968b274b), #930 (#922
+  test fix, a79d5236; #922's library side stays open). Merge order for `scripts/test.sh`:
+  #929 first (touches nothing shared), then #926, #928, #930 (all insert at batch 4 line
+  329: a development merge between each), then #927 (line 350). **Error 76 settled:** 24
+  runs at once with the fix had none; the children ran ROMIO.
 - **#918 (00f06689) held for Louis's acceptance of the narrowed rule** (split levels 0.98,
   unsplit 0.75); confirmed on row 3 and test_1134 passes on Linux.
 - **#921 held on #925.** The stacks (job 3537, dumps at 300/600/900 s) show no deadlock and
@@ -1175,6 +1178,7 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-02: PRs #926-#930 open; the hub merges on green in the test.sh-safe order.
 - 2026-11-02: kaiju report 7: five phase-1 branches validated; PRs opening from the laptop
   under Louis's standing authorisation. #918 and the pressure rtol wait on him; #921 on #925
   (rank 1 computing, not deadlocked).
