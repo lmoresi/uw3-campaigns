@@ -36,6 +36,7 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 | `uw_wall_check` | 1 | added 2026-11-01 | records max |v.n| per wall every solve; the defect above showed only as a smaller dt before. |
 | placement attempts | margin_rings 1/1/2/1, clearance 0.7, width x1/x1.25/x1/x1.5 | hard-coded, taken | the library's defaults are margin_rings 2, clearance 0.3; never compared. |
 | restart at a different rung spacing (`uw_resample_restored`) | auto: re-sample restored crust-law polylines when this run's S differs from the checkpoint's, else leave them (bit-identical restarts) | found and fixed 2026-11-02 (the restart rule) | a restart rebuilt the fault from the stored polyline at the old S and kept those rungs until the next re-fit: the first ladder-spacing arms at S = h_b kept 0.004 rungs for all 10 steps (79 pairs against 19 when re-sampled). `force`/`never` remain for tests. |
+| `uw_spacing` (rung spacing S) | 0.004 (band ratio h_b/S 3.9 at refinement 5); one base cell (0.0156) or half (0.0078) proposed | taken (every run); with Louis 2026-11-02 | kaiju 2026-11-02 (page 7cbuaxBnoZrfjdPioMHroT; re-sampled reruns, chain 0, np 16, 10 steps, inset one base cell): matching S to the base shrinks the serial FAC patch 3x (3114-3468 -> 952-1070 rows) and its solve up to 4.5x, the step 14 % on the same node; the mature-rollback answer (TBf 70) is within 0.3 % in vrms and 4 % in slip_max with the trench unchanged; the early slab (TAf 20) loses 10-18 % of slip_max, mostly because the cut's top sits one base cell down instead of 0.005. A physics choice (near-surface slip resolution) more than a cost one at np 16. |
 | `uw_rebuild_rungs` | 4 | measured 2026-10-26 (rungs 8 vs 4: 29 vs 47 rebuilds, -10 % wall, trench and slip unchanged) | with the envelope the per-step trace change is 0.19-0.76 of the threshold, so production rebuilds every 2-4 steps. |
 | `uw_weld_ok` | 0 (a refused chain level refuses the build) | fixed 2026-10-29 | the silent weld put a band along the surface and OOM'd (186 GB). |
 
@@ -65,5 +66,6 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 ## Open
 
 - ~~The inset's unit and default.~~ Ruled 2026-11-02: 1 rung.
-- The wall normal default: geometric ruled, held on the faulted acceptance failure (job 3447) until the fault interaction is understood.
+- The wall normal default: geometric ruled, held on a known mechanism (rigid rotation admitted with a placed fault; the #906 class) until the library fixes it or the analytic node set.
+- The rung spacing default (0.004, or one base cell / half): with Louis, 2026-11-02.
 - Levers measured but not taken: a warm Newton switch measured against the warm iterate's own residual; an inexact inner velocity solve; the crust-strength sweep.
