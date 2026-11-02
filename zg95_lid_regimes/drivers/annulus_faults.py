@@ -243,6 +243,8 @@ params = uw.Params(
                                 #   (the band's region moved onto one rank and carved there; every campaign run to
                                 #   2026-11-01) or "conform" (#670, 2-D: meshed through the seam, each rank its own
                                 #   side). The mesh record carries the mode and the band's cells per rank
+    uw_resample_restored="auto",  # restart: re-sample restored crust-law polylines at this run's S when it differs from
+                                #   the checkpoint's ("auto"); "force" or "never" for tests
     uw_split_inset=3.0,         # how many rungs inside the outer wall the split's cut stops (3: 0.012 at S = 0.004).
                                 #   Louis, 2026-11-02: the inset is one element because the surface DOFs cannot be
                                 #   rotated, not a physical depth (the unit, a rung or a base cell, is his to set)
@@ -2180,6 +2182,21 @@ last_damage = {}               # each fault's line damage at the last detection
 built = faults
 if params.uw_restart >= 0:
     k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
+    # the restart rule (2026-11-02): a crust-law fault's stored polyline is at the rung spacing of the run that wrote
+    # it, and every build places its ladder on those points, so a restart at a different -uw_spacing re-samples them
+    # at this run's S before the first build (otherwise the old rungs last until the next re-fit). An unchanged S
+    # leaves them alone, so restarts of existing runs stay bit-identical. -uw_resample_restored force|never: tests.
+    S_saved = float((state.get("params") or {}).get("uw_spacing", S))
+    mode = str(params.uw_resample_restored)
+    if mode == "force" or (mode == "auto" and abs(S_saved - S) > 1e-9 * S):
+        n_resampled = 0
+        for f in [*faults, *(built if built is not faults else [])]:
+            if "points" in f:
+                f["points"] = resample_polyline(np.asarray(f["points"], dtype=float), S,
+                                                2 ** int(params.uw_chain)).tolist()
+                n_resampled += 1
+        uw.pprint(f"restart: {n_resampled} crust-law fault polyline(s) re-sampled from the checkpoint's S {S_saved:g} "
+                  f"to this run's S {S:g} ({mode})")
 keep_apart(faults, (records[-1].get("slip") or {}) if records else {}, {}, [])
 faulted = FaultedMesh(built, "f0")
 restart_transfer = "none"
@@ -2249,7 +2266,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_rungs", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
