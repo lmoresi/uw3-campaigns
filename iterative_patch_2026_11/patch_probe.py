@@ -12,8 +12,9 @@ Spec (the drivers' uw.Params):
     block      lu (preonly + LU, the production default) or fgmres
     block_pc   ilu or gamg, for fgmres
     ilu_levels ILU fill levels
-    rtol       the block solve's relative tolerance; 0 runs exactly max_it steps
-               (convergence test "skip": a fixed number of Krylov steps)
+    rtol       the block solve's relative tolerance; 0 runs max_it steps, fewer only
+               if the block is solved first (rtol 1e-12, and reaching max_it counts
+               as converged: ksp_converged_maxits)
     max_it     the block solve's iteration cap (with rtol > 0, a safety cap)
     cut        1: the structural patch cut along strike into pieces of 2000 rows
     strip      >0: cut into strips of this many rung spacings instead
@@ -34,7 +35,8 @@ def configure_patch(spec, rung_spacing):
         os.environ["UW_FAC_SEGMENT_STRUCTURAL"] = "1"
         os.environ["UW_FAC_BLOCK_ROWS"] = "2000"
     if float(spec["strip"]) > 0:
-        os.environ["UW_FAC_STRIP_WIDTH"] = repr(float(spec["strip"]) * rung_spacing)
+        # a plain float: the repr of a numpy scalar is 'np.float64(...)'
+        os.environ["UW_FAC_STRIP_WIDTH"] = repr(float(float(spec["strip"]) * rung_spacing))
     if spec["block"] == "lu":
         return
     os.environ["UW_FAC_SUB_PC"] = spec["block_pc"]
@@ -50,9 +52,14 @@ def configure_patch(spec, rung_spacing):
                 opts[p + "ksp_rtol"] = rtol
                 opts[p + "ksp_atol"] = 0.0
             else:
-                # exactly max_it steps, reported converged (a capped block solve
-                # that reports DIVERGED_ITS can fail its PCASM)
-                opts[p + "ksp_convergence_test"] = "skip"
+                # max_it steps, reported converged (a capped block solve that
+                # reports DIVERGED_ITS can fail its PCASM). Not the "skip" test:
+                # under it FGMRES reports DIVERGED_BREAKDOWN on an empty block,
+                # which every rank without the fault holds at np > 1, and the
+                # ASM fails at its first application.
+                opts[p + "ksp_rtol"] = 1.0e-12
+                opts[p + "ksp_atol"] = 0.0
+                opts[p + "ksp_converged_maxits"] = None
             if spec["block_pc"] == "ilu":
                 opts[p + "pc_factor_levels"] = int(spec["ilu_levels"])
 
@@ -84,15 +91,10 @@ def patch_summary(velpc):
            "block_pc": sorted(set().union(*uw.mpi.comm.allgather({k.getPC().getType() for k in subs})))}
     level_pc = velpc.getMGSmoother(velpc.getMGLevels() - 1).getPC()
     if level_pc.getType() == "composite":
-        members = []
-        k = 0
-        while True:
-            try:
-                members.append(level_pc.getCompositePC(k).getType())
-            except Exception:
-                break
-            k += 1
-        out["composite"] = members
+        # custom_mg builds two members, SOR then the ASM (#629). Probing past the
+        # last one raises in PCCompositeGetPC, and PETSc's error leaves the run
+        # exiting 1 after its record is written.
+        out["composite"] = [level_pc.getCompositePC(k).getType() for k in range(2)]
     return out
 
 

@@ -8,9 +8,13 @@ gate open so the fraction is recorded.
 """
 import json
 import os
+import sys
 
 import underworld3 as uw
 from underworld3.utilities.custom_mg import set_custom_fmg
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import row7_common as rc  # noqa: E402  (the collective-safe patch reader)
 
 params = uw.Params(uw_out="records/uniform.json")
 base = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1), cellSize=1 / 8,
@@ -32,9 +36,10 @@ last = h.level_patch_rows[-1]
 rows = int(h.transfers[-1].getSize()[0])          # the finest level's reduced rows
 rec = {"cover_max": float(os.environ.get("UW_FAC_COVER", 0.75)), "taken": last is not None,
        "level_rows": rows}
-if last is not None:
-    rec["patch_owned_rows"] = int(uw.mpi.comm.allreduce(len(last[0])))
-    rec["subdomain_rows"] = int(uw.mpi.comm.allreduce(len(last[1])))
+_patch = rc.patch_rows_global(last)       # one collective on every rank
+if _patch["taken"]:
+    rec["patch_owned_rows"] = _patch["patch_owned_rows"]
+    rec["subdomain_rows"] = _patch["subdomain_rows"]
     rec["patch_fraction"] = rec["patch_owned_rows"] / rows
     rec["subdomain_fraction"] = rec["subdomain_rows"] / rows
 uw.pprint("UNIFORM " + json.dumps(rec))

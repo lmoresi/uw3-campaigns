@@ -32,6 +32,7 @@ every 2^j-th spine point, and the spine count is a multiple of 8.
 """
 import json
 import os
+import sys
 import time
 
 import numpy as np
@@ -40,6 +41,9 @@ from petsc4py import PETSc
 from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import fault_slip
 from underworld3.utilities.place_surface import place_fault_ribbon_2d
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import row7_common as rc  # noqa: E402  (the collective-safe patch reader)
 
 params = uw.Params(
     uw_n_rungs=80,            # spine intervals at S (a multiple of 8): 80, 160, 320
@@ -232,9 +236,10 @@ _last = _pr[-1] if _pr else None
 gate = {"cover_max": float(os.environ.get("UW_FAC_COVER", 0.75)),
         "taken": any(uw.mpi.comm.allgather(_last is not None)),
         "level_rows": level_ops[-1]["rows"] if level_ops else None}
-if _last is not None:
-    gate["patch_owned_rows"] = int(uw.mpi.comm.allreduce(len(_last[0])))
-    gate["subdomain_rows"] = int(uw.mpi.comm.allreduce(len(_last[1])))
+_patch = rc.patch_rows_global(_last)       # one collective on every rank
+if _patch["taken"]:
+    gate["patch_owned_rows"] = _patch["patch_owned_rows"]
+    gate["subdomain_rows"] = _patch["subdomain_rows"]
     if gate["level_rows"]:
         gate["subdomain_fraction"] = gate["subdomain_rows"] / gate["level_rows"]
 

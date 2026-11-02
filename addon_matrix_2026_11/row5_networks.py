@@ -24,6 +24,7 @@ structural rows into a fac_zone patch.
 """
 import json
 import os
+import sys
 import resource
 import time
 
@@ -34,6 +35,9 @@ from petsc4py import PETSc
 from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import fault_slip
 from underworld3.utilities.place_surface import place_fault_ribbon_2d
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import row7_common as rc  # noqa: E402  (the collective-safe patch reader)
 
 params = uw.Params(
     uw_case="junction",       # junction, pair or ti
@@ -213,13 +217,6 @@ pr = getattr(h, "level_patch_rows", None)
 last = pr[-1] if pr else None
 
 
-def _rows(item):
-    if item is None:
-        return None
-    blocks = item if isinstance(item, list) else [item]
-    return [int(uw.mpi.comm.allreduce(len(b[1]))) for b in blocks]
-
-
 owned = mesh.dm.getCellNumbering().getIndices() >= 0
 record = {
     "row": 5, "case": case, "hierarchy": hier, "zone_key": zone_key,
@@ -230,7 +227,9 @@ record = {
     "band_cells_per_rank": {"main": uw.mpi.comm.allgather(int((band_main & owned).sum())),
                             "second": uw.mpi.comm.allgather(int((band_second & owned).sum()))},
     "level_ops_velocity": level_ops, "level_smoothers": smoothers,
-    "patch_block_rows": _rows(last),
+    # rank-local in the hierarchy, so read with one collective on every rank
+    # (one allreduce per local block hung at np 4 on kaiju: the counts differ)
+    "patch": rc.patch_rows_global(last),
     "converged": info.get("converged"), "ksp_its": info.get("ksp_its"),
     "vel_its_last": info.get("vel_its_last"),
     "vel_its_last_again": info2.get("vel_its_last"),

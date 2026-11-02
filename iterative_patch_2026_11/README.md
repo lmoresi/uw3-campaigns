@@ -32,7 +32,7 @@ Louis ruled that the ladder and the base should have similar resolution, and tha
 
 ## Experiment 1: inexact block solves
 
-Each block's `preonly` + LU is replaced by FGMRES with one of four preconditioners: ILU(1), ILU(2), GAMG or hypre BoomerAMG. It runs either to a block rtol of 1e-1, 1e-2 or 1e-3 (cap 200), or for exactly 5 or 10 steps (convergence test `skip`). The same arms run on one structural block (cut 0) and on pieces of 2000 rows (cut 1).
+Each block's `preonly` + LU is replaced by FGMRES with one of four preconditioners: ILU(1), ILU(2), GAMG or hypre BoomerAMG. It runs either to a block rtol of 1e-1, 1e-2 or 1e-3 (cap 200), or for 5 or 10 steps (block rtol 1e-12 with `ksp_converged_maxits`, so the cap counts as converged and a block already solved stops early). The first version used the convergence test `skip`, under which FGMRES reports DIVERGED_BREAKDOWN on an empty block. At np 4 every rank without the fault holds one, so all 24 such box arms failed on their first Newton step (reason -11, PC failed); they rerun with this driver on the probe overlay 53924f82. The same arms run on one structural block (cut 0) and on pieces of 2000 rows (cut 1).
 
 No library code changes. The block KSPs read their options when the ASM sets up, inside `_set_up_fac_smoothers`, under the per-solve prefix `rotfs<N>_fieldsplit_vel_mg_levels_<l>_sub_1_sub_`. `patch_probe.configure_patch` writes those keys for the next few solve counts. `UW_FAC_SUB_PC` picks the block PC.
 

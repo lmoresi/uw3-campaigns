@@ -69,6 +69,22 @@ def cell_sizes_near(mesh, polyline, radius):
             "max": float(allv.max()), "cells": int(len(allv))}
 
 
+def patch_rows_global(item):
+    """The FAC patch on one level, summed over the ranks, from the hierarchy's
+    rank-local ``level_patch_rows[l]``: None (no blocks on this rank), one
+    ``(owned, subdomain)`` pair, or a list of pairs. The form differs between ranks
+    (a rank holding no patch has None, or an empty pair), so every rank normalises
+    its own and makes the same single allgather."""
+    blocks = [] if item is None else (item if isinstance(item, list) else [item])
+    mine = ([int(len(b[1])) for b in blocks], int(sum(len(b[0]) for b in blocks)))
+    every = uw.mpi.comm.allgather(mine)
+    per_rank = [rows for rows, _ in every]
+    return {"taken": any(per_rank),
+            "patch_owned_rows": int(sum(o for _, o in every)),
+            "subdomain_rows": int(sum(sum(r) for r in per_rank)),
+            "block_rows_per_rank": per_rank}
+
+
 def tip_topology(mesh, boundary, surface_point, t_hat, n_fault, h_element, surface_y=1.0, max_steps=8):
     """The split fault's upper tip in the placed mesh, against the surface y = surface_y.
 
