@@ -216,7 +216,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Tidal shell / box-fault study | `feature/tidal-shell` fc35972a | waiting on Louis: gravitational topography term, next sweep |
 | Hyperion rescue WIP (campaign half) | uw3-campaigns `main-hyperion-2026-10-20-wip` | saved, untriaged; the six underworld3 rescue branches are the dev hub's |
 | Library fixes and PRs (stress-transport fix, leak PR #882, rotated-solve diagnostics and parallel add-on in #890, shear-band length scale, headless pyvista, coarse-solve null space, parallel `read_checkpoint`, #891 units dt, pressure rtol default, `zone` docstring) | `DEV-HUB.md` (dev hub) | HANDED OVER 2026-10-29 per Louis; see the hand-over section below. The science half of each stays in this table |
-| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 99049b5 (split inset default 1 rung; restart rule -uw_resample_restored auto; wall normal analytic, geometric held; uw_chain default 0 in b440b88; builds from development 25d62812; DECISIONS.md ledger; -uw_split_inset in rungs, default 3, unit and default with Louis; -uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
+| Lid-regime annulus campaign | uw3-campaigns `zg95-annulus-for-kaiju` 64feaec, MERGED to main as a7792cd on 2026-11-03 (recipe v2 complete: S = one base cell, envelope default; split inset default 1 rung; restart rule -uw_resample_restored auto; wall normal analytic, geometric held; uw_chain default 0 in b440b88; builds from development 25d62812; DECISIONS.md ledger; -uw_split_inset in rungs, default 3, unit and default with Louis; -uw_wall_normal analytic|geometric, run_info explicit/effective + README choices block; -uw_fault_seams gather|conform with the partition/band-ranks record; -uw_pres_rtol default 1e-2 per Louis 2026-11-01; -uw_retry_keep best, -uw_wall_check 1 recording max |v.n| per wall; chain-comment fix in annulus_fault/box_fault, yield_stress_min = -oo for development's #759 refusal; wall-stub, envelope locator, plate_metrics by arc, TI band behind -uw_fault_realisation ti with -uw_ti_smooth/-uw_ti_model band|linear|vep, -uw_bridge_ti, -uw_fault_normal, bridge-own floor flags; ... Earth setup options, -uw_fault_precedence, -uw_marker_rheo_depth, -uw_scaled units mode with physical record columns; all new options default off); library `feature/box-faults-warm` 99259d35 | on kaiju: 11/12 controls done, faulted set relaunching |
 | Restart / warm-start fixes + solver record + faulted-mesh checkpoint + docs | merged into `zg95-annulus-for-kaiju` (4955e80); branch head 361657f | done |
 | Kaiju docs | underworld-community/uw3-hpc-install-run PR #1 | open |
 | Technical notes (2026-018, 2026-020/021, 2026-022) | handed to the notes hub 2026-10-27; frozen state in the section above | not this hub's |
@@ -664,7 +664,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   clones and runs under ~/+Claude/kaiju (clones/, runs/, launch/), reading the builds and the old run dirs in
   place; the recipe v2 acceptance is running from there (job 3830). Either widen the allow-list to ~/campaigns (and
   ~/uw3 for new overlays) or accept ~/+Claude/kaiju as the new root; the hub records whichever you choose and the
-  ledger's machine section names it. The old results stay where they are either way.
+  ledger's machine section names it. The old results stay where they are either way. (The recipe v2 acceptance
+  passed from that root on 2026-11-03, job 3830; the ledger names ~/+Claude/kaiju as the run root pending your
+  choice.)
 
 - **Recipe v2 and the restart of the rollback experiments (Louis, 2026-11-02: "I want to start pushing the changes to
   the fault recipe and library so that I can start running the annulus rollback experiments again").** Plan: (1)
@@ -2519,3 +2521,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   running from ~/+Claude/kaiju (job 3830, 6633afa + b21c264, development 25d62812, np 16, -uw_fault_fit envelope set
   explicitly). Gap found: the driver's locator default is still parabola; kaiju to send the envelope-default patch
   for recipe v2 after the acceptance. Allow-list decision for Louis.
+- 2026-11-03: recipe v2 acceptance PASSED (job 3830: vrms 1318.24, slip 5724, Newton 5, walls 1e-12, 161 s/step, patch
+  1168 rows). The held spacing patch (b21c264) and the envelope-default patch (2ab14e4) applied to the branch (head
+  64feaec; blobs 95e9c34, fd6950f); the campaign branch MERGED into uw3-campaigns main (a7792cd, no conflicts): the
+  recipe, drivers, scripts, figures and DECISIONS.md are on main. Caveat recorded: parabola runs (TAf, TBf,
+  TA_age25f) restarted on the new driver need -uw_fault_fit parabola explicitly. Proposal page v2 has the
+  acceptance and the launch line; the baseline pick is Louis's.
