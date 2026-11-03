@@ -1262,6 +1262,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: **#926 merged** (e7dfbf9a; #919 relabelled fixed-in-development). #930 green;
+  merging after #926.
 - 2026-11-03: the stack is open as #932/#933/#934; #927 merged (f53bbffb) and #920
   relabelled. Kaiju: a MUMPS-distributed patch solve matches the library's iterations at np
   1-16 and is 1.8-3.5x faster (phase 3 lever, not proposed).
