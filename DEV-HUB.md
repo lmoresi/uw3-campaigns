@@ -536,7 +536,14 @@ failures beyond the baseline; PRs being opened from the laptop.**
   runs at once with the fix had none; the children ran ROMIO.
 - **#918: Louis accepted the narrowed rule (2026-11-03, "Yes to the narrowed #918 rule -
   merge the stack")**: split levels decline above 0.98, every other level keeps 0.75. The
-  stack #918 -> #921 -> #925 merges in order on green once its PRs are open.
+  stack is open: **#932** (#918, 0a11963d), **#933** (#921, c414465c, base #918's branch),
+  **#934** (#925, a2e38396, base #921's branch), reviews as first comments, development
+  through #927 merged into the base of the stack. Merge order on green: #932, then #933 and
+  #934 retargeted; #933 never without #934. Louis's "merge the stack" covers all three.
+  Correction to the hub's row 5 shorthand: 820 / 94 / 344 are serial (TI blocks alone;
+  with the structural block, the #921 result; with the band mask also keyed); 1179 / 439 /
+  131 are np 4 on development (TI alone; band mask keyed; structural patch alone with the
+  gate open). 131 is not the #921 configuration.
 - **#921 held on #925.** The stacks (job 3537, dumps at 300/600/900 s) show no deadlock and
   no mismatched collective: ranks 0, 2 and 3 wait in MPI on rank 1, which stays in native
   code outside MPI throughout. **Corrected by the traced run (job 3627):** not a giant LU
@@ -598,6 +605,14 @@ failures beyond the baseline; PRs being opened from the laptop.**
   the fault cost almost nothing (serial 8-rung strips within 7 %). So phase 3 cuts the
   patch across the fault or adds a slip coarse space. Inference; a serial test was offered
   to Louis.
+  **A formally parallel patch solve works (kaiju report 17, Louis's question):** each patch
+  block solved as one matrix spread over every rank with MUMPS gives the library's
+  iteration counts exactly at np 1-16, on row 5 with and without the TI zone. First solve,
+  structural patch alone: MUMPS 13.9 / 8.5 / 8.7 s at np 1/4/16 against the one-rank block's
+  25.0 / 23.8 / 30.4 s; MUMPS on one rank is already 1.8x faster than the block LU. No
+  library change proposed yet: MUMPS is in conda-forge PETSc, but Louis's 10-28 ruling kept
+  it off the defaults (it breaks on the Mac). This is phase 3's first lever if the one-rank
+  LU becomes the bottleneck.
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
@@ -1247,6 +1262,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: the stack is open as #932/#933/#934; #927 merged (f53bbffb) and #920
+  relabelled. Kaiju: a MUMPS-distributed patch solve matches the library's iterations at np
+  1-16 and is 1.8-3.5x faster (phase 3 lever, not proposed).
 - 2026-11-03: **Louis accepted #918's narrowed rule and ordered the stack merged.** #926
   and #927 green after the #917 re-run; #926 needed a development merge (test.sh, both
   sides kept); #930 hit #917 again, re-run requested.
