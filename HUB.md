@@ -2527,3 +2527,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   recipe, drivers, scripts, figures and DECISIONS.md are on main. Caveat recorded: parabola runs (TAf, TBf,
   TA_age25f) restarted on the new driver need -uw_fault_fit parabola explicitly. Proposal page v2 has the
   acceptance and the launch line; the baseline pick is Louis's.
+- 2026-11-03: kaiju holds a verified clone of 64feaec (~/+Claude/kaiju/clones/zg95-v2-64feaec, blob fd6950f; envelope
+  and spacing defaults confirmed) for the baselines; proposal page v3 carries the flagless launch line. Nothing
+  launched; waiting on Louis's pick. (main's head b4e6801 is the HUB.md commit after the merge; zg95_lid_regimes is
+  identical to 64feaec.)
