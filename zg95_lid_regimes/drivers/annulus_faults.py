@@ -816,6 +816,13 @@ def resample_polyline(poly, spacing, block):
     return np.c_[np.interp(t, s, poly[:, 0]), np.interp(t, s, poly[:, 1])]
 
 
+def division_record(spine, width):
+    """The division a ladder was built on: its rung count, the rung length (mean, min, max) and the band width."""
+    seg = np.linalg.norm(np.diff(np.asarray(spine, dtype=float), axis=0), axis=1)
+    return {"rungs": int(len(seg) + 1), "rung_mean": float(seg.mean()), "rung_min": float(seg.min()),
+            "rung_max": float(seg.max()), "width": float(width)}
+
+
 def parabola_fit(pts):
     """A parabola through a polyline's points, least squares in the frame of its chord
     (distance along the chord, offset from it). A marker contour wiggles at the cell
@@ -1361,12 +1368,19 @@ class FaultedMesh:
                             # patch solve is serial there (kaiju, 2026-11-01)
                             "seams": str(params.uw_fault_seams), "partition": FAULT_PARTITION,
                             "band_cells_per_rank": band_per_rank,
-                            "band_ranks": sum(1 for c in band_per_rank if c)}
+                            "band_ranks": sum(1 for c in band_per_rank if c),
+                            # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
+                            # fault points and we can see if that is sufficient"): rungs, rung length, band width
+                            "division": {name: division_record(spine, self.width)
+                                         for name, (spine, _) in self.pieces.items()}}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
                   f"built in {self.t_build:.1f} s; band on {self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
+        for name, d in self.mesh_record["division"].items():
+            uw.pprint(f"  {name} division: {d['rungs']} rungs, {d['rung_min']:.4f}-{d['rung_max']:.4f} (mean "
+                      f"{d['rung_mean']:.4f}); W {d['width']:.4f}")
 
     def split_nudges(self, var):
         """Offsets that put each split copy of ``var``'s DOFs on its own side of its
