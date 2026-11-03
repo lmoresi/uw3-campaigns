@@ -2618,3 +2618,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault's own nodes with one cell either side best, and no benefit to more cells in the band. Ledger principle row
   carries his words (merged to main); kaiju amends the page and withdraws the one-cell candidate; the notes session
   asked for the evaluation's citation. Baselines unaffected (already W = 2h).
+- 2026-11-04: fault-division page v3 and the draft branch (c291d57 on kaiju/fault-division-draft) carry Louis's
+  ladder-evaluation ruling: BAND_CELLS 2, the one-cell variant withdrawn (its placement check kept as a record),
+  "unmeasured" replaced by the ruling. Baselines 3841/3842 before their first checkpoint; watch.log quiet.
