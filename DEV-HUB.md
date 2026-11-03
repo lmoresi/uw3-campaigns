@@ -1262,6 +1262,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
+  wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
+  waits only on Louis's 2-D confirmation.
 - 2026-11-03: **the stack's CI (#932/#933/#934) cancelled shard 4 at the 60-minute cap on all
   three**, inside `test_1097_place_sheet_partitioned_addon_parallel` (a 25-minute 3-D
   sheet test, timeout 1500 s) that is on the stack's branches and not on development under
@@ -1284,9 +1287,15 @@ refuses deletions from here, so this needs a laptop or Louis.
   Louis confirms the 2-D narrowing, and green CI.
   **CI on the re-pushed stack:** #932 green on every shard (the 3-D gate fix holds). #933
   failed shard 4 on #917's flake (re-run). **#934 hangs in `test_1089_fault_split_multigrid_parallel`**
-  at the 60-minute cap, distinct from the 3-D gate: a parallel defect in #925's gathered
-  blocks on a split hierarchy is the first suspect. The integration session reproduces at
-  np 2.
+  at the 60-minute cap. **Correction: not a hang.** test_1089 prints its first `x` and then
+  takes 48 s on development too; #934's job was cancelled 43 s after that mark, at the cap.
+  Shard 4 is simply the longest: it owns the whole MPI phase plus every tests/parallel
+  file's serial run, 55 min on development and 47 min of serial on the stack (the stack's
+  four new tests add 5 min; the rest is runner variance), while shards 2 and 3 take 29 min.
+  **Rebalanced on #925's branch (e8957186):** the ten serial tests/parallel lines move to
+  shard 3 and test_05*/06*/07* to shard 2; coverage and the shard plan still pass. The
+  integration session also, correctly, declined the hub's request for an np 2 run on wombat
+  under Louis's rule.
 - 2026-11-03: **#926 merged** (e7dfbf9a; #919 relabelled fixed-in-development) and **#930
   merged** (af6f19b3; #922's library side stays open). **All five of the first phase-1 batch
   are in:** #926, #927, #928, #929, #930. The stack #932-#934 is on CI.
