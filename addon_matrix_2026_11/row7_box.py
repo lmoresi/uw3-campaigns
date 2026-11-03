@@ -25,8 +25,8 @@ the placement with that record. The bridge is the band cells above the tip, as i
 fixture, so it is 2S wide: a weak zone cannot be narrower than the band it lives in.
 
     depth 0      the ladder at S in the base
-    depth k > 0  the base refined k times (nested NVB, mesh.adapt) in the corridor of
-                 half-width rings * h_b around the fault, h = h_b / 2^k there
+    depth k > 0  RETIRED (Louis 2026-11-03: no node-adding adaptation of the base;
+                 it breaks the FMG hierarchy); corridor_child refuses it
 
 The record carries the slip profile (s down dip from the surface, V the tangential
 jump), the surface velocity, the vertical velocity at depth 0.05, the Newton and

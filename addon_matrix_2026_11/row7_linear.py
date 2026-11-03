@@ -11,10 +11,8 @@ forced open (UW_FAC_COVER=1.01, #918), so every arm takes the patch.
 
 Two arms:
     depth 0      the ladder at S = L / n_rungs in the base: h_b/S = 1, 2, ... 48
-    depth k > 0  the base refined k times (nested NVB, mesh.adapt) in the corridor of
-                 half-width rings * h_b around the fault, h = h_b / 2^k there, then the
-                 ladder at S in the child; the levels are the base's, one per doubling,
-                 then the child, then S
+    depth k > 0  RETIRED (Louis 2026-11-03: no node-adding adaptation of the base;
+                 it breaks the FMG hierarchy); corridor_child refuses it
 
 The record carries the slip profile (s from the fault's end at (0.30, 0.45), V the
 tangential jump), the velocity on a line across the fault's midpoint, the Newton and

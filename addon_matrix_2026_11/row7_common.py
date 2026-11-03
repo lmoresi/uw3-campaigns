@@ -37,6 +37,9 @@ def corridor_child(base, polyline, h_b, rings, depth):
     base levels, then one level per doubling."""
     if int(depth) <= 0:
         return base
+    # Louis 2026-11-03: no node-adding adaptation of the base. It breaks the FMG
+    # hierarchy and is not the method; the corridor arms are retired.
+    raise ValueError("corridor refinement of the base is retired: run depth 0 only")
     h_in = 0.5 * h_b / 2 ** int(depth)
 
     def metric(centroids):
