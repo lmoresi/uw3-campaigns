@@ -659,6 +659,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Does a `uw_spacing` knob conflict with your decision 1b (2026-11-02, journal a4e5852)?** 1b: "the fault would
+  carry its own resolution (it comes triangulated / as a divided line) and this is how we create the ladder. No S
+  parameter defines the along-strike resolution." Recipe v2's default is one base cell via `uw_spacing 0`, which
+  you accepted on the hub's question; the notes session points out the two may not agree and has asked you. If
+  the knob goes, the ladder is placed on the trace's own division (which may well be one base cell) and the
+  drivers lose the parameter; nothing changes until you say. The ledger row now quotes your words rather than the
+  "S = h_b" form, which was the dev hub's working reading.
+
 - **Kaiju's write allow-list (2026-11-03):** Slurm answers again, but ~/campaigns and ~/uw3 are read-only to the
   kaiju session (its sandbox allows writes only under its working directory ~/+Claude and $TMPDIR). Kaiju now
   clones and runs under ~/+Claude/kaiju (clones/, runs/, launch/), reading the builds and the old run dirs in
@@ -2531,3 +2539,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   and spacing defaults confirmed) for the baselines; proposal page v3 carries the flagless launch line. Nothing
   launched; waiting on Louis's pick. (main's head b4e6801 is the HUB.md commit after the merge; zg95_lid_regimes is
   identical to 64feaec.)
+- 2026-11-03: the notes session: 022 cites main now; the spacing page's "S = h_b or h_b/2" was the dev hub's reading,
+  not Louis's words; Louis's decision 1b (journal a4e5852) says no S parameter defines along-strike resolution,
+  which the uw_spacing knob may conflict with. Ledger row corrected to quote Louis (c8df8a9, merged to main); the
+  question put to Louis (the notes session has asked him too).
