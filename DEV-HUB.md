@@ -540,6 +540,15 @@ failures beyond the baseline; PRs being opened from the laptop.**
   row is held once. If rows are held more than once at np > 1, the fix is a partition of
   unity over the union, making the blocks disjoint before the overlap layer (RASM itself
   was measured to stall in August).
+  **Probes (2026-11-03):** the duplicates are real (232 rows in blocks on two ranks at np 2,
+  224 at np 4, none serially; mostly zone-block rows across a seam, plus a few
+  structural-block rows another rank's zone block holds; rank 1 holds one 17,752-row
+  block). Keeping each duplicated row in one block only lets the outer solve complete
+  iteration 1 at np 4 (1.5e1 to 2e-3) where before it never finished iteration 0, but
+  neither np 2 nor np 4 reaches iteration 2 in 20 minutes; serially it is one outer
+  iteration and 94 velocity its in 20 s. So double correction is part of the cause, not
+  the whole. Velocity-monitor runs at np 2 and 4, with a same-host serial baseline, are
+  looking for the remaining parallel difference before any code.
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
