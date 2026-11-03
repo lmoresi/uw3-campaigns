@@ -2625,3 +2625,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the cut on the fault's own nodes with one cell either side snaps nothing (slip 0.4315, angles kept) where the
   centre-line cut pinched the band (13 deg, slip 0.4290); scripts on wombat only, no note or journal entry; the
   "no more cells" half unmeasured and recorded as recollection. Ledger cites it; merged to main.
+- 2026-11-04: #595 cited on the design page (v4) and the draft branch (3402ad0). Baselines: TAf-v2 at step 2 (~180
+  s/step), Earth run 2 at step 4 (~88 s/step), 3-4 Newton each, watch.log quiet.
