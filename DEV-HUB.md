@@ -561,6 +561,16 @@ failures beyond the baseline; PRs being opened from the laptop.**
   same zone rows and at most 5 velocity its per solve; fail-first at np 2 and 4 on kaiju,
   then the fix, review, held, stacked on #921. The big structural LU lands on one rank, as
   serially: the known imbalance, phase 3's.
+  **Fix verified on kaiju (reports 13a, 13b):** test_1139 fails first at np 2 and 4 (98 and
+  218 rows held twice, 4 and 6 blocks against 2, 123 and 200 its against 5) and passes on
+  e67aa114, with tests 1135/1134/1106/1090/1088 at np 1/2/4. Row 5 TI: n 80 97/95 its at np
+  2/4, n 320 110/117 (serial 94), 4-6 per solve, no caps. The step-4 control fell on the
+  degrading side (structural patch alone, cut per rank: 70/96/143 its at np 1/2/4), so
+  fc58912c gathers the structural block into one too. The stack #918 bcf89553, #921
+  de53ba03, #925 724ff952 carries development; test_1133 asserts one structural block at
+  any rank count; the doc names the one-rank LU and `block_rows_per_rank`. Pending:
+  round-2 fail-first on the tightened tests, the cost check of the one-rank LU on row 3 at
+  np 1/2/4 (its and wall time), the full tests/parallel, review round 2. Held.
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
@@ -1210,6 +1220,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: the runner confirms kaiju's permission change: squeue, sinfo, a login-node
+  overlay build and sbatch all work, no sandbox. #925's fix verified at np 1/2/4 and
+  extended to the structural-only patch; held on the #918/#921 stack.
 - 2026-11-03: kaiju's admin lifted part of the restriction (Louis: Claude can submit jobs
   without approval and build containers on the login node; more to come). Both kaiju
   sessions told; the runner checks before resuming its queue.
