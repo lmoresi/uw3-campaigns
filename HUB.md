@@ -2559,3 +2559,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   width; neither is a knob; the ladder is built from the fault points and sufficiency is observed, not set.
   Ledger principle row added and merged to main; uw_spacing marked for removal; kaiju drafts the design with an
   offline placement check at W = h_b. Baselines: v2 now or after the removal is Louis's call.
+- 2026-11-03: notes session: 022's "spacing is a parameter" clause rewritten to the fault's own points; whether 022
+  keeps its W = 2S runs or reruns at W = local cell size is put to Louis; a journal follow-up to 1b drafted for the
+  docs hub. Library facts for the knob removal relayed to kaiju: the ladder path takes the trace's points verbatim
+  (place_thin_volume with a precomputed (samples, reach) pair; no arclength resampling through
+  place_fault_ribbon_2d), so the locator's points are the rungs as given; at W = h_b with rungs ~h_b the band cell
+  aspect is 2 against the mesher docstring's "about 2 elements across width", to be weighed on the design page.
