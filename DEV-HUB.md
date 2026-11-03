@@ -1246,6 +1246,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: #925 complete at c094073d (round 3 verified on kaiju; the queue is empty). The
+  stack #918 -> #921 -> #925 goes to PRs from the laptop; the merge gate is Louis's yes on
+  #918's narrowed rule. Phase 1 item 4 (cases with tests) starts.
 - 2026-11-03: Louis's rule recorded: no node-adding adaptation of the base in the add-on
   work (fixtures are a uniform base plus the ladder). #925 at c094073d, rounds 2 and 3
   fixed, one gathered structural block flat to np 16 where the per-rank cut reaches 445.
