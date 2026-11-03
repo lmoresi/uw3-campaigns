@@ -659,7 +659,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Does a `uw_spacing` knob conflict with your decision 1b (2026-11-02, journal a4e5852)?** 1b: "the fault would
+- The `uw_spacing` question: **ANSWERED 2026-11-03 (Louis): the knob is wrong in principle.** "The along-fault
+  resolution is set by the discretisation of the fault, the fault width is set by the local mesh size (... an
+  average of some sort seems sensible here). What is going wrong in our model is that we are also defining the
+  fault and its discretisation as a knob we can control. Generally this is not true - the ladder is built from the
+  fault points and we can see if that is sufficient or not, but we generally can't just change it." Recorded as the
+  principle row in the ledger; kaiju drafts the removal (rungs = the locator's points at the local cell size; W =
+  the local cell size, so one cell wide against v2's two; the record states the division used; the restart rule
+  re-divides only when the mesh differs) with an offline placement check at W = h_b, no driver change or run until
+  Louis sees the page. **For Louis: run the baselines on v2 as it stands (same rung spacing as the principle on the
+  uniform annulus, band two cells wide) or wait for the knob removal (band one cell wide)?** Earlier framing: 1b: "the fault would
   carry its own resolution (it comes triangulated / as a divided line) and this is how we create the ladder. No S
   parameter defines the along-strike resolution." Recipe v2's default is one base cell via `uw_spacing 0`, which
   you accepted on the hub's question; the notes session points out the two may not agree and has asked you. If
@@ -2546,3 +2555,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-03: spacing page v2 and proposal page v4 corrected: Louis's two remarks quoted verbatim, the S form named as
   the dev hub's reading, decision 1b quoted and the knob question marked open, the Newton-vs-velocity iteration
   fact beside his quote. Drivers and the 64feaec clone untouched; kaiju holds for the baseline pick.
+- 2026-11-03: Louis clarifies 1b: the fault's own points set the along-fault division, the local mesh size the
+  width; neither is a knob; the ladder is built from the fault points and sufficiency is observed, not set.
+  Ledger principle row added and merged to main; uw_spacing marked for removal; kaiju drafts the design with an
+  offline placement check at W = h_b. Baselines: v2 now or after the removal is Louis's call.
