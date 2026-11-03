@@ -2614,3 +2614,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   segments with in-job stop and pause rules (the login-node supervisor cannot run under the sandbox). Division
   record patch (a2caa30, record only) applied as a87bc9d and merged to main; the draft division design stays on
   kaiju/fault-division-draft as module input.
+- 2026-11-04: Louis corrects the design page's "unmeasured": the ladder evaluation already found the cut on the
+  fault's own nodes with one cell either side best, and no benefit to more cells in the band. Ledger principle row
+  carries his words (merged to main); kaiju amends the page and withdraws the one-cell candidate; the notes session
+  asked for the evaluation's citation. Baselines unaffected (already W = 2h).
