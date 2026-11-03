@@ -2505,3 +2505,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02: kaiju sandboxed (read-only ~/campaigns, no Slurm): acceptance and launches blocked; for Louis. Spacing
   patch b21c264 held unapplied in the hub's scratchpad until the acceptance; proposal page CDy2RR1fLhBUyPXtUMftNr
   recorded. Correction: velocity its per increment unchanged with S; the gain is Newton increments and the patch.
+- 2026-11-03: Louis: the sandbox issues are no longer a problem. Kaiju told to verify write access and Slurm, pin
+  b21c264 on 6633afa, run the whole-recipe acceptance, and report; on a pass the hub applies the held spacing patch
+  and merges the campaign branch to main; baselines wait on Louis's pick.
