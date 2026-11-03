@@ -659,6 +659,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Kaiju's write allow-list (2026-11-03):** Slurm answers again, but ~/campaigns and ~/uw3 are read-only to the
+  kaiju session (its sandbox allows writes only under its working directory ~/+Claude and $TMPDIR). Kaiju now
+  clones and runs under ~/+Claude/kaiju (clones/, runs/, launch/), reading the builds and the old run dirs in
+  place; the recipe v2 acceptance is running from there (job 3830). Either widen the allow-list to ~/campaigns (and
+  ~/uw3 for new overlays) or accept ~/+Claude/kaiju as the new root; the hub records whichever you choose and the
+  ledger's machine section names it. The old results stay where they are either way.
+
 - **Recipe v2 and the restart of the rollback experiments (Louis, 2026-11-02: "I want to start pushing the changes to
   the fault recipe and library so that I can start running the annulus rollback experiments again").** Plan: (1)
   kaiju lands the last default (S = one base cell), runs the whole-recipe acceptance on one commit, and the hub
@@ -2508,3 +2515,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-03: Louis: the sandbox issues are no longer a problem. Kaiju told to verify write access and Slurm, pin
   b21c264 on 6633afa, run the whole-recipe acceptance, and report; on a pass the hub applies the held spacing patch
   and merges the campaign branch to main; baselines wait on Louis's pick.
+- 2026-11-03: Slurm back; ~/campaigns still read-only to the kaiju session (allow-list = ~/+Claude only). Acceptance
+  running from ~/+Claude/kaiju (job 3830, 6633afa + b21c264, development 25d62812, np 16, -uw_fault_fit envelope set
+  explicitly). Gap found: the driver's locator default is still parabola; kaiju to send the envelope-default patch
+  for recipe v2 after the acceptance. Allow-list decision for Louis.
