@@ -180,8 +180,9 @@ params = uw.Params(
                                 #   wall (its shallowest point: the crust base on the incoming plate); deeper, no fault
     uw_weld_ok=0,               # 1: a refused chain level is welded and the build goes on (the old behaviour);
                                 #   0: the build is refused and the previous faults kept
-    uw_fault_fit="parabola",    # crust law locator: "parabola" (crust_fault_points) or "envelope" (the crust base
-                                #   marched up from the cap, crust_envelope_points)
+    uw_fault_fit="envelope",    # crust law locator: "envelope" (the crust base marched up from the cap,
+                                #   crust_envelope_points; ruled by the go on the Earth plan, 2026-10-29, locator A/B
+                                #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
                                 #   point to the wall; the unfloored dip is recorded
     uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
