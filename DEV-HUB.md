@@ -1282,6 +1282,11 @@ refuses deletions from here, so this needs a laptop or Louis.
   0.98), #933 998ff4a8, #934 e4eee30e; the 3-D threshold is marked a placeholder pending
   phase 2 in the subsystem doc, the code comment, #932's body and on #895. **Merge gate:**
   Louis confirms the 2-D narrowing, and green CI.
+  **CI on the re-pushed stack:** #932 green on every shard (the 3-D gate fix holds). #933
+  failed shard 4 on #917's flake (re-run). **#934 hangs in `test_1089_fault_split_multigrid_parallel`**
+  at the 60-minute cap, distinct from the 3-D gate: a parallel defect in #925's gathered
+  blocks on a split hierarchy is the first suspect. The integration session reproduces at
+  np 2.
 - 2026-11-03: **#926 merged** (e7dfbf9a; #919 relabelled fixed-in-development) and **#930
   merged** (af6f19b3; #922's library side stays open). **All five of the first phase-1 batch
   are in:** #926, #927, #928, #929, #930. The stack #932-#934 is on CI.
