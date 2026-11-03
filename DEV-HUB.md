@@ -1198,6 +1198,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: Louis switched the hub to Accept edits so merges reach him as prompts.
+  **Merged: #929** (LU block solver, squash, 6321c714) and **#928** (patch summary,
+  d9783f02). #930 got development merged in (670f6252; adjacent test.sh lines, both
+  kept) and re-runs CI. The flaky shard 4 on #926 and #927 (#917) was re-run.
 - 2026-11-03: CI on #926-#930: #928, #929, #930 green; #926 and #927 failed shard 4 on
   test_0023's hash (#917, a known flake). **This hub's session can no longer merge:** its
   permission classifier refuses every merge as "merge without review" (it allowed
