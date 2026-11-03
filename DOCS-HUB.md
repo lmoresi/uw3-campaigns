@@ -525,3 +525,16 @@ Measured here, not inherited.
   size and that every measurement used $2S$ (#862 pushed). Also noted: the campaign
   branch is merged into uw3-campaigns `main` (febbb87), so b440b88 and the ledger are on
   GitHub now; yesterday's "push the campaign work" item is closed.
+- 2026-11-03 (later): **corrected: the ladder is equant** (Louis on kaiju's design page,
+  the same day; ledger 017b84d principle and `uw_spacing` rows, HUB.md 1575048). The
+  "one local cell wide" reading in this morning's entry was the hubs', not his: the
+  half-width is one cell, the band two cells wide, the rungs about one cell apart, which
+  is recipe v2 as it stands (`uw_spacing 0` derives one base cell, $W = 2S$; the knob
+  stays only as the derivation's override). Kaiju's division design (f393fd7) is shelved
+  as input for a library plate-boundaries module; the v2 baselines (TAf-v2, Earth run 2)
+  are launched. Done here: the notes session's corrected entry committed with light
+  edits; this morning's entry marked superseded by it (its principle and Louis's quote
+  are carried forward, so a reader meets the right width); the topic page bullet; ruling
+  4, the production parenthetical and the convection recipe on #862 give the equant form
+  (pushed with absolute paths this time); `FAULT-SPLIT-INTEGRATION.md`. Nothing is now
+  owed on the drivers for the ladder.
