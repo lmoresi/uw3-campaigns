@@ -371,6 +371,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   scale_isolate_geometric_inset3_TAf_ck40, scale_normalcheck_*; scripts rot.py, viol.py beside the scaling
   scripts. **Campaign consequence: the analytic normal stays the driver default (clean at np 16); Louis's
   geometric ruling is held on this mechanism until #906 or the analytic node set is fixed.**
+- 2026-11-03, to the dev hub, a module proposal from Louis: on kaiju's fault-division design (page
+  UANqhA82AfRoh7fjgrPwYG; draft f393fd7 on kaiju/fault-division-draft in uw3-campaigns, offline-placed on 80 stored
+  faults, never run) he said "This is a lot of design for what is, actually, a simple driver to test a concept. If
+  we implement this, then we should consider it part of a plate-boundaries module." The design (every locator
+  divides the fault at the local cell size h(s); the ladder on those points verbatim; W = a whole number of local
+  cells averaged along the fault, equant by his ruling, i.e. 2h with rungs at h; a division record for restarts;
+  the division used stated per build) is therefore yours to weigh as a library module, with the campaign driver
+  staying the simple concept-test it is. His principle in his words is in the ledger's principle row.
 - 2026-11-03, to the dev hub, a placement observation from kaiju's 320 offline placements (page
   UANqhA82AfRoh7fjgrPwYG): slivers down to 0.11 deg occur in every arm, production v2 included (Earth run 1
   checkpoint 40); every cell under 10 deg lies within 0.004 of the surface and 0.03 of the outcrop, none along the
@@ -690,9 +698,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   W = h needs rungs at h/2 (22 -> 42 rungs, 85 -> 137 band cells). Slivers (worst 0.11 deg, in v2 on Earth run 1
   checkpoint 40) are in every arm: all cells under 10 deg lie within 0.004 of the surface and 0.03 of the
   outcrop, none along the cut or at the tip: the band's outcrop meeting the wall, independent of division and
-  width (dev hub). Effect on slip, vrms and the solver unmeasured until a run is approved. **For Louis: (1)
-  BAND_CELLS 1 (the principle as stated; aspect 2) or 2 (the mesher's preference; v2's width)? (2) the baselines on
-  v2 as accepted, or on this draft after its own acceptance?** Earlier framing: 1b: "the fault would
+  width (dev hub). Effect on slip, vrms and the solver unmeasured until a run is approved. **RULED 2026-11-03 (Louis): "This is a lot of design for what is, actually, a simple driver to test a
+  concept. If we implement this, then we should consider it part of a plate-boundaries module. I'd say - make the
+  ladder equant if given the choice. The half-width is one cell (I think) and so the discretisation along the
+  length would be similar."** So BAND_CELLS is 2 (W = 2h, rungs at h: recipe v2 as accepted), the draft is shelved
+  as design input for a library plate-boundaries module (dev hub), and the baselines run on v2: TAf-v2 and Earth
+  run 2 launched from the pinned 64feaec clone (kaiju to report job ids); TAc-v2 only if Louis asks. Earlier
+  framing: 1b: "the fault would
   carry its own resolution (it comes triangulated / as a divided line) and this is how we create the ladder. No S
   parameter defines the along-strike resolution." Recipe v2's default is one base cell via `uw_spacing 0`, which
   you accepted on the hub's question; the notes session points out the two may not agree and has asked you. If
@@ -2593,3 +2605,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   one-cell band places on all 80 faults; rungs barely change from v2; the width halves; aspect 2 vs the mesher's
   preference for 2 cells across; outcrop slivers in every arm (dev hub). Two choices for Louis: BAND_CELLS 1 or 2,
   and the baselines on v2 or on the draft.
+- 2026-11-03: Louis: the division design is too much for a concept-test driver; if implemented it belongs in a
+  plate-boundaries module; make the ladder equant (half-width one cell, rungs similar), which is recipe v2 as
+  accepted. Draft shelved for the dev hub as module input; ledger updated and merged; baselines TAf-v2 and Earth
+  run 2 ordered on v2 from the pinned clone.
