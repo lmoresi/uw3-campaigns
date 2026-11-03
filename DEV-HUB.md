@@ -91,6 +91,15 @@ GitHub, or in session transcripts. If it dies:
 
 ## Standing rules (team)
 
+- **No node-adding adaptation of the base in the fault add-on work** (Louis, 2026-11-03, to
+  the integration session): "Don't use any node-adding adaptation of the base - we
+  discussed this as being problematic because it creates a mess of the FMG strategy and is
+  not at all what we need here." "When I discussed adaptation, it was mmpde or gmsh work -
+  outside the fault add-on." "Fine in testing, not fine for this set of experiments. We are
+  trying to optimise the FMG and the add on so we have to work clean." Experiment fixtures
+  are a uniform base plus the ladder; test_1134's bisection-refined fixture is for tests
+  only.
+
 - **Solver strategies run on conda-forge PETSc as shipped** (Louis, 2026-11-01: "Adding
   packages adds a large technical overhead"). MUMPS, superlu_dist, hypre, mmg and parmmg
   are in; HPDDM, SLEPc and anything needing a PETSc rebuild are out.
@@ -571,6 +580,23 @@ failures beyond the baseline; PRs being opened from the laptop.**
   any rank count; the doc names the one-rank LU and `block_rows_per_rank`. Pending:
   round-2 fail-first on the tightened tests, the cost check of the one-rank LU on row 3 at
   np 1/2/4 (its and wall time), the full tests/parallel, review round 2. Held.
+  **Report 14 (c094073d):** the structural block stays gathered as one. Row 5, no zone, n
+  320 (30,048-row block), velocity its at np 1/2/4/8/16: cut per rank 67/128/131/316/445;
+  one gathered block 67/76/80/82/86. The owner rank peaks at about 2x the others' memory
+  (520-540 against 250-290 MB) at every np; cut per rank the largest piece was still ~20k
+  rows, so the cut saved little factor time. Row 3's one-rank LU is a flat 55-66 s at np
+  1-16. Review rounds 2 and 3 fixed (a keyed zone with no cells installed a 7980-row block
+  in parallel; rank-asymmetric keying would hang, now one allgather and a collective
+  raise; `fac_zone=[]` refused). A review cost model that predicted the one-rank LU losing
+  from np 8 was built on the bisection-refined fixture and is discarded under Louis's rule
+  above. **#895's premise is stale** (the structural block is now one unbounded LU on one
+  rank by design); to be noted there when the PR opens. On why the per-rank cut degrades
+  so sharply when Krylov is partition-independent: the patch is the only part of the
+  preconditioner that can correct slip (the coarse levels are welded), and rank boundaries
+  cut it arbitrarily along the band and through split pairs, where deliberate cuts across
+  the fault cost almost nothing (serial 8-rung strips within 7 %). So phase 3 cuts the
+  patch across the fault or adds a slip coarse space. Inference; a serial test was offered
+  to Louis.
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
@@ -1220,6 +1246,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: Louis's rule recorded: no node-adding adaptation of the base in the add-on
+  work (fixtures are a uniform base plus the ladder). #925 at c094073d, rounds 2 and 3
+  fixed, one gathered structural block flat to np 16 where the per-rank cut reaches 445.
 - 2026-11-03: the runner confirms kaiju's permission change: squeue, sinfo, a login-node
   overlay build and sbatch all work, no sandbox. #925's fix verified at np 1/2/4 and
   extended to the structural-only patch; held on the #918/#921 stack.
