@@ -547,8 +547,20 @@ failures beyond the baseline; PRs being opened from the laptop.**
   iteration 1 at np 4 (1.5e1 to 2e-3) where before it never finished iteration 0, but
   neither np 2 nor np 4 reaches iteration 2 in 20 minutes; serially it is one outer
   iteration and 94 velocity its in 20 s. So double correction is part of the cause, not
-  the whole. Velocity-monitor runs at np 2 and 4, with a same-host serial baseline, are
-  looking for the remaining parallel difference before any code.
+  the whole. **Found (kaiju reports 11b, 12a, 12b): rank boundaries cut the union's blocks.**
+  Holding each row once let the outer solve converge, but every velocity solve still hit
+  max_it 200 at np 2 and 4 (serial: 5). The library builds 2 blocks serially, 4 at np 2, 7
+  at np 4, over the same rows; only the cut differs. Rebuilding the serial blocks from the
+  gathered rows restores serial convergence: at n 80, 97/95 its at np 2/4 (serial 88); at n
+  320, 109/117 (serial 94), 4-6 per velocity solve. The cut through the structural block is
+  what fails; band pieces cut per rank add to it. **Fix plan, approved by the hub (no
+  default change; parallel made to match serial):** the parallel union and the zone pieces
+  are built from the gathered rows, so the blocks are the same at any rank count and each
+  row is in exactly one block; each block goes to the rank owning most of its rows.
+  test_1139 (row 5 TI fixture, n 80) asserts one block per row, serial block count, the
+  same zone rows and at most 5 velocity its per solve; fail-first at np 2 and 4 on kaiju,
+  then the fix, review, held, stacked on #921. The big structural LU lands on one rank, as
+  serially: the known imbalance, phase 3's.
 - **Pressure rtol (item 3):** kaiju found test_1064 (spherical3d topography, np 4) off by
   1.4e-6 against a 1e-6 tolerance. The test solved at 1e-5 and compared at 1e-6, passing
   only because the pressure sub-solve over-solved at 0.1 x tol; fixed (56130269, the
@@ -1198,6 +1210,8 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: #925's cause found (rank boundaries cut the FAC union's blocks) and the fix
+  plan approved: blocks from gathered rows, the same at any rank count.
 - 2026-11-03: Louis switched the hub to Accept edits so merges reach him as prompts.
   **Merged: #929** (LU block solver, squash, 6321c714) and **#928** (patch summary,
   d9783f02). #930 got development merged in (670f6252; adjacent test.sh lines, both
