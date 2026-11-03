@@ -2543,3 +2543,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   not Louis's words; Louis's decision 1b (journal a4e5852) says no S parameter defines along-strike resolution,
   which the uw_spacing knob may conflict with. Ledger row corrected to quote Louis (c8df8a9, merged to main); the
   question put to Louis (the notes session has asked him too).
+- 2026-11-03: spacing page v2 and proposal page v4 corrected: Louis's two remarks quoted verbatim, the S form named as
+  the dev hub's reading, decision 1b quoted and the knob question marked open, the Newton-vs-velocity iteration
+  fact beside his quote. Drivers and the 64feaec clone untouched; kaiju holds for the baseline pick.
