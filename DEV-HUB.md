@@ -1262,6 +1262,14 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: **the stack's CI (#932/#933/#934) cancelled shard 4 at the 60-minute cap on all
+  three**, inside `test_1097_place_sheet_partitioned_addon_parallel` (a 25-minute 3-D
+  sheet test, timeout 1500 s) that is on the stack's branches and not on development under
+  that path; it arrived with the development merge into #918's base (`add_conforming_sheet`
+  commits). Shard 4 on development already ran 56 minutes. #932 also conflicted with
+  development on the batch-4 line after #926/#930; resolved and pushed (7c401c3d). The
+  integration session is asked where test_1097 belongs and to tier-C it or move it to a
+  lighter shard; then the stack re-runs and merges in order (Louis's yes is given).
 - 2026-11-03: **#926 merged** (e7dfbf9a; #919 relabelled fixed-in-development) and **#930
   merged** (af6f19b3; #922's library side stays open). **All five of the first phase-1 batch
   are in:** #926, #927, #928, #929, #930. The stack #932-#934 is on CI.
