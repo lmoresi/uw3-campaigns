@@ -2630,3 +2630,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-04: Louis agrees: the #595 evaluation's scripts and write-up (wombat only) come into scripts/sessions beside
   the note that cites it; the notes session instructed, the docs hub to route; the ledger's citation gains the
   commit when it lands.
+- 2026-11-04: #595's evaluation placed by the notes session with UWTN 2026-022 (figures/src/cut_in_band_595: the
+  scripts, modules, caches, write-up and a cache-only reproduction of the numbers), unsaved on the wombat
+  workbench until Louis saves 022; ledger citation updated and merged to main.
