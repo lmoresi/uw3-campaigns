@@ -194,6 +194,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Add-on mesh demonstration for UWTN 2026-022 (trench-mesh movie, cost and load tables, rebuild breakdown, rungs8 overlay) | https://claude.ai/artifact/2BFCbPTLgUgDBTHgwjKXee |
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
+| Fault-division design (the knob removed: rungs = the locator's points at the local cell size, W = BAND_CELLS x mean local h; offline placement check on 80 faults; the draft diff) | https://claude.ai/artifact/UANqhA82AfRoh7fjgrPwYG |
 | Recipe v2 production proposal: the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs (TAf-v2 ~4.8 h, Earth run 2 ~4.4 h, TAc-v2 ~3.0 h, one exclusive node each) | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
 | Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
@@ -370,6 +371,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   scale_isolate_geometric_inset3_TAf_ck40, scale_normalcheck_*; scripts rot.py, viol.py beside the scaling
   scripts. **Campaign consequence: the analytic normal stays the driver default (clean at np 16); Louis's
   geometric ruling is held on this mechanism until #906 or the analytic node set is fixed.**
+- 2026-11-03, to the dev hub, a placement observation from kaiju's 320 offline placements (page
+  UANqhA82AfRoh7fjgrPwYG): slivers down to 0.11 deg occur in every arm, production v2 included (Earth run 1
+  checkpoint 40); every cell under 10 deg lies within 0.004 of the surface and 0.03 of the outcrop, none along the
+  cut or at the tip, so it is the band's outcrop meeting the wall, independent of the division and the width. For
+  the ladder placement at the wall. Also: the ladder path takes the trace's points verbatim (precomputed samples +
+  reach), confirmed on uneven divisions (0.0133-0.0165).
 - 2026-11-02, to the dev hub: Louis has ruled the campaign drivers' wall normal to the geometric (library default,
   normal=None) path, "the computed normal is probably the correct default", and the split inset to 1 rung (the one
   element the surface rotation needs; the test showed 3 rungs was a ~10 % physics choice with no evidence behind
@@ -667,8 +674,25 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   principle row in the ledger; kaiju drafts the removal (rungs = the locator's points at the local cell size; W =
   the local cell size, so one cell wide against v2's two; the record states the division used; the restart rule
   re-divides only when the mesh differs) with an offline placement check at W = h_b, no driver change or run until
-  Louis sees the page. **For Louis: run the baselines on v2 as it stands (same rung spacing as the principle on the
-  uniform annulus, band two cells wide) or wait for the knob removal (band one cell wide)?** Earlier framing: 1b: "the fault would
+  Louis sees the page. **DESIGN READY (page UANqhA82AfRoh7fjgrPwYG; draft f393fd7 on kaiju/fault-division-draft over
+  main 7efb5ef, compiles, not run):** every locator divides at the measured local cell size h(s) (uniform in
+  u = integral ds/h; uw_spacing and resample_polyline deleted); W = BAND_CELLS x the arc-length mean of h along the
+  fault (length-weighted across faults); chain levels take every 2^k-th point; the restart rule compares a
+  "division" record saved in each checkpoint (bit-identical no-op; existing checkpoints re-divided once); the
+  record states the division used; every other use of S becomes h (inset, keep_apart, split nudge, rebuild
+  hysteresis, restart tolerance, wall-check and damage reach); h gathered from every cell, partition independent.
+  Offline on the 80 stored faults: a one-cell band (W = h_f) builds all 80 on the first attempt (one margin ring,
+  clearance 0.7, width x1), as do v2 (W = 2S), rungs at h with W = 2h, and rungs at h/2 with W = h; rung-to-cell
+  ratio 0.83-1.04; the measured h is 0.0155-0.0161 (nominal 0.0156) so the rungs barely change from v2 and the
+  material difference on the uniform annulus is the width halving (band ~15 % fewer cells, fill ~35 % fewer). Aspect:
+  at W = h with rungs at h the band cells are h/2 across by h along (aspect 2, smallest interior angle 26.6 deg
+  against 45 at aspect 1); the mesher docstring's "about 2 elements across width" is W = 2h (v2's); aspect 1 at
+  W = h needs rungs at h/2 (22 -> 42 rungs, 85 -> 137 band cells). Slivers (worst 0.11 deg, in v2 on Earth run 1
+  checkpoint 40) are in every arm: all cells under 10 deg lie within 0.004 of the surface and 0.03 of the
+  outcrop, none along the cut or at the tip: the band's outcrop meeting the wall, independent of division and
+  width (dev hub). Effect on slip, vrms and the solver unmeasured until a run is approved. **For Louis: (1)
+  BAND_CELLS 1 (the principle as stated; aspect 2) or 2 (the mesher's preference; v2's width)? (2) the baselines on
+  v2 as accepted, or on this draft after its own acceptance?** Earlier framing: 1b: "the fault would
   carry its own resolution (it comes triangulated / as a divided line) and this is how we create the ladder. No S
   parameter defines the along-strike resolution." Recipe v2's default is one base cell via `uw_spacing 0`, which
   you accepted on the hub's question; the notes session points out the two may not agree and has asked you. If
@@ -2565,3 +2589,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (place_thin_volume with a precomputed (samples, reach) pair; no arclength resampling through
   place_fault_ribbon_2d), so the locator's points are the rungs as given; at W = h_b with rungs ~h_b the band cell
   aspect is 2 against the mesher docstring's "about 2 elements across width", to be weighed on the design page.
+- 2026-11-03: kaiju's fault-division design ready (page UANqhA82AfRoh7fjgrPwYG; draft f393fd7, compiles, not run):
+  one-cell band places on all 80 faults; rungs barely change from v2; the width halves; aspect 2 vs the mesher's
+  preference for 2 cells across; outcrop slivers in every arm (dev hub). Two choices for Louis: BAND_CELLS 1 or 2,
+  and the baselines on v2 or on the draft.
