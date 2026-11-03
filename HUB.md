@@ -2633,3 +2633,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-04: #595's evaluation placed by the notes session with UWTN 2026-022 (figures/src/cut_in_band_595: the
   scripts, modules, caches, write-up and a cache-only reproduction of the numbers), unsaved on the wombat
   workbench until Louis saves 022; ledger citation updated and merged to main.
+- 2026-11-04: baselines at checkpoint 5, every step converged, walls 1e-13, watch.log quiet. TAf-v2 vs TAf_env: vrms
+  500-533 vs 534-547, slip_max 924-1255 vs 1100-1247, Newton 4-5 vs 5, step 162-214 s vs 395-428 (2.3x, as
+  estimated); division F0 14 rungs at 0.0153 (resample rounds the count), W 0.03125, dip 60.5. Earth run 2 vs run 1:
+  vrms 253-283 vs 245-255, slip_max 644-1031 vs 452-648 (early top-of-fault sensitivity, compare at the base),
+  Newton 3-5 vs 3-6, step 87-156 s vs 138-256; division 17 rungs at 0.0159, dip 30 (the floor). ETA: TAf-v2 ~5 h,
+  Earth run 2 ~2.5 h.
