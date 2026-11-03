@@ -1268,8 +1268,16 @@ refuses deletions from here, so this needs a laptop or Louis.
   that path; it arrived with the development merge into #918's base (`add_conforming_sheet`
   commits). Shard 4 on development already ran 56 minutes. #932 also conflicted with
   development on the batch-4 line after #926/#930; resolved and pushed (7c401c3d). The
-  integration session is asked where test_1097 belongs and to tier-C it or move it to a
-  lighter shard; then the stack re-runs and merges in order (Louis's yes is given).
+  **Correction: the hub's reading was wrong.** test_1097 is on development under the same
+  path (293bf8dd, 2026-10-17), and its slowness on the stack is a **real #918 regression in
+  3-D**: on its 3-D fault the split finest level's patch and halo are 94 % of the level, so
+  the 0.98 gate takes one 3-D LU over 94 % of the level (463 s, 6.3 GB peak) where
+  development's 0.75 declines it (35 s, 4 velocity its, 1.6 GB). This is the OOM risk the
+  r2 review flagged; #918's evidence was all 2-D. **Stack merge HELD.** Fix on #918's branch:
+  the 0.98 threshold applies to 2-D split levels only; 3-D levels keep 0.75 until the 3-D
+  add-on is measured (phase 2; #895 bounds the block), with a test; carried up to
+  #933/#934, CI reruns. This narrows the rule Louis accepted to 2-D; the integration
+  session is telling him directly.
 - 2026-11-03: **#926 merged** (e7dfbf9a; #919 relabelled fixed-in-development) and **#930
   merged** (af6f19b3; #922's library side stays open). **All five of the first phase-1 batch
   are in:** #926, #927, #928, #929, #930. The stack #932-#934 is on CI.
