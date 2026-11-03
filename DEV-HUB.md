@@ -1210,6 +1210,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: kaiju's admin lifted part of the restriction (Louis: Claude can submit jobs
+  without approval and build containers on the login node; more to come). Both kaiju
+  sessions told; the runner checks before resuming its queue.
 - 2026-11-03: #925's cause found (rank boundaries cut the FAC union's blocks) and the fix
   plan approved: blocks from gathered rows, the same at any rank count.
 - 2026-11-03: Louis switched the hub to Accept edits so merges reach him as prompts.
