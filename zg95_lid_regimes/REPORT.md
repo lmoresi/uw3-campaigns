@@ -91,7 +91,158 @@ warm-start rules, and the rebuild rules for a moving trench. Through an overturn
 nonlinear solve sets the cost (15-25 Newton increments per step on the moving-trench
 run); a tolerance of 1e-2 or the declared regularisation eta_reg are the open choices.
 
+## The annulus
+
+Drivers: `drivers/annulus_model.py`, `annulus_convection.py` (no fault), `annulus_fault.py`
+(one fault: fixed, window, fault-normal or strain-steered trench), `annulus_faults.py`
+(faults formed and retired by damage), `strain_band.py` (the band detector). The annulus is
+built in layer depths (r_o 1/0.45, r_i 0.55/0.45), so every box parameter carries over
+unconverted. Outputs in `~/+Simulations/zg95/annulus_regimes/runs/` and
+`~/+Simulations/zg95/annulus_faults/runs/`; the movie `movies/04_annulus_fault_strain_weakening.mp4`.
+
+**Calibration.** At Hyperion's resolution (finest d/11) the driver reproduces Hyperion's
+mobile `conv_ms98` (M 0.60, lid 0.23 d, T_mid 0.68). At tau1/Ra 1 the annulus mobilises at
+d/32 too, from either seed (six cells within t 0.05, ten cells after t 0.13), where the box
+stays stagnant to t 1.0 (the box at d/11 is stagnant to t 0.55, then overturns episodically).
+The annulus counterpart of the box reference is tau1/Ra 1.5 with the ten-cell seed: stagnant
+to t 0.59 (M 0.037, lid 0.34 d, T_mid 0.885). A two-cell box at tau1/Ra 1 is mobile (M 0.69):
+long cells alone move the bistable lid onto the mobile branch.
+
+**A moving fault through that lid** (45 degrees, 0.35 d, from t 0.295): episodic. A slab goes
+down the fault and M rises to 0.51, the lid relocks (M 0.13 by t 0.33), and a second episode
+follows. With **strain weakening** (yield x1.25 intact, x0.5 at gamma 0.5, transported plastic
+strain) and the declared regularisation **eta_reg** (100 held M back to 0.26; 10 kept it at
+0.36-0.43 at 5-14 Newton increments per step) the first episode is stronger (M 0.66) and the
+second reaches M 0.81, with a ridge opening at about +100 degrees.
+
+**The fault leaves the downwelling** under both kinematic trench laws (the overriding-plate
+window, and the fault's own mean normal velocity): the slab sinks near-vertically at the
+original trench while the straight fault, held at 45 degrees, drifts 15-20 degrees away.
+
+**Strain-steered faults.** The detector finds the saturated, cold, descending plastic-strain
+band and fits its ridge (the position of greatest strain at each depth, over the depth the
+fault occupies). The fault relaxes onto it in trench angle, dip (which may pass vertical: the
+slab steepens from 40-55 to 80-95 degrees) and depth (the local thermal boundary layer, the
+T = 0.7 isotherm beside the trench, 0.08-0.15 d before the relock thickens it). The fault then
+stays on the downwelling. The lid still relocks after the first slab: the relock is physical.
+With faults formed where a band's damage exceeds 0.05 d^2 (and retired below 0.01), a second
+fault formed at +30 degrees and took over the slip while the first stayed on its own band.
+The remobilisation at +100 degrees is a spreading ridge, which the downwelling criterion
+correctly leaves without a fault: mid-ocean-ridge physics is the open item.
+
+**Line-law faults, 2026-10-18 to 10-23.** Up to four faults fitted to the damage as straight
+lines (RANSAC on plastic strain at or above 2, each as long as its damage is deep), matched
+to the existing faults by trench angle, formed where unmatched, retired after three
+detections without a line. The conjugate V of a downwelling resolves as a stem and two
+arms; a converging pair closed into a V and hung the mesher at 0.2 cells of spine
+separation, so faults are kept apart by a clearance rule (0.08 d: the weaker, by slip, is
+shortened, and retires if it cannot clear). Movie: `renders/movie_lines_2870_3250.mp4`.
+
+**Ra x 3 (2.73e6, tau1/Ra 1.5) from the line-law run's checkpoint 3250.** vrms tripled at
+once, the lid thinned from 0.33 to 0.20-0.22 d over t 0.433-0.445 (Ra^(1/3) predicts 0.23),
+q_top 2.8 to 4.8, q_base 2.7 to 5.9, the internally heated fraction 0.40 to 0.23. A second
+downwelling formed at the antipode with its own faults and the planform became degree 2;
+the two trenches alternate in slip (up to 50 on one while the other locks), each with a
+conjugate pair whose dips swing through vertical as the polarity flips. Rebuilds every 5-10
+steps cost a Picard-first cold solve (20-40 Newton iterations, 10-25 min on 7 ranks) against
+2-5 iterations warm: the dominant cost. Stopped at checkpoint 3910 (t 0.4696) for kaiju.
+Movie with the strain panels: `renders_strain/movie_strain_3250_3910.mp4`.
+
+**What the strain panels say.** A slipping fault is a one-cell band at a strain rate of 1e3
+inside a yield zone at 1e2 that is 0.3 d wide: the fault adds a decade on one cell while the
+yielding lid takes most of the convergence, so the downwellings are fat, symmetric and
+two-sided. A locked fault keeps its damage scar (no healing in the lid), and the line fit
+keeps it there: damage is a memory, not a measure of activity. The plastic strain is also
+fed by the faults (0.5 x slip within two band widths), so damage is highest exactly where
+the continuum plastic strain rate is lowest.
+
+**Fault evolution rethought (2026-10-23).** A fault pinned to a damage scar does not move
+when the scar goes inactive, because the damage is a memory. New rules in the driver
+(`-uw_fault_law rate`): the lines are fitted to the total strain-rate invariant of the base
+velocity (normalised by the lid's 99.5th-percentile rate; a slipping fault is a one-cell
+band in it), so faults form and follow where the lid deforms now; the trench advects every
+step with the surface velocity of its overriding plate (sampled 0.1 d beyond the trench on
+the side the fault dips under) and the fit only corrects it; a fault retires when its slip
+stays below a tenth of the largest for three detections, not when the fit misses; damage
+decides nothing but the weakening, and `-uw_heal_time_lid` lets the lid's scars fade. Also:
+`-uw_detect_start` (no fit before a shear band exists), the records carry the surface
+velocity of the plate on each side of every trench and the trench's own rate.
+
+**The foundering slab (after Zhong and Gurnis 1995).** `-uw_init slab` builds the state from
+an age line: the plate age ramps from zero at each plate's ridge (opposite the trench by
+default) to uw_age_sub (0.0025: a 0.1 d plate) on the subducting plate and uw_age_over (0.001,
+0.063 d) on the overriding one; the age continues down the fault plane as the trench age plus
+the distance down-dip over uw_slab_rate, and the subducting plate's one-sided profile at the
+trench diffuses freely into both the slab and the wedge for that time (tabulated, no closed
+form), fading beyond the slab's end over its own diffusion length. At rate 100, the model's own
+plate speed at Ra 3e6, a 0.35 d slab warms through: the thermal Peclet number of this regime;
+1000 (a plate-tectonic value) keeps a cold core. First steps on the laptop (Ra 2.7e6, tau1/Ra
+1.5, asthenosphere x0.1, one fault on the slab's upper surface, cut through the lithosphere):
+with the sharp contact the fault slips at 153, the subducting plate converges at 96, the
+overriding plate advances at 29 and the trench retreats at 29; with the freely diffused slab
+(half the thermal anomaly) 57, 41, 4 and 4. A fault placed along the slab's cold core instead
+of its upper surface locks (slip 11). The scan for kaiju is `launch/slab_kaiju/` (ten runs,
+one change each: asthenosphere, tau1/Ra, dip, slab length, plate ages, deta, two faults).
+Rerun on the age-line state the two contacts are alike at step 1 (slip 67 and 64); the diffused
+slab rolls back twice as fast (trench rate 14 against 6) because the cooled wedge couples the
+overriding plate to the slab.
+
+**Sixty steps of the diffused slab (laptop, 4 ranks, dt at the Courant limit: the driver's
+accuracy estimate, `uw_dt_mult` x the library's, was six times smaller and would have needed
+hundreds of steps).** No roll-back. The slab drips vertically under the trench and is gone by
+step 40 (peak speed 900, dt 4e-5); the overriding plate moves toward the trench at 30
+throughout, so the trench advected with it retreats 0.05 d by step 20 and the refits then walk
+it 0.8 deg the other way, to the strain-rate band on the overriding side. The ridge in the
+initial state does not develop: by step 20 the lid at the antipode has thickened from 0.04 to
+0.14 and the surface divergence there is gone (`analysis/surface_profile.py`: surface velocity,
+divergence and lid depth around the annulus).
+
+**An imposed ridge.** `-uw_ridge_weak f` puts a weak vertical seam through the lid at each
+plate's ridge angle (`ridge_factor` in `annulus_model.py`: the viscosity and the yield stress
+times f, Gaussian across the seam with half-width uw_ridge_width 0.06, to uw_ridge_depth 0.2,
+fixed in the mantle frame and carried through restarts in the state). At f 0.01 the seam
+spreads (divergence 600 at the antipode, lid 0.09 instead of 0.14) and the fault slips twice as
+fast (124), but the young plate it feeds drips at 108 deg from the trench before it gets there,
+and by step 59 the ridge side of the annulus is a field of small drips and new spreading
+centres (speeds 1300) while the trench side is a slow plate (subducting 10, overriding 96, no
+retreat). The yield-everywhere lid again: the thin plate near the ridge fails on its own. Next
+on the laptop: the same with tau1/Ra 3 (`runs/slab_ridge_tau3`).
+
+**Stage A without a fault or an overriding plate (laptop, 2026-10-24).** Louis's plan: (1) a
+half-annulus plate with a thin boundary layer elsewhere, no fault, no overriding plate, tuned
+until the slab founders by half its own length; (2) an overriding plate set back at least a plate
+thickness; (3) the fault. No thermal slab founders. At Ra 2.7e7 with a thin plate (age 0.0025),
+a held-hot overriding surface and the cold-top slab state (A4), the hinge is a free pivot (the
+chord dip goes 63 to 88 deg with the hinge fixed) and the core warms from 0.04 to 0.3 by
+t 0.0005, before anything rolls back; a weak channel from depth 0.15 (A5) drops the slab
+straight through; a one-cell weak crust carried by particles (A7) is the best of them, 0.12 d of
+retreat by t 0.0006, at 7 min a step with 15 to 21 Newton iterations as the crust yields.
+`analysis/slab_metrics.py` tabulates the hinge, tip, chord, dip, core temperature and cold mass
+of every checkpoint.
+
+**The compositional slab (the recipe).** The subducting plate and its slab are a particle
+marker with a fixed temperature deficit in the buoyancy and a viscosity factor, on one swarm
+with the crust (`markers` in the driver: crust, slab, over; per-cell linear proxies, P1
+pictures `annulus.mesh.<name>.NNNNN.h5` for the renders, the swarm checkpointed with the mesh).
+Thermal buoyancy off, isoviscous mantle: `-uw_deta 1 -uw_buoy_T 0 -uw_asth 1 -uw_ra 3e6
+-uw_tau0 2.25e5 -uw_tau1 3e7 -uw_comp_dT 0.5 -uw_comp_eta 100 -uw_comp_thick 0.1
+-uw_crust_weak 0.001` with the stage-A flags (`launch/stage_a/run_stage_b_comp.sh`); the
+overriding plate for stage 3 is `-uw_over_eta 100 -uw_over_gap 0.15` (neutrally buoyant). Read
+the metrics' trench column (the marker's surface edge); the hinge band mixes steepening with
+retreat. Refinement 5, 4 ranks, 75 s a step, one Newton iteration. B1 (slab x100): steepens to
+vertical by step 20, then rolls back at 450 with the plate feeding in at 800 to 970; trench
+retreat 0.33 d at t 0.0007 and 0.45 d at t 0.0011; the tip reaches the base at step 70, the slab
+drapes at 75 deg and the rate halves. B2 (x1000): the same path at a third of the rate. C1
+(stage 3): the overriding plate halves the rate (0.19 d at t 0.0007, 0.39 d at t 0.0018), is
+drawn along with the trench and rides on the crust from step 40. The fault goes at that contact.
+
 ## Next
 
-The annulus as the periodic domain: moving fault against no fault, after matching the
-annulus lid mobility and boundary-layer thickness to the box's.
+The regime suite for kaiju (`launch/suite_kaiju/`): Ra 2.7e6 and 9.1e6, tau1/Ra 1.5 and 3,
+with an asthenosphere channel (viscosity x 0.1 between 0.25-0.3 and 0.7 d), the surface
+yield stress tripled, weak_min 0.25 and the fault depth cap at the lid base, all from
+checkpoint 3910. The aim is a lid that is stagnant unless damaged, so that the faults
+reinforce the shear bands instead of decorating a yielding lid, and a slab that can roll
+back. Then: form and steer the faults on the plastic strain rate rather than the damage,
+advect the trench with the overriding plate between detections, retire on slip; lid
+healing; mid-ocean-ridge physics for the divergent boundaries.

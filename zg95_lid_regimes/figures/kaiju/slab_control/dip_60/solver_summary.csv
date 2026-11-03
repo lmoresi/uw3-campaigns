@@ -1,0 +1,4 @@
+kind,steps,its,picard,newton,F0/F_ref,s/step,s/nonlinear it,vel KSP mean,pres KSP mean,cold retries,total its,total s
+ordinary,299,1.0,0.0,1.0,1.0,30.48,16.61,5.0,23.0,0,302.0,9150.89
+init_first,1,1.0,1.0,0.0,1.0,35.73,19.991,6.0,19.0,0,1.0,35.73
+all,300,1.0,0.0,1.0,1.0,30.48,16.616,5.0,23.0,0,303.0,9186.62
