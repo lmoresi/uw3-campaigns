@@ -2627,3 +2627,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   "no more cells" half unmeasured and recorded as recollection. Ledger cites it; merged to main.
 - 2026-11-04: #595 cited on the design page (v4) and the draft branch (3402ad0). Baselines: TAf-v2 at step 2 (~180
   s/step), Earth run 2 at step 4 (~88 s/step), 3-4 Newton each, watch.log quiet.
+- 2026-11-04: Louis agrees: the #595 evaluation's scripts and write-up (wombat only) come into scripts/sessions beside
+  the note that cites it; the notes session instructed, the docs hub to route; the ledger's citation gains the
+  commit when it lands.
