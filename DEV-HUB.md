@@ -534,8 +534,9 @@ failures beyond the baseline; PRs being opened from the laptop.**
   #929 first (touches nothing shared), then #926, #928, #930 (all insert at batch 4 line
   329: a development merge between each), then #927 (line 350). **Error 76 settled:** 24
   runs at once with the fix had none; the children ran ROMIO.
-- **#918 (00f06689) held for Louis's acceptance of the narrowed rule** (split levels 0.98,
-  unsplit 0.75); confirmed on row 3 and test_1134 passes on Linux.
+- **#918: Louis accepted the narrowed rule (2026-11-03, "Yes to the narrowed #918 rule -
+  merge the stack")**: split levels decline above 0.98, every other level keeps 0.75. The
+  stack #918 -> #921 -> #925 merges in order on green once its PRs are open.
 - **#921 held on #925.** The stacks (job 3537, dumps at 300/600/900 s) show no deadlock and
   no mismatched collective: ranks 0, 2 and 3 wait in MPI on rank 1, which stays in native
   code outside MPI throughout. **Corrected by the traced run (job 3627):** not a giant LU
@@ -1246,6 +1247,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-03: **Louis accepted #918's narrowed rule and ordered the stack merged.** #926
+  and #927 green after the #917 re-run; #926 needed a development merge (test.sh, both
+  sides kept); #930 hit #917 again, re-run requested.
 - 2026-11-03: #925 complete at c094073d (round 3 verified on kaiju; the queue is empty). The
   stack #918 -> #921 -> #925 goes to PRs from the laptop; the merge gate is Louis's yes on
   #918's narrowed rule. Phase 1 item 4 (cases with tests) starts.
