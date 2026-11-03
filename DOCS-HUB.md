@@ -511,3 +511,17 @@ Measured here, not inherited.
   until one changes: journal dead-end entry; the fault-multigrid guide's parallel
   section and closing paragraph rewritten from "never run here, first run pending" to
   the limit; topic page. #862 pushed.
+- 2026-11-03: **Louis's clarification of 1b: the fault's division and the band's width
+  are not knobs** (to the science hub; ledger principle row at febbb87, HUB.md 7efb5ef).
+  The notes session drafted the journal decision entry; verified against both and
+  against the code on `development` af6f19b3 (the points become the spine verbatim; the
+  rails sit at half the width) and committed with light edits. New against 2026-11-02:
+  the band is as wide as the local mesh size (an average where the mesh is not uniform),
+  so about half the drivers' $2S$; `uw_spacing` (one base cell since 2026-11-02) is
+  marked for removal; nothing has run with a one-cell band yet, kaiju is drafting the
+  driver change with an offline placement check first. Done here: topic page bullet;
+  ruling 4 in the fault-multigrid guide carries the width half, the production
+  parenthetical updated; the convection guide's recipe says width is the local mesh
+  size and that every measurement used $2S$ (#862 pushed). Also noted: the campaign
+  branch is merged into uw3-campaigns `main` (febbb87), so b440b88 and the ledger are on
+  GitHub now; yesterday's "push the campaign work" item is closed.

@@ -309,6 +309,15 @@ division without `uw_spacing` is still to do. Dividing the patch across ranks
 cannot place one (serial repro on kaiju, `HUB.md` 29cd738) and the ladder takes only
 gather; the k-partitions test waits on one of the two changing, the dev hub's call.
 
+**2026-11-03, 1b clarified.** Louis: the along-fault resolution is the fault's own
+discretisation and the band's width is the local mesh size; neither is a knob (journal
+decision entry of 2026-11-03; ledger principle row, uw3-campaigns main febbb87). The
+campaign branch is merged into `main`, so the driver default and the ledger are on
+GitHub. Still to do on the drivers: remove `uw_spacing`, set the width to the local cell
+size, record the division used; kaiju drafts it with an offline placement check at
+$W = h_b$ first, and no run before Louis sees it. Every measurement to date, the note's
+included, used a $2S$ band.
+
 **B's review (2026-10-28) was not a quick PR.** Must-fix items reported: `test_1091`
 matches no CI glob (`check_test_coverage` exits 1); `test_1087` asserts one method beats
 another (Charter forbids); `test_1081` and `test_1084` would gate every PR at 13 and 7
