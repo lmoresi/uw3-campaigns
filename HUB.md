@@ -2621,3 +2621,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-04: fault-division page v3 and the draft branch (c291d57 on kaiju/fault-division-draft) carry Louis's
   ladder-evaluation ruling: BAND_CELLS 2, the one-cell variant withdrawn (its placement check kept as a record),
   "unmeasured" replaced by the ruling. Baselines 3841/3842 before their first checkpoint; watch.log quiet.
+- 2026-11-04: the ladder evaluation Louis cited is underworld3 #595 (2026-08-17, the cut-in-band configuration):
+  the cut on the fault's own nodes with one cell either side snaps nothing (slip 0.4315, angles kept) where the
+  centre-line cut pinched the band (13 deg, slip 0.4290); scripts on wombat only, no note or journal entry; the
+  "no more cells" half unmeasured and recorded as recollection. Ledger cites it; merged to main.
