@@ -2874,3 +2874,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   reference (the rest-state residual, so warm steps run 5-6 Picard iterations); the arms raise its value instead, a
   proxy for the same effect. Inexact inner velocity solve: library-fixed on the rotated path; passed to the dev
   hub (For the other hubs).
+- 2026-11-04: 2 nodes x 16 (3971): 185 s per step, same as 1-node np 32 (187), identical answer; 10.9 GB rss per
+  node. Kernels faster (MatSOR 1.55x, MatMult 1.34x vs 1-node np 32, VecScatterEnd 408 -> 300 s) but MG Apply
+  unchanged (1635 vs 1642 s): ~540 s moved elsewhere in the stage. Kaiju reads latency over IPoIB (needs RDMA, e.g.
+  Gadi); the hub asked for the events that grew with their max/min ratios before concluding, since load imbalance
+  (gathered patch, coarse level, partition) would be a software fix. Per Newton iteration np 32 is 1.37x np 16
+  (Newton 6.3 vs 5.5 is partition-dependent). ref6 probe (3972): cold step 1 took 940 s at np 32. pack3 v1 (3973)
+  serialised (per-step --mem omitted), so it is the warm-switch comparison run sequentially; pack3 v2 (3975) is
+  the real packing measurement.
