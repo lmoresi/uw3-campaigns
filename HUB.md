@@ -761,10 +761,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   attempt has rel > 0.1 (an unsolved state, not a near miss); today a single unconverged mid-run step is carried
   forward with only the two-in-a-row trigger as guard. The hub agrees in principle.
 
-- **Refinement 6 for TAf-v2 (2026-11-04):** the test of whether production (refinement 5) is converged; trench and
-  slip moved 35-45 % from ref4 to ref5. Probe-measured: ~38 h (~1.6 days) to the base at np 32 on one node
-  (+/- 30 %), 71 GB per node; two nodes do not help. Before a run: why the cold step 0 stalled at rel 0.77, and
-  whether the rising pressure iterations plateau (both being measured). Louis decides whether to run it.
+- **Refinement 6 for TAf-v2 (2026-11-04): READY FOR LOUIS'S GO.** The test of whether production (refinement 5) is
+  converged; trench and slip moved 35-45 % from ref4 to ref5. Ten-step probe (3978, cost and trend only): every warm
+  step converged, pressure its plateau at ~30 per Newton iteration (production 21-25), 780 s per step at np 32 on
+  one node, dt ~1.9e-6 (2x the steps). To the base ~35 h (~1.5 days) at np 32, ~30 h with the warm switch at 1e-1;
+  ~71 GB per node. Needs the cold-solve patch (kaiju/pres-rtol-cold 131cb89; ~20 min once at the start), so
+  accepting that patch comes first. The hub recommends both.
 
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
@@ -2968,3 +2970,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   match to all digits. Hub: switch 1e-1 recommended to Louis after an Earth confirmation (two np 26 runs on one
   node, control vs 1e-1, 15 steps from checkpoint 40). Earth overturn 3957 at step 159+, fault in slab; cell025 at
   step 21 (~880 s per step); ref6 s10 (3978) running.
+- 2026-11-04: ref6 ten-step probe (3978) complete, labelled NOT A REF6 RESULT (stepped on from the 1e-2 cold
+  start): warm steps 1-10 all converged (4-7 Newton, no cold retries); pressure its plateau (~30 per Newton
+  iteration from step 2); 780 s per step mean at np 32; ~35 h to the base. Earth warm-switch check 3983 (two np 26
+  runs on n2, control vs 1e-1, 15 steps from checkpoint 40) running.
