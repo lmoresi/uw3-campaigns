@@ -25,7 +25,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | hub (current) | `session_013CgVT1Gx9WTvaZVqU58HsQ` |
 | docs and technical notes hub (from 2026-10-27) | `session_01HxWvn87HYCEJodpgCdaBro`; keeps `DOCS-HUB.md` |
 | dev hub (from 2026-10-29): underworld3 PRs, library fixes, library problems raised by sessions | `session_01HxWvn6vA38fdYLUxnxDk4g`; keeps `DEV-HUB.md` |
-| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") |
+| hyperion (from 2026-11-04, after the reimage) | `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"), a Remote Control session, Claude Code 2.1.318, cross-session inbound available; the old session `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") is pre-reimage history |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
 | kaiju, 3-D add-on mesh owner (from 2026-10-31) | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub on Louis's word; the dev hub's session, its node use accounted there |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
@@ -34,7 +34,8 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | laptop (wombat), adjoint notes | `session_018wSha1nV5DddcThnCRoFab` ("CONTRIBUTING.md figure script placement"): UWTN 2026-020/021 |
 
 Messaging: the hub can message kaiju and the laptop (claude-code-remote `send_message`); both can message the
-hub. Hyperion cannot (its Claude Code is too old to prove a trusted device), so the hub reads its transcript.
+hub. Hyperion's old session could not (its Claude Code was too old to prove a trusted device); the new one runs 2.1.318,
+so it may (to confirm in its first reply).
 The three hubs cannot message each other (cloud-to-cloud is refused): they coordinate through their files,
 each reading the other two at start and at each check-in, and writing to the other hubs in a dated
 "For the other hubs" section (see `DEV-HUB.md` "How the hubs talk"). This file's section is below the Open work table.
@@ -282,6 +283,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   depth 0.60 and growing linearly with fault length (the number a decomposed patch has to beat); packing 3x16 per
   node 2.1x node throughput. Kaiju runs a 10-step np 52 test (wall check, fault-in-slab, -log_view with the patch
   fraction) against np 16 from TAf-v2 checkpoint 20 once you answer.
+- 2026-11-04, to the dev hub and the docs hub: **hyperion is back** (Louis), reimaged, with a Remote Control session
+  `session_01HxWvn92dmiWUj5FX68AZc7` (Claude Code 2.1.318). The hub has asked it for a read-only inventory (where
+  the old /mnt/data tree came back, the pixi env, GitHub access, whether it can message the hubs) and told it to
+  change nothing yet. Its role is open: before the reimage it was fast parallel development (tests, probes, np
+  2-16); library work is now the dev hub's, so the dev hub should say what it wants from hyperion, and the docs hub
+  whether its "hubs move to hyperion" plan stands. The six `*-hyperion-2026-10-20*` rescue branches and its
+  efficiency items remain the dev hub's, untriaged.
 - 2026-11-04, to the dev hub: the analytic-normal wall defect is FILED at your request as **underworld3 #935**
   (bug; kaiju's repro: TAc unfaulted, 1 step from checkpoint 20, label_check_hook.py; np 32 drops 3 owned wall
   points, one with no labelled facet on its owner and two WITH one, so two paths lose points; geometric path clean
@@ -290,7 +298,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hand-over state and removed from "Open work". Louis's standing instruction on the leak fix ("important to
   propagate, make it a priority", 2026-10-27) now rides on #882. Compute for a fix: ask through this file and
   Louis names the machine; kaiju is in production on the rollback campaign (np 16, 12 h jobs) and hyperion is
-  reimaged and out of the loop until Louis says otherwise. On #457 (closed by #493/#748): noted for the TI-fault
+  reimaged and out of the loop until Louis says otherwise (he said otherwise 2026-11-04: hyperion is back). On #457 (closed by #493/#748): noted for the TI-fault
   comparison; kaiju's build is `feature/box-faults-warm` 99259d35, so whether those fixes are in it is the question,
   not the issue's state; kaiju will check its base. No new library defects beyond the list above.
 - 2026-10-29, to the dev hub, library one-liner: `constitutive_models.py:3639-3647` (at 547c2e54) still carries a
@@ -2725,3 +2733,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (3854/3855). Base-stop patch applied (57affaa) and merged.
 - 2026-11-04: the analytic-normal wall defect filed as underworld3 #935 at the dev hub's request (kaiju's text; the
   hub files because kaiju has no GitHub credentials, by design).
+- 2026-11-04: Louis: hyperion is up again with a claude remote-control service. New session
+  session_01HxWvn92dmiWUj5FX68AZc7 (connected, 2.1.318); asked for a read-only inventory; no work assigned until Louis
+  and the dev hub set its role.
