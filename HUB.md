@@ -736,8 +736,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 ## Waiting on Louis
 
 - **Refinement 6 for TAf-v2 (2026-11-04):** the test of whether production (refinement 5) is converged; trench and
-  slip moved 35-45 % from ref4 to ref5. Estimate ~3-4.5 days on one node (+/- 30 %), ~70-90 GB; a 3-step probe is
-  running to pin it down, and the 2-node x 16 result may shorten it. Louis decides whether to run it.
+  slip moved 35-45 % from ref4 to ref5. Probe-measured: ~38 h (~1.6 days) to the base at np 32 on one node
+  (+/- 30 %), 71 GB per node; two nodes do not help. Before a run: why the cold step 0 stalled at rel 0.77, and
+  whether the rising pressure iterations plateau (both being measured). Louis decides whether to run it.
 
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
@@ -2902,3 +2903,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   code). Fixable in software (a reduction-free smoother), with the skill's measured gmres-over-richardson margin
   against it; question to the dev hub (For the other hubs). Per Newton iteration np 16 / 32 / 2x16 / 52: 38.8 /
   28.4 / 27.9 / 30.7 s; Newton counts identical through step 26, partitions diverge at 27-29.
+- 2026-11-04: ref6 probe (3972, np 32, one node, steps 0-3): 7 levels, custom FMG built, label check 0 missing; 62.3
+  GB rss / 71.2 GB per node (fits every node). Steps 0-3: 239 / 940 / 577 / 1024 s, Newton 5 / 7 / 4 / 5, mean
+  pressure its 4.0 / 19.9 / 25.8 / 37.4 (rising), dt 1.76-1.79e-6 (production 3.3-3.6e-6: halved). Kaiju's
+  corrected estimate: ~4.5x production per step at np 32 (~850 s), ~160 steps, ~38 h (~1.6 days) at np 32, ~1.9 days
+  at np 16, +/- 30 %. Step 0 (cold, unfaulted) did NOT converge: Newton stopped at 5 with rel 0.77. Hub asked for
+  (1) production's pressure its for comparison and the probe continued to step 10 to see whether they plateau, and
+  (2) the cause of the step-0 stop (cap, line search, linear stall) with reasons per iteration. ref6 waits on Louis.
