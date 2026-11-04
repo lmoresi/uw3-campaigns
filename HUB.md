@@ -72,6 +72,10 @@ No long campaigns.
   no scratch filesystem.
 - **There are no GitHub credentials on kaiju.** Fixes come to the hub as `git format-patch`
   output, and the hub pushes them.
+- **The kaiju session's sandbox (2026-11-03 allow-list) cannot resolve the Slurm controller.** A plain
+  `squeue`/`sbatch` from the session works; a compound command (`date; squeue`, `squeue | head`) runs inside the
+  sandbox and fails with "Unable to resolve kaiju.anu.edu.au". Every "Slurm outage" recorded on 2026-11-02..04 was
+  this (kaiju's correction, 2026-11-04); the cluster never failed and nothing is for the admin.
 
 **wombat (laptop)**: development only since 2026-10-23, no production runs (8-core budget).
 Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to kaiju.
@@ -2663,8 +2667,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Earth run 2 ~2.5 h.
 - 2026-11-04: Earth run 2 diverging from run 1 (slip 3.4x at step 45) while TAf-v2 tracks its twin; not a baseline
   until the cause is found; three one-knob arms from run 1's checkpoint 20 ordered (band width via -uw_spacing
-  0.004, inset 3, v2 as is). Slurm resolution failing again from the kaiju session (second time); for Louis.
-- 2026-11-04: Slurm answered again (the morning failure was transient). Isolation arms queued as job array 3843
+  0.004, inset 3, v2 as is). Slurm resolution failing again from the kaiju session (second time); for Louis
+  (WITHDRAWN below).
+- 2026-11-04: Slurm answered again (WITHDRAWN below: never an outage). Isolation arms queued as job array 3843
   (a: v2 as is; b: -uw_spacing 0.004; c: -uw_split_inset 3), 10 steps each from run 1's checkpoint 20 on the v2
   build; (d) -uw_detect_every 5 follows if neither b nor c closes the gap. Proposal page v5 carries TAf-v2's 1.92x
   and Earth run 2's departure. Baselines: TAf-v2 near step 36, Earth run 2 near step 50, watch.logs clean.
@@ -2685,3 +2690,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   rebuild_cells series applied and merged to main (3486eeb, 76f161b, 9e69c6b; blobs bcced6f/1d9c660/d5d72d0/82cd923
   verified). TAf-v2 corrected 2.03x per step (proposal v6). The 1.92x on the cancelled run stood with its cut in the
   mantle; corrected the gain is larger, not smaller.
+- 2026-11-04: CORRECTION (kaiju): there was no Slurm outage, on any day. Every failed squeue was a compound command
+  the managed policy ran inside the sandbox, which cannot resolve kaiju.anu.edu.au; plain squeue always worked, as did
+  Louis's. The "recurrence" items for Louis are withdrawn; the rule is in the kaiju machine section. Running: 3849
+  (TAf-v2_rr1, n2), 3850 (Earth run 2_rr1, n3); 3851 renders the corrected-run side-by-side movies (n4).
