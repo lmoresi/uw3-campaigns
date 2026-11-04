@@ -1438,6 +1438,19 @@ class FaultedMesh:
             self.p.array[:, 0, 0] = at(self.p, P, model_xy(self.p)).ravel()
         self.has_guess = True
 
+    def _live_pres_ksp(self):
+        """The live pressure sub-KSP of the rotated solve's cached KSP context, or None (no context yet, or not a
+        fieldsplit context)."""
+        cache = getattr(self.stokes, "_rotated_linear_cache", None) or {}
+        ksp = (cache.get("ctx") or {}).get("ksp")
+        if ksp is None:
+            return None
+        try:
+            subs = ksp.getPC().getFieldSplitSubKSP()          # ("vel", "pres"): the pressure block is the second
+            return subs[1] if len(subs) > 1 else None
+        except Exception:
+            return None
+
     def _set_pres_rtol(self, rtol):
         """The rotated solve's Schur (pressure) sub-KSP rtol for the next solve. The library reads
         solver._rotated_pres_rtol when it builds the KSP context and then reuses that context across solves
@@ -1445,17 +1458,23 @@ class FaultedMesh:
         if rtol is None or rtol <= 0 or rtol == self.pres_rtol_now:
             return
         self.stokes._rotated_pres_rtol = float(rtol)
-        cache = getattr(self.stokes, "_rotated_linear_cache", None) or {}
-        ctx = cache.get("ctx") or {}
-        ksp = ctx.get("ksp")
-        if ksp is not None:
-            try:
-                subs = ksp.getPC().getFieldSplitSubKSP()      # ("vel", "pres"): the pressure block is the second
-                if len(subs) > 1:
-                    subs[1].setTolerances(rtol=float(rtol))
-            except Exception:                                # not a fieldsplit context (the vector route): rebuilt
-                pass
+        had_ctx = bool((getattr(self.stokes, "_rotated_linear_cache", None) or {}).get("ctx"))
+        sub = self._live_pres_ksp()
+        if sub is not None:
+            sub.setTolerances(rtol=float(rtol))
+        elif had_ctx and not getattr(self, "_pres_rtol_warned", False):
+            uw.pprint(f"  warning: the live pressure sub-KSP was not reachable; the pressure rtol {rtol} applies "
+                      f"only when the library rebuilds its KSP context (the solver record carries the rtol read back)")
+            self._pres_rtol_warned = True
         self.pres_rtol_now = float(rtol)
+
+    def _pres_rtol_applied(self):
+        """The pressure rtol the last solve actually ran with, read back from the live sub-KSP; None if unreadable."""
+        sub = self._live_pres_ksp()
+        try:
+            return float(sub.getTolerances()[0]) if sub is not None else None
+        except Exception:
+            return None
 
     def _stokes_solve(self, from_rest):
         # the TI VEP model is a viscoelastic class to the solver, which demands a timestep even with
@@ -1466,7 +1485,8 @@ class FaultedMesh:
         self.stokes.solve(zero_init_guess=from_rest, picard=params.uw_picard,
                           verbose=bool(params.uw_verbose), **extra)
         info = self.stokes._rotated_freeslip_info
-        info["pres_rtol_used"] = self.pres_rtol_now
+        info["pres_rtol_used"] = self._pres_rtol_applied()      # read back, not the requested value (hub review)
+        info["pres_rtol_requested"] = self.pres_rtol_now
         return info
 
     def solve(self):
@@ -1517,7 +1537,7 @@ class FaultedMesh:
             raise RuntimeError(
                 f"the first solve of this fresh run did not converge: {why}, rel |F| {rel:.2e} after "
                 f"{info.get('nonlinear_iterations')} iterations (line-search alpha {alpha}), pressure rtol "
-                f"{self.pres_rtol_now}. The run stops rather than step on from an unsolved initial flow; tighten "
+                f"{info.get('pres_rtol_used')}. The run stops rather than step on from an unsolved initial flow; tighten "
                 f"-uw_pres_rtol_cold, or see the solver record")
         FIRST_SOLVE = False
         self.stokes.newton_switch_rtol = params.uw_warm_newton_switch
