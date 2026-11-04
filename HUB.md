@@ -195,6 +195,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
 | Fault-division design (the knob removed: rungs = the locator's points at the local cell size, W = BAND_CELLS x mean local h; offline placement check on 80 faults; the draft diff) | https://claude.ai/artifact/UANqhA82AfRoh7fjgrPwYG |
+| Side-by-side movies, old run left / recipe v2 rerun right, matched by step (TAf_env vs TAf-v2; Earth run 1 vs run 2): trench window (T, log strain rate) and whole annulus with the surface-velocity ring fixed at 6000; labels step, time, tip depth, vrms, plate speeds. Re-rendered over the whole history at the base | https://claude.ai/artifact/Q1Dq1epuXoEjPnKN7rzcKL |
 | Recipe v2 production proposal (v5): the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs; TAf-v2's measured 1.92x per step at the same Newton count with the twin comparison at step 30; Earth run 2's departure and the isolation in progress | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
 | Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
@@ -2661,3 +2662,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (a: v2 as is; b: -uw_spacing 0.004; c: -uw_split_inset 3), 10 steps each from run 1's checkpoint 20 on the v2
   build; (d) -uw_detect_every 5 follows if neither b nor c closes the gap. Proposal page v5 carries TAf-v2's 1.92x
   and Earth run 2's departure. Baselines: TAf-v2 near step 36, Earth run 2 near step 50, watch.logs clean.
+- 2026-11-04: side-by-side movies (Louis asked kaiju; page Q1Dq1epuXoEjPnKN7rzcKL, render jobs 3847/3848). No
+  breakoff, no stagnant lid in any run. TAf-v2 and TAf_env are the same evolution. Earth run 2 follows run 1's slab
+  path but reaches each stage in ~2/3 of the model time with plates 1.5-2x faster; from step 20 a stronger, wider
+  high-strain-rate zone along the fault and under the trench (fits the band-width suspicion). Late: run 1's
+  overriding plate stops (-36 at step 55) and its trench stalls; run 2's is still at -2882. Arms 3843 at steps 24-26.
