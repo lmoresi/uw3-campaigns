@@ -1340,6 +1340,17 @@ refuses deletions from here, so this needs a laptop or Louis.
   CI's pixi `dev` environment from pixi.lock to reproduce CI's keys.
 - 2026-11-04: **#942 merged** (045466df), green on every shard; #936 relabelled
   fixed-in-development. Development at 045466df.
+- 2026-11-04: **PR #943** (#917, `bugfix/jit-key-softness-917`). Cause: SymPy names an
+  unnamed Dummy from a process-wide counter and sorts dummies by that name as a string;
+  `_jit_graph.KernelGraph._split_shared` hid leaves behind unnamed dummies, so a rebuild
+  whose dummies straddled a power of ten (999 to 1000) shared differently under cse: same
+  kernel, different source and key. Fix: fixed-width dummy names; the generated C is
+  byte-identical (16 distinct sources across test_0022-26, the 17th was the
+  counter-dependent variant). test_0027 fails before (6 offsets) and passes after. The
+  branch had merged #938's tip instead of development's merge commit (two merge bases,
+  GitHub reported a conflict, no CI); the hub merged development 045466df in (430ef613,
+  clean, net change the four #917 files). **#917's fix was the hub's request, not
+  Louis's: the merge goes to him for a yes on green.**
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
