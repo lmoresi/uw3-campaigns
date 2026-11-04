@@ -2782,3 +2782,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault against the first fit); hub ruled a grace (GAP_GRACE = first checkpoint, WATCH not pause) rather than a
   higher limit; patch applied as 23f509d (kaiju 4fb23d2; blobs 637e988 / 74a0d87 verified) and merged. New
   launches and resumes after a pause use it; 3953 stays on the 57affaa stopgap to the base with hand checks.
+- 2026-11-04: **Earth run 2_c (3858) reached the base** (tip on base at checkpoint 75, stopped after 80). ACCEPTANCE:
+  built cut 0.0 hot, gap 0.0161; every FAULT line 5-80 0.0 hot. Kaiju continued it to a full overturn as job 3957
+  (same dir, from checkpoint 80, 23f509d, STOP_AT_BASE=0, up to 400 steps, 72 h; estimate t ~0.0015, ~250 steps,
+  15-20 h). Driver file unchanged 9e69c6b..23f509d (watcher/tools only). Louis had been asked to pick the overturn
+  case (Earth or TAf-v2); whether he chose Earth is to confirm. Base page (run 2_c vs run 1) next.
+  ref4 (3952) paused at checkpoint 30 on the old whole-cut rule (0.136 at checkpoint 25; by 23f509d's split top
+  0.097, deep 0.171, gap 1.47 cells); resumed on 23f509d as 3955. The top came within 0.003 of HOT_PAUSE at this
+  resolution, where the gap in model units is twice production's: to be stated on the resolution page. ref4 costs
+  15-25 s per step against 180-230 s at refinement 5. TAf-v2_c (3953) hand checks: checkpoints 60/65 0.0 hot, gap
+  1.11/1.20 cells. sbatch "I/O error writing script/environment" recurred once and succeeded on retry: intermittent,
+  controller side, nothing for the admin unless it persists.
