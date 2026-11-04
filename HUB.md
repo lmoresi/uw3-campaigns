@@ -136,10 +136,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
   template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
   if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
-- **Kaiju launcher setting for independent runs (2026-11-01, measured):** three 16-rank jobs per node, --mem=60G,
-  no --exclusive, core binding, no socket pinning (pinning has no effect); 2.1x node throughput. Timing studies and
-  cost comparisons stay exclusive (a shared node slows each job ~1.45x whether two or three share it). Page
-  1CFNXD4TpQLX5jfeTdMN8k v2.
+- **Kaiju launcher setting for independent runs (REVISED 2026-11-04, measured on recipe v2):** two 26-rank runs per
+  node, each a 26-task step in one 52-task exclusive allocation, one per socket (~/+Claude/kaiju/launch/pack3/
+  sock2_job.sh; placement confirmed by cpu-bind masks): ~1.2x node throughput against one np 32 run (25 against
+  29.7 s per Newton iteration per node). Pitfalls: Slurm gives an --exact step cores in order, so a 16-task step in
+  a 48-task allocation lands wholly on socket 0; three 16-rank steps at --mem 55G exceed a 140 GB node. Packed runs
+  at np 26 are not bit-comparable with np 16 runs (the trajectory spreads a few % by 10 steps across decompositions).
+  The 2026-11-01 figure (three 16-rank jobs, 2.1x, page 1CFNXD4TpQLX5jfeTdMN8k v2) was measured on the old recipe and
+  does not hold for v2, whose steps are memory-bandwidth bound. Timing studies stay exclusive.
 - **The drivers are not underworld3; their decisions live beside them (Louis, 2026-11-02).** "We treat the driver
   for the fault runs as something that is fundamentally part of underworld. But it isn't ... we need to make sure
   these decisions are recorded in places that other claudes and human users can pick them up." The ledger is
@@ -741,6 +745,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **Warm Newton switch 1e-1 (2026-11-04):** -13 % per step on TAf-v2 (48 against 55 Newton in 10 steps) with the
+  answer unchanged to 1.5e-4 in vrms; 3e-2 is slower and further off. A DECISIONS change. The hub recommends it once
+  an Earth confirmation (every-step detection, more rebuilds) holds; that run is ordered.
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
@@ -2890,7 +2898,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (1.19x at 32 and 52). MG Apply 85-87 % of the time; MatSOR 1.45x and MatMult 1.17x from 16 to 52, VecScatterEnd
   up 220 -> 380 s: memory-bandwidth bound, the node saturates by np 32. The one-rank FAC patch is 1.6-2.3 % of the
   time: the ceiling on a decomposed SuperLU/MUMPS patch, not worth doing. Levers on kaiju, in order: resolution
-  (ref4 ~17x, with caveats), packing np 16 runs (2.1x node throughput), fewer MG applications (warm Newton switch,
+  (ref4 ~17x, with caveats), packing np 16 runs (2.1x node throughput; REVISED to ~1.2x, 2026-11-04), fewer MG applications (warm Newton switch,
   inexact inner solve). More ranks per run is not one. Hub: kaiju's ref6 estimate (~8x the steps) contradicts its
   own ref4/ref5 pair (2x); ref6 should be ~160 steps to the base, ~35-40 h on one node; kaiju to restate. A 2-node x
   16 np 32 point ordered (bandwidth vs TCP scatter) for single long runs. ref6 waits on Louis.
@@ -2950,3 +2958,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   can claim an rtol that was not applied if the live sub-KSP is unreachable (follow-up). Follow-up applied as 131cb89 (kaiju 3081acc,
   blob 462de6e verified): pres_rtol_used is read back, pres_rtol_requested beside it, a warning once if the sub-KSP
   is unreachable; job 3980 confirmed 1e-4 at step 0 and 1e-2 at step 1, answers as 3979.
+- 2026-11-04: throughput arms (TAf-v2 from checkpoint 20, 10 steps, f631ce42 / 23f509d), s per Newton iteration per
+  node: np 16 alone 40.6; np 32 alone 29.7; np 52 alone 32.1; np 16 on one socket 53.6; two np 26 runs one per socket
+  25 for the node (job 3982). Packing on v2 is ~1.2x node throughput, not 2.1x; the pack3 jobs were confounded by
+  Slurm's in-order core placement (bind probe 3981) and pack3 v2's third step never started (--mem). Warm Newton
+  switch on the same node and socket (np 16): 1e-1 48 Newton against 55, 256 against 295 s per step (-13 %), vrms
+  904.93 against 904.79, slip 3555 against 3554; 3e-2 51 Newton, -6 %, vrms 909.73. Together ~1.35x per node
+  against np 32 alone. Decomposition spread: step-30 vrms 904.8 / 870.8 / 883.2 at np 16 / 26 / 32; same-np runs
+  match to all digits. Hub: switch 1e-1 recommended to Louis after an Earth confirmation (two np 26 runs on one
+  node, control vs 1e-1, 15 steps from checkpoint 40). Earth overturn 3957 at step 159+, fault in slab; cell025 at
+  step 21 (~880 s per step); ref6 s10 (3978) running.
