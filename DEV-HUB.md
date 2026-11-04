@@ -1128,6 +1128,7 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | Rotated free slip on a spherical shell with the default `normal=None`: facet-averaged normals violate all three rotations by 0.008-0.016, so none is detected. The answer carries an undetermined rigid rotation (v_rms 4.47 against 1.77) and takes 83 velocity its against 18. The annulus is unaffected; CLAUDE.md recommends `normal=None` | the #901 work | #906 | **Louis: null modes belong in the mesh metadata.** They are already there (`Mesh.nullspace_rotations`, since 2026-04-07, set by the annulus, shell and segmented constructors) but the rotated path ignores them: it rebuilds the rotations and filters them by a 1e-8 constraint test, which is the failure. The integration session is to make the rotated path read the declared modes (stacked on #901), then measure facet normals against the analytic normal on the shell for Louis's remaining choice |
 | `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
+| Rotated free slip with the analytic wall normal: from np 24 an owned outer-wall vertex can get no constraint row. No-solve repro on unfaulted TAc: np 16 none missing, np 32 three missing, two of them with a labelled facet on their owning rank, so the cause is wider than "facets all on other ranks". Solved at np 32, the wall-normal velocity reaches 1.2e4. The geometric normal is clean at np 32 but admits the rigid rotation (#906) | kaiju, 2026-11-04 | #935 | filed by kaiju through the science hub. Blocks np > 16 on the annulus with either normal until #935 or #906 lands. Not a duplicate of #906 or #896. No owner yet |
 
 ## Issue queue (2026-10-29)
 
@@ -1273,6 +1274,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   analytic-normal defect. Kaiju's own numbers: np 52 against 16 is 339 against 487 s per
   step (1.44x); the serial patch is 5-8 s of a 150-230 s step, so the patch alone is not
   the 2x.
+- 2026-11-04: kaiju: the analytic-normal defect is #935 (repro above, in the problems
+  table). superlu_dist and MUMPS are both in the kaiju image's PETSc 3.25. The np 16 against
+  np 52 timing on the current recipe runs as jobs 3854/3855 (10 steps from TAf-v2
+  checkpoint 20, driver 9e69c6b, staged `-log_view`), reporting through the science hub.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
