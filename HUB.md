@@ -201,6 +201,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
 | Fault-division design (the knob removed: rungs = the locator's points at the local cell size, W = BAND_CELLS x mean local h; offline placement check on 80 faults; the draft diff) | https://claude.ai/artifact/UANqhA82AfRoh7fjgrPwYG |
 | Side-by-side movies, old run left / recipe v2 rerun right, matched by step (TAf_env vs TAf-v2; Earth run 1 vs run 2): trench window (T, log strain rate) and whole annulus with the surface-velocity ring fixed at 6000; labels step, time, tip depth, vrms, plate speeds. Re-rendered over the whole history at the base | https://claude.ai/artifact/Q1Dq1epuXoEjPnKN7rzcKL |
+| Resolution comparison: TAf-v2 at refinement 4 against production (refinement 5), matched by tip depth, evolution and cost tables; cell025 (same resolution, other triangulation) to follow | https://claude.ai/artifact/B83QxCPeYmX2f9HMjx9W4e |
 | Recipe v2 production proposal (v5): the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs; TAf-v2's measured 1.92x per step at the same Newton count with the twin comparison at step 30; Earth run 2's departure and the isolation in progress | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
 | Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
@@ -2817,3 +2818,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   resume; reached the base in about half the steps (~doubled dt). development f631ce42 carries #937 (#902) and #938
   (#935), both merged green (DEV-HUB); kaiju built an overlay (~/+Claude/kaiju/uw3/overlay-dev-f631ce42) and runs the
   merged-build np 16 vs np 52 test on the production mesh, exclusive, no workarounds, plus np 32 if a node is free.
+- 2026-11-04: resolution page (B83QxCPeYmX2f9HMjx9W4e): ref4 ~17x cheaper to the base (0.25 h vs 4.4 h; 23 vs 197 s
+  per step; 40 vs 80 steps); same slab shape at matched depth, but it runs ahead (vrms peak 1521 at t 1.2e-4 vs
+  ~1440-1500 at 1.8e-4; plates 5323 vs 3631; base at t 1.89e-4 vs 2.20e-4) and at the base the trench has retreated
+  less (-5.3 vs -8.1 deg) and the fault slipped less (2382 vs 4273). Kaiju: a fast preview of the descent, not a
+  substitute where trench and slip matter; cause suspected to be the one-cell band at twice the physical width
+  (a hypothesis: it is confounded with the lid and slab boundary layers at half the cells). Hub's note: two points
+  cannot show production is converged; a 35-45 % change in trench and slip from ref4 to ref5 means ref5 itself may
+  be off by a fair fraction of that, so refinement 6 (np 52, now possible on f631ce42) is the test of production.
+  Movie page v5 (Q1Dq1epuXoEjPnKN7rzcKL): TAf-v2_c tracks TAf_env (step 70: tips 0.915 at t 2.0e-4, vrms 1289 vs
+  1335); the step-10 straight cut is gone. Earth overturn 3957 clean at checkpoints 85/90/95; TAf-v2_c near its base
+  (checkpoint 80: 1 % whole-cut hot, gap 1.16 cells). Merged-build test: np 52 (3959) running, np 16 (3960) and np 32
+  (3961) queued. cell025 (3951) slow (448-cell coarse level), at checkpoint 5.
