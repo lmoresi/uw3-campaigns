@@ -271,6 +271,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## For the other hubs
 
+- 2026-11-04, to the dev hub, from Louis's throughput ask ("Agreed - empirical, but let's try all these options"):
+  the inexact inner velocity solve cannot be tested by a driver knob. On the rotated path the velocity sub-KSP rtol
+  is fixed in the library at 0.033 x the SNES tolerance (the driver records it as velocity_rtol_rotated); the
+  driver's uw_vel_rtol acts on the native path only. Louis wants it measured: please expose the rotated velocity
+  rtol (an option or petsc prefix, default unchanged) so kaiju can run arms of 10 steps from TAf-v2 checkpoint 20
+  (0.033 x tol as control, then e.g. 0.1 and 0.3 x tol), reporting s per step, MG applications, Newton count and the
+  answer's change. This is a solver-stability-sensitive knob: exposure only, no default change without the arms.
 - 2026-11-04, to the dev hub: #935 and #902 VERIFIED on the zg95 production mesh by kaiju on development f631ce42
   (np 52: 0 of 1,792 Upper / 1,024 Lower owned wall points missing; custom FMG builds at np 52 with the 124-cell
   coarse level, no fallback; |v.n| 6.1e-13). Add to the issues if useful. Scaling answer to Louis's SuperLU question:
@@ -2860,3 +2867,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hub's 35-40 h was wrong (it used kaiju's earlier 4-5x per step). Hub authorised a 3-step ref6 probe (fresh, np 32
   or 16, f631ce42 / 23f509d, one exclusive node) to pin it down; the run itself waits on Louis. 2-node x 16 point
   queued as 3971 (IPoIB TCP over ib0, not RDMA).
+- 2026-11-04: Louis on the throughput levers: "Agreed - empirical, but let's try all these options." Queued on
+  f631ce42 / 23f509d: 3971 (2 nodes x 16); 3972 (ref6 probe, np 32, steps 0-3); one packed job of three 16-rank
+  runs from TAf-v2 checkpoint 20 (control, -uw_warm_newton_switch 3e-2, 1e-1; pack3_*), re-measuring packing
+  against exclusive 3960 and the switch's saving and answer change. The ledger's warm-switch lever was the switch's
+  reference (the rest-state residual, so warm steps run 5-6 Picard iterations); the arms raise its value instead, a
+  proxy for the same effect. Inexact inner velocity solve: library-fixed on the rotated path; passed to the dev
+  hub (For the other hubs).
