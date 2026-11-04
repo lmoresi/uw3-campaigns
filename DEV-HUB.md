@@ -1042,13 +1042,13 @@ taken to the finish.
   close #626 if #638's ladder and #664's `embed=` realise it; correct the
   topic page's "2-D, 3-D and parallel" claim.
 
-## Open pull requests (2026-11-04, `development` at 60dbf0e4)
+## Open pull requests (2026-11-04, `development` at f631ce42)
 
 **Merged 2026-11-01 to 11-04 on Louis's word:** #912 (#892), #913 (#894), #914 (#896),
 #915 (levels accessor), #916 (#907), #929 (squash, 6321c714), #928 (d9783f02), #927
 (f53bbffb), #926 (e7dfbf9a), #930 (af6f19b3), then the stack #932 (2556c979), #933
-(4ee0b13d), #934 (60dbf0e4). The ten PRs in the table below are still the open set
-(checked 2026-11-04).
+(4ee0b13d), #934 (60dbf0e4), #937 (#902, c514013f), #938 (#935, f631ce42). The ten PRs in
+the table below are still the open set (checked 2026-11-04).
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
 admin, which Louis ordered):
@@ -1323,6 +1323,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   stacked on #938's branch, in pre-PR review. Its finding: the integral skipped a node
   whose first component is constrained, so it read the pool only where v_x is free and v_y
   pinned (-207 against 3292). #917: kaiju reproducing with CI's `--dist loadfile -n 4`.
+- 2026-11-04: **#937 merged** (c514013f) and **#938 merged** (f631ce42), each green on every
+  shard; #938 was clean on top of #937. #902, #886 and #935 relabelled
+  fixed-in-development. Development at f631ce42 now builds the custom FMG above 16 ranks
+  and constrains every analytic-normal wall node. #936's PR is to target development.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
