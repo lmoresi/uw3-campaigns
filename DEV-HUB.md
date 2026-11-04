@@ -540,6 +540,9 @@ failures beyond the baseline; PRs being opened from the laptop.**
   **#934** (#925, a2e38396, base #921's branch), reviews as first comments, development
   through #927 merged into the base of the stack. Merge order on green: #932, then #933 and
   #934 retargeted; #933 never without #934. Louis's "merge the stack" covers all three.
+  **Merged 2026-11-04**, all green on every shard: #932 2556c979, #933 4ee0b13d, #934
+  60dbf0e4 (development's tree equals #934's tested head e8957186). #918, #921 and #925
+  relabelled fixed-in-development.
   Correction to the hub's row 5 shorthand: 820 / 94 / 344 are serial (TI blocks alone;
   with the structural block, the #921 result; with the band mask also keyed); 1179 / 439 /
   131 are np 4 on development (TI alone; band mask keyed; structural patch alone with the
@@ -1039,7 +1042,13 @@ taken to the finish.
   close #626 if #638's ladder and #664's `embed=` realise it; correct the
   topic page's "2-D, 3-D and parallel" claim.
 
-## Open pull requests (2026-10-31, `development` at fc67b650)
+## Open pull requests (2026-11-04, `development` at 60dbf0e4)
+
+**Merged 2026-11-01 to 11-04 on Louis's word:** #912 (#892), #913 (#894), #914 (#896),
+#915 (levels accessor), #916 (#907), #929 (squash, 6321c714), #928 (d9783f02), #927
+(f53bbffb), #926 (e7dfbf9a), #930 (af6f19b3), then the stack #932 (2556c979), #933
+(4ee0b13d), #934 (60dbf0e4). The ten PRs in the table below are still the open set
+(checked 2026-11-04).
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
 admin, which Louis ordered):
@@ -1149,9 +1158,8 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## Waiting on Louis
 
-- After #892's fix and the re-measurement: the production multigrid tail for faults
-  (welded base with the FAC LU patch, or the chain).
-- Confirm the role above (proposes and briefs on your go; never approves or merges).
+- (Settled 2026-11-02: the add-on is the production tail. Settled 2026-10-31 on: the hub
+  merges PRs Louis has ordered, on green CI.)
 - The next merges: #780, #861, and #862 after its caveat; whether the hub re-reviews
   gthyagi's fixes on #855, #858, #859.
 - An owner for #800 (conflicts with `development`, idle since 2026-10-12) and for the
@@ -1278,6 +1286,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   table). superlu_dist and MUMPS are both in the kaiju image's PETSc 3.25. The np 16 against
   np 52 timing on the current recipe runs as jobs 3854/3855 (10 steps from TAf-v2
   checkpoint 20, driver 9e69c6b, staged `-log_view`), reporting through the science hub.
+- 2026-11-04: **the stack is merged**: #932 2556c979, #933 4ee0b13d, #934 60dbf0e4, all
+  green on every shard; development's tree equals #934's tested head. #918, #921, #925
+  relabelled fixed-in-development. Next from the integration session: #917's small PR.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
