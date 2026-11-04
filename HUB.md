@@ -2755,3 +2755,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   run with the 57affaa watcher; a resolution table of both meshes (where they actually differ, since h_b is
   0.0156 in both); a side-by-side movie against TAf-v2_c matched by tip depth; vrms / slip / trench / plate speeds
   against tip depth; fault-in-slab for both; on a page.
+- 2026-11-04: kaiju CORRECTION: the cell 0.25 / ref 4 mesh is NOT coarser at the walls (identical: 1,792 Upper /
+  1,024 Lower P2 points); it has the same h_b, S, W, ~10 % fewer cells overall and is ~10 % finer in the trench
+  region (another gmsh base triangulation; refinement uniform in both, no grading). So production vs cell025 tests
+  sensitivity to the base triangulation at the same resolution, not resolution. 3951 (cell025, np 16, from step 0,
+  57affaa) runs on as that noise floor. For Louis's resolution question the hub ordered TAf-v2 at -uw_cell 0.5
+  -uw_refinement 4 (production's base, h_b = S = 0.0312, W = 0.0625; band widens with the cell by the recipe), np
+  16, from step 0; refinement 6 waits on #902/#935 (np 52), kaiju to estimate its cost. Page three-way. On cell025
+  np 52 is SLOWER than np 16 (430 vs 310 s per step, same answer): suspect the 448-cell coarse level's dense SVD on
+  every rank (#901); -log_view from 3941/3942 to confirm, then to the dev hub as the case for #901's A-prime PR.
