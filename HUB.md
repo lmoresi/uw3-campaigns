@@ -744,7 +744,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
-  Patch READY on branch kaiju/pres-rtol-cold d43ccae (kaiju 55c1808, blobs verified), not merged: uw_pres_rtol_cold
+  Patch READY on branch kaiju/pres-rtol-cold, head 131cb89 (d43ccae = kaiju 55c1808, plus 131cb89 = kaiju 3081acc,
+  the record reads the applied rtol back from the live sub-KSP; blobs verified; job 3980 read back 1e-4 cold and
+  1e-2 warm), not merged: uw_pres_rtol_cold
   1e-4 for cold solves, 1e-2 warm, and a fresh run whose first solve fails stops. At refinement 5 it is invisible
   (job 3979: step-0 vrms 442.524 vs 442.523, +48 s once per run; warm steps identical to 6 figures). Louis to accept
   (merge then makes it the default). Also for him: kaiju's mid-run proposal, a hard stop only when keep-best's kept
@@ -2945,4 +2947,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-04: cold-solve patch applied on branch kaiju/pres-rtol-cold as d43ccae, unmerged pending Louis. Kaiju's
   production check (3979, ref5, steps 0-2): step 0 at 1e-4 vrms 442.524 vs 442.523 at 1e-2 (+48 s), warm steps
   1-2 at 1e-2 pressure its and vrms identical to TAf-v2_c's (the live sub-KSP switch works). Hub review: the record
-  can claim an rtol that was not applied if the live sub-KSP is unreachable (follow-up).
+  can claim an rtol that was not applied if the live sub-KSP is unreachable (follow-up). Follow-up applied as 131cb89 (kaiju 3081acc,
+  blob 462de6e verified): pres_rtol_used is read back, pres_rtol_requested beside it, a warning once if the sub-KSP
+  is unreachable; job 3980 confirmed 1e-4 at step 0 and 1e-2 at step 1, answers as 3979.
