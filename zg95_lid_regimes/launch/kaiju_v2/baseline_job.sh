@@ -12,7 +12,10 @@
 #    detected fault in base cells, logged as a FAULT line. The run pauses at the next complete checkpoint, as the
 #    convergence trigger does, when the top's hot fraction exceeds HOT_PAUSE (0.10) or the gap exceeds GAP_PAUSE (2.0)
 #    base cells; a hot deep end is a WATCH line only (it runs along the slab top's warm margin near the depth cap, and
-#    a five-step lag puts part of the built cut in it: TAf-v2 checkpoint 50, TAf_env on the old recipe likewise).
+#    a five-step lag puts part of the built cut in it: TAf-v2 checkpoint 50, TAf_env on the old recipe likewise). The
+#    gap pause does not apply at checkpoints n <= GAP_GRACE (default EVERY, the first checkpoint): there the gap measures
+#    the initial straight fault against the first fit, not drift (TAf-v2_c: 1.94 base cells at checkpoint 5), and is a
+#    WATCH line; the top's pause applies from the first checkpoint.
 # Every unconverged step goes into the README with its Newton count and final relative residual. Events go to
 # watch.log in the run dir. At the end the acceptance lines: the last checkpoint's fault-in-slab numbers and the
 # KSP-cap check.
@@ -26,6 +29,7 @@ FIS=${FIS:-$(dirname "$(dirname "$SCRIPT")")/analysis/fault_in_slab.py}   # besi
 HOT_PAUSE=${HOT_PAUSE:-0.10}               # the top of the built cut: hot fraction that pauses
 GAP_PAUSE=${GAP_PAUSE:-2.0}                # the built cut's gap to the detected fault, base cells, that pauses
 TOP_DEPTH=${TOP_DEPTH:-0.09}               # the top of the cut: depth <= TOP_DEPTH
+GAP_GRACE=${GAP_GRACE:-$EVERY}             # no gap pause at checkpoints n <= GAP_GRACE (the first fit replaces the initial fault)
 STOP_AT_BASE=${STOP_AT_BASE:-1}            # 0: log the base and run on (a full overturn)
 LOG=$D/watch.log
 note() { echo "$(date '+%F %T') $*" >> "$LOG"; }
@@ -85,6 +89,7 @@ cat >> "$D/README.md" <<TXT
 | HOT_PAUSE (hot fraction of the built cut's top that pauses) | $HOT_PAUSE |
 | GAP_PAUSE (built cut to detected fault, base cells, that pauses) | $GAP_PAUSE |
 | TOP_DEPTH (the top of the cut: depth <= this) | $TOP_DEPTH |
+| GAP_GRACE (no gap pause at checkpoints n <= this) | $GAP_GRACE |
 TXT
 setsid bash /home/louis/campaigns/kaiju-launch/kaiju_uw3_job.sh "$@" &
 RUN=$!
@@ -105,7 +110,15 @@ while kill -0 "$RUN" 2>/dev/null; do
         if over "$top" 0 || over "$deep" 0; then
             note "WATCH: the built cut reaches hot mantle at checkpoint $n (top $top, deep $deep, gap $cells base cells)"
         fi
-        if [ "$why" != pause ] && { over "$top" "$HOT_PAUSE" || over "$cells" "$GAP_PAUSE"; }; then
+        gap_pause=0
+        if over "$cells" "$GAP_PAUSE"; then
+            if [ "$n" -le "$GAP_GRACE" ]; then
+                note "WATCH: gap $cells base cells at checkpoint $n is above GAP_PAUSE $GAP_PAUSE, within the grace (n <= GAP_GRACE $GAP_GRACE: the first fit replacing the initial fault); no pause"
+            else
+                gap_pause=1
+            fi
+        fi
+        if [ "$why" != pause ] && { over "$top" "$HOT_PAUSE" || [ "$gap_pause" = 1 ]; }; then
             echo "built cut at checkpoint $n: top hot fraction $top (pause above $HOT_PAUSE), gap $cells base cells (pause above $GAP_PAUSE)" > "$D/.trigger"
             note "TRIGGER: $(cat "$D/.trigger"); stopping at the next complete checkpoint"
             stop_at=$((n + EVERY)); why=pause
