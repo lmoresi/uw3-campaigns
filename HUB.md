@@ -746,9 +746,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Warm Newton switch 1e-1 (2026-11-04):** -13 % per step on TAf-v2 (48 against 55 Newton in 10 steps) with the
-  answer unchanged to 1.5e-4 in vrms; 3e-2 is slower and further off. A DECISIONS change. The hub recommends it once
-  an Earth confirmation (every-step detection, more rebuilds) holds; that run is ordered.
+- **Warm Newton switch 1e-1 (2026-11-04): TESTED ON BOTH CASES, the hub recommends it.** TAf-v2 (10 steps from
+  checkpoint 20): -13 % per step, 48 against 55 Newton, vrms 904.93 against 904.79. Earth run 2_c (15 steps from
+  checkpoint 40, 3 rebuilds, two np 26 runs on one node): -22 % per step (135 against 173 s), 64 against 87 Newton,
+  no failures or cold retries, the steps after rebuilds no worse, every step matching the control to 4-5 figures,
+  fault in the slab in both. A DECISIONS change (evidence in its Open list, campaign branch); Louis to rule.
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
@@ -2974,3 +2976,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   start): warm steps 1-10 all converged (4-7 Newton, no cold retries); pressure its plateau (~30 per Newton
   iteration from step 2); 780 s per step mean at np 32; ~35 h to the base. Earth warm-switch check 3983 (two np 26
   runs on n2, control vs 1e-1, 15 steps from checkpoint 40) running.
+- 2026-11-04: Earth warm-switch check (3983) holds: 1e-1 -22 % per step, no failures, answers to 4-5 figures, no
+  worse after rebuilds. Kaiju's ledger patch (3873a2e: ranks row with the decomposition floor, packing row revised to
+  one run per socket ~1.2x, the switch evidence in Open) applied on the campaign branch, blob e81d62f verified, and
+  merged to main. The switch row itself waits on Louis.
