@@ -1042,13 +1042,13 @@ taken to the finish.
   close #626 if #638's ladder and #664's `embed=` realise it; correct the
   topic page's "2-D, 3-D and parallel" claim.
 
-## Open pull requests (2026-11-04, `development` at 045466df)
+## Open pull requests (2026-11-04, `development` at 1f87430f)
 
 **Merged 2026-11-01 to 11-04 on Louis's word:** #912 (#892), #913 (#894), #914 (#896),
 #915 (levels accessor), #916 (#907), #929 (squash, 6321c714), #928 (d9783f02), #927
 (f53bbffb), #926 (e7dfbf9a), #930 (af6f19b3), then the stack #932 (2556c979), #933
 (4ee0b13d), #934 (60dbf0e4), #937 (#902, c514013f), #938 (#935, f631ce42), #942 (#936,
-045466df). The ten PRs in
+045466df), #943 (#917, 1f87430f). The ten PRs in
 the table below are still the open set (checked 2026-11-04).
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
@@ -1352,6 +1352,10 @@ refuses deletions from here, so this needs a laptop or Louis.
   clean, net change the four #917 files). **#917's fix was the hub's request, not
   Louis's: the merge goes to him for a yes on green.**
 - 2026-11-04: **Louis: "Yes, merge #943 on green".** CI running on 430ef613.
+- 2026-11-04: **#943 merged** (1f87430f), green on every shard; development's tree equals
+  430ef613. The first merge call hit a GitHub 502 and held a lock; the retry merged. #917
+  relabelled fixed-in-development. Next from the integration session: phase 1 item 4,
+  then the TODO(MEASURE) knobs PR.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
