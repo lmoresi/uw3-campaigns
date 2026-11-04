@@ -8,8 +8,11 @@
 #  - the pause trigger (the TAti supervisor v4's rule): two consecutive unconverged steps, or more than two in any ten,
 #    are logged at once and the run stops at the next complete checkpoint (one segment, so the pause is a stop).
 #  - the fault-in-slab check (2026-11-04): at every complete checkpoint, analysis/fault_in_slab.py measures the BUILT
-#    cut's hot-mantle fraction (T > 0.7) and its gap to the detected fault, logged as a FAULT line. Any hot fraction is a
-#    WATCH event; above 10 % the run pauses at the next complete checkpoint, as the convergence trigger does.
+#    cut's hot-mantle fraction (T > 0.7) over its top (depth <= TOP_DEPTH, 0.09) and its deep end, and its gap to the
+#    detected fault in base cells, logged as a FAULT line. The run pauses at the next complete checkpoint, as the
+#    convergence trigger does, when the top's hot fraction exceeds HOT_PAUSE (0.10) or the gap exceeds GAP_PAUSE (2.0)
+#    base cells; a hot deep end is a WATCH line only (it runs along the slab top's warm margin near the depth cap, and
+#    a five-step lag puts part of the built cut in it: TAf-v2 checkpoint 50, TAf_env on the old recipe likewise).
 # Every unconverged step goes into the README with its Newton count and final relative residual. Events go to
 # watch.log in the run dir. At the end the acceptance lines: the last checkpoint's fault-in-slab numbers and the
 # KSP-cap check.
@@ -20,7 +23,9 @@ D=${RUN_DIR:?run dir}; EVERY=${EVERY:?checkpoint interval}
 SIF=/home/louis/uw3/images/uw3-gadi-development-20261021.sif
 TIP=/home/louis/campaigns/kaiju-launch/slab_thermal_fault/tip_depth.py
 FIS=${FIS:-$(dirname "$(dirname "$SCRIPT")")/analysis/fault_in_slab.py}   # beside the driver's repo
-HOT_PAUSE=${HOT_PAUSE:-0.10}
+HOT_PAUSE=${HOT_PAUSE:-0.10}               # the top of the built cut: hot fraction that pauses
+GAP_PAUSE=${GAP_PAUSE:-2.0}                # the built cut's gap to the detected fault, base cells, that pauses
+TOP_DEPTH=${TOP_DEPTH:-0.09}               # the top of the cut: depth <= TOP_DEPTH
 STOP_AT_BASE=${STOP_AT_BASE:-1}            # 0: log the base and run on (a full overturn)
 LOG=$D/watch.log
 note() { echo "$(date '+%F %T') $*" >> "$LOG"; }
@@ -77,29 +82,32 @@ cat >> "$D/README.md" <<TXT
 |---|---|
 | STOP_AT_BASE | $STOP_AT_BASE (1: stop one checkpoint interval after the tip reaches 0.95; 0: run on) |
 | EVERY (checkpoint interval) | $EVERY |
-| HOT_PAUSE (built cut hot fraction that pauses) | $HOT_PAUSE |
+| HOT_PAUSE (hot fraction of the built cut's top that pauses) | $HOT_PAUSE |
+| GAP_PAUSE (built cut to detected fault, base cells, that pauses) | $GAP_PAUSE |
+| TOP_DEPTH (the top of the cut: depth <= this) | $TOP_DEPTH |
 TXT
 setsid bash /home/louis/campaigns/kaiju-launch/kaiju_uw3_job.sh "$@" &
 RUN=$!
 on_base=""; stop_at=""; why=""; checked=-1
-fault_check() {   # the fault-in-slab numbers of checkpoint $1 as "hot gap" (one line of JSON kept in fault_in_slab.jsonl)
-    local j; j=$(apptainer exec "$SIF" python3 "$FIS" "$D" --ckpt "$1" --json 2>/dev/null | tail -1)
+fault_check() {   # checkpoint $1 as "top deep gap cells" (built cut's hot fractions, gap; JSON kept in fault_in_slab.jsonl)
+    local j; j=$(apptainer exec "$SIF" python3 "$FIS" "$D" --ckpt "$1" --json --top "$TOP_DEPTH" 2>/dev/null | tail -1)
     [ -z "$j" ] && return 1
     echo "$j" >> "$D/fault_in_slab.jsonl"
-    python3 -c "import json,sys; c=json.loads(sys.argv[1]); print(c['built_hot_max'], c['gap_max'])" "$j"
+    python3 -c "import json,sys; c=json.loads(sys.argv[1]); print(c['built_hot_top_max'], c['built_hot_deep_max'], c['gap_max'], c['gap_cells_max'])" "$j"
 }
+over() { python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > float(sys.argv[2]) else 1)" "$1" "$2"; }
 while kill -0 "$RUN" 2>/dev/null; do
     sleep 120
     n=$(last_complete); n=${n:-0}
-    if [ "$n" -gt "$checked" ] && read -r hot gap < <(fault_check "$n"); then
+    if [ "$n" -gt "$checked" ] && read -r top deep gap cells < <(fault_check "$n"); then
         checked=$n
-        note "FAULT checkpoint $n: built cut hot fraction $hot, gap to detected $gap"
-        if python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > 0 else 1)" "$hot"; then
-            note "WATCH: the built cut reaches hot mantle at checkpoint $n (hot fraction $hot, gap $gap)"
+        note "FAULT checkpoint $n: built cut hot fraction top $top, deep $deep; gap to detected $gap ($cells base cells)"
+        if over "$top" 0 || over "$deep" 0; then
+            note "WATCH: the built cut reaches hot mantle at checkpoint $n (top $top, deep $deep, gap $cells base cells)"
         fi
-        if [ "$why" != pause ] && python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > float(sys.argv[2]) else 1)" "$hot" "$HOT_PAUSE"; then
-            echo "built cut hot fraction $hot > $HOT_PAUSE at checkpoint $n (gap $gap)" > "$D/.trigger"
-            note "TRIGGER: built cut hot fraction $hot > $HOT_PAUSE at checkpoint $n; stopping at the next complete checkpoint"
+        if [ "$why" != pause ] && { over "$top" "$HOT_PAUSE" || over "$cells" "$GAP_PAUSE"; }; then
+            echo "built cut at checkpoint $n: top hot fraction $top (pause above $HOT_PAUSE), gap $cells base cells (pause above $GAP_PAUSE)" > "$D/.trigger"
+            note "TRIGGER: $(cat "$D/.trigger"); stopping at the next complete checkpoint"
             stop_at=$((n + EVERY)); why=pause
         fi
     fi
@@ -132,10 +140,10 @@ EOF
         else
             cat >> "$D/README.md" <<EOF
 
-## $(date '+%Y-%m-%d %H:%M') PAUSED by the convergence trigger
+## $(date '+%Y-%m-%d %H:%M') PAUSED by a trigger (convergence or fault in slab)
 $(cat "$D/.trigger"); job ${SLURM_JOB_ID} stopped the driver after checkpoint $stop_at. A restart from it continues the run.
 EOF
-            note "PAUSED by the convergence trigger after checkpoint $stop_at"
+            note "PAUSED by a trigger after checkpoint $stop_at: $(head -1 "$D/.trigger")"
         fi
         break
     fi
@@ -144,8 +152,8 @@ wait "$RUN" 2>/dev/null; rc=$?
 [ -z "$why" ] && note "ENDED on its own (exit $rc; on the base at: ${on_base:-not reached})"
 # the end-of-run acceptance: the fault in the slab (last complete checkpoint), then the KSP caps
 n=$(last_complete); n=${n:-0}
-if read -r hot gap < <(fault_check "$n"); then
-    note "ACCEPTANCE fault in slab at checkpoint $n: built cut hot fraction $hot, gap $gap"
+if read -r top deep gap cells < <(fault_check "$n"); then
+    note "ACCEPTANCE fault in slab at checkpoint $n: built cut hot fraction top $top, deep $deep; gap $gap ($cells base cells)"
 else
     note "ACCEPTANCE fault in slab: no measurement at checkpoint $n"
 fi
