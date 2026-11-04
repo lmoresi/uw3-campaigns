@@ -2742,3 +2742,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   not open them (no duplicates). Kaiju's np 52 re-measure waits for a build carrying #902 and #935 (development
   after the merges, or the merged branches as a test build if the dev hub names one); the 1.44x and kaiju's np 52
   failure (#902's DMCreateInterpolation) predate both fixes.
+- 2026-11-04: kaiju's early np 52 read (3941 np 52 on n2, 3942 np 16 control on n7; TAf-v2 fresh, 15 steps,
+  25d62812) avoids both defects: #902 by a coarser base (-uw_cell 0.25 -uw_refinement 4, 448 coarse cells, finest
+  114,688), #935 by the integration session's driver workaround (workaround_analytic_normal_nodes.py,
+  addon-matrix-2026-11 3ade599; label check at np 52: 0 owned wall points missing on every level). Not production's
+  mesh (walls about half as finely resolved), so it compares np 16 with np 52 on that mesh only; the merged-build
+  test uses production's 0.5 / refinement 5. Let run (2 nodes, ~1 h). 3854 finished: the np 16 production-mesh
+  reference. Baselines: TAf-v2_c (3852) ~step 45, Earth run 2_c (3858) ~step 50, built cut in slab at every
+  checkpoint (hot 0.0, gap 0.003-0.024). 3849/3850 stopped at their bases (checkpoints 90, 80), superseded, kept.
