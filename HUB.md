@@ -711,7 +711,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
   failing disk "nvme0" with no serial; names can swap between installs. The hub asked hyperion for SMART / nvme
-  smart-log per serial (read-only). **The ~210 GB at /home/lmorese/lmoresi must be copied somewhere that survives
+  smart-log per serial (read-only); hyperion could not (sudo prompts; smartctl and nvme-cli not installed), so Louis
+  runs them. Hyperion's evidence without sudo: both PM9A1 2 TB, same firmware; nvme0 = PCI 10000:01:00.0, nvme1 =
+  10000:02:00.0; journalctl -k over the 6 boots since 2026-11-02 shows no I/O, medium, EXT4 or nvme reset errors on
+  either. October (claude-mirror transcripts): nvme0n1p3 was / with ext4 errors 2026-10-18, nvme1n1p1 was /mnt/data;
+  no serials then. Inference, not proof: same PCI slot order, so today's nvme0 is probably October's failing
+  drive, i.e. the OS is on it. SMART's error log decides. **The ~210 GB at /home/lmorese/lmoresi must be copied somewhere that survives
   first** (underworld3 19G, all committed and matching its remote branches as of the last fetch; Simulations 93G;
   hyperion-rescue-2026-10-20 94G, frozen, copy whole; claude-mirror incl. pre-reimage-2026-11-04/). After: data on
   the good disk mounted at /mnt/data so the pixi env and worktree paths work unchanged; install git, gh, pixi.
