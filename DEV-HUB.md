@@ -71,7 +71,7 @@ GitHub, or in session transcripts. If it dies:
 | science hub | `session_013CgVT1Gx9WTvaZVqU58HsQ` ("Underworld Science Hub"); keeps `HUB.md` |
 | docs hub | `session_01HxWvn87HYCEJodpgCdaBro` ("Underworld Docs and technical notes Hub"); keeps `DOCS-HUB.md` |
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
-| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below |
+| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
 | kaiju, dev runner | `session_01HxWvn9ik2HHt9ANKndJRDr` ("kaiju: dev runs 2"), created 2026-11-02 in Auto, replacing `...65HBbkFbSxnYfNuxR`, which locked itself out of its permissions and is archived. It runs suites, benchmarks and parallel checks of library branches on free nodes, in the held-queue order; it reports to the hub or, if refused, to the integration session |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
@@ -1327,6 +1327,9 @@ refuses deletions from here, so this needs a laptop or Louis.
   shard; #938 was clean on top of #937. #902, #886 and #935 relabelled
   fixed-in-development. Development at f631ce42 now builds the custom FMG above 16 ranks
   and constrains every analytic-normal wall node. #936's PR is to target development.
+- 2026-11-04: hyperion is out again (reimage); its clone, 12 worktrees and four detached
+  commits are all on remote branches, so nothing is lost. Kaiju told f631ce42 lets it drop
+  the #935 driver workaround and the enlarged coarse level.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
