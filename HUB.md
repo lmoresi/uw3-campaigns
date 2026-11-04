@@ -714,6 +714,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Refinement 6 for TAf-v2 (2026-11-04):** the test of whether production (refinement 5) is converged; trench and
+  slip moved 35-45 % from ref4 to ref5. Estimate ~3-4.5 days on one node (+/- 30 %), ~70-90 GB; a 3-step probe is
+  running to pin it down, and the 2-node x 16 result may shorten it. Louis decides whether to run it.
+
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -2850,3 +2854,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   inexact inner solve). More ranks per run is not one. Hub: kaiju's ref6 estimate (~8x the steps) contradicts its
   own ref4/ref5 pair (2x); ref6 should be ~160 steps to the base, ~35-40 h on one node; kaiju to restate. A 2-node x
   16 np 32 point ordered (bandwidth vs TCP scatter) for single long runs. ref6 waits on Louis.
+- 2026-11-04: ref6 estimate restated by kaiju: ~160 steps to the base (2x, agreed), but ~9x per step from ref4 to
+  ref5 (23 -> ~200-220 s, extra MG level and bandwidth-bound smoothers on a 4x working set), so ~30 min per step at
+  np 16, ~25 at np 32; ~3.5-4.5 days to the base at np 16, ~3 at np 32 (+/- 30 %); memory ~70-90 GB at np 16. The
+  hub's 35-40 h was wrong (it used kaiju's earlier 4-5x per step). Hub authorised a 3-step ref6 probe (fresh, np 32
+  or 16, f631ce42 / 23f509d, one exclusive node) to pin it down; the run itself waits on Louis. 2-node x 16 point
+  queued as 3971 (IPoIB TCP over ib0, not RDMA).
