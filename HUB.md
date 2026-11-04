@@ -271,6 +271,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## For the other hubs
 
+- 2026-11-04, to the dev hub: the Picard line-search stall (already on your list, rotated_bc's "if not improved:
+  exit_reason = _SNES_DIVERGED_LINE_SEARCH; break") reproduced on a cold start: TAf-v2 at refinement 6 (f631ce42,
+  np 32), the unfaulted step-0 solve exits after five Picard iterations at rel 0.77 with alpha halving to 0, pressure
+  sub-KSP 4 its every iteration at rtol 1e-2. Production's step 0 (refinement 5) takes alpha 1.0 throughout. The
+  driver then carries on from the unconverged state. Kaiju is testing pressure rtol 1e-4 on that step (job 3977);
+  result to follow. Relevant to the library pressure-rtol default (feature/rotated-pressure-rtol-default) if the
+  tighter rtol is what fixes it.
 - 2026-11-04, to the dev hub, a SMOOTHER QUESTION from kaiju's itemised -log_view (np 16 / np 32 one node / 2 x 16, f631ce42,
   TAf-v2 production mesh): the custom FMG's level smoother (gmres max_it 4 + sor, norm_type none, set in code) does
   global reductions every inner iteration (Arnoldi VecMDot + VecNorm): 2.79M VecNorm and 2.23M VecMDot calls in 10
@@ -2910,3 +2917,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   at np 16, +/- 30 %. Step 0 (cold, unfaulted) did NOT converge: Newton stopped at 5 with rel 0.77. Hub asked for
   (1) production's pressure its for comparison and the probe continued to step 10 to see whether they plateau, and
   (2) the cause of the step-0 stop (cap, line search, linear stall) with reasons per iteration. ref6 waits on Louis.
+- 2026-11-04: ref6 step 0 cause: not a cap (rotated max_it 50) but the line-search stall exit
+  (SNES_DIVERGED_LINE_SEARCH in rotated_bc): five Picard iterations, |F| 2.209e5 -> 1.701e5, alpha 0.25 / 0.0625 /
+  0.03125 / 0.015625 / 0.0, velocity its 16-17, pressure its 4 every time; no switch to Newton. Production's step 0:
+  alpha 1.0 throughout, |F| 4.4e5 -> 1.6e2, Newton at iteration 5, pressure its 4/16/28/26/27/27. Kaiju's
+  hypothesis: the pressure solve stopping at 4 its (rtol 1e-2) gives an inaccurate Picard direction at ref6; test
+  3977 = step 0 alone at -uw_pres_rtol 1e-4. Pressure its: production 23.2 mean at steps 0-3, 20.4 at 20-30 (max
+  28-29); ref6 19.9 / 25.8 / 37.4 at steps 1-3 (max 43); no KSP cap hits (cap 200). Step-10 rerun
+  (probe_ref6_s10_TAf_v2_np32) submitted to see whether they plateau.
