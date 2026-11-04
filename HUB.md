@@ -707,6 +707,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **The overturn case for the article (2026-11-04):** Earth run 2_c, TAf-v2_c, or both. Louis has not chosen.
+  Earth's continuation runs (3957, from its base at checkpoint 80, launched by kaiju because it reached the base
+  first). Hub default: both, i.e. TAf-v2_c continues to the overturn at its base (~checkpoint 85-90) unless Louis
+  says otherwise; one more node for about a day; either can be stopped later at no cost.
+
 - **Earth run 2's departure: CAUSE FOUND 2026-11-04 (Louis, from the movies; kaiju measured it).** Recipe v2's
   spacing default quadrupled the rebuild threshold without anyone choosing it: `needs_rebuild` tests the built cut's
   gap to the detected polyline against `uw_rebuild_rungs` x S, and S went from 0.004 to h_b = 0.0156, so rungs 4
