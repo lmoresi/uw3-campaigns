@@ -1351,6 +1351,7 @@ refuses deletions from here, so this needs a laptop or Louis.
   GitHub reported a conflict, no CI); the hub merged development 045466df in (430ef613,
   clean, net change the four #917 files). **#917's fix was the hub's request, not
   Louis's: the merge goes to him for a yes on green.**
+- 2026-11-04: **Louis: "Yes, merge #943 on green".** CI running on 430ef613.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
