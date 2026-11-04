@@ -25,7 +25,7 @@ is not in this file, on GitHub, or in session transcripts. If it dies:
 | hub (current) | `session_013CgVT1Gx9WTvaZVqU58HsQ` |
 | docs and technical notes hub (from 2026-10-27) | `session_01HxWvn87HYCEJodpgCdaBro`; keeps `DOCS-HUB.md` |
 | dev hub (from 2026-10-29): underworld3 PRs, library fixes, library problems raised by sessions | `session_01HxWvn6vA38fdYLUxnxDk4g`; keeps `DEV-HUB.md` |
-| hyperion (from 2026-11-04, after the reimage) | `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"), a Remote Control session, Claude Code 2.1.318, cross-session inbound available; the old session `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") is pre-reimage history |
+| hyperion (from 2026-11-04, after the reimage; DOWN again for a second reimage the same day) | `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"), a Remote Control session, Claude Code 2.1.318, can message the hub (confirmed); the old session `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra") is pre-reimage history |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju-anu-edu-au-jiggly-magpie") |
 | kaiju, 3-D add-on mesh owner (from 2026-10-31) | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub on Louis's word; the dev hub's session, its node use accounted there |
 | kaiju dev (driver restart fixes) | `session_015H8d4zLWhW1moUQ8u1nMtw` ("kaiju: annulus driver restart fixes"), started by the hub 2026-10-23 |
@@ -706,6 +706,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
+
+- **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
+  health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
+  ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
+  failing disk "nvme0" with no serial; names can swap between installs. The hub asked hyperion for SMART / nvme
+  smart-log per serial (read-only). **The ~210 GB at /home/lmorese/lmoresi must be copied somewhere that survives
+  first** (underworld3 19G, all committed and matching its remote branches as of the last fetch; Simulations 93G;
+  hyperion-rescue-2026-10-20 94G, frozen, copy whole; claude-mirror incl. pre-reimage-2026-11-04/). After: data on
+  the good disk mounted at /mnt/data so the pixi env and worktree paths work unchanged; install git, gh, pixi.
 
 - **The overturn case for the article (2026-11-04):** Earth run 2_c, TAf-v2_c, or both. Louis has not chosen.
   Earth's continuation runs (3957, from its base at checkpoint 80, launched by kaiju because it reached the base
@@ -2798,3 +2807,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   15-25 s per step against 180-230 s at refinement 5. TAf-v2_c (3953) hand checks: checkpoints 60/65 0.0 hot, gap
   1.11/1.20 cells. sbatch "I/O error writing script/environment" recurred once and succeeded on retry: intermittent,
   controller side, nothing for the admin unless it persists.
+- 2026-11-04: hyperion going down again for a second reimage (Louis: OS installed on the wrong disk). Its inventory:
+  everything of value on the root disk nvme0n1p4 (~210 GB), nvme1n1p4 empty; repos clean and pushed; worktrees
+  repaired; ~/+Simulations symlink; claude-mirror pre-reimage copy. Hub asked for per-serial SMART before any wipe.
