@@ -2750,3 +2750,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   test uses production's 0.5 / refinement 5. Let run (2 nodes, ~1 h). 3854 finished: the np 16 production-mesh
   reference. Baselines: TAf-v2_c (3852) ~step 45, Earth run 2_c (3858) ~step 50, built cut in slab at every
   checkpoint (hot 0.0, gap 0.003-0.024). 3849/3850 stopped at their bases (checkpoints 90, 80), superseded, kept.
+- 2026-11-04: Louis: "I'd like to see the evolution at this resolution to see how well resolved it is." Kaiju asked
+  to carry the coarse-base TAf-v2 (3941, np 52, cell 0.25 / refinement 4, #935 workaround) to the base as its own
+  run with the 57affaa watcher; a resolution table of both meshes (where they actually differ, since h_b is
+  0.0156 in both); a side-by-side movie against TAf-v2_c matched by tip depth; vrms / slip / trench / plate speeds
+  against tip depth; fault-in-slab for both; on a page.
