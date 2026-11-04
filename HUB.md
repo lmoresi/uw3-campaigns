@@ -742,6 +742,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
+  refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
+  Proposed: 1e-4 for cold solves only, 1e-2 warm (v2's speed kept), and a fresh run whose first solve fails stops
+  rather than carrying on. Kaiju drafting the patch with a production step-0 check; Louis to accept.
+
 - **Refinement 6 for TAf-v2 (2026-11-04):** the test of whether production (refinement 5) is converged; trench and
   slip moved 35-45 % from ref4 to ref5. Probe-measured: ~38 h (~1.6 days) to the base at np 32 on one node
   (+/- 30 %), 71 GB per node; two nodes do not help. Before a run: why the cold step 0 stalled at rel 0.77, and
@@ -2925,3 +2930,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   3977 = step 0 alone at -uw_pres_rtol 1e-4. Pressure its: production 23.2 mean at steps 0-3, 20.4 at 20-30 (max
   28-29); ref6 19.9 / 25.8 / 37.4 at steps 1-3 (max 43); no KSP cap hits (cap 200). Step-10 rerun
   (probe_ref6_s10_TAf_v2_np32) submitted to see whether they plateau.
+- 2026-11-04: 3977 (ref6 step 0 alone, -uw_pres_rtol 1e-4): CONVERGES in 6 iterations (rel 2.8e-5, alpha 1.0 throughout,
+  Newton from iteration 4; pressure its 18/71/68/70/58/55; 1188 s; 50 GB). Initial-flow vrms 430.9 against the stalled
+  iterate's 512.6: the 1e-2 cold start was materially wrong, so 3978's steps 1-10 are cost and trend only. The
+  failure is the cold Picard from rest: ref6's warm steps converged at 1e-2, production's cold step 0 converged at
+  1e-2. Hub ordered one driver patch: uw_pres_rtol_cold 1e-4 for every cold solve (first solve, any cold retry),
+  1e-2 warm; a fresh run whose first solve ends unconverged stops instead of carrying it forward (it slipped past the
+  two-in-a-row pause trigger); ledger rows; a check of production's step 0 with the patch. To Louis as a small recipe
+  change affecting run starts only.
