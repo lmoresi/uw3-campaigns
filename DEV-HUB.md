@@ -1315,6 +1315,14 @@ refuses deletions from here, so this needs a laptop or Louis.
   the integration session: #935's PR after its review round 2; #902's after a development
   merge and serial checks; #936 as its own small PR, test first. Merge order on green:
   #902, #935, #936. #901 (A-prime) can follow when Louis wants; it is about 5 % per step.
+- 2026-11-04: **PR #937** (#902, `bugfix/custom-mg-many-ranks` 09c7f480, development merged
+  in, closes #902 and #886) and **PR #938** (#935, 76219530, two review rounds; kaiju report
+  24: test_1140 12 passed at np 2 and 11 + 1 skipped at np 4 on the tip, 10 failed on
+  development) opened by the integration session; CI running. #936's fix
+  (`bugfix/traction-constrained-node-936` f7d049d5, test_1141 first: 3 failed before) is
+  stacked on #938's branch, in pre-PR review. Its finding: the integral skipped a node
+  whose first component is constrained, so it read the pool only where v_x is free and v_y
+  pinned (-207 against 3292). #917: kaiju reproducing with CI's `--dist loadfile -n 4`.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
