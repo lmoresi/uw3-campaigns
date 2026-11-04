@@ -3,7 +3,8 @@
 # The driver runs through kaiju-launch/kaiju_uw3_job.sh; the stop rule and the convergence trigger run beside it in this
 # job, because this session's login-node loops cannot reach Slurm or Apptainer (managed sandbox, 2026-11-03):
 #  - stop at the base (Louis, 2026-10-28; stop_at_base.sh): when the slab tip (tip_depth.py) reaches 0.95 at checkpoint
-#    N, stop the run once checkpoint N + EVERY is complete, so a restart can continue it;
+#    N, stop the run once checkpoint N + EVERY is complete, so a restart can continue it. STOP_AT_BASE=0 (the overturn
+#    runs, 2026-11-04) logs the base and runs on to -uw_steps;
 #  - the pause trigger (the TAti supervisor v4's rule): two consecutive unconverged steps, or more than two in any ten,
 #    are logged at once and the run stops at the next complete checkpoint (one segment, so the pause is a stop).
 #  - the fault-in-slab check (2026-11-04): at every complete checkpoint, analysis/fault_in_slab.py measures the BUILT
@@ -20,6 +21,7 @@ SIF=/home/louis/uw3/images/uw3-gadi-development-20261021.sif
 TIP=/home/louis/campaigns/kaiju-launch/slab_thermal_fault/tip_depth.py
 FIS=${FIS:-$(dirname "$(dirname "$SCRIPT")")/analysis/fault_in_slab.py}   # beside the driver's repo
 HOT_PAUSE=${HOT_PAUSE:-0.10}
+STOP_AT_BASE=${STOP_AT_BASE:-1}            # 0: log the base and run on (a full overturn)
 LOG=$D/watch.log
 note() { echo "$(date '+%F %T') $*" >> "$LOG"; }
 
@@ -66,7 +68,17 @@ sys.exit(0 if pause else 1)
 PY
 }
 
-note "job ${SLURM_JOB_ID} on ${SLURM_NODELIST}: driver started; stop at the base after checkpoint tip+${EVERY}; pause trigger on"
+note "job ${SLURM_JOB_ID} on ${SLURM_NODELIST}: driver started; $( [ "$STOP_AT_BASE" = 1 ] && echo "stop at the base after checkpoint tip+${EVERY}" || echo "no stop at the base (STOP_AT_BASE=0)"); pause trigger on"
+# the watcher's choices, beside the driver's choices block
+cat >> "$D/README.md" <<TXT
+
+## Watcher choices (launch/kaiju_v2/baseline_job.sh, job ${SLURM_JOB_ID})
+| knob | value |
+|---|---|
+| STOP_AT_BASE | $STOP_AT_BASE (1: stop one checkpoint interval after the tip reaches 0.95; 0: run on) |
+| EVERY (checkpoint interval) | $EVERY |
+| HOT_PAUSE (built cut hot fraction that pauses) | $HOT_PAUSE |
+TXT
 setsid bash /home/louis/campaigns/kaiju-launch/kaiju_uw3_job.sh "$@" &
 RUN=$!
 on_base=""; stop_at=""; why=""; checked=-1
@@ -93,9 +105,11 @@ while kill -0 "$RUN" 2>/dev/null; do
     fi
     if [ -z "$on_base" ]; then
         on_base=$(apptainer exec "$SIF" python3 "$TIP" "$D" 2>/dev/null | awk '/ON BASE/ {print $1; exit}')
-        if [ -n "$on_base" ]; then
+        if [ -n "$on_base" ] && [ "$STOP_AT_BASE" = 1 ]; then
             note "BASE: tip on the base at checkpoint $on_base; stopping after $((on_base + EVERY))"
             if [ -z "$stop_at" ] || [ $((on_base + EVERY)) -lt "$stop_at" ]; then stop_at=$((on_base + EVERY)); why=base; fi
+        elif [ -n "$on_base" ]; then
+            note "BASE: tip on the base at checkpoint $on_base; running on (STOP_AT_BASE=0)"
         fi
     fi
     if [ "$why" != pause ] && trigger > "$D/.trigger" 2>&1; then
