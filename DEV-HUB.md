@@ -1137,7 +1137,7 @@ Merged with #890 (fc67b650): `feature/box-faults`,
 | Rotated free slip on a spherical shell with the default `normal=None`: facet-averaged normals violate all three rotations by 0.008-0.016, so none is detected. The answer carries an undetermined rigid rotation (v_rms 4.47 against 1.77) and takes 83 velocity its against 18. The annulus is unaffected; CLAUDE.md recommends `normal=None` | the #901 work | #906 | **Louis: null modes belong in the mesh metadata.** They are already there (`Mesh.nullspace_rotations`, since 2026-04-07, set by the annulus, shell and segmented constructors) but the rotated path ignores them: it rebuilds the rotations and filters them by a 1e-8 constraint test, which is the failure. The integration session is to make the rotated path read the declared modes (stacked on #901), then measure facet normals against the analytic normal on the shell for Louis's remaining choice |
 | `project_to_degree` from a discontinuous to a continuous field sums the adjacent cells (2-7x at P1 vertices); the XDMF writer is unaffected | the #902 work | #905 | filed; marked TODO(BUG) on the #902 branch |
 | The direct-LU rotated path (`_rotated_use_lu`) never converges on a split-fault contact; slip 4-5 % off | #894's work | #899 | filed; `test_1088` carries it as an xfail. An opt-in path, against the no-direct-LU rule anyway |
-| Rotated free slip with the analytic wall normal: from np 24 an owned outer-wall vertex can get no constraint row. No-solve repro on unfaulted TAc: np 16 none missing, np 32 three missing, two of them with a labelled facet on their owning rank, so the cause is wider than "facets all on other ranks". Solved at np 32, the wall-normal velocity reaches 1.2e4. The geometric normal is clean at np 32 but admits the rigid rotation (#906) | kaiju, 2026-11-04 | #935 | filed by kaiju through the science hub. Blocks np > 16 on the annulus with either normal until #935 or #906 lands. Not a duplicate of #906 or #896. No owner yet |
+| Rotated free slip with the analytic wall normal: from np 24 an owned outer-wall vertex can get no constraint row. No-solve repro on unfaulted TAc: np 16 none missing, np 32 three missing, two of them with a labelled facet on their owning rank, so the cause is wider than "facets all on other ranks". Solved at np 32, the wall-normal velocity reaches 1.2e4. The geometric normal is clean at np 32 but admits the rigid rotation (#906) | kaiju, 2026-11-04 | #935 | filed by kaiju through the science hub. Blocks np > 16 on the annulus with either normal until #935 or #906 lands. Not a duplicate of #906 or #896. **Cause (integration session, from the code):** the analytic path takes wall nodes only from facets labelled on the rank; the geometric path also walks the support-1 closures and sums over the SF (#560). Driver workaround: uw3-campaigns `addon-matrix-2026-11` 02439b0, `workaround_analytic_normal_nodes.py` (bit-identical serially; kaiju to verify at np 32-52). **Library fix queued to the integration session after #917**, on a side branch, test first; PR on Louis's yes |
 
 ## Issue queue (2026-10-29)
 
@@ -1289,6 +1289,16 @@ refuses deletions from here, so this needs a laptop or Louis.
 - 2026-11-04: **the stack is merged**: #932 2556c979, #933 4ee0b13d, #934 60dbf0e4, all
   green on every shard; development's tree equals #934's tested head. #918, #921, #925
   relabelled fixed-in-development. Next from the integration session: #917's small PR.
+- 2026-11-04: the integration session answered kaiju. The distributed patch is a probe
+  (uw3-campaigns `addon-matrix-2026-11` 02439b0, `probe_patch_parallel_lu.py`, needs
+  development 60dbf0e4 or later for the gathered blocks); superlu_dist ran 10-20 % slower
+  than MUMPS; report 17's MUMPS gain is mostly MUMPS's faster serial triangular solve, about
+  3-5 s per zg95 step. Its suspect for np 52's time is the dense redundant SVD coarse solve
+  (#901, factored twice per solve); kaiju's `-log_view` (mg_coarse PCSetUp) decides whether
+  A-prime (77de8d81) goes to a PR. It asked whether Louis had approved the 0.98 rule, since
+  Louis asked it today what the decision was: the hub confirmed Louis's own words to this
+  hub on 2026-11-03 ("Yes to the narrowed #918 rule - merge the stack"); a different
+  choice now is a follow-up PR.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
