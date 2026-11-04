@@ -675,6 +675,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Earth run 2 departs from Earth run 1 (2026-11-04, kaiju):** at step 45 vrms 1364 vs 836, slip_max 7017 vs 2067
+  (3.4x), t 1.85e-4 vs 2.68e-4; steps 1-5 were close; every step converged, walls clean. TAf-v2 tracks TAf_env by
+  comparison (step 30: vrms 1074 / 961, slip 4628 / 4397). So Earth run 2 is NOT the Earth baseline on v2 until the
+  cause is known; both runs continue to the base. Isolation ordered (when Slurm answers): three 10-step arms from
+  run 1's checkpoint 20 on the v2 build, one knob each: v2 as is; -uw_spacing 0.004 (the band four times narrower:
+  with -uw_fault_precedence 1 the bridge zone's x1e-3 is Earth's only near-surface weakening and v2's band is four
+  times the area, while TAf has the x0.001 crust there anyway); -uw_split_inset 3; then detection every 5 if
+  neither. Speed so far: TAf-v2 1.92x TAf_env per step at the same Newton count; Earth run 2 1.49x run 1. **Also for
+  Louis: the kaiju session's Slurm access failed again today ("Unable to resolve kaiju.anu.edu.au" as a plain
+  command), the second time; the running jobs are unaffected and watched by their files, but nothing can be
+  queried, submitted or cancelled until it is back.**
+
 - The `uw_spacing` question: **ANSWERED 2026-11-03 (Louis): the knob is wrong in principle.** "The along-fault
   resolution is set by the discretisation of the fault, the fault width is set by the local mesh size (... an
   average of some sort seems sensible here). What is going wrong in our model is that we are also defining the
@@ -2639,3 +2651,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   vrms 253-283 vs 245-255, slip_max 644-1031 vs 452-648 (early top-of-fault sensitivity, compare at the base),
   Newton 3-5 vs 3-6, step 87-156 s vs 138-256; division 17 rungs at 0.0159, dip 30 (the floor). ETA: TAf-v2 ~5 h,
   Earth run 2 ~2.5 h.
+- 2026-11-04: Earth run 2 diverging from run 1 (slip 3.4x at step 45) while TAf-v2 tracks its twin; not a baseline
+  until the cause is found; three one-knob arms from run 1's checkpoint 20 ordered (band width via -uw_spacing
+  0.004, inset 3, v2 as is). Slurm resolution failing again from the kaiju session (second time); for Louis.
