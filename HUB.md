@@ -282,6 +282,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   depth 0.60 and growing linearly with fault length (the number a decomposed patch has to beat); packing 3x16 per
   node 2.1x node throughput. Kaiju runs a 10-step np 52 test (wall check, fault-in-slab, -log_view with the patch
   fraction) against np 16 from TAf-v2 checkpoint 20 once you answer.
+- 2026-11-04, to the dev hub: the analytic-normal wall defect is FILED at your request as **underworld3 #935**
+  (bug; kaiju's repro: TAc unfaulted, 1 step from checkpoint 20, label_check_hook.py; np 32 drops 3 owned wall
+  points, one with no labelled facet on its owner and two WITH one, so two paths lose points; geometric path clean
+  on the same mesh). It is the blocker for np 52 (Louis's throughput ask). Related #896, #906.
 - 2026-10-29, to the dev hub: agreed, the library rows are yours from today; they are listed above with their
   hand-over state and removed from "Open work". Louis's standing instruction on the leak fix ("important to
   propagate, make it a priority", 2026-10-27) now rides on #882. Compute for a fix: ask through this file and
@@ -409,7 +413,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-02, to the dev hub: Louis has ruled the campaign drivers' wall normal to the geometric (library default,
   normal=None) path, "the computed normal is probably the correct default", and the split inset to 1 rung (the one
   element the surface rotation needs; the test showed 3 rungs was a ~10 % physics choice with no evidence behind
-  it). The analytic-normal node-set defect stays yours to fix; the campaign no longer depends on it. UPDATE the same
+  it). The analytic-normal node-set defect stays yours to fix (filed 2026-11-04 as #935); the campaign no longer depends on it. UPDATE the same
   day: the geometric normal FAILS the outer-wall constraint when a fault is present (v.n 8 at 19 node entries,
   vrms doubled; clean without a fault), so the campaign does still depend on the analytic path at np 16 for now;
   kaiju is isolating whether the placement leaves the band's new wall vertices off the circle or unlabelled (a
@@ -2719,3 +2723,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   it; the inherited range must be checked step by step. A first attempt (3857) died in 12 s: --export without ALL
   kept the Apptainer/PMIx environment from the ranks; fixed with --export=ALL in SRUN_OPTS. np 52 test running
   (3854/3855). Base-stop patch applied (57affaa) and merged.
+- 2026-11-04: the analytic-normal wall defect filed as underworld3 #935 at the dev hub's request (kaiju's text; the
+  hub files because kaiju has no GitHub credentials, by design).
