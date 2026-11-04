@@ -744,8 +744,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
-  Proposed: 1e-4 for cold solves only, 1e-2 warm (v2's speed kept), and a fresh run whose first solve fails stops
-  rather than carrying on. Kaiju drafting the patch with a production step-0 check; Louis to accept.
+  Patch READY on branch kaiju/pres-rtol-cold d43ccae (kaiju 55c1808, blobs verified), not merged: uw_pres_rtol_cold
+  1e-4 for cold solves, 1e-2 warm, and a fresh run whose first solve fails stops. At refinement 5 it is invisible
+  (job 3979: step-0 vrms 442.524 vs 442.523, +48 s once per run; warm steps identical to 6 figures). Louis to accept
+  (merge then makes it the default). Also for him: kaiju's mid-run proposal, a hard stop only when keep-best's kept
+  attempt has rel > 0.1 (an unsolved state, not a near miss); today a single unconverged mid-run step is carried
+  forward with only the two-in-a-row trigger as guard. The hub agrees in principle.
 
 - **Refinement 6 for TAf-v2 (2026-11-04):** the test of whether production (refinement 5) is converged; trench and
   slip moved 35-45 % from ref4 to ref5. Probe-measured: ~38 h (~1.6 days) to the base at np 32 on one node
@@ -2938,3 +2942,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   1e-2 warm; a fresh run whose first solve ends unconverged stops instead of carrying it forward (it slipped past the
   two-in-a-row pause trigger); ledger rows; a check of production's step 0 with the patch. To Louis as a small recipe
   change affecting run starts only.
+- 2026-11-04: cold-solve patch applied on branch kaiju/pres-rtol-cold as d43ccae, unmerged pending Louis. Kaiju's
+  production check (3979, ref5, steps 0-2): step 0 at 1e-4 vrms 442.524 vs 442.523 at 1e-2 (+48 s), warm steps
+  1-2 at 1e-2 pressure its and vrms identical to TAf-v2_c's (the live sub-KSP switch works). Hub review: the record
+  can claim an rtol that was not applied if the live sub-KSP is unreachable (follow-up).
