@@ -1262,6 +1262,17 @@ refuses deletions from here, so this needs a laptop or Louis.
   development merge into B for the test.sh conflict and a green sharded CI), fc67b650.
   #730 and #573 relabelled. #892 steps 2 and 3 pushed; B's coarse-patch rule settled by
   measurement.
+- 2026-11-04: Louis, via kaiju: run the zg95 annulus at np 52 with "the decomposed patch
+  problem using super_lu" for about 2x throughput, now. The hub's record has the
+  distributed-patch solve as a MUMPS probe (report 17), not library code, not on development
+  af6f19b3; whether superlu_dist was also run is with the integration session, which is
+  answering kaiju directly. Kaiju's np 52 blocker is not the patch: with the analytic wall
+  normal, at np 24/32/40/52 an owned outer-wall vertex whose rank holds none of its labelled
+  facets gets no constraint row (np 16 clean); the geometric normal is clean at np 32 but
+  admits the rigid rotation (#906, fix held on its branch). Kaiju asked to file the
+  analytic-normal defect. Kaiju's own numbers: np 52 against 16 is 339 against 487 s per
+  step (1.44x); the serial patch is 5-8 s of a 150-230 s step, so the patch alone is not
+  the 2x.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
