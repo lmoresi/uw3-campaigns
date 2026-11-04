@@ -195,7 +195,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Continent gap analysis (overriding-side surface flow from checkpoints; gap left after rollback for g 0.15-1.0; extent table) | https://claude.ai/artifact/PcRP5QjPT8DSa9rEjkfs4F |
 | Thermal comparison page v6: TAti_smooth vs TAf_env vs TAf vs TAc (final TI-vs-split comparison, locator A/B, cost rows, convergence caveat, equivalence paragraph) | https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R |
 | Fault-division design (the knob removed: rungs = the locator's points at the local cell size, W = BAND_CELLS x mean local h; offline placement check on 80 faults; the draft diff) | https://claude.ai/artifact/UANqhA82AfRoh7fjgrPwYG |
-| Recipe v2 production proposal: the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs (TAf-v2 ~4.8 h, Earth run 2 ~4.4 h, TAc-v2 ~3.0 h, one exclusive node each) | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
+| Recipe v2 production proposal (v5): the v2 table against the old recipe, the full TAf-v2 launch line, the baseline set with costs; TAf-v2's measured 1.92x per step at the same Newton count with the twin comparison at step 30; Earth run 2's departure and the isolation in progress | https://claude.ai/artifact/CDy2RR1fLhBUyPXtUMftNr |
 | Ladder-spacing arms for the dev hub: S = h_b and h_b/2 vs production 0.004, re-sampled on restart, TAf 20 and TBf 70 | https://claude.ai/artifact/7cbuaxBnoZrfjdPioMHroT |
 | Split-inset test: 1 vs 2 vs 3 rungs (history, 720 offline placements, TAf 40 smoke) | https://claude.ai/artifact/T37Y3MMpYyfgQZbCmuk5YQ |
 | Node-packing throughput test on kaiju (1/2/3 x 16-rank jobs per node, same case) | https://claude.ai/artifact/1CFNXD4TpQLX5jfeTdMN8k |
@@ -682,10 +682,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   run 1's checkpoint 20 on the v2 build, one knob each: v2 as is; -uw_spacing 0.004 (the band four times narrower:
   with -uw_fault_precedence 1 the bridge zone's x1e-3 is Earth's only near-surface weakening and v2's band is four
   times the area, while TAf has the x0.001 crust there anyway); -uw_split_inset 3; then detection every 5 if
-  neither. Speed so far: TAf-v2 1.92x TAf_env per step at the same Newton count; Earth run 2 1.49x run 1. **Also for
-  Louis: the kaiju session's Slurm access failed again today ("Unable to resolve kaiju.anu.edu.au" as a plain
-  command), the second time; the running jobs are unaffected and watched by their files, but nothing can be
-  queried, submitted or cancelled until it is back.**
+  neither. Speed so far: TAf-v2 1.92x TAf_env per step at the same Newton count; Earth run 2 1.49x run 1. Nothing
+  for Louis to do here yet: the arms are RUNNING as job array 3843 (tasks 0/1/2 = a/b/c; run dirs
+  ~/+Claude/kaiju/runs/earth_iso_{a,b,c}_ck20, seeded by symlink from run 1's checkpoint 20, run 1's dir not
+  written; development 25d62812, driver 64feaec, np 16, one exclusive node, n1 excluded). Arms a and c re-sample the
+  restored polyline from 0.004 to h_b through the restart rule; arm b keeps the restored rungs. Results at step 30
+  come with the ledger entry. (The Slurm resolution failure of 2026-11-04 morning was transient; squeue answers
+  again. Third occurrence; if it recurs it goes back on this list.)
 
 - The `uw_spacing` question: **ANSWERED 2026-11-03 (Louis): the knob is wrong in principle.** "The along-fault
   resolution is set by the discretisation of the fault, the fault width is set by the local mesh size (... an
@@ -2654,3 +2657,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-04: Earth run 2 diverging from run 1 (slip 3.4x at step 45) while TAf-v2 tracks its twin; not a baseline
   until the cause is found; three one-knob arms from run 1's checkpoint 20 ordered (band width via -uw_spacing
   0.004, inset 3, v2 as is). Slurm resolution failing again from the kaiju session (second time); for Louis.
+- 2026-11-04: Slurm answered again (the morning failure was transient). Isolation arms queued as job array 3843
+  (a: v2 as is; b: -uw_spacing 0.004; c: -uw_split_inset 3), 10 steps each from run 1's checkpoint 20 on the v2
+  build; (d) -uw_detect_every 5 follows if neither b nor c closes the gap. Proposal page v5 carries TAf-v2's 1.92x
+  and Earth run 2's departure. Baselines: TAf-v2 near step 36, Earth run 2 near step 50, watch.logs clean.
