@@ -48,6 +48,10 @@ from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clam
 from strain_band import (boundary_layer_depth, detect_fault, fit_fault_lines, polar_grid, rank_bands,
                          spine_separation)
 
+if any(a.lstrip("-").split("=")[0] == "uw_rebuild_rungs" for a in sys.argv[1:]):
+    raise ValueError("-uw_rebuild_rungs is retired (2026-11-04): it counted rungs of the spacing S, so S = one base cell "
+                     "made rungs 4 a rebuild tolerance of 0.0625 and the built fault lagged into hot mantle. Use "
+                     "-uw_rebuild_cells (base cells, default 1; DECISIONS.md, the rebuild threshold row)")
 params = uw.Params(
     uw_out="~/+Simulations/zg95/annulus_faults/runs/test_multi",
     uw_init="checkpoint",       # "checkpoint": T, V from uw_source at uw_source_index; "slab": the
@@ -175,7 +179,12 @@ params = uw.Params(
                                 #   kaiju 2026-11-01, 5.9 against 7.7 velocity its per increment, the same answer; on
                                 #   a build without #912 (overlay-leakfix 547c2e54) chain 0 was ~1.5x slower: use 2
     uw_band_widen=1,
-    uw_rebuild_rungs=4,
+    uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
+                                #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the crust-law polyline's
+                                #   gap to the built one, or a fixed-dip fault's trench shift. Replaces uw_rebuild_rungs
+                                #   (retired 2026-11-04, refused if set): counted in rungs of S, the spacing default (S =
+                                #   h_b) made rungs 4 a tolerance of 0.0625 where the old recipe's was 0.016, and the built
+                                #   cut lagged into hot mantle (Earth run 2: 69 % of it at T > 0.7; TAf-v2: all of it)
     uw_fault_surface_gap=2.0,   # crust law: the fit's up-dip end may stop this many crust thicknesses below the
                                 #   wall (its shallowest point: the crust base on the incoming plate); deeper, no fault
     uw_weld_ok=0,               # 1: a refused chain level is welded and the build goes on (the old behaviour);
@@ -364,6 +373,8 @@ def effective_spacing(p):
 
 
 S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": params.uw_cell, "uw_refinement": params.uw_refinement})
+H_B = float(params.uw_cell) / 2 ** int(params.uw_refinement)    # the base cell (effective_spacing's derivation)
+REBUILD = float(params.uw_rebuild_cells) * H_B                  # the rebuild threshold, a distance (needs_rebuild)
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
@@ -2298,7 +2309,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_rungs", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2354,6 +2365,9 @@ def write_run_info():
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
                  "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
                  else "one base cell (uw_cell / 2**uw_refinement)",
+                 "rebuild_threshold": REBUILD,
+                 "rebuild_threshold_source": f"uw_rebuild_cells {float(params.uw_rebuild_cells):g} x base cell {H_B:g} "
+                                             "(a distance, independent of S)",
                  "fault_seams": str(params.uw_fault_seams),
                  "fault_mesher": "ladder" if params.uw_fault_seams == "gather" else "network",
                  "fault_partition": FAULT_PARTITION, "wall_normal": str(params.uw_wall_normal),
@@ -2380,13 +2394,13 @@ def needs_rebuild(faults, built):
     for f, g in zip(faults, built):
         if ("points" in f) != ("points" in g):
             return True
-        if "points" in f:          # a crust-following fault: its polyline moved by more than the rungs
-            if polyline_gap(f["points"], g["points"]) > params.uw_rebuild_rungs * S:
+        if "points" in f:          # a crust-following fault: its polyline moved by more than the threshold
+            if polyline_gap(f["points"], g["points"]) > REBUILD:
                 return True
             continue
-        if (abs(wrap(f["theta"] - g["theta"])) * r_o > params.uw_rebuild_rungs * S
+        if (abs(wrap(f["theta"] - g["theta"])) * r_o > REBUILD
                 or abs(f["dip"] - g["dip"]) > params.uw_rebuild_dip
-                or abs(f["depth"] - g["depth"]) > 2 * S):
+                or abs(f["depth"] - g["depth"]) > 2 * H_B):
             return True
     return False
 
