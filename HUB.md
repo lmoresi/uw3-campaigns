@@ -2764,3 +2764,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   16, from step 0; refinement 6 waits on #902/#935 (np 52), kaiju to estimate its cost. Page three-way. On cell025
   np 52 is SLOWER than np 16 (430 vs 310 s per step, same answer): suspect the 448-cell coarse level's dense SVD on
   every rank (#901); -log_view from 3941/3942 to confirm, then to the dev hub as the case for #901's A-prime PR.
+- 2026-11-04: TAf-v2_c (3852) PAUSED by the fault-in-slab trigger (built cut hot fraction 0.18 at checkpoint 50, 0.052
+  at 55; gap 0.0222 = 1.4 h_b). The hot part is the cut's deep end, 0.09-0.15 deep along the slab's warm top margin;
+  the top 0.06 is cold. TAf_env on the old recipe had the same (13 of 94 samples hot at checkpoint 50). Hub's
+  decision: the whole-cut 10 % was the hub's mis-specification; the drift test is the gap. Resume from checkpoint 55
+  on 57affaa with HOT_PAUSE 0.30 as a recorded stopgap, kaiju reading each FAULT line by hand (pause if gap > 2
+  base cells or top-0.09 hot > 10 %). Watcher patch ordered: top/deep hot fractions separately for built and
+  detected, gap in base cells, pause on top hot > 0.10 or gap > 2 cells, deep end WATCH only; ledger row. Detect
+  every step for TAf (option c) not taken: a cadence change against the twin, unmotivated. ref4 (3952) launched
+  (0.5 / ref 4, h_b 0.03125, np 16, n4). Refinement 6 estimate: ~508k cells, ~2.0M P2 dofs, ~75-80 GB at np 16,
+  ~15 min per step, ~8x the steps; behind #902/#935.
