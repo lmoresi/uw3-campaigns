@@ -2774,3 +2774,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   every step for TAf (option c) not taken: a cadence change against the twin, unmotivated. ref4 (3952) launched
   (0.5 / ref 4, h_b 0.03125, np 16, n4). Refinement 6 estimate: ~508k cells, ~2.0M P2 dofs, ~75-80 GB at np 16,
   ~15 min per step, ~8x the steps; behind #902/#935.
+- 2026-11-04: TAf-v2_c resumed from checkpoint 55 as job 3953 (57affaa, HOT_PAUSE 0.30 stopgap, kaiju's hand checks).
+  At checkpoint 50 the DETECTED fault is cold at depth (0 % hot) and only the built cut's deep end is hot (47 %;
+  TAf_env 37 %): the five-step lag across the gradient, not the locator. Watcher patch applied as 4c32f77 (kaiju
+  fa390e1; blobs 7ab8f3a / bce66dd / 596073d verified) and merged (1fd3c96): pause on top-0.09 hot > 0.10 or gap >
+  2.0 base cells, deep end WATCH only, ledger row. Kaiju flagged the first checkpoint's gap (1.94 cells: the initial
+  fault against the first fit); hub ruled a grace (GAP_GRACE = first checkpoint, WATCH not pause) rather than a
+  higher limit; small patch to come.
