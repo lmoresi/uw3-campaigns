@@ -20,8 +20,17 @@ the row 5 driver (row5_networks.py) with its own arguments.
     PROBE_PATCH=mumps mpirun -np 8 python probe_patch_parallel_lu.py \\
         -uw_case ti -uw_zone none -uw_n_rungs 320 -uw_out records/x.json
 
-PROBE_PATCH          library (no change, the control), mumps or superlu_dist
+PROBE_DRIVER         the driver to run (row5_networks.py; sheet3d_addon.py for 3-D)
+PROBE_PATCH          library (no change, the control), mumps or superlu_dist, or
+                     krylov: an inexact iterative block solve, CG with GAMG by
+                     default (-probe_patch_ksp_type, -probe_patch_pc_type ...
+                     override), its preconditioner set up once per operator and
+                     reused by every application, zero initial guess
 PROBE_PATCH_OVERLAP  overlap layers added to each block (1, as the library)
+PROBE_PATCH_RTOL     krylov: the block solve's relative tolerance (1e-2)
+PROBE_PATCH_MAXIT    krylov: its iteration cap (50)
+PROBE_PATCH_WARM     krylov: 1 starts each block solve from that block's previous
+                     solution instead of zero
 
 Options reach the parallel factorisation under the prefix probe_patch_, for
 example -probe_patch_mat_mumps_icntl_24 1 (MUMPS null-pivot detection). The
@@ -40,16 +49,20 @@ from mpi4py import MPI
 from petsc4py import PETSc
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.argv[0] = os.path.join(HERE, "row5_networks.py")
+sys.argv[0] = os.path.join(HERE, os.environ.get("PROBE_DRIVER", "row5_networks.py"))
 
 from underworld3.utilities import custom_mg  # noqa: E402
 
 MODE = os.environ.get("PROBE_PATCH", "mumps")
-if MODE not in ("library", "mumps", "superlu_dist"):
-    raise ValueError(f"PROBE_PATCH={MODE}: expected library, mumps or superlu_dist")
+if MODE not in ("library", "mumps", "superlu_dist", "krylov"):
+    raise ValueError(f"PROBE_PATCH={MODE}: expected library, mumps, superlu_dist or krylov")
 OVERLAP = int(os.environ.get("PROBE_PATCH_OVERLAP", "1"))
+RTOL = float(os.environ.get("PROBE_PATCH_RTOL", "1e-2"))
+MAXIT = int(os.environ.get("PROBE_PATCH_MAXIT", "50"))
+WARM = os.environ.get("PROBE_PATCH_WARM", "0") == "1"
 STATS = {"setups": 0, "t_setup": 0.0, "applies": 0, "t_apply": 0.0,
-         "failed_solves": 0, "blocks": [], "rows_here": []}
+         "failed_solves": 0, "inner_its": 0, "inner_its_max": 0, "inner_at_cap": 0,
+         "blocks": [], "rows_here": []}
 PARALLEL_LEVELS = set()
 
 
@@ -95,12 +108,19 @@ class ParallelPatch:
             ksp = PETSc.KSP().create(comm=P.getComm())
             ksp.setOptionsPrefix("probe_patch_")
             ksp.setOperators(A_k)
-            ksp.setType("preonly")
-            ksp.getPC().setType("lu")
-            ksp.getPC().setFactorSolverType(MODE)
+            if MODE == "krylov":
+                ksp.setType("cg")
+                ksp.getPC().setType("gamg")
+                ksp.setTolerances(rtol=RTOL, max_it=MAXIT)
+                ksp.setInitialGuessNonzero(WARM)
+            else:
+                ksp.setType("preonly")
+                ksp.getPC().setType("lu")
+                ksp.getPC().setFactorSolverType(MODE)
             ksp.setFromOptions()
             ksp.setUp()
             xs, ys = A_k.createVecs()
+            ys.set(0.0)
             scatter = PETSc.Scatter().create(template, is_k, xs, None)
             self.parts.append((ksp, scatter, xs, ys, A_k, is_k))
             sizes.append(int(rows.size))
@@ -117,7 +137,16 @@ class ParallelPatch:
             scatter.scatter(x, xs, PETSc.InsertMode.INSERT_VALUES,
                             PETSc.ScatterMode.FORWARD)
             ksp.solve(xs, ys)
-            if ksp.getConvergedReason() < 0:
+            reason = ksp.getConvergedReason()
+            if MODE == "krylov":
+                its = ksp.getIterationNumber()
+                STATS["inner_its"] += its
+                STATS["inner_its_max"] = max(STATS["inner_its_max"], its)
+                if reason == PETSc.KSP.ConvergedReason.DIVERGED_MAX_IT:
+                    STATS["inner_at_cap"] += 1
+                elif reason < 0:
+                    STATS["failed_solves"] += 1
+            elif reason < 0:
                 STATS["failed_solves"] += 1
             scatter.scatter(ys, y, PETSc.InsertMode.ADD_VALUES,
                             PETSc.ScatterMode.REVERSE)
@@ -173,4 +202,7 @@ if comm.rank == 0:
         "t_factor_s_max": round(max(e["t_setup"] for e in everyone), 2),
         "t_apply_s_max": round(max(e["t_apply"] for e in everyone), 2),
         "failed_solves": sum(e["failed_solves"] for e in everyone),
+        "rtol": RTOL if MODE == "krylov" else None, "warm": WARM,
+        "inner_its": everyone[0]["inner_its"], "inner_its_max": everyone[0]["inner_its_max"],
+        "inner_at_cap": everyone[0]["inner_at_cap"],
     }), flush=True)
