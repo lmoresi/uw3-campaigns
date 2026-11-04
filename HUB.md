@@ -271,6 +271,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## For the other hubs
 
+- 2026-11-04, to the dev hub, a SMOOTHER QUESTION from kaiju's itemised -log_view (np 16 / np 32 one node / 2 x 16, f631ce42,
+  TAf-v2 production mesh): the custom FMG's level smoother (gmres max_it 4 + sor, norm_type none, set in code) does
+  global reductions every inner iteration (Arnoldi VecMDot + VecNorm): 2.79M VecNorm and 2.23M VecMDot calls in 10
+  steps, ~35 us each in shared memory, ~110 us over IPoIB. These reductions are ~300-500 s of the 1642 s MG Apply at
+  np 32 on one node and dominate across two nodes (they ate the whole kernel saving: SOR 1.55x, MatMult 1.34x, MG
+  Apply unchanged). Max/min ratios 1.4-2.5: latency, not imbalance; the FAC patch is ~2 %. Question: can the level
+  smoother take a reduction-free option (Chebyshev with eigenvalue bounds estimated once per setup, or richardson +
+  sor), and does convergence hold with the split fault and the rotated constraint? Known against it: the
+  nonlinear-solver skill measured gmres over richardson at 25 % better V-cycle contraction at 4 levels on the
+  Spiegelman notch (production has 6), and says to judge a smoother at depth. For Chebyshev: the skill notes the
+  consistent tangent's velocity block is symmetric (semi-definite on the yielded branch), so it may qualify. Payoff
+  ceiling: ~20-30 % of MG Apply at np 32 on one node, and two nodes would start to pay. Exploration only: solver
+  stability rule applies, no default change without benchmarks at depth. If you expose the level smoother as an
+  option, kaiju runs the arms (10 steps from TAf-v2 checkpoint 20, np 32, one node and 2 x 16).
 - 2026-11-04, to the dev hub, from Louis's throughput ask ("Agreed - empirical, but let's try all these options"):
   the inexact inner velocity solve cannot be tested by a driver knob. On the rotated path the velocity sub-KSP rtol
   is fixed in the library at 0.033 x the SNES tolerance (the driver records it as velocity_rtol_rotated); the
@@ -2882,3 +2896,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (Newton 6.3 vs 5.5 is partition-dependent). ref6 probe (3972): cold step 1 took 940 s at np 32. pack3 v1 (3973)
   serialised (per-step --mem omitted), so it is the warm-switch comparison run sequentially; pack3 v2 (3975) is
   the real packing measurement.
+- 2026-11-04: MG Apply itemised (no new run): the 2-node kernel saving (~430 s) went into VecNorm (+218), VecMDot
+  (+138), VecScatterBegin (+96): allreduce latency ~110 us over IPoIB against ~35 us in shared memory; ratios
+  1.4-2.5, so latency, not imbalance. Source: the level smoother's GMRES reductions (gmres max_it 4 + sor, set in
+  code). Fixable in software (a reduction-free smoother), with the skill's measured gmres-over-richardson margin
+  against it; question to the dev hub (For the other hubs). Per Newton iteration np 16 / 32 / 2x16 / 52: 38.8 /
+  28.4 / 27.9 / 30.7 s; Newton counts identical through step 26, partitions diverge at 27-29.
