@@ -2780,4 +2780,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fa390e1; blobs 7ab8f3a / bce66dd / 596073d verified) and merged (1fd3c96): pause on top-0.09 hot > 0.10 or gap >
   2.0 base cells, deep end WATCH only, ledger row. Kaiju flagged the first checkpoint's gap (1.94 cells: the initial
   fault against the first fit); hub ruled a grace (GAP_GRACE = first checkpoint, WATCH not pause) rather than a
-  higher limit; small patch to come.
+  higher limit; patch applied as 23f509d (kaiju 4fb23d2; blobs 637e988 / 74a0d87 verified) and merged. New
+  launches and resumes after a pause use it; 3953 stays on the 57affaa stopgap to the base with hand checks.
