@@ -231,6 +231,12 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   write; put to Louis (no other session is asked to do it in its place). Verification: job
   4098 repeats 4043 (TAf-v2, np 26, 20 steps) with the fixed hook, to the science hub. It
   proposes ~/+Claude/kaiju/launch go into uw3-campaigns as zg95_lid_regimes/launch/kaiju_tools.
+- 2026-11-06: test_0078_rebuild_memory_rotated_fmg_parallel.py costs 36.8 s at np 2 and
+  24.0 s at np 4 in CI's environment (kaiju 4079/4080; skipped off Linux). The hub
+  recommends keeping it: a small PR on Louis's yes. Verification is job 4097 (4096 hit a
+  controller I/O error): eddab707, np 16, two rebuilds, the private weakref hook. The
+  integration session closes #948 when it is flat; #946 resumed (development merged in;
+  test_1111's shell values being re-recorded), then #906.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
