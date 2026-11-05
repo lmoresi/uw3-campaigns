@@ -71,7 +71,7 @@ GitHub, or in session transcripts. If it dies:
 | science hub | `session_013CgVT1Gx9WTvaZVqU58HsQ` ("Underworld Science Hub"); keeps `HUB.md` |
 | docs hub | `session_01HxWvn87HYCEJodpgCdaBro` ("Underworld Docs and technical notes Hub"); keeps `DOCS-HUB.md` |
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
-| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back |
+| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back. **Back 2026-11-04 22:33 UTC:** Remote Control session `session_01HxWvnAXb5n85uEcw711tJC` ("hyperion-abstract-token"), bridge environment `env_01WoSLV9PFA8uKGmUUB1rYN6` ("hyperion:+Underworld") |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
 | kaiju, dev runner | `session_01HxWvn9ik2HHt9ANKndJRDr` ("kaiju: dev runs 2"), created 2026-11-02 in Auto, replacing `...65HBbkFbSxnYfNuxR`, which locked itself out of its permissions and is archived. It runs suites, benchmarks and parallel checks of library branches on free nodes, in the held-queue order; it reports to the hub or, if refused, to the integration session |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
@@ -1356,6 +1356,17 @@ refuses deletions from here, so this needs a laptop or Louis.
   430ef613. The first merge call hit a GitHub 502 and held a lock; the retry merged. #917
   relabelled fixed-in-development. Next from the integration session: phase 1 item 4,
   then the TODO(MEASURE) knobs PR.
+- 2026-11-05: **Louis: hyperion is back with `claude remote-control` running; set it up as
+  the main service for the Claude hubs and similar.** Hyperion's session is
+  `session_01HxWvnAXb5n85uEcw711tJC` (bridge env `env_01WoSLV9PFA8uKGmUUB1rYN6`). Briefed:
+  step 1, a read-only inventory (disks and their health first, given the 2026-10-18 failure
+  and two reimages; Claude Code version; how Remote Control survives logout or reboot; gh
+  auth; pixi; connectors including Box; whether ListAgents sees peers). Step 2, only on a
+  healthy disk: a public underworld3 clone on development as a reference, `./uw setup` and
+  `./uw build`, level_1 tier_a serially and one parallel test at np 2 and 4. Louis's alone:
+  gh auth, sudo or services or linger, permission settings, the private repos. The docs
+  hub's plan ("hubs move to hyperion; the laptop talks to them over Remote Control") is
+  known only from its session summary, since its transcript cannot be read from here.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
