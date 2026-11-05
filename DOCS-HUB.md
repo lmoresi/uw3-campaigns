@@ -572,3 +572,9 @@ Measured here, not inherited.
   Brief for whoever runs it: on A-prime plus the bundle line, each curved or periodic
   example with and without its `svd` line, recording convergence, velocity iterations
   and the solution against the `svd` run.
+- 2026-11-05 (later still): Louis: hyperion's disks are still in flux, but UW can be
+  built and run there for testing, with the build and outputs liable to vanish unless
+  copied. Brief sent to the hyperion Remote Control session ("hyperion-abstract-token",
+  session_01HxWvnAXb5n85uEcw711tJC): build `docs/coarse-solve-one-rule` plus the
+  bundle-shift line locally (not pushed), run the 28 examples in two arms, report a
+  table to this hub after the user-facing batch and at the end.
