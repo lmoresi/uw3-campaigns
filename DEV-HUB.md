@@ -1423,6 +1423,12 @@ refuses deletions from here, so this needs a laptop or Louis.
   change): the integration session is to make it a clear error naming the replacement, pin
   it in test_1021, follow the Charter on deprecation, and state it and the every-route shift
   in the PR body. The PR waits on Louis's yes.
+- 2026-11-05: #901 at 9aa89dc6: `geometric_mg_bundle(coarse="svd")` raises an error naming
+  the replacement and the manual PETSc option; test_1021 pins it and checks a user's own
+  `mg_coarse_pc_type=svd` is still honoured (21 passed, serial); the Charter has no
+  deprecation-period rule; the CHANGELOG states the every-route shift and the removal. The
+  hub confirmed kaiju's 2026-11-01 C-against-B numbers for the PR body. Still to come: review
+  round 3 over 42e55655..9aa89dc6, kaiju's counts on 836f3e18, Louis's yes.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
