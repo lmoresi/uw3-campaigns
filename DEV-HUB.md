@@ -333,6 +333,8 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   / 10 / 19, flat after the first two rebuild events, against 4043's 17.1 to 32.2 GB.
   Production runs pick it up at their next restart. Still unfixed: the
   ~/campaigns/kaiju-launch/scaling/ copy (Louis).
+- 2026-11-06: Louis renamed the scaling copy to coarse_log_hook_leaky_20261106.py; no
+  leaky hook remains importable on kaiju. #948 is fully closed out.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
