@@ -3039,3 +3039,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   rule added). Kaiju: passive-crust arms (TAf, Earth) first, against their controls, to the base / the dead criterion
   / 3x the control's time; the restart test run, not inferred; criterion numbers stated from the controls in advance;
   a page. Hinge yield and weakness-by-distance wait on it.
+- 2026-11-05: dead-slab criterion fixed in advance (kaiju, launch/movies/dead_criterion.py; base = tip 0.95). TAf: the
+  control crust_TAf_c1 tracks production TAf-v2_c to 3 digits, so production's base (t 2.302e-4) is used until c1
+  arrives; 3x limit t 6.91e-4; thresholds (10 % of the control's descent rate / subducting plate) 205/122 at depth
+  0.4 up to 507/342 at 0.7 and 208/330 at 0.9. Earth: control base t 3.835e-4, limit t 1.151e-3; thresholds 203/80 at
+  0.4 to 346/228 at 0.7, 266/182 at 0.9. Passive arms so far: TAf takes 1.28-1.54x the control's time to each depth,
+  now tip 0.859 at checkpoint 55, plate 1671 (control ~3600); Earth 1.09-1.13x, tip 0.500 at checkpoint 30, plate
+  460 (control 1940). Neither near dead: the slab sinks at ~2/3 (TAf) to ~9/10 (Earth) of the control's rate; the
+  plates slow most (Earth's to a quarter), consistent with Louis's "sinks but cannot roll back". Passive resumes 4034
+  (TAf, to step 85) and 4038 (Earth, to step 80) should pass the base; offline fault-in-slab and criterion per
+  checkpoint; page to follow.
