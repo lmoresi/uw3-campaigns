@@ -281,6 +281,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## For the other hubs
 
+- 2026-11-05, to the dev hub: a MEMORY LEAK of ~0.5-1 GB per step on development f631ce42 in the zg95 runs (kaiju;
+  the earlier build 25d62812 leaked at most ~0.35 GB per step over 480 steps). Being separated from a driver change
+  first (the hub), then reproduced and bisected 25d62812..f631ce42 by hyperion-abstract-token at Louis's request;
+  suspects custom_mg.py (#937), rotated_bc.py, petsc_compat.h. Fixes come to you. Question for you meanwhile: does
+  #882's regression test exercise the custom FMG at np > 1 after #937?
 - 2026-11-04, to the dev hub: the Picard line-search stall (already on your list, rotated_bc's "if not improved:
   exit_reason = _SNES_DIVERGED_LINE_SEARCH; break") reproduced on a cold start: TAf-v2 at refinement 6 (f631ce42,
   np 32), the unfaulted step-0 solve exits after five Picard iterations at rel 0.77 with alpha halving to 0, pressure
@@ -3011,3 +3016,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   changes non-physical couplings at once (weakness linear in the projected marker; locator thresholds in crust
   thicknesses; particle rows), so it is a sampling check, not physics; those couplings are driver-change candidates
   once the passive test reports.
+- 2026-11-05: MEMORY LEAK on driver 4f2fbaa + development f631ce42 (exclusive nodes, the job's own processes): Earth np
+  26 15.6 -> 68.6 GB over 50 steps (~1.05 GB per step); TAf np 26 hit a 60 GB per-step cap at step 51; ref6 (3990) 76 GB
+  at step 28 against the probe's ~62 (~0.5 GB per step; ~140-150 GB projected at the base on a 187 GB node; kaiju
+  restarts at a checkpoint if needed). Production Earth (bcced6f on 25d62812, 480 steps, np 16) leaked at most ~0.35 GB
+  per step. All crust-test arms hit their 60 GB caps; resuming with whole nodes (4032-4034, 4038-4040). Louis had kaiju
+  ask hyperion-abstract-token (a new hyperion session) to reproduce small and bisect 25d62812..f631ce42 (93 commits;
+  suspects custom_mg.py #937, rotated_bc.py, petsc_compat.h). Hub: the comparison also changed the driver (4f2fbaa's
+  per-solve sub-KSP read-back), so kaiju separates driver from library first (existing logs of 3983/3985/3987 on
+  bcced6f + f631ce42, else a 2-arm 20-step run); if library, check #882's regression test against the custom FMG at
+  np > 1. Crust (Louis with kaiju): without the weak crust the TAf slab descends at about half the rate; Louis: the
+  fault follows the thicker passive crust much better but the slab cannot roll back without the weak crust; kaiju
+  suggests the one-element weak crust eases hinge bending, and proposes weakness keyed on fault distance or explicit
+  lithosphere yielding; a hinge-yield comparison next.
