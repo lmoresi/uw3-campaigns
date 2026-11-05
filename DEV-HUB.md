@@ -272,6 +272,14 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   serial check that stops a run if the work directory is not on S65XNE0R602587. For Louis:
   the mounts follow device names; /etc/fstab to UUID= (sudo). Hyperion -> hub messages work
   by SendMessage.
+- 2026-11-06: hyperion repointed both ~/+Underworld symlinks and env.sh to
+  /mnt/nvme0n1p4/home/lmorese/hyperion-work, with a guard that refuses to continue unless
+  the directory's disk has serial S65XNE0R602587 (tested both ways; backup
+  env.sh.bak-2026-11-06). Four harness scripts (run_one, run_batch, summarise, run_leak)
+  still hardcode the old mount: asked to source env.sh instead. For Louis (sudo):
+  ~/+Simulations goes through the root-owned link /mnt/data/lmoresi -> /home/lmorese/lmoresi,
+  which does not exist; the old data tree is on the healthy disk at
+  /mnt/nvme0n1p4/home/lmorese/lmoresi today.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
