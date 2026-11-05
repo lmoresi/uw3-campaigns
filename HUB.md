@@ -287,6 +287,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## For the other hubs
 
+- 2026-11-06, to the dev hub: the f631ce42 MEMORY LEAK is the library (kaiju 4043: driver 23f509d and 4f2fbaa leak
+  identically). ~190 MB per rank per detection/rebuild event, flat between events; Earth (rebuilding every step)
+  ~1.8 GB per step at np 26. 25d62812 ran 480 such steps without it. The signature is #882 (per-rebuild leak) coming
+  back, most likely through #937's custom_mg.py rewrite. Suggested first check (hyperion-abstract-token is doing it
+  for Louis): #882's regression test on f631ce42 at np > 1 and on the custom-FMG path; if it does not exercise the
+  custom FMG, the fix should ship a test that does.
 - 2026-11-05, to the dev hub: a MEMORY LEAK of ~0.5-1 GB per step on development f631ce42 in the zg95 runs (kaiju;
   the earlier build 25d62812 leaked at most ~0.35 GB per step over 480 steps). Being separated from a driver change
   first (the hub), then reproduced and bisected 25d62812..f631ce42 by hyperion-abstract-token at Louis's request;
@@ -3091,3 +3097,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   leaves runs unchanged). So thin geometry at 0.249 and 0.004, thick at 0.101 and 0.249. Kaiju's ledger point: with
   linear P1 blending the interface strength is a hair-trigger near the weakness floor (scale 0.9 gives 0.018, 0.5
   0.004; matching 0.101 needs 0.988), hence very sensitive to the projection and so to h.
+- 2026-11-06: LEAK is the library, not the driver (4043: 23f509d and 4f2fbaa identical rss, 17.1 -> 32.3 GB over 20
+  steps). Growth is a ~5 GB step (~190 MB per rank) every 5 steps, flat in between: the detection / rebuild /
+  refill / checkpoint cadence; Earth (detects every step) ~1.8 GB per step from step 0. Hub: the signature of #882
+  (per-rebuild leak, fixed for 25d62812); its regression test on f631ce42 at np > 1 / on the custom FMG (#937) first,
+  before a 93-commit bisection; passed to hyperion via kaiju and to the dev hub. Packed pairs run in segments under
+  90 GB per run (Earth ~35 steps per segment). Crust arms: TAf pair (4064) c1w05 to step 60, c05s05 at 56; Earth pair
+  (4065) c1w05 killed at its 90 GB cap at step 41 (restarts from 40), c05s05 at 57; continuations TAf c1 85-145 and
+  Earth c05 80-140 packed (4067); Earth c1 and Earth passive to step 160, TAf c05 to 205 done. ref6 (4047) step 64,
+  fault in slab (gap 1.11 cells at checkpoint 60), 59 GB.
