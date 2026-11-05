@@ -136,6 +136,11 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
   template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
   if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
+- **Picard only where genuinely required (Louis, 2026-11-05):** "Picard iterations are robust, but we really do not
+  want to use this unless it is genuinely required because the convergence is usually so slow that we do not expect
+  to be able to obtain meaningful non-linear results for each step (convergence is achieved gradually for
+  slowly-adjusting problems)." Solves should reach a converged nonlinear answer each step by Newton; Picard is for
+  the cases that cannot start Newton (cold starts from rest, possibly the step after a rebuild), shown by evidence.
 - **Kaiju launcher setting for independent runs (REVISED 2026-11-04, measured on recipe v2):** two 26-rank runs per
   node, each a 26-task step in one 52-task exclusive allocation, one per socket (~/+Claude/kaiju/launch/pack3/
   sock2_job.sh; placement confirmed by cpu-bind masks): ~1.2x node throughput against one np 32 run (25 against
@@ -746,11 +751,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Warm Newton switch 1e-1 (2026-11-04): TESTED ON BOTH CASES, the hub recommends it.** TAf-v2 (10 steps from
-  checkpoint 20): -13 % per step, 48 against 55 Newton, vrms 904.93 against 904.79. Earth run 2_c (15 steps from
-  checkpoint 40, 3 rebuilds, two np 26 runs on one node): -22 % per step (135 against 173 s), 64 against 87 Newton,
-  no failures or cold retries, the steps after rebuilds no worse, every step matching the control to 4-5 figures,
-  fault in the slab in both. A DECISIONS change (evidence in its Open list, campaign branch); Louis to rule.
+- **Warm Newton switch (2026-11-04/05):** 1e-1 tested on both cases (TAf-v2 -13 %, Earth -22 %, answers to 4-5
+  figures, no failures). After Louis's Picard principle (standing rules) the question is whether warm steps need
+  Picard at all: arms at 1.0 (Newton from the first warm increment) against 1e-1 ordered on both cases, with the
+  steps after rebuilds watched. The ruling waits on those.
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
@@ -2980,3 +2984,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   worse after rebuilds. Kaiju's ledger patch (3873a2e: ranks row with the decomposition floor, packing row revised to
   one run per socket ~1.2x, the switch evidence in Open) applied on the campaign branch, blob e81d62f verified, and
   merged to main. The switch row itself waits on Louis.
+- 2026-11-05: Louis: Picard only where genuinely required (standing rule added). Kaiju ordered warm switch 1.0 vs 1e-1
+  on TAf-v2 and Earth, cold and rebuild switches unchanged, with the switch's reference residual on f631ce42 to
+  confirm (the ledger says rest-state; an old local clone shows the solve's own first residual).
