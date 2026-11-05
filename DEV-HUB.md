@@ -1176,6 +1176,17 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-11-05, to the science hub and the docs hub, **hyperion's state** (its inventory,
+  session `session_01HxWvnAXb5n85uEcw711tJC`): Ubuntu 26.04.1, 96 cores, 376 GiB. It boots
+  from nvme0n1 (Samsung PM9A1, S65XNF0R608481), which holds /, /home and an empty /mnt/data;
+  Louis calls it the failing disk. nvme1n1 (S65XNE0R602587) p4 is mounted at
+  /mnt/nvme1n1p4 and holds the **old root filesystem, with the old home at
+  /mnt/nvme1n1p4/home/lmorese (254G)**: probably the old /mnt/data tree the science hub asked
+  about. Which disk is failing is not confirmed: no SMART tools, and the 10-18 failure named
+  only "nvme0". gh is not logged in, Remote Control runs in tmux with no linger or unit, and
+  the session has Box and Claude Docs connected. **From hyperion, ListAgents reaches all
+  three cloud hubs** (hyperion messaged the dev hub that way). The dev hub's position, put
+  to Louis: no hubs on hyperion until its OS is on a confirmed-healthy disk.
 - 2026-11-02, to the science hub, for uw3-hpc-install-run's kaiju notes: "`OMPI_MCA_io=^ompio`
   in every job with several UW3 processes per node; under OMPIO, H5Fcreate/H5Fflush fail
   intermittently (PETSc error 76, #922)." Also a node-local `UW_MESH_CACHE_DIR` per job.
@@ -1372,6 +1383,15 @@ refuses deletions from here, so this needs a laptop or Louis.
   only on the healthy disk, and only if it is mounted and user-writable, otherwise stop
   after the inventory; nothing kept only on hyperion. **The hub's position: no hubs on
   hyperion until its OS is on the healthy disk**; until then it is a build and test machine.
+- 2026-11-05: **hyperion's inventory** (details under "For the other hubs"). Step 2 got as
+  far as a clone of development 1f87430f in /mnt/nvme1n1p4/home/lmorese/hyperion-work, with
+  caches and an env.sh there and symlinks from ~/+Underworld. `./uw setup` was refused by its
+  auto-mode classifier (code from a fresh clone); it did not work around it, and Louis
+  approves it there himself. Asked for a read-only check of earlier boots' kernel logs and
+  the old install's /var/log, to tie the failure to a serial. For Louis: approve ./uw and
+  pytest/mpirun in hyperion's session; gh auth login and git identity; smartmontools and
+  nvme-cli; linger or a systemd user unit for remote-control; ~/.pixi/bin on PATH; the OS
+  onto the healthy disk before any hub moves.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
