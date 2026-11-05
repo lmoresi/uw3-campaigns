@@ -564,3 +564,11 @@ Measured here, not inherited.
   line out of 16 box and Dirichlet examples and tutorials). Both branches local,
   awaiting Louis's permission to push. Left: 28 curved or periodic examples, after the
   bundle shift and a run.
+- 2026-11-05 (later): Louis gave permission; both branches pushed (42e55655, b88c9fd9).
+  The bundle-shift line needs no ruling ("in line with how we work: removing multiple
+  paths where we can"); sent to the integration session, A-prime's owner, with the ask to
+  merge the docs branch into A-prime. Hyperion has Claude, but its one session is the dev
+  hub's and its build is on hold pending Louis's disk check, so the 28-example run waits.
+  Brief for whoever runs it: on A-prime plus the bundle line, each curved or periodic
+  example with and without its `svd` line, recording convergence, velocity iterations
+  and the solution against the `svd` run.
