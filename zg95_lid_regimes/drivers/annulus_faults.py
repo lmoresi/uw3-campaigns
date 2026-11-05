@@ -312,12 +312,23 @@ params = uw.Params(
                                 #   0 = the library's. 1e-2 (Louis, 2026-11-01): kaiju A/B 2026-10-28, -28 to -57 %
                                 #   Stokes time, the answer to 7e-6; kaiju budget 2026-11-01 (TAf 40, np 16), 2.3x, vrms
                                 #   to 6 figures, slip within 0.05 (12-22 pressure its per increment against 41-47).
-                                #   A run's README records the value it used; pinned running drivers keep theirs
+                                #   A run's README records the value it used; pinned running drivers keep theirs.
+                                #   Warm solves only from 2026-11-04: cold solves take uw_pres_rtol_cold
+    uw_pres_rtol_cold=1.0e-4,   # the Schur (pressure) KSP rtol for every COLD solve: the run's first solve and any cold
+                                #   retry (keep-best's cold attempt included); warm solves keep uw_pres_rtol. 1e-4 is the
+                                #   library's 0.1 x uw_tol. Kaiju 2026-11-04: at refinement 6 the cold first solve at 1e-2
+                                #   stalled in the line search (pressure 4 its per solve, alpha to 0, rel 0.77; job 3972)
+                                #   and at 1e-4 converged in 6 (alpha 1.0, rel 2.8e-5; job 3977). 0 = uw_pres_rtol
     uw_vel_rtol=0.0,            # > 0: the native path's inner velocity KSP rtol (0.033 x uw_tol); the rotated solve,
                                 #   which these drivers use, has no knob for its velocity rtol (0.033 x uw_tol)
     uw_picard=0,
     uw_newton_switch=1.0e-2,
-    uw_warm_newton_switch=1.0,
+    uw_warm_newton_switch=1.0e-1,  # Picard -> Newton on warm steps once |F| <= this x max(F0, F_rest) (rotated_bc).
+                                #   1e-1 (Louis, 2026-11-05): one or two Picard steps bring a warm iterate into
+                                #   Newton's basin; pure Newton (1.0, the old default) took 1.5-2x the iterations
+                                #   with line-search cutbacks, 1e-2 (the launch lines from 2026-10-28) 2-6 Picard
+                                #   steps; -13 % (TAf-v2) and -22 % (Earth) per step against 1e-2, answers to 4-5
+                                #   figures (kaiju jobs 3973, 3983, 3985, 3987; DECISIONS.md, Newton switches)
     uw_verbose=0,
     uw_dt_mult=3.0,
     uw_courant=1.0,
@@ -374,6 +385,9 @@ def effective_spacing(p):
 
 S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": params.uw_cell, "uw_refinement": params.uw_refinement})
 H_B = float(params.uw_cell) / 2 ** int(params.uw_refinement)    # the base cell (effective_spacing's derivation)
+PRES_RTOL_WARM = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 else 0.1 * float(params.uw_tol)
+PRES_RTOL_COLD = float(params.uw_pres_rtol_cold) if float(params.uw_pres_rtol_cold) > 0 else PRES_RTOL_WARM
+FIRST_SOLVE = True             # the run's first solve: an unconverged cold one stops a fresh run
 REBUILD = float(params.uw_rebuild_cells) * H_B                  # the rebuild threshold, a distance (needs_rebuild)
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
@@ -1344,6 +1358,7 @@ class FaultedMesh:
         if params.uw_pres_rtol > 0:
             s._rotated_pres_rtol = float(params.uw_pres_rtol)
             s.petsc_options["fieldsplit_pressure_ksp_rtol"] = float(params.uw_pres_rtol)
+        self.pres_rtol_now = None
         if params.uw_vel_rtol > 0:
             s.petsc_options["fieldsplit_velocity_ksp_rtol"] = float(params.uw_vel_rtol)
         s.consistent_jacobian = "continuation"
@@ -1428,13 +1443,56 @@ class FaultedMesh:
             self.p.array[:, 0, 0] = at(self.p, P, model_xy(self.p)).ravel()
         self.has_guess = True
 
+    def _live_pres_ksp(self):
+        """The live pressure sub-KSP of the rotated solve's cached KSP context, or None (no context yet, or not a
+        fieldsplit context)."""
+        cache = getattr(self.stokes, "_rotated_linear_cache", None) or {}
+        ksp = (cache.get("ctx") or {}).get("ksp")
+        if ksp is None:
+            return None
+        try:
+            subs = ksp.getPC().getFieldSplitSubKSP()          # ("vel", "pres"): the pressure block is the second
+            return subs[1] if len(subs) > 1 else None
+        except Exception:
+            return None
+
+    def _set_pres_rtol(self, rtol):
+        """The rotated solve's Schur (pressure) sub-KSP rtol for the next solve. The library reads
+        solver._rotated_pres_rtol when it builds the KSP context and then reuses that context across solves
+        (rotated_bc's cross-solve cache), so a change must also reach the live pressure sub-KSP."""
+        if rtol is None or rtol <= 0 or rtol == self.pres_rtol_now:
+            return
+        self.stokes._rotated_pres_rtol = float(rtol)
+        had_ctx = bool((getattr(self.stokes, "_rotated_linear_cache", None) or {}).get("ctx"))
+        sub = self._live_pres_ksp()
+        if sub is not None:
+            sub.setTolerances(rtol=float(rtol))
+        elif had_ctx and not getattr(self, "_pres_rtol_warned", False):
+            uw.pprint(f"  warning: the live pressure sub-KSP was not reachable; the pressure rtol {rtol} applies "
+                      f"only when the library rebuilds its KSP context (the solver record carries the rtol read back)")
+            self._pres_rtol_warned = True
+        self.pres_rtol_now = float(rtol)
+
+    def _pres_rtol_applied(self):
+        """The pressure rtol the last solve actually ran with, read back from the live sub-KSP; None if unreadable."""
+        sub = self._live_pres_ksp()
+        try:
+            return float(sub.getTolerances()[0]) if sub is not None else None
+        except Exception:
+            return None
+
     def _stokes_solve(self, from_rest):
         # the TI VEP model is a viscoelastic class to the solver, which demands a timestep even with
         # elasticity off (shear_modulus oo); it does not enter the law then
         extra = {"timestep": 1.0} if params.uw_ti_model == "vep" and getattr(self, "ti", None) is not None else {}
+        # cold solves (from rest) take uw_pres_rtol_cold, warm ones uw_pres_rtol (2026-11-04)
+        self._set_pres_rtol(PRES_RTOL_COLD if from_rest else PRES_RTOL_WARM)
         self.stokes.solve(zero_init_guess=from_rest, picard=params.uw_picard,
                           verbose=bool(params.uw_verbose), **extra)
-        return self.stokes._rotated_freeslip_info
+        info = self.stokes._rotated_freeslip_info
+        info["pres_rtol_used"] = self._pres_rtol_applied()      # read back, not the requested value (hub review)
+        info["pres_rtol_requested"] = self.pres_rtol_now
+        return info
 
     def solve(self):
         wall = time.perf_counter()
@@ -1451,13 +1509,13 @@ class FaultedMesh:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             info = self._stokes_solve(from_rest=not self.has_guess)
-            attempts = [nonlinear_record(info)]
+            attempts = [dict(nonlinear_record(info), pres_rtol=info.get("pres_rtol_used"))]
             if not info.get("converged") and self.has_guess:
                 uw.pprint("  the warm start did not converge: solving from rest")
                 warm = (info, np.array(self.v.array), np.array(self.p.array))
                 self.stokes.newton_switch_rtol = params.uw_newton_switch
                 info = self._stokes_solve(from_rest=True)
-                attempts.append(nonlinear_record(info))
+                attempts.append(dict(nonlinear_record(info), pres_rtol=info.get("pres_rtol_used")))
                 F_w, F_c = attempts[0]["F_final"], attempts[1]["F_final"]
                 if (params.uw_retry_keep == "best" and not info.get("converged")
                         and F_w is not None and F_c is not None and F_w < F_c):
@@ -1472,6 +1530,21 @@ class FaultedMesh:
                     a["kept"] = kept
         for w in caught:           # put the warnings back where they would have gone
             warnings.showwarning(w.message, w.category, w.filename, w.lineno)
+        global FIRST_SOLVE
+        if FIRST_SOLVE and start == "cold" and params.uw_restart < 0 and not info.get("converged"):
+            # an unconverged cold first solve is not carried forward (2026-11-04: refinement 6's cold start stalled at
+            # rel 0.77 and its vrms was 512.6 against the converged 430.9; the run went on from it silently)
+            alpha = info.get("line_search_alpha") or []
+            why = ("a linear-solve failure" if info.get("linear_failure") else
+                   "the line-search stall (no step descended)" if alpha and alpha[-1] == 0.0 else
+                   "the iteration cap or a step-norm stagnation")
+            rel = (info.get("rnorm") or float("nan")) / (info.get("ref") or float("nan"))
+            raise RuntimeError(
+                f"the first solve of this fresh run did not converge: {why}, rel |F| {rel:.2e} after "
+                f"{info.get('nonlinear_iterations')} iterations (line-search alpha {alpha}), pressure rtol "
+                f"{info.get('pres_rtol_used')}. The run stops rather than step on from an unsolved initial flow; tighten "
+                f"-uw_pres_rtol_cold, or see the solver record")
+        FIRST_SOLVE = False
         self.stokes.newton_switch_rtol = params.uw_warm_newton_switch
         self.has_guess = True
         slips = {}
@@ -2306,7 +2379,7 @@ def git_head(path):
     return None
 
 
-CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
+CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
@@ -2362,6 +2435,9 @@ def write_run_info():
     pres = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 else 0.1 * float(params.uw_tol)
     effective = {"pressure_rtol": pres, "pressure_rtol_source": "uw_pres_rtol" if float(params.uw_pres_rtol) > 0
                  else "library default 0.1 x uw_tol",
+                 "pressure_rtol_warm": PRES_RTOL_WARM, "pressure_rtol_cold": PRES_RTOL_COLD,
+                 "pressure_rtol_rule": "cold solves (the first solve and any cold retry) take the cold rtol, warm "
+                                       "solves the warm; an unconverged cold first solve stops a fresh run",
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
                  "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
                  else "one base cell (uw_cell / 2**uw_refinement)",
