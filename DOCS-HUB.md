@@ -578,3 +578,14 @@ Measured here, not inherited.
   session_01HxWvnAXb5n85uEcw711tJC): build `docs/coarse-solve-one-rule` plus the
   bundle-shift line locally (not pushed), run the 28 examples in two arms, report a
   table to this hub after the user-facing batch and at the end.
+- 2026-11-05: A-prime (`bugfix/rotated-fmg-coarse-solve`) is at 4af44735: the docs
+  branch fast-forwarded in, plus the bundle shift on every route (`test_1021` reads it
+  off the live coarse KSP on the native, custom-P and rotated routes; native and
+  custom-P annulus FMG bitwise identical with and without it). The integration session
+  corrected two of the docs hub's sentences, both verified against the code: plain LU
+  without the shift did not stop on the singular level in `test_1111` (it converged
+  5e-7 off), so "it stops with DIVERGED_PC_FAILED" was wrong; the rotation tolerance is
+  a relative 1e-8. Docs build clean at 4af44735. Hyperion told to build that commit,
+  pinned. A-prime is taking a development merge; its PR stays unopened per the dev hub.
+  The journal decision's "where enforced" is closed by one entry when the example run
+  reports, not before.
