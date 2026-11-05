@@ -1401,6 +1401,17 @@ refuses deletions from here, so this needs a laptop or Louis.
   disk, is October's failing one) agrees with Louis, so the clone on S65XNE0R602587 stands.
   Its 254G is the old /mnt/data tree, not an old root (corrected under "For the other
   hubs"). Hyperion holds; the build waits on Louis's approval in its session.
+- 2026-11-05: **#901 A-prime confirmed as it stands** (Louis to the integration session,
+  relayed verbatim: "Pass that back to the Docs Hub with the goal of making everything
+  simpler, fewer special cases, no slow-SVD unless a genuine singular pivot is discovered
+  during a solve"; asked about an SVD retry, he chose "Keep the shift, no SVD"). The SVD
+  docs cleanup (one coarse-solve rule, the `svd` override in multigrid-preconditioning.md,
+  about 40 example scripts) went to the Docs Hub and lands on top of A-prime.
+  `bugfix/rotated-fmg-coarse-solve` 77de8d81 is 136 behind development and conflicts in
+  test.sh, custom_mg.py (#937) and rotated_bc.py (#938, #942): the integration session is
+  to merge development in before phase 1 item 4. The PR needs Louis's yes; the hub's view
+  is that kaiju's 2026-11-01 measurement (build C against B) is the evidence, so it need
+  not wait for the new -log_view.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
