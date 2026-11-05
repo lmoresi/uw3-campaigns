@@ -284,6 +284,10 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   $HYPERION_WORK (backups *.bak-2026-11-06; syntax-checked, not yet run). Worktrees built
   before the swap (wt-coarse-one-rule, wt-f631, wt-25d6) carry the old mount in their pixi
   prefixes: rebuild (`pixi install`) before reuse, or discard; all are disposable.
+- 2026-11-06: **#948 closed as not planned** by the integration session on Louis's "Go ahead"
+  (said to it directly), after the explanation was posted. Open: the scaling copy of the
+  hook (Louis, sudo-free but outside the rollback session's sandbox); the rebuild-memory
+  test PR and #946's PR, both waiting on hyperion's fresh builds.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
