@@ -237,6 +237,8 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   controller I/O error): eddab707, np 16, two rebuilds, the private weakref hook. The
   integration session closes #948 when it is flat; #946 resumed (development merged in;
   test_1111's shell values being re-recorded), then #906.
+- 2026-11-06: **Louis: "Yes, do those"**: the test-only PR for test_0078's rotated FMG
+  variant (Refs #948; the hub merges on green) and #948's close once 4097 is flat. Briefed.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
