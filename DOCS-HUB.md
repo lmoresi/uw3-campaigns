@@ -589,3 +589,16 @@ Measured here, not inherited.
   pinned. A-prime is taking a development merge; its PR stays unopened per the dev hub.
   The journal decision's "where enforced" is closed by one entry when the example run
   reports, not before.
+- 2026-11-05: hyperion's user-facing batch (17 files, two arms, np 1, on the
+  docs branch plus the bundle line, code-identical to 4af44735). Every example builds
+  its mesh without refinement, so the velocity block fell back to GAMG: the `svd` line
+  only replaced GAMG's coarse solve, and the new geometric rule did not run (A-prime's
+  tests cover that). Where the solve ran, removing the line changed nothing (five
+  examples, same u and p to 1e-9 or better, same iterations; no zero pivot anywhere);
+  tutorial 8 does not converge in either arm. Twelve of the 17 fail for unrelated
+  reasons on `development`: a removed `evalf` API, three-index array shapes, pint units,
+  `estimate_dt`, and two files that do not parse; 9 of the 230 example scripts do not
+  parse and 33 files still call `evalf`. The `svd` line is now out of all 17
+  (`docs/examples-no-svd-coarse` 24727cdc, pushed). One issue drafted for the broken
+  examples (CI parse check, a scheduled smoke set, fix or retire); filing it was
+  refused by the classifier, so it waits for Louis. Investigation batch still running.
