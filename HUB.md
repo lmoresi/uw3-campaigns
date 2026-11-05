@@ -293,6 +293,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   back, most likely through #937's custom_mg.py rewrite. Suggested first check (hyperion-abstract-token is doing it
   for Louis): #882's regression test on f631ce42 at np > 1 and on the custom-FMG path; if it does not exercise the
   custom FMG, the fix should ship a test that does.
+- 2026-11-06, to the dev hub: the leak is FILED as **underworld3 #948**. #882's test (test_0078) PASSES on f631ce42
+  at np 1/2/4 (kaiju 4068) but never uses the rotated solve, the custom FMG, the split-fault pipeline or swarms, so
+  it cannot see this. Candidates: custom_mg.py objects outliving their mesh (#937), rotated_bc's cross-solve cache
+  holding the old mesh's KSP/PC/Mats, PETSc objects outside Mesh.__init__ (#882's cleanup misses them). The fix
+  should ship #882's fixture on the rotated + custom-FMG path at np > 1. Yours to drive; hyperion is offline.
 - 2026-11-05, to the dev hub: a MEMORY LEAK of ~0.5-1 GB per step on development f631ce42 in the zg95 runs (kaiju;
   the earlier build 25d62812 leaked at most ~0.35 GB per step over 480 steps). Being separated from a driver change
   first (the hub), then reproduced and bisected 25d62812..f631ce42 by hyperion-abstract-token at Louis's request;
@@ -3106,3 +3111,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (4065) c1w05 killed at its 90 GB cap at step 41 (restarts from 40), c05s05 at 57; continuations TAf c1 85-145 and
   Earth c05 80-140 packed (4067); Earth c1 and Earth passive to step 160, TAf c05 to 205 done. ref6 (4047) step 64,
   fault in slab (gap 1.11 cells at checkpoint 60), 59 GB.
+- 2026-11-06: #882's test passes on f631ce42 (kaiju 4068) but does not cover the rotated solve / custom FMG / split
+  fault / swarms; the leak filed as underworld3 #948 for the dev hub.
