@@ -309,6 +309,11 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   a real directory; rerun after a reboot by hand or from Louis's user crontab. No
   /usr/local/sbin script, no root crontab, no /mnt/data/healthy; /mnt/data/lmoresi stays
   broken (old scripts only). Hyperion told to use ~/hyperion-disk instead.
+  Done by hyperion (serial guard passes on the resolved path). **pixi resolves the link**: an
+  env built under ~/hyperion-disk records /mnt/nvme0n1p4/... (pixi info, pip shebang,
+  sys.prefix, sysconfigdata), so a disk-name swap still means rebuilding every env. Hyperion
+  asked to make env.sh stop with a "rebuild" message when an env's prefix is not under the
+  current mount.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
