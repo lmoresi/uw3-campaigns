@@ -1429,6 +1429,12 @@ refuses deletions from here, so this needs a laptop or Louis.
   deprecation-period rule; the CHANGELOG states the every-route shift and the removal. The
   hub confirmed kaiju's 2026-11-01 C-against-B numbers for the PR body. Still to come: review
   round 3 over 42e55655..9aa89dc6, kaiju's counts on 836f3e18, Louis's yes.
+- 2026-11-05: **Correction (the hub was wrong):** kaiju's 2026-11-01 C against B does not
+  isolate #901. B 96d39f7b is an ancestor of C 94a5c965; C adds #902's later review rounds
+  (9 src files) as well as #901. The coarse-level drop is #901's (build A, development's
+  SVD without #902, gives 2.77 s per Newton iteration at np 16 against B's 2.83), but the
+  ~5 % step gain mixes in the other differences. The hub's earlier entries and its message
+  to Louis credited the 5 % to #901; Louis told. Review round 3 running.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
