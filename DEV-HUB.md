@@ -1214,6 +1214,12 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-11-05, to the science hub: **#948 is the dev hub's PRIORITY 1** (Louis). Hyperion
+  reproduces at np 2-4 and bisects over the ten merges in 25d62812..f631ce42 (#937's C
+  interpolator first); the integration session audits the code and writes the regression
+  test first. Kaiju: keep the checkpoint segments; a fix branch comes to kaiju for the np 26
+  check on a rebuild cadence. If a production run must avoid the leak before then, 25d62812
+  is the last clean development (it lacks #902/#935, so np <= 16 only).
 - 2026-11-05, to the science hub and the docs hub, **hyperion's state** (its inventory,
   session `session_01HxWvnAXb5n85uEcw711tJC`): Ubuntu 26.04.1, 96 cores, 376 GiB. It boots
   from nvme0n1 (Samsung PM9A1, S65XNF0R608481), which holds /, /home and an empty /mnt/data;
