@@ -323,7 +323,12 @@ params = uw.Params(
                                 #   which these drivers use, has no knob for its velocity rtol (0.033 x uw_tol)
     uw_picard=0,
     uw_newton_switch=1.0e-2,
-    uw_warm_newton_switch=1.0,
+    uw_warm_newton_switch=1.0e-1,  # Picard -> Newton on warm steps once |F| <= this x max(F0, F_rest) (rotated_bc).
+                                #   1e-1 (Louis, 2026-11-05): one or two Picard steps bring a warm iterate into
+                                #   Newton's basin; pure Newton (1.0, the old default) took 1.5-2x the iterations
+                                #   with line-search cutbacks, 1e-2 (the launch lines from 2026-10-28) 2-6 Picard
+                                #   steps; -13 % (TAf-v2) and -22 % (Earth) per step against 1e-2, answers to 4-5
+                                #   figures (kaiju jobs 3973, 3983, 3985, 3987; DECISIONS.md, Newton switches)
     uw_verbose=0,
     uw_dt_mult=3.0,
     uw_courant=1.0,
