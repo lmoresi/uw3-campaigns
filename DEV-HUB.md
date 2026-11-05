@@ -1412,6 +1412,17 @@ refuses deletions from here, so this needs a laptop or Louis.
   to merge development in before phase 1 item 4. The PR needs Louis's yes; the hub's view
   is that kaiju's 2026-11-01 measurement (build C against B) is the evidence, so it need
   not wait for the new -log_view.
+- 2026-11-05: **#901 branch brought up to date**: 836f3e18 (merge of development 1f87430f
+  onto 4af44735), pushed, no PR. On top of 77de8d81: 42e55655 (the Docs Hub's coarse-solve
+  docs) and 4af44735 (the zero-pivot shift in the shared bundle, so **every route** carries
+  it; test_1021 reads it off the live coarse KSP; bitwise-identical v and p on a
+  nonsingular coarse level). Conflicts in test.sh, custom_mg.py and rotated_bc.py resolved
+  keeping both sides. Serial on wombat: 25 passed. The rotated and custom-MG serial set and
+  test_1112/1114/1116/1064 at np 2 and 4 are with kaiju dev runs 2. **The hub's review
+  point:** the bundle's `coarse="svd"` variant is removed, not deprecated (a public API
+  change): the integration session is to make it a clear error naming the replacement, pin
+  it in test_1021, follow the Charter on deprecation, and state it and the every-route shift
+  in the PR body. The PR waits on Louis's yes.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
