@@ -71,7 +71,7 @@ GitHub, or in session transcripts. If it dies:
 | science hub | `session_013CgVT1Gx9WTvaZVqU58HsQ` ("Underworld Science Hub"); keeps `HUB.md` |
 | docs hub | `session_01HxWvn87HYCEJodpgCdaBro` ("Underworld Docs and technical notes Hub"); keeps `DOCS-HUB.md` |
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
-| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back. **Back 2026-11-04 22:33 UTC:** Remote Control session `session_01HxWvnAXb5n85uEcw711tJC` ("hyperion-abstract-token"), bridge environment `env_01WoSLV9PFA8uKGmUUB1rYN6` ("hyperion:+Underworld") |
+| hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back. **Back 2026-11-04 22:33 UTC:** Remote Control session `session_01HxWvnAXb5n85uEcw711tJC` ("hyperion-abstract-token"), bridge environment `env_01WoSLV9PFA8uKGmUUB1rYN6` ("hyperion:+Underworld"); **archived 2026-11-05 23:20, its environment deleted.** **Current (from 2026-11-05 22:36): `session_01HxWvn98DsWPTz4ZpKByzQM` ("hyperion-splendid-sutherland"), environment `env_01KTKALPSCKW7p6heBTUQoig` ("hyperion:+Underworld:969d").** Check `list_sessions` before briefing hyperion: its sessions change with each Remote Control restart |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
 | kaiju, dev runner | `session_01HxWvn9ik2HHt9ANKndJRDr` ("kaiju: dev runs 2"), created 2026-11-02 in Auto, replacing `...65HBbkFbSxnYfNuxR`, which locked itself out of its permissions and is archived. It runs suites, benchmarks and parallel checks of library branches on free nodes, in the held-queue order; it reports to the hub or, if refused, to the integration session |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
@@ -247,6 +247,12 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   wall load, np 1/2/4/8, script on test/probe-941) and #931 (test_1064 shell np 1/2/4,
   host-specific or not). Budget 48 cores at once. Hyperion is the integration session's
   default for np 2-16; kaiju keeps zg95 and np > 16; wombat stays serial.
+- 2026-11-06: **the hub briefed an archived hyperion session** (abstract-token, archived
+  2026-11-05 23:20) with the 48-core queue and the #948 notes, so hyperion sat idle; Louis
+  noticed. The current session is splendid-sutherland (from 22:36); the integration session
+  found it and sent it the #948 test checks and #946's sets at 23:26, which it started. The
+  queue was re-sent to it. Also pending for Louis: "kaiju: dev runs 2" waits on a Bash
+  approval (checking whether the #946 jobs started).
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
