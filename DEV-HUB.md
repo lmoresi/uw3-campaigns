@@ -155,6 +155,10 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   a checkpoint), then bisect over the ten merges, one overlay per hash, c514013f against
   60dbf0e4 first. **Hyperion is offline** (Louis, 2026-11-05), so it was moved here; hyperion
   told to stand down on #948 when it returns.
+- **hyperion** is back and serving (Louis, 2026-11-06). Not the bisection (dropped). It
+  builds development eddab707 on the healthy disk and serves interactive np 2-32 runs of
+  library-level pin probes for the integration session; the zg95 driver stays on kaiju
+  (hyperion has no access to the private campaigns repo).
 - **integration session**: read #937's C code and the custom-MG / FAC object lifecycles
   against a serial probe (object counts across rebuilds, wombat-size); write the regression
   test first (#882's fixture extended to rotated free slip + custom FMG at np > 1, shown
@@ -176,6 +180,28 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   ranks (#902). Kaiju's dev runner asked for two control arms beside the bisection:
   f631ce42 at np 16, and 25d62812 at np 26 (logging whether its custom FMG built). If (2)
   leaks, the leak predates the range and the bisection is the wrong search.
+
+- 2026-11-06, kaiju reports 1-3 (relayed by the integration session; kaiju's own messages
+  to this hub are refused as an untrusted device). **Small models do not leak:** the new
+  regression test test_0078_rebuild_memory_rotated_fmg_parallel.py (449c0d37 on eddab707:
+  rotated walls, split fault, custom FMG, FAC patch) passes at np 2 (1.03 MB per rebuild)
+  and np 4 (0.70 MB); kaiju's annulus reproduction is flat at np 2 and 4 on 60dbf0e4,
+  f631ce42 and 25d62812, PETSc objects net 0 per rebuild. **zg95 TAf-v2 does leak, and the
+  old faulted mesh stays alive in Python:** after gc.collect on rank 0, every rebuild adds
+  4 Mesh (the faulted mesh and 3 chain levels), 1 SNES_Stokes and 3-4 CustomMGHierarchy,
+  identically on f631ce42 and eddab707 at np 26 (jobs 4084, 4087). Rss per rebuild: +180 MB
+  per rank at np 26 on both builds, +260 MB at np 16 on f631ce42 (4077), flat between. So
+  **#947 does not fix it, the SVD hypothesis is out, and np 16 leaks too**. 25d62812 at np 26
+  takes the custom-FMG fallback (4078), so the pin may predate the range: the bisection is
+  dropped. The integration session's serial pin probe (placement, custom-FMG solve with
+  add_fault_bc, global_evaluate, warm start) keeps no child mesh, so the holder is in a step
+  not yet reproduced (chain levels on persistent coarse hosts, projections,
+  AnnulusDiagnostics, crust-swarm marker evaluation, fault_slip) or is parallel-only.
+  **Next: kaiju dumps gc referrer chains of a stale Mesh and SNES_Stokes at np 16 on
+  eddab707.** The hub's read of the library: the model, mesh and swarm registries are all
+  weak, and Swarm.__del__ unregisters and destroys its DM, so library swarm bookkeeping is
+  not the pin; candidates for the walk include sympy, expression or JIT caches holding the
+  old mesh's symbols, registered callbacks or closures, stored tracebacks, driver globals.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
