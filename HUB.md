@@ -752,9 +752,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Overturn movie restyle (2026-11-05):** the test frame at step 400 (no marker contours, continent filled,
-  oceanic crust as small dots) is on the movie page (Q1Dq1epuXoEjPnKN7rzcKL); kaiju re-renders the full overturn
-  when Louis approves it.
+- **Overturn movie restyle (2026-11-05):** Louis is directing it with kaiju directly (continent from its particles in
+  bright orange, oceanic crust as small dark-green particles, no contours; test frame on the movie page v10). The
+  full re-render follows his approval there; no hub action.
 
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
@@ -2999,3 +2999,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   slip_max 5078 / 4273 (+19 %). Hub: slip_max is too noisy for the convergence comparison (ref4-ref5 45 % is ~2x
   the triangulation noise; the trench's 35 % is ~10x); integrated slip added to the three-way page, trench and
   plate speeds lead.
+- 2026-11-05: ref6 (3990) step 0: the cold solve at pressure rtol 1e-4 converged (4 Picard + 2 Newton, switch at
+  iteration 4 at rel 9.2e-3, final rel 2.77e-5; vrms 430.93, matching probe 3977's 430.9; dt 2.03e-6; 1182 s).
+  Stepping on; steps 1-10 in ~2-2.5 h.
