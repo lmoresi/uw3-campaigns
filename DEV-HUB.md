@@ -1180,10 +1180,14 @@ refuses deletions from here, so this needs a laptop or Louis.
   session `session_01HxWvnAXb5n85uEcw711tJC`): Ubuntu 26.04.1, 96 cores, 376 GiB. It boots
   from nvme0n1 (Samsung PM9A1, S65XNF0R608481), which holds /, /home and an empty /mnt/data;
   Louis calls it the failing disk. nvme1n1 (S65XNE0R602587) p4 is mounted at
-  /mnt/nvme1n1p4 and holds the **old root filesystem, with the old home at
-  /mnt/nvme1n1p4/home/lmorese (254G)**: probably the old /mnt/data tree the science hub asked
-  about. Which disk is failing is not confirmed: no SMART tools, and the 10-18 failure named
-  only "nvme0". gh is not logged in, Remote Control runs in tmux with no linger or unit, and
+  /mnt/nvme1n1p4 and holds, at /mnt/nvme1n1p4/home/lmorese (254G), an 11-04 copy of the
+  current system plus **/home/lmorese/lmoresi: the old /mnt/data/lmoresi tree** (underworld3,
+  claude-mirror, hyperion-rescue-2026-10-20, Simulations, crontab.backup); the old
+  ~/+Simulations symlink there dangles. Which disk failed in October is inferred, not proven:
+  both filesystems date from 2026-11-02, no older logs survive, and the root filesystem has
+  been on S65XNF0R608481 in all 12 boots since (names swapped once, 11-04 21:19, same UUID).
+  October's record put / and /home on the failing disk and /mnt/data on the one that read
+  cleanly, which agrees with Louis. SMART would settle it. gh is not logged in, Remote Control runs in tmux with no linger or unit, and
   the session has Box and Claude Docs connected. **From hyperion, ListAgents reaches all
   three cloud hubs** (hyperion messaged the dev hub that way). The dev hub's position, put
   to Louis: no hubs on hyperion until its OS is on a confirmed-healthy disk.
@@ -1392,6 +1396,11 @@ refuses deletions from here, so this needs a laptop or Louis.
   pytest/mpirun in hyperion's session; gh auth login and git identity; smartmontools and
   nvme-cli; linger or a systemd user unit for remote-control; ~/.pixi/bin on PATH; the OS
   onto the healthy disk before any hub moves.
+- 2026-11-05: hyperion's disk check: no errors on either disk in 12 boots since the
+  2026-11-02 reinstall; nothing older survives. The inference (S65XNF0R608481, today's boot
+  disk, is October's failing one) agrees with Louis, so the clone on S65XNE0R602587 stands.
+  Its 254G is the old /mnt/data tree, not an old root (corrected under "For the other
+  hubs"). Hyperion holds; the build waits on Louis's approval in its session.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
