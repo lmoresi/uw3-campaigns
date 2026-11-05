@@ -1367,6 +1367,11 @@ refuses deletions from here, so this needs a laptop or Louis.
   gh auth, sudo or services or linger, permission settings, the private repos. The docs
   hub's plan ("hubs move to hyperion; the laptop talks to them over Remote Control") is
   known only from its session summary, since its transcript cannot be read from here.
+- 2026-11-05: **Louis: hyperion's second disk exists but it still boots from the failing
+  one, so hyperion stays fragile.** Brief amended: step 2 (clone, pixi environment, caches)
+  only on the healthy disk, and only if it is mounted and user-writable, otherwise stop
+  after the inventory; nothing kept only on hyperion. **The hub's position: no hubs on
+  hyperion until its OS is on the healthy disk**; until then it is a build and test machine.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
