@@ -328,6 +328,11 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   fixed-gauge rerun, with and without the pinned corner; file if confirmed). Hyperion: git
   identity per clone (Claude), env check called from the harness scripts, then queue items
   2 and 3.
+- 2026-11-06: **#948 verified at production size** (kaiju 4098, 4043's case: TAf-v2, np 26,
+  20 steps, f631ce42, the weakref hook): node rss 17.4 / 21.5 / 23.1 / 23.4 GB at steps 1 / 5
+  / 10 / 19, flat after the first two rebuild events, against 4043's 17.1 to 32.2 GB.
+  Production runs pick it up at their next restart. Still unfixed: the
+  ~/campaigns/kaiju-launch/scaling/ copy (Louis).
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
