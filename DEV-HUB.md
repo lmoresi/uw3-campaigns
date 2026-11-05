@@ -222,6 +222,15 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   (449c0d37): coverage of rotated + custom FMG + split fault + FAC rebuild memory, passing on
   development; kept or dropped on Louis's word. The integration session returns to #946
   (4aade5ad), then #906. Hyperion's probe role is moot.
+- 2026-11-06, kaiju rollback session (the hook's author; np52/run_driver.py ran every packed
+  crust run, which is why direct-driver runs like production Earth did not leak): **fixed
+  ~/+Claude/kaiju/launch/np52/coarse_log_hook.py** (weak references, dead entries pruned on
+  each add_fault_bc; the leaky copy kept as coarse_log_hook_leaky_20261106.py); no other
+  hook holds a solver. Running jobs keep the old copy until their next segment. **Not
+  fixed: ~/campaigns/kaiju-launch/scaling/coarse_log_hook.py**, which its sandbox cannot
+  write; put to Louis (no other session is asked to do it in its place). Verification: job
+  4098 repeats 4043 (TAf-v2, np 26, 20 steps) with the fixed hook, to the science hub. It
+  proposes ~/+Claude/kaiju/launch go into uw3-campaigns as zg95_lid_regimes/launch/kaiju_tools.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
