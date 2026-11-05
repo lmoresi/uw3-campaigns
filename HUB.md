@@ -245,6 +245,7 @@ frozen as the hand-over state; they are not updated here after this date.
 | Recipe v2 baselines: **COMPLETE 2026-11-04.** TAf-v2_c (3852/3953, from step 0, base at checkpoint 85) and Earth run 2_c (3858, base at checkpoint 75; continued to the overturn as 3957, the article run), both with the built cut in cold slab at every checkpoint. Base pages and movies from kaiju. | kaiju | done |
 | Full overturn run for the article (Louis, 2026-11-04: "soon") | kaiju; Earth run 2 corrected and TAf-v2 carried past the base; estimate ~4x the time to the base, t ~0.001-0.0015, 400-600 steps, ~1-1.5 days per run on one node at np 16 (or ~1 day at np 52 if the wall node is clean) | Louis to pick the case. Watcher base stop optional: STOP_AT_BASE (default 1; 0 logs the base and runs on to -uw_steps), applied 57affaa, blob 6501ae5 verified, merged to main; the watcher writes its choices (STOP_AT_BASE, EVERY, HOT_PAUSE) to the run README beside the driver's block. |
 | np 52 for production (Louis's throughput ask) | kaiju 10-step test from TAf-v2 checkpoint 20, np 52 vs 16: wall check, fault-in-slab, -log_view with the one-rank patch's fraction of the step; then the SuperLU decomposed patch if the dev hub says how | DONE 2026-11-04 on f631ce42: np 32 and 52 both 1.19x np 16 on one node (memory-bandwidth bound); FAC patch 2 % (SuperLU not worth it); #935 and #902 verified on the production mesh. Open: a 2-node x 16 point. SuperLU waits on that number. The known np 52 state: 1.44x per step, one unconstrained outer-wall node (v.n 2722), 46-47 GB per node. |
+| Refinement 6 (TAf-v2, the convergence test of production; Louis's go 2026-11-05) | kaiju, np 32, one node, driver 4f2fbaa, f631ce42; ~30 h to the base | ORDERED 2026-11-05; resolution page to become three-way at the base |
 | TI-in-the-ladder fault comparison (one run) | kaiju runs/slab_thermal_fault_TAti_smooth (checkpoints to 90), page v6 https://claude.ai/artifact/TAUT7fi5cM75zkbna7gm9R; design report figures_work/ti_fault/; TI pages 7mau5dPymUCYGPYJCCDnME, box reference Em96SAdVik4gAdhJC5LV7x | COMPLETE 2026-11-01. TAti_smooth at the base (tip on it at checkpoint 85, stopped after 90, job 2469; L1 band strength, chain 0, envelope locator, whole-band mask, smooth band law, 3e-2 Newton switches, keep-best retry from step 61). RESULT: the TI band and the split give the same large-scale subduction: time on base 2.350e-4 vs TAf_env 2.349e-4, tip histories overlie; incoming plate 698 vs 686, P10 0.100 vs 0.096; TI trench and hinge retreat ~20 % less by the base (-7.6 vs -9.5 deg; hinge -4.0 vs -5.1); dips 35-40 in both; TAc later (2.445e-4), slower (580), less plate-like (0.119). Slip medians on each run's own measure (TI 3774 band probe, TAf_env 4200 node jump, TAf 6243), not comparable. COST (+-10 % non-determinism): TAf 455 s/step, 7.0 Newton, 12.7 h; TAf_env 340, 5.6, 9.5 h; TAc 302, 6.7, 6.8 h; TAti_smooth 912, 13.8, 23.0 h recorded (~26 h node time with discarded segments and the hang). CAVEAT: 31 of TAti's 91 steps unconverged (20 in 6-60 under the old retry rule, 15 of them cold-worse; 11 in 61-90 with keep-best, none cold-worse), clustered after rebuilds; the three split/no-fault runs had none. All four at pressure rtol 1e-4; walls clean at np 16. Louis's "all the models seem to do similar things" is answered: the realisations are close in this setting |
 | Add-on mesh demonstration movie (fault refit and rebuilt every step, fixed window, 30 frames) | kaiju figures_out/addon_demo/mesh_movie/ (demo-mesh-envelope.mp4, .json, README.md); page https://claude.ai/artifact/3NDYkgLksNA1yuQGdvVrZ3 | COMPLETE 2026-10-29 (job 2375, TA_age25f steps 31-60 on 07667b2, envelope, rebuild every step): 30/30 fits, no welds, 17.9 GB; windows centred at -3.21 deg (slab: -21.0 to 22.6 deg to depth 1.0, tip at 0.87 by step 60; trench: -8.75 to 2.33 deg to 0.24); trench -1.35 -> -5.07 deg; placed dip 32-43 (floor never bound; data 30.9-41.4); fit change 0.003-0.012/step (0.19-0.76 of the 4-rung threshold; production would rebuild every 2-4 steps); rebuild 16.0-16.6 s (build 11.1-11.7, transfer 1.9, to base 2.9) against 131-248 s steps, ~8 %; +524-624 cells on 126,976. The parabola from the same start (2367) OOM'd at step 40. For UWTN 2026-022: the notes hub's to use; files reach the laptop by Louis's rsync |
 | Faulted thermal set (TAf, TBf, TA_age25f + fault-free twin TAc, crust sampled at 12 ppc) | kaiju `figures_out/slab_thermal_fault/` (README, overlay.png, solver.png, plate_metrics for all seven thermal runs, fault_compare.json, records) | COMPLETE 2026-10-29, stopped at the base (TAc 80, TA_age25f 90, TAf 100, TBf 110), all on full checkpoints; artifact https://claude.ai/artifact/NJCoW6npE4kr4D5yXfbqVR (table, four movies, overlay, solver); rsync for the files |
@@ -750,31 +751,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
-
-- **Warm Newton switch (2026-11-05): 1e-1 recommended, pure Newton tested and rejected on evidence.** At 1.0 (Newton
-  from the first warm increment) every warm step converged but took 1.5-2x the Newton iterations with frequent
-  line-search cutbacks (TAf 90 vs 51 Newton, +59 % per step; Earth 96 vs 64, +87 %); answers identical to 5-6 figures.
-  At 1e-1 warm steps run 1-2 Picard iterations then 1-4 full Newton steps, and each step converges to tolerance, so
-  it meets Louis's principle (Picard only as the one or two steps needed to enter Newton's basin, not a slow
-  Picard-driven convergence). At 1e-2 warm steps ran 2-6 Picard. Louis to rule on 1e-1.
-
-- **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
-  refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
-  Patch READY on branch kaiju/pres-rtol-cold, head 131cb89 (d43ccae = kaiju 55c1808, plus 131cb89 = kaiju 3081acc,
-  the record reads the applied rtol back from the live sub-KSP; blobs verified; job 3980 read back 1e-4 cold and
-  1e-2 warm), not merged: uw_pres_rtol_cold
-  1e-4 for cold solves, 1e-2 warm, and a fresh run whose first solve fails stops. At refinement 5 it is invisible
-  (job 3979: step-0 vrms 442.524 vs 442.523, +48 s once per run; warm steps identical to 6 figures). Louis to accept
-  (merge then makes it the default). Also for him: kaiju's mid-run proposal, a hard stop only when keep-best's kept
-  attempt has rel > 0.1 (an unsolved state, not a near miss); today a single unconverged mid-run step is carried
-  forward with only the two-in-a-row trigger as guard. The hub agrees in principle.
-
-- **Refinement 6 for TAf-v2 (2026-11-04): READY FOR LOUIS'S GO.** The test of whether production (refinement 5) is
-  converged; trench and slip moved 35-45 % from ref4 to ref5. Ten-step probe (3978, cost and trend only): every warm
-  step converged, pressure its plateau at ~30 per Newton iteration (production 21-25), 780 s per step at np 32 on
-  one node, dt ~1.9e-6 (2x the steps). To the base ~35 h (~1.5 days) at np 32, ~30 h with the warm switch at 1e-1;
-  ~71 GB per node. Needs the cold-solve patch (kaiju/pres-rtol-cold 131cb89; ~20 min once at the start), so
-  accepting that patch comes first. The hub recommends both.
 
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
@@ -3000,3 +2976,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-05: ledger Open item gains the pure-Newton arms and the switch reference (kaiju ed38f50, applied as
   dac8ad3, blob 1c448b5 verified, merged). The older "Levers measured but not taken" line still calls the reference
   the warm iterate's own residual; reworded with Louis's ruling, not before.
+- 2026-11-05: **Louis: "OK, go with 1e-1, the cold patch and ref6".** Campaign branch head 4f2fbaa (merged to main
+  6de0700): kaiju/pres-rtol-cold merged (e14483a); warm switch default 1.0 -> 1e-1 (66c80db; the old default was pure
+  Newton, production's 1e-2 came from the launch lines since 2026-10-28; new launch lines omit the flag); ledger
+  Newton switches row with ruling and history, Open item struck, levers line updated; cold rule marked accepted
+  (4f2fbaa). Blobs annulus_faults.py 97649e0, baseline_job.sh 637e988, fault_in_slab.py 7ab8f3a, DECISIONS.md 19797c2.
+  ref6 ordered: TAf-v2 -uw_cell 0.5 -uw_refinement 6, fresh, 4f2fbaa, f631ce42, np 32 one exclusive node, to the base;
+  ~30 h. Kaiju to verify blobs and compile in the image before launching.
