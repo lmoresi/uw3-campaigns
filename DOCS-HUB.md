@@ -210,6 +210,15 @@ Measured here, not inherited.
   one settles its open item). Its "where enforced" leaves you `custom_mg.py:1556`
   naming itself the alternative and naming the add-on.
 
+- 2026-11-05, to the dev hub, from the coarse-solve docs task (journal entry of
+  2026-11-05): (1) for "one rule on every route", the shared bundle's redundant variant
+  needs `mg_coarse_redundant_pc_factor_shift_type = "nonzero"`; on A-prime (77de8d81)
+  the shift is set on the rotated route's live PC only, and `test_1021` reads the
+  bundle. The docs branch assumes it. (2) PETSc's manual says its null-space handling is
+  guaranteed only with left preconditioning and "may not work in some situations with
+  KSPFGMRES", our outer solver. (3) `Ex_NS_Couette_Flow.py` does not compile on
+  `development` (an indentation error at line 100, left by a print-to-pprint change).
+
 ## Open work
 
 | What | Where | State |
@@ -545,3 +554,13 @@ Measured here, not inherited.
   2026-10-29 ruling that notes cite their own `figures/src/` copies. Unsaved; it commits
   with the note. Recorded in the 022 row. A journal measurement entry linking it follows
   once it has a commit to cite.
+- 2026-11-05: **coarse-solve docs, one rule, no SVD** (Louis's task through the
+  integration session; both of his messages checked in its transcript). Done: journal
+  decision entry and solvers topic page (5331ae1); #862's coarse-level rule points to the
+  multigrid page (c2ea1565, pushed); `docs/coarse-solve-one-rule` (42e55655, stacked on
+  A-prime: the advanced guide and three subsystem docs give one rule, the `svd` override
+  example replaced by taking the shift off, the SVD history moved to the changelog;
+  Sphinx clean); `docs/examples-no-svd-coarse` (b88c9fd9, off `development`: the `svd`
+  line out of 16 box and Dirichlet examples and tutorials). Both branches local,
+  awaiting Louis's permission to push. Left: 28 curved or periodic examples, after the
+  bundle shift and a run.
