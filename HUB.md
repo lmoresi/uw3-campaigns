@@ -763,6 +763,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Half-element crust as the recipe (2026-11-05):** it changes the geometry (a thin entrained marker, no pile-up)
+  and the effective weakening (~2x, not 1000x) at once, and both scale with the element size. Before it becomes the
+  recipe: a pair of arms separating the two (kaiju designing it), and the crust thickness and weakening stated
+  physically. Louis to decide whether to run the pair.
+
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3062,3 +3067,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   creeping forward deeper than ~0.62, so no lock-up test deeper than 0.6), mean -1125, threshold |rate| < 113. Lock-up
   = over the arm's passage through the range, mean retreat below the threshold, slab still descending (above the dead
   criterion's 10 %), subducting plate below 10 % of the control's. Louis's sentence is the page's definition.
+- 2026-11-05: **fault-only results at the base** (passive crust vs weak-crust control, np 26, 4f2fbaa, f631ce42; movie
+  page v13). TAf: base at 1.37x the control's time (3.20e-4 vs 2.33e-4), not dead; hinge retreat over 0.5-0.95 855 vs
+  2146 (threshold 221), not locked; slab thins a little. Verdict slow but alive. Earth: base at 1.12x (4.31e-4 vs
+  3.84e-4), not dead; retreat over 0.4-0.6 793 vs 1123 (threshold 113), not locked; but the slab NECKS (cold core
+  0.016-0.035 at depths 0.3-0.7 vs ~0.05-0.06), Louis's drip signature; both Earth arms continue to checkpoint 160
+  (4054, 4055) to see whether it detaches. Louis on the renders: "The half element crust is the only one that does
+  not pile up. As a result it produces a fault that is much better defined. There is a much smaller / narrower band
+  of entrained crust near the surface, the fault is low angle there and steepening at depth. It looks like textbook
+  subduction. That is true in both models, though in each case there is a hiccup at the beginning where they
+  struggle to adjust to the initial condition. Crust as a thin marker entrained from the surface, slightly weaker,
+  seems to capture the essence of the problem. Run the models some more." Half-element continued (Earth 4059 from
+  checkpoint 80, TAf 4057 from 85, 120 steps), TAf weak-crust control alongside (4058). Kaiju's ledger note: the
+  half-element arm's weakening is ~2x effective, not the nominal 1000x (linear in the projected marker). Hub to
+  Louis: geometry and effective strength change together and both scale with the element, so a recipe on it must
+  state thickness and weakening physically; kaiju asked to design the separating pair, not launched. 19:40 outage:
+  all eight nodes rebooted; ref6 resubmitted as a restart from checkpoint 30 (4047, README records it); leak test
+  driver vs library (4043) running.
