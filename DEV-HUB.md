@@ -296,6 +296,12 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   `@reboot sleep 60 && /usr/local/sbin/hyperion-relink` in place of fstab. Hyperion told to
   move its links and HYPERION_WORK onto /mnt/data/healthy once it exists, keep the serial
   guard, and test whether a pixi env built there keeps the stable prefix.
+- 2026-11-06: **PR #951** (rebuild-memory test, 4d636194, test-only: the new rotated-FMG
+  file plus a flush before test_0078's first reading; Refs #948). Proven at np 2 on hyperion
+  in CI's environment: 2 passed at 2.61 MB per rebuild, no object alive; with every Stokes
+  solver pinned as the hook did, 2 failed (20 objects alive, 49.4 MB per rebuild). Bound
+  10 MB; tier B; MPI phase (no batch line). CI running; the hub merges on green (Louis's
+  "Yes, do those"). #946 waits on hyperion's run on both builds.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
