@@ -162,6 +162,21 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
 - **kaiju**: keeps running in checkpoint segments; verifies the fix at np 26 on a rebuild
   cadence once a branch exists.
 
+**Progress:**
+- 2026-11-05, integration session: #937's C code (petsc_compat.h) frees or destroys
+  everything it creates on the normal path; the custom_mg and rotated_bc diffs add no
+  caches or stored attributes; #934's block index sets are destroyed. Serial probe on a
+  build with all ten merges (af9d3c33), annulus rebuilt and solved per cycle: rotated + custom
+  FMG, rotated + GAMG, no-slip + custom FMG and a plain control all leave **no PETSc object
+  per rebuild** (creations equal destructions in every class). Not reached: np > 1 (petsc4py
+  defers destruction there), the split-fault ladder and FAC patch, non-PETSc memory. Next:
+  split fault + FAC patch in the serial probe.
+- 2026-11-05, hub: **a confound in #948.** The clean baseline (25d62812) ran at np 16; every
+  leak measurement is at np 26 or 32, and on 25d62812 the custom FMG fell back above ~16
+  ranks (#902). Kaiju's dev runner asked for two control arms beside the bisection:
+  f631ce42 at np 16, and 25d62812 at np 26 (logging whether its custom FMG built). If (2)
+  leaks, the leak predates the range and the bisection is the wrong search.
+
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
 ## Done: the rotated path's FAC patch blocks ran ILU(0), not LU (#892; fixed by #912)
