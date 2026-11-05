@@ -314,6 +314,20 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   sys.prefix, sysconfigdata), so a disk-name swap still means rebuilding every env. Hyperion
   asked to make env.sh stop with a "rebuild" message when an env's prefix is not under the
   current mount.
+- 2026-11-06, hyperion queue item 4 (eddab707): **#931 not reproduced** (test_1064 shell:
+  worst coefficient 2.3e-7 at np 2, 1.5e-7 at np 4, inside 1e-6; this mesh has 1991 cells
+  against the anchor's 2016, so a different triangulation from kaiju's). **#941 unconfirmed**:
+  in no run at np 1-8, cellSize 0.1-0.033, was the corner node on a rank without Top facets;
+  `-petscpartitioner_type simple` was ignored, so a forced partition is needed. Probe pushed
+  by the hub (hyperion has no credentials) as underworld3 test/probe-941 b6525a87,
+  scripts/sessions/probe_941_partly_pinned_normal.py, not for merge. **Side finding:**
+  boundary_normal_traction_integral with remove_mean=True varies with the partition
+  (-0.1066155 to -0.1066242, np 1-8), tracking the raw integral's gauge drift at ~-2.7e-3;
+  mean removal should cancel a constant pressure. Candidate: #942's zero at the partly pinned
+  corner drops the gauge's share there. To the integration session after #946 and #906 (a
+  fixed-gauge rerun, with and without the pinned corner; file if confirmed). Hyperion: git
+  identity per clone (Claude), env check called from the harness scripts, then queue items
+  2 and 3.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
