@@ -149,10 +149,12 @@ petsc_compat.h +242 (#937: UW3's C copy of PETSc's nested interpolator), rotated
 rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
 
 **Who:**
-- **hyperion** (`session_01HxWvnAXb5n85uEcw711tJC`): reproduce small at np 2-4 (rotated
-  free slip, custom FMG, a few rebuilds; rss per rank and PETSc object creations minus
-  destructions per rebuild), then bisect over the ten merges, builds in worktrees on the
-  healthy disk. Louis had already asked it, through kaiju.
+- **kaiju's dev runner** (`session_01HxWvn9ik2HHt9ANKndJRDr`, "kaiju: dev runs 2"):
+  reproduce small at np 2-4 (rotated free slip, custom FMG, a few rebuilds; rss per rank and
+  PETSc object creations minus destructions per rebuild; fall back to the zg95 driver from
+  a checkpoint), then bisect over the ten merges, one overlay per hash, c514013f against
+  60dbf0e4 first. **Hyperion is offline** (Louis, 2026-11-05), so it was moved here; hyperion
+  told to stand down on #948 when it returns.
 - **integration session**: read #937's C code and the custom-MG / FAC object lifecycles
   against a serial probe (object counts across rebuilds, wombat-size); write the regression
   test first (#882's fixture extended to rotated free slip + custom FMG at np > 1, shown
