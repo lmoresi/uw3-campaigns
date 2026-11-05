@@ -280,6 +280,10 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   ~/+Simulations goes through the root-owned link /mnt/data/lmoresi -> /home/lmorese/lmoresi,
   which does not exist; the old data tree is on the healthy disk at
   /mnt/nvme0n1p4/home/lmorese/lmoresi today.
+  Later: the four harness scripts now source the guarded env (`|| exit 1`) and use
+  $HYPERION_WORK (backups *.bak-2026-11-06; syntax-checked, not yet run). Worktrees built
+  before the swap (wt-coarse-one-rule, wt-f631, wt-25d6) carry the old mount in their pixi
+  prefixes: rebuild (`pixi install`) before reuse, or discard; all are disposable.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
