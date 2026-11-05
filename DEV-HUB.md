@@ -239,6 +239,14 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   test_1111's shell values being re-recorded), then #906.
 - 2026-11-06: **Louis: "Yes, do those"**: the test-only PR for test_0078's rotated FMG
   variant (Refs #948; the hub merges on green) and #948's close once 4097 is flat. Briefed.
+- 2026-11-06: **Louis: hyperion is idle with 48 cores; use it.** Hyperion's standing queue,
+  in order: (1) development eddab707 build and serial tier A+B baseline; (2) the parallel
+  suite at np 2 and 4 as CI runs it (is #931 there too?); (3) the integration session's
+  requests first (#946's Linux-CI-matching shell values, #906's parallel tests, the
+  rebuild-memory test PR); (4) investigation probes, no fixes: #941 (partition-dependent
+  wall load, np 1/2/4/8, script on test/probe-941) and #931 (test_1064 shell np 1/2/4,
+  host-specific or not). Budget 48 cores at once. Hyperion is the integration session's
+  default for np 2-16; kaiju keeps zg95 and np > 16; wombat stays serial.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
