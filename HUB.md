@@ -136,6 +136,12 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
   template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
   if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
+- **No strategy change on the crust weakness until the fault alone is shown to kill the slab (Louis, 2026-11-05):** "We
+  need to be sure that the fault alone leads to a dead slab that cannot restart before we make significant changes to
+  the strategy." The test (hub, fixed in advance from the controls): passive crust vs weak-crust control at the same
+  np; dead = tip descent rate and subducting plate speed both < 10 % of the control's at the same tip depth, sustained
+  over the control's own time from that depth to the base; then continued as long again to see whether it restarts;
+  limit 3x the control's time to the base.
 - **Picard only where genuinely required (Louis, 2026-11-05):** "Picard iterations are robust, but we really do not
   want to use this unless it is genuinely required because the convergence is usually so slow that we do not expect
   to be able to obtain meaningful non-linear results for each step (convergence is achieved gradually for
@@ -3029,3 +3035,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault follows the thicker passive crust much better but the slab cannot roll back without the weak crust; kaiju
   suggests the one-element weak crust eases hinge bending, and proposes weakness keyed on fault distance or explicit
   lithosphere yielding; a hinge-yield comparison next.
+- 2026-11-05: Louis: be sure the fault alone gives a dead slab that cannot restart before changing strategy (standing
+  rule added). Kaiju: passive-crust arms (TAf, Earth) first, against their controls, to the base / the dead criterion
+  / 3x the control's time; the restart test run, not inferred; criterion numbers stated from the controls in advance;
+  a page. Hinge yield and weakness-by-distance wait on it.
