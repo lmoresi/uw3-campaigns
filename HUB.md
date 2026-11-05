@@ -764,9 +764,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 ## Waiting on Louis
 
 - **Half-element crust as the recipe (2026-11-05):** it changes the geometry (a thin entrained marker, no pile-up)
-  and the effective weakening (~2x, not 1000x) at once, and both scale with the element size. Before it becomes the
-  recipe: a pair of arms separating the two (kaiju designing it), and the crust thickness and weakening stated
-  physically. Louis to decide whether to run the pair.
+  and the effective interface weakening together. CORRECTED (kaiju): not "~2x weaker"; both arms are fully weak
+  (1000x) on the surface node row; one node down the one-element marker is 0.62-0.74 and the half-element's ~0;
+  averaged over the top two cells the interface factor (harmonic mean) is 0.249 half-element against 0.101
+  one-element, so the half-element crust is ~2.5x LESS weakened as an interface. Separating arm, no driver change:
+  one-element crust with -uw_crust_weak 0.05 (same interface factor as the half-element crust), TAf and Earth, np 26,
+  from step 0, against the existing c1 and c05 arms: if pile-up and the poorly defined fault persist, they go with
+  the thickness; if not, with the strength. Louis to say whether to run it. A mesh-independent recipe states the
+  crust's physical thickness and an interface factor over a stated depth, not "w and one element".
 
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
@@ -3084,3 +3089,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   state thickness and weakening physically; kaiju asked to design the separating pair, not launched. 19:40 outage:
   all eight nodes rebooted; ref6 resubmitted as a restart from checkpoint 30 (4047, README records it); leak test
   driver vs library (4043) running.
+- 2026-11-05: kaiju corrected the half-element weakening (measured from the projected marker): full weakness on the
+  surface node row in both arms, the half-element's gone one node down; interface factors 0.249 vs 0.101 (harmonic),
+  0.740 vs 0.411 (along the layer). The converse arm (thin crust at the one-element's factor) needs a sharpened marker
+  in crust_factor_on (a driver change). Separating arm (a) proposed, not launched.
