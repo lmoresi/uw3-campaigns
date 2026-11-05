@@ -302,6 +302,13 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   solver pinned as the hook did, 2 failed (20 objects alive, 49.4 MB per rebuild). Bound
   10 MB; tier B; MPI phase (no batch line). CI running; the hub merges on green (Louis's
   "Yes, do those"). #946 waits on hyperion's run on both builds.
+- 2026-11-06: **Louis: the script lives in his home directory and touches no system
+  directory.** Replaced: `~/bin/hyperion-relink`, run as Louis with no sudo, links
+  ~/hyperion-disk to the healthy disk's p4 mount (serial S65XNE0R602587, lsblk + findmnt)
+  and ~/+Simulations to ~/hyperion-disk/home/lmorese/lmoresi/Simulations; refuses to replace
+  a real directory; rerun after a reboot by hand or from Louis's user crontab. No
+  /usr/local/sbin script, no root crontab, no /mnt/data/healthy; /mnt/data/lmoresi stays
+  broken (old scripts only). Hyperion told to use ~/hyperion-disk instead.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
