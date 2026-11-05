@@ -293,11 +293,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   back, most likely through #937's custom_mg.py rewrite. Suggested first check (hyperion-abstract-token is doing it
   for Louis): #882's regression test on f631ce42 at np > 1 and on the custom-FMG path; if it does not exercise the
   custom FMG, the fix should ship a test that does.
-- 2026-11-06, to the dev hub: the leak is FILED as **underworld3 #948**. #882's test (test_0078) PASSES on f631ce42
-  at np 1/2/4 (kaiju 4068) but never uses the rotated solve, the custom FMG, the split-fault pipeline or swarms, so
-  it cannot see this. Candidates: custom_mg.py objects outliving their mesh (#937), rotated_bc's cross-solve cache
-  holding the old mesh's KSP/PC/Mats, PETSc objects outside Mesh.__init__ (#882's cleanup misses them). The fix
-  should ship #882's fixture on the rotated + custom-FMG path at np > 1. Yours to drive; hyperion is offline.
+- 2026-11-06, to the dev hub: **WITHDRAWN: the f631ce42 "leak" was not the library.** A gc referrer dump (kaiju
+  4094) traced it to the campaign's own profiling hook (launch/np52/coarse_log_hook.py, imported by run_driver.py),
+  which appended every fault solver to a module-level list that was never cleared, keeping each rebuild's solver,
+  mesh, coarse levels and FMG hierarchy alive. Fixed with weak references; flat rss after the fix (4098). #948 closed
+  not-planned with the explanation. The two entries below (the leak report and #948) stand corrected; nothing for
+  you to fix. The hub's step "not the driver, so the library" skipped the launcher's own code.
 - 2026-11-05, to the dev hub: a MEMORY LEAK of ~0.5-1 GB per step on development f631ce42 in the zg95 runs (kaiju;
   the earlier build 25d62812 leaked at most ~0.35 GB per step over 480 steps). Being separated from a driver change
   first (the hub), then reproduced and bisected 25d62812..f631ce42 by hyperion-abstract-token at Louis's request;
@@ -3113,3 +3114,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault in slab (gap 1.11 cells at checkpoint 60), 59 GB.
 - 2026-11-06: #882's test passes on f631ce42 (kaiju 4068) but does not cover the rotated solve / custom FMG / split
   fault / swarms; the leak filed as underworld3 #948 for the dev hub.
+- 2026-11-06: **CORRECTION: the leak was kaiju's own profiling hook**, not the library and not the driver
+  (coarse_log_hook.py kept every fault solver in a module-level list; weak references fix it; 4098: 17.4 -> 23.4 GB
+  over 19 steps, flat after the first two rebuilds, against 17.1 -> 32.2 before). It affected only runs through
+  run_driver.py (crust tests, scaling and packing tests), not the baselines or ref6, which call the driver through
+  baseline_job.sh. Segment workaround dropped. #948 closed not-planned with the correction. The hub's "library
+  regression" reading and the #882 signature were wrong. Still leaky: the copy in ~/campaigns/kaiju-launch/scaling/,
+  which kaiju cannot write (for Louis). ref6's slower growth (~0.5 GB per step) is separate, within the node, watched.
+  Kaiju proposes putting ~/+Claude/kaiju/launch (job scripts, run_driver, hooks, render and analysis scripts) under
+  version control in uw3-campaigns; the hub agrees. Bending-line fault (Louis's request): experimental branch
+  kaiju/bending-fault (35a50f5, 003af01; driver blob 9c6f357), -uw_fault_fit bending (mid-crust fit of the crust
+  particles with a tanh dip profile along arc length), half-element crust runs from step 0 (TAf 4095, Earth 4105).
