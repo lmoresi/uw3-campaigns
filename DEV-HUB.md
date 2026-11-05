@@ -264,6 +264,14 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   options database after the solver is gone: ~41 entries per rebuild; the one library-side
   growth found). The rebuild-memory test PR waits on hyperion's pinned np-2 run (proving it
   can fail); #946 (b1739413, review fixed) waits on hyperion's Linux test set.
+- 2026-11-06: **hyperion's disk names swapped again.** The healthy disk (S65XNE0R602587)
+  is now nvme0n1 at /mnt/nvme0n1p4, and /mnt/nvme1n1p4 now holds the failing boot disk's
+  partition (S65XNF0R608481). The rule is by serial only: work lives at
+  /mnt/nvme0n1p4/home/lmorese/hyperion-work today. The old env.sh and ~/+Underworld symlinks
+  pointed at /mnt/nvme1n1p4, i.e. the failing disk: hyperion asked to repoint them and add a
+  serial check that stops a run if the work directory is not on S65XNE0R602587. For Louis:
+  the mounts follow device names; /etc/fstab to UUID= (sudo). Hyperion -> hub messages work
+  by SendMessage.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
