@@ -3125,3 +3125,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   version control in uw3-campaigns; the hub agrees. Bending-line fault (Louis's request): experimental branch
   kaiju/bending-fault (35a50f5, 003af01; driver blob 9c6f357), -uw_fault_fit bending (mid-crust fit of the crust
   particles with a tanh dip profile along arc length), half-element crust runs from step 0 (TAf 4095, Earth 4105).
+- 2026-11-06: kaiju/bending-fault pushed as an experimental branch on kaiju/crust-marker-scale (kaiju 35a50f5 ->
+  1050cc5, 003af01 -> 59e5551; blobs 71f868c, 9c6f357 verified); not merged. **TIMING QUESTION OPEN:** with the hook
+  fixed, 4098 ran 145 s per step against 229 s for the leaky 4043 on the same case, same Newton counts and answers,
+  the difference inside the solve, but confounded by node and pairing. If the leaky hook slowed solves (a growing live
+  heap, garbage scans), every run_driver timing (3959-3961, 3971, 3973, 3982, 3983, 3985, 3987) is suspect: the np
+  16/32/52 ceiling and the 2-node result most, since those came from separate jobs; the warm-switch and packing
+  ratios were within-job on one node and may hold. Clean A/B (leaky vs fixed hook, one node, one per socket) queued
+  as 4107.
