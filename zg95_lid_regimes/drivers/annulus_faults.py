@@ -1209,9 +1209,11 @@ def crust_bending_points(faults):
     u_far, q = float(params.uw_bend_u_far), float(params.uw_bend_q)
     w_lo, w_hi = float(params.uw_bend_w_min), float(params.uw_bend_w_max)
     sel = (Z <= params.uw_bend_fit_depth) & (U <= u_far) & (U >= -0.5)
-    if sel.sum() < 30 or (sel & (Z > cap)).sum() < 6:
+    if sel.sum() < 30 or (sel & (Z > 0.5 * cap)).sum() < 6:
+        # as the envelope locator: subducted crust below half the cap (a short initial slab need not reach the cap;
+        # Earth's 0.2-long slab at 45 deg ends at about 0.14, and the curve carries its dip on to the cap)
         uw.pprint(f"  crust fault (bending): too little crust to fit ({sel.sum()} particles, "
-                  f"{(sel & (Z > cap)).sum()} below the cap)")
+                  f"{(sel & (Z > 0.5 * cap)).sum()} below half the cap)")
         return None
     U, Z = U[sel], Z[sel]
     prev = faults[0].get("bend") if faults else None
