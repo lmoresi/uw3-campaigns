@@ -114,6 +114,10 @@ params = uw.Params(
     uw_crust_thick=-1.0,
     uw_crust_depth=0.5,
     uw_crust_fill=1,            # particles per cell parameter (1: about 3 per cell)
+    uw_crust_marker_scale=1.0,  # the crust's weakness acts on clamp01(marker / this): 1 = the marker as projected (P1,
+                                #   blended linearly between nodes); < 1 sharpens it, so a layer thinner than a cell is
+                                #   fully weak over more of its cell (kaiju 2026-11-05, the crust experiments: 0.5 with a
+                                #   half-element crust makes its top half-cell fully weak)
     uw_crust_ppc=0,             # > 0: the crust layer seeded denser than the swarm, about this many
                                 #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
     uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the crust on the subducting
@@ -466,7 +470,7 @@ def crust_factor_on(mesh, crust_sym, mask=0):
     uw_marker_rheo_depth), and 1 where ``mask`` (the fault band, uw_fault_precedence) is 1."""
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
     window = (1 - sympy.tanh((depth - params.uw_crust_depth) / 0.05)) / 2 * marker_rheo_window(mesh)
-    return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym) * window * (1 - mask)
+    return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym / float(params.uw_crust_marker_scale)) * window * (1 - mask)
 
 
 def comp_factor_on(marker_sym, eta, mask=0, window=1):
@@ -2382,7 +2386,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_marker_scale", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
