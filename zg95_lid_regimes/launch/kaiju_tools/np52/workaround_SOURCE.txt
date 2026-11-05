@@ -1,0 +1,2 @@
+# kaiju_tools: where the workaround came from
+3ade59963dc3deb72bb85e45280310bd6d865965 #935 probe: choose the cell sizes and meshes (PROBE935_SIZES, PROBE935_MESHES), regular boxes too
