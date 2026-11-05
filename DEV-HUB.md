@@ -288,6 +288,14 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   (said to it directly), after the explanation was posted. Open: the scaling copy of the
   hook (Louis, sudo-free but outside the rollback session's sandbox); the rebuild-memory
   test PR and #946's PR, both waiting on hyperion's fresh builds.
+- 2026-11-06: Louis can fix hyperion's links with sudo but cannot change fstab. The hub gave
+  him `/usr/local/sbin/hyperion-relink`: finds the disk with serial S65XNE0R602587 by lsblk,
+  its p4 mount by findmnt, checks the old data tree, refuses to replace a non-link, then
+  links /mnt/data/healthy to the mount and /mnt/data/lmoresi to
+  /mnt/data/healthy/home/lmorese/lmoresi (repairing ~/+Simulations); optional root crontab
+  `@reboot sleep 60 && /usr/local/sbin/hyperion-relink` in place of fstab. Hyperion told to
+  move its links and HYPERION_WORK onto /mnt/data/healthy once it exists, keep the serial
+  guard, and test whether a pixi env built there keeps the stable prefix.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
