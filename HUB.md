@@ -752,10 +752,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Overturn movie restyle (2026-11-05):** Louis is directing it with kaiju directly (continent from its particles in
-  bright orange, oceanic crust as small dark-green particles, no contours; test frame on the movie page v10). The
-  full re-render follows his approval there; no hub action.
-
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3002,3 +2998,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-05: ref6 (3990) step 0: the cold solve at pressure rtol 1e-4 converged (4 Picard + 2 Newton, switch at
   iteration 4 at rel 9.2e-3, final rel 2.77e-5; vrms 430.93, matching probe 3977's 430.9; dt 2.03e-6; 1182 s).
   Stepping on; steps 1-10 in ~2-2.5 h.
+- 2026-11-05: ref6 steps 1-10 all converged, no cold retries; ~690 s per step (the 1e-1 switch ~10 % under the
+  probe's 780); dt 1.72-2.01e-6, ~150-160 steps and ~30 h to the base. Warm steps 1-2 Picard + 2-4 Newton; rebuilds
+  4+1, 3+1; pressure its 24-31 per increment at 1e-2 (read-back confirms 1e-4 at step 0, 1e-2 after). Fault in slab
+  (top 0, deep 0) at checkpoints 0/5/10; gap 0.0 / 2.41 (within the grace) / 1.93 base cells. GAP_PAUSE is 2 cells =
+  0.0156 at ref6, half production's physical limit; hub: leave it, and if it pauses with the top cold and the
+  physical gap within production's (~0.022), resume at once with GAP_PAUSE=3, recorded. Louis directly with kaiju:
+  the restyled overturn movie (steps 0-480) is on the movie page v11; crust tests (np 26, 4f2fbaa, each against its
+  own control): half-element crust (3993 Earth, 3994 TAf) and passive crust (-uw_crust_weak 0.9999, 3997) on his
+  concern that the one-element weak crust is a wide weak zone substituting in part for the fault; early passive
+  numbers support it (TAf step-1 slip 368 vs 967 weak; Earth step-0 vrms 169 vs 219). He notes the half-element arm
+  changes non-physical couplings at once (weakness linear in the projected marker; locator thresholds in crust
+  thicknesses; particle rows), so it is a sampling check, not physics; those couplings are driver-change candidates
+  once the passive test reports.
