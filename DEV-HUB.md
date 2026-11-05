@@ -1469,6 +1469,13 @@ refuses deletions from here, so this needs a laptop or Louis.
   default normal). The branch's change is test-only (cellSize 0.3, a fold gate, a
   faulthandler watchdog, since pytest-timeout cannot stop a KSPSolve). Every 3-D shell
   refined through that callback is exposed: a candidate roadmap item.
+- 2026-11-05: the integration session: Louis did not say "open the PR"; it read his
+  "Keep going with the fixes and let's get this part over the line" (2026-11-05) as covering
+  it. Nothing said about merging. **#947 green on every shard; merge put to Louis**, with
+  whether #901's intent is met. Louis also ruled #946 a fix (to the integration session:
+  "Better fix this - I had not seen this bite before. I'd fix it at the gmsh end but the
+  callback should be alert too because we won't only be using gmsh"), on
+  `bugfix/shell-refinement-folds-946`, separate from #947.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
