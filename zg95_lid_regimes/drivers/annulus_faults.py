@@ -196,6 +196,13 @@ params = uw.Params(
     uw_fault_fit="envelope",    # crust law locator: "envelope" (the crust base marched up from the cap,
                                 #   crust_envelope_points; ruled by the go on the Earth plan, 2026-10-29, locator A/B
                                 #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
+    uw_bend_q=0.5,              # -uw_fault_fit bending (kaiju 2026-11-06, Louis: "the fault should lie on a flexural-shaped
+                                #   bending line that flattens out along the plate"): the quantile of the crust particles
+                                #   in normal distance the curve is fitted to (0.5 the crust's middle; 0.1 its base, 0.9 top)
+    uw_bend_w_min=0.04,         # bending: the hinge width's bounds (layer depths): a kink is not a bend
+    uw_bend_w_max=0.2,
+    uw_bend_u_far=0.35,         # bending: the curve starts this far along the incoming plate from the fault's trench
+    uw_bend_fit_depth=0.25,     # bending: crust deeper than this is not fitted (below the cap, to fix the slab dip)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
                                 #   point to the wall; the unfloored dip is recorded
     uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
@@ -1146,6 +1153,121 @@ def crust_envelope_points(faults):
     uw.pprint(f"  crust fault (envelope): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
               f"data {top_dip:.1f}{' (floored)' if info['top_dip_floored'] else ''}, trench gap {gap:.3f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
+
+
+def bending_curve(p, u_far, n=900):
+    """The bending line in (u, z): u the surface arc from the fault's trench, positive along the incoming plate, z depth.
+    Its dip rises along its own arc length s from 0 on the incoming plate to phi at depth:
+    dip(s) = phi (1 + tanh((s - s_h) / w)) / 2, from (u_far, z0). p = (s_h, w, phi, z0)."""
+    s_h, w, phi, z0 = p
+    s = np.linspace(0.0, u_far + 0.6, n)
+    dip = phi * 0.5 * (1.0 + np.tanh((s - s_h) / max(w, 1e-4)))
+    ds = s[1] - s[0]
+    u = u_far - np.concatenate([[0.0], np.cumsum(np.cos(dip[:-1]) * ds)])
+    z = z0 + np.concatenate([[0.0], np.cumsum(np.sin(dip[:-1]) * ds)])
+    return u, z, dip
+
+
+def crust_bending_points(faults):
+    """The fault on a flexural bending line fitted to the oceanic crust (-uw_fault_fit bending; kaiju 2026-11-06). The
+    crust particles (the continent's excluded), from 0.5 on the overriding side of the fault's trench to uw_bend_u_far
+    along the incoming plate and to depth uw_bend_fit_depth, are fitted by bending_curve: a quantile regression of their signed normal
+    distance (uw_bend_q; 0.5 the crust's middle), Nelder-Mead over (s_h, w, phi, z0) with w in [uw_bend_w_min,
+    uw_bend_w_max], seeded with the previous fit (the fault's "bend"). The fault follows the curve from the depth cap up
+    to where its dip falls to uw_fault_top_dip_min, then goes straight to the wall at that dip; a stub to 0.02 above
+    the wall; resampled at the rung spacing. Theta and dip are measured on that polyline. The fit runs on rank 0 and is
+    broadcast. Collective. Returns (points, theta, dip, depth, info) or None, as crust_envelope_points. Prototyped
+    offline on 36 stored checkpoints (launch/movies/bending_fit.py)."""
+    from scipy.optimize import minimize
+    from scipy.spatial import cKDTree
+    cap = fault_depth_cap()
+    ct = crust_thick
+    xy = np.asarray(swarm_xy(), dtype=float)
+    keep = np.asarray(crust_var.array[:, 0, 0]).ravel() > 0.5
+    if "over" in markers:
+        keep &= ~(np.asarray(markers["over"][0].array[:, 0, 0]).ravel() > 0.5)
+    P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
+    depth = r_o - np.hypot(P[:, 0], P[:, 1])
+    theta = np.arctan2(P[:, 1], P[:, 0])
+    if faults:
+        hint = float(faults[0]["theta"])
+    else:                                            # the subducted cluster that goes deepest
+        sub = (depth > 1.25 * ct) & (depth <= cap + 2 * ct)
+        if sub.sum() < 12:
+            return None
+        o = np.argsort(theta[sub])
+        pieces = np.split(o, np.flatnonzero(np.diff(theta[sub][o]) > 0.03) + 1)
+        piece = max(pieces, key=lambda p: depth[sub][p].max())
+        hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
+    u_all = r_o * wrap(theta - hint)
+    surf = (depth < max(0.5 * ct, 0.004)) & (np.abs(u_all) > 0.05) & (np.abs(u_all) < 0.5)
+    if surf.sum() < 4:
+        uw.pprint("  crust fault (bending): no surface crust on either side of the fault")
+        return None
+    side = 1.0 if np.median(u_all[surf]) > 0 else -1.0
+    U, Z = side * u_all, depth
+    u_far, q = float(params.uw_bend_u_far), float(params.uw_bend_q)
+    w_lo, w_hi = float(params.uw_bend_w_min), float(params.uw_bend_w_max)
+    sel = (Z <= params.uw_bend_fit_depth) & (U <= u_far) & (U >= -0.5)
+    if sel.sum() < 30 or (sel & (Z > cap)).sum() < 6:
+        uw.pprint(f"  crust fault (bending): too little crust to fit ({sel.sum()} particles, "
+                  f"{(sel & (Z > cap)).sum()} below the cap)")
+        return None
+    U, Z = U[sel], Z[sel]
+    prev = faults[0].get("bend") if faults else None
+    if prev is None:
+        d0 = float(faults[0]["dip"]) if faults else float(params.uw_dip)
+        d0 = d0 if d0 < 90 else 180.0 - d0
+        prev = [u_far - 0.02, 0.06, float(np.radians(d0)), 0.5 * ct]
+    p = None
+    if uw.mpi.rank == 0:
+        def signed(pp):
+            cu, cz, dip = bending_curve(pp, u_far)
+            dd, k = cKDTree(np.c_[cu, cz]).query(np.c_[U, Z])
+            return (U - cu[k]) * (-np.sin(dip[k])) + (Z - cz[k]) * (-np.cos(dip[k]))
+
+        def obj(pp):
+            r = signed(pp)
+            pen = 0.0 if w_lo <= pp[1] <= w_hi else 1e3 * min(abs(pp[1] - w_lo), abs(pp[1] - w_hi)) ** 2 + 1e-3
+            return float(np.mean(np.maximum(q * r, (q - 1) * r))) + pen
+        g = np.array(prev, dtype=float)
+        g[1] = np.clip(g[1], w_lo, w_hi)
+        res = minimize(obj, g, method="Nelder-Mead", options={"xatol": 1e-5, "fatol": 1e-9, "maxiter": 4000})
+        p = [float(v) for v in res.x] + [float(res.fun)]
+    p = uw.mpi.comm.bcast(p, root=0)
+    misfit = p.pop()
+    cu, cz, dip = bending_curve(p, u_far)
+    dmin = np.radians(float(params.uw_fault_top_dip_min))
+    k0 = int(np.argmax(dip >= dmin)) if (dip >= dmin).any() else None
+    k1 = int(np.flatnonzero(cz <= cap)[-1]) if (cz <= cap).any() else None
+    if k0 is None or k1 is None or k1 <= k0 + 2:
+        uw.pprint(f"  crust fault (bending): the fitted curve never steepens past {params.uw_fault_top_dip_min} deg "
+                  f"above the cap (hinge {p[0]:.3f}, w {p[1]:.3f}, dip {np.degrees(p[2]):.1f})")
+        return None
+    seg_u, seg_z = cu[k0:k1 + 1], cz[k0:k1 + 1]
+    u_wall = seg_u[0] + seg_z[0] / np.tan(dip[k0])    # straight up to the wall at the top dip (toward +u)
+    x = r_o * hint + side * np.r_[u_wall, seg_u]
+    raw = np.c_[x, np.r_[0.0, seg_z]]                 # (x, depth): wall point, then the curve to the cap
+    d = raw[1] - raw[0]
+    pol = np.vstack([raw[0] - d * (0.02 / d[1]), raw])
+    radius = r_o - pol[:, 1]
+    poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
+                             S, 2 ** int(params.uw_chain))
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(rp <= r_o))
+    w = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip_t = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    info = {"locator": "bending", "bend": [round(v, 6) for v in p], "bend_misfit": misfit,
+            "bend_quantile": q, "raw": np.c_[raw[:, 0] / r_o, raw[:, 1]].round(6).tolist()}
+    uw.pprint(f"  crust fault (bending): trench {np.degrees(theta_t):.2f} deg, dip {dip_t:.1f}; hinge {p[0]:.3f}, "
+              f"w {p[1]:.3f}, slab dip {np.degrees(p[2]):.1f}, z0 {p[3]:.4f}, misfit {misfit:.2e}")
+    return poly, theta_t, dip_t, float((r_o - rp).max()), info
 
 
 def ti_band_viscosity(s, faulted, footprint, tag):
@@ -2385,7 +2507,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_bend_q", "uw_bend_w_min", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_marker_scale", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
@@ -2706,6 +2828,8 @@ for k in range(k0, k0 + params.uw_steps):
         # trench down to the depth cap; it forms at the first detection and never retires
         if params.uw_fault_fit == "envelope":
             found = crust_envelope_points(faults)
+        elif params.uw_fault_fit == "bending":
+            found = crust_bending_points(faults)
         else:
             found = crust_fault_points(faults)
             found = found + ({"locator": "parabola"},) if found is not None else None
