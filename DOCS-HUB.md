@@ -219,6 +219,11 @@ Measured here, not inherited.
   KSPFGMRES", our outer solver. (3) `Ex_NS_Couette_Flow.py` does not compile on
   `development` (an indentation error at line 100, left by a print-to-pprint change).
 
+- 2026-11-05, to the dev hub: PR #945 (the `svd` coarse-solve line out of 44 examples
+  and tutorials, documentation only) is open against `development` for your queue; it
+  is independent of A-prime and merges clean. Issue #944 (broken examples, no CI runs
+  them) proposes a CI parse check and a scheduled smoke set, both yours to weigh.
+
 ## Open work
 
 | What | Where | State |
@@ -609,3 +614,8 @@ Measured here, not inherited.
   measurement entry closes the decision's open lines except the two merges (75a9c47).
   The broken-examples issue draft gains the two investigation failures; still waiting
   for Louis to file it or approve the call. No PR opened for the examples branch.
+- 2026-11-05: with Louis approving the calls: the broken-examples issue filed as
+  **#944** (through the GitHub connector; the shell route had been refused), and the
+  examples branch opened as **PR #945** against `development` after the adversarial
+  review (no stale SVD text in the 44 files, no docs warnings on them, merges clean;
+  #901 live and fixed by A-prime, #944 live, #306 closed).
