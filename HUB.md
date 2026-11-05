@@ -3057,3 +3057,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   -687 / -727 against the control's -1301 / -843 at tip 0.44 / 0.50-0.56; the Earth control's own hinge stops by tip
   0.62 and creeps forward near the base. Reading: slow but alive, no lock-up. Hub: lock-up to be judged against the
   control's mean retreat rate over the depths where the control retreats, with an absolute floor, fixed in advance.
+- 2026-11-05: lock-up check FIXED in advance (kaiju): TAf range tip 0.50-0.95 (control retreats at every checkpoint,
+  -565 to -3340), mean -2213, threshold |rate| < 221; Earth range 0.40-0.60 (control retreats steadily; fixed or
+  creeping forward deeper than ~0.62, so no lock-up test deeper than 0.6), mean -1125, threshold |rate| < 113. Lock-up
+  = over the arm's passage through the range, mean retreat below the threshold, slab still descending (above the dead
+  criterion's 10 %), subducting plate below 10 % of the control's. Louis's sentence is the page's definition.
