@@ -751,10 +751,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Warm Newton switch (2026-11-04/05):** 1e-1 tested on both cases (TAf-v2 -13 %, Earth -22 %, answers to 4-5
-  figures, no failures). After Louis's Picard principle (standing rules) the question is whether warm steps need
-  Picard at all: arms at 1.0 (Newton from the first warm increment) against 1e-1 ordered on both cases, with the
-  steps after rebuilds watched. The ruling waits on those.
+- **Warm Newton switch (2026-11-05): 1e-1 recommended, pure Newton tested and rejected on evidence.** At 1.0 (Newton
+  from the first warm increment) every warm step converged but took 1.5-2x the Newton iterations with frequent
+  line-search cutbacks (TAf 90 vs 51 Newton, +59 % per step; Earth 96 vs 64, +87 %); answers identical to 5-6 figures.
+  At 1e-1 warm steps run 1-2 Picard iterations then 1-4 full Newton steps, and each step converges to tolerance, so
+  it meets Louis's principle (Picard only as the one or two steps needed to enter Newton's basin, not a slow
+  Picard-driven convergence). At 1e-2 warm steps ran 2-6 Picard. Louis to rule on 1e-1.
 
 - **Cold-solve pressure tolerance (2026-11-04):** recipe v2's pressure rtol 1e-2 stalls the cold first solve at
   refinement 6 (line-search exit at rel 0.77, initial vrms 513 vs 431 converged); 1e-4 converges it in 6 iterations.
@@ -2987,3 +2989,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-05: Louis: Picard only where genuinely required (standing rule added). Kaiju ordered warm switch 1.0 vs 1e-1
   on TAf-v2 and Earth, cold and rebuild switches unchanged, with the switch's reference residual on f631ce42 to
   confirm (the ledger says rest-state; an old local clone shows the solve's own first residual).
+- 2026-11-05: warm switch 1.0 vs 1e-1 (3985 TAf-v2, 3987 Earth; np 26 one per socket; f631ce42 / 23f509d). The switch
+  reference on f631ce42 is max(own first residual, rest-state residual) (TAf: own F0, 1.15-3.6x F_rest; Earth:
+  F_rest, warm F0 0.29-0.66 of it). Pure Newton warm: 7-14 (TAf) / 3-13 (Earth) Newton per step, 0-10 cutbacks; 1e-1:
+  1-2 Picard + 1-6 Newton, 0-2 cutbacks; rebuild steps identical (rebuild switch). Totals TAf 51 / 90 Newton, 252 /
+  401 s per step; Earth 64 / 96, 134 / 250 s. No failures; end states agree to 5-6 figures; fault in slab identical;
+  Earth's 1e-1 arm reproduces 3983 digit for digit on another node. Hub's reading for Louis: pure Newton from the
+  previous step's solution loses its first steps, most likely to the yield state changing between steps (the
+  hard-Min law's active set), which one or two Picard steps absorb.
