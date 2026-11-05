@@ -2997,3 +2997,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Earth's 1e-1 arm reproduces 3983 digit for digit on another node. Hub's reading for Louis: pure Newton from the
   previous step's solution loses its first steps, most likely to the yield state changing between steps (the
   hard-Min law's active set), which one or two Picard steps absorb.
+- 2026-11-05: ledger Open item gains the pure-Newton arms and the switch reference (kaiju ed38f50, applied as
+  dac8ad3, blob 1c448b5 verified, merged). The older "Levers measured but not taken" line still calls the reference
+  the warm iterate's own residual; reworded with Louis's ruling, not before.
