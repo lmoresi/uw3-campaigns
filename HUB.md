@@ -3133,3 +3133,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   16/32/52 ceiling and the 2-node result most, since those came from separate jobs; the warm-switch and packing
   ratios were within-job on one node and may hold. Clean A/B (leaky vs fixed hook, one node, one per socket) queued
   as 4107.
+- 2026-11-06: **kaiju_tools under version control**: zg95_lid_regimes/launch/kaiju_tools/ (51 scripts, 344 KB: README,
+  run wrapper and hooks incl. the fixed coarse_log_hook.py, packing and baseline job scripts, movie / report /
+  analysis scripts, render_v2, the fault-division study, the Earth isolation test), kaiju 114baac / 542fe7a / 7a699c5 /
+  f1c4250 applied as 1cfa721 / a11831d / 8b9bfd8 / cacc3e0 on the campaign branch (fetched from kaiju's private page,
+  sizes and sha256 matched; 51 of 51 blobs match their index lines; py_compile / bash -n clean; credential scan clean;
+  leaky hook and run outputs excluded); merged to main. From now on launches run hooks and scripts from a pushed
+  commit. Hub's note on the hook: it also opens a new PETSc log stage per solve, which the 4107 A/B (leaky vs fixed
+  hook) cannot see; a no-hook arm (the driver through baseline_job.sh) asked for.
