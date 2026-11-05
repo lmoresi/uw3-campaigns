@@ -3049,3 +3049,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   plates slow most (Earth's to a quarter), consistent with Louis's "sinks but cannot roll back". Passive resumes 4034
   (TAf, to step 85) and 4038 (Earth, to step 80) should pass the base; offline fault-in-slab and criterion per
   checkpoint; page to follow.
+- 2026-11-05: Louis on rollback vs lock-up: "Rollback means the slab descends with low plate velocity, but the
+  distinction is that the hinge retreats. If the hinge is fixed and the slab is descending and the plate is not
+  moving, then we have lock up of the plate boundary." Kaiju adds a lock-up check beside the fixed dead criterion
+  (trench retreat rate, slab descending, subducting plate below 10 %). Trench so far: TAf passive hinge retreats
+  steadily at ~1/3 of the control's rate (e.g. tip 0.82-0.84: -2.69 vs -5.68 deg, rate -1018 vs -2884); Earth passive
+  -687 / -727 against the control's -1301 / -843 at tip 0.44 / 0.50-0.56; the Earth control's own hinge stops by tip
+  0.62 and creeps forward near the base. Reading: slow but alive, no lock-up. Hub: lock-up to be judged against the
+  control's mean retreat rate over the depths where the control retreats, with an absolute floor, fixed in advance.
