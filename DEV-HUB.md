@@ -1435,6 +1435,26 @@ refuses deletions from here, so this needs a laptop or Louis.
   SVD without #902, gives 2.77 s per Newton iteration at np 16 against B's 2.83), but the
   ~5 % step gain mixes in the other differences. The hub's earlier entries and its message
   to Louis credited the 5 % to #901; Louis told. Review round 3 running.
+- 2026-11-05: **hyperion built and validated** on the healthy disk (S65XNE0R602587), Louis
+  having approved the build in its session. The build is a worktree of
+  `docs/coarse-solve-one-rule` 42e55655 (src identical to #901's 4af44735, base development
+  1f87430f) for the docs hub's coarse-solve evaluation; the development clone stays a
+  read-only reference. `./uw set-env dev`, `./uw build`, conda-forge PETSc 3.25.3, uw from
+  the worktree's .pixi/envs/dev. level_1 and tier_a: 1498 passed, 44 skipped, 0 failed in
+  37m45s (shared with about 30 single-rank jobs). test_0076 at np 2 and 4 and
+  ptest_002_projection at np 2 and 4 pass. Nothing local to push. Still Louis's: gh auth and
+  git identity, SMART tools, linger or a unit for remote-control, the OS move.
+- 2026-11-05: **#901 review round 3 done** (independent, serial, 42e55655..9aa89dc6): 1
+  MEDIUM (the rotated route wrote the shift a second time on its live PC, for a false
+  reason; the helper is deleted, the bundle is the only writer) and 6 LOW (a rotated set-up
+  that raised left 11 options in the global database, 10 also on development, now swept in
+  `finally` with a test; the shift's wording matches PETSc; development's native and
+  standard routes already ran PETSc's default INBLOCKS shift at np > 1 and none at np 1,
+  stated in the CHANGELOG and body, kaiju confirming; doc overstatements; the svd error says
+  the hand-set SVD works on the standard path only). Fixed in af9d3c33, wording in bca84349;
+  34 passed serially. #910 not seen at the tip (0 of 20) but no regression test, so left
+  open; #877 still live. Kaiju has af9d3c33 for the serial set, the parallel tests and the
+  np 1/2/4 shift check. The PR waits on those and on Louis's yes.
 - 2026-11-03: #934's second shard-4 cancel was the cap, not a hang (the hub's reading was
   wrong twice on this shard); the shards are rebalanced on #925's branch. #932 is green and
   waits only on Louis's 2-D confirmation.
