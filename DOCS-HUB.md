@@ -602,3 +602,10 @@ Measured here, not inherited.
   (`docs/examples-no-svd-coarse` 24727cdc, pushed). One issue drafted for the broken
   examples (CI parse check, a scheduled smoke set, fix or retire); filing it was
   refused by the classifier, so it waits for Louis. Investigation batch still running.
+- 2026-11-05 (close): hyperion's investigation batch: nine of the eleven submesh scripts
+  give the same answer to 1e-11 or better; `test_region_ds_phase3` segfaults and
+  `test_bootstrap_viscosity` stalls at the 20-minute cap, both in both arms. The `svd`
+  line is out of all 44 files (`docs/examples-no-svd-coarse` 32966c18, pushed). Journal
+  measurement entry closes the decision's open lines except the two merges (75a9c47).
+  The broken-examples issue draft gains the two investigation failures; still waiting
+  for Louis to file it or approve the call. No PR opened for the examples branch.
