@@ -763,16 +763,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Half-element crust as the recipe (2026-11-05):** it changes the geometry (a thin entrained marker, no pile-up)
-  and the effective interface weakening together. CORRECTED (kaiju): not "~2x weaker"; both arms are fully weak
-  (1000x) on the surface node row; one node down the one-element marker is 0.62-0.74 and the half-element's ~0;
-  averaged over the top two cells the interface factor (harmonic mean) is 0.249 half-element against 0.101
-  one-element, so the half-element crust is ~2.5x LESS weakened as an interface. Separating arm, no driver change:
-  one-element crust with -uw_crust_weak 0.05 (same interface factor as the half-element crust), TAf and Earth, np 26,
-  from step 0, against the existing c1 and c05 arms: if pile-up and the poorly defined fault persist, they go with
-  the thickness; if not, with the strength. Louis to say whether to run it. A mesh-independent recipe states the
-  crust's physical thickness and an interface factor over a stated depth, not "w and one element".
-
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3093,3 +3083,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   surface node row in both arms, the half-element's gone one node down; interface factors 0.249 vs 0.101 (harmonic),
   0.740 vs 0.411 (along the layer). The converse arm (thin crust at the one-element's factor) needs a sharpened marker
   in crust_factor_on (a driver change). Separating arm (a) proposed, not launched.
+- 2026-11-05: Louis: "try the experiments". Queued (np 26, a node each, behind the continuations): (a)
+  crust_{TAf,earth}_c1w05 (4061, 4060), one-element crust at -uw_crust_weak 0.05 = the half-element's interface factor
+  0.249, driver 4f2fbaa; (b) crust_{TAf,earth}_c05s05 (4063, 4062), half-element crust with the weakness on a
+  sharpened marker (-uw_crust_marker_scale 0.5, top half-cell fully weak, factor ~0.004), experimental branch
+  kaiju/crust-marker-scale (kaiju 990af13, applied by the hub as b9361e0, blob b59b3a7 verified; NOT merged; default 1
+  leaves runs unchanged). So thin geometry at 0.249 and 0.004, thick at 0.101 and 0.249. Kaiju's ledger point: with
+  linear P1 blending the interface strength is a hair-trigger near the weakness floor (scale 0.9 gives 0.018, 0.5
+  0.004; matching 0.101 needs 0.988), hence very sensitive to the projection and so to h.
