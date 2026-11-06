@@ -1109,6 +1109,14 @@ def crust_envelope_points(faults):
         if wedge is not None:
             cap = float(np.clip(wedge + float(params.uw_fault_wedge_margin), float(params.uw_fault_wedge_min),
                                 float(params.uw_fault_depth_max)))
+            # the march starts at the new cap: its starting x is the subducted crust there (the run nearest the deep
+            # crust's), not the deep crust's median taken at the fixed cap
+            at_cap = sub & (np.abs(depth - cap) < 2 * ct)
+            if at_cap.sum() >= 3:
+                xc = np.sort(x[at_cap])
+                runs = np.split(xc, np.flatnonzero(np.diff(xc) > 2 * ct) + 1)
+                xdeep = float(np.median(min(runs, key=lambda r: np.abs(r - xdeep).min())))
+        uw.pprint(f"  crust fault (envelope): mantle contact {wedge if wedge is None else round(wedge, 4)}, cap {cap:.3f}")
     h_z, h_s, dz, q = 0.5 * ct, 0.015, 0.0025, 0.1
     zs = np.arange(cap, 1.25 * ct, -dz)
     base = np.full(len(zs), np.nan)
