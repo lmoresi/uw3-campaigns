@@ -254,7 +254,9 @@ base; #908 still live there). **#855 ready with changes, must not merge as is:**
 development), but a clean-looking merge silently drops the fault-pair sheet datum (test_1092 error
 0.047 vs 0.00096; a one-line fix, `SHEET_TANGENCY` in `build_rotation`, tested); its tests never reach
 the repaired call site (a mutant restoring `if datum_nodes:` passes); 376 behind. #857 carries the
-same code. **test_1092's sheet-datum case fails at np 3 on development itself**: hyperion filing it.
+same code. **Correction:** test_1092 is a serial test; under mpirun its rank-local `assert len(sig) > 5`
+fails on ranks with no fault nodes. Gathered across ranks the reaction is identical at np 1-8
+(11 nodes, max relative error 0.00901). No defect; nothing filed; correction posted on #855.
 Remaining: #780, #857, #858, #859, #689. Report to Louis when the set is done.
 
 **2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
