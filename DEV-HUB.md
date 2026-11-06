@@ -276,6 +276,10 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**PR #973 (#905):** projecting a discontinuous field to a continuous one averages the cells at a
+node (each interpolation row divided by its sum, discontinuous sources only); tier-B test fails first;
+hyperion reviewing at np 2 and 4. The integration session's remaining queue: test anchors (with
+hyperion on CI's environment), #950; after #964 (rotated_bc.py): #924, #939, #969, #962.
 **PR #972 (#971, disk-snapshot swarm restore)** by the integration session: `var.data[...] = saved`;
 test_0020 fails 2/2 on development, passes on the branch; development merged into the 2026-10-06
 branch; hyperion reviewing with a parallel save/restore check. Merge queue: #954, #967, #955, #970,
