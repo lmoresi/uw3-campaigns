@@ -273,6 +273,10 @@ meaning-changing re-declarations with new units still pass silently; reopens #77
 surviving a reset; the conflict is one mechanical hunk. Remaining: #689. Report to Louis when the
 set is done.
 
+**#967, hyperion's review: one must-fix** (the solve is right on all 8 kernels; the wrapped multigrid
+leaks 19 MB per adjoint solve at np >= 2; a four-line fix verified, with the integration session).
+#964 round 2: not ready, no High findings left. **#969** filed (off-origin rotation: FMG reports
+converged on a rigid rotation; predates #967).
 **PR #967 (#963 fix) opened**, evidence in the body for Louis: test_1142 fails on eddab707 and
 passes on the branch (macOS: inner bound "200 <= 10"; hyperion: the Nehalem child times out at
 240 s vs 14 s); all 8 kernels finish at np 1 and 2 (8 of 16 stalled before), L2 the same to ~1e-16;
