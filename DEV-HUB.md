@@ -261,7 +261,13 @@ fails on ranks with no fault nodes. Gathered across ranks the reaction is identi
 model size ~10 or more silently get wrong values where development is right (annulus at L=100:
 144 of 9144 on-edge points unclaimed, errors 1.6e-2, no flag; shell at L=100 misses 8.7 %;
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
-parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
+parallel. **#858 ready with changes** (its test misses the ownership bug; leaks memory per
+call). **#857 not ready:** numerics hold against analytic cases on both walls (rate 2, np 1-8) and
+it is opt-in, but it shares #855's silent sheet-datum drop, has a pyx conflict whose obvious
+resolution keeps stale methods shadowing development's, and its tests cannot fail on the core (no
+Stokes solve; 14 of 18 mutants survive); wall updates are not recorded in the transcript while the
+solve claims adjoint support; lands after #855. Remaining: #780, #689. Report to Louis when the
+set is done.
 
 **#963 fix in progress** (`bugfix/rotated-vel-pc-projection-963` from eddab707): after the
 rotated custom-FMG velocity PC is set up, admitted rotations that A_vv annihilates to 1e-10 relative
