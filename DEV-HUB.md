@@ -259,7 +259,9 @@ fails on ranks with no fault nodes. Gathered across ranks the reaction is identi
 (11 nodes, max relative error 0.00901). No defect; nothing filed; correction posted on #855.
 Remaining: #780, #857, #858, #859, #689. Report to Louis when the set is done.
 
-**2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
+**2026-11-06:** #955's round-2 cross-review: no must-fix, no should-fix. **Squash merge on green**
+(d8d5984c fails its own test, so a merge commit would leave a red bisect point; precedent #929).
+#954 waits on green and the laptop's review. **2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
 4 skipped); merge on green. **PR #958** (#900: 14 ptest files into CI, appended so no batch
 moves; review record posted) to the laptop for cross-review. **#961** filed (0844_reconnect hang,
 failing assert and stacks).
