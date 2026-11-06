@@ -209,6 +209,16 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: PR #952 (#946, shell folds; 20560442)** opened; #946 and #903 labelled
+fixed-in-PR ("Closes" does not fire on development). Hyperion's Linux run: nothing fails on
+the branch that passes on development; the new test_0001 fails 10/11 on development and passes
+11/11 on the branch. Waits on hyperion's independent review and, since it adds a parallel file
+(batch shift), on the test_1062 -> test_1064 state-leak fix, like #951. Noted: serial
+test_1064_constrained_spherical_shell_response fails identically on both builds on hyperion as
+an XPASS(strict) (a stale or mesh-dependent xfail): added to the anchors item. #906 rebuilt as
+`bugfix/rotated-nullspace-from-mesh-906` off eddab707 (three commits cherry-picked, 964dc3ce
+dropped, the old branch untouched; 54 serial rotated tests pass); reviews next, then its PR.
+
 **2026-11-06: adversarial review on every PR, ours included** (Louis: "We should be running
 an adversarial review on all PRs (including our own). Hyperion can do much of the donkey work.
 The Laptop is also available and I intend to leave it as an always-on machine while we try to
