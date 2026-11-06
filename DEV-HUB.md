@@ -190,6 +190,30 @@ rescue branch carried a copy. Use this branch (integration session's item 1b).
    #881.
 6. **Small, independent:** #665 headless pyvista (clean); the disk-restore fix (clean).
 
+**Stress-history map (hyperion, 2026-11-06, read-only, eddab707).** Holders: `_StressHistoryMixin`
+(systems/solvers.py:514) for SNES_Stokes, SNES_ThinSheet and the composed Navier-Stokes;
+SNES_NavierStokes (:5504) outside it with its own path and no flux commit. One step: prepare,
+build, advance (`update_pre_solve(store_result=False)`), solve, post-solve
+(`commit_flux_to_history`, `update_post_solve`, DEVSS, model hook). **Live order defect on
+development:** the source snapshot refreshes before the carry (ddt.py:3984, :2035) and the
+commit projection reads it (:1112-1116) (#735). Restore from disk writes a detached view
+(disk_snapshot.py:784). The five: (a) #800, 21 commits, renames schemes, adds
+ForwardNodesSemiLagrangian, moves SNES_NavierStokes onto the mixin, FENE-P and the particle
+projector, removes the node nudge (**changes the default scheme**); its test check fails; a
+merge with development leaves two `_StressHistoryMixin` classes silently (development's wins,
+SNES_NavierStokes would break) plus 589 conflict lines; renamed classes make development-written
+disk files refuse to load; it keeps the old (defective) order. (b) `bugfix/backward-nodes-snapshot-order`
+(#735): refreshes the snapshot after the carry; **the port is small** (development already moved
+the methods into the mixin; the fix lives in ddt.py, which merges clean); new reach to ThinSheet
+and `stress_transport="none"` needs coverage. (c) `feature/ve-stretch-split`: `stretch_in_momentum`,
+`preconditioner_flux`; independent of #800; conflicts with #800 on `E_eff`/`_objective_term`.
+(d) `lagged_stretch_velocity`: experimental, no test, needs #800's `_spring_factor_sym`, decides
+the same terms opposite to (c). (e) the disk-restore fix: independent (the integration
+session's item 1b, on `bugfix/disk-snapshot-swarm-values`). **Landing order:** (e), (b), then
+#800 and (c) in either order (second resolves `E_eff`), (d) only after (c) with evidence.
+**Routing:** (b) to hyperion now (port, tests incl. ThinSheet and "none", PR once its GitHub
+writes are allowed); #800, (c) and (d) to Louis.
+
 **Out of date:** #800 (480 behind, 7 conflicts), #780 (376 behind, 1 conflict), #861 (344 behind,
 1 conflict), `feature/shear-band-length-scale` (22 unique, 380 behind, 7 conflicts across
 rotated_bc, custom_mg, solvers, constitutive_models; second review owed since 2026-10-18).
