@@ -307,6 +307,17 @@ asserts reduce first). Hyperion: new parallel test fails or hangs on eddab707, p
 8; ptest_0844 passes at np 2 and 4 (hung 840 s before); serial 501 passed; hyperion's review:
 mergeable. Touches nvb.py and discretisation_mesh.py (independent of #967 and #964); adds one
 parallel file. #967 CI: shards 1-3 green, shard 4 running.
+**#908/#909 review (hyperion):** no production, campaign or driver path builds a mesh of degree >= 2
+(AST scan of 600 files), so nothing goes to Louis. Not ready: #908's fix holds; #909's transfer
+corrupts non-symmetric tensors silently (serial error 3.0 vs 8.9e-16 on development) and leaves a
+hang in the restore step; five must-fixes with the fixer. Radius factors for the body: degree 2 x2
+on tri, quad and tet but x3.63 on hexes; degree 3 x2.59, ~x3e6, x3, x4.06; callers: estimate_dt x2
+advective, x4 diffusive; SUPG tau x2; Nitsche gamma x1/2; metric and adapt targets unmoved; store
+smoothing x4. Filed **#975** (metricCreateIsotropic on an empty rank hangs a later distribute),
+**#976** (global_evaluate extrapolates on small partitions, no flag), **#977** (Mesh.remesh silently
+zeroes units-carrying and symmetric-tensor variables: told to the MMPDE session, whose #959 touches
+remesh.py), **#978** (other degree-2 routes still read midpoints); #974 (disk-restore shape mismatch
+on one rank). #965 fixed by the #908/#909 branch.
 **#908 + #909 fixed locally on hyperion** (`bugfix/parallel-collectives-908-909`, two commits, in
 review): behaviour change on straight-sided degree-2 meshes: cell radii, get_min/max/mean_radius and
 cell_size() double (in serial too), matching degree 1 to 1e-15 (the FVM read edge midpoints as
