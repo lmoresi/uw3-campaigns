@@ -276,6 +276,14 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**PR #970 (#961 and #807: ptest_0844_reconnect hang)** by the integration session: the subsampler
+kept parent maps derived through repaired passes; nested-transfer helpers decided None rank-locally
+before collective fallbacks; the test's asserts stopped one rank ahead of a collective. Fixed
+(repaired passes recorded, verdicts reduced over all ranks, coordinates read before early return,
+asserts reduce first). Hyperion: new parallel test fails or hangs on eddab707, passes at np 2, 3, 4,
+8; ptest_0844 passes at np 2 and 4 (hung 840 s before); serial 501 passed; hyperion's review:
+mergeable. Touches nvb.py and discretisation_mesh.py (independent of #967 and #964); adds one
+parallel file. #967 CI: shards 1-3 green, shard 4 running.
 **#908 + #909 fixed locally on hyperion** (`bugfix/parallel-collectives-908-909`, two commits, in
 review): behaviour change on straight-sided degree-2 meshes: cell radii, get_min/max/mean_radius and
 cell_size() double (in serial too), matching degree 1 to 1e-15 (the FVM read edge midpoints as
