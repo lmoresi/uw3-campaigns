@@ -270,9 +270,15 @@ solve claims adjoint support; lands after #855. **#780 not ready:** `Mesh.__init
 `uw.expression(r"t", 0.0, ...)`, so with the new refusal any mesh built at non-zero model time raises
 (mesh.adapt after a step, read_timestep); "same value passes" is false for dimensional parameters;
 meaning-changing re-declarations with new units still pass silently; reopens #774 for containers
-surviving a reset; the conflict is one mechanical hunk. Remaining: #689. Report to Louis when the
-set is done.
+surviving a reset; the conflict is one mechanical hunk. **#689 not ready:** numerics hold
+(second order honest, conservation 1e-15, partition independence 1e-15), but scaled models get no
+transport silently (metres read against non-dimensional values), restore breaks for every
+AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
+transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#967 at 488c53b1:** the adjoint leak closed (533.1 to 549.5 MB over 31 adjoints; new parallel test
+fails without the fix); review answered; merge on green and Louis's yes. **#954 and #955 green on
+every shard;** both wait on the hub's merge permission (Accept edits).
 **#967, hyperion's review: one must-fix** (the solve is right on all 8 kernels; the wrapped multigrid
 leaks 19 MB per adjoint solve at np >= 2; a four-line fix verified, with the integration session).
 #964 round 2: not ready, no High findings left. **#969** filed (off-origin rotation: FMG reports
