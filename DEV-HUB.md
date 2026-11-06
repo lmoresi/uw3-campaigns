@@ -245,6 +245,16 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: Louis authorised hyperion's GitHub writes in its own session** (push side
+branches, open PRs, PR and issue comments, file issues; no merging, approving or closing).
+Out: **PR #954** (CI keeps the MPI supervisor's stacks with native frames; merge first, then
+rerun #951 and #952), **PR #955** (#665, headless pyvista without IPython or trame), review
+records on #945, #862, #952, the #900 table, **#956** (fault pins 0863-0865 fail at np 4, back to
+2026-10-29: 3-D fault parallel peak slip wrong) and **#957** (plot_scalar/plot_vector fail with
+their default cmap). Both PRs' CI running; the integration session reviews them. Still to come
+from hyperion: the #900 PR, 0844_reconnect's issue, #735's PR, external reviews of #780,
+#855-#859 and #689.
+
 **2026-11-06, development baseline on hyperion (eddab707, serial tier A+B):** 2887 passed,
 145 skipped (134 need --with-mpi), 9 xfailed, 0 failed; 5 h 57 min on one core, ~25 GB peak.
 Slowest: test_maxwell_transfer_function_under_a_t... at 4972 s (machine shared; check its CI
