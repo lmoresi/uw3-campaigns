@@ -245,6 +245,17 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, #906 invariance check pushed** (`bugfix/rotated-nullspace-from-mesh-906`
+c6c2668a): test_1131 moved-mesh cases (a wall-preserving move keeps the mode: detection drops it
+at violation 0.0037, declared keeps it at rate 3.6e-20; a 1e-6 free-surface move rejects it with a
+warning); all-rank min/max reduction; 1e-9 relative, pinned both ways; one warning plus
+`declared_modes_kept` per mode; inheritance at every derived-mesh site, setter refuses a non-rigid
+field, cache key includes the declaration, adjoint restores the record, builders on coords_nd
+(#877's TypeError), test_1131 in shard 3. The 0.3 shell: rotation rate 4.66 (v_rms 3.93) under
+the old route, 1.1e-15 (v_rms 1.807 vs 1.806 radial) declared. Before the PR: 40 serial
+rotated/fault files and test_1131 mutants; then hyperion's np 2 run and review. #952: hyperion's
+rank-local-holds mutant now fails at np 2, 4 and 8 (finding 2 closed); record unposted.
+
 **2026-11-06, MMPDE session first report:** the mover and FMG run on eddab707 (no folds, wall
 radius exact, 4-5 velocity its, np 1 and 4). Blocker: after a move, rotated free slip with the
 default normal drops the rotation mode (1 to 0; rigid rotation in the answer, v_rms ~6 % high);
