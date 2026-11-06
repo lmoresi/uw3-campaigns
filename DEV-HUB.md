@@ -273,6 +273,16 @@ meaning-changing re-declarations with new units still pass silently; reopens #77
 surviving a reset; the conflict is one mechanical hunk. Remaining: #689. Report to Louis when the
 set is done.
 
+**PR #967 (#963 fix) opened**, evidence in the body for Louis: test_1142 fails on eddab707 and
+passes on the branch (macOS: inner bound "200 <= 10"; hyperion: the Nehalem child times out at
+240 s vs 14 s); all 8 kernels finish at np 1 and 2 (8 of 16 stalled before), L2 the same to ~1e-16;
+parallel set passes at np 2 and 4; macOS projection on/off: annulus inner velocity 4 vs 200 its,
+answer to 2e-11; shell 5 its either way, to 1e-13; serial 504/505 rotated and custom-MG tests
+(test_1021 now unwraps the PC). Waits on hyperion's review and Louis's yes. #964 round 3 at
+2bd82efe (cached re-solve keeps its verdict; mixed given/default normals warn; every wall reduced
+before branching; round-2 mutants killed; moved child pinned at np 3, 4, 5, 8); development merged
+in after #967, then hyperion's round 3. #959 laptop round 3 at a41f2250: no must-fix, one
+should-fix (test_1070's datum error measured after the deform).
 **#963 fix in progress** (`bugfix/rotated-vel-pc-projection-963` from eddab707): after the
 rotated custom-FMG velocity PC is set up, admitted rotations that A_vv annihilates to 1e-10 relative
 are orthonormalised and the velocity sub-KSP's PC becomes a PCShell z = P M(P r) around the
