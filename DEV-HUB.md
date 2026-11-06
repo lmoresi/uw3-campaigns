@@ -245,6 +245,14 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**External review verdicts (hyperion, records on the PRs):** #945 ready with changes; #862 ready
+with changes; **#856 ready with changes** (library fix right, and also fixes checkpoint metadata
+losing names when rank 0 is empty; the test hangs rather than fails on the old code, since
+`dm.destroy()` follows rank-dependent asserts, which would take down a CI batch, and
+`getLabel(...) is not None` cannot fail; lands after #858; 376 behind, green only on the old
+base; #908 still live there). Remaining: #780, #855, #857, #858, #859, #689. Report to Louis
+when the set is done.
+
 **2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
 4 skipped); merge on green. **PR #958** (#900: 14 ptest files into CI, appended so no batch
 moves; review record posted) to the laptop for cross-review. **#961** filed (0844_reconnect hang,
