@@ -276,6 +276,12 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#985 (test_0022 runtime) is #911's failure seen as cost** (hyperion): each forward solve's last Newton
+step solves past round-off and breaks down; pressure hits its 200 cap on 465-1208 solves per run;
+that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there. Folded into #911
+(#985 closed as duplicate on the hub's word). **#911 moved up** to right after #964 in the integration
+session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
+evidence table for Louis before merge (a Newton stopping change).
 **#983 ready on green at 7397bd17** (round 2: no must-fix; the low should-fix done: the hex rows now fail
 under a two-point mutant; manifold rule worst radius error 7.6e-8). **#983 at d3f7647e: should-fixes done** (FEGeom rule follows the coordinate degree, cells in bounded
 blocks: 27k hexes qdegree 6 peak 1550 -> 3 MB, 8.7 -> 0.64 s; 195k hexes qdegree 3 2090 -> 0 MB;
