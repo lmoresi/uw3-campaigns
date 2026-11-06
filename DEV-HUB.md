@@ -276,6 +276,16 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**PR #983 (#908, split from #909)**: degree >= 2 cell radii, with factors and the caller table in the
+body; test_0782 10 passed, parallel 4 passed at np 2-8; its review ran on the combined branch, so the
+laptop cross-reviews the carved branch. #909 and #965 still in fixing (round 2 found three new
+must-fixes: dimensional values mis-scaled through remesh, mesh.deform corrupting square MATRIX
+variables, a mis-shaped SwarmVariable.array write hanging at np 3). **#984** filed (read_timestep
+raises on tensor-shaped swarm variables; mesh.deform raises on a SYM_TENSOR mesh variable). test_0022's
+slowdown is kernel-sensitive and not fixed by #967 (Nehalem 22:10, Zen 42:22, default 52:14 with the
+fix), all in the rotated_gradient fixture: hyperion filing it for the integration session.
+#981 ready on green (hyperion's review: no conditions; 14 passed, 0 skipped at np 2, 7 previously
+skipped; each anchor a live gate).
 **#980** ready on green CI (hyperion's three review changes in; rerun green at np 1 and 2). **PR #981
 (test anchors, tests only):** per-host anchors so test_1063, test_1064 and test_1066 check absolute
 answers on Linux CI instead of skipping (hyperion's Linux values); drops the stale strict xfail on
