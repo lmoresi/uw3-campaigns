@@ -155,6 +155,16 @@ whether #780 and #861 (conflicts) are still wanted; who reviews gthyagi's #855-#
 **Later, larger:** #910, #911, #898, #885, #877, #891 (units), #922 library side, #899,
 #940 (live with #553), #949, #941 (forced partition), the review-finding issues #876-#888.
 
+**2026-11-06: hyperion has GitHub access** (Louis: "Definitely I would like to have hyperion
+able to do much of the gh work. I have provided the PAT"). Hyperion is a second fixer under the
+laptop session's rules (side branches from development; test first; independent adversarial
+review as the PR's first comment; house PR text and attribution; the hub merges on green;
+hyperion never merges, approves or closes issues without word; the token never printed or
+stored). **Split:** integration session: #946, #906, test anchors, disk-restore fix, #950,
+#924, #939, #905, mean-removal drift. Hyperion: #665 (headless pyvista), #909 + #908, #900
+(passing ptest files into CI), CI stack artifacts, the stress-transport port (stop and ask
+if over a day or beyond the original behaviour).
+
 **Hyperion item 7, rescue branches (2026-11-06):** 8 refs on origin, not 6. **One live bug
 on development:** `disk_snapshot._read_swarm_from_sidecar` writes `current[...] = saved` into
 `np.asarray(var.data)`, a detached view (the #313 pattern), so a disk restore never reaches
