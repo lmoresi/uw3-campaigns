@@ -263,6 +263,16 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
+**#963 fix in progress** (`bugfix/rotated-vel-pc-projection-963` from eddab707): after the
+rotated custom-FMG velocity PC is set up, admitted rotations that A_vv annihilates to 1e-10 relative
+are orthonormalised and the velocity sub-KSP's PC becomes a PCShell z = P M(P r) around the
+configured MG; near-null (faceted) modes are not projected; the record gains
+`projected_null_modes`; GAMG and vector routes unchanged. test_1142: in process, the analytic-normal
+annulus_fmg projects one mode (L2 0.0190696176, rel 1e-8), the default normal none; x86 only, a
+child with OPENBLAS_CORETYPE=Nehalem must finish within 240 s (CI's Linux runs it, macOS skips).
+Hyperion shows it failing on eddab707 and passing on the branch, then the 8-kernel table, then its
+review. **Nothing merges until Louis has seen the before/after iteration and answer table.** #964
+then merges development in (no rebase; no force-push).
 **2026-11-06: #963's mechanism found (hyperion, posted on the issue): a library issue, not a test
 artifact.** The rotation is an exact null vector of the rotated velocity block; the FMG cycle
 injects rounding along it, flooring the inner solve. Whether the floor lands above the 3.3e-11 rtol
