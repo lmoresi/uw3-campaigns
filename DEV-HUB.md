@@ -205,7 +205,9 @@ build). `probe/iterative-patch` and `test/probe-941` are probes (keep while usef
 **Decisions for Louis:** #800's fate; shear-band-length-scale's fate (rebase and review, or
 retire); the 15 deletions.
 
-**Practice:** a bulk review weekly (the hub, Mondays) and before any feature branch starts.
+**Practice:** a bulk review weekly and before any feature branch starts. Scheduled task
+`trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
+Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
 **2026-11-06: adversarial review on every PR, ours included** (Louis: "We should be running
 an adversarial review on all PRs (including our own). Hyperion can do much of the donkey work.
