@@ -3174,3 +3174,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   around that and try to do better"; Earth, thin crust, from step 0, 120 steps, np 26): bench_cap08 and bench_cap12
   (4125 packed, 4f2fbaa; how deep the decoupling must reach) and bench_cap04_dz (4127, b9361e0: fault to 0.04 plus the crust
   weakness on a sharpened marker along the slab top to ~0.12; can a weak band replace the fault's deep part).
+- 2026-11-06: **cap-depth bracket** (Earth, thin crust, np 26) at t ~3e-4, subducting plate / trench / slip: benchmark
+  (0.15) 1820 / -5.34 deg / 2667; cap 0.12 455 / -2.86 / 670; cap 0.08 295 / -2.27 / 531; cap 0.04 + weak band to 0.12
+  121 / -2.22 / 105, reversed by 4e-4. Every shortened fault chokes; the jump is between 0.12 and 0.15. Kaiju's
+  hypothesis: Earth's weak asthenosphere (-uw_asth 0.1 from 0.12 to 0.231, ramp 0.02) must be connected to the
+  surface by the plate boundary; 0.15 reaches into it, 0.12 only touches its top, and the weak band was cut at 0.12 by
+  -uw_marker_rheo_depth. Testing it: bench_cap14 (fault to 0.14) and bench_cap04_dz20 (fault to 0.04 + the weak band
+  to 0.2), packed as job 4128, from step 0, 120 steps, drivers 4f2fbaa and b9361e0. cap08 / cap12 / cap04_dz stopped
+  once answered. The geometric placement of each fault's bottom (vs the overriding plate's base and the slab-wedge
+  contact, along the slab) still owed, for all arms together. Note: the asthenosphere top (0.12) likely coincides with
+  the plates' thermal base, so cap14 cannot by itself separate "reach the weak asthenosphere" from "cut the whole
+  lithosphere".
