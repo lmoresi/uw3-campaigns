@@ -276,6 +276,10 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**PR #972 (#971, disk-snapshot swarm restore)** by the integration session: `var.data[...] = saved`;
+test_0020 fails 2/2 on development, passes on the branch; development merged into the 2026-10-06
+branch; hyperion reviewing with a parallel save/restore check. Merge queue: #954, #967, #955, #970,
+#972, #958, then #964 after #967.
 **#967 all green on 488c53b1** (run 42187331541): shard 4 passed in 55 min, the first green shard 4
 since eddab707; test_1064 ran all 18 cases in ~100 s; test_1142 passed. Hyperion's conditions met.
 Waits on Louis's yes (evidence table given) and the hub's merge permission. The quarantine falls
