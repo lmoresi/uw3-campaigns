@@ -155,6 +155,58 @@ whether #780 and #861 (conflicts) are still wanted; who reviews gthyagi's #855-#
 **Later, larger:** #910, #911, #898, #885, #877, #891 (units), #922 library side, #899,
 #940 (live with #553), #949, #941 (forced partition), the review-finding issues #876-#888.
 
+## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
+
+Louis, 2026-11-06: "We also should do bulk reviews where we can check which PRs overlap, which
+are out of date, which are fixed and bundle the work. Sometimes this is very useful to prevent
+features from being built without the big-picture." Scope: the 12 open PRs and every branch
+not merged into development with a commit since 2026-10-01 (35 refs, 31 with commits not in
+development by patch-id; squash merges show as unique, so read "unique" with care).
+
+**Already done, not yet merged:** `bugfix/disk-snapshot-swarm-values` (2026-10-06, 2 commits)
+IS the disk-restore fix (`var.data[...] = saved`, #313 pattern) with
+tests/test_0020_snapshot_disk_swarm_values.py; clean against development; never PR'd. The
+rescue branch carried a copy. Use this branch (integration session's item 1b).
+
+**Bundles (work that touches the same code and should be seen together):**
+1. **Stress history and VE transport** (systems/solvers.py, systems/ddt.py,
+   constitutive_models.py, petsc_generic_snes_solvers.pyx): #800 forward-from-nodes (21 unique,
+   480 behind, 7 conflicts, idle since 2026-10-12, no owner); `bugfix/backward-nodes-snapshot-order`
+   (verified stress-transport fix, conflicts in solvers.py); `feature/ve-stretch-split` (#744, 4
+   unique); the rescue WIP's experimental lagged_stretch_velocity; the disk-restore fix (Lagrangian
+   stress history across restarts). Five efforts in one region with no plan between them.
+   **Big-picture step first:** hyperion writes a one-page map of development's stress-history
+   paths and what each branch changes, before porting the backward-nodes fix; Louis decides
+   #800's fate (an owner to rebase and land it, or retire it).
+2. **Rotated free-slip core** (utilities/rotated_bc.py): #906 null modes, the pressure-rtol
+   default, queued #924, #939, #950, the mean-removal check, plus `feature/shear-band-length-scale`
+   and the held slip coarse space. One owner (the integration session) serialises them:
+   #906, then rtol (on Louis's yes), then #924, #939, #950.
+3. **Fault multigrid** (custom_mg.py): `feature/fault-slip-coarse-space` and
+   `feature/fac-structural-segments` (both held since 2026-10-30, #670, conflicting now), and
+   shear-band's custom_mg changes. Phase-3 material; stays held, will need rebasing.
+4. **Spherical meshing:** #946 (+ #903, #949, #931), one owner.
+5. **Expressions and units:** #780 (5 unique, conflicts navier_stokes_eulerian.py), #891, #877,
+   #881.
+6. **Small, independent:** #665 headless pyvista (clean); the disk-restore fix (clean).
+
+**Out of date:** #800 (480 behind, 7 conflicts), #780 (376 behind, 1 conflict), #861 (344 behind,
+1 conflict), `feature/shear-band-length-scale` (22 unique, 380 behind, 7 conflicts across
+rotated_bc, custom_mg, solvers, constitutive_models; second review owed since 2026-10-18).
+
+**Dead or superseded (delete on Louis's word, 15 refs):** the seven `*-hyperion-2026-10-20*`
+rescue refs (triaged; the one live fix is on its own branch above); `docs/issue-state-on-merge`
+and `docs/test-tier-policy` (nothing unmerged); `feature/fac-block-solver-lu` (squash-merged as
+#929); `bugfix/faulted-rebuild-leak` and `bugfix/rebuild-efficiency` (superseded by #882);
+`feature/coarse-solve-nullspace` (superseded by #947); `test/kaiju-scaling-902-901` (a test
+build). `probe/iterative-patch` and `test/probe-941` are probes (keep while useful).
+`release/v3.2.0` is in main (keep).
+
+**Decisions for Louis:** #800's fate; shear-band-length-scale's fate (rebase and review, or
+retire); the 15 deletions.
+
+**Practice:** a bulk review weekly (the hub, Mondays) and before any feature branch starts.
+
 **2026-11-06: adversarial review on every PR, ours included** (Louis: "We should be running
 an adversarial review on all PRs (including our own). Hyperion can do much of the donkey work.
 The Laptop is also available and I intend to leave it as an always-on machine while we try to
