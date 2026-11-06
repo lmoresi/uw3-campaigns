@@ -245,6 +245,11 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
+4 skipped); merge on green. **PR #958** (#900: 14 ptest files into CI, appended so no batch
+moves; review record posted) to the laptop for cross-review. **#961** filed (0844_reconnect hang,
+failing assert and stacks).
+
 **2026-11-06, cross-reviews:** #955 reviewed by the laptop (no must-fix, five should-fix: the
 test cannot see a reintroduced IPython/trame import, the notebook default unpinned,
 `jupyter_backend="none"` raises without IPython, tier_a marking, #957 not mentioned); hyperion
