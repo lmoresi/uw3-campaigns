@@ -164,6 +164,10 @@ stored). **Split:** integration session: #946, #906, test anchors, disk-restore 
 #924, #939, #905, mean-removal drift. Hyperion: #665 (headless pyvista), #909 + #908, #900
 (passing ptest files into CI), CI stack artifacts, the stress-transport port (stop and ask
 if over a day or beyond the original behaviour).
+Access confirmed: gh logged in as lmoresi (repo, workflow, read:org), origin reachable,
+git identity Claude per clone; gh's credential helper passed per command, no global config
+change. #665's branch merged locally into eddab707 passes test_0846 (both files),
+test_0017 and test_0005 at np 2 (17 + 1 passed): its PR is first in hyperion's queue.
 
 **Hyperion item 7, rescue branches (2026-11-06):** 8 refs on origin, not 6. **One live bug
 on development:** `disk_snapshot._read_swarm_from_sidecar` writes `current[...] = saved` into
