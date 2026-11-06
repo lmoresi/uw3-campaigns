@@ -209,6 +209,19 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: #900, the 39 ptest_*.py files on eddab707 (hyperion, np 2 and 4, one file per
+mpirun):** 30 pass at both (script-style files: exit 0 only, need a harness for CI). **9 fail:**
+000c and 000d (PETSc error 76, likely #922), 001a (setCoordinateDisc signature drift), 003
+(three-index array drift), 0851 (ViscoPlasticFlowModel yield-floor error, likely #759's rule:
+test update), **0844_reconnect hangs at both np** (seventh test fails first at np 2),
+**0863_fault_network_3d_width** (parallel peak 0.0029 vs serial 0.00335), **0864_seam_ligament**
+and **0865_seam_split** (pass at np 2, fail at np 4: "Main was not split on any rank"; "the
+fill ring crosses itself"). 0863-0865 are pins the design notes cite. Hyperion: regression
+check on 25d62812 (and fc67b650) at np 4 for 0863-0865 and 0844 before fixes; issues filed;
+the passing pytest-style files into CI and the small test fixes (0851, 001a, 003) in its #900
+PR; error 76 checked against #922. The triple 1062+1063+1064 passes on hyperion at np 2
+(201 s); the full 1062-1068 batch is running, pinned and unpinned.
+
 **2026-11-06: PR #952 (#946, shell folds; 20560442)** opened; #946 and #903 labelled
 fixed-in-PR ("Closes" does not fire on development). Hyperion's Linux run: nothing fails on
 the branch that passes on development; the new test_0001 fails 10/11 on development and passes
