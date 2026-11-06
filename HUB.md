@@ -3185,3 +3185,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   contact, along the slab) still owed, for all arms together. Note: the asthenosphere top (0.12) likely coincides with
   the plates' thermal base, so cap14 cannot by itself separate "reach the weak asthenosphere" from "cut the whole
   lithosphere".
+- 2026-11-06: separating pair added (job 4129, from step 0, 120 steps, np 26, 4f2fbaa): bench_asth18_cap15 (asthenosphere
+  top moved to 0.18; the fault to 0.15 cuts the lithosphere, base ~0.11 at step 0, but does not reach the weak layer)
+  and bench_asth18_cap20 (the same with the fault to 0.2, reaching it); asthenosphere strength x0.1 and bottom 0.231
+  kept; compared within the pair, not against the benchmark. cap15 runs -> the lithosphere cut matters; cap15 chokes
+  and cap20 runs -> the connection matters. Geometric placements to follow with 4128 / 4129.
