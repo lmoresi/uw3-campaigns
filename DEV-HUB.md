@@ -245,6 +245,12 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, MMPDE session:** #906 at c6c2668a passes the moved annulus at np 1 and 4
+(declared_modes_kept [True], gauge orthonormal, nodal rate round-off, v_rms within 0.05 % of
+unit_e_0). New: the default CG mover stalls after ~5 of 150 outer iterations; regression test
+written and failing, fix next. (It reaches the hub by SendMessage; the hub's send_message to it
+works.)
+
 **2026-11-06, #906 invariance check pushed** (`bugfix/rotated-nullspace-from-mesh-906`
 c6c2668a): test_1131 moved-mesh cases (a wall-preserving move keeps the mode: detection drops it
 at violation 0.0037, declared keeps it at rate 3.6e-20; a 1e-6 free-surface move rejects it with a
