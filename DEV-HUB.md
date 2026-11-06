@@ -266,7 +266,11 @@ call). **#857 not ready:** numerics hold against analytic cases on both walls (r
 it is opt-in, but it shares #855's silent sheet-datum drop, has a pyx conflict whose obvious
 resolution keeps stale methods shadowing development's, and its tests cannot fail on the core (no
 Stokes solve; 14 of 18 mutants survive); wall updates are not recorded in the transcript while the
-solve claims adjoint support; lands after #855. Remaining: #780, #689. Report to Louis when the
+solve claims adjoint support; lands after #855. **#780 not ready:** `Mesh.__init__` re-declares
+`uw.expression(r"t", 0.0, ...)`, so with the new refusal any mesh built at non-zero model time raises
+(mesh.adapt after a step, read_timestep); "same value passes" is false for dimensional parameters;
+meaning-changing re-declarations with new units still pass silently; reopens #774 for containers
+surviving a reset; the conflict is one mechanical hunk. Remaining: #689. Report to Louis when the
 set is done.
 
 **#963 fix in progress** (`bugfix/rotated-vel-pc-projection-963` from eddab707): after the
