@@ -155,6 +155,27 @@ whether #780 and #861 (conflicts) are still wanted; who reviews gthyagi's #855-#
 **Later, larger:** #910, #911, #898, #885, #877, #891 (units), #922 library side, #899,
 #940 (live with #553), #949, #941 (forced partition), the review-finding issues #876-#888.
 
+**2026-11-06: adversarial review on every PR, ours included** (Louis: "We should be running
+an adversarial review on all PRs (including our own). Hyperion can do much of the donkey work.
+The Laptop is also available and I intend to leave it as an always-on machine while we try to
+get the backlog of PRs and bugs squared away.") **Rule:** each PR gets an independent
+adversarial review by the other fixer (hyperion reviews the laptop's PRs, the laptop reviews
+hyperion's), a fresh agent given the diff, record posted as a PR comment, on top of the
+author's own rounds; the hub merges only on green CI with both reviews' findings resolved.
+Hyperion is the review desk for PRs not written by us: #945, #862, #780, gthyagi's #855,
+#857, #858, #856, #859, then #689 (#861 and #800 wait for their owners: they conflict). The
+laptop stays serial-only.
+
+**2026-11-06: #951 BLOCKED by a cross-test state leak.** Its shard-4 rerun hung again in
+test_1064's spherical3d partition-independence test at np 2 (job 127632111767). #951 adds one
+parallel file, shifting CI's 6-file batches: on #947's green run test_1062_forward_stress_history_mpi
+ran in the batch before; on #951 it runs in the same process just before test_1063 and
+test_1064, which then hangs. Hyperion's single-file runs pass. So an earlier test leaves state
+that hangs a later spherical rotated solve. **Any PR adding a parallel file can trip it (#946
+adds one).** Hyperion reproducing the exact batch at np 2, dumping the global options database
+at test_1064's start; #950 (options outliving solvers) the first suspect; if confirmed, #950
+goes to the top of the integration session's queue and #951 and #946 wait for it.
+
 **2026-11-06: hyperion has GitHub access** (Louis: "Definitely I would like to have hyperion
 able to do much of the gh work. I have provided the PAT"). Hyperion is a second fixer under the
 laptop session's rules (side branches from development; test first; independent adversarial
