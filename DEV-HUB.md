@@ -276,6 +276,13 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**PR #980 (#950, options database growth):** dropped solvers' options go when the solver is
+collected; the coordinate FE's keys go right after use; rebuild-loop growth 17 keys/cycle -> 0.
+Touches petsc_generic_snes_solvers.pyx only in the base constructor (a weakref.finalize, not run at
+exit) and a module helper; no numerics; serial 1380 passed; hyperion reviewing and checking in
+parallel. **Flagged to Louis** (CLAUDE.md's rule on that file). #972: hyperion's review ready, no
+conditions; parallel test fails on eddab707, passes on the branch. #973: hyperion's three changes
+pushed (b8399ce5), final word pending.
 **PR #973 (#905):** projecting a discontinuous field to a continuous one averages the cells at a
 node (each interpolation row divided by its sum, discontinuous sources only); tier-B test fails first;
 hyperion reviewing at np 2 and 4. The integration session's remaining queue: test anchors (with
