@@ -276,7 +276,8 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
-**#983 at d3f7647e: should-fixes done** (FEGeom rule follows the coordinate degree, cells in bounded
+**#983 ready on green at 7397bd17** (round 2: no must-fix; the low should-fix done: the hex rows now fail
+under a two-point mutant; manifold rule worst radius error 7.6e-8). **#983 at d3f7647e: should-fixes done** (FEGeom rule follows the coordinate degree, cells in bounded
 blocks: 27k hexes qdegree 6 peak 1550 -> 3 MB, 8.7 -> 0.64 s; 195k hexes qdegree 3 2090 -> 0 MB;
 dm_class removed; reuses _collective_raise; per-cell closed-form tests 15 failed / 2 passed on
 eddab707, 17 passed on the branch; body corrected; diff commands posted: no #909/#965 hunk). #908's
