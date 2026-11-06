@@ -775,6 +775,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Half-element crust as the recipe default (2026-11-06):** Louis prefers it (crust_{TAf,earth}_c05). To make it the
+  default, the hub suggests stating it physically: a crust thickness (0.0078 at refinement 5) and an interface
+  weakening (harmonic factor 0.249 over the top two cells), so it does not change with h. Louis to say when.
+
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3152,3 +3156,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   -3.6 vs -8.1 deg, plate 593 vs 2563 against the half-element envelope locator); on TAf slightly ahead (trench -0.8
   vs -0.4 deg at 1.35e-4). Continuing (Earth 4114 to 160, TAf 4110 to 120); comparison render (production |
   half-element envelope | half-element bending) running.
+- 2026-11-06: Louis REJECTED the bending-line locator ("a disaster ... routinely overturned and does not align with the
+  particles defining the crustal layer. The best one is still the half-element crust model with whatever fit that
+  is"). Runs 4110 / 4114 cancelled; kaiju/bending-fault kept unmerged as a record. Cause: an unbounded dip fitted to
+  crust down to 0.25 (Earth slab dip > 90 deg in 70 of 131 fits). Preferred: the half-element crust on the envelope
+  locator (crust_{TAf,earth}_c05). DECISIONS.md (campaign branch, merged to main) records both; the half-element crust
+  is not yet the default: open items are a physical crust thickness and a stated interface weakening.
