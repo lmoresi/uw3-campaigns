@@ -233,6 +233,20 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: #906 grew to a medium PR after its review** (Louis in the loop with the
+integration session). HIGH finding: a mesh-declared rotation skipped the constraint test, so on
+a deformed wall it was admitted though no longer null (annulus, 1 % wall deformation: answer
+0.86 % off while reporting convergence; FreeSurface runs exactly this). Fix: admit a declared
+rotation only while each rotated wall's vertices are equidistant from its centre (factory shells
+and wall-preserving movers pass, a free-surface step fails). Also: declarations inherited by
+adapt and add_fault children; declared modes on non-dimensional coordinates; test_1131 rebuilt
+on the unfolded 0.3 FMG shell with hard baselines and a CI batch line (it was unreachable);
+geometry cache key, adjoint slack restore, docs. The hub asked for: a collective check (np 2,
+forced partition), a round-off relative tolerance pinned both ways in a test, and a visible
+record when a declared mode is rejected. A radius variable (Louis's suggestion: snapping on
+deformed walls, analytic normals of deformed walls, the free surface owning target positions)
+to be filed as a design item.
+
 **2026-11-06: hyperion's GitHub writes are blocked by its own session's permission check**
 (its first PR comments, on #945 and #862, denied as external writes). Hyperion waits for Louis;
 no other session posts for it. Put to Louis: allow rules for gh pr create/comment, gh issue
