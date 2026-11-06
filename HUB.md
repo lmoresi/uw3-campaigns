@@ -775,6 +775,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Earth's fault depth as a physical rule (2026-11-06, pending one control):** the evidence so far says the plate
+  boundary must reach Earth's weak asthenosphere; kaiju's reading for the recipe is fault depth = asthenosphere top +
+  ramp (+ margin) instead of the fixed 0.15. Louis to rule once the no-weak-layer control reports.
+
 - **Half-element crust as the recipe default (2026-11-06):** Louis prefers it (crust_{TAf,earth}_c05). To make it the
   default, the hub suggests stating it physically: a crust thickness (0.0078 at refinement 5) and an interface
   weakening (harmonic factor 0.249 over the top two cells), so it does not change with h. Louis to say when.
@@ -3190,3 +3194,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   and bench_asth18_cap20 (the same with the fault to 0.2, reaching it); asthenosphere strength x0.1 and bottom 0.231
   kept; compared within the pair, not against the benchmark. cap15 runs -> the lithosphere cut matters; cap15 chokes
   and cap20 runs -> the connection matters. Geometric placements to follow with 4128 / 4129.
+- 2026-11-06: 4128 / 4129 early (Earth, thin crust, np 26), subducting plate at t ~2e-4 / ~3e-4: benchmark (0.15) 883 /
+  1820; fault to 0.14 665 / -; 0.12 443 / 603 (719 at 4e-4); 0.04 + weak band to 0.2 120 / stalling; asth top 0.18 with
+  fault 0.15 356 / 531; asth 0.18 with fault 0.20 476 / 1324. Kaiju: the connection to the weak asthenosphere dominates
+  (the lithosphere cut alone runs at 40 % of the connected fault), with both contributing; depth acts progressively
+  in the standard model (0.12 < 0.14 < 0.15, the layer's ramp); a weak band along the slab top does not replace the
+  deep fault even into the asthenosphere. Geometry (benchmark, checkpoint 55): fault bottom 0.150; the hanging wall
+  reaches T 0.6 (the slab-wedge thermal contact) at 0.080; at the bottom footwall T 0.19, hanging wall 0.72; so the
+  benchmark fault runs 0.07 below the contact against hot wedge mantle and ~0.03 into the asthenosphere. In the
+  slower arms the wedge corner cools and no hot contact forms along the fault. Kaiju's recipe reading: fault depth =
+  asthenosphere top + ramp (+ margin), not a free number. Hub: one confound left (the asth18 pair also changes fault
+  length), so a no-weak-layer control pair (-uw_asth 1, fault 0.15 vs 0.20) asked for before the ledger says
+  "connection dominates"; the weak-band result recorded as "a damage zone as implemented (a half-cell band) does not
+  replace the split", not "no damage zone can".
