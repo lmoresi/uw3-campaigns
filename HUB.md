@@ -3165,8 +3165,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-06: **Earth only from here (Louis).** The benchmark is crust_earth_c05 (Earth run 2's line, half-element
   crust, envelope locator, fault to the fixed cap 0.15). Louis's questions: can the plate boundary be the fault alone,
   or does it need a damage zone; must the crust be weak? Rig: the fault stopped at the overriding plate's thermal
-  base beside the trench (-uw_fault_cap wedge, experimental branch kaiju/fault-wedge-cap ccfd98d + d8f0f64 on 4f2fbaa,
-  NOT yet on GitHub; not for merging; its column measurement misfires once the trench moves). Result: in every arm
+  base beside the trench (-uw_fault_cap wedge, experimental branch kaiju/fault-wedge-cap on 4f2fbaa, pushed as
+  70fc17a + 9fce5a1 = kaiju ccfd98d + d8f0f64, blobs a0fcc66 / 5af6a38 verified; rejected, not for merging; its column measurement misfires once the trench moves). Result: in every arm
   subduction CHOKES (t ~3e-4: subducting plate 85-230 vs 1820, slip 59-220 vs 2667, trench -0.9 to -1.9 vs -5.3 deg;
   the plate reverses by 4.5e-4 in the passive and lithosphere-only arms; a weak crust helps ~2x, not enough); the
   lithosphere-only arm restarted when its misfired cap let the fault back to 0.15. Lesson: the slab must be decoupled
