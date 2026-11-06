@@ -263,6 +263,17 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
+**2026-11-06: #963 filed (the test_1064 CI hang), owned by the integration session.** #947's PR
+run and the development push have identical trees; the PR run passed test_1064 in 100 s at 11:30;
+every run since 19:39 sits in the annulus_fmg solve past 300 s; same image, cache key and
+pixi.lock. #954's own CI artifact shows both ranks in one FMG F-cycle restriction (not a collective
+mismatch). Hypothesis: on some runner CPUs the solve stops converging and heads for max_it 10000
+(host-dependent, not batch order). Next: #954 prints lscpu; hyperion sweeps OPENBLAS_CORETYPE
+with iteration counts; the laptop bounds the outer KSP in the test (a library default change
+would need Louis). **#954 review (laptop):** 1 must-fix (`if: failure()` misses the cap
+cancellation; `failure() || cancelled()` plus headroom), 9 should-fix; to hyperion. A rerun of an
+old PR run reuses its old workflow: #951 needs development merged in to pick up #954.
+
 **2026-11-06: development itself is red.** Its own push run at eddab707 (the #947 merge,
 2026-11-05 20:38) failed shard 4 on the same test_1064 spherical3d hang at np 2. That tree equals
 #947's tested head e15f5fad, which passed on its PR run: **the hang is intermittent on GitHub's
