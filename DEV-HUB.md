@@ -245,6 +245,15 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, cross-reviews:** #955 reviewed by the laptop (no must-fix, five should-fix: the
+test cannot see a reintroduced IPython/trame import, the notebook default unpinned,
+`jupyter_backend="none"` raises without IPython, tier_a marking, #957 not mentioned); hyperion
+to address before merge. #954 and #959 reviews running (#959's parallel checks written out for
+hyperion). **#906** at d992064d: the laptop's serial suite caught its own bug (derived meshes
+inherited modes in the parent's coordinate symbols: NameError on a faulted thin sheet; fixed in
+b7030602 with a failing-first test); hyperion's parallel runs pass at np 2/4/8, a rank-local
+reduction mutant hangs at np 2-8. PR after the 40-file serial rerun and hyperion's review.
+
 **2026-11-06: PR #959 (MMPDE session, bugfix/mover-stale-mesh-vector add5ea77):** after a mesh
 move, solves used the pre-move field on the moved nodes (a bug since 2026-05-28; first solve after
 a move 3-4 % high in v_rms), and a non-moving rank could hang the collective remap. remesh.py +16,
