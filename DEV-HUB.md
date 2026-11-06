@@ -233,6 +233,27 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, hyperion (all local; GitHub writes still blocked):**
+- **#900 pins are long-standing, not recent regressions:** 0863, 0864, 0865 fail and 0844_reconnect
+  hangs identically at np 4 on eddab707, 25d62812 and fc67b650 (2026-10-29). 0851, with its
+  yield floor set as test_0851 does, reaches the same family: **parallel peak slip 0.0064 vs
+  serial 0.0142** at np 2 and 4 (0863: 0.0029 vs 0.00335). So 3-D fault networks give wrong
+  peak slip in parallel: a correctness problem for phase 2 (3-D). 0844_reconnect at np 2: rank 0
+  in `_global()`, rank 1 in `_free_petsc_garbage()`, both spinning: a collective mismatch.
+  Issues to file once hyperion can write (not routed through another session meanwhile).
+- **CI hang:** `scripts/test.sh --p 2 --shard 4/4` on #951's tree passes on hyperion pinned to
+  2 cores (4033 s, test_1064 `..ss....ssss......`); unpinned still running. The diagnostics PR
+  (local 99cd9668) is the way forward.
+- **#900 PR ready locally** (bugfix/ptest-in-ci-900 0171eef6): CI runs the 15 passing pytest-style
+  ptest files, appended so no batch moves; check_test_coverage accounts for every ptest file; 001a
+  and 003 fixed; 000c/000d are not #922 (missing input files; 000c passes with the file; 000d stale
+  DMSwarm API).
+- **#952 review: not ready.** `CubedSphere(numElements=2, simplex=True, refinement=2)` with
+  radiusInner 0.547 leaves 5 inverted cells at np 8 (0 at np 1), reproduced; the parallel test
+  cannot see vertex-copy disagreement. Sent to the integration session.
+- **#735 port:** new ThinSheet and "none" tests fail on eddab707, pass on the branch; wider tests,
+  then review. **#665:** second review's must-fix done (d8c05c93).
+
 **2026-11-06: #906 grew to a medium PR after its review** (Louis in the loop with the
 integration session). HIGH finding: a mesh-declared rotation skipped the constraint test, so on
 a deformed wall it was admitted though no longer null (annulus, 1 % wall deformation: answer
