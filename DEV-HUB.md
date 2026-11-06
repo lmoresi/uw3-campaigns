@@ -279,7 +279,11 @@ transcript claims adjoint support. **External review set complete** (reported to
 **#967 all green on 488c53b1** (run 42187331541): shard 4 passed in 55 min, the first green shard 4
 since eddab707; test_1064 ran all 18 cases in ~100 s; test_1142 passed. Hyperion's conditions met.
 Waits on Louis's yes (evidence table given) and the hub's merge permission. The quarantine falls
-away once it lands. **Shard 4 at 55 of 60 min:** hyperion to rebalance after #954 (cap 70) if #958
+away once it lands. **Shard times on #967's green run:** 4: 55.0, 3: 53.5, 1: 43.8, 2: 25.6 min. The test_00[0-4]* band
+grew from 5:14 to 27:11 (test_0022_rotated_adjoint 956 s on hyperion). Hyperion: one rebalance PR
+after #954 (test_0022 its own batch on shard 2; shard 3's 27-min batch moved too), and first a check
+of whether one merge slowed test_0022 (a performance regression to file) or it grew gradually.
+**Shard 4 at 55 of 60 min:** hyperion to rebalance after #954 (cap 70) if #958
 and #970 push it past ~45. Merge order: #954, #967, #955, #970, #958.
 **PR #970 (#961 and #807: ptest_0844_reconnect hang)** by the integration session: the subsampler
 kept parent maps derived through repaired passes; nested-transfer helpers decided None rank-locally
