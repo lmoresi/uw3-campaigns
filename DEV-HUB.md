@@ -245,6 +245,16 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, MMPDE session first report:** the mover and FMG run on eddab707 (no folds, wall
+radius exact, 4-5 velocity its, np 1 and 4). Blocker: after a move, rotated free slip with the
+default normal drops the rotation mode (1 to 0; rigid rotation in the answer, v_rms ~6 % high);
+normal=unit_e_0 clean. **Combined with #906:** the MMPDE session tests
+`bugfix/rotated-nullspace-from-mesh-906` on its moved mesh (wall-preserving move should be
+admitted by the invariance check), reporting to the integration session, whose #906 tests should
+gain a moved-mesh case. Other findings (Louis and the MMPDE session directly): Nitsche after a move
+v_rms 14-23 vs ~1.65; penalty half the v_rms even on a uniform mesh; rotated `auto` on a refinement
+mesh picks GAMG not FMG; np 4 mesh differs from np 1. SUPG on a moving mesh not yet tested.
+
 **2026-11-06, #952 fixed after hyperion's review** (0306f834): the refinement callback moved a
 wall vertex only on ranks holding a labelled facet, and each rank checked its own copy; now
 every copy takes the move made on any rank before the check (the moved copy wins), which also
