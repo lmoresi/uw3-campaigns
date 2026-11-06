@@ -276,6 +276,10 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#980** ready on green CI (hyperion's three review changes in; rerun green at np 1 and 2). **PR #981
+(test anchors, tests only):** per-host anchors so test_1063, test_1064 and test_1066 check absolute
+answers on Linux CI instead of skipping (hyperion's Linux values); drops the stale strict xfail on
+the constrained-shell LU-subsolve case (tier C); hyperion reviewing.
 **#735 port held for Louis (hyperion, 2026-11-06):** the code does what it claims and the stored
 stress now moves (rotation 4.05 -> 0.298 at order 2; yield overshoot 2.8 % -> 0.9 %; faulted nodal
 sheet 2.78 -> 0.311; cylinder off-wall excess gone; other flavours unchanged to 1.7e-15, ThinSheet to
