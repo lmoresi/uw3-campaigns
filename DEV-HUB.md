@@ -276,7 +276,9 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
-**PR #983 (#908, split from #909)**: degree >= 2 cell radii, with factors and the caller table in the
+#983 cross-review (laptop): no must-fix, 4 should-fix (FEGeom for all cells at the user's qdegree on
+every rebuild, ~+1.5 GB at 27k hexes qdegree 6; a dead dm_class; a duplicate _collective_raise; two
+non-closed-form baselines); warped hexes x3.74-3.80 not x3.63; to hyperion. **PR #983 (#908, split from #909)**: degree >= 2 cell radii, with factors and the caller table in the
 body; test_0782 10 passed, parallel 4 passed at np 2-8; its review ran on the combined branch, so the
 laptop cross-reviews the carved branch. #909 and #965 still in fixing (round 2 found three new
 must-fixes: dimensional values mis-scaled through remesh, mesh.deform corrupting square MATRIX
