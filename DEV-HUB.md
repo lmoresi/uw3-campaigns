@@ -276,6 +276,11 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#967 all green on 488c53b1** (run 42187331541): shard 4 passed in 55 min, the first green shard 4
+since eddab707; test_1064 ran all 18 cases in ~100 s; test_1142 passed. Hyperion's conditions met.
+Waits on Louis's yes (evidence table given) and the hub's merge permission. The quarantine falls
+away once it lands. **Shard 4 at 55 of 60 min:** hyperion to rebalance after #954 (cap 70) if #958
+and #970 push it past ~45. Merge order: #954, #967, #955, #970, #958.
 **PR #970 (#961 and #807: ptest_0844_reconnect hang)** by the integration session: the subsampler
 kept parent maps derived through repaired passes; nested-transfer helpers decided None rank-locally
 before collective fallbacks; the test's asserts stopped one rank ahead of a collective. Fixed
