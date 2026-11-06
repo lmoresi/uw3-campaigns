@@ -245,6 +245,11 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, development baseline on hyperion (eddab707, serial tier A+B):** 2887 passed,
+145 skipped (134 need --with-mpi), 9 xfailed, 0 failed; 5 h 57 min on one core, ~25 GB peak.
+Slowest: test_maxwell_transfer_function_under_a_t... at 4972 s (machine shared; check its CI
+cost in the next bulk review). Hyperion's queue items 1-7 done except GitHub writes.
+
 **2026-11-06, MMPDE session:** #906 at c6c2668a passes the moved annulus at np 1 and 4
 (declared_modes_kept [True], gauge orthonormal, nodal rate round-off, v_rms within 0.05 % of
 unit_e_0). New: the default CG mover stalls after ~5 of 150 outer iterations; regression test
