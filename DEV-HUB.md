@@ -209,6 +209,21 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: hyperion's GitHub writes are blocked by its own session's permission check**
+(its first PR comments, on #945 and #862, denied as external writes). Hyperion waits for Louis;
+no other session posts for it. Put to Louis: allow rules for gh pr create/comment, gh issue
+create/comment/edit and git push in hyperion's Claude settings, or approve each prompt there.
+**Ready locally on hyperion:** the CI-diagnostics change (bugfix/ci-keep-hang-stacks 99cd9668
+off eddab707: CI installs gdb from apt and uploads /tmp/uw-stacks-* for 5 days on failure; the
+supervisor writes native stacks via gdb, ranks allowing the attach with PR_SET_PTRACER; new
+test fails before; workflow YAML-checked only; the KSP-monitor switch dropped because the
+rotated solve's own rotfsN_ prefix ignores solver options). Review verdicts: **#945 ready with
+changes** (two tutorials left with an empty code fence, stale body, three unparsable files not
+two); **#862 ready with changes** (design note contradicts the guide on where split-level work
+lives; "one block per rank" should be "one block on one rank"). **#665 not ready:** the branch
+fixes missing trame, but #665's reported case (IPython missing) still crashes inside the new
+handler, and a named backend is silently replaced with static; hyperion reworking.
+
 **2026-11-06: the CI hang does not reproduce off the runner** (hyperion, eddab707, np 2): the
 1062_forward + 1063 + 1064 triple passes (201 s); the full CI batch 1062_forward-1068 passes
 (246 s, 210 s pinned to 2 cores). Options database: grows ~40 entries per solver (#950
