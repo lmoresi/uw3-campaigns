@@ -3172,5 +3172,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   lithosphere-only arm restarted when its misfired cap let the fault back to 0.15. Lesson: the slab must be decoupled
   from the mantle wedge below the contact, not only split from the overriding lithosphere. Now (Louis: "let's work
   around that and try to do better"; Earth, thin crust, from step 0, 120 steps, np 26): bench_cap08 and bench_cap12
-  (4122, 4f2fbaa; how deep the decoupling must reach) and bench_cap04_dz (4123, b9361e0: fault to 0.04 plus the crust
+  (4125 packed, 4f2fbaa; how deep the decoupling must reach) and bench_cap04_dz (4127, b9361e0: fault to 0.04 plus the crust
   weakness on a sharpened marker along the slab top to ~0.12; can a weak band replace the fault's deep part).
