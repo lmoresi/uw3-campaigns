@@ -259,6 +259,19 @@ fails on ranks with no fault nodes. Gathered across ranks the reaction is identi
 (11 nodes, max relative error 0.00901). No defect; nothing filed; correction posted on #855.
 Remaining: #780, #857, #858, #859, #689. Report to Louis when the set is done.
 
+**2026-11-06: development itself is red.** Its own push run at eddab707 (the #947 merge,
+2026-11-05 20:38) failed shard 4 on the same test_1064 spherical3d hang at np 2. That tree equals
+#947's tested head e15f5fad, which passed on its PR run: **the hang is intermittent on GitHub's
+runners, not caused by any PR** (3 of the last 4 shard-4 runs that reached it hung; it never hangs
+on hyperion). #954's own CI run carries its diagnostics (gdb, stack artifacts), so if it hangs
+there we get the runner's stacks. **Put to Louis:** quarantine that one test case in CI (skip under
+CI with an issue reference) once stacks are captured, so CI is meaningful again; until then a
+shard-4 failure that is exactly this hang is treated as known. **#959 review (laptop):** 2
+must-fix (remesh.py:516 still skips `global_evaluate` on a rank with no target points, so
+populated ranks hang: #960 part 1, a one-line fix; both tests tier_a), 2 should-fix (the swarm
+proxy stays at pre-move nodes after a mover move, 3.4e-2, no issue covers it; follow_metric still
+decides `moved` per rank). Sent to the MMPDE session.
+
 **2026-11-06:** #955's round-2 cross-review: no must-fix, no should-fix. **Squash merge on green**
 (d8d5984c fails its own test, so a merge commit would leave a red bisect point; precedent #929).
 #954 waits on green and the laptop's review. **2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
