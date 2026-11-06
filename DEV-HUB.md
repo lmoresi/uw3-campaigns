@@ -263,6 +263,16 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
+**2026-11-06: #963 reproduced on hyperion: the OpenBLAS kernel, not leaked state.** Default and
+SkylakeX kernels: the annulus_fmg solve finishes in 2.3 s. Haswell and Zen: the inner velocity FMG
+floors near 1.2e-7 and stops at its 200-iteration cap; the outer FGMRES stagnates at 1.37e-9 against
+the test's tol 1e-9, so the solve never finishes. Batch order irrelevant; deterministic under Zen
+(GitHub's AMD runners). Hyperion checking where the rounding enters (coarse shift on/off, null space
+attached/detached, #906's tip under Zen). **PR #964 (#906)** opened: test_1131 10 passed; 40 rotated
+and fault files 367 passed, 1 skipped; full rotated parallel set and the twin pass at np 2, 4, 8 on
+hyperion; #906 and #877 labelled fixed-in-PR; hyperion's cross-review to follow; the radius variable
+filed as a draft design item.
+
 **2026-11-06: #963 filed (the test_1064 CI hang), owned by the integration session.** **Correction: the hanging case is
 `test_rotated_freeslip_annulus_fmg_partition_independent`** (the custom-FMG rotated annulus, the
 fifth test; #954's stacks put both ranks in `_annulus_fmg_diagnostics`, test_1064:309), not
