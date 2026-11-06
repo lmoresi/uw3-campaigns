@@ -276,6 +276,15 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#908 + #909 fixed locally on hyperion** (`bugfix/parallel-collectives-908-909`, two commits, in
+review): behaviour change on straight-sided degree-2 meshes: cell radii, get_min/max/mean_radius and
+cell_size() double (in serial too), matching degree 1 to 1e-15 (the FVM read edge midpoints as
+corners). The zg95 annulus uses Annulus's default degree=1 (checked by the hub): unaffected. PR to
+list every caller and its movement; stop for Louis only if the audit finds a production degree-2
+path. test_0782/0783 fail first, pass at np 2, 3, 4, 8. Found, to file if confirmed:
+metricCreateIsotropic on an empty rank hangs the next collective; global_evaluate extrapolates a few
+interior nodes on very small partitions. Hyperion fix queue: #954, #955, #958 are PRs; #735 committed
+locally, in review.
 **#967 at 488c53b1:** the adjoint leak closed (533.1 to 549.5 MB over 31 adjoints; new parallel test
 fails without the fix); review answered; merge on green and Louis's yes. **#954 and #955 green on
 every shard;** both wait on the hub's merge permission (Accept edits).
