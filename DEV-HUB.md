@@ -349,6 +349,16 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   every case 1 outer iteration in ~3 s). Cause unknown: np-2 partition or another; hyperion's
   R2 runs test_1064 at np 2 and 4 on both builds. **Proposed:** CI keeps the MPI
   supervisor's /tmp/uw-stacks-* as an artifact on failure (a workflow change; to Louis).
+- 2026-11-06, hyperion queue item 3: **the whole tests/parallel set on eddab707 is clean**
+  at np 2 (251 passed, 21 skipped, 1 xfailed) and np 4 (260 passed, 11 skipped, 1 xfailed,
+  CI's #611 deselect), 72 files each, one file per mpirun (CI batches 6), 417 s at up to 34
+  ranks. test_1064 passed at both (the CI hang did not reproduce; #931 not seen). **Gap
+  found:** test_1063_constrained_freeslip_parallel skips all its tests in CI too (#951's
+  shard-4 log: "ssssss"), and 3 cases of test_1064 and 1 of test_1066 likewise: their
+  accuracy anchors were recorded on a macOS mesh and skip on Linux's triangulation. So CI
+  asserts nothing in test_1063. Proposed to the integration session (after #946, #906) and
+  to Louis: record anchors in CI's Linux environment (hyperion), per mesh fingerprint or
+  on triangulation-independent quantities, so CI runs them.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
