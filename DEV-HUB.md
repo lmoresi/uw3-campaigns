@@ -263,6 +263,22 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
+**2026-11-06: #963's mechanism found (hyperion, posted on the issue): a library issue, not a test
+artifact.** The rotation is an exact null vector of the rotated velocity block; the FMG cycle
+injects rounding along it, flooring the inner solve. Whether the floor lands above the 3.3e-11 rtol
+depends on the OpenBLAS kernel and np (of 8 kernels: default/SkylakeX finish at np 1 and 2;
+Haswell/Zen stall at np 2; Sandybridge/Nehalem at np 1; Core2/Prescott at both; thread count
+irrelevant; hyperion is a Xeon Gold 6240R). **Projecting the mode out of the preconditioner removes
+the stall on every kernel, same answer to 13 digits**; #947's shift, the smoother and the
+orthogonalisation are not the cause. Any rotated FMG solve with an exact rotation mode can stall on
+some CPUs. Fix: the integration session's next PR, ahead of finishing #964 (CI is red for all until
+it lands), test forcing a stalling kernel, hyperion cross-review. Quarantine not needed if it lands
+soon. Also: #954 at 12525d48 (review addressed: upload on cancel, 70-min cap, two native samples,
+per-shard CPU/BLAS report); #958 at 12585422 (must-fixes done: ptest loop on shard 2, 16 files,
+0864_seam and 0865 at np 2 only, ptest_jit_cache no longer wipes the real cache); #858 ready with
+changes (its test misses the ownership bug; leaks memory per call); filed #961 (0844), #962
+(test_1140 at np 8), #965 (global_evaluate on empty submesh ranks).
+
 **2026-11-06, #964 (#906): hyperion's review says don't merge yet** (ten conditions). Being
 fixed in #964: `addon_partition._moved_wrap` drops the declaration at np > 1 (rank-dependent
 answer); the exemption ignored a constrained normal (a non-radial given normal on a circular wall
