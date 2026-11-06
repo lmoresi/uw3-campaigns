@@ -245,6 +245,14 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: PR #959 (MMPDE session, bugfix/mover-stale-mesh-vector add5ea77):** after a mesh
+move, solves used the pre-move field on the moved nodes (a bug since 2026-05-28; first solve after
+a move 3-4 % high in v_rms), and a non-moving rank could hang the collective remap. remesh.py +16,
+serial and parallel tests. Its review predates the final squash; the last seven source lines
+unreviewed: the integration session cross-reviews. **#960** filed (two unreproduced
+rank-asymmetry risks in the remap). Merge order on green: #954, reruns of #951/#952, then #959
+and #955. **Earlier moving-mesh results may carry the error** (told to the science hub below).
+
 **2026-11-06: Louis authorised hyperion's GitHub writes in its own session** (push side
 branches, open PRs, PR and issue comments, file issues; no merging, approving or closing).
 Out: **PR #954** (CI keeps the MPI supervisor's stacks with native frames; merge first, then
@@ -1723,6 +1731,11 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-11-06, to the science hub: **moving-mesh results since 2026-05-28 may carry an error.**
+  After a mesh move (MMPDE or any remesh mover), the first solve used the pre-move field on the
+  moved nodes: v_rms 3-4 % high on that solve (PR #959, fix in review). Runs that move the mesh
+  every step re-enter the error each step; check which campaigns move meshes (free surface,
+  MMPDE convection) before relying on their numbers, and rerun key ones once #959 merges.
 - 2026-11-06, to the science hub: **#948's leak is kaiju-launch's `coarse_log_hook.py`**,
   which keeps every fault rebuild's Stokes solver (and its mesh and multigrid levels) alive
   in a module-level list. Not underworld3; no library change. Once kaiju's verification is
