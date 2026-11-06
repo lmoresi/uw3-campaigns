@@ -132,7 +132,8 @@ test_1064 hang), #946 (shell folds; waits on hyperion's run on both builds), #90
 modes from the mesh; after #946).
 
 **Integration session, in order, each a small test-first PR merged on green:** (1) test
-anchors so test_1063/1064/1066 run in CI (Louis's yes); (2) #950 options database growth;
+anchors so test_1063/1064/1066 run in CI (Louis's yes); (1b) the disk-restore swarm fix
+(below); (2) #950 options database growth;
 (3) #924 rotated loop ignores snes_rtol/atol/stol; (4) #939 corner constraint ignores a
 nonzero pin; (5) #909 and #908; (6) #905 project_to_degree; (7) CI keeps the MPI
 supervisor's stack dumps as an artifact on failure; (8) the mean-removal partition drift.
@@ -153,6 +154,23 @@ whether #780 and #861 (conflicts) are still wanted; who reviews gthyagi's #855-#
 
 **Later, larger:** #910, #911, #898, #885, #877, #891 (units), #922 library side, #899,
 #940 (live with #553), #949, #941 (forced partition), the review-finding issues #876-#888.
+
+**Hyperion item 7, rescue branches (2026-11-06):** 8 refs on origin, not 6. **One live bug
+on development:** `disk_snapshot._read_swarm_from_sidecar` writes `current[...] = saved` into
+`np.asarray(var.data)`, a detached view (the #313 pattern), so a disk restore never reaches
+the DMSwarm field; a run restarted with `stress_transport="lagrangian"` loses its stress
+history. Confirmed by the hub at eddab707 line ~784. The fix (`var.data[...] = saved`) and
+test_0020_snapshot_disk_swarm_values.py are on
+`feature/forward-from-nodes-hyperion-2026-10-20-wip` dd773265; the test fails 2/2 on
+eddab707 (hyperion). Queued to the integration session as item 1b (test and fix only, not
+the commit's experimental lagged_stretch_velocity). The rest: test/sbls-coss (and -wip)
+are ancestors of feature/shear-band-length-scale; #360 kdtree, restore-head, mem-leak-176
+and review/bn-mergetest are superseded (restore-head's Oldroyd-B `_channel` block in
+test_0020 is absent from development, intent unchecked); wip/yield-782-759 is
+patch-identical to #852. Seven rescue refs can be deleted on Louis's word once the
+disk-restore fix is in. **Item 6:** `bugfix/backward-nodes-snapshot-order` conflicts with
+development in solvers.py (SNES_Stokes stress-history hooks, a region since rewritten):
+a port, not a merge; `bugfix/visualisation-headless-no-trame` merges clean, tests running.
 
 ## Done 2026-11-06 (kaiju's monitoring hook, not the library; verified by kaiju 4097): memory grows ~190 MB per rank per fault rebuild on kaiju (#948) (Louis, 2026-11-05: "The memory leak on kaiju is crippling - please put this on a priority list!")
 
