@@ -257,7 +257,11 @@ the repaired call site (a mutant restoring `if datum_nodes:` passes); 376 behind
 same code. **Correction:** test_1092 is a serial test; under mpirun its rank-local `assert len(sig) > 5`
 fails on ranks with no fault nodes. Gathered across ranks the reaction is identical at np 1-8
 (11 nodes, max relative error 0.00901). No defect; nothing filed; correction posted on #855.
-Remaining: #780, #857, #858, #859, #689. Report to Louis when the set is done.
+**#859 not ready:** fixes #799 at unit scale, but its new tolerance is absolute, so meshes of
+model size ~10 or more silently get wrong values where development is right (annulus at L=100:
+144 of 9144 on-edge points unclaimed, errors 1.6e-2, no flag; shell at L=100 misses 8.7 %;
+swarms lose on-face particles). A relative scaling is sketched in the record, untested in
+parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
 **2026-11-06: development itself is red.** Its own push run at eddab707 (the #947 merge,
 2026-11-05 20:38) failed shard 4 on the same test_1064 spherical3d hang at np 2. That tree equals
