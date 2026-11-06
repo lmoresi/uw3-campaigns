@@ -264,7 +264,7 @@ all-rank reduction); forced-partition case, two-sided test and rejection record 
   in `_global()`, rank 1 in `_free_petsc_garbage()`, both spinning: a collective mismatch.
   Issues to file once hyperion can write (not routed through another session meanwhile).
 - **CI hang:** `scripts/test.sh --p 2 --shard 4/4` on #951's tree passes on hyperion pinned to
-  2 cores (4033 s, test_1064 `..ss....ssss......`); unpinned still running. The diagnostics PR
+  2 cores (4033 s, test_1064 `..ss....ssss......`) and unpinned (6174 s): runner-specific. The diagnostics PR
   (local 99cd9668) is the way forward.
 - **#900 PR ready locally** (bugfix/ptest-in-ci-900 0171eef6): CI runs the 15 passing pytest-style
   ptest files, appended so no batch moves; check_test_coverage accounts for every ptest file; 001a
