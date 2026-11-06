@@ -72,6 +72,7 @@ GitHub, or in session transcripts. If it dies:
 | docs hub | `session_01HxWvn87HYCEJodpgCdaBro` ("Underworld Docs and technical notes Hub"); keeps `DOCS-HUB.md` |
 | laptop (wombat), fault-split integration | `session_01HxWvn5rMK67zasgirdXszQ` ("Fault Models Code Unification"): built A, B, C; reports to the docs hub |
 | hyperion | `session_01QZvR7SZKsjcFnzx2aLxn1j` ("hyperion-zesty-dijkstra"): reimaged 2026-10-27; owner of several fix branches below. Later Remote Control session `session_01HxWvn92dmiWUj5FX68AZc7` ("hyperion-transient-chipmunk"): **out again 2026-11-04** (OS on the wrong disk; reboot and reimage). Nothing on hyperion was unpushed; the Science Hub has the inventory. Assign no hyperion work until it is back. **Back 2026-11-04 22:33 UTC:** Remote Control session `session_01HxWvnAXb5n85uEcw711tJC` ("hyperion-abstract-token"), bridge environment `env_01WoSLV9PFA8uKGmUUB1rYN6` ("hyperion:+Underworld"); **archived 2026-11-05 23:20, its environment deleted.** **Current (from 2026-11-05 22:36): `session_01HxWvn98DsWPTz4ZpKByzQM` ("hyperion-splendid-sutherland"), environment `env_01KTKALPSCKW7p6heBTUQoig` ("hyperion:+Underworld:969d").** Check `list_sessions` before briefing hyperion: its sessions change with each Remote Control restart |
+| hyperion, MMPDE | `session_01HxWvn6QP8MysBnjgab6A5v` ("hyperion: MMPDE annulus, FMG-preserving meshes"), created by the hub 2026-11-06 on Louis's word: clean up MMPDE on the annulus against current development, then two FMG-preserving strategies for a talk and poster, later a base mesh for the fault add-on. Louis talks to it directly; 24 cores; milestones to the hub |
 | kaiju | `session_01HX67HY6xwuJivHKLLXrR3H` ("kaiju: rollback experiments"): no GitHub credentials; fixes arrive as patches through a hub |
 | kaiju, dev runner | `session_01HxWvn9ik2HHt9ANKndJRDr` ("kaiju: dev runs 2"), created 2026-11-02 in Auto, replacing `...65HBbkFbSxnYfNuxR`, which locked itself out of its permissions and is archived. It runs suites, benchmarks and parallel checks of library branches on free nodes, in the held-queue order; it reports to the hub or, if refused, to the integration session |
 | kaiju, 3-D add-on mesh owner | `session_01HxWvn87Vw8gzXsEHJ7iF8u` ("kaiju: 3-D add-on mesh"), created by the dev hub 2026-10-31 on Louis's word; milestones M0-M4 of the 3-D plan, #900 first; patches come through the dev hub |
@@ -154,6 +155,17 @@ whether #780 and #861 (conflicts) are still wanted; who reviews gthyagi's #855-#
 
 **Later, larger:** #910, #911, #898, #885, #877, #891 (units), #922 library side, #899,
 #940 (live with #553), #949, #941 (forced partition), the review-finding issues #876-#888.
+
+## HOW THE HUB WORKS NOW (Louis, 2026-11-06)
+
+"Long responses so I am probably missing a few things. I am not keen to migrate the hubs until
+Hyperion is proven reliable so please continue to orchestrate. I am happy to converse at a
+technical level with the technical sessions so the context here is not flooded and you monitor
+the activity to look for opportunities to schedule tasks and to combine work."
+- **Short replies to Louis:** decisions and completions only, a few lines.
+- Louis talks technical detail with the technical sessions directly; the hub monitors them,
+  schedules, combines overlapping work, merges, and keeps this file.
+- Hubs stay in the cloud until hyperion has proven reliable.
 
 ## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
 
