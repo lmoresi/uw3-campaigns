@@ -276,6 +276,14 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#983 at d3f7647e: should-fixes done** (FEGeom rule follows the coordinate degree, cells in bounded
+blocks: 27k hexes qdegree 6 peak 1550 -> 3 MB, 8.7 -> 0.64 s; 195k hexes qdegree 3 2090 -> 0 MB;
+dm_class removed; reuses _collective_raise; per-cell closed-form tests 15 failed / 2 passed on
+eddab707, 17 passed on the branch; body corrected; diff commands posted: no #909/#965 hunk). #908's
+np 3 case: eddab707 exit 142 ("Edge has 6 coordinates != 4"), branch area 0.5 to 15 digits. The new
+FEGeom rule asked of the laptop for a look; merge on green regardless. #909 round 2 at 0d0ed886
+(two more transposition fixes), third independent review running; hyperion stops and reports if it
+finds defects in the fixes again. test_0022: pressure hits its 200 cap hundreds of times per run.
 #983 cross-review (laptop): no must-fix, 4 should-fix (FEGeom for all cells at the user's qdegree on
 every rebuild, ~+1.5 GB at 27k hexes qdegree 6; a dead dm_class; a duplicate _collective_raise; two
 non-closed-form baselines); warped hexes x3.74-3.80 not x3.63; to hyperion. **PR #983 (#908, split from #909)**: degree >= 2 cell radii, with factors and the caller table in the
