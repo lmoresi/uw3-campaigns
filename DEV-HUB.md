@@ -276,6 +276,16 @@ transport silently (metres read against non-dimensional values), restore breaks 
 AdvDiffusion built after a capture (theta 1.0 becomes 0.5), and a PC step records nothing while the
 transcript claims adjoint support. **External review set complete** (reported to Louis 2026-11-06).
 
+**#735 port held for Louis (hyperion, 2026-11-06):** the code does what it claims and the stored
+stress now moves (rotation 4.05 -> 0.298 at order 2; yield overshoot 2.8 % -> 0.9 %; faulted nodal
+sheet 2.78 -> 0.311; cylinder off-wall excess gone; other flavours unchanged to 1.7e-15, ThinSheet to
+5e-14), but **Waters and King gets worse and stops converging** (error at t=2: development 7.8e-4 ->
+3.9e-4 halving; branch 2.42e-3 -> 1.97e-3), uniform bias along the channel, max|v_y| 2.6e-4 -> 1.2e-3
+(candidate mechanism); nodal rotation error grows as dt falls (0.30 -> 0.44 at Courant 0.7 -> 0.087);
+the snapshot itself is now inert (bit-identical disabled on 6 of 7). test_1054 fails 10/23 (pinned on
+the defect). The wall peak remains, so #735 stays open (Refs). **The hub's recommendation to Louis:
+do not merge yet**; file the bias, find its cause, land once convergence is restored. Records on
+hyperion runs/2026-11-06/.
 **PR #980 (#950, options database growth):** dropped solvers' options go when the solver is
 collected; the coordinate FE's keys go right after use; rebuild-loop growth 17 keys/cycle -> 0.
 Touches petsc_generic_snes_solvers.pyx only in the base constructor (a weakref.finalize, not run at
