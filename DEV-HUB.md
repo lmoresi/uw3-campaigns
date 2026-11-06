@@ -335,6 +335,13 @@ rebuild); then the FAC union blocks (#934) and the rotated cross-solve cache.
   ~/campaigns/kaiju-launch/scaling/ copy (Louis).
 - 2026-11-06: Louis renamed the scaling copy to coarse_log_hook_leaky_20261106.py; no
   leaky hook remains importable on kaiju. #948 is fully closed out.
+- 2026-11-06: **#951's CI failed on shard 4, not on its tests**: both test_0078 files
+  passed; test_1064_rotated_freeslip_parallel hung at np 2 after "..ss" (MPI supervisor:
+  no output 300 s, every rank in _solve_rotated_iterative spinning; run 42130702511, job
+  127606355452). An intermittent hang on development eddab707, plausibly the folded-shell
+  symptom #946 fixes (Linux gmsh). Failed job rerun; merge on green since #951 does not
+  touch test_1064. Told the integration session, for #946's PR body if B hangs on a folded
+  mesh in hyperion's R2.
 
 **Merge rule:** the fix PR goes to Louis like any other; this priority does not waive it.
 
