@@ -263,7 +263,10 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
-**2026-11-06: #963 filed (the test_1064 CI hang), owned by the integration session.** #947's PR
+**2026-11-06: #963 filed (the test_1064 CI hang), owned by the integration session.** **Correction: the hanging case is
+`test_rotated_freeslip_annulus_fmg_partition_independent`** (the custom-FMG rotated annulus, the
+fifth test; #954's stacks put both ranks in `_annulus_fmg_diagnostics`, test_1064:309), not
+spherical3d as the hub had it. A quarantine must target that case. #947's PR
 run and the development push have identical trees; the PR run passed test_1064 in 100 s at 11:30;
 every run since 19:39 sits in the annulus_fmg solve past 300 s; same image, cache key and
 pixi.lock. #954's own CI artifact shows both ranks in one FMG F-cycle restriction (not a collective
