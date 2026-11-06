@@ -3141,3 +3141,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   leaky hook and run outputs excluded); merged to main. From now on launches run hooks and scripts from a pushed
   commit. Hub's note on the hook: it also opens a new PETSc log stage per solve, which the 4107 A/B (leaky vs fixed
   hook) cannot see; a no-hook arm (the driver through baseline_job.sh) asked for.
+- 2026-11-06: **timing verdicts (4107 n2, 4108 n3; TAf-v2 from checkpoint 20, np 26, one per socket):** s per Newton
+  iteration fixed hook 45.5, leaky 46.4 (rss 22.0 vs 32.1 GB at step 18-19), no hook 45.5 (fixed 45.6 on n3; n2 and n3
+  agree to 0.2 %). So the per-solve log stages cost nothing measurable and the leak cost ~2 % at that point. The
+  229 / 145 s per step of 4043 / 4098 was bandwidth, not the leak: 4098 ran alone and its ranks spread over both
+  sockets (27 s per Newton iteration) where a packed run gets one socket (45). STAND: the np 16/32/52 ceiling and
+  the 2-node result (shape holds; the exact np 16 -> 32 gain carries a node-to-node uncertainty, np 16 on n7 vs
+  np 32/52 on n4, unrelated to the hook), packing ~1.2x, warm switch -13 % / -22 %, pure Newton +59 % / +87 %.
+  Nothing reruns. Bending-line fault (Louis asked kaiju directly): on Earth it holds rollback back (t ~3.8e-4: trench
+  -3.6 vs -8.1 deg, plate 593 vs 2563 against the half-element envelope locator); on TAf slightly ahead (trench -0.8
+  vs -0.4 deg at 1.35e-4). Continuing (Earth 4114 to 160, TAf 4110 to 120); comparison render (production |
+  half-element envelope | half-element bending) running.
