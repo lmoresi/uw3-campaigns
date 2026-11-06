@@ -347,6 +347,9 @@ populated ranks hang: #960 part 1, a one-line fix; both tests tier_a), 2 should-
 proxy stays at pre-move nodes after a mover move, 3.4e-2, no issue covers it; follow_metric still
 decides `moved` per rank). Sent to the MMPDE session.
 
+**2026-11-06: #955 green on every shard; the hub's squash merge was refused by this session's
+auto-mode classifier ("Merge Without Review").** Not worked around; put to Louis (switch the hub to
+Accept edits, as on 2026-11-03). #954: shards 2 and 4 green, 1 and 3 running.
 **2026-11-06:** #955's round-2 cross-review: no must-fix, no should-fix. **Squash merge on green**
 (d8d5984c fails its own test, so a merge commit would leave a red bisect point; precedent #929).
 #954 waits on green and the laptop's review. **2026-11-06:** #955's five should-fix items addressed at dfb6a6c0 (none declined; 39 passed,
