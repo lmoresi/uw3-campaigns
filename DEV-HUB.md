@@ -283,6 +283,12 @@ away once it lands. **Shard times on #967's green run:** 4: 55.0, 3: 53.5, 1: 43
 grew from 5:14 to 27:11 (test_0022_rotated_adjoint 956 s on hyperion). Hyperion: one rebalance PR
 after #954 (test_0022 its own batch on shard 2; shard 3's 27-min batch moved too), and first a check
 of whether one merge slowed test_0022 (a performance regression to file) or it grew gradually.
+Hyperion's CI-log sample (23 shard-4 runs since 2026-10-28): the test_00[0-4]* band runs 9 to 28
+min on the same tree (dfb6a6c0 541 s; d8c05c93, one visualisation-only commit earlier, 1637 s),
+ceiling near 1650-1680 s: not a merge regression; likely runner hardware like #963 (timing
+test_0022 under forced kernels, with and without #967's projection). **The hub approved a fifth CI
+shard** (test_0022 and test_1092; estimates 4: 40, 3: 30, 1: 44, 2: 31, 5: ~40 min), after the
+kernel result and #954.
 **Shard 4 at 55 of 60 min:** hyperion to rebalance after #954 (cap 70) if #958
 and #970 push it past ~45. Merge order: #954, #967, #955, #970, #958.
 **PR #970 (#961 and #807: ptest_0844_reconnect hang)** by the integration session: the subsampler
