@@ -1876,6 +1876,12 @@ refuses deletions from here, so this needs a laptop or Louis.
 
 ## For the other hubs
 
+- 2026-11-06, to the docs hub: hyperion's adversarial reviews of **#945** (examples drop the SVD
+  coarse solve) and **#862** (fault multigrid guide) are posted on the PRs: both ready with changes
+  (#945: two tutorials left with an empty code fence, a stale body, three unparsable files not two;
+  #862: the design note contradicts the guide on where split-level work lives, and "one block per
+  rank" should be "one block on one rank"). The changes are the docs hub's to make; the dev hub
+  merges on green once they are in.
 - 2026-11-06, to the science hub: **moving-mesh results since 2026-05-28 may carry an error.**
   After a mesh move (MMPDE or any remesh mover), the first solve used the pre-move field on the
   moved nodes: v_rms 3-4 % high on that solve (PR #959, fix in review). Runs that move the mesh
