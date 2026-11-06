@@ -209,6 +209,17 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06: the CI hang does not reproduce off the runner** (hyperion, eddab707, np 2): the
+1062_forward + 1063 + 1064 triple passes (201 s); the full CI batch 1062_forward-1068 passes
+(246 s, 210 s pinned to 2 cores). Options database: grows ~40 entries per solver (#950
+confirmed: 424 before test_1064's fifth test in the triple, 179 single-file) but prefixes are
+unique and every shared option matches, so **#950 is not the hang's cause**; it keeps its place.
+"Stuck, not slow" is inferred from Python stacks: a long C-level KSP solve looks the same. Next:
+hyperion runs `scripts/test.sh --p 2 --shard 4/4` on #951's tree; if it does not hang,
+**hyperion's CI-artifacts PR goes first** (supervisor stacks uploaded on failure, native
+stacks if cheap, optional KSP telemetry for test_1064's spherical3d case), then #951's CI is
+rerun to capture the runner's state. #951 and #952 stay blocked until then.
+
 **2026-11-06: #900, the 39 ptest_*.py files on eddab707 (hyperion, np 2 and 4, one file per
 mpirun):** 30 pass at both (script-style files: exit 0 only, need a harness for CI). **9 fail:**
 000c and 000d (PETSc error 76, likely #922), 001a (setCoordinateDisc signature drift), 003
