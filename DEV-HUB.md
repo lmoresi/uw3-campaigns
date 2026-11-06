@@ -233,6 +233,16 @@ retire); the 15 deletions.
 `trig_01TRM27hLPzzTwk2s854isYE` ("Weekly underworld3 bulk review") fires into this hub session
 Mondays 10:37 Australia/Sydney; a hub restarted elsewhere must re-create it.
 
+**2026-11-06, #952 fixed after hyperion's review** (0306f834): the refinement callback moved a
+wall vertex only on ranks holding a labelled facet, and each rank checked its own copy; now
+every copy takes the move made on any rank before the check (the moved copy wins), which also
+fixes a pre-existing rank-count-dependent offset of refined wall vertices. The parallel test
+checks copies on every level, with a one-rank-move case. Hyperion reruns at np 2, 4 and 8 with
+mutants; its review record waits for its GitHub writes (not posted by anyone else). **#953
+filed:** segmented shell and ball hang at np 2 on development (gmsh2dmplex inside a rank-0
+block that reaches a barrier). #906's wall-invariance check in (1e-9 relative to the radius,
+all-rank reduction); forced-partition case, two-sided test and rejection record to come.
+
 **2026-11-06, hyperion (all local; GitHub writes still blocked):**
 - **#900 pins are long-standing, not recent regressions:** 0863, 0864, 0865 fail and 0844_reconnect
   hangs identically at np 4 on eddab707, 25d62812 and fc67b650 (2026-10-29). 0851, with its
