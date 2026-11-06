@@ -3162,3 +3162,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   crust down to 0.25 (Earth slab dip > 90 deg in 70 of 131 fits). Preferred: the half-element crust on the envelope
   locator (crust_{TAf,earth}_c05). DECISIONS.md (campaign branch, merged to main) records both; the half-element crust
   is not yet the default: open items are a physical crust thickness and a stated interface weakening.
+- 2026-11-06: **Earth only from here (Louis).** The benchmark is crust_earth_c05 (Earth run 2's line, half-element
+  crust, envelope locator, fault to the fixed cap 0.15). Louis's questions: can the plate boundary be the fault alone,
+  or does it need a damage zone; must the crust be weak? Rig: the fault stopped at the overriding plate's thermal
+  base beside the trench (-uw_fault_cap wedge, experimental branch kaiju/fault-wedge-cap ccfd98d + d8f0f64 on 4f2fbaa,
+  NOT yet on GitHub; not for merging; its column measurement misfires once the trench moves). Result: in every arm
+  subduction CHOKES (t ~3e-4: subducting plate 85-230 vs 1820, slip 59-220 vs 2667, trench -0.9 to -1.9 vs -5.3 deg;
+  the plate reverses by 4.5e-4 in the passive and lithosphere-only arms; a weak crust helps ~2x, not enough); the
+  lithosphere-only arm restarted when its misfired cap let the fault back to 0.15. Lesson: the slab must be decoupled
+  from the mantle wedge below the contact, not only split from the overriding lithosphere. Now (Louis: "let's work
+  around that and try to do better"; Earth, thin crust, from step 0, 120 steps, np 26): bench_cap08 and bench_cap12
+  (4122, 4f2fbaa; how deep the decoupling must reach) and bench_cap04_dz (4123, b9361e0: fault to 0.04 plus the crust
+  weakness on a sharpened marker along the slab top to ~0.12; can a weak band replace the fault's deep part).
