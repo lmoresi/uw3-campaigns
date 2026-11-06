@@ -272,6 +272,13 @@ params = uw.Params(
     uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
                                 #    lid depth of the last record plus uw_fault_lid_margin, so a
                                 #    fault can cut the whole lithosphere
+    uw_fault_cap="fixed",       # crust law (envelope locator): "fixed" = the fault reaches uw_fault_depth_max; "wedge" =
+                                #   it stops at the mantle contact (Louis, 2026-11-06: a megathrust splits the lithosphere;
+                                #   the crust guides it, but stops being plate-bounding in the mantle wedge): the overriding
+                                #   plate's thermal base beside the trench (fault_wedge_depth), plus uw_fault_wedge_margin,
+                                #   within [uw_fault_wedge_min, uw_fault_depth_max]
+    uw_fault_wedge_margin=0.0,  # wedge cap: added to the measured contact depth
+    uw_fault_wedge_min=0.04,    # wedge cap: the shallowest cap allowed
     uw_fault_lid_margin=0.05,
     uw_detect_max_ddepth=0.05,
     # forming and removing faults
@@ -389,6 +396,8 @@ PRES_RTOL_WARM = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 el
 PRES_RTOL_COLD = float(params.uw_pres_rtol_cold) if float(params.uw_pres_rtol_cold) > 0 else PRES_RTOL_WARM
 FIRST_SOLVE = True             # the run's first solve: an unconverged cold one stops a fresh run
 REBUILD = float(params.uw_rebuild_cells) * H_B                  # the rebuild threshold, a distance (needs_rebuild)
+if str(params.uw_fault_cap) not in ("fixed", "wedge"):
+    raise ValueError(f"-uw_fault_cap must be fixed or wedge, not {params.uw_fault_cap!r}")
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
@@ -1029,6 +1038,21 @@ def wquantile(x, w, q):
     return float(np.interp(q * c[-1], c, x[o]))
 
 
+
+def fault_wedge_depth(theta_t, inc):
+    """The mantle contact beside the trench: the overriding plate's thermal base. In columns on the overriding side
+    (-inc) at arc distances 0.06-0.16 from theta_t, the first depth (from the surface, steps of 0.0025 to 0.3) where T
+    reaches uw_detect_T_lith; the median over the columns. Collective (global_evaluate). None if no column reaches it."""
+    dists = np.linspace(0.06, 0.16, 6)
+    deps = np.arange(0.0025, 0.3, 0.0025)
+    th = theta_t - inc * dists / r_o
+    R = r_o - deps
+    pts = np.array([[r * np.cos(t), r * np.sin(t)] for t in th for r in R])
+    Tv = np.asarray(uw.function.global_evaluate(T_b.sym[0], pts)).reshape(len(dists), len(deps))
+    found = [deps[np.argmax(row >= params.uw_detect_T_lith)] for row in Tv if (row >= params.uw_detect_T_lith).any()]
+    return float(np.median(found)) if found else None
+
+
 def crust_envelope_points(faults):
     """The fault on the base of the crust layer, located without an assumed shape (the
     parabola of crust_fault_points cannot follow a broad hinge). In x = arc length at the
@@ -1078,6 +1102,13 @@ def crust_envelope_points(faults):
     runs = np.split(xd, np.flatnonzero(np.diff(xd) > r_o * 0.03) + 1)
     xdeep = float(np.median(min(runs, key=lambda r: np.abs(r - r_o * hint).min())))
     inc = 1.0 if np.median(x[sh]) > xdeep else -1.0
+    wedge = None
+    if params.uw_fault_cap == "wedge":
+        # the fault stops at the mantle contact (the overriding plate's thermal base beside the trench)
+        wedge = fault_wedge_depth(hint, inc)
+        if wedge is not None:
+            cap = float(np.clip(wedge + float(params.uw_fault_wedge_margin), float(params.uw_fault_wedge_min),
+                                float(params.uw_fault_depth_max)))
     h_z, h_s, dz, q = 0.5 * ct, 0.015, 0.0025, 0.1
     zs = np.arange(cap, 1.25 * ct, -dz)
     base = np.full(len(zs), np.nan)
@@ -1136,10 +1167,11 @@ def crust_envelope_points(faults):
     t_hat = np.array([-r_hat[1], r_hat[0]])
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
-    info = {"locator": "envelope", "trench_gap": float(gap), "top_dip_data": top_dip,
+    info = {"locator": "envelope", "cap": float(cap), "wedge_depth": wedge, "trench_gap": float(gap), "top_dip_data": top_dip,
             "top_dip_floored": bool(top_dip < params.uw_fault_top_dip_min),
             "particle_trench": float(xt / r_o), "raw": np.c_[raw[:, 0] / r_o, raw[:, 1]].round(6).tolist()}
-    uw.pprint(f"  crust fault (envelope): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
+    uw.pprint(f"  crust fault (envelope): cap {cap:.3f}" + (f" (mantle contact {wedge:.3f})" if wedge is not None else "")
+              + f"; trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
               f"data {top_dip:.1f}{' (floored)' if info['top_dip_floored'] else ''}, trench gap {gap:.3f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
@@ -2381,7 +2413,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_fault_cap", "uw_fault_wedge_margin", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
@@ -2712,7 +2744,7 @@ for k in range(k0, k0 + params.uw_steps):
             if faults:
                 f = faults[0]
                 moved = polyline_gap(poly, f["points"])
-                for key in ("raw", "trench_gap", "top_dip_data", "top_dip_floored", "particle_trench"):
+                for key in ("raw", "trench_gap", "top_dip_data", "top_dip_floored", "particle_trench", "cap", "wedge_depth"):
                     f.pop(key, None)                 # the record's keys describe the locator named in it
                 f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth, **info})
                 damage[f["name"]] = float(moved)
