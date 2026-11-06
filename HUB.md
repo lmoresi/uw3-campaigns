@@ -3207,3 +3207,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   length), so a no-weak-layer control pair (-uw_asth 1, fault 0.15 vs 0.20) asked for before the ledger says
   "connection dominates"; the weak-band result recorded as "a damage zone as implemented (a half-cell band) does not
   replace the split", not "no damage zone can".
+- 2026-11-06: no-weak-layer control launched (job 4130, from sbatch): bench_noasth_cap15 and bench_noasth_cap20
+  (-uw_asth 1, fault to 0.15 vs 0.20, benchmark line otherwise, from step 0, 120 steps, np 26 packed, 4f2fbaa);
+  reported with 4128 / 4129 at the same matched times. Kaiju agrees the standard model's 0.12 -> 0.15 jump carries the
+  same confound (longer fault, lithosphere base ~0.11 and layer top crossed together). Weak-band wording agreed.
