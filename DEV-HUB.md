@@ -263,6 +263,21 @@ model size ~10 or more silently get wrong values where development is right (ann
 swarms lose on-face particles). A relative scaling is sketched in the record, untested in
 parallel. Remaining: #780, #857, #858, #689. Report to Louis when the set is done.
 
+**2026-11-06, #964 (#906): hyperion's review says don't merge yet** (ten conditions). Being
+fixed in #964: `addon_partition._moved_wrap` drops the declaration at np > 1 (rank-dependent
+answer); the exemption ignored a constrained normal (a non-radial given normal on a circular wall
+reached v_rms 2e7: exempt only normal=None walls and sheet tangency); wall vertices read from the
+label's direct stratum (SegmentedSphericalShell labels interior vertices "Upper": read the closure
+of the labelled facets; the label spread to be filed); a screw [-y, x, 1] accepted and an off-origin
+sphere centred wrongly (common centre by stacked lstsq, residual and rank checks, numeric setter);
+#877 with a unit-carrying velocity; the record stale on a warm start (renamed
+`declared_modes_exempt`, warning names wall and spread); tests and docs. Hyperion's np 4 off-sphere
+vertex is #952's bug (to confirm on #952's branch). **Put to Louis:** (a) a wall deformed past 1e-9
+keeps the near-null rotation (large, ill-determined; warning; document the post-solve
+`_project_out_rotation`, as free-surface-convection.md 3 already says) or removes it as a gauge
+(changes the physics); the integration session and the hub recommend keep and document. (b) snapping
+cut-created wall vertices onto the wall: left to the radius-variable design item.
+
 **2026-11-06: #963 reproduced on hyperion: the OpenBLAS kernel, not leaked state.** Default and
 SkylakeX kernels: the annulus_fmg solve finishes in 2.3 s. Haswell and Zen: the inner velocity FMG
 floors near 1.2e-7 and stops at its 200-iteration cap; the outer FGMRES stagnates at 1.37e-9 against
