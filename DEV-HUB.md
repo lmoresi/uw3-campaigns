@@ -356,6 +356,10 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
+**#997's first five-shard run green:** shard 5 38 passed in 20:13, shard 3 down to 21:18 (EPYC 9V74; was
+41:34-51:59); shard 4 55:00 until #911. Lows fixed at 1227d1cf; merge on that green. Narrowed #909's four
+conditions fixed at 05ffb102, re-check before PR; a possible conftest leak of the non-dimensional scaling
+flag between tests to file if confirmed. #952 rerunning on 284dd314.
 **2026-11-07 state:** #997 cross-review posted (no must-fix; two Lows: shard times from one run on 2x-different
 runner CPUs; a paragraph contradicting #958's shard-2 ptest phase); new head 1227d1cf, CI running. #964 round 3
 fixed (59828ca0 + 99c8b050: exactness a Jacobi-scaled local residual at 1e-6, viscosity-independent, pinned at
