@@ -283,6 +283,15 @@ that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there
 instruction to close it was refused by its own classifier, correctly). **#911 moved up** to right after #964 in the integration
 session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
 evidence table for Louis before merge (a Newton stopping change).
+**2026-11-07: Louis switched the hub to Accept edits and said yes to #967 and #980.** Merged: **#954**
+(c5c87100), **#967** (7c3d31fd), **#955** (squash, 081417a1), **#970** (37aa2a11). #963, #665, #961,
+#807 relabelled fixed-in-development. Development at 37aa2a11. Red on old bases (shard 4, the #963
+hang): #972, #980, #981 (integration session), #983, #958 (hyperion), #959 (MMPDE session): each
+owner merges development in for fresh CI; the hub merges on green. #973 waits on hyperion's final
+word. #964 merges development in, then round 3. **#982** (MMPDE: remap clamp off by default on
+Louis's decision; kd-tree fixed after a mover) is stacked on #959: #959 first. **#977** gets its own
+PR after #959. **#979** (units model: mesh.deform scales the mesh to metres and the mover does
+nothing) is the MMPDE session's priority after #959/#982 and #977.
 **#983's shard 4 red at 7397bd17 on the #963 stall in test_1064** (run 42219732969, job 127898568438;
 no test failed; #983 adds a file, so test_1062 shares test_1064's batch); rerun after #967 merges.
 **#983 ready on green at 7397bd17** (round 2: no must-fix; the low should-fix done: the hex rows now fail
@@ -1842,13 +1851,14 @@ taken to the finish.
   close #626 if #638's ladder and #664's `embed=` realise it; correct the
   topic page's "2-D, 3-D and parallel" claim.
 
-## Open pull requests (2026-11-05, `development` at eddab707)
+## Open pull requests (2026-11-07, `development` at 37aa2a11)
 
 **Merged 2026-11-01 to 11-04 on Louis's word:** #912 (#892), #913 (#894), #914 (#896),
 #915 (levels accessor), #916 (#907), #929 (squash, 6321c714), #928 (d9783f02), #927
 (f53bbffb), #926 (e7dfbf9a), #930 (af6f19b3), then the stack #932 (2556c979), #933
 (4ee0b13d), #934 (60dbf0e4), #937 (#902, c514013f), #938 (#935, f631ce42), #942 (#936,
-045466df), #943 (#917, 1f87430f), #947 (#901, eddab707). The ten PRs in
+045466df), #943 (#917, 1f87430f), #947 (#901, eddab707), #954 (c5c87100), #967 (#963, 7c3d31fd),
+#955 (#665, squash 081417a1), #970 (#961, #807, 37aa2a11). The ten PRs in
 the table below are still the open set (checked 2026-11-04).
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
