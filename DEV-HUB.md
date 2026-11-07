@@ -293,6 +293,18 @@ loop, vector, adjoint, projections), the PETSc mechanisms, the issues it settles
 #883, #884, the pressure-rtol default), and an evidence plan (it touches petsc_generic_snes_solvers).
 Hyperion inventories every tolerance setting, warm start and reference residual in src as input.
 Louis reads the design before code.
+**Design note ready for Louis:** docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md on
+`docs/convergence-reference-policy` (88c73b6c), docs only. One reference per solve() call, F_ref =
+max(||F(x0)||, ||F(0)||) (warm and cold get the same targets; datum-only forcing from the lifted state
+#883; null space projected out before measuring #884); Newton T = max(rtol F_ref, atol) from the user's
+tolerances (#924); an inexact-Newton floor η T (η 0.1) on the outer KSP and every fieldsplit sub-KSP,
+bounded below by 10 ε ‖A‖ ‖u‖; one helper on SolverBaseClass called from `_snes_solve_with_retries`
+and the rotated loop, replacing five references; SNES and KSP atols set once per call; closes
+#911/#985, #924, #883, #884; the pressure-rtol default overlaps and the measurement decides; four-arm
+evidence (test_0022 on three kernels, rotated parallel set, zg95 on kaiju, SolCx, the notch, a warm
+adv-diff loop, a projector); bar: same answers, no more Newton or linear work. The hub asked for a
+paragraph on F(0) with strain-rate-dependent rheology (caps dominate at zero velocity) and a
+viscoplastic arm.
 **Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
 each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
 start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
