@@ -302,9 +302,12 @@ bounded below by 10 ε ‖A‖ ‖u‖; one helper on SolverBaseClass called fro
 and the rotated loop, replacing five references; SNES and KSP atols set once per call; closes
 #911/#985, #924, #883, #884; the pressure-rtol default overlaps and the measurement decides; four-arm
 evidence (test_0022 on three kernels, rotated parallel set, zg95 on kaiju, SolCx, the notch, a warm
-adv-diff loop, a projector); bar: same answers, no more Newton or linear work. The hub asked for a
-paragraph on F(0) with strain-rate-dependent rheology (caps dominate at zero velocity) and a
-viscoplastic arm.
+adv-diff loop, a projector); bar: same answers, no more Newton or linear work. The rheology question is
+answered (d6c56325): F(0) is the residual at u = 0 with boundary data in place; 2η(ε̇)ε̇ vanishes at
+zero strain rate for any finite η(0), so caps do not enter the interior rows and F(0) is the forcing
+(the cold start's measure); a nonzero weak velocity (Nitsche/penalty γμ(0)/h·g) is the one exception,
+handled by leaving weak boundary terms out of the reference; viscoplastic and weak-velocity arms
+added, recording ||F(x0)||, ||F(0)|| and the forcing-only norm. Waits on Louis's read.
 **Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
 each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
 start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
