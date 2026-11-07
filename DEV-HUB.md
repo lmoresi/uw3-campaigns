@@ -356,7 +356,10 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
-**#997 merged** (fifth CI shard; green on all five at 1227d1cf).
+**#997 merged** (fifth CI shard; green on all five at 1227d1cf). **#952 merged** (15f13d0c; #946, #903 relabelled; merged result checked against
+the five-shard test.sh: coverage OK). #964 merges development in next. #1002: hyperion keeps #991 as a
+refusal (every units change in the PR's history opened a new fault; #991 goes to the bundle owner with #979
+and #989).
 **#1002 cross-review (laptop):** 1 must-fix (global_evaluate on a matrix-valued derivative through the RBF route
 raises on point-holding ranks only: a hang at np >= 2), 5 should-fix (to hyperion). **Transpose question
 answered: no objective-rate or VE campaign path changes** (L and W are symbolic in `_objective_term`, objective
