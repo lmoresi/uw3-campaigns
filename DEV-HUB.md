@@ -283,6 +283,16 @@ that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there
 instruction to close it was refused by its own classifier, correctly). **#911 moved up** to right after #964 in the integration
 session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
 evidence table for Louis before merge (a Newton stopping change).
+**2026-11-07, Louis: a DRY fix for the solver stall.** "This is a persistent problem that we encounter
+in various solvers. PETSc does not respect the original residual of the solve when we warm start. We
+should try to find a DRY solution to this problem." So: the stacked inexact-Newton patch paused; the
+integration session writes a design note first (docs/developer/design/): one convergence-reference
+policy (the original residual carried across warm starts, Newton steps and re-solves), linear
+tolerances derived from the Newton target, one helper used by every solver (generic SNES, rotated
+loop, vector, adjoint, projections), the PETSc mechanisms, the issues it settles (#911/#985, #924,
+#883, #884, the pressure-rtol default), and an evidence plan (it touches petsc_generic_snes_solvers).
+Hyperion inventories every tolerance setting, warm start and reference residual in src as input.
+Louis reads the design before code.
 **#911/#985 rediagnosed (laptop probe):** Newton is not at round-off (last residual 1.15e-9, 400-30,000x
 above the ε‖Â‖‖û‖ floor); the linear targets are unreachable (outer rtol 1e-11 relative to an
 increment RHS ~1e-9, i.e. ~1e-20 absolute; inner pressure 0.033·tol likewise, hence the 200 caps).
