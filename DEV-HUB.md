@@ -316,7 +316,14 @@ reference residual; the helper applies the targets mechanically; implementation 
 residual (weak BC terms, datum lift, null-space projection, rotated reduction, DEVSS/VE history) listed
 as edge cases with their declarations; warm-re-solve contract test first; four-arm evidence; hyperion's
 independent edge-case review (every solver class, warm/cold, time loops, units, np > 1, weak BCs, lift,
-projectors, adjoint, VE); evidence table to Louis before merge.
+projectors, adjoint, VE); evidence table to Louis before merge. **Started**
+(`feature/convergence-reference-policy` from f31edcb1, local): test_0028 (tier B) fails on
+development's scalar warm start (passed T, one extra step) and passes on the branch; stage 1 in
+`_snes_solve_with_retries` (SNES atol T, outer KSP atol 0.1 T, restored after; the saddle-point
+warm-start atol and nrichardson pre-solve removed). The hub asked that the reference be a per-equation
+hook (`_reference_residual()`, default F(0), overridden for weak nonzero velocity, lift, null space)
+that the helper only reads. Next: rotated loop (#924, #883, #884), sub-KSP floors, legacy references,
+evidence arms, hyperion's review.
 **Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
 each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
 start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
