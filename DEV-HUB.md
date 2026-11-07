@@ -291,7 +291,9 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
-**2026-11-07: Louis switched the hub to Accept edits and said yes to #967 and #980.** Merged: **#954**
+**2026-11-07: #973 merged** (f31edcb1; hyperion's final word: DG to DG byte-identical to eddab707; #905
+relabelled). #983 (26244045) and #958 (d31b9039, also moves ptest_0844_reconnect into CI) pushed with
+development merged in; CI rerunning. **2026-11-07: Louis switched the hub to Accept edits and said yes to #967 and #980.** Merged: **#954**
 (c5c87100), **#967** (7c3d31fd), **#955** (squash, 081417a1), **#970** (37aa2a11). #963, #665, #961,
 #807 relabelled fixed-in-development. Development at 37aa2a11. Red on old bases (shard 4, the #963
 hang): #972, #980, #981 (integration session), #983, #958 (hyperion), #959 (MMPDE session): each
