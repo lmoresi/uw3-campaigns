@@ -283,6 +283,14 @@ that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there
 instruction to close it was refused by its own classifier, correctly). **#911 moved up** to right after #964 in the integration
 session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
 evidence table for Louis before merge (a Newton stopping change).
+**#911/#985 rediagnosed (laptop probe):** Newton is not at round-off (last residual 1.15e-9, 400-30,000x
+above the ε‖Â‖‖û‖ floor); the linear targets are unreachable (outer rtol 1e-11 relative to an
+increment RHS ~1e-9, i.e. ~1e-20 absolute; inner pressure 0.033·tol likewise, hence the 200 caps).
+Fix proposed: inexact Newton (linear atol ~η(rtol·ref + atol), η ~0.1, on outer and inner splits; the
+Newton test still measures the true residual). Stacked on #964. **Combined with the pressure-rtol
+default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
+rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
+decides one tolerance policy.
 **2026-11-07: Louis switched the hub to Accept edits and said yes to #967 and #980.** Merged: **#954**
 (c5c87100), **#967** (7c3d31fd), **#955** (squash, 081417a1), **#970** (37aa2a11). #963, #665, #961,
 #807 relabelled fixed-in-development. Development at 37aa2a11. Red on old bases (shard 4, the #963
