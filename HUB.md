@@ -783,10 +783,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Half-element crust as the recipe default (2026-11-06):** Louis prefers it (crust_{TAf,earth}_c05). To make it the
-  default, the hub suggests stating it physically: a crust thickness (0.0078 at refinement 5) and an interface
-  weakening (harmonic factor 0.249 over the top two cells), so it does not change with h. Louis to say when.
-
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3231,3 +3227,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   written with his words and the evidence (campaign branch, merged to main); the fixed cap 0.15 stays. Hub's role
   becomes monitoring and reporting (standing rules); direction: benchmarking for one or two movie demos, then a
   science paper on a fully realistic Earth configuration.
+- 2026-11-07: Louis (via kaiju): "the fault depth appears to be controlling here. We have a winner." The Earth recipe is
+  the thin-crust benchmark (crust_earth_c05: half-element crust, envelope locator, fault to 0.15); ledger updated
+  (campaign branch, merged). Later: depth itself or the line's fit; the ridge's location waits for the driver to add
+  faults when subduction starts elsewhere. Next (Louis's choice, in place of a Ra sweep): the subducting plate's age at
+  the trench halved and doubled, fault fixed at 0.15: job 4134, earth_age_half (-uw_age_sub 0.00175) and
+  earth_age_double (0.007), packed, 4f2fbaa, np 26, from step 0, 200 steps. Renders of the fault-depth and asthenosphere
+  sets on the movie page v18. Hub's note for the reading: if the needed depth is the plate's strong part, the doubled
+  age (thermal base ~0.11 x sqrt 2 ~ 0.16, below the 0.15 fault) is where the fixed fault could fail.
