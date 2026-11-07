@@ -357,6 +357,13 @@ default** (waiting since 2026-10-28): one four-arm measurement (current, inexact
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
 **#997 merged** (fifth CI shard; green on all five at 1227d1cf).
+**#1002 cross-review (laptop):** 1 must-fix (global_evaluate on a matrix-valued derivative through the RBF route
+raises on point-holding ranks only: a hang at np >= 2), 5 should-fix (to hyperion). **Transpose question
+answered: no objective-rate or VE campaign path changes** (L and W are symbolic in `_objective_term`, objective
+order and Cayley steps, thin-sheet spin; SemiLagrangian stress and log-conformation history is SYM_TENSOR,
+bit-identical; only a user-built non-symmetric TENSOR history changes, where development stored the transpose;
+four VE variants md5-identical). Not to Louis. #964 round 4 fix: threshold max(1e-10, min(1e-6, 100 tol)),
+workspace rebuilt on a tolerance change; the convergence note carries the one-rule edge case.
 **#964 round 4 (hyperion): not ready;** round 3's viscosity Medium and Lows fixed; new Medium: the fixed
 1e-6 projection threshold ignores tol and np (at tol 1e-11 a projected near-null mode stalls like #963; at
 1e-9 2-5x cost at np 2 and 4; answers unchanged). Fix: scale with tol; later folded into the convergence-
