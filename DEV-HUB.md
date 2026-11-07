@@ -356,6 +356,12 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
+**2026-11-07: merged on green with development merged in: #972 (#971, 1733fd6f), #980 (#950, ec493daa),
+#981 (Linux anchors, a92355e7), #983 (#908, 145f95d7), #958 (#900 ptest files into CI, 72741873).**
+#971, #950, #908 relabelled fixed-in-development (#900 stays open: 24 ptest files still need a harness or
+a fix). Development at 72741873. Still open from the queue: #959 (MMPDE, np 3 non-moving-rank hang to
+check), #982 (stacked on #959), #964 (round 3), the narrowed #909, the fifth-shard PR, and the
+convergence-reference work.
 **2026-11-07: #973 merged** (f31edcb1; hyperion's final word: DG to DG byte-identical to eddab707; #905
 relabelled). #983 (26244045) and #958 (d31b9039, also moves ptest_0844_reconnect into CI) pushed with
 development merged in; CI rerunning. **2026-11-07: Louis switched the hub to Accept edits and said yes to #967 and #980.** Merged: **#954**
@@ -1926,14 +1932,15 @@ taken to the finish.
   close #626 if #638's ladder and #664's `embed=` realise it; correct the
   topic page's "2-D, 3-D and parallel" claim.
 
-## Open pull requests (2026-11-07, `development` at 37aa2a11)
+## Open pull requests (2026-11-07, `development` at 72741873)
 
 **Merged 2026-11-01 to 11-04 on Louis's word:** #912 (#892), #913 (#894), #914 (#896),
 #915 (levels accessor), #916 (#907), #929 (squash, 6321c714), #928 (d9783f02), #927
 (f53bbffb), #926 (e7dfbf9a), #930 (af6f19b3), then the stack #932 (2556c979), #933
 (4ee0b13d), #934 (60dbf0e4), #937 (#902, c514013f), #938 (#935, f631ce42), #942 (#936,
 045466df), #943 (#917, 1f87430f), #947 (#901, eddab707), #954 (c5c87100), #967 (#963, 7c3d31fd),
-#955 (#665, squash 081417a1), #970 (#961, #807, 37aa2a11). The ten PRs in
+#955 (#665, squash 081417a1), #970 (#961, #807, 37aa2a11), #973 (#905), #972 (#971), #980 (#950),
+#981, #983 (#908), #958 (#900 part, 72741873). The ten PRs in
 the table below are still the open set (checked 2026-11-04).
 
 **Merged 2026-10-31 on Louis's word** (the hub merged; the approval rule was bypassed as
