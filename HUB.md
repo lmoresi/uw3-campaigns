@@ -136,6 +136,14 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   bite (approved): the driver writes its full resolved params block into run_info.json at start-up, and the README
   template gets a "choices" block. Test requested: TAc 20 at np 32 with normal=None (-uw_wall_normal geometric):
   if the walls are clean the parallel option existed all along and the defect is confined to the analytic path.
+- **The hub's role from 2026-11-07 (Louis): monitoring and reporting.** "I will continue to advise the session
+  directly so this session is mainly monitoring and reporting." Louis directs kaiju himself. The hub keeps HUB.md and
+  the ledger current, pushes kaiju's patches (kaiju has no GitHub credentials; blobs verified as before), files
+  issues kaiju cannot, carries dev-hub items, and reports to Louis; it does not order experiments unless he asks.
+- **Direction (Louis, 2026-11-07):** "We are starting to look at scientific results from this model now. I am not sure
+  it is quite ready for that, so I prefer that we continue benchmarking for the purposes of finding one or two good
+  demos for a movie. Then a science paper with a 'fully realistic' earth configuration." So: benchmarking for one or
+  two movie demos first; science results wait for the realistic-Earth configuration.
 - **No strategy change on the crust weakness until the fault alone is shown to kill the slab (Louis, 2026-11-05):** "We
   need to be sure that the fault alone leads to a dead slab that cannot restart before we make significant changes to
   the strategy." The test (hub, fixed in advance from the controls): passive crust vs weak-crust control at the same
@@ -774,11 +782,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   parallel_addon/uwtn_*, kaiju figures_out/) is unchanged and made on request.
 
 ## Waiting on Louis
-
-- **Earth's fault depth (2026-11-07):** the control overturned the asthenosphere-connection reading: the fault's depth
-  decides whether subduction runs (~0.15 full speed, 0.12 slow, 0.08 and below reverse), the weak asthenosphere how
-  fast it starts. So "asthenosphere top + ramp" is not the rule; what the depth is tied to (perhaps the plates'
-  mechanical base) is open. Louis reviewing the renders for the next step; ledger held for his ruling.
 
 - **Half-element crust as the recipe default (2026-11-06):** Louis prefers it (crust_{TAf,earth}_c05). To make it the
   default, the hub suggests stating it physically: a crust thickness (0.0078 at refinement 5) and an interface
@@ -3224,3 +3227,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hypothesis, not tested. Louis: "This highlights something about the importance of the weak mantle wedge in actual
   subduction zones"; he is reviewing the renders (fault-depth set 4131, asthenosphere set 4132) for the next step.
   LEDGER ENTRY HELD until his ruling (kaiju's request).
+- 2026-11-07: Louis: "we definitely need the fault to run deep (and/or we need the weak mantle wedge)"; the ledger entry
+  written with his words and the evidence (campaign branch, merged to main); the fixed cap 0.15 stays. Hub's role
+  becomes monitoring and reporting (standing rules); direction: benchmarking for one or two movie demos, then a
+  science paper on a fully realistic Earth configuration.
