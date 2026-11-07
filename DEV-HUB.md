@@ -356,6 +356,14 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
+**2026-11-07 state:** #997 cross-review posted (no must-fix; two Lows: shard times from one run on 2x-different
+runner CPUs; a paragraph contradicting #958's shard-2 ptest phase); new head 1227d1cf, CI running. #964 round 3
+fixed (59828ca0 + 99c8b050: exactness a Jacobi-scaled local residual at 1e-6, viscosity-independent, pinned at
+contrasts 1 and 1e6; mutants killed); CI running; the np 4 shell vertex is #903, fixed by #952. **#952 has been
+stale since 2026-11-06 05:45**, red on the old base: the integration session merges development in; #952
+merges before #964. #959 green at 7bfda648; the hub asked the MMPDE session to confirm the np 3
+non-moving-rank case before merging; #982 (stacked, green) after its cross-review. Louis's rulings on deformed
+walls and wall-crossing cuts still open on #906; #964 merges with the behaviour documented.
 **PR #997 (fifth CI shard, test.sh only):** moves shard 3's test_108*/109* batch (25:47) to shard 5;
 shard 3 and 5 near 31 min each; test_0022 stays on shard 4 for #911 (wall clock ~56 min until then);
 coverage exact (404 paths, each in one shard); hyperion's review nothing blocking; laptop cross-review
