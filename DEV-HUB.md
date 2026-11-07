@@ -356,6 +356,16 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
+**PR #997 (fifth CI shard, test.sh only):** moves shard 3's test_108*/109* batch (25:47) to shard 5;
+shard 3 and 5 near 31 min each; test_0022 stays on shard 4 for #911 (wall clock ~56 min until then);
+coverage exact (404 paths, each in one shard); hyperion's review nothing blocking; laptop cross-review
+asked; CI running. Noted by its review: **branch protection on development and main requires no CI
+check** (pre-existing; Louis's setting). **#964 round 3:** close; one new Medium from the auto-merge with
+#967 (a viscosity-dependent exactness test projects a near-null mode, 2-4x slower at contrast >= 1e5; a
+viscosity-independent fix shown); four round-2 conditions open (one on #952); parallel set passes at np 2,
+4, 8 except #962 at np 8 (shared with development). **Narrowed #909** built at
+`bugfix/remesh-transfer-909`: keeps development's numbers on round 3's probes; parallel refinement of a
+units variable will refuse on every rank naming #991; then review.
 **2026-11-07: merged on green with development merged in: #972 (#971, 1733fd6f), #980 (#950, ec493daa),
 #981 (Linux anchors, a92355e7), #983 (#908, 145f95d7), #958 (#900 ptest files into CI, 72741873).**
 #971, #950, #908 relabelled fixed-in-development (#900 stays open: 24 ptest files still need a harness or
