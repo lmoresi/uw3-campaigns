@@ -356,6 +356,13 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
+**PR #1002 (narrowed #909; closes #909, #965, #977):** global_evaluate no longer transposes any
+non-symmetric 2-D result (TENSOR, MATRIX, velocity gradients): a user-visible change to semi-Lagrangian
+tensor history; parallel refinement transfers refuse with reference quantities (naming #991) instead of
+going silently wrong; test_0782-0785 pass at np 2, 3, 4, 8. Cross-review asked of the laptop, with a
+table of which production or campaign paths read non-symmetric tensors through global_evaluate (objective
+rates: Jaumann, upper-convected); to Louis before merge if any VE or zg95 campaign changes. Filed #999,
+#1000, #1001 (the scaling flag leaking across reset_default_model).
 **#997's first five-shard run green:** shard 5 38 passed in 20:13, shard 3 down to 21:18 (EPYC 9V74; was
 41:34-51:59); shard 4 55:00 until #911. Lows fixed at 1227d1cf; merge on that green. Narrowed #909's four
 conditions fixed at 05ffb102, re-check before PR; a possible conftest leak of the non-dimensional scaling
