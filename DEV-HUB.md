@@ -294,7 +294,11 @@ faults to file (P1 deform with units rescales geometry, linked to #979; P2 semi-
 np >= 2 with units; P3 semi-Lagrangian clamp with units; P4 unit-aware array into SwarmVariable.array; P5
 limiter IndexError swallowed on one rank; P6 SemiLagrangian with MATRIX raises), H1/H2/M3 as issues.
 **#959: a rank whose nodes don't move hangs at np 3 on both builds** (told to the MMPDE session).
-**Units bundle** (one owner later): H1, H2, P1-P4, #979; root near the TODO at functions_unit_system.py:701.
+**Units bundle** (one owner later): **#979** (= P1, remesh.py:368, 378), **#989** (H1 monotone clamp in a units
+model; development's own error 0.125-0.27), **#990** (P3), **#991** (H2), **#992** (P2; also the SYM S[1,1] slot
+read), **#993** (P4); root near the TODO at functions_unit_system.py:701. Also filed: **#994** (P5), **#995**
+(P6), **#996** (M3 test gap). Narrowed #909 being built as `bugfix/remesh-transfer-909` from f31edcb1
+(units paths stay at development's numbers).
 
 **2026-11-07, Louis: a DRY fix for the solver stall.** "This is a persistent problem that we encounter
 in various solvers. PETSc does not respect the original residual of the solve when we warm start. We
