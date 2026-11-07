@@ -307,7 +307,16 @@ answered (d6c56325): F(0) is the residual at u = 0 with boundary data in place; 
 zero strain rate for any finite η(0), so caps do not enter the interior rows and F(0) is the forcing
 (the cold start's measure); a nonzero weak velocity (Nitsche/penalty γμ(0)/h·g) is the one exception,
 handled by leaving weak boundary terms out of the reference; viscoplastic and weak-velocity arms
-added, recording ||F(x0)||, ||F(0)|| and the forcing-only norm. Waits on Louis's read.
+added, recording ||F(x0)||, ||F(0)|| and the forcing-only norm. **Louis approved it for implementation (2026-11-07):** "The principle here looks
+good and I think we should implement and run through review to check that there are no edge cases that
+have been missed. Broadly speaking: the equation knows what to define as the residual and the solver
+should be more mechanical about applying the rules. I agree that some of the implementation choices
+carry residual implications and that complicates things." Briefed: each equation declares its
+reference residual; the helper applies the targets mechanically; implementation choices that change the
+residual (weak BC terms, datum lift, null-space projection, rotated reduction, DEVSS/VE history) listed
+as edge cases with their declarations; warm-re-solve contract test first; four-arm evidence; hyperion's
+independent edge-case review (every solver class, warm/cold, time loops, units, np > 1, weak BCs, lift,
+projectors, adjoint, VE); evidence table to Louis before merge.
 **Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
 each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
 start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
