@@ -283,6 +283,8 @@ that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there
 instruction to close it was refused by its own classifier, correctly). **#911 moved up** to right after #964 in the integration
 session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
 evidence table for Louis before merge (a Newton stopping change).
+**#983's shard 4 red at 7397bd17 on the #963 stall in test_1064** (run 42219732969, job 127898568438;
+no test failed; #983 adds a file, so test_1062 shares test_1064's batch); rerun after #967 merges.
 **#983 ready on green at 7397bd17** (round 2: no must-fix; the low should-fix done: the hex rows now fail
 under a two-point mutant; manifold rule worst radius error 7.6e-8). **#983 at d3f7647e: should-fixes done** (FEGeom rule follows the coordinate degree, cells in bounded
 blocks: 27k hexes qdegree 6 peak 1550 -> 3 MB, 8.7 -> 0.64 s; 195k hexes qdegree 3 2090 -> 0 MB;
