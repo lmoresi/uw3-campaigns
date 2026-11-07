@@ -140,6 +140,10 @@ Commits to uw3-campaigns only when Louis asks. The lid-regime campaign moves to 
   directly so this session is mainly monitoring and reporting." Louis directs kaiju himself. The hub keeps HUB.md and
   the ledger current, pushes kaiju's patches (kaiju has no GitHub credentials; blobs verified as before), files
   issues kaiju cannot, carries dev-hub items, and reports to Louis; it does not order experiments unless he asks.
+  Refined the same day: "you should monitor rather than reason about it because that would simply double the token
+  usage for the problem. Focus on orchestration." So the hub records events and results as kaiju reports them, without
+  its own analysis or experiment suggestions; it pushes patches, files issues, keeps hub-to-hub items moving and
+  flags only process problems (unpushed launches, unverified blobs, stalled jobs).
 - **Direction (Louis, 2026-11-07):** "We are starting to look at scientific results from this model now. I am not sure
   it is quite ready for that, so I prefer that we continue benchmarking for the purposes of finding one or two good
   demos for a movie. Then a science paper with a 'fully realistic' earth configuration." So: benchmarking for one or
