@@ -293,6 +293,13 @@ loop, vector, adjoint, projections), the PETSc mechanisms, the issues it settles
 #883, #884, the pressure-rtol default), and an evidence plan (it touches petsc_generic_snes_solvers).
 Hyperion inventories every tolerance setting, warm start and reference residual in src as input.
 Louis reads the design before code.
+**Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
+each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
+start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
+KSP is never warm-started. A warm start is the default once a solve has succeeded
+(`_resolve_zero_init_guess`). The rotated bundle sets no `ksp_atol` (likely #911's immediate gap).
+`_snes_solve_with_retries` is the single gate on native routes; the rotated loop bypasses it (a natural
+home for the shared helper).
 **#911/#985 rediagnosed (laptop probe):** Newton is not at round-off (last residual 1.15e-9, 400-30,000x
 above the ε‖Â‖‖û‖ floor); the linear targets are unreachable (outer rtol 1e-11 relative to an
 increment RHS ~1e-9, i.e. ~1e-20 absolute; inner pressure 0.033·tol likewise, hence the 200 caps).
