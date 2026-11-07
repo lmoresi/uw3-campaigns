@@ -775,9 +775,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Earth's fault depth as a physical rule (2026-11-06, pending one control):** the evidence so far says the plate
-  boundary must reach Earth's weak asthenosphere; kaiju's reading for the recipe is fault depth = asthenosphere top +
-  ramp (+ margin) instead of the fixed 0.15. Louis to rule once the no-weak-layer control reports.
+- **Earth's fault depth (2026-11-07):** the control overturned the asthenosphere-connection reading: the fault's depth
+  decides whether subduction runs (~0.15 full speed, 0.12 slow, 0.08 and below reverse), the weak asthenosphere how
+  fast it starts. So "asthenosphere top + ramp" is not the rule; what the depth is tied to (perhaps the plates'
+  mechanical base) is open. Louis reviewing the renders for the next step; ledger held for his ruling.
 
 - **Half-element crust as the recipe default (2026-11-06):** Louis prefers it (crust_{TAf,earth}_c05). To make it the
   default, the hub suggests stating it physically: a crust thickness (0.0078 at refinement 5) and an interface
@@ -3211,3 +3212,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (-uw_asth 1, fault to 0.15 vs 0.20, benchmark line otherwise, from step 0, 120 steps, np 26 packed, 4f2fbaa);
   reported with 4128 / 4129 at the same matched times. Kaiju agrees the standard model's 0.12 -> 0.15 jump carries the
   same confound (longer fault, lithosphere base ~0.11 and layer top crossed together). Weak-band wording agreed.
+- 2026-11-07: **CORRECTION, full runs (to step 119): the connection does NOT dominate.** Subducting plate at t ~2/3/4/5/6e-4:
+  benchmark 0.15 883/1820/1883/1933/1013; 0.14 665/1363/1218/1314; 0.12 443/603/719; 0.08 168/295/262/41; 0.04 + band
+  to 0.12 195/121/-48/-120/-95; 0.04 + band to 0.2 120/136/-96/-145/-117; asth 0.18 fault 0.15 356/531/2028/1624/1803;
+  asth 0.18 fault 0.20 476/1324/2941/2076/1526; no asth fault 0.15 211/474/1657/1783/1887; no asth fault 0.20
+  126/416/1159/1955/1926. With no weak layer anywhere, a fault to 0.15 or 0.20 reaches full speed by 4-5e-4, and with
+  the layer moved down the 0.15 fault catches up by 4e-4. So the asthenosphere (and reaching it) sets how quickly
+  subduction gets going, not whether it does; the control is the fault's depth (~0.15 full speed, 0.14 ~70 %, 0.12
+  slow, 0.08 and below stall and reverse); both weak-band arms reverse. Hub's note: 0.15 lies ~0.04 below the plates'
+  T = 0.6 base (~0.11), so the depth that matters may be the plates' mechanical base, deeper than that isotherm; a
+  hypothesis, not tested. Louis: "This highlights something about the importance of the weak mantle wedge in actual
+  subduction zones"; he is reviewing the renders (fault-depth set 4131, asthenosphere set 4132) for the next step.
+  LEDGER ENTRY HELD until his ruling (kaiju's request).
