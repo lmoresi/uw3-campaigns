@@ -283,6 +283,19 @@ that step is nearly all of 19-52 min by kernel; #963's fix changes nothing there
 instruction to close it was refused by its own classifier, correctly). **#911 moved up** to right after #964 in the integration
 session's queue: its stopping-test fix cuts CI time and the production time loop's KSP rebuild;
 evidence table for Louis before merge (a Newton stopping change).
+**2026-11-07, #909 round 3 not ready** (the fixes created new defects a third time; hyperion stopped as
+agreed). New at 0d0ed886: H1 deform with units (limiter clamps dimensional values against
+non-dimensional bounds, then divides by the scale: T 0.0005 for 0.5), H2 refinement transfers with units
+at np >= 2 still wrong (units stripped at discretisation_mesh.py:2617, 2644), H3 semi-Lagrangian reads a
+MATRIX component from the transposed slot, M1 a bad scalar swarm shape hangs, M2 1-D empty-rank hang, M3
+multi-column _write_evaluated untested. **Hub's decision: option (a), narrow the PR** to #909, #965 and
+#977's remesh fix (dropping the lookup and shape-path changes), one review pass, then PR. Six pre-existing
+faults to file (P1 deform with units rescales geometry, linked to #979; P2 semi-Lagrangian record x1000 at
+np >= 2 with units; P3 semi-Lagrangian clamp with units; P4 unit-aware array into SwarmVariable.array; P5
+limiter IndexError swallowed on one rank; P6 SemiLagrangian with MATRIX raises), H1/H2/M3 as issues.
+**#959: a rank whose nodes don't move hangs at np 3 on both builds** (told to the MMPDE session).
+**Units bundle** (one owner later): H1, H2, P1-P4, #979; root near the TODO at functions_unit_system.py:701.
+
 **2026-11-07, Louis: a DRY fix for the solver stall.** "This is a persistent problem that we encounter
 in various solvers. PETSc does not respect the original residual of the solve when we warm start. We
 should try to find a DRY solution to this problem." So: the stacked inexact-Newton patch paused; the
