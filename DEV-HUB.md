@@ -350,7 +350,18 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Convergence branch stage 1, tier A/B serial (3317ca29, local):** 8 failed of 2850 (test_0063 also on development).
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Louis's ruling on evaluate() accuracy (2026-11-08):** "I don't mind, but 10^-9 is a very fine tolerance which can go wrong
+if there is any difficulty with the solve (e.g. an instability) and just get stuck forever. Remove the redundant work, set a
+reasonable tolerance." Applied: no projector exemption, no tightening to 1e-9 anywhere; tests assert at the accuracy their solver
+is asked for (test_1057 at the projector's tolerance, or a projector tolerance of 1e-7 to 1e-8 if needed; test_0009 assertion
+matched to 1e-4; test_1111 re-recorded at 1e-6 with the v_rms bound matched; test_1087 reads the first increment). **Rotated-loop
+stage done** (`feature/convergence-reference-policy` b2a88402 on 06c574e8, pushed, not a PR): stationary keeps max(r0, ||F(0)||),
+memory measures r0; test_0022 758 s -> 13.6 s (last increments' linear solves 300/32/12 -> 1); floor = min(0.1 T, 0.1 ||b||)
+(the round-off term overstated round-off 300-fold); a shared KSP convergence-test dispatcher (floor + wall-clock guard); **#924
+fixed** (test_1143); NaN residuals leave tolerances alone; time loop after 300 steps: development 1.36e-6, max rule 9.07e-5, branch
+1.45e-6; tier A/B serial 6 failed / 2932 passed. Hyperion's parallel runs and edge-case review next; evidence arms remaining:
+notch, zg95 viscoplastic, weak nonzero velocity, kaiju VE rotated.
+**Convergence branch stage 1, tier A/B serial (3317ca29, local):** 8 failed of 2850 (test_0063 also on development).
 Fixed: the pre-solve floor had replaced PETSc 3.25's Eisenstat-Walker pre-solve (EW now sets rtol and the floor bounds it
 from below inside the KSP convergence test, scaled into the KSP's norm); the floor relaxed explicitly set ksp_rtol (it now
 replaces only the tolerance-derived key, per _TOLERANCE_DERIVED_KEYS). **For Louis:** the floor removes accuracy that came
