@@ -3239,3 +3239,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_age_double (0.007), packed, 4f2fbaa, np 26, from step 0, 200 steps. Renders of the fault-depth and asthenosphere
   sets on the movie page v18. Hub's note for the reading: if the needed depth is the plate's strong part, the doubled
   age (thermal base ~0.11 x sqrt 2 ~ 0.16, below the 0.15 fault) is where the fixed fault could fail.
+- 2026-11-08: plate-age pair (4134) at steps 37 / 29, clean. Subducting plate at t 1e-4: benchmark 480, half age 273,
+  double age 664; at 3e-4: benchmark 1820, half age 1526, double not yet there.
