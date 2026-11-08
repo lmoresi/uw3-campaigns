@@ -350,8 +350,9 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Hold
-#964's merge until the integration session reports whether round 5 slowed test_0022**: the same Xeon 8370C gave
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **#964 hold released (2026-11-08): round 5 does not
+change test_0022** (serial on wombat, r5 in place vs reverted: identical iteration counts, 758.5 vs 758.7 s; 666 s
+are two last Newton steps at the 300 cap, i.e. #911). Earlier note:: the same Xeon 8370C gave
 55:38 on #964 and 26:37 elsewhere, so the runner alone may not explain #964's capped shard 4. Shard 6 can still reach
 57-60 min on a slow runner until #911. **Shear-band data** (hyperion inventory): ~4 GB notch results/figures/jobs/meshes
 and 2.1 GB ShearLayerVEP output exist only on hyperion (twice on the healthy disk, once on the boot disk), plus an
