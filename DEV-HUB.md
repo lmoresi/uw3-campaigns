@@ -341,6 +341,19 @@ warm-start atol and nrichardson pre-solve removed). The hub asked that the refer
 hook (`_reference_residual()`, default F(0), overridden for weak nonzero velocity, lift, null space)
 that the helper only reads. Next: rotated loop (#924, #883, #884), sub-KSP floors, legacy references,
 evidence arms, hyperion's review.
+**Design point for Louis (2026-11-08):** the approved rule loses accuracy in time loops. Stage 1's serial run:
+1825 passed, 2 failed (test_0063 also fails on development; test_0008, the warm-started AdvDiffusionSLCN loop,
+tier A, fails only on the branch: restore drift 5.4e-7 against an 8.7e-8 floor). Cause: in a time step ||F(0)||
+carries the mass term M T*/dt, so max(||F(x0)||, ||F(0)||) holds each step to rtol of the whole field, not
+its change: errors vs a tight loop 20-70x larger (step 4: 1.2e-6 vs 4.0e-5; step 300: 1.4e-6 vs 9.1e-5),
+accumulating. Proposal (the equation declares its reference): solves that carry memory through a DDt
+(AdvDiffusion, VE Stokes) take the increment residual (PETSc's default, `_reference_residual` = 0);
+stationary re-solves (continuation, chunked restarts, perturbed re-solves: #911, test_0028) keep the max;
+quasi-static Stokes under changing buoyancy keeps the field scale; the linear floor stays everywhere.
+Development's rotated loop already uses max(r0, ||F(0)||) in time loops, so VE or rotated time-stepping
+models have had the looser rule all along. Asks: (1) adopt the memory/stationary split; (2) VE rotated
+models take the increment reference at more iterations per step. Built as a switch meanwhile.
+
 **Inventory (hyperion, on #911: issuecomment-6712890427):** no helper owns the reference. Five routes
 each compute one: the rotated loop and continuation (F(0)) and Picard (first residual) survive a warm
 start; SaddlePt's warm start uses F(guess); Scalar, Vector and MultiComponent warm starts have none.
@@ -356,7 +369,9 @@ Newton test still measures the true residual). Stacked on #964. **Combined with 
 default** (waiting since 2026-10-28): one four-arm measurement (current, inexact Newton, pressure
 rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (kaiju), so Louis
 decides one tolerance policy.
-**#997 merged** (fifth CI shard; green on all five at 1227d1cf). **#952 merged** (15f13d0c; #946, #903 relabelled; merged result checked against
+**#997 merged** (fifth CI shard; green on all five at 1227d1cf). **#1002** answered at 6b435eed (RBF derivative refused on every rank,
+np 2 and serial tests; #991 a refusal with the reason; Closes #996); filed #1004, #1005 (swarm MATRIX reads
+back transposed), #1006; merges on green once the laptop agrees. **#952 merged** (15f13d0c; #946, #903 relabelled; merged result checked against
 the five-shard test.sh: coverage OK). #964 merges development in next. #1002: hyperion keeps #991 as a
 refusal (every units change in the PR's history opened a new fault; #991 goes to the bundle owner with #979
 and #989).
