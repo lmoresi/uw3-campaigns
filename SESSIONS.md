@@ -60,5 +60,6 @@ FROM <code role> TO <code role> | ORIGIN <Louis, or a code> | RE <issue, PR or t
 - Library runs on kaiju (A/B evidence, scaling, leak hunts) go to the **kaiju dev runner**, even when
   they use a science driver or checkpoint. The dev runner reads the science session's files; it does
   not ask the science session to run them.
-- A fix to a science driver found during dev work goes to the **science hub**, which owns the drivers.
+- A fault in a science driver found during dev work goes to the **science hub**, which routes it to the
+  session that owns the driver (K1 for the zg95 drivers). The hub does not write the fix itself.
 - Hubs route; technical sessions talk to Louis directly on technical detail.
