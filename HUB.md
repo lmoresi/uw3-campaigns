@@ -3255,3 +3255,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   October 3590 checkpoint). The hub MISROUTED the follow-up to the rollback session; the #911 A/B is not its work
   (probably the dev hub's runner, "kaiju: dev runs 2"); correction sent to the rollback session, and the fix commit
   is with the reporting session, which coordinates the #911 runner.
+- 2026-11-08: 079effc did not fix plain_notch: notch_model.build evaluates the viscosity (saddle preconditioner) before
+  yield_stress_with_shift runs (kaiju dev runner, development 06c574e8, via the integration session). Fixed on main
+  e958bec: build sets yield_stress_min = residual_strength * C after the yield stress (positive residual strength
+  only). Dev runner to re-check plain_notch ref 1 on e958bec.
