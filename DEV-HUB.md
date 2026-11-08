@@ -341,6 +341,12 @@ warm-start atol and nrichardson pre-solve removed). The hub asked that the refer
 hook (`_reference_residual()`, default F(0), overridden for weak nonzero velocity, lift, null space)
 that the helper only reads. Next: rotated loop (#924, #883, #884), sub-KSP floors, legacy references,
 evidence arms, hyperion's review.
+**#911 four-arm result on test_0022 (laptop, tol 1e-11, two fixtures):** current: no convergence (last increment
+stalls), 55 / 254 s; pressure rtol 1e-2 alone: no, 110 / 107 s; linear floor η T alone: yes, 6 Newton, 6.6 / 2.1 s;
+both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees to 4e-10. Keep both; the floor is
+independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
+(serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
+development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
 **Design point for Louis (2026-11-08):** the approved rule loses accuracy in time loops. Stage 1's serial run:
 1825 passed, 2 failed (test_0063 also fails on development; test_0008, the warm-started AdvDiffusionSLCN loop,
 tier A, fails only on the branch: restore drift 5.4e-7 against an 8.7e-8 floor). Cause: in a time step ||F(0)||
