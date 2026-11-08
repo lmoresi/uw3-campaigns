@@ -268,6 +268,11 @@ params = uw.Params(
                                 #   test (page T37Y3MMpYyfgQZbCmuk5YQ): 1 rung placed all 80 stored faults on the finest and 2S
                                 #   levels, but refused 2 of 80 at the 4S chain level, so a chain 2 run should set 2 or 3;
                                 #   slip is ~10 % higher than at 3 (the cut reaches 0.005 instead of 0.013 below the surface)
+    uw_split_inset_along=0,     # 1: uw_split_inset is measured along the fault from where its spine crosses the outer wall,
+                                #   not as depth below the wall. Louis (2026-11-08): the split should run to one element
+                                #   from the boundary, as the ladder does; by depth, a 27-degree fault's cut stopped ~2 cells
+                                #   along the fault short of that (refinement 6: first split node 1.8 cells deep). 0 keeps
+                                #   the depth rule (the recipe until ruled)
     uw_fault_depth_max=0.25,
     uw_fault_cut_lid=0,         # 1: the depth cap is the larger of uw_fault_depth_max and the
                                 #    lid depth of the last record plus uw_fault_lid_margin, so a
@@ -617,7 +622,7 @@ def fault_trace(fault, coarsening=1):
     rung spacing with its surface end above the wall."""
     if "points" in fault:
         spine = np.asarray(fault["points"], dtype=float)[::coarsening]
-        return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - trace_inset() * S]
+        return spine, cut_of(spine)
     theta_t, phi = fault["theta"], np.deg2rad(fault["dip"])
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
@@ -629,7 +634,22 @@ def fault_trace(fault, coarsening=1):
     block = 2 ** int(params.uw_chain)
     n = block * max(1, int(round(length / (block * S))))
     spine = np.array([top + down_dip * (length * i / n) for i in range(n + 1)])[::coarsening]
-    return spine, spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o - trace_inset() * S]
+    return spine, cut_of(spine)
+
+
+def cut_of(spine):
+    """The part of a spine to cut: the points trace_inset() rungs inside the wall, by depth, or with
+    uw_split_inset_along (the split only) by distance along the spine from its wall crossing, so the
+    cut runs as close to the wall along the fault as the ladder does."""
+    r = np.hypot(spine[:, 0], spine[:, 1])
+    if TI or not params.uw_split_inset_along or r[0] <= r_o:
+        return spine[r <= r_o - trace_inset() * S]
+    k = int(np.argmax(r < r_o))                     # the first point inside the wall (the spine starts above it)
+    f = (r[k - 1] - r_o) / (r[k - 1] - r[k])        # the crossing on segment k-1 -> k
+    cross = spine[k - 1] + f * (spine[k] - spine[k - 1])
+    along = np.r_[np.zeros(k), np.linalg.norm(spine[k] - cross)
+                  + np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(spine[k:], axis=0), axis=1))]]
+    return spine[(np.arange(len(spine)) >= k) & (along >= trace_inset() * S - 1e-12)]
 
 
 def trace_inset():
@@ -2381,7 +2401,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
