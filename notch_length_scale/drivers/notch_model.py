@@ -513,6 +513,10 @@ def build(msh, eta_bg, v_mmyr, phi, refinement, xi=0.0, seed=True, H_km=30.0,
         "unreachable yield stress: the weak inclusion is purely viscous")
     yield_full = m_strong * tau_y + (1 - m_strong) * yield_none
     cm.Parameters.yield_stress = yield_full
+    if float(residual_strength) > 0:
+        # the floor stated to the library before anything evaluates the viscosity (the saddle preconditioner below
+        # does); its residual-strength guard refuses an unstated 0 floor (kaiju dev runner, 2026-11-08)
+        cm.Parameters.yield_stress_min = _smin
 
     # The approved smoother, and the model owns the march.
     cm.yield_smoother = "powermean"
