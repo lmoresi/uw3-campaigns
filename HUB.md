@@ -3252,4 +3252,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the #911 convergence A/B): coupled_notch.py (and plain_notch.py) failed the library's residual-strength guard;
   fixed on main 079effc by stating yield_stress_min = 0.02 C (the floor it already applied). RESTART_AND_RECORDS.md
   section 5 marked not repeatable as written (driver 460e49d fails the same guard; today's driver cannot restart the
-  October 3590 checkpoint). Kaiju told to use 079effc and a fresh checkpoint.
+  October 3590 checkpoint). The hub MISROUTED the follow-up to the rollback session; the #911 A/B is not its work
+  (probably the dev hub's runner, "kaiju: dev runs 2"); correction sent to the rollback session, and the fix commit
+  is with the reporting session, which coordinates the #911 runner.
