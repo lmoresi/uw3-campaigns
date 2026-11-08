@@ -19,6 +19,8 @@ fix. It briefs a session when Louis says go. It does not approve, merge, or open
 own (the standing rules reserve those for Louis), and it runs nothing on a machine: compute
 for a fix goes through the science hub or the session Louis names.
 
+**Session rules and roster: SESSIONS.md** (standing rules, Louis 2026-11-08; codes C/W/H/K). They override anything below.
+
 ## Boundaries with the other two hubs
 
 | Work | Owner | Notes |
