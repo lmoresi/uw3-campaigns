@@ -350,7 +350,8 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **#964 merged** (green on five shards at 5031aa28; #906 and #877 relabelled fixed-in-development; #906 stays open
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **#1008 merged** (sixth shard: test_0022 alone, 11:29 on an EPYC 9V74; shard 4 29:15 without it; merged result's
+coverage checked: 400 files, shards [1..6]). **#964 merged** (green on five shards at 5031aa28; #906 and #877 relabelled fixed-in-development; #906 stays open
 for the wall-crossing-cut experiment). **#964 hold released (2026-11-08): round 5 does not
 change test_0022** (serial on wombat, r5 in place vs reverted: identical iteration counts, 758.5 vs 758.7 s; 666 s
 are two last Newton steps at the 300 cap, i.e. #911). Earlier note:: the same Xeon 8370C gave
