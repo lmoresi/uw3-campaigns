@@ -233,8 +233,9 @@ Measured here, not inherited.
   zero-pivot shift on every route. The CHANGELOG entry exists (from the docs branch); the
   switch back is `..._mg_coarse_redundant_pc_factor_shift_type = "none"`; the evidence is
   #901 and the 2026-11-05 journal entries. (3) #895's title ("one LU per rank") predates
-  #925, under which the structural block is one LU on one rank at any rank count; the
-  title and its framing may want updating.
+  #934 (merged 2026-11-04 for issue #925), under which the structural rows of every
+  fault, a network's included, are one LU on one rank at any rank count; the title and
+  its framing may want updating (the notes session sent you the network point).
 
 ## Open work
 
@@ -641,3 +642,10 @@ Measured here, not inherited.
   full, sources named, development merged; replies on both PRs. #861's conflict with
   `development` in `CLAUDE.md` resolved and pushed. Items for the dev hub above; 022's
   "one block on each process" sent to the notes session.
+- 2026-11-08 (later): the notes session corrected two points in #862's guide, both
+  checked against `custom_mg._gathered_patch_blocks`: the change is PR #934 (merged
+  2026-11-04, for issue #925, still open), not "#925 merged 2026-11-03"; and with no zone
+  keyed all of a network's faults form one structural block on one rank, so the guide's
+  "a few bands per rank" was wrong for the LU. Guide fixed (b74af785), correction posted
+  on #862. 022 keeps its 25d62812 pin, so its "one block on each process" stands for that
+  build; re-pinning is Louis's call and would mean rerunning the recipe and figure (c).
