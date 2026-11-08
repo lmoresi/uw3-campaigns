@@ -350,7 +350,15 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Louis's ruling on evaluate() accuracy (2026-11-08):** "I don't mind, but 10^-9 is a very fine tolerance which can go wrong
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Convergence branch 43857a53 (pushed):** the weak-nonzero-velocity arm found a regression under the max rule (a Nitsche-driven
+lid on a power law: ||F(0)|| 118-2540 from the penalty times the datum; warm re-solves 70-1300x less accurate than development);
+fixed by a `_weak_datum` declaration (a boundary term nonzero at rest makes the equation measure its increment; detection
+symbolic; a datum in a constant counts); test_0028 carries both cases. The forcing-only F(0) was left out (it would change the
+generated C of every Nitsche/penalty model). **#1011** filed: on development a cold solve with a weak datum is 1e-3 to 3e-2 off at
+tolerance 1e-4 (its target follows the penalty). Louis's ruling applied to the four tests (test_1087 now counts the cycle with
+the floor switched off by `rotated_bc._INCREMENT_TARGET_FRACTION = None`); CHANGELOG records the evaluate() change. test_1087's
+premise (welded tail 13 its at k=3) is stale on development (5, like split levels): to hyperion.
+**Louis's ruling on evaluate() accuracy (2026-11-08):** "I don't mind, but 10^-9 is a very fine tolerance which can go wrong
 if there is any difficulty with the solve (e.g. an instability) and just get stuck forever. Remove the redundant work, set a
 reasonable tolerance." Applied: no projector exemption, no tightening to 1e-9 anywhere; tests assert at the accuracy their solver
 is asked for (test_1057 at the projector's tolerance, or a projector tolerance of 1e-7 to 1e-8 if needed; test_0009 assertion
