@@ -350,6 +350,18 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
+**Louis, 2026-11-08: "The shear band micromorphic / cosserat formulation is really important, do not lose it or
+any examples."** Inventory: the library work (coupled volume fields monolithic with u and p, micromorphic yield
+regularisation, Cosserat shear-layer test; docs micromorphic-plasticity.md and saddle-point-field-groups.md; two
+review records; tests test_1070 and test_1078, serial and parallel) exists only on underworld3
+`feature/shear-band-length-scale` (114c472c) and the `test/sbls-coss-hyperion-2026-10-20` refs (538042dc,
+f5709813). **Pinned** as `archive/shear-band-length-scale`, `archive/sbls-coss-hyperion-2026-10-20` and
+`archive/sbls-coss-hyperion-2026-10-20-wip` (the repo's archive/ convention). Examples and records: uw3-campaigns
+main `notch_length_scale/` (118 files: cosserat_notch.py, micromorphic_notch.py, coupled_notch.py, HANDOFF,
+REPORT, plots), the journal's main (16 entries, 2026-10-09 to 10-11). Tracked in #1010. **Never delete any of these
+refs.** Hyperion inventorying run outputs, figures and notebooks on disk (git ignores runs/), first flagging
+anything on its failing boot disk.
+
 **Louis's rulings, 2026-11-08:** (1) memory/stationary split for the convergence reference: "Yes";
 (2) VE rotated time-stepping reference decided from the evidence: "Agree"; (3) a deformed wall keeps the near-null
 rotation: "keep - the deformation may not eliminate the null space" (to be documented in #964 and
