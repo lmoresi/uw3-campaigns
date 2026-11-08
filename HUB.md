@@ -3275,3 +3275,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (vrms 945.27 vs 945.34 at step 110, slip 3761 vs 3762), matching the benchmark's record; the head ~30 % faster
   (1436 vs 2036 s over 10 steps), not yet checked with the sockets swapped. Finer-ladder run TAf_v2_ref5_fineladder
   (4211, 5bddd97) at step 58, ~100 s per step, all converged.
+- 2026-11-09: finer ladder (TAf_v2_ref5_fineladder, 5bddd97) at the base at checkpoint 85; ref5 / finer ladder / ref6:
+  time 2.30 / 2.25 / 2.69e-4; trench -8.6 / -8.3 / -7.4 deg; slip 3975 / 4311 / 4684; plates 2587/-1134, 2693/-1545,
+  2283/-2178. Cancelled past the base at step ~320 (4211). Plate-age pair (4134): half age finished 200 steps; double
+  age hit the 12 h limit at step 177, restarted from checkpoint 175 (4213).
