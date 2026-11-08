@@ -167,6 +167,23 @@ the activity to look for opportunities to schedule tasks and to combine work."
   schedules, combines overlapping work, merges, and keeps this file.
 - Hubs stay in the cloud until hyperion has proven reliable.
 
+## REGISTER: changes to solver defaults (Louis, 2026-11-08)
+
+"I'll take your recommendation for now, but we do need to keep track of these kinds of changes as
+they may not be benign for all solvers or models." Every change to a convergence or solver default
+gets a row here and in the repo (the design note's table and a CHANGELOG line), with the switch that
+restores the old behaviour and the evidence Louis saw. The weekly bulk review checks merged PRs against
+this table. A row is **provisional** until the evidence named in it is in.
+
+| # | Path | Development's behaviour | New default | Switch back | Evidence | Status |
+|---|---|---|---|---|---|---|
+| 1 | Stationary solves (generic SNES, warm or cold) | reference ‖F(x0)‖ (a warm start tightens the target; #911/#985 stall) | max(‖F(x0)‖, ‖F(0)‖) | `_convergence_reference_rule` per solver; global switch requested | test_0028; #911 four arms | branch 43857a53, not merged |
+| 2 | Solves with memory (DuDt or DFDt) | as row 1 | increment residual of the step (ruling 1) | as row 1 | warm adv-diff loop | branch, not merged |
+| 3 | Weak nonzero datum (Nitsche/penalty, `_weak_datum`) | as row 1 | increment | as row 1 | weak-velocity arm (max rule 70-1300x worse) | branch, not merged |
+| 4 | VE rotated time stepping | max(r0, ‖F̂(0)‖) | increment (ruling 2, 2026-11-08) | as row 1 | wombat VEP annulus: +60 % Newton, +15 % time, 3-650x more accurate | **provisional** until kaiju zg95 and notch np 16 |
+| 5 | Linear solves inside Newton | KSP rtol only | floor min(0.1 T, 0.1 ‖b‖) | `rotated_bc._INCREMENT_TARGET_FRACTION = None` (rotated); generic to confirm | test_0022: 6 Newton, 2.0 s vs no convergence | branch, not merged |
+| 6 | evaluate() | 1e-9 tolerance, redundant work | reasonable tolerance, redundant work removed (Louis) | to confirm | CHANGELOG entry on the branch | branch, not merged |
+
 ## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
 
 Louis, 2026-11-06: "We also should do bulk reviews where we can check which PRs overlap, which
@@ -356,6 +373,9 @@ development in for a fresh run; hyperion puts test_0022 on a sixth shard until #
 and 15 % more time for 3-650x accuracy beyond the tolerance. Kaiju arms at np 16 running (zg95 faulted restart A/B; plain notch
 ref 1 and 2). Put to Louis: VE rotated default (the hub suggests increment, per ruling 1's principle, unless zg95 shows the cost
 matters; both switchable).
+**Ruling 2 (Louis, 2026-11-08): increment for VE rotated, for now.** "I'll take your recommendation for now, but we do need to keep
+track of these kinds of changes as they may not be benign for all solvers or models." Register opened (top of file); row 4 provisional
+until the kaiju arms.
 **Convergence branch 43857a53 (pushed):** the weak-nonzero-velocity arm found a regression under the max rule (a Nitsche-driven
 lid on a power law: ||F(0)|| 118-2540 from the penalty times the datum; warm re-solves 70-1300x less accurate than development);
 fixed by a `_weak_datum` declaration (a boundary term nonzero at rest makes the equation measure its increment; detection
