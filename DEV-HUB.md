@@ -371,7 +371,12 @@ rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (
 decides one tolerance policy.
 **#997 merged** (fifth CI shard; green on all five at 1227d1cf). **#1002** answered at 6b435eed (RBF derivative refused on every rank,
 np 2 and serial tests; #991 a refusal with the reason; Closes #996); filed #1004, #1005 (swarm MATRIX reads
-back transposed), #1006; merges on green once the laptop agrees. **#952 merged** (15f13d0c; #946, #903 relabelled; merged result checked against
+back transposed), #1006; laptop agreed (the refusal verdict is the same on every rank); CI running on 6b435eed; merge on green.
+**#964 round 5** (d7548b3c): ready once one Low is fixed or filed (~10 MB per re-solve leaked when a warm
+converged re-solve changes tolerance); the threshold now picks the cheaper or converging side in every case; the
+np 4 shell is on the sphere with #952 underneath. #959 still green at 7bfda648, held for the MMPDE session's np 3
+answer. Note: `gh pr edit` fails on this repo (a Projects (classic) GraphQL error) and changes nothing; hyperion
+now edits PR bodies through REST; #983's merged body was corrected after the fact. **#952 merged** (15f13d0c; #946, #903 relabelled; merged result checked against
 the five-shard test.sh: coverage OK). #964 merges development in next. #1002: hyperion keeps #991 as a
 refusal (every units change in the PR's history opened a new fault; #991 goes to the bundle owner with #979
 and #989).
