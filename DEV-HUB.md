@@ -371,7 +371,8 @@ rtol 1e-2, both) on test_0022 (laptop, hyperion kernels) and the zg95 fixtures (
 decides one tolerance policy.
 **#997 merged** (fifth CI shard; green on all five at 1227d1cf). **#1002** answered at 6b435eed (RBF derivative refused on every rank,
 np 2 and serial tests; #991 a refusal with the reason; Closes #996); filed #1004, #1005 (swarm MATRIX reads
-back transposed), #1006; laptop agreed (the refusal verdict is the same on every rank); CI running on 6b435eed; merge on green.
+back transposed), #1006; laptop agreed (the refusal verdict is the same on every rank). **#1002 merged** (green on five shards;
+#909, #965, #977, #996 relabelled).
 **#964 round 5** (d7548b3c): ready once one Low is fixed or filed (~10 MB per re-solve leaked when a warm
 converged re-solve changes tolerance); the threshold now picks the cheaper or converging side in every case; the
 np 4 shell is on the sphere with #952 underneath. #959 still green at 7bfda648, held for the MMPDE session's np 3
