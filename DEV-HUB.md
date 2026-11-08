@@ -350,7 +350,17 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **#1008 merged** (sixth shard: test_0022 alone, 11:29 on an EPYC 9V74; shard 4 29:15 without it; merged result's
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Convergence branch stage 1, tier A/B serial (3317ca29, local):** 8 failed of 2850 (test_0063 also on development).
+Fixed: the pre-solve floor had replaced PETSc 3.25's Eisenstat-Walker pre-solve (EW now sets rtol and the floor bounds it
+from below inside the KSP convergence test, scaled into the KSP's norm); the floor relaxed explicitly set ksp_rtol (it now
+replaces only the tolerance-derived key, per _TOLERANCE_DERIVED_KEYS). **For Louis:** the floor removes accuracy that came
+from over-solving: test_1057 via evaluate()'s projector (snes_rtol 1e-6; development's second Newton step solved exactly,
+better than 1e-10; now 4e-9 on 0.05) and test_0009 (a clock test asserting 1e-6 at default tolerance 1e-4; fix the test).
+Question: should evaluate() keep its old effective accuracy? (a) yes, projectors over-solve (exempt, or state their
+accuracy) or (b) no, evaluate returns the 1e-6 it asks for. Integration session recommends (a); the hub prefers (a)
+implemented as the projector stating its own tight tolerance (an explicit rtol the floor already respects), not a
+special-case exemption.
+**#1008 merged** (sixth shard: test_0022 alone, 11:29 on an EPYC 9V74; shard 4 29:15 without it; merged result's
 coverage checked: 400 files, shards [1..6]). **#964 merged** (green on five shards at 5031aa28; #906 and #877 relabelled fixed-in-development; #906 stays open
 for the wall-crossing-cut experiment). **#964 hold released (2026-11-08): round 5 does not
 change test_0022** (serial on wombat, r5 in place vs reverted: identical iteration counts, 758.5 vs 758.7 s; 666 s
