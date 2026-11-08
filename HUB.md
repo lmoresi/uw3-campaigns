@@ -3261,3 +3261,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   only). Dev runner to re-check plain_notch ref 1 on e958bec. VERIFIED: a clean unpatched checkout on the 06c574e8 overlay, plain_notch.py -uw_ref 1
   -uw_xi 0.03 -uw_linear production_tight at np 1, matches the patched runs exactly (CONVERGED_FNORM_ABS, 5 its, ksp 168,
   39 s; W_int 3.55, W_out9 4.43; exit 0). The dev runner dropped its throwaway patch. Closed.
+- 2026-11-08: TAf-v2 resolution movie (ref 4 | 5 | 6 over ref6's whole run, base-mesh close-up along the fault) on the
+  resolution page v5 (B83QxCPeYmX2f9HMjx9W4e), jobs 4137 / 4162. Session labels now in use: K1 = kaiju science (the
+  rollback session, session_01HX67HY6xwuJivHKLLXrR3H), K2 = kaiju dev runner, W1 = integration (Fault Models Code
+  Unification, session_01HxWvn5rMK67zasgirdXszQ), C2 = this science hub.
