@@ -350,7 +350,13 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
-**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Convergence branch 43857a53 (pushed):** the weak-nonzero-velocity arm found a regression under the max rule (a Nitsche-driven
+**#1008 at 598ab620** (laptop review: no must-fix; the coverage check now honours --deselect): merge on green. **Ruling 2 evidence, VE rotated time stepping (wombat, serial, 43857a53):** VEP order 1 annulus, 40 steps, tol 1e-5, error vs a
+1e-8 reference. Increment rule: 67 Newton its, 38.5 s, error 1.4e-8 to 9.7e-7. Stationary (development's rotated rule): 42 its,
+33.5 s, error 2.7e-6 to 9.1e-6, within tolerance and not growing (unlike the adv-diff loop). Increment costs ~60 % more Newton
+and 15 % more time for 3-650x accuracy beyond the tolerance. Kaiju arms at np 16 running (zg95 faulted restart A/B; plain notch
+ref 1 and 2). Put to Louis: VE rotated default (the hub suggests increment, per ruling 1's principle, unless zg95 shows the cost
+matters; both switchable).
+**Convergence branch 43857a53 (pushed):** the weak-nonzero-velocity arm found a regression under the max rule (a Nitsche-driven
 lid on a power law: ||F(0)|| 118-2540 from the penalty times the datum; warm re-solves 70-1300x less accurate than development);
 fixed by a `_weak_datum` declaration (a boundary term nonzero at rest makes the equation measure its increment; detection
 symbolic; a datum in a constant counts); test_0028 carries both cases. The forcing-only F(0) was left out (it would change the
