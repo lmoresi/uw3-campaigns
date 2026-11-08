@@ -177,11 +177,11 @@ this table. A row is **provisional** until the evidence named in it is in.
 
 | # | Path | Development's behaviour | New default | Switch back | Evidence | Status |
 |---|---|---|---|---|---|---|
-| 1 | Stationary solves (generic SNES, warm or cold) | reference ‖F(x0)‖ (a warm start tightens the target; #911/#985 stall) | max(‖F(x0)‖, ‖F(0)‖) | `_convergence_reference_rule` per solver; global switch requested | test_0028; #911 four arms | branch 43857a53, not merged |
+| 1 | Stationary solves (generic SNES, warm or cold) | reference ‖F(x0)‖ (a warm start tightens the target; #911/#985 stall) | max(‖F(x0)‖, ‖F(0)‖). Known consequence (M3): a stationary equation re-solved in a time loop lags its forcing by up to the tolerance; documented in the design note and nonlinear-solver guide, with the override | `_convergence_reference_rule` per solver; global switch requested | test_0028; #911 four arms | branch 43857a53, not merged |
 | 2 | Solves with memory (DuDt or DFDt) | as row 1 | increment residual of the step (ruling 1) | as row 1 | warm adv-diff loop | branch, not merged |
 | 3 | Weak nonzero datum (Nitsche/penalty, `_weak_datum`) | as row 1 | increment | as row 1 | weak-velocity arm (max rule 70-1300x worse) | branch, not merged |
 | 4 | VE rotated time stepping | max(r0, ‖F̂(0)‖) | increment (ruling 2, 2026-11-08) | as row 1 | wombat VEP annulus: +60 % Newton, +15 % time, 3-650x more accurate | **provisional** until kaiju zg95 and notch np 16 |
-| 5 | Linear solves inside Newton | KSP rtol only | floor min(0.1 T, 0.1 ‖b‖) | `rotated_bc._INCREMENT_TARGET_FRACTION = None` (rotated); generic to confirm | test_0022: 6 Newton, 2.0 s vs no convergence | branch, not merged |
+| 5 | Linear solves inside Newton | KSP rtol only | floor min(0.1 T, 0.1 ‖b‖); rotated sub-solves keep their own rtols, scaled by how far the floor relaxed the outer target; a first increment solves as on development (H1 fix); on a preconditioned norm the floor checks the true residual before stopping (M2) | `rotated_bc._INCREMENT_TARGET_FRACTION = None` (rotated); generic to confirm | test_0022: 6 Newton, 2.0 s vs no convergence | branch, not merged |
 | 6 | evaluate() | 1e-9 tolerance, redundant work | reasonable tolerance, redundant work removed (Louis) | to confirm | CHANGELOG entry on the branch | branch, not merged |
 
 ## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
@@ -373,6 +373,7 @@ development in for a fresh run; hyperion puts test_0022 on a sixth shard until #
 and 15 % more time for 3-650x accuracy beyond the tolerance. Kaiju arms at np 16 running (zg95 faulted restart A/B; plain notch
 ref 1 and 2). Put to Louis: VE rotated default (the hub suggests increment, per ruling 1's principle, unless zg95 shows the cost
 matters; both switchable).
+**Convergence branch, hyperion's review at 43857a53: not ready (H1, M1, M2, M3); all four fixed locally (integration, 2026-11-08).** H1: the rotated sub-solve atol was in outer units and moved fault slip 2.2e-4; now scaled sub-solve rtols, first increment as on development, so test_1087 and test_1111 pass on development's own baselines (rebaselines reverted), test_0022 still fast. M1: weak datum read by its symbols (a lid ramped from zero counts). M2: the native floor checks the true residual on a preconditioned norm; warm nonlinear Poisson re-solves 1 Newton step against development's 2. M3: documented (register row 1). Full serial suite running before push; hyperion re-checks np 2-4 on the new tip. **#1007:** first fix missed (the solver's cache reset ran before the rotated solve); cleanup now at the end of a solve that built a new workspace, ee3f4d4c pushed; hyperion's control says deferred garbage; its np 2 numbers decide. **#1012** (hyperion): a separate Stokes-only rebuild leak, 23 MB per solve, not deferred garbage; loose-ends queue. **#895 network case** queued after the convergence branch (row 5, np 4 on hyperion or the dev runner).
 **Ruling 2 (Louis, 2026-11-08): increment for VE rotated, for now.** "I'll take your recommendation for now, but we do need to keep
 track of these kinds of changes as they may not be benign for all solvers or models." Register opened (top of file); row 4 provisional
 until the kaiju arms.
