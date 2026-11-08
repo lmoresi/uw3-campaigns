@@ -341,6 +341,9 @@ warm-start atol and nrichardson pre-solve removed). The hub asked that the refer
 hook (`_reference_residual()`, default F(0), overridden for weak nonzero velocity, lift, null space)
 that the helper only reads. Next: rotated loop (#924, #883, #884), sub-KSP floors, legacy references,
 evidence arms, hyperion's review.
+**PR #1008 (sixth shard: test_0022 alone, deselected from shard 4's band; comment names #911):** `--deselect`
+(not `--ignore`, which still collects a named file); collect-only batch 4 399/406, batch 6 7; --print-shards [1..6];
+coverage OK, but the coverage check does not parse --deselect (noted). Cross-review by the laptop; CI running.
 **#911 four-arm result on test_0022 (laptop, tol 1e-11, two fixtures):** current: no convergence (last increment
 stalls), 55 / 254 s; pressure rtol 1e-2 alone: no, 110 / 107 s; linear floor η T alone: yes, 6 Newton, 6.6 / 2.1 s;
 both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees to 4e-10. Keep both; the floor is
