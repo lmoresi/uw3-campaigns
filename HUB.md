@@ -3265,3 +3265,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   resolution page v5 (B83QxCPeYmX2f9HMjx9W4e), jobs 4137 / 4162. Session labels now in use: K1 = kaiju science (the
   rollback session, session_01HX67HY6xwuJivHKLLXrR3H), K2 = kaiju dev runner, W1 = integration (Fault Models Code
   Unification, session_01HxWvn5rMK67zasgirdXszQ), C2 = this science hub.
+- 2026-11-08: kaiju/split-inset-ladder pushed (K1's 18d5579 -> 5bddd97 on 4f2fbaa; mbox sha256 matched, blob 9243349,
+  py_compile clean): uw_split_inset_along (default 0 keeps the recipe) measures the split's surface setback along the
+  fault instead of as depth (Louis: the split should run to one element from the boundary, as the ladder does).
+  Louis directed K1: (1) a half-base-cell ladder with this option on TAf-v2 refinement 5 from step 0, against the
+  existing ref5 and ref6; (2) a short build A/B, development 80d3ebe9 against f631ce42, on an Earth benchmark restart.
