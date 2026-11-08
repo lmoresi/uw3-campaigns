@@ -3244,3 +3244,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-08: ref6 (TAf-v2) stopped at the base at checkpoint 165 on 7 Nov, fault in the slab (gap 1.46 cells). At the
   base, ref4 / 5 / 6: trench -5.3 / -8.6 / -7.4 deg; slip 2382 / 3975 / 4684; time 1.89 / 2.30 / 2.69e-4. 5 -> 6 moves
   trench and slip 14-18 %, against 60-67 % for 4 -> 5. Resolution page updated (B83QxCPeYmX2f9HMjx9W4e).
+- 2026-11-08 16:10: plate-age pair (4134) mid-run, rendered against the benchmark (render 4143; movie page v19). Double
+  age at step 70 (t 2.7e-4): at t ~2.1e-4 plate 1734 vs benchmark 1249, tip 0.67 vs 0.50. Half age at step 90 (t
+  4.9e-4): ~65-75 % of the benchmark's plate speed, tip 0.94 at 4.1e-4 (benchmark 0.97). Slab shapes alike. Resolution
+  movie ref4 | 5 | 6 with a mesh close-up rendering (4137), for Louis.
