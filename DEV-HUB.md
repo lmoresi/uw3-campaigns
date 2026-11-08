@@ -350,6 +350,24 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
+**Louis's rulings, 2026-11-08:** (1) memory/stationary split for the convergence reference: "Yes";
+(2) VE rotated time-stepping reference decided from the evidence: "Agree"; (3) a deformed wall keeps the near-null
+rotation: "keep - the deformation may not eliminate the null space" (to be documented in #964 and
+rotated-freeslip.md); (4) snapping cut-created wall vertices: "I'm not sure. We can try." (an experiment after #964
+and the convergence work, under the radius item); (5) #735: "Keep an eye on this, hold for now" (hyperion files the
+Waters and King bias as an issue); (6) #800: "Unknown" (revisit at the next bulk review); (7) shear-band-length-scale:
+"Important work, is it captured?" (captured only on its branch: design doc micromorphic-plasticity.md, field-groups
+doc, two reviews; hyperion files a tracking issue; rebase after rotated_bc/custom_mg settle); (8) "Truly dead,
+remove". **Deletion:** the hub's check found its bulk-review list over-called: coarse-solve-nullspace,
+faulted-rebuild-leak, rebuild-efficiency (session scripts and records), restore-head (a unique VE restore test), the
+360-kdtree WIP (a unique test), both sbls-coss refs (not contained in shear-band) and the forward-from-nodes WIP
+(lagged stretch) are NOT dead. Truly dead (no unique content in development's terms): docs/issue-state-on-merge
+(7184379072b8), docs/test-tier-policy (40db1d4c3dff), feature/fac-block-solver-lu (61233c84ba8f, squash-merged as
+#929), test/kaiju-scaling-902-901 (94a5c965da2f), wip/yield-782-759-hyperion-2026-10-20 (0eda3c7006a0),
+bugfix/mem-leak-176-hyperion-2026-10-20-wip (95291ba64d2b, a #176 reproducer), review/bn-mergetest-hyperion-2026-10-20-wip
+(eef11d3d4d26, a merge-test patch). **The cloud proxy refuses ref deletion** (403 on git/refs); not worked around;
+the commands went to Louis.
+
 **Design point for Louis (2026-11-08):** the approved rule loses accuracy in time loops. Stage 1's serial run:
 1825 passed, 2 failed (test_0063 also fails on development; test_0008, the warm-started AdvDiffusionSLCN loop,
 tier A, fails only on the branch: restore drift 5.4e-7 against an 8.7e-8 floor). Cause: in a time step ||F(0)||
