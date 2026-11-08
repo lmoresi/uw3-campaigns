@@ -350,6 +350,16 @@ both: yes, 6 Newton, 2.0 / 0.6 s (every pressure solve 4 iterations); L2 agrees 
 independent of the time-loop ruling. **CI:** #964's shard 4 cancelled at the 70-min cap on a Xeon 8370C runner
 (serial phase 55:38 vs development's 27:50 on an EPYC 7763): runner speed, mostly test_0022. #964 merges
 development in for a fresh run; hyperion puts test_0022 on a sixth shard until #911's floor lands.
+**Rulings applied (2026-11-08):** #964 at 5031aa28 (docs: a deformed wall's rotation kept as a near-null mode, Louis's
+reason quoted; `_project_out_rotation` described as the free-surface driver's helper, global reductions in parallel);
+the memory/stationary split is the convergence branch's default (`_carries_memory()`: DuDt or DFDt; test_0008 passes);
+**the linear floor moved to KSPSetPreSolve as η T/||F_k|| of each solve's own first residual** (a KSP atol was in the
+preconditioned norm on the scalar GMRES route, ~40x under ||F||, stopping Newton's linear solve at iteration 0);
+FGMRES routes measure the true residual so test_0022's table stands; test_0028 gained a nonlinear adv-diff step;
+tier A/B serial running. VE rotated switch `_convergence_reference_rule = "increment" | "stationary"`, kaiju arms
+after the rotated-loop stage. Snapping logged as a queued experiment. #964's CI re-triggered on 5031aa28 (five
+shards; #1008 not yet underneath).
+
 **Louis, 2026-11-08: "The shear band micromorphic / cosserat formulation is really important, do not lose it or
 any examples."** Inventory: the library work (coupled volume fields monolithic with u and p, micromorphic yield
 regularisation, Cosserat shear-layer test; docs micromorphic-plasticity.md and saddle-point-field-groups.md; two
