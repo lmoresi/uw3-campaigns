@@ -237,6 +237,27 @@ Measured here, not inherited.
   fault, a network's included, are one LU on one rank at any rank count; the title and
   its framing may want updating (the notes session sent you the network point).
 
+- **2026-11-08, to the dev hub, approved by Louis: compare the two-level FAC patch with
+  #934's one block in parallel, before any 3-D work (schedule under #895).** Why: #934
+  fixed #925 by gathering the structural patch into one block, one LU on one rank; with no
+  zone keyed it holds every fault's rows, a network's included. The two-level form on
+  `feature/fault-slip-coarse-space` (bounded ASM pieces plus one global slip coarse
+  problem, a column per piece over every fault, factorised redundantly on every rank;
+  design note `fault-slip-coarse-space-2026-10.md`) was held on 2026-11-02 on a serial
+  iteration comparison (79-87 against 67), where one block always wins; its case is
+  parallel time and memory, never measured. #934's own figures: owning rank at 1.6-2.2x
+  the others' memory; a 61k-row block 66 s serial, 63 s at np 8 and 16. The run (2-D,
+  kaiju, development plus the coarse-space branch brought up to date; it is 244 commits
+  behind): fixtures UWTN 2026-022's linear fixture at h_b/S 24 and 48, a two-fault network
+  whose faults land on different ranks, and a `seams="conform"` fault where one can be
+  placed; arms one block (#934), two-level at `fac_block_rows` 2000 and at one rung, and
+  per-rank pieces without the coarse space as the control; np 1, 4, 8, 16; record velocity
+  iterations, velocity-solve wall time, patch set-up and factorisation time, peak memory
+  per rank (max and min), coarse size, and the answer against one block. It feeds Louis's
+  decision on whether the two-level form becomes the default for networks or all faults,
+  and whether 3-D builds on it. If the branch cannot be brought up to date cheaply, say so
+  before the run. (Sent to you directly and refused: cloud-to-cloud needs a trusted device.)
+
 ## Open work
 
 | What | Where | State |
