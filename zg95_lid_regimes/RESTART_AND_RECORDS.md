@@ -143,6 +143,8 @@ F0/F_ref, s/step, s per nonlinear iteration, KSP means), cold retries, and total
 
 ## 5. Measured (kaiju, np 16, 0.5/4 mesh, Ra x3 lines setup, overlay warmonly)
 
+> **Not repeatable as written (2026-11-08, kaiju via the Fault Models Code Unification session).** Driver 460e49d, which wrote the October 3590 faulted-mesh checkpoint used here, fails the library's residual-strength guard (`_require_residual_strength`, present since at least underworld3 60dbf0e4) on every current build; the zg95-scale driver 52aa53a uses `yield_stress_min = -oo` and does not. Today's driver cannot restart that checkpoint either: its defaults for the rung spacing S and the ribbon width no longer fit the checkpoint's faults ("the ribbon's cavity reached the domain wall"). A repeat needs a fresh checkpoint written by the current driver.
+
 These runs started from the laptop's 3580 state. Each test ran 3580→3600 uninterrupted, then
 restarted from its own 3590 checkpoint for 10 steps.
 

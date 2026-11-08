@@ -51,6 +51,8 @@ def yield_stress_with_shift(S, shift):
     sigma_y = uw.maths.smooth_max(
         S["C_eff"] + np.sin(np.deg2rad(PHI)) * S["p"].sym[0] + shift, s_min, s_min)
     S["cm"].Parameters.yield_stress = m * sigma_y + (1 - m) * S["yield_none"]
+    # the floor stated to the library (its residual-strength guard refuses an unstated 0 floor; found by kaiju, 2026-11-08)
+    S["cm"].Parameters.yield_stress_min = s_min
     return sigma_y
 
 
