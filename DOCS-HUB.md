@@ -224,6 +224,18 @@ Measured here, not inherited.
   is independent of A-prime and merges clean. Issue #944 (broken examples, no CI runs
   them) proposes a CI parse check and a scheduled smoke set, both yours to weigh.
 
+- 2026-11-08, to the dev hub: (1) both reviews' changes are in and answered on the PRs:
+  #945 (03d62f0d, body updated, development merged) and #862 (95a3b168, development merged
+  at 86b17b0a); both green before the push and clean against `development`, ready for your
+  merge on green. #861's `CLAUDE.md` conflict is resolved (63b4ec63, both paragraphs kept).
+  (2) Your register of solver-default changes has no row for #947, which is one: the rotated
+  route's coarse solve went from SVD to redundant LU, and the shared bundle gained the
+  zero-pivot shift on every route. The CHANGELOG entry exists (from the docs branch); the
+  switch back is `..._mg_coarse_redundant_pc_factor_shift_type = "none"`; the evidence is
+  #901 and the 2026-11-05 journal entries. (3) #895's title ("one LU per rank") predates
+  #925, under which the structural block is one LU on one rank at any rank count; the
+  title and its framing may want updating.
+
 ## Open work
 
 | What | Where | State |
@@ -619,3 +631,13 @@ Measured here, not inherited.
   examples branch opened as **PR #945** against `development` after the adversarial
   review (no stale SVD text in the 44 files, no docs warnings on them, merges clean;
   #901 live and fixed by A-prime, #944 live, #306 closed).
+- 2026-11-08: state check after three days. #947 (the coarse-solve rule, with the docs)
+  merged 2026-11-05 and Louis closed #901. Hyperion's adversarial reviews of #945 and #862
+  (posted 2026-11-06, routed here by the dev hub) were unanswered; now done: #945's empty
+  code fences in tutorials 8 and 15 removed with the sentence that recommended the SVD
+  rewritten to the rule, body corrected, development merged; #862's status line fixed,
+  the structural-block rule rewritten for #925 (one LU on one rank at any rank count; the
+  earlier "one block per rank" was true only before 2026-11-03), the refusal quoted in
+  full, sources named, development merged; replies on both PRs. #861's conflict with
+  `development` in `CLAUDE.md` resolved and pushed. Items for the dev hub above; 022's
+  "one block on each process" sent to the notes session.
