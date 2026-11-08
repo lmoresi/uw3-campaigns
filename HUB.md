@@ -3270,3 +3270,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault instead of as depth (Louis: the split should run to one element from the boundary, as the ladder does).
   Louis directed K1: (1) a half-base-cell ladder with this option on TAf-v2 refinement 5 from step 0, against the
   existing ref5 and ref6; (2) a short build A/B, development 80d3ebe9 against f631ce42, on an Earth benchmark restart.
+- 2026-11-08: build A/B (job 4212; Earth thin-crust benchmark from checkpoint 100, 10 steps, np 26, driver 4f2fbaa, one
+  per socket): f631ce42 and head 80d3ebe9 converge every step with the same Newton counts (3-9); answers to 4-5 figures
+  (vrms 945.27 vs 945.34 at step 110, slip 3761 vs 3762), matching the benchmark's record; the head ~30 % faster
+  (1436 vs 2036 s over 10 steps), not yet checked with the sockets swapped. Finer-ladder run TAf_v2_ref5_fineladder
+  (4211, 5bddd97) at step 58, ~100 s per step, all converged.
