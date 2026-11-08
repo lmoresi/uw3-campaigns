@@ -3258,4 +3258,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-08: 079effc did not fix plain_notch: notch_model.build evaluates the viscosity (saddle preconditioner) before
   yield_stress_with_shift runs (kaiju dev runner, development 06c574e8, via the integration session). Fixed on main
   e958bec: build sets yield_stress_min = residual_strength * C after the yield stress (positive residual strength
-  only). Dev runner to re-check plain_notch ref 1 on e958bec.
+  only). Dev runner to re-check plain_notch ref 1 on e958bec. VERIFIED: a clean unpatched checkout on the 06c574e8 overlay, plain_notch.py -uw_ref 1
+  -uw_xi 0.03 -uw_linear production_tight at np 1, matches the patched runs exactly (CONVERGED_FNORM_ABS, 5 its, ksp 168,
+  39 s; W_int 3.55, W_out9 4.43; exit 0). The dev runner dropped its throwaway patch. Closed.
