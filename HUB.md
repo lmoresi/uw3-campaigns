@@ -3248,3 +3248,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   age at step 70 (t 2.7e-4): at t ~2.1e-4 plate 1734 vs benchmark 1249, tip 0.67 vs 0.50. Half age at step 90 (t
   4.9e-4): ~65-75 % of the benchmark's plate speed, tip 0.94 at 4.1e-4 (benchmark 0.97). Slab shapes alike. Resolution
   movie ref4 | 5 | 6 with a mesh close-up rendering (4137), for Louis.
+- 2026-11-08: routed for the Fault Models Code Unification session (session_01HxWvn5rMK67zasgirdXszQ; found by kaiju in
+  the #911 convergence A/B): coupled_notch.py (and plain_notch.py) failed the library's residual-strength guard;
+  fixed on main 079effc by stating yield_stress_min = 0.02 C (the floor it already applied). RESTART_AND_RECORDS.md
+  section 5 marked not repeatable as written (driver 460e49d fails the same guard; today's driver cannot restart the
+  October 3590 checkpoint). Kaiju told to use 079effc and a fresh checkpoint.
