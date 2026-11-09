@@ -3284,3 +3284,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   steps; at the base half age / benchmark / double age: time 4.29 / 3.59 / 2.95e-4, trench -6.5 / -7.6 / -8.7 deg, slip
   3111 / 4221 / 5517, vrms 669 / 970 / 1267. Renders now use isotherms, no plastic-strain-rate panel (Louis); the
   render_v2 options come as a tools patch. Pages: movies v20, resolution v11.
+- 2026-11-09: Louis to the hub, relayed to K1 verbatim: "I also think we need more particles in the oceanic
+  surface-tracking layer. It is clear that the fit of the fault to the particles is unstable when the particles get
+  bunched up. And the fault-fit seems to influence the bunching of the particles too." (Existing knobs pointed out:
+  uw_crust_ppc, uw_crust_refill_every.)
