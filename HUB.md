@@ -3279,3 +3279,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   time 2.30 / 2.25 / 2.69e-4; trench -8.6 / -8.3 / -7.4 deg; slip 3975 / 4311 / 4684; plates 2587/-1134, 2693/-1545,
   2283/-2178. Cancelled past the base at step ~320 (4211). Plate-age pair (4134): half age finished 200 steps; double
   age hit the 12 h limit at step 177, restarted from checkpoint 175 (4213).
+- 2026-11-09: Louis: "the finer ladder is a good choice" (-uw_spacing half a base cell + -uw_split_inset_along 1, driver
+  5bddd97; not yet run on the Earth recipe); ledger entry (campaign branch, merged). Plate-age pair complete to 200
+  steps; at the base half age / benchmark / double age: time 4.29 / 3.59 / 2.95e-4, trench -6.5 / -7.6 / -8.7 deg, slip
+  3111 / 4221 / 5517, vrms 669 / 970 / 1267. Renders now use isotherms, no plastic-strain-rate panel (Louis); the
+  render_v2 options come as a tools patch. Pages: movies v20, resolution v11.
