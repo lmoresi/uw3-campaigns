@@ -35,6 +35,10 @@ Quiet ranks: 246–300 MB, LU flops about 1e6.
 ## Reading
 
 - **Memory.** With qmd the patch's memory is small. Splitting it lowers the busy rank's peak by 7–8 % (434 → 399 MB, 557 → 516 MB). The busy/quiet ratio stays at about 1.5–2 in both arms, so the imbalance is the fault region the rank holds, not the LU block.
-- **Time.** The patch's triangular solves are the critical path: on the busy rank, MatSolve time is close to the whole solve time. Splitting the block over the fault ranks cuts the busy rank's LU flops and MatSolve time by 1.8–2×, and the first solve by up to 28 % (most at h_b/S 48: 31.0 → 22.5 s at np 4, 32.2 → 23.1 s at np 8). Iterations and answer are unchanged.
+- **Time.** The patch's triangular solves are the largest single cost. On the busy rank, MatSolve (summed over the first and the repeat solve) is about 55–60 % of the two solves' wall time.
+  - Splitting the block over the fault ranks cuts the busy rank's LU flops and MatSolve time by 1.8–2× at every np.
+  - Wall time follows clearly only at h_b/S 48, where the first solve falls 27 %, 28 % and 19 % at np 4, 8 and 16.
+  - At h_b/S 24 the changes are −18 %, −2 % and +2 %: small or nil past np 4, on shared nodes.
+  - Iterations and answer are unchanged.
 - **Coarse space.** No coarse space was needed for this: the pieces are whole faults, so nothing couples across a piece. The two-level form's case rested on memory and on splitting one fault's block; qmd has removed the first, and the second does not arise while each fault is rank-interior.
 - **Partition differences.** Against np 1 the slip differs by 4e-8 to 2.9e-6 in both arms alike, from the partition at solver tolerance 1e-6. It is not an arm effect.
