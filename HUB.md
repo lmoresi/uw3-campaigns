@@ -3288,3 +3288,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   surface-tracking layer. It is clear that the fit of the fault to the particles is unstable when the particles get
   bunched up. And the fault-fit seems to influence the bunching of the particles too." (Existing knobs pointed out:
   uw_crust_ppc, uw_crust_refill_every.)
+- 2026-11-09 evening: Earth thin-crust benchmark with the finer ladder on build 80d3ebe9 (earth_fineladder, 4221) and
+  the same with 48 crust particles per cell (earth_fineladder_ppc48, 4292; Louis's ruling): both 200 steps, every solve
+  converged. Means around the base, benchmark / 12 per cell / 48 per cell: slip 3899 / 2970 / 2986; overriding plate
+  -1322 / -707 / -789; dip change per step 2.9 / 1.6 / 0.7 deg; dip jumps > 5 deg 19 / 5 / 1. At 48 per cell the split
+  stays on the slab side of T = 0.5 throughout. Movie page v24. Louis plans the next runs.
