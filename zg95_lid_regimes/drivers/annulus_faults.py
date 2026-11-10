@@ -131,6 +131,15 @@ params = uw.Params(
                                 #   jump across the split), not the base mesh's (which carries the slip as a band
                                 #   a cell wide, so particles at the fault drift across it into the hanging wall);
                                 #   the RK2 midpoint step of Swarm.advection, in advect_split. "base": as before
+    uw_fault_lagrange=0,        # 1 (Louis, 2026-11-11: the fault "drifts away from the points that define it"; "worth
+                                #   trying the lagrangian idea - but we likely still need to fit a smooth curve through the
+                                #   points"): a crust-law fault moves with the slab every step: its nodes are carried with
+                                #   the faulted mesh's velocity sampled just on the slab side of the fault, and a smooth
+                                #   curve is put through the moved nodes (place_line: the envelope's local quadratic in
+                                #   depth, its straight stub to the wall, the depth cap). At a detection the particle fit
+                                #   no longer replaces the fault: the fault is pulled uw_fault_lagrange_relax of the way
+                                #   toward it. 0: the fault is the latest fit, as before
+    uw_fault_lagrange_relax=0.2,  # with uw_fault_lagrange: the fraction of the gap to the particle fit closed per detection
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -1068,6 +1077,107 @@ def wquantile(x, w, q):
     o = np.argsort(x)
     c = np.cumsum(w[o])
     return float(np.interp(q * c[-1], c, x[o]))
+
+
+def place_line(zk, xk, inc):
+    """A fault through samples (depth zk ascending, x = arc length at the wall xk), placed as
+    crust_envelope_points places the crust base: a local quadratic in depth (Gaussian 0.015)
+    on a 0.0025 grid from the shallowest sample to the depth cap; above it a straight run to
+    the wall at the top's own slope over 0.03, dipping at least uw_fault_top_dip_min, and a
+    stub to 0.02 above the wall; resampled at the rung spacing. ``inc`` is the side (+1/-1 in
+    x) of the incoming plate. Returns (points, theta, dip, depth) or None."""
+    zk, xk = np.asarray(zk, dtype=float), np.asarray(xk, dtype=float)
+    o = np.argsort(zk)
+    zk, xk = zk[o], xk[o]
+    cap = fault_depth_cap()
+    if len(zk) < 6 or zk[-1] < cap - 0.03:
+        return None
+    zg = np.arange(max(zk[0], 0.0), cap + 1e-9, 0.0025)
+    sm = np.empty(len(zg))
+    for j, z in enumerate(zg):
+        w = np.exp(-0.5 * ((zk - z) / 0.015) ** 2)
+        A = np.c_[np.ones_like(zk), zk - z, (zk - z) ** 2] * np.sqrt(w)[:, None]
+        sm[j] = np.linalg.lstsq(A, xk * np.sqrt(w), rcond=None)[0][0]
+    top = zg <= zg[0] + 0.03
+    slope = np.polyfit(zg[top], sm[top], 1)[0]
+    run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    xa = sm[0] + inc * run_len * zg[0]
+    raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]
+    d = raw[1] - raw[0]
+    pol = np.vstack([raw[0] - d * (0.02 / max(d[1], 1e-12)), raw])
+    radius = r_o - pol[:, 1]
+    poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
+                             S, 2 ** int(params.uw_chain))
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(rp <= r_o))
+    w = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    return poly, theta_t, dip, float((r_o - rp).max())
+
+
+def fault_zx(points, theta_ref):
+    """A fault polyline's points inside the wall as (depth, x = arc length at the wall), x
+    measured continuously about theta_ref; and the incoming plate's side (+1/-1 in x): the
+    fault deepens away from it."""
+    P = np.asarray(points, dtype=float)
+    r = np.hypot(P[:, 0], P[:, 1])
+    P = P[r <= r_o]
+    z = r_o - np.hypot(P[:, 0], P[:, 1])
+    x = r_o * (theta_ref + wrap(np.arctan2(P[:, 1], P[:, 0]) - theta_ref))
+    o = np.argsort(z)
+    z, x = z[o], x[o]
+    inc = -1.0 if x[-1] > x[0] else 1.0
+    return z, x, inc
+
+
+def advect_fault(f, faulted_mesh, dt):
+    """Move a crust-law fault with the slab one step (uw_fault_lagrange): its nodes inside the
+    wall go with the faulted mesh's velocity sampled a quarter base cell to the slab side of
+    the fault (the normal with a downward radial part: the footwall), by an RK2 midpoint step;
+    then place_line puts a smooth curve through them. Every rank holds the same fault, so
+    every rank evaluates the same points. Collective. Updates f in place; returns True if moved."""
+    P = np.asarray(f["points"], dtype=float)
+    P = P[np.hypot(P[:, 0], P[:, 1]) <= r_o]
+    if len(P) < 6:
+        return False
+
+    def slab_side(Q):
+        t = np.gradient(Q, axis=0)
+        t /= np.maximum(np.linalg.norm(t, axis=1), 1e-12)[:, None]
+        n = np.c_[-t[:, 1], t[:, 0]]
+        rh = Q / np.linalg.norm(Q, axis=1)[:, None]
+        n *= np.where((n * rh).sum(axis=1) > 0, -1.0, 1.0)[:, None]
+        return onto(Q + 0.25 * H_B * n)
+
+    v1 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, slab_side(P))).reshape(-1, 2)
+    Pm = P + 0.5 * dt * v1
+    v2 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, slab_side(Pm))).reshape(-1, 2)
+    z, x, inc = fault_zx(P + dt * v2, float(f["theta"]))
+    placed = place_line(z, x, inc)
+    if placed is None:
+        return False
+    poly, theta_t, dip, depth = placed
+    f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth})
+    return True
+
+
+def relax_fault(f, fit_points, alpha):
+    """Pull a Lagrangian fault alpha of the way toward the particle fit, depth by depth, and
+    place a smooth curve through the result. Returns (points, theta, dip, depth) or None."""
+    za, xa, inc = fault_zx(f["points"], float(f["theta"]))
+    zf, xf, _ = fault_zx(fit_points, float(f["theta"]))
+    lo, hi = max(za[0], zf[0]), min(za[-1], zf[-1])
+    if hi - lo < 0.05:
+        return None
+    zg = np.arange(lo, hi + 1e-9, 0.0025)
+    xa_g, xf_g = np.interp(zg, za, xa), np.interp(zg, zf, xf)
+    return place_line(zg, xa_g + alpha * (xf_g - xa_g), inc)
 
 
 def crust_envelope_points(faults):
@@ -2539,7 +2649,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2794,6 +2904,10 @@ for k in range(k0, k0 + params.uw_steps):
                                                     bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
+    # the Lagrangian fault moves with the slab (after the particles, before any detection)
+    if params.uw_fault_lagrange and params.uw_fault_law == "crust" and faults and "points" in faults[0]:
+        if not advect_fault(faults[0], faulted, dt):
+            uw.pprint("  lagrangian fault: the moved nodes do not reach the cap; the fault keeps its place")
     t_swarm = time.perf_counter() - t_phase
     t_phase = time.perf_counter()
     t += dt
@@ -2870,6 +2984,12 @@ for k in range(k0, k0 + params.uw_steps):
             uw.pprint("  crust fault: no slab top reaching the cap from the surface; the fault keeps its place")
         else:
             poly, theta_t, dip, depth, info = found
+            if faults and params.uw_fault_lagrange:
+                relaxed = relax_fault(faults[0], poly, float(params.uw_fault_lagrange_relax))
+                if relaxed is not None:
+                    gap_fit = polyline_gap(poly, faults[0]["points"])
+                    poly, theta_t, dip, depth = relaxed
+                    info = dict(info, lagrange_gap_to_fit=float(gap_fit))
             if faults:
                 f = faults[0]
                 moved = polyline_gap(poly, f["points"])
