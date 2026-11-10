@@ -6,14 +6,11 @@
 - #683 fmg inert on semi-Lagrangian solvers: fixed by #1030, probed, labelled fixed-in-development.
 
 ## A. Custom-P / FAC hierarchy lifecycle (custom_mg.py, solvers' install path)
-Root: the hierarchy and its options-database keys are not owned by the solver or tied to the mesh version.
-- #1017 deform: coarse levels do not move, FAC patch declined
+Root: state an install leaves behind (options-database keys, deferred objects, a patch built on old geometry) outlives a change to the solver or mesh.
 - #1019 gamg after FAC: leftover composite key, error 73
 - #1020 reinstall leaks deferred objects at np > 1
-- #898 remesh leaves dm_hierarchy and coarse wraps on the old mesh
-- #885 last_builder_stats module-global
-- #546 tolerance / FMG config latched into the cached KSP
-One PR: drop FAC keys after set-up on every path, free garbage on reinstall, carry the deform to nested levels, resync on remesh.
+- #1017 deform kills the FAC patch (ruled 2026-11-08); this PR does the kill and its record; the rebuild is the fault-move cycle
+Branch bugfix/custom-mg-hierarchy-lifecycle (W1). Moved out: #898 (remesh() is mmg-only; Louis 2026-11-10: "let the mmg stuff atrophy"), #546 (rotated cache) to C, #885 (builder stats, fault-split review) to E.
 
 ## B. Timestep estimation (estimate_dt in solvers.py, advection_diffusion_eulerian.py, swarm)
 - #891 units model reads dimensional coords as model units (dt 3.4x)
@@ -28,6 +25,7 @@ Separate, needs a benchmark: #1029 theta inert; #1031 setter unwrap (small, coul
 - rigid-rotation gauge: #968, #969, #884
 - cold start / datum: #883, #910, #348
 - partition: #931 (may share #941's cause)
+- #546 rotated workspace cache latches tolerance / FMG config
 - #887 docs behind the code
 Probably two PRs: corners+partition, gauge+datum.
 
@@ -39,7 +37,7 @@ Probably two PRs: corners+partition, gauge+datum.
 One PR: a solve that hits a cap or does not move says so, and the report records it.
 
 ## E. Fault-split MG in parallel (custom_mg, cell-located transfer)
-- #873 empty-rank coarse level, #874 rank-local raises before collectives, #888 CI coverage, #880 hardening, #671 np 3 Galerkin diagonal, #956 ptest_0863-0865 at np 4
+- #873 empty-rank coarse level, #874 rank-local raises before collectives, #888 CI coverage, #880 hardening, #671 np 3 Galerkin diagonal, #956 ptest_0863-0865 at np 4, #885 builder stats module-global / outside_hull cross-partition trigger
 Needs hyperion for np > 1.
 
 ## F. ThinSheet
