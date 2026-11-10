@@ -787,6 +787,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Crust as a line or a layer (2026-11-10):** both line arms ran 200 steps; neither matches the layer over the whole
+  run (movie page v27). Louis's decision, with K1.
+
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3302,3 +3305,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   line dense with particles rather than a layer. We do not really need the thickness"); default "layer" unchanged.
   Louis directed two arms on the Earth recipe (finer ladder, half-cell rebuild, 80d3ebe9) from step 0: line with the
   near-surface weakness (uw_crust_weak 0.001) and line with none (uw_crust_weak 1).
+- 2026-11-10 evening: crust-line arms complete (86ccfa5; Earth, finer ladder, half-cell rebuild, 80d3ebe9; 200 steps, all
+  converged): earth_line_weak (4300) and earth_line_free (4301). The line fits a steeper fault than the layer (40-58 deg
+  early vs 25-30). Weak-skin line: delayed start, then layer-like speeds; after 7e-4 steepens to ~54 deg and slows
+  (plates 337 / -116 at 9e-4). No-weakness line: plate nearly held until 6e-4 while the slab necks, then layer-like
+  speeds by 9e-4. Neither matches the layer over the whole run. Movie page v27. Louis to decide.
