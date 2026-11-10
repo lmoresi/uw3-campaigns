@@ -2312,6 +2312,7 @@ refuses deletions from here, so this needs a laptop or Louis.
 8. A solver's auto-created unknowns owned by the solver rather than the mesh (#1050 N4) [yes: they go with the solver; fields passed in stay the mesh's].
 9. Published-note corrections (UWTN 2026-011, 2026-014) [after H2's rerun and #1044].
 10. Required status checks on development [yes].
+11. #1050 (#1041) contract: a snapshot naming a dropped solver's history refuses to restore on every rank, writing nothing (development wrote into the dead solver the leaking register kept alive); alternative: snapshots hold their solvers strongly [refuse; the model's registries are already weak and TranscriptAdjoint already refuses]. #1050 ready (H1 four rounds; 0 solvers/SNES/KSPs left per dropped solver, about 4.6 MB each on development); merge held for this.
 
 - (Settled 2026-11-02: the add-on is the production tail. Settled 2026-10-31 on: the hub
   merges PRs Louis has ordered, on green CI.)
