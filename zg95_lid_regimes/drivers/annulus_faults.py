@@ -140,6 +140,14 @@ params = uw.Params(
                                 #   no longer replaces the fault: the fault is pulled uw_fault_lagrange_relax of the way
                                 #   toward it. 0: the fault is the latest fit, as before
     uw_fault_lagrange_relax=0.2,  # with uw_fault_lagrange: the fraction of the gap to the particle fit closed per detection
+    uw_fault_lagrange_refit="detect",  # with uw_fault_lagrange: when the particles correct the fault. "detect": at every
+                                #   detection, blended uw_fault_lagrange_relax of the way and not smoothed. "rebuild"
+                                #   (Louis, 2026-11-11: "only refit the particles when we move the fault - to create a
+                                #   reasonable ladder"): the nodes alone move the fault between rebuilds; when the
+                                #   Lagrangian curve has moved a rebuild threshold, the fault is blended
+                                #   uw_fault_lagrange_rebuild_fit of the way to the latest particle fit and smoothed,
+                                #   and the ladder is built on that
+    uw_fault_lagrange_rebuild_fit=1.0,  # with refit "rebuild": the share of the particle fit at a rebuild (1: the fit)
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -448,6 +456,8 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 LINE = str(params.uw_crust_mode) == "line"
 SPLIT_ADVECT = str(params.uw_crust_advect) == "split"
+if str(params.uw_fault_lagrange_refit) not in ("detect", "rebuild"):
+    raise ValueError(f"-uw_fault_lagrange_refit {params.uw_fault_lagrange_refit}: 'detect' or 'rebuild'")
 if str(params.uw_crust_advect) not in ("base", "split") or (SPLIT_ADVECT and SCALED):
     raise ValueError(f"-uw_crust_advect {params.uw_crust_advect}: 'base' or 'split' (split: not in a units run)")
 if str(params.uw_crust_mode) not in ("layer", "line"):
@@ -1184,7 +1194,7 @@ def advect_fault(f, faulted_mesh, dt):
     return True
 
 
-def relax_fault(f, fit_points, alpha):
+def relax_fault(f, fit_points, alpha, smooth=False):
     """Pull a Lagrangian fault alpha of the way toward the particle fit, depth by depth, and
     place a smooth curve through the result. Returns (points, theta, dip, depth) or None."""
     za, xa, inc = fault_zx(f["points"], float(f["theta"]))
@@ -1194,7 +1204,7 @@ def relax_fault(f, fit_points, alpha):
         return None
     zg = np.arange(lo, hi + 1e-9, 0.0025)
     xa_g, xf_g = np.interp(zg, za, xa), np.interp(zg, zf, xf)
-    return place_line(zg, xa_g + alpha * (xf_g - xa_g), inc, smooth=False)   # the fit is already smooth
+    return place_line(zg, xa_g + alpha * (xf_g - xa_g), inc, smooth=smooth)   # the fit is already smooth
 
 
 def crust_envelope_points(faults):
@@ -2666,7 +2676,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2822,6 +2832,15 @@ for k in range(k0, k0 + params.uw_steps):
     mesh_rec = faulted.mesh_record if k == k0 else None
     t_build = t_warm = 0.0
     if needs_rebuild(faults, faulted.faults) or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing):
+        if (params.uw_fault_lagrange and str(params.uw_fault_lagrange_refit) == "rebuild" and faults
+                and "fit_points" in faults[0]):
+            # the Lagrangian curve has moved a threshold: the ladder is built on its blend with the
+            # latest particle fit, smoothed
+            refit = relax_fault(faults[0], faults[0]["fit_points"], float(params.uw_fault_lagrange_rebuild_fit),
+                                smooth=True)
+            if refit is not None:
+                poly_r, theta_r, dip_r, depth_r = refit
+                faults[0].update({"points": poly_r.tolist(), "theta": theta_r, "dip": dip_r, "depth": depth_r})
         previous = faulted
         try:
             faulted = FaultedMesh(faults, f"f{n_built}")
@@ -3002,11 +3021,18 @@ for k in range(k0, k0 + params.uw_steps):
         else:
             poly, theta_t, dip, depth, info = found
             if faults and params.uw_fault_lagrange:
-                relaxed = relax_fault(faults[0], poly, float(params.uw_fault_lagrange_relax))
-                if relaxed is not None:
-                    gap_fit = polyline_gap(poly, faults[0]["points"])
-                    poly, theta_t, dip, depth = relaxed
+                gap_fit = polyline_gap(poly, faults[0]["points"])
+                if str(params.uw_fault_lagrange_refit) == "rebuild":
+                    # keep the fit for the next rebuild; the fault stays where its nodes took it
+                    faults[0]["fit_points"] = poly.tolist()
+                    g = faults[0]
+                    poly, theta_t, dip, depth = np.asarray(g["points"]), g["theta"], g["dip"], g["depth"]
                     info = dict(info, lagrange_gap_to_fit=float(gap_fit))
+                else:
+                    relaxed = relax_fault(faults[0], poly, float(params.uw_fault_lagrange_relax))
+                    if relaxed is not None:
+                        poly, theta_t, dip, depth = relaxed
+                        info = dict(info, lagrange_gap_to_fit=float(gap_fit))
             if faults:
                 f = faults[0]
                 moved = polyline_gap(poly, f["points"])
