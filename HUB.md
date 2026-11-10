@@ -3293,3 +3293,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   converged. Means around the base, benchmark / 12 per cell / 48 per cell: slip 3899 / 2970 / 2986; overriding plate
   -1322 / -707 / -789; dip change per step 2.9 / 1.6 / 0.7 deg; dip jumps > 5 deg 19 / 5 / 1. At 48 per cell the split
   stays on the slab side of T = 0.5 throughout. Movie page v24. Louis plans the next runs.
+- 2026-11-10: rebuild at half a cell (earth_fineladder_ppc48_rb05, 4297; Earth, finer ladder, 48 per cell,
+  -uw_rebuild_cells 0.5, 5bddd97, 80d3ebe9): 200 steps, all converged. 53 rebuilds vs 27; move per rebuild 0.33 vs 0.67
+  base cells; built fault partly in warm mantle at 1 of 40 checkpoints vs 4; rebuild steps 12 % of step time vs 7 %;
+  late-run slip 1407 vs 1499 with half the scatter; base reached 7 % later. Movie page v25.
