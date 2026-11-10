@@ -18,7 +18,7 @@ One PR: drop FAC keys after set-up on every path, free garbage on reinstall, car
 ## B. Timestep estimation (estimate_dt in solvers.py, advection_diffusion_eulerian.py, swarm)
 - #891 units model reads dimensional coords as model units (dt 3.4x)
 - #1025 SLCN diffusion limit shrinks dt as h^2
-- #693 empty-rank reshape; rank-local max_magvel
+- #693 empty-rank reshape; rank-local max_magvel (H1 verifying on development: out of B if fixed)
 - #978 (estimate_dt part) degree-2 midpoints
 - H2's June mismatch lead (#688 rewrite of estimate_dt) belongs here
 Separate, needs a benchmark: #1029 theta inert; #1031 setter unwrap (small, could ride with B).
@@ -32,9 +32,9 @@ Separate, needs a benchmark: #1029 theta inert; #1031 setter unwrap (small, coul
 Probably two PRs: corners+partition, gauge+datum.
 
 ## D. Silent non-convergence and reporting
-- #585, #625 inner KSP caps hit silently
-- #770 warm start reports CONVERGED without moving
-- #778 solve_history misses the Picard stage; #806 introspection lacks the config
+- #585, #625, #755 sub-solve iteration caps. Changing a cap is a solver default: register row and evidence to Louis before any merge
+- #770 warm start reports CONVERGED without moving (H1 verifying; author withdrew the evidence)
+- #778 solve_history misses the Picard stage; #806 introspection lacks the config (H1 verifying)
 - #804 gradient of an unconverged forward solve
 One PR: a solve that hits a cap or does not move says so, and the report records it.
 
@@ -49,6 +49,6 @@ Needs hyperion for np > 1.
 - #844 Stokes without pressureField discards v, #712 positional drop-ins, #742 psi_star[0] differs between families
 
 ## Not bundled (single, or not mine)
-#1012 Stokes bodyforce leak (not deferred-destroy; separate from #1020), #755, #817, #821, #899, #307/#425/#429/#449 (MG prolongation quality, could be bundle H), #622/#629 (performance design).
+#1012 Stokes bodyforce leak (not deferred-destroy; separate from #1020), #817, #821, #899, #307/#425/#429/#449 (MG prolongation quality, could be bundle H), #622/#629 (performance design).
 
-Proposed order for W1: A (already next in queue: #1017, #1019, #1020), then B, then C.
+Agreed with C1 (2026-11-10): A, then B, then C, one PR per bundle, each reviewed by H1 in whole-code context. B and D wait for H1's verification table (#693, #770, #806). Hub triage: TRIAGE-2026-11-10.md, clusters C1, C2, C5.
