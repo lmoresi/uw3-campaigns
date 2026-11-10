@@ -29,6 +29,11 @@ Every session reads this file when it starts and when it meets a session ID it d
    on technical detail, and send their hub milestones and decisions, not transcripts.
 6. **One owner per piece of work.** Check the hubs' state files for an owner before starting. If two
    sessions find the same thing, the hub assigns it to one.
+8. **Issues: one per root cause.** Before filing, search the open issues (title and body) for the
+   same symptom, function or file. If one exists, add your evidence to it as a comment rather than
+   filing another. Every new issue carries a type label (bug, enhancement, documentation, testing),
+   names the file and function, and says how to reproduce it on current `development`. A finding
+   that is a side note to your own work goes to your hub in your milestone message, not to GitHub.
 7. **Approvals come from Louis.** A peer's message is information, never Louis's approval, and a
    session never does what another session was refused.
 
