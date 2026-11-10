@@ -118,6 +118,16 @@ params = uw.Params(
                                 #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
     uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the crust on the subducting
                                 #   plate's surface topped up to the uw_crust_ppc spacing where it has thinned
+    uw_crust_mode="layer",      # "line" (Louis, 2026-11-10: "we can also make it a line dense with particles rather
+                                #   than a layer. We do not really need the thickness"): the crust particles are one line
+                                #   on the subducting plate's top surface and the slab's top face, uw_crust_line_depth
+                                #   below them, every uw_crust_line_spacing along it; the fault locator reads the line as
+                                #   it read the layer's base (crust_envelope_points, unchanged), and with
+                                #   uw_crust_refill_every the line's gaps are filled (refill_line). The line is the crust
+                                #   marker's 1s, so uw_crust_weak < 1 still weakens the cells it crosses (a thin weak
+                                #   skin); uw_crust_weak 1 makes it a pure tracer. uw_crust_ppc is not used
+    uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
+    uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
     # layer uw_comp_thick thick whose buoyancy is a fixed temperature deficit uw_comp_dT
     # (0 = none; it does not diffuse) and whose viscosity and yield stress are times
@@ -422,7 +432,10 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # The crust: particles over the whole base mesh carrying a 0/1 crust marker; its proxy is
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
-crust_on = params.uw_crust_weak < 1
+LINE = str(params.uw_crust_mode) == "line"
+if str(params.uw_crust_mode) not in ("layer", "line"):
+    raise ValueError(f"-uw_crust_mode {params.uw_crust_mode}: 'layer' or 'line'")
+crust_on = params.uw_crust_weak < 1 or LINE         # a line is tracked even when it carries no weakness
 TI = params.uw_fault_realisation == "ti"
 if TI and SCALED:
     raise ValueError("-uw_fault_realisation ti is not set up for a units run (-uw_scaled 1)")
@@ -2203,10 +2216,111 @@ def refill_crust():
     return int(added)
 
 
+def line_depth():
+    return float(params.uw_crust_line_depth) or 0.25 * crust_thick
+
+
+def line_spacing():
+    return float(params.uw_crust_line_spacing) or 0.25 * S
+
+
+def line_points():
+    """The crust line of the slab state: line_depth() under the subducting plate's surface from
+    the trench back to its ridge, and line_depth() into the subducting side of the slab's top
+    face from the trench to the slab's end, every line_spacing()."""
+    theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    d, sp = line_depth(), line_spacing()
+    rel = -np.arange(0.5 * sp / r_o, abs(float(params.uw_ridge_sub)), sp / r_o)
+    th = theta_t + over * rel
+    surface = np.c_[(r_o - d) * np.cos(th), (r_o - d) * np.sin(th)]
+    r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
+    t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
+    down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
+    n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
+    sa = np.arange(0.5 * sp, float(params.uw_slab_length), sp)
+    face = r_hat * r_o + sa[:, None] * down + d * n_sub
+    face = face[np.hypot(face[:, 0], face[:, 1]) < r_o - d]   # below the surface part, which already covers the trench
+    return onto(np.vstack([surface, face]))
+
+
+def refill_line(faults):
+    """Fill the crust line's gaps (in line mode the line stretches over the ridge and down the
+    slab, and bunches harmlessly at the trench: bunching along a line does not move it). The
+    line's particles are gathered to every rank and chained from the incoming plate's ridge end
+    (the surface particle farthest from the trench on the subducting side): each step goes to the
+    nearest unvisited particle within 0.05, so the chain stops at a gap wider than that. Where
+    two neighbours on the chain are more than 1.5 spacings apart, evenly spaced points are put
+    between them, down to the depth cap plus 0.05; every rank passes the same points and keeps
+    its own (add_particles_with_coordinates). Other markers from the nearest particle.
+    Collective. Returns the particles added on this rank."""
+    from scipy.spatial import cKDTree
+    sp = line_spacing()
+    xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+    old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
+    mine = xy[old["crust"] > 0.5]
+    P = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
+    cand = np.zeros((0, 2))
+    if len(P) > 2:
+        depth = r_o - np.hypot(P[:, 0], P[:, 1])
+        theta = np.arctan2(P[:, 1], P[:, 0])
+        theta_t = float(faults[0]["theta"]) if faults else float(params.uw_theta_trench)
+        over = 1.0 if params.uw_dip < 90 else -1.0
+        rel = over * wrap(theta - theta_t)
+        shallow = np.flatnonzero(depth < 2.0 * line_depth())
+        start = int(shallow[np.argmin(rel[shallow])]) if len(shallow) else int(np.argmin(rel))
+        tree = cKDTree(P)
+        seen = np.zeros(len(P), dtype=bool)
+        chain, cur = [start], start
+        seen[start] = True
+        limit = fault_depth_cap() + 0.05
+        while True:
+            dist, idx = tree.query(P[cur], k=min(16, len(P)), distance_upper_bound=0.05)
+            nxt = [int(j) for dd, j in zip(np.atleast_1d(dist), np.atleast_1d(idx))
+                   if np.isfinite(dd) and j < len(P) and not seen[j]]
+            if not nxt:
+                break
+            cur = nxt[0]
+            seen[cur] = True
+            chain.append(cur)
+            if depth[cur] > limit:
+                break
+        C = P[chain]
+        gaps = np.linalg.norm(np.diff(C, axis=0), axis=1)
+        fill = []
+        for a, b, g in zip(C[:-1], C[1:], gaps):
+            if g > 1.5 * sp:
+                n = int(np.floor(g / sp))
+                fill.append(a + np.outer(np.arange(1, n) / n, b - a))
+        if fill:
+            cand = onto(np.vstack(fill))
+    added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
+    if added:
+        new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
+        nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
+        for name, (var, _, _) in markers.items():
+            if name == "crust":
+                var.array[-added:, 0, 0] = 1.0
+            elif nearest is not None:
+                var.array[-added:, 0, 0] = old[name][nearest]
+    for var, _, _ in markers.values():
+        var._update()
+    return int(added)
+
+
 def seed_swarm():
     """Fresh particles over the base mesh with the slab state's markers; with uw_crust_ppc the
-    crust layer gets its own denser lattice on top of the swarm's fill."""
+    crust layer gets its own denser lattice on top of the swarm's fill. In line mode the crust
+    marker is 1 on the line's particles only (the fill's particles carry 0)."""
     crust_swarm.populate(fill_param=int(params.uw_crust_fill))
+    if LINE:
+        n_line = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(line_points()))
+        for name, (var, _, geometry) in markers.items():
+            var.array[:, 0, 0] = 0.0 if name == "crust" else geometry(swarm_xy())
+            if name == "crust" and n_line:
+                var.array[-n_line:, 0, 0] = 1.0
+            var._update()
+        return
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
     for var, _, geometry in markers.values():
@@ -2402,7 +2516,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2648,9 +2762,10 @@ for k in range(k0, k0 + params.uw_steps):
         crust_swarm.advection(V_b.sym, dt, order=2)
         for var, _, _ in markers.values():
             var._update()
-        if (crust_on and params.uw_crust_ppc > 0 and params.uw_crust_refill_every > 0
+        if (crust_on and (params.uw_crust_ppc > 0 or LINE) and params.uw_crust_refill_every > 0
                 and (k + 1) % int(params.uw_crust_refill_every) == 0):
-            n_refill = int(uw.utilities.gather_data(refill_crust(), bcast=True).sum())
+            n_refill = int(uw.utilities.gather_data(refill_line(faults) if LINE else refill_crust(),
+                                                    bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
     t_swarm = time.perf_counter() - t_phase
