@@ -258,6 +258,29 @@ Measured here, not inherited.
   and whether 3-D builds on it. If the branch cannot be brought up to date cheaply, say so
   before the run. (Sent to you directly and refused: cloud-to-cloud needs a trusted device.)
 
+- **2026-11-10, HOLD on moved-refined-mesh claims (#1037, open).** On a mesh built with
+  `refinement >= 1`, `mesh.deform` and every mover write only `mesh.dm`; solvers clone
+  `dm_hierarchy`, whose finest level keeps the pre-move coordinates, so the solve runs on
+  the old geometry with no warning (51 % off on a Poisson probe, 36-71 % on Stokes). Fix:
+  H2's `bugfix/moved-mesh-hierarchy-coords`, stacked on #959. Relayed by the notes session
+  from C1. Do not promote, cite or build on, until H2's check is in:
+  - UWTN 2026-011's `figures/adaptive-convection.gif` (no script; build and refinement
+    unknown; H2 checking a June build);
+  - UWTN 2026-014's "the hierarchy survives it" for any guide or example that relaxes a
+    refined mesh and then solves (`relax()` is one of #1037's movers; the mesh-only figure
+    stands);
+  - **our own docs**: `docs/advanced/multigrid-preconditioning.md`'s "Hierarchy and mesh
+    adaptation" (line 89, the hierarchy survives the movers so FMG keeps working) and its
+    FMG-vs-GAMG benchmark on an MMPDE-deformed refined annulus (line 316,
+    `figures/bench_fmg_vs_gamg_velocity_ksp`), whose solves may have run on the pre-move
+    coordinates; to check: `guides/adaptive-meshing.md` (moving-mesh convection) and the
+    `preconditioner` docstring's "the hierarchy survives the coordinate-deforming
+    adaptation movers".
+  Not exposed: 2026-016 (unrefined box), 2026-022 (from its scripts and the placement
+  code; drivers not read). Any correction to a published note is Louis's. The docs
+  passages get rewritten when H2's PR lands, to describe the fixed code and rerun the
+  benchmark, not before.
+
 ## Open work
 
 | What | Where | State |
