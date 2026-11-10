@@ -54,7 +54,7 @@ Every session reads this file when it starts and when it meets a session ID it d
 | K2 | **dev runner** | `session_01HxWvn9ik2HHt9ANKndJRDr` | kaiju (Slurm) | C1 | library runs at scale: A/B evidence, scaling, leak checks | science runs |
 | K3 | **3-D add-on mesh** | `session_01HxWvn87Vw8gzXsEHJ7iF8u` | kaiju | C1 | 3-D add-on mesh, milestones M0-M4 | |
 
-Reachability: H1 has no remote send_message tool, so messages between H1 and H3/H4 go through C1 (`VIA C1`). Hyperion setup for new sessions: `$HYPERION_WORK/HYPERION-SESSION-SETUP.md` on hyperion (H1's).
+Reachability: H1 has no remote send_message tool. Sessions on hyperion exchange messages through a file mailbox: each reads `$HYPERION_WORK/mail/<code>/` and writes to the recipient's folder, one file per message named `<date>-<from>-<topic>.md`, starting with the header. Milestones to hubs still go by send_message; C1 relays when a session cannot send. Hyperion setup for new sessions: `$HYPERION_WORK/HYPERION-SESSION-SETUP.md` on hyperion (H1's).
 
 Retired (do not message): `session_01HxWvn8uLiybpyPgjwGunRf` (empty fork of K2),
 `session_01HxWvn65HBbkFbSxnYfNuxR`, `session_01HxWvnAXb5n85uEcw711tJC`,
