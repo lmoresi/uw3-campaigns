@@ -280,6 +280,15 @@ Measured here, not inherited.
   code; drivers not read). Any correction to a published note is Louis's. The docs
   passages get rewritten when H2's PR lands, to describe the fixed code and rerun the
   benchmark, not before.
+  **2026-11-10 (later), H2's verdict, relayed by the notes session from C1, not yet on
+  GitHub and not verified here:** on the June build e19893ae the 2026-011 gif is exposed
+  (REFINE 2, MMPDE every step; Stokes correct, the temperature's advection-diffusion
+  assembled on the unmoved mesh); the multigrid benchmark's Stokes solves used the moved
+  mesh, so its iteration comparison stands as a solver claim, but the temperature driving
+  it carries the error; 2026-014's figure stands and its relax() sentence needs
+  correcting after the fix. That Stokes and advection-diffusion saw different geometries
+  is not what #1037's text predicts for every solver; holds stay until the verdict and
+  the fix are on GitHub.
 
 ## Open work
 
