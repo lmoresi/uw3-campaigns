@@ -194,6 +194,7 @@ this table. A row is **provisional** until the evidence named in it is in.
 "There are something like 235 issues live at the moment ... mostly because the different sessions are busy raising. I am worried that we are not getting these under control. The hub needs to (arrange a) sweep to consolidate, label, fix these quickly but ... correctly in the context of the whole code."
 - **Count (development a6eebb61):** 254 open; 80 fixed-in-development (closed at release by policy); 174 live, 111 unlabelled; 243 opened under Louis's account by sessions.
 - **Step 1, triage (done):** `issue-sweep/TRIAGE-2026-11-10.md`: 18 clusters; 8 high + 9 medium probably fixed but unlabelled; 4 fixed in open PRs (#989 by #1003, #682 by #800, #531 by #1024, #1005 by #988); #611 claimed fixed but live; #770 not a defect; #734 label in doubt; 22 duplicate groups; 22 decisions for Louis; 12 stale.
+- **H1 steps 2-3 (a6eebb61):** #611 FIXED (labelled; the np 4 deselect in scripts/test.sh can go: to W1's next bundle); #734 FIXED (label correct); #770 NOT A DEFECT, **closed not planned by the hub**. Steps 1 and 4 running.
 - **Step 2, verification (H1, dispatched):** probes on development, evidence on each issue, fixed-in-development labels; no closing until Louis rules on close-at-merge.
 - **Step 3, bundles to single owners (proposed to Louis):** see the triage summary's top clusters.
 - **Inflow:** SESSIONS.md rule 8 (one issue per root cause; search first; side findings to the hub); sent to W1, H1, H2, K2, K3.
