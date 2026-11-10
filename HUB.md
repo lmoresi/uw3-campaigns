@@ -787,9 +787,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Crust as a line or a layer (2026-11-10):** both line arms ran 200 steps; neither matches the layer over the whole
-  run (movie page v27). Louis's decision, with K1.
-
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3310,3 +3307,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   early vs 25-30). Weak-skin line: delayed start, then layer-like speeds; after 7e-4 steepens to ~54 deg and slows
   (plates 337 / -116 at 9e-4). No-weakness line: plate nearly held until 6e-4 while the slab necks, then layer-like
   speeds by 9e-4. Neither matches the layer over the whole run. Movie page v27. Louis to decide.
+- 2026-11-10: kaiju/crust-split-advect pushed (K1's 32f2b75 -> 88e9f0e on 86ccfa5; mbox sha256 matched, blob 6a294d0,
+  py_compile clean): -uw_crust_advect split moves the particles with the faulted mesh's velocity (with the jump across
+  the split) instead of the base mesh's; default "base" unchanged. Why: renders showed crust drifting across the fault
+  into the hanging wall (the layer piles a weak wedge there; the line ends on the hanging-wall side). Louis directed two
+  arms on the Earth recipe (finer ladder, half-cell rebuild, 48 per cell, 80d3ebe9) from step 0: a quarter-cell crust
+  layer (uw_crust_thick 0.0039) with uw_crust_weak 0.5 and 0.2, both with split advection.
