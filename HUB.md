@@ -3329,3 +3329,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Follow-up pushed on kaiju/lagrangian-fault (K1's b9ca087 -> 3be610b; mbox sha256 matched, blob 376bf58, py_compile
   clean): no re-smoothing of the nodes each step; the curve moves with the normal velocity averaged across the fault;
   the particle-fit path unchanged. Louis approved the rerun as earth_thin_w05_lag2.
+- 2026-11-11: second follow-up pushed on kaiju/lagrangian-fault (K1's f71c6c5 -> f545d9f on 3be610b; mbox sha256 matched,
+  blob ea40a66, py_compile clean): -uw_fault_lagrange_refit rebuild with -uw_fault_lagrange_rebuild_fit, refitting to
+  the particles only when the ladder is rebuilt (Louis: "only refit the particles when we move the fault - to create a
+  reasonable ladder. We can try different recipes."); default "detect" unchanged. earth_thin_w05_lag2 (3be610b, 4313,
+  running) holds a steady ~5 deg steeper than the particle fit. Next arm: earth_thin_w05_lag3 (refit rebuild, fit 1).
