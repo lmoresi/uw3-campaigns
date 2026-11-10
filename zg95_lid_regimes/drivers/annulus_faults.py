@@ -126,6 +126,11 @@ params = uw.Params(
                                 #   uw_crust_refill_every the line's gaps are filled (refill_line). The line is the crust
                                 #   marker's 1s, so uw_crust_weak < 1 still weakens the cells it crosses (a thin weak
                                 #   skin); uw_crust_weak 1 makes it a pure tracer. uw_crust_ppc is not used
+    uw_crust_advect="base",     # "split" (Louis, 2026-11-10: "we advect with the proper (split) velocity"): the
+                                #   particles are moved with the faulted mesh's own velocity (the solver's, with the
+                                #   jump across the split), not the base mesh's (which carries the slip as a band
+                                #   a cell wide, so particles at the fault drift across it into the hanging wall);
+                                #   the RK2 midpoint step of Swarm.advection, in advect_split. "base": as before
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -433,6 +438,9 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 LINE = str(params.uw_crust_mode) == "line"
+SPLIT_ADVECT = str(params.uw_crust_advect) == "split"
+if str(params.uw_crust_advect) not in ("base", "split") or (SPLIT_ADVECT and SCALED):
+    raise ValueError(f"-uw_crust_advect {params.uw_crust_advect}: 'base' or 'split' (split: not in a units run)")
 if str(params.uw_crust_mode) not in ("layer", "line"):
     raise ValueError(f"-uw_crust_mode {params.uw_crust_mode}: 'layer' or 'line'")
 crust_on = params.uw_crust_weak < 1 or LINE         # a line is tracked even when it carries no weakness
@@ -2308,6 +2316,21 @@ def refill_line(faults):
     return int(added)
 
 
+def advect_split(faulted_mesh, dt):
+    """Move the particles one step with the faulted mesh's velocity: the RK2 midpoint step of
+    Swarm.advection (global evaluations, so a particle anywhere is sampled on the rank owning
+    its point of the faulted mesh, which is partitioned unlike the base), with positions kept in
+    the annulus. Swarm.advection itself cannot take the faulted mesh's velocity: its time-step
+    estimate evaluates the velocity locally on the swarm's (base) partition. A point in a band
+    cell takes the velocity of its own side of the split. Collective."""
+    x0 = np.array(crust_swarm._particle_coordinates.data, dtype=float).reshape(-1, 2)
+    v1 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, onto(x0))).reshape(-1, 2)
+    xm = onto(x0 + 0.5 * dt * v1)
+    v2 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, xm)).reshape(-1, 2)
+    crust_swarm._particle_coordinates.data[...] = onto(x0 + dt * v2)
+    crust_swarm.migrate(delete_lost_points=True)
+
+
 def seed_swarm():
     """Fresh particles over the base mesh with the slab state's markers; with uw_crust_ppc the
     crust layer gets its own denser lattice on top of the swarm's fill. In line mode the crust
@@ -2516,7 +2539,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2759,7 +2782,10 @@ for k in range(k0, k0 + params.uw_steps):
     t_energy_strain = time.perf_counter() - t_phase
     t_phase = time.perf_counter()
     if swarm_on:
-        crust_swarm.advection(V_b.sym, dt, order=2)
+        if SPLIT_ADVECT:
+            advect_split(faulted, dt)
+        else:
+            crust_swarm.advection(V_b.sym, dt, order=2)
         for var, _, _ in markers.values():
             var._update()
         if (crust_on and (params.uw_crust_ppc > 0 or LINE) and params.uw_crust_refill_every > 0
