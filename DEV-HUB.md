@@ -189,6 +189,16 @@ this table. A row is **provisional** until the evidence named in it is in.
 | 7 | Rotated pressure sub-solve | rtol as development | rtol 1e-2 (`feature/rotated-pressure-rtol-default`) | to confirm | test_0022 only: composes with the floor, 2.0 / 0.6 s against 6.6 / 2.1 s | **proposed; Louis 2026-11-08: "agree, separate PR"** (W1, with fixtures beyond test_0022) |
 | 8 | FAC patch LU ordering | PETSc default (nd); fill follows the band's row numbering | qmd, set beside the shift key in `_configure_pcmg` and on the rotated path's live blocks | to confirm | K2 job 4192: 25-58x less fill at every rank count, MatSolve 3.5-6x faster, solves 2.3-4x faster, identical iterations, slip within 1e-8; test_1090 asserts the ordering | **PR #1022** (W1). K2: 2-D LU flops 4.08e8 vs nd 2.35e10; 3-D split sheet, one 87666-row block: 5.8x fewer flops, solve 445 vs 1736 s, half the peak memory, same iterations, slip to 1e-15. H1: ready (lows and K2's user-key override fixed). **Louis 2026-11-08: "1022 can merge"; merged on green** |
 
+## ISSUE SWEEP (Louis, 2026-11-10)
+
+"There are something like 235 issues live at the moment ... mostly because the different sessions are busy raising. I am worried that we are not getting these under control. The hub needs to (arrange a) sweep to consolidate, label, fix these quickly but ... correctly in the context of the whole code."
+- **Count (development a6eebb61):** 254 open; 80 fixed-in-development (closed at release by policy); 174 live, 111 unlabelled; 243 opened under Louis's account by sessions.
+- **Step 1, triage (done):** `issue-sweep/TRIAGE-2026-11-10.md`: 18 clusters; 8 high + 9 medium probably fixed but unlabelled; 4 fixed in open PRs (#989 by #1003, #682 by #800, #531 by #1024, #1005 by #988); #611 claimed fixed but live; #770 not a defect; #734 label in doubt; 22 duplicate groups; 22 decisions for Louis; 12 stale.
+- **Step 2, verification (H1, dispatched):** probes on development, evidence on each issue, fixed-in-development labels; no closing until Louis rules on close-at-merge.
+- **Step 3, bundles to single owners (proposed to Louis):** see the triage summary's top clusters.
+- **Inflow:** SESSIONS.md rule 8 (one issue per root cause; search first; side findings to the hub); sent to W1, H1, H2, K2, K3.
+- **Put to Louis:** close at merge instead of release (keep the label); owners for the bundles (units, ThinSheet, adjoint, transport have none).
+
 ## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
 
 Louis, 2026-11-06: "We also should do bulk reviews where we can check which PRs overlap, which
