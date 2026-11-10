@@ -1079,13 +1079,16 @@ def wquantile(x, w, q):
     return float(np.interp(q * c[-1], c, x[o]))
 
 
-def place_line(zk, xk, inc):
+def place_line(zk, xk, inc, smooth=True):
     """A fault through samples (depth zk ascending, x = arc length at the wall xk), placed as
     crust_envelope_points places the crust base: a local quadratic in depth (Gaussian 0.015)
     on a 0.0025 grid from the shallowest sample to the depth cap; above it a straight run to
     the wall at the top's own slope over 0.03, dipping at least uw_fault_top_dip_min, and a
     stub to 0.02 above the wall; resampled at the rung spacing. ``inc`` is the side (+1/-1 in
-    x) of the incoming plate. Returns (points, theta, dip, depth) or None."""
+    x) of the incoming plate. With smooth=False the samples are interpolated, not smoothed:
+    the Lagrangian fault's own nodes (repeating the local quadratic on its own output steepened
+    a stored fault by 1.4-3.3 deg over 45 repeats, with no motion). Returns (points, theta,
+    dip, depth) or None."""
     zk, xk = np.asarray(zk, dtype=float), np.asarray(xk, dtype=float)
     o = np.argsort(zk)
     zk, xk = zk[o], xk[o]
@@ -1093,11 +1096,14 @@ def place_line(zk, xk, inc):
     if len(zk) < 6 or zk[-1] < cap - 0.03:
         return None
     zg = np.arange(max(zk[0], 0.0), cap + 1e-9, 0.0025)
-    sm = np.empty(len(zg))
-    for j, z in enumerate(zg):
-        w = np.exp(-0.5 * ((zk - z) / 0.015) ** 2)
-        A = np.c_[np.ones_like(zk), zk - z, (zk - z) ** 2] * np.sqrt(w)[:, None]
-        sm[j] = np.linalg.lstsq(A, xk * np.sqrt(w), rcond=None)[0][0]
+    if smooth:
+        sm = np.empty(len(zg))
+        for j, z in enumerate(zg):
+            w = np.exp(-0.5 * ((zk - z) / 0.015) ** 2)
+            A = np.c_[np.ones_like(zk), zk - z, (zk - z) ** 2] * np.sqrt(w)[:, None]
+            sm[j] = np.linalg.lstsq(A, xk * np.sqrt(w), rcond=None)[0][0]
+    else:
+        sm = np.interp(zg, zk, xk)
     top = zg <= zg[0] + 0.03
     slope = np.polyfit(zg[top], sm[top], 1)[0]
     run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
@@ -1137,29 +1143,40 @@ def fault_zx(points, theta_ref):
 
 
 def advect_fault(f, faulted_mesh, dt):
-    """Move a crust-law fault with the slab one step (uw_fault_lagrange): its nodes inside the
-    wall go with the faulted mesh's velocity sampled a quarter base cell to the slab side of
-    the fault (the normal with a downward radial part: the footwall), by an RK2 midpoint step;
-    then place_line puts a smooth curve through them. Every rank holds the same fault, so
-    every rank evaluates the same points. Collective. Updates f in place; returns True if moved."""
+    """Move a crust-law fault with the slab one step (uw_fault_lagrange). The fault is a
+    material interface with no opening, so the velocity component normal to it is the same on
+    both sides; that component moves the curve, sampled a quarter base cell to each side and
+    averaged. The component along it only slides the nodes along the curve (taken on the slab
+    side, the normal with a downward radial part, so the nodes go down with the slab). An RK2
+    midpoint step; then place_line re-spaces the nodes, cuts them at the cap and re-attaches the
+    top to the wall, without smoothing (smoothness comes from the particle fit the fault is
+    relaxed toward; repeated smoothing steepened it). (91c5a75 moved the
+    nodes with the velocity a quarter cell inside the slab: in the bending hinge the slab's
+    interior rotates relative to its top, which carried the fault into the slab each step;
+    earth_thin_w05_lag, 2026-11-11.) Every rank holds the same fault, so every rank evaluates
+    the same points. Collective. Updates f in place; returns True if moved."""
     P = np.asarray(f["points"], dtype=float)
     P = P[np.hypot(P[:, 0], P[:, 1]) <= r_o]
     if len(P) < 6:
         return False
+    eps = 0.25 * H_B
 
-    def slab_side(Q):
+    def velocity(Q):
         t = np.gradient(Q, axis=0)
         t /= np.maximum(np.linalg.norm(t, axis=1), 1e-12)[:, None]
         n = np.c_[-t[:, 1], t[:, 0]]
         rh = Q / np.linalg.norm(Q, axis=1)[:, None]
-        n *= np.where((n * rh).sum(axis=1) > 0, -1.0, 1.0)[:, None]
-        return onto(Q + 0.25 * H_B * n)
+        n *= np.where((n * rh).sum(axis=1) > 0, -1.0, 1.0)[:, None]      # n points into the slab
+        both = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, onto(np.vstack([Q + eps * n, Q - eps * n]))))
+        v_slab, v_hang = both.reshape(-1, 2)[:len(Q)], both.reshape(-1, 2)[len(Q):]
+        vn = 0.5 * ((v_slab * n).sum(axis=1) + (v_hang * n).sum(axis=1))
+        vt = (v_slab * t).sum(axis=1)
+        return vn[:, None] * n + vt[:, None] * t
 
-    v1 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, slab_side(P))).reshape(-1, 2)
-    Pm = P + 0.5 * dt * v1
-    v2 = np.asarray(uw.function.global_evaluate(faulted_mesh.v.sym, slab_side(Pm))).reshape(-1, 2)
+    v1 = velocity(P)
+    v2 = velocity(P + 0.5 * dt * v1)
     z, x, inc = fault_zx(P + dt * v2, float(f["theta"]))
-    placed = place_line(z, x, inc)
+    placed = place_line(z, x, inc, smooth=False)        # the nodes' own curve: no re-smoothing each step
     if placed is None:
         return False
     poly, theta_t, dip, depth = placed
@@ -1177,7 +1194,7 @@ def relax_fault(f, fit_points, alpha):
         return None
     zg = np.arange(lo, hi + 1e-9, 0.0025)
     xa_g, xf_g = np.interp(zg, za, xa), np.interp(zg, zf, xf)
-    return place_line(zg, xa_g + alpha * (xf_g - xa_g), inc)
+    return place_line(zg, xa_g + alpha * (xf_g - xa_g), inc, smooth=False)   # the fit is already smooth
 
 
 def crust_envelope_points(faults):
