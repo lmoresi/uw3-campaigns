@@ -787,6 +787,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
+- **Lagrangian fault (2026-11-11):** K1's next candidate (fault nodes moved with the slab instead of re-fitted); pending
+  Louis, with K1.
+
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3313,3 +3316,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   into the hanging wall (the layer piles a weak wedge there; the line ends on the hanging-wall side). Louis directed two
   arms on the Earth recipe (finer ladder, half-cell rebuild, 48 per cell, 80d3ebe9) from step 0: a quarter-cell crust
   layer (uw_crust_thick 0.0039) with uw_crust_weak 0.5 and 0.2, both with split advection.
+- 2026-11-11: thin-crust arms complete (88e9f0e; 200 steps each, all converged): earth_thin_w05 / earth_thin_w02 (4308 /
+  4307; crust 0.0039, weakness x0.5 / x0.2, split advection). Split advection removes the weak wedge (the crust stays on
+  the slab side along the split). Fault dip ~29 deg to 5e-4; subduction and rollback faster than the old x0.001 layer.
+  After 6e-4 the faults steepen to 42-44 deg and the trench stops at about -11 deg. The fit still jumps (1.0 deg dip
+  change per step vs 0.6); rebuild steps 22-34 % of step time vs 12 %. Next candidate: a Lagrangian fault (nodes moved
+  with the slab), pending Louis. Movie page v31.
