@@ -289,6 +289,19 @@ Measured here, not inherited.
   correcting after the fix. That Stokes and advection-diffusion saw different geometries
   is not what #1037's text predicts for every solver; holds stay until the verdict and
   the fix are on GitHub.
+  **2026-11-10 (revised): H2 withdrew the June verdict.** The fix is PR #1044 (open,
+  `bugfix/moved-mesh-hierarchy-coords`, `test_1172`), checked here: on a refined mesh a
+  *scalar* solve after a move (deform, any mover, `relax()`) assembled on the pre-move
+  coordinates (Poisson 51 % off, default PC and FMG alike); "Stokes was already right",
+  and so are SLCN and SUPG. H2's 26 % SLCN error on the June build came from an older,
+  since-fixed `_deform_mesh` defect, so the 2026-011 gif is unsettled either way: hold
+  until H2 reruns the June case on current code (H2's 2e-6 and 26 % are not on GitHub).
+  Our multigrid benchmark is Stokes plus advection-diffusion, so its answer is not shown
+  wrong; its FMG iteration counts sit on a moved refined hierarchy whose coarse levels
+  #1044 deliberately leaves unmoved, so leave that passage alone and do not cite the
+  iteration curve as a moving-mesh result until someone confirms it. 2026-014's relax()
+  sentence stays in scope for Poisson-type solves (#1044's test relaxes a refined annulus
+  and solves FMG Poisson). Rewrites wait for #1044's merge.
 
 ## Open work
 
