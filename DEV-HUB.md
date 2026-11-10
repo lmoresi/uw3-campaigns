@@ -197,6 +197,8 @@ this table. A row is **provisional** until the evidence named in it is in.
 - **Step 2, verification (H1, dispatched):** probes on development, evidence on each issue, fixed-in-development labels; no closing until Louis rules on close-at-merge.
 - **Step 3, bundles to single owners (proposed to Louis):** see the triage summary's top clusters.
 - **Inflow:** SESSIONS.md rule 8 (one issue per root cause; search first; side findings to the hub); sent to W1, H1, H2, K2, K3.
+- **W1's own sweep (Louis to W1: "...tying issues together and solving them in coherent bundles. I would usually do this by forcing a sweep before starting off on a hackathon!"):** `issue-sweep/W1-BUNDLES.md` (185c5f0): A hierarchy lifecycle (#1019, #1020, #1017; branch bugfix/custom-mg-hierarchy-lifecycle), B timestep estimation, C rotated free slip (corners/partition; gauge/datum; docs), D silent non-convergence (caps #585/#625/#755 are defaults: Louis with evidence), E fault-split MG in parallel, F ThinSheet, G solver API traps. Order A, B, C. #683 fixed by #1030.
+- **mmg ruling (Louis to W1, 2026-11-10):** "No ! No mmg" ... "Let's let the mmg stuff atrophy. We have lots of non-mmg remeshing available. It is unreliable and hard to install mmg and not universal." #898 (remesh() through mmg) closed as not planned by W1.
 - **Put to Louis:** close at merge instead of release (keep the label); owners for the bundles (units, ThinSheet, adjoint, transport have none).
 
 ## BULK REVIEW 1 (2026-11-06, development eddab707; `tools/bulk_review.py`)
