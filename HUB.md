@@ -3324,3 +3324,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   step, with a smooth curve placed through them; at a detection the fault is pulled uw_fault_lagrange_relax (0.2) of the
   way toward the particle fit instead of replaced; default 0 unchanged. Louis approved one arm: earth_thin_w05's line
   plus -uw_fault_lagrange 1, from step 0, against earth_thin_w05.
+- 2026-11-11: earth_thin_w05_lag (4311, 91c5a75) cancelled at step ~45: the Lagrangian fault drifted 6-8 deg steeper than
+  the particle fit and the slab pinched out (Louis); cause, repeated smoothing of the fault's own nodes (~twice a step).
+  Follow-up pushed on kaiju/lagrangian-fault (K1's b9ca087 -> 3be610b; mbox sha256 matched, blob 376bf58, py_compile
+  clean): no re-smoothing of the nodes each step; the curve moves with the normal velocity averaged across the fault;
+  the particle-fit path unchanged. Louis approved the rerun as earth_thin_w05_lag2.
