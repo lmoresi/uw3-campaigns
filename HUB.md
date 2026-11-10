@@ -3297,3 +3297,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   -uw_rebuild_cells 0.5, 5bddd97, 80d3ebe9): 200 steps, all converged. 53 rebuilds vs 27; move per rebuild 0.33 vs 0.67
   base cells; built fault partly in warm mantle at 1 of 40 checkpoints vs 4; rebuild steps 12 % of step time vs 7 %;
   late-run slip 1407 vs 1499 with half the scatter; base reached 7 % later. Movie page v25.
+- 2026-11-10: kaiju/crust-line pushed (K1's f1ed273 -> 86ccfa5 on 5bddd97; mbox sha256 matched, blob 7ffb99e, py_compile
+  clean): -uw_crust_mode line, the crust as one dense line of particles the locator reads (Louis: "we can also make it a
+  line dense with particles rather than a layer. We do not really need the thickness"); default "layer" unchanged.
+  Louis directed two arms on the Earth recipe (finer ladder, half-cell rebuild, 80d3ebe9) from step 0: line with the
+  near-surface weakness (uw_crust_weak 0.001) and line with none (uw_crust_weak 1).
