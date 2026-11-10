@@ -787,9 +787,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 
 ## Waiting on Louis
 
-- **Lagrangian fault (2026-11-11):** K1's next candidate (fault nodes moved with the slab instead of re-fitted); pending
-  Louis, with K1.
-
 - **Hyperion's second reimage (2026-11-04: "the OS was installed on the wrong disk"):** identify the failing drive by
   health, not name, before the installer touches a disk. Serials: nvme0 S65XNF0R608481 (today: root, nvme0n1p4, holds
   ALL the data), nvme1 S65XNE0R602587 (nvme1n1p4 1.5T, formatted 2026-11-02, empty). October's record calls the
@@ -3322,3 +3319,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   After 6e-4 the faults steepen to 42-44 deg and the trench stops at about -11 deg. The fit still jumps (1.0 deg dip
   change per step vs 0.6); rebuild steps 22-34 % of step time vs 12 %. Next candidate: a Lagrangian fault (nodes moved
   with the slab), pending Louis. Movie page v31.
+- 2026-11-11: kaiju/lagrangian-fault pushed (K1's c493e8f -> 91c5a75 on 88e9f0e; mbox sha256 matched, blob ece5eca,
+  py_compile clean): -uw_fault_lagrange 1 moves the crust-law fault's nodes with the slab-side split velocity every
+  step, with a smooth curve placed through them; at a detection the fault is pulled uw_fault_lagrange_relax (0.2) of the
+  way toward the particle fit instead of replaced; default 0 unchanged. Louis approved one arm: earth_thin_w05's line
+  plus -uw_fault_lagrange 1, from step 0, against earth_thin_w05.
