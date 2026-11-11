@@ -3361,3 +3361,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   placing the fault X-km above that line while allowing the crust to deform as it pleases"; "we can think of that crust
   layer as 'the oceanic crust plus accumulated sediments'". Run: earth_thin_w05_lag3_ref (the recipe + ref depth
   0.015625, one base cell), alongside earth_thin_w05_lag3_top (4322).
+- 2026-11-11: kaiju/fault-damage-zone pushed (K1's 169daae -> 7fd93ac on f3c364a; mbox sha256 matched, blob fd27a60,
+  py_compile clean): -uw_damage, a damage field of its own made by fault slip in a zone on the hanging-wall side,
+  carried and healing, weakening viscosity and yield stress; default 0 unchanged. Louis: a damage zone in the upper
+  plate as in Sandiford & Moresi, separate from the tracked crust; the crust should reach the mantle on the slab top;
+  fluid over-pressure on the megathrust (Wada & Wang 2009). Two experiments approved: A earth_ref_dmg (4324, the
+  existing uw_fault_damage, from f3c364a, running); B earth_ref_dmgzone (7fd93ac: fault from the reference line, crust
+  passive at weak 0.999, uw_damage 0.25 with weak 0.2, two base cells wide, hanging-wall side).
