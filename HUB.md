@@ -3399,3 +3399,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   c405e07 as stated, py_compile clean): -uw_fault_band_weak f with -uw_fault_band_depth D weakens the fault band's cells
   above D (outside the bridge) by f, no weaker than the zone floor if one is set; default 1 unchanged. Louis: "weaken
   the upper part of the ladder".
+- 2026-11-11: earth_top_band launched (4378): band x0.1 above depth 0.05, floor 100, no hanging-wall zone; from K1's local
+  efce945 (same driver blob c405e07 as the pushed 05a260c); the README quotes both.
