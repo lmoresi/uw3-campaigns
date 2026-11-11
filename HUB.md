@@ -3354,3 +3354,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   along the fault sits on the hanging-wall side. Louis: "It's clear that the crust should be on the slab side. The
   question is only whether the presence of a slightly-weak crust obducted onto the over-riding plate is needed to create
   the fault geometry"; he chose this option. Run: earth_thin_w05_lag3_top (the recipe + -uw_fault_crust_side top).
+- 2026-11-11: kaiju/fault-ref-line pushed (K1's f507394 -> f3c364a on e4337fd; mbox sha256 matched, blob 9e8a5a0,
+  py_compile clean): -uw_fault_ref_depth X seeds a separately tagged reference line X below the plate surface; the
+  locator fits that line moved X up along its normal, so the crust deforms freely and no longer places the fault;
+  default 0 unchanged. Louis: "a secondary line (of separately tagged particles) that is X-km below the surface and
+  placing the fault X-km above that line while allowing the crust to deform as it pleases"; "we can think of that crust
+  layer as 'the oceanic crust plus accumulated sediments'". Run: earth_thin_w05_lag3_ref (the recipe + ref depth
+  0.015625, one base cell), alongside earth_thin_w05_lag3_top (4322).
