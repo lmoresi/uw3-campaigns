@@ -3393,3 +3393,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Louis's decision it runs from K1's local c0db29f, which carries the same driver blob 51d3e26 as the pushed 16bad51; the
   README quotes both. Process note: while github.com is refused on kaiju, "launch from a pushed commit" is met by blob
   identity, not by fetching.
+- 2026-11-11: earth_top_floor (4377) at checkpoint 10 (t 1e-4): converging, each solve ~30 % slower; dip 49 deg, plates
+  183 / -275, close to the cold-zone run; crust on the slab side at 0.07 cells. Close-ups on movie page v38.
