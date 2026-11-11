@@ -3408,3 +3408,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   blob dfafd2a as stated, py_compile clean): -uw_fault_band_side hanging weakens only the ladder's hanging-wall half;
   -uw_fault_band_depth 0 now means the whole band; default "both" unchanged. Louis wants the ladder's hanging-wall half
   weakened, not its shallow part ("the true hanging-wall which is the upper half of the ladder").
+- 2026-11-11: job array 4382: earth_top_hw_f30 / f10 / f3 / f1, the ladder's hanging-wall half weakened x0.001 to floors
+  30 / 10 / 3 / 1, from 6c350cf (= 120ad1d). earth_top_band and earth_top_band_f30 / f10 / f3 (4378, 4379) cancelled:
+  they weakened both sides, not what Louis meant (READMEs record it). Louis: hanging wall first, then the two-sided weak
+  ladder to see whether the crust survives.
