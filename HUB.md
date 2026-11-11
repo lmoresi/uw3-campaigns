@@ -3368,3 +3368,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fluid over-pressure on the megathrust (Wada & Wang 2009). Two experiments approved: A earth_ref_dmg (4324, the
   existing uw_fault_damage, from f3c364a, running); B earth_ref_dmgzone (7fd93ac: fault from the reference line, crust
   passive at weak 0.999, uw_damage 0.25 with weak 0.2, two base cells wide, hanging-wall side).
+- 2026-11-11: experiments A and B (4324, 4325) CANCELLED: the reference line let the fault drift off the slab top, and the
+  damage was far too weak to act. kaiju/fault-ref-line (f3c364a) and kaiju/fault-damage-zone (7fd93ac) kept as records,
+  unmerged. kaiju/fault-zone-weak pushed (K1's ad552c5 -> 999a3f8 on e4337fd; mbox sha256 matched, blob aa40ee5,
+  py_compile clean): -uw_fault_zone_weak f multiplies viscosity and yield stress by f in cells within two base cells of
+  the built fault on its hanging-wall side, rebuilt with the fault; default 1 unchanged. Louis: "instantaneous damage
+  that results from the presence of the fault rather than some complicated formulation with additional parameters".
+  Run: earth_top_zone02 = the recipe + -uw_fault_crust_side top + -uw_crust_weak 0.999 (crust passive) +
+  -uw_fault_zone_weak 0.2.
