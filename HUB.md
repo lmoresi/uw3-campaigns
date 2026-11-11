@@ -3404,3 +3404,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-11: Louis: "moving that floor down until something happens". Job array 4379: earth_top_band_f30 / f10 / f3
   (upper ladder x0.001, floor 30 / 10 / 3, from efce945 = 05a260c); earth_top_band (floor 100, 4378) continues.
   earth_top_zone02 (4375) and earth_top_floor (4377) cancelled, having answered their questions (READMEs say why).
+- 2026-11-11: kaiju/fault-band-hanging pushed (K1's 6c350cf -> 120ad1d on 05a260c; fault-band-hanging.mbox sha256 matched,
+  blob dfafd2a as stated, py_compile clean): -uw_fault_band_side hanging weakens only the ladder's hanging-wall half;
+  -uw_fault_band_depth 0 now means the whole band; default "both" unchanged. Louis wants the ladder's hanging-wall half
+  weakened, not its shallow part ("the true hanging-wall which is the upper half of the ladder").
