@@ -3491,3 +3491,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_recipe_movie launched (job 4417): crust_ppc 96, checkpoint every step (~105 MB), 800 steps, 72 h; every step
   from initiation to the first plume, plus mesh and fault movies. Asked K1 to confirm quota for ~84 GB.
 - 2026-11-13: quota confirmed (K1): no user quota; /home 9.4 TB free of 11 TB, so ~85 GB plus renders fits.
+- 2026-11-13: earth_recipe_movie (4417) past step 30. Test clips for steps 0-29 on movie page v55 (#recipe-movie), two
+  styles: "nice" (talks) and "mesh" (solver mesh, split, next fit); white backgrounds (Louis's standing rule); frames
+  rendered only from checkpoints (kaiju launch/movies/movie_frames.py).
