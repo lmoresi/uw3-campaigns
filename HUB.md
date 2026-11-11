@@ -3447,3 +3447,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-12: 4391 at t 1e-4 (w05 / passive vs lag3): dip 36-37 vs 39 deg; subducting plate 237-238 vs 230; slip 678-704
   vs 733. Crust x0.5 adds only ~4 % slip over passive. Oceanic-crust line entirely on the slab side. Renders on movie
   page v48.
+- 2026-11-12: 4391 at t 2.5e-4: spline arms trail lag3. Passive: plates 342/-283 vs lag3 1137/-1052; slip 769 vs 2531.
+  The spline fault turns near-vertical below 0.05, following the crust as the slab hangs. Movie page v49.
