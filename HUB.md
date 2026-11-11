@@ -3334,3 +3334,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the particles only when the ladder is rebuilt (Louis: "only refit the particles when we move the fault - to create a
   reasonable ladder. We can try different recipes."); default "detect" unchanged. earth_thin_w05_lag2 (3be610b, 4313,
   running) holds a steady ~5 deg steeper than the particle fit. Next arm: earth_thin_w05_lag3 (refit rebuild, fit 1).
+- 2026-11-11: Lagrangian recipes complete, 200 steps each, all converged (Earth thin x0.5, split advection): fitted /
+  lag2 (3be610b, pulled 0.2 to the fit each detection) / lag3 (f545d9f, refit at rebuild). lag3 matches the fitted run
+  within a few percent throughout (4e-4: plates 1955 / -1247 vs 1980 / -1303, trench -8.0 deg both), including the late
+  steepening to ~43 deg, so that steepening is in the model, not a fitting artefact. Rebuilds 54 vs 68, moves 0.42 vs
+  0.29 cells, rebuild steps 27 % of step time vs 34 %. lag2 holds ~39 deg and subducts at about half the speed. Movie
+  page v34; complete renders to follow.
