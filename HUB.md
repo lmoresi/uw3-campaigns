@@ -3484,3 +3484,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   lowering lag3's top-dip floor to 10 deg helps by 6-13 %. Side finding for the dev hub (send refused: dev hub needs a trusted device; Louis to relay; not filed):
   earth_sb_lag_fix had two failed placements, kept its previous mesh: after step 81 place_thin_volume ribbon area
   mismatch against CAD; after step 107 "fault_split: the fault touches the domain boundary". No other run had either.
+- 2026-11-13: RECIPE RULED (Louis: "we'll settle on this as the best recipe"): lag3's line with -uw_fault_fit spline
+  -uw_spline_side base -uw_fault_lagrange 0 -uw_rebuild_cells 0 -uw_crust_weak 0.999 -uw_ocrust_depth 0.006 (base
+  spline rebuilt every step, passive crust, oceanic-crust tracer), driver d358b97 = 31c7e08. Ledger 847a41d on
+  zg95-annulus-for-kaiju; kaiju/fault-spline-base merged there (7328115, blob a85fca4). Publication movie
+  earth_recipe_movie launched (job 4417): crust_ppc 96, checkpoint every step (~105 MB), 800 steps, 72 h; every step
+  from initiation to the first plume, plus mesh and fault movies. Asked K1 to confirm quota for ~84 GB.
