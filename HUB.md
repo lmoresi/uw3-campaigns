@@ -3490,3 +3490,4 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   zg95-annulus-for-kaiju; kaiju/fault-spline-base merged there (7328115, blob a85fca4). Publication movie
   earth_recipe_movie launched (job 4417): crust_ppc 96, checkpoint every step (~105 MB), 800 steps, 72 h; every step
   from initiation to the first plume, plus mesh and fault movies. Asked K1 to confirm quota for ~84 GB.
+- 2026-11-13: quota confirmed (K1): no user quota; /home 9.4 TB free of 11 TB, so ~85 GB plus renders fits.
