@@ -3449,3 +3449,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   page v48.
 - 2026-11-12: 4391 at t 2.5e-4: spline arms trail lag3. Passive: plates 342/-283 vs lag3 1137/-1052; slip 769 vs 2531.
   The spline fault turns near-vertical below 0.05, following the crust as the slab hangs. Movie page v49.
+- 2026-11-12: kaiju/fault-spline-base pushed on 777d432 (K1's 127b220 -> 6f5f0d1, driver blob 08bba03; mbox sha256
+  matched, py_compile clean): -uw_spline_side base (second pass takes the layer's base, 10 % quantile toward the plate
+  interior) and, with spline + Lagrangian rebuild_fit 1, a rebuild builds the ladder on the spline as it is (no x(depth)
+  refit, no straight top). Defaults unchanged. Louis: "Lag3 but with a thin, weak upper layer that we follow the base,
+  and a line representing the oceanic crust just below that." Gates K1's overnight fault-fit-variant campaign.
