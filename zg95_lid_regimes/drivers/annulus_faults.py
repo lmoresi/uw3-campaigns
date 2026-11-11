@@ -255,6 +255,12 @@ params = uw.Params(
                                 #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
                                 #   point to the wall; the unfloored dip is recorded
+    uw_fault_top_dip_fix=0.0,   # > 0: the fault's top prescribed at this dip (deg) down to uw_fault_top_fix_depth, blended
+                                #   into the curve's own slope over the next 0.02, in the envelope fit and the Lagrangian
+                                #   fault's line alike (Louis, 2026-11-12: "if we prescribed a near-surface dip of 30
+                                #   degrees, would the fault fitted to the crust-top actually match the lag3 case");
+                                #   uw_fault_top_dip_min is then unused. 0: none
+    uw_fault_top_fix_depth=0.03,  # the depth (layer depths) over which uw_fault_top_dip_fix holds
     uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
                                 #   depths) from the particle trench
     uw_fault_realisation="split",  # "split": the fault cut and split, a frictionless contact; "ti": the band painted
@@ -1113,6 +1119,20 @@ def crust_fault_points(faults):
     return poly, theta_t, dip, float((r_o - radius).max())
 
 
+def fixed_top(zg, sm, inc):
+    """uw_fault_top_dip_fix: a fault curve x(depth) on the grid zg (ascending) with its top at the prescribed dip down to
+    uw_fault_top_fix_depth, its own slope below that depth plus 0.02 and a linear blend between, integrated up from the
+    deepest point so the curve below the blend is unchanged; and the run to the wall at the prescribed dip. ``inc`` is
+    the incoming plate's side: going up the fault moves toward it."""
+    zf = float(params.uw_fault_top_fix_depth)
+    s_fix = -inc / np.tan(np.radians(float(params.uw_fault_top_dip_fix)))
+    w = np.clip((zg - zf) / 0.02, 0.0, 1.0)
+    sl = w * np.gradient(sm, zg) + (1 - w) * s_fix
+    seg = 0.5 * (sl[1:] + sl[:-1]) * np.diff(zg)
+    out = sm[-1] - np.r_[np.cumsum(seg[::-1])[::-1], 0.0]
+    return out, float(-s_fix * inc)
+
+
 def wquantile(x, w, q):
     """The q-quantile of x with weights w."""
     o = np.argsort(x)
@@ -1148,6 +1168,8 @@ def place_line(zk, xk, inc, smooth=True):
     top = zg <= zg[0] + 0.03
     slope = np.polyfit(zg[top], sm[top], 1)[0]
     run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    if params.uw_fault_top_dip_fix > 0:
+        sm, run_len = fixed_top(zg, sm, inc)
     xa = sm[0] + inc * run_len * zg[0]
     raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]
     d = raw[1] - raw[0]
@@ -1325,6 +1347,8 @@ def crust_envelope_points(faults):
     slope = np.polyfit(zg[top], sm[top], 1)[0]       # dx/dz; going up the base moves toward inc
     top_dip = float(np.degrees(np.arctan2(1.0, max(-slope * inc, 1e-12))))
     run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    if params.uw_fault_top_dip_fix > 0:
+        sm, run_len = fixed_top(zg, sm, inc)
     xa = sm[0] + inc * run_len * zg[0]
     gap = abs(xa - xt)
     if gap > params.uw_fault_trench_tol:
@@ -2771,7 +2795,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
