@@ -154,6 +154,14 @@ params = uw.Params(
                                 #   or its "top" (the 10th percentile toward the overriding plate: the crust lies under the
                                 #   fault, in the subducting plate; Louis, 2026-11-11: "It's clear that the crust should be
                                 #   on the slab side")
+    uw_fault_ref_depth=0.0,     # > 0 (Louis, 2026-11-11: "a secondary line (of separately tagged particles) that is X-km
+                                #   below the surface and placing the fault X-km above that line while allowing the crust to
+                                #   deform as it pleases"): a reference line of its own particles, this far below the
+                                #   subducting plate's surface and into the slab's top face, carried with the flow (its gaps
+                                #   filled every uw_crust_refill_every steps); the envelope locator fits that line moved this
+                                #   far up along its own normal, not the crust. The crust keeps its weakness but no longer
+                                #   places the fault. 0: the crust places the fault, as before
+    uw_fault_ref_spacing=0.0,   # the reference line's particle spacing; 0: a quarter of the rung spacing S
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -496,6 +504,11 @@ for name, on, geometry in (("crust", crust_on, lambda xy: layer_marker(xy, crust
                          uw.discretisation.MeshVariable(name, base, 1, degree=1), geometry)
 if crust_on:
     crust_var, crust_b = markers["crust"][:2]
+# the reference line (uw_fault_ref_depth): its own tag on the same swarm, not one of the rheology markers
+REF = float(params.uw_fault_ref_depth) > 0
+ref_var = uw.swarm.SwarmVariable("ref", crust_swarm, 1, proxy_location="cells", proxy_degree=1) if (REF and swarm_on) else None
+if REF and (LINE or not crust_on or params.uw_fault_fit != "envelope" or params.uw_fault_law != "crust"):
+    raise ValueError("-uw_fault_ref_depth needs the crust law with the envelope fit, a crust, and the layer crust mode")
 if comp_on:
     slab_var, slab_b = markers["slab"][:2]
 
@@ -1236,9 +1249,12 @@ def crust_envelope_points(faults):
     cap = fault_depth_cap()
     ct = crust_thick
     xy = np.asarray(swarm_xy(), dtype=float)
-    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
-    keep = marker > 0.5
-    P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
+    if REF:
+        P = ref_surface()
+    else:
+        marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+        keep = marker > 0.5
+        P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
     depth = r_o - np.hypot(P[:, 0], P[:, 1])
     theta = np.arctan2(P[:, 1], P[:, 0])
     if faults:
@@ -2050,14 +2066,15 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
         mesh_vars.append(picture)
     if swarm_on:
         crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
-                                   swarmVars=[m[0] for m in markers.values()], outputPath=out)
+                                   swarmVars=[m[0] for m in markers.values()] + ([ref_var] if REF else []),
+                                   outputPath=out)
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
     solver_files = write_solver_fields(faulted, step)
     # everything a restart from here reads: it refuses to start if any is missing
     needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
     if swarm_on:
         needed += [f"annulus.crust_swarm.{step:05d}.h5"] + [f"annulus.crust_swarm.{name}.{step:05d}.h5"
-                                                          for name in markers]
+                                                          for name in list(markers) + (["ref"] if REF else [])]
     with uw.selective_ranks(0) as selected:
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
@@ -2365,8 +2382,12 @@ def refill_crust():
                 var.array[-added:, 0, 0] = 1.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
+        if REF:
+            ref_var.array[-added:, 0, 0] = 0.0
     for var, _, _ in markers.values():
         var._update()
+    if REF:
+        ref_var._update()
     return int(added)
 
 
@@ -2378,13 +2399,44 @@ def line_spacing():
     return float(params.uw_crust_line_spacing) or 0.25 * S
 
 
-def line_points():
-    """The crust line of the slab state: line_depth() under the subducting plate's surface from
-    the trench back to its ridge, and line_depth() into the subducting side of the slab's top
-    face from the trench to the slab's end, every line_spacing()."""
+def ref_depth():
+    return float(params.uw_fault_ref_depth)
+
+
+def ref_spacing():
+    return float(params.uw_fault_ref_spacing) or 0.25 * S
+
+
+def ref_surface():
+    """The reference line moved ref_depth() up along its own normal: the subducting plate's
+    surface as the reference line places it, for the envelope locator. The normal at each
+    particle is the line's from its 8 nearest neighbours (the principal direction), turned
+    upward (outward radial part). Gathered to every rank. Collective."""
+    from scipy.spatial import cKDTree
+    xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+    mine = xy[np.asarray(ref_var.array[:, 0, 0]).ravel() > 0.5]
+    P = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
+    if len(P) < 9:
+        return P
+    _, nb = cKDTree(P).query(P, k=9)
+    Q = P[nb] - P[nb].mean(axis=1, keepdims=True)
+    cov = np.einsum("nki,nkj->nij", Q, Q)
+    t = np.linalg.eigh(cov)[1][:, :, -1]                          # the principal direction: along the line
+    n = np.c_[-t[:, 1], t[:, 0]]
+    rh = P / np.linalg.norm(P, axis=1)[:, None]
+    n *= np.where((n * rh).sum(axis=1) < 0, -1.0, 1.0)[:, None]   # upward
+    return P + ref_depth() * n
+
+
+def line_points(d=None, sp=None):
+    """A line of the slab state: ``d`` (line_depth()) under the subducting plate's surface from
+    the trench back to its ridge, and ``d`` into the subducting side of the slab's top face
+    from the trench to the slab's end, every ``sp`` (line_spacing()): the crust line, or with
+    other arguments the reference line."""
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
-    d, sp = line_depth(), line_spacing()
+    d = line_depth() if d is None else d
+    sp = line_spacing() if sp is None else sp
     rel = -np.arange(0.5 * sp / r_o, abs(float(params.uw_ridge_sub)), sp / r_o)
     th = theta_t + over * rel
     surface = np.c_[(r_o - d) * np.cos(th), (r_o - d) * np.sin(th)]
@@ -2398,8 +2450,8 @@ def line_points():
     return onto(np.vstack([surface, face]))
 
 
-def refill_line(faults):
-    """Fill the crust line's gaps (in line mode the line stretches over the ridge and down the
+def refill_line(faults, tag="crust"):
+    """Fill the crust line's gaps (tag "crust") or the reference line's (tag "ref") (in line mode the line stretches over the ridge and down the
     slab, and bunches harmlessly at the trench: bunching along a line does not move it). The
     line's particles are gathered to every rank and chained from the incoming plate's ridge end
     (the surface particle farthest from the trench on the subducting side): each step goes to the
@@ -2409,10 +2461,10 @@ def refill_line(faults):
     its own (add_particles_with_coordinates). Other markers from the nearest particle.
     Collective. Returns the particles added on this rank."""
     from scipy.spatial import cKDTree
-    sp = line_spacing()
+    sp, d_line = (ref_spacing(), ref_depth()) if tag == "ref" else (line_spacing(), line_depth())
     xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
     old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
-    mine = xy[old["crust"] > 0.5]
+    mine = xy[(np.asarray(ref_var.array[:, 0, 0]).ravel() if tag == "ref" else old["crust"]) > 0.5]
     P = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
     cand = np.zeros((0, 2))
     if len(P) > 2:
@@ -2421,7 +2473,7 @@ def refill_line(faults):
         theta_t = float(faults[0]["theta"]) if faults else float(params.uw_theta_trench)
         over = 1.0 if params.uw_dip < 90 else -1.0
         rel = over * wrap(theta - theta_t)
-        shallow = np.flatnonzero(depth < 2.0 * line_depth())
+        shallow = np.flatnonzero(depth < 2.0 * d_line)
         start = int(shallow[np.argmin(rel[shallow])]) if len(shallow) else int(np.argmin(rel))
         tree = cKDTree(P)
         seen = np.zeros(len(P), dtype=bool)
@@ -2454,11 +2506,15 @@ def refill_line(faults):
         nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
         for name, (var, _, _) in markers.items():
             if name == "crust":
-                var.array[-added:, 0, 0] = 1.0
+                var.array[-added:, 0, 0] = 0.0 if tag == "ref" else 1.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
+        if REF:
+            ref_var.array[-added:, 0, 0] = 1.0 if tag == "ref" else 0.0
     for var, _, _ in markers.values():
         var._update()
+    if REF:
+        ref_var._update()
     return int(added)
 
 
@@ -2492,9 +2548,16 @@ def seed_swarm():
         return
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
+    n_ref = crust_swarm.add_particles_with_coordinates(
+        np.ascontiguousarray(line_points(ref_depth(), ref_spacing()))) if REF else 0
     for var, _, geometry in markers.values():
         var.array[:, 0, 0] = geometry(swarm_xy())
         var._update()
+    if REF:
+        ref_var.array[:, 0, 0] = 0.0
+        if n_ref:
+            ref_var.array[-n_ref:, 0, 0] = 1.0
+        ref_var._update()
 
 
 def restore_swarm(path, index):
@@ -2505,6 +2568,12 @@ def restore_swarm(path, index):
         seed_swarm()
         return
     crust_swarm.read_timestep("annulus", "crust_swarm", index, outputPath=path)
+    if REF:
+        if os.path.exists(os.path.join(path, f"annulus.crust_swarm.ref.{index:05d}.h5")):
+            ref_var.read_timestep("annulus", "crust_swarm", "ref", index, outputPath=path)
+        else:
+            raise RuntimeError("-uw_fault_ref_depth: the checkpoint carries no reference line (start from step 0)")
+        ref_var._update()
     for name, (var, _, geometry) in markers.items():
         if os.path.exists(os.path.join(path, f"annulus.crust_swarm.{name}.{index:05d}.h5")):
             var.read_timestep("annulus", "crust_swarm", name, index, outputPath=path)
@@ -2685,7 +2754,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_ref_depth", "uw_fault_ref_spacing", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2949,6 +3018,10 @@ for k in range(k0, k0 + params.uw_steps):
                                                     bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
+        if REF and params.uw_crust_refill_every > 0 and (k + 1) % int(params.uw_crust_refill_every) == 0:
+            n_ref = int(uw.utilities.gather_data(refill_line(faults, tag="ref"), bcast=True).sum())
+            if n_ref:
+                events.append(f"reference line refill: {n_ref} particles")
     # the Lagrangian fault moves with the slab (after the particles, before any detection)
     if params.uw_fault_lagrange and params.uw_fault_law == "crust" and faults and "points" in faults[0]:
         if not advect_fault(faults[0], faulted, dt):
