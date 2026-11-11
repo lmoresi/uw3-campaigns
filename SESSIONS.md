@@ -50,7 +50,7 @@ Every session reads this file when it starts and when it meets a session ID it d
 | H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | |
 | H3 | **units** | `session_01HxWvn7YfEseX8cKRcgzW9Z` | hyperion, 6 cores | C1 | units: the dimensional / non-dimensional boundary (issue-sweep cluster C6, #763, #765) | |
 | H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, 6 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4) | |
-| H5 | **restart** | `session_01HxWvn6CL6S3R1ELzJHJEay` | hyperion, 8 cores | C1 | parallel checkpoint reload of refined meshes and FMG hierarchy restart (#690); then uw.visualisation for higher-order fields (#1057) | |
+| H5 | **restart** | `session_01HxWvn6CL6S3R1ELzJHJEay` | hyperion, 8 cores | C1 | parallel checkpoint reload of refined meshes and FMG hierarchy restart (#690); then uw.visualisation for higher-order fields (#1057), then the per-step diagnostics log (#1060) | |
 | K1 | **science** | `session_01HX67HY6xwuJivHKLLXrR3H` | kaiju (Slurm) | C2 | science campaigns (zg95), renders; owns the campaign drivers | library runs |
 | K2 | **dev runner** | `session_01HxWvn9ik2HHt9ANKndJRDr` | kaiju (Slurm) | C1 | library runs at scale: A/B evidence, scaling, leak checks | science runs |
 | K3 | **3-D add-on mesh** | `session_01HxWvn87Vw8gzXsEHJ7iF8u` | kaiju | C1 | 3-D add-on mesh, milestones M0-M4 | |
