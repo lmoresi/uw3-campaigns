@@ -3395,3 +3395,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   identity, not by fetching.
 - 2026-11-11: earth_top_floor (4377) at checkpoint 10 (t 1e-4): converging, each solve ~30 % slower; dip 49 deg, plates
   183 / -275, close to the cold-zone run; crust on the slab side at 0.07 cells. Close-ups on movie page v38.
+- 2026-11-11: kaiju/fault-band-weak pushed (K1's efce945 -> 05a260c on 16bad51; fault-band-weak.mbox sha256 matched, blob
+  c405e07 as stated, py_compile clean): -uw_fault_band_weak f with -uw_fault_band_depth D weakens the fault band's cells
+  above D (outside the bridge) by f, no weaker than the zone floor if one is set; default 1 unchanged. Louis: "weaken
+  the upper part of the ladder".
