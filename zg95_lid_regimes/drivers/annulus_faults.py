@@ -173,7 +173,10 @@ params = uw.Params(
                                 #   uw_fault_zone_floor > 0 no weaker than that floor (the zone's rule). Otherwise the band
                                 #   has the host's own rheology (uw_fault_precedence 1 only turns the crust and zone off
                                 #   there), as strong as the plate around it. 1: none
-    uw_fault_band_depth=0.05,   # the depth (layer depths) above which uw_fault_band_weak acts
+    uw_fault_band_depth=0.05,   # the depth (layer depths) above which uw_fault_band_weak acts; 0: the whole band
+    uw_fault_band_side="both",  # which of the band's halves uw_fault_band_weak weakens: "both", or "hanging", the half on
+                                #   the fault's hanging-wall (overriding-plate) side (Louis, 2026-11-11: "the true
+                                #   hanging-wall which is the upper half of the ladder")
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -1424,6 +1427,26 @@ def ti_band_viscosity(s, faulted, footprint, tag):
             "tau_y": tau_y, "on_yield": 1 - at_floor - at_host, "at_floor": at_floor, "at_host": at_host}
 
 
+def fault_side(points, pieces, r_o):
+    """The distance of each point from the nearest built fault line (its spine inside the wall) and its side of it:
+    > 0 on the overriding (hanging-wall) side, the side the segment normal with an outward radial part points to."""
+    best, side = np.full(len(points), np.inf), np.zeros(len(points))
+    for name, (spine, trace) in pieces.items():
+        sp = spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o + 1e-12]
+        for a, b in zip(sp[:-1], sp[1:]):
+            ab = b - a
+            L2 = max(ab @ ab, 1e-30)
+            t = np.clip(((points - a) @ ab) / L2, 0.0, 1.0)
+            q = a + t[:, None] * ab
+            d = np.linalg.norm(points - q, axis=1)
+            n = np.array([-ab[1], ab[0]]) / np.sqrt(L2)
+            if n @ (0.5 * (a + b)) < 0:
+                n = -n
+            upd = d < best
+            best[upd], side[upd] = d[upd], (points[upd] - q[upd]) @ n
+    return best, side
+
+
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
     solver, the bridge zones and the P1 fields the renders read."""
@@ -1491,11 +1514,19 @@ class FaultedMesh:
             near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
-        # the upper ladder (uw_fault_band_weak): band cells outside the bridge above uw_fault_band_depth
+        # the weakened ladder (uw_fault_band_weak): band cells outside the bridge above uw_fault_band_depth (0: all),
+        # on both sides of the fault or (uw_fault_band_side "hanging") on its hanging-wall side
         self.band_upper = None
         if params.uw_fault_band_weak < 1 and self.faults:
+            if params.uw_fault_band_side not in ("both", "hanging"):
+                raise ValueError(f"uw_fault_band_side must be both or hanging, not {params.uw_fault_band_side!r}")
+            sel = band & ~bridge
+            if params.uw_fault_band_depth > 0:
+                sel &= r_o - radius < params.uw_fault_band_depth
+            if params.uw_fault_band_side == "hanging":
+                sel &= fault_side(centroids, self.pieces, r_o)[1] >= 0
             self.band_upper = uw.discretisation.MeshVariable(f"bandup_{tag}", mesh, 1, degree=0, continuous=False)
-            self.band_upper.array[:, 0, 0] = (band & ~bridge & (r_o - radius < params.uw_fault_band_depth)).astype(float)
+            self.band_upper.array[:, 0, 0] = sel.astype(float)
         # the fault's band (uw_fault_precedence): every band cell, the zone included, where the
         # fault's own rheology alone applies
         self.band_mask = None
@@ -1508,22 +1539,8 @@ class FaultedMesh:
         if params.uw_fault_zone_weak < 1 and self.pieces:
             width = float(params.uw_fault_zone_width) or 2.0 * H_B
             hang = np.zeros(len(centroids), dtype=bool)
-            for name, (spine, trace) in self.pieces.items():
-                sp = spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o + 1e-12]
-                if len(sp) < 2:
-                    continue
-                best, side = np.full(len(centroids), np.inf), np.zeros(len(centroids))
-                for a, b in zip(sp[:-1], sp[1:]):
-                    ab = b - a
-                    L2 = max(ab @ ab, 1e-30)
-                    t = np.clip(((centroids - a) @ ab) / L2, 0.0, 1.0)
-                    q = a + t[:, None] * ab
-                    d = np.linalg.norm(centroids - q, axis=1)
-                    n = np.array([-ab[1], ab[0]]) / np.sqrt(L2)
-                    if n @ (0.5 * (a + b)) < 0:
-                        n = -n
-                    upd = d < best
-                    best[upd], side[upd] = d[upd], (centroids[upd] - q[upd]) @ n
+            for name, piece in self.pieces.items():
+                best, side = fault_side(centroids, {name: piece}, r_o)
                 hang |= (best < width) & (side >= 0)
             self.fault_zone = uw.discretisation.MeshVariable(f"fzone_{tag}", mesh, 1, degree=0, continuous=False)
             self.fault_zone.array[:, 0, 0] = hang.astype(float)
@@ -2754,7 +2771,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
