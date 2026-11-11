@@ -3444,3 +3444,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   starting crust reaches only 0.142; delay accepted, no code change. Relaunched as array 4391 (same two runs, first try
   kept as *_try1) with lag3's isotropic bridge instead of -uw_bridge_ti 1 (Louis: "TI or weak patch is probably not so
   important"). Driver still 78ba3c4 = 777d432.
+- 2026-11-12: 4391 at t 1e-4 (w05 / passive vs lag3): dip 36-37 vs 39 deg; subducting plate 237-238 vs 230; slip 678-704
+  vs 733. Crust x0.5 adds only ~4 % slip over passive. Oceanic-crust line entirely on the slab side. Renders on movie
+  page v48.
