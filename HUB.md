@@ -3340,3 +3340,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   steepening to ~43 deg, so that steepening is in the model, not a fitting artefact. Rebuilds 54 vs 68, moves 0.42 vs
   0.29 cells, rebuild steps 27 % of step time vs 34 %. lag2 holds ~39 deg and subducts at about half the speed. Movie
   page v34; complete renders to follow.
+- 2026-11-11: **EARTH RECIPE RULED (Louis): earth_thin_w05_lag3.** "fitted and lag3 are very similar, but lag3 feels more
+  physically constrained, less external free parameters that the fitted case. It seems to be the best-recipe so far and I
+  am inclined to call this at the current state. For the purposes of demonstration, this looks well suited at every view
+  ... I see no major improvements in the pipeline." Driver f545d9f (kaiju/lagrangian-fault) merged into the campaign
+  branch (8902de5; driver blob ea40a66 identical; all new options default off, so other runs are unchanged); ledger
+  entry with the full flag set (fbbb886); both merged to main. Recipe flags: thin crust 0.00390625, weak 0.5, ppc 48,
+  refill every 5, split advection; spacing 0.0078125, split_inset_along 1, cap 0.15, rebuild_cells 0.5; fault_lagrange 1,
+  refit rebuild, rebuild_fit 1; underworld3 80d3ebe9. Driver defaults unchanged: the recipe is the launch line.
