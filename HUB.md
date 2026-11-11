@@ -3421,3 +3421,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   stalled like crust top, dip 73-86 deg at t 1.1e-3 (late renders, movie page v42). Louis: "I think the wedge that forms
   from having a near-surface weak layer is important, actually." K1's proposal to Louis: lag3 unchanged, its weak layer
   read as the sediments, plus a passive oceanic-crust tracer layer beneath it on the slab side.
+- 2026-11-12: Louis: is lag3 mechanical or geometric ("if we prescribed a near-surface dip of 30 degrees, would the fault
+  fitted to the crust-top actually match the lag3 case. Is lag3 mechanical or just a curve-sketching difference"). Arm A,
+  lag3 with a passive crust (earth_lag3_passive, 4387), running on lag3's own driver f545d9f. kaiju/fault-top-dip-fix
+  pushed (K1's a0da6d4 -> 6fabce3 on 120ad1d; fault-top-dip-fix.mbox sha256 matched, blob f1abfe2 as stated,
+  py_compile clean): -uw_fault_top_dip_fix a prescribes the fault's top at dip a down to -uw_fault_top_fix_depth
+  (default 0.03), blended into the curve below; default 0 unchanged.
