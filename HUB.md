@@ -3417,3 +3417,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   page v40.
 - 2026-11-11: earth_top_hw floors 30 / 10 / 3 / 1 at t 2e-4: the early gain fades and the runs stall like crust top; dip
   48-51 deg, subducting plate 228-252, against lag3's 33 deg and 654. Movie page v41.
+- 2026-11-11: hanging-wall ladder runs (earth_top_hw_f30 / f10 / f3 / f1) complete, 200 steps: early slip freed, then
+  stalled like crust top, dip 73-86 deg at t 1.1e-3 (late renders, movie page v42). Louis: "I think the wedge that forms
+  from having a near-surface weak layer is important, actually." K1's proposal to Louis: lag3 unchanged, its weak layer
+  read as the sediments, plus a passive oceanic-crust tracer layer beneath it on the slab side.
