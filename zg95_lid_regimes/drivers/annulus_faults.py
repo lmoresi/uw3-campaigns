@@ -162,6 +162,20 @@ params = uw.Params(
                                 #   far up along its own normal, not the crust. The crust keeps its weakness but no longer
                                 #   places the fault. 0: the crust places the fault, as before
     uw_fault_ref_spacing=0.0,   # the reference line's particle spacing; 0: a quarter of the rung spacing S
+    uw_damage=0.0,              # > 0 (Louis, 2026-11-11: the slowdown "may just be a question of the fault needing to create
+                                #   a damage zone in the upper plate ... We probably want it not to be the same thing as the
+                                #   oceanic crust that we track"): a damage field of its own, made by the fault at this rate x
+                                #   its slip within uw_damage_width of its line (the hanging wall's side only with
+                                #   uw_damage_side "hanging"), shallower than uw_damage_depth, carried by the flow and
+                                #   healing as the plastic strain does (uw_damage_heal); it multiplies viscosity and yield
+                                #   stress by down to uw_damage_weak (at uw_damage_crit). Not the plastic strain gamma
+                                #   (uw_fault_damage adds to that and only lowers the yield stress). 0: none
+    uw_damage_weak=0.2,         # the viscosity and yield-stress factor of saturated damage
+    uw_damage_crit=0.5,         # the damage at which it saturates
+    uw_damage_width=0.0,        # the damage zone's width from the fault line (layer depths); 0: two base cells
+    uw_damage_side="hanging",   # "hanging": only on the overriding side of the fault; "both"
+    uw_damage_depth=0.0,        # damage made only shallower than this (layer depths); 0: the whole fault
+    uw_damage_heal=0.0,         # the damage's healing time (gated by uw_heal_T as the plastic strain's); 0: uw_heal_time
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -643,6 +657,22 @@ if params.uw_heal_time_lid > 0:
     heal_rate = heal_rate + 1 / params.uw_heal_time_lid
 fault_damage_b = uw.discretisation.MeshVariable("fault_damage", base, 1, degree=1)
 strain_adv.f = edot_p_b.sym[0] + fault_damage_b.sym[0] - gamma_b.sym[0] * heal_rate
+DAMAGE = float(params.uw_damage) > 0
+if DAMAGE:
+    if str(params.uw_damage_side) not in ("hanging", "both"):
+        raise ValueError(f"-uw_damage_side {params.uw_damage_side}: 'hanging' or 'both'")
+    damage_b = uw.discretisation.MeshVariable("damage", base, 1, degree=1)
+    damage_src_b = uw.discretisation.MeshVariable("damage_source", base, 1, degree=1)
+    damage_adv = uw.systems.AdvDiffusion(base, damage_b, V_b.sym, order=1)
+    damage_adv.constitutive_model = uw.constitutive_models.DiffusionModel
+    damage_adv.constitutive_model.Parameters.diffusivity = 1.0e-6
+    _heal_t = float(params.uw_damage_heal) or float(params.uw_heal_time)
+    damage_heal = 0
+    if _heal_t > 0:
+        damage_heal = 1 / _heal_t
+        if params.uw_heal_T > 0:
+            damage_heal = damage_heal * (1 + sympy.tanh((T_b.sym[0] - params.uw_heal_T) / 0.02)) / 2
+    damage_adv.f = damage_src_b.sym[0] - damage_b.sym[0] * damage_heal
 # the strain-rate invariant of the base velocity, for the "rate" law and the trench advection
 _E_b = (V_b.sym.jacobian(base.X) + V_b.sym.jacobian(base.X).T) / 2
 edot_total_b = sympy.sqrt((_E_b[0, 0] ** 2 + _E_b[1, 1] ** 2 + 2 * _E_b[0, 1] ** 2) / 2)
@@ -1467,6 +1497,7 @@ class FaultedMesh:
         self.log_eta = uw.discretisation.MeshVariable(f"log10_eta_{tag}", mesh, 1, degree=1)
         self.yield_ratio = uw.discretisation.MeshVariable(f"yield_ratio_{tag}", mesh, 1, degree=1)
         self.gamma = uw.discretisation.MeshVariable(f"plastic_strain_{tag}", mesh, 1, degree=2)
+        self.damage = uw.discretisation.MeshVariable(f"damage_{tag}", mesh, 1, degree=1) if DAMAGE else None
         self.edot_p = uw.discretisation.MeshVariable(f"edot_plastic_{tag}", mesh, 1, degree=1)
         # the crust marker on this mesh (DG1, filled from the particles' proxy at each solve)
         self.crust = (uw.discretisation.MeshVariable(f"crust_{tag}", mesh, 1, degree=1, continuous=False)
@@ -1502,6 +1533,9 @@ class FaultedMesh:
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
+        if DAMAGE:
+            weak = weak * (1 - (1 - params.uw_damage_weak) * sympy.Min(
+                sympy.Max(self.damage.sym[0], 0) / params.uw_damage_crit, 1) * (1 - M))
         if comp_on:
             weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta, mask=M)
         if over_on:
@@ -1703,6 +1737,9 @@ class FaultedMesh:
             uw.function.global_evaluate(T_b.sym[0], onto(model_xy(self.T)))).ravel()
         self.gamma.array[:, 0, 0] = np.asarray(
             uw.function.global_evaluate(gamma_b.sym[0], onto(model_xy(self.gamma)))).ravel()
+        if DAMAGE:
+            self.damage.array[:, 0, 0] = np.asarray(
+                uw.function.global_evaluate(damage_b.sym[0], onto(model_xy(self.damage)))).ravel()
         for name, (var, _, _) in markers.items():
             mine = getattr(self, name)
             mine.array[:, 0, 0] = np.asarray(
@@ -1850,6 +1887,42 @@ class FaultedMesh:
         edot_p_b.array[:, 0, 0] = np.maximum(edot, 0.0)
         if params.uw_fault_damage > 0:
             self.fault_damage(slips)
+        if DAMAGE:
+            self.damage_source(slips)
+
+    def damage_source(self, slips):
+        """The damage zone's source (uw_damage): rate uw_damage x the fault's slip at the base
+        mesh's nodes within uw_damage_width of the fault's line (the spine inside the wall),
+        on the overriding side only with uw_damage_side "hanging" (the side the segment's normal
+        with an outward radial part points to), shallower than uw_damage_depth."""
+        pts = np.asarray(model_xy(damage_src_b), dtype=float)
+        depth = r_o - np.hypot(pts[:, 0], pts[:, 1])
+        width = float(params.uw_damage_width) or 2.0 * H_B
+        rate = np.zeros(len(pts))
+        for f in self.faults:
+            spine, _ = self.pieces[f["name"]]
+            spine = spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o + 1e-12]
+            if len(spine) < 2:
+                continue
+            best, side = np.full(len(pts), np.inf), np.zeros(len(pts))
+            for a, b in zip(spine[:-1], spine[1:]):
+                ab = b - a
+                L2 = max(ab @ ab, 1e-30)
+                t = np.clip(((pts - a) @ ab) / L2, 0.0, 1.0)
+                q = a + t[:, None] * ab
+                d = np.linalg.norm(pts - q, axis=1)
+                n = np.array([-ab[1], ab[0]]) / np.sqrt(L2)
+                if n @ (0.5 * (a + b)) < 0:
+                    n = -n                                   # outward: toward the hanging wall
+                upd = d < best
+                best[upd], side[upd] = d[upd], ((pts[upd] - q[upd]) @ n)
+            on = best < width
+            if str(params.uw_damage_side) == "hanging":
+                on &= side >= 0
+            if float(params.uw_damage_depth) > 0:
+                on &= depth < float(params.uw_damage_depth)
+            rate = np.maximum(rate, float(params.uw_damage) * slips.get(f["name"], 0.0) * on)
+        damage_src_b.array[:, 0, 0] = rate
 
     def fault_damage(self, slips):
         """The damage a fault does to its surroundings: at rate uw_fault_damage x its slip,
@@ -2059,7 +2132,7 @@ def write_ti_band(faulted, step):
 def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
     write_ti_band(faulted, step)
-    mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
+    mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b] + ([damage_b] if DAMAGE else [])
     for var, picture, _ in markers.values():
         picture.array[:, 0, 0] = np.asarray(
             uw.function.global_evaluate(var.sym[0], onto(model_xy(picture)))).ravel()
@@ -2071,7 +2144,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
     solver_files = write_solver_fields(faulted, step)
     # everything a restart from here reads: it refuses to start if any is missing
-    needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
+    needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b) + ((damage_b,) if DAMAGE else ())] \
+        + list(solver_files.values())
     if swarm_on:
         needed += [f"annulus.crust_swarm.{step:05d}.h5"] + [f"annulus.crust_swarm.{name}.{step:05d}.h5"
                                                           for name in list(markers) + (["ref"] if REF else [])]
@@ -2613,7 +2687,7 @@ else:
     missing = [name for name in state.get("checkpoint_files", []) if not os.path.exists(os.path.join(out, name))]
     if missing:
         raise FileNotFoundError(f"checkpoint {params.uw_restart} in {out} lists files that are missing: {missing}")
-    for var in (T_b, V_b, gamma_b):
+    for var in (T_b, V_b, gamma_b) + ((damage_b,) if DAMAGE else ()):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
     if swarm_on:
         restore_swarm(out, params.uw_restart)
@@ -2754,7 +2828,8 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_ref_depth", "uw_fault_ref_spacing", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_damage", "uw_damage_weak", "uw_damage_crit", "uw_damage_width",
+                "uw_damage_side", "uw_damage_depth", "uw_damage_heal", "uw_fault_ref_depth", "uw_fault_ref_spacing", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -3002,6 +3077,9 @@ for k in range(k0, k0 + params.uw_steps):
     dt = min(dt_accuracy, params.uw_courant * dt_crossing, params.uw_dt_max)
     adv.solve(timestep=dt)
     strain_adv.solve(timestep=dt)
+    if DAMAGE:
+        damage_adv.solve(timestep=dt)
+        damage_b.array[:, 0, 0] = np.maximum(damage_b.array[:, 0, 0], 0.0)
     gamma_b.array[:, 0, 0] = np.maximum(gamma_b.array[:, 0, 0], 0.0)
     t_energy_strain = time.perf_counter() - t_phase
     t_phase = time.perf_counter()
