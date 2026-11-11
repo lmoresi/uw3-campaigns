@@ -79,7 +79,8 @@ params = uw.Params(
                                 #   distance short of the antipode, tanh ramps of uw_over_ramp
     uw_top_hot_start=0.06,
     uw_ridge_patch=0.05,        # uw_top_hot 2 (a fixed ridge): only a patch of this half-width (arc, layer depths) at the
-                                #   antipode of the trench is held at T_interior, tanh ramps of uw_over_ramp; T = 0 elsewhere
+                                #   subducting plate's ridge (uw_ridge_sub behind the trench: the antipode by default) is
+                                #   held at T_interior, tanh ramps of uw_over_ramp; T = 0 elsewhere
     uw_cont_extent=0.0,         # > 0: the compositional overriding plate (the continent) ends this angle (radians) from the
                                 #   trench (uw_theta_trench) instead of at the overriding plate's ridge. Measured from the
                                 #   trench, not from the continent's start: 1/3 of the annulus from the start at
@@ -218,6 +219,11 @@ params = uw.Params(
     uw_restart=-1,
     uw_cell=0.5,
     uw_refinement=4,
+    uw_cell_outer=0.0,          # > 0: a graded mesh, the coarse cell this size at the outer wall (Louis, 2026-11-13: refine
+    uw_cell_inner=0.0,          #   near the surface to resolve a slab of half the age with fewer cells overall); > 0: the
+                                #   coarse cell at the inner wall; 0 = uw_cell. Then the base cell H_B (the crust lattice,
+                                #   the rung spacing by default, the rebuild threshold) is the outer wall's cell, where
+                                #   the plates, the crust and the fault are
     uw_ra=9.1125e5,
     uw_deta=3.0e4,
     uw_tau0=2.025e4,
@@ -473,8 +479,9 @@ def effective_spacing(p):
     return sp if sp > 0 else float(p.get("uw_cell", 0.5)) / 2 ** int(p.get("uw_refinement", 4))
 
 
-S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": params.uw_cell, "uw_refinement": params.uw_refinement})
-H_B = float(params.uw_cell) / 2 ** int(params.uw_refinement)    # the base cell (effective_spacing's derivation)
+CELL_TOP = float(params.uw_cell_outer or params.uw_cell)          # the coarse cell at the surface (graded or not)
+S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": CELL_TOP, "uw_refinement": params.uw_refinement})
+H_B = CELL_TOP / 2 ** int(params.uw_refinement)    # the base cell at the surface (effective_spacing's derivation)
 PRES_RTOL_WARM = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 else 0.1 * float(params.uw_tol)
 PRES_RTOL_COLD = float(params.uw_pres_rtol_cold) if float(params.uw_pres_rtol_cold) > 0 else PRES_RTOL_WARM
 FIRST_SOLVE = True             # the run's first solve: an unconverged cold one stops a fresh run
@@ -495,7 +502,8 @@ if params.uw_fault_seams != "gather" and int(params.uw_chain) > 0:
                      "run it with -uw_chain 0")
 W = 2.0 * S
 
-base = annulus_mesh(params.uw_cell, params.uw_refinement)
+base = annulus_mesh(params.uw_cell, params.uw_refinement, outer=params.uw_cell_outer, inner=params.uw_cell_inner,
+                    filename=f"{out}/annulus_graded.msh")
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
@@ -528,7 +536,7 @@ if params.uw_fault_law == "crust" and not (crust_on or comp_on):
 over_on = params.uw_over_dT != 0 or params.uw_over_eta != 1   # a negative uw_over_dT is a buoyant block
 swarm_on = crust_on or comp_on or over_on
 crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
-               else float(params.uw_cell) / 2 ** int(params.uw_refinement))
+               else H_B)
 ocrust_on = crust_on and not LINE and params.uw_ocrust_depth > 0
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
@@ -647,8 +655,11 @@ def hot_top_window(rel_arc, lib=np):
     tanh ramps; numpy or sympy."""
     start, ramp = float(params.uw_top_hot_start), max(float(params.uw_over_ramp), 1e-6)
     if int(params.uw_top_hot) == 2:
-        # a fixed ridge: a patch of half-width uw_ridge_patch about the antipode of the trench
-        dist = np.pi * r_o - (lib.Abs(rel_arc) if lib is sympy else np.abs(rel_arc))
+        # a fixed ridge: a patch of half-width uw_ridge_patch about the subducting plate's ridge, uw_ridge_sub
+        # behind the trench (the antipode by default); dist is the arc to it, either way round
+        a = rel_arc / r_o + abs(float(params.uw_ridge_sub))
+        dist = (lib.Abs(sympy.atan2(sympy.sin(a), sympy.cos(a))) if lib is sympy
+                else np.abs(np.arctan2(np.sin(a), np.cos(a)))) * r_o
         return (1 - lib.tanh((dist - float(params.uw_ridge_patch)) / ramp)) / 2
     far = np.pi * r_o - start
     return (1 + lib.tanh((rel_arc - start) / ramp)) * (1 + lib.tanh((far - rel_arc) / ramp)) / 4
@@ -2107,7 +2118,7 @@ class FaultedMesh:
             return 0.0
         mid, t_hat = mid[keep], t_hat[keep]
         n_hat = np.c_[-t_hat[:, 1], t_hat[:, 0]]
-        d = 0.5 * self.width + float(params.uw_cell) / 2 ** int(params.uw_refinement)
+        d = 0.5 * self.width + H_B
         pts = np.vstack([mid + d * n_hat, mid - d * n_hat])
         vel = np.asarray(uw.function.global_evaluate(self.v.sym, onto(pts))).reshape(-1, 2)
         jump = ((vel[:len(mid)] - vel[len(mid):]) * t_hat).sum(axis=1)
@@ -2488,22 +2499,26 @@ def slab_temperature(xy):
     def half_space(dist, age):
         return T_i * erf(dist / (2.0 * np.sqrt(np.maximum(age, 1e-8))))
 
-    # the surface age: a ramp from the ridge to the trench on each side
+    # the surface age: a ramp from the ridge to the trench on each side, each plate measured from
+    # the trench round to its own ridge (an overriding plate may reach past the antipode, to a
+    # subducting plate's ridge near the trench: uw_ridge_over 2 pi - uw_ridge_sub)
     rel = over * wrap(theta - theta_t)                    # positive on the overriding side
+    rel_o = np.mod(over * (theta - theta_t), 2 * np.pi)   # the angle into the overriding side, 0 to 2 pi
+    rel_s = 2 * np.pi - rel_o                             # the angle into the subducting side
     ridge_o, ridge_s = abs(float(params.uw_ridge_over)), abs(float(params.uw_ridge_sub))
     age_thin = float(params.uw_age_thin)
-    age_o = params.uw_age_over * np.clip(1 - np.abs(rel) / max(ridge_o, 1e-6), 0, 1)
-    age_s = params.uw_age_sub * np.clip(1 - np.abs(rel) / max(ridge_s, 1e-6), 0, 1)
+    age_o = params.uw_age_over * np.clip(1 - rel_o / max(ridge_o, 1e-6), 0, 1)
+    age_s = params.uw_age_sub * np.clip(1 - rel_s / max(ridge_s, 1e-6), 0, 1)
     if not params.uw_over_plate:                          # no overriding plate: the thin layer
         age_o = np.full_like(age_o, age_thin)
     elif params.uw_over_gap > 0:                          # the plate set back from the trench
-        w = np.clip((np.abs(rel) * r_o - params.uw_over_gap) / max(params.uw_over_ramp, 1e-6), 0, 1)
+        w = np.clip((rel_o * r_o - params.uw_over_gap) / max(params.uw_over_ramp, 1e-6), 0, 1)
         age_o = age_thin + (age_o - age_thin) * w
     if params.uw_cont_age > 0:                            # the continent: a uniform, old lid
         cont_end = float(params.uw_cont_extent) or ridge_o
-        in_cont = (rel * r_o >= float(params.uw_over_gap)) & (rel < cont_end)
+        in_cont = (rel_o * r_o >= float(params.uw_over_gap)) & (rel_o < cont_end)
         age_o = np.where(in_cont, float(params.uw_cont_age), age_o)
-    age_surface = np.maximum(np.where(rel >= 0, age_o, age_s), age_thin)
+    age_surface = np.maximum(np.where(rel_s <= ridge_s, age_s, age_o), age_thin)
     T_plate = half_space(depth, age_surface)
     if params.uw_top_hot:                                 # no cooling at all where the surface is held hot
         T_plate = np.maximum(T_plate, T_i * hot_top_window(rel * r_o))
@@ -2621,8 +2636,7 @@ def over_marker(xy, thick):
 
 def crust_spacing():
     """The lattice spacing of the dense crust: about uw_crust_ppc particles per (triangular) cell."""
-    h = float(params.uw_cell) / 2 ** int(params.uw_refinement)
-    return h / np.sqrt(2.0 * float(params.uw_crust_ppc))
+    return H_B / np.sqrt(2.0 * float(params.uw_crust_ppc))
 
 
 def crust_layer_points(spacing, surface_only=False):
@@ -2883,8 +2897,9 @@ t, step = float(state["t"]), int(state["step"]) + 1
 # carried through restarts in the state
 if params.uw_ridge_weak < 1:
     theta_0 = float(state.get("ridge_origin", faults[0]["theta"] if faults else params.uw_theta_trench))
-    ridges = [float(wrap(theta_0 + params.uw_ridge_sub))]
-    other = float(wrap(theta_0 - params.uw_ridge_over))
+    over = 1.0 if params.uw_dip < 90 else -1.0     # the overriding side; the subducting plate's ridge is behind it
+    ridges = [float(wrap(theta_0 - over * params.uw_ridge_sub))]
+    other = float(wrap(theta_0 + over * params.uw_ridge_over))
     if abs(wrap(other - ridges[0])) > 0.01:      # one ridge when both plates share it (the antipode)
         ridges.append(other)
 else:

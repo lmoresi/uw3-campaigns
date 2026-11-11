@@ -21,12 +21,20 @@ def annulus_radii(ratio=RADIUS_RATIO):
     return 1.0 / (1.0 - ratio), ratio / (1.0 - ratio)
 
 
-def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO):
+def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, outer=0.0, inner=0.0, filename=None):
     """The unit-depth annulus with its refinement hierarchy (the multigrid levels);
-    refined boundary nodes are snapped to the circles."""
+    refined boundary nodes are snapped to the circles. ``outer`` / ``inner`` > 0 grade the
+    coarse mesh from that size at the outer wall to that at the inner one (gmsh interpolates
+    between the walls); a graded mesh needs its own ``filename``, because the library's
+    cached .msh name carries cellSize only."""
     r_o, r_i = annulus_radii(ratio)
-    return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
-                              refinement=int(refinement), qdegree=3)
+    if not (outer or inner):
+        return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
+                                  refinement=int(refinement), qdegree=3)
+    outer, inner = float(outer or cell), float(inner or cell)
+    return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=max(outer, inner),
+                              cellSizeOuter=outer, cellSizeInner=inner,
+                              refinement=int(refinement), qdegree=3, filename=filename)
 
 
 def radius_of(mesh):
