@@ -154,6 +154,12 @@ params = uw.Params(
                                 #   or its "top" (the 10th percentile toward the overriding plate: the crust lies under the
                                 #   fault, in the subducting plate; Louis, 2026-11-11: "It's clear that the crust should be
                                 #   on the slab side")
+    uw_fault_zone_weak=1.0,     # < 1 (Louis, 2026-11-11: "instantaneous damage that results from the presence of the
+                                #   fault rather than some complicated formulation with additional parameters"): every cell
+                                #   of the faulted mesh within uw_fault_zone_width of the built fault, on its hanging-wall
+                                #   side, has its viscosity and yield stress multiplied by this, outside the fault band;
+                                #   the zone is rebuilt with the fault. 1: none
+    uw_fault_zone_width=0.0,    # the zone's width from the fault line (layer depths); 0: two base cells
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -1477,6 +1483,31 @@ class FaultedMesh:
         if params.uw_fault_precedence:
             self.band_mask = uw.discretisation.MeshVariable(f"band_{tag}", mesh, 1, degree=0, continuous=False)
             self.band_mask.array[:, 0, 0] = (band | bridge).astype(float)
+        # the fault's damage zone (uw_fault_zone_weak): the cells within its width of a built fault's line, on the
+        # overriding side (the side its segment normal with an outward radial part points to)
+        self.fault_zone = None
+        if params.uw_fault_zone_weak < 1 and self.pieces:
+            width = float(params.uw_fault_zone_width) or 2.0 * H_B
+            hang = np.zeros(len(centroids), dtype=bool)
+            for name, (spine, trace) in self.pieces.items():
+                sp = spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o + 1e-12]
+                if len(sp) < 2:
+                    continue
+                best, side = np.full(len(centroids), np.inf), np.zeros(len(centroids))
+                for a, b in zip(sp[:-1], sp[1:]):
+                    ab = b - a
+                    L2 = max(ab @ ab, 1e-30)
+                    t = np.clip(((centroids - a) @ ab) / L2, 0.0, 1.0)
+                    q = a + t[:, None] * ab
+                    d = np.linalg.norm(centroids - q, axis=1)
+                    n = np.array([-ab[1], ab[0]]) / np.sqrt(L2)
+                    if n @ (0.5 * (a + b)) < 0:
+                        n = -n
+                    upd = d < best
+                    best[upd], side[upd] = d[upd], (centroids[upd] - q[upd]) @ n
+                hang |= (best < width) & (side >= 0)
+            self.fault_zone = uw.discretisation.MeshVariable(f"fzone_{tag}", mesh, 1, degree=0, continuous=False)
+            self.fault_zone.array[:, 0, 0] = hang.astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
         bridge_ti = bool(params.uw_bridge_ti) and not TI and bool(self.faults)
@@ -1486,6 +1517,8 @@ class FaultedMesh:
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
+        if self.fault_zone is not None:
+            weak = weak * (1 - (1 - params.uw_fault_zone_weak) * self.fault_zone.sym[0] * (1 - M))
         if comp_on:
             weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta, mask=M)
         if over_on:
@@ -2685,7 +2718,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
