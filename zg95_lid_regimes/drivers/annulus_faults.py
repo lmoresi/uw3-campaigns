@@ -266,6 +266,9 @@ params = uw.Params(
                                 #   level of the layer chosen, no straight top, no dip floor. Louis, 2026-11-12: "a
                                 #   smooth fit with finite curvature (a spline is a plate bending solution of sorts)",
                                 #   "let the dynamics control the shape and not the other way around")
+    uw_spline_side="centre",    # spline: "centre" (the layer's median line) or "base" (Louis, 2026-11-12: "a thin, weak upper
+                                #   layer that we follow the base": a second pass about the centre line takes the quantile
+                                #   with 10 % of the layer beyond it toward the plate interior, as the envelope does)
     uw_spline_length=0.02,      # spline: its smoothing length L (layer depths): lam = L^4 / 0.005 (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
@@ -1264,6 +1267,23 @@ def advect_fault(f, faulted_mesh, dt):
     return True
 
 
+def fault_from_points(poly):
+    """(points, theta, dip, depth) of a placed fault polyline as it is: the trench where it crosses the wall, the dip of
+    its chord from there to 0.03 deep, its deepest point. Returns None for a polyline that does not cross the wall."""
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    if not (rp[0] > r_o and (rp <= r_o).any()):
+        return None
+    k = int(np.argmax(rp <= r_o))
+    w = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    return poly, float(np.arctan2(at_wall[1], at_wall[0])), dip, float((r_o - rp).max())
+
+
 def relax_fault(f, fit_points, alpha, smooth=False):
     """Pull a Lagrangian fault alpha of the way toward the particle fit, depth by depth, and
     place a smooth curve through the result. Returns (points, theta, dip, depth) or None."""
@@ -1464,37 +1484,45 @@ def crust_spline_points(faults):
     if -C[-1, 1] < cap:
         uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
         return None
-    sc = np.r_[0, np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))]
-    Cd = np.c_[np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 0]), np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 1])]
-    s_d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(Cd, axis=0), axis=1))]
-    tg = np.gradient(Cd, axis=0)
-    tg /= np.linalg.norm(tg, axis=1)[:, None]
-    _, k = cKDTree(Cd).query(M)
-    rel = M - Cd[k]
-    s_p, n_p = s_d[k] + (rel * tg[k]).sum(1), (rel * left(tg[k])).sum(1)
-    inb = (np.abs(n_p) < band) & (s_p > s_d[0]) & (s_p < s_d[-1])
-    b = np.digitize(s_p[inb], np.arange(s_d[0], s_d[-1] + ds, ds))
-    ss, off, cnt = [], [], []
-    for j in np.unique(b):
-        v = n_p[inb][b == j]
-        if len(v) >= 3:
-            ss.append(s_p[inb][b == j].mean())
-            off.append(np.median(v))
-            cnt.append(len(v))
-    ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
-    if len(ss) < 12:
-        uw.pprint("  crust fault (spline): too few crust bins along the layer")
-        return None
-    Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
-    ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
-    ts /= np.linalg.norm(ts, axis=1)[:, None]
-    Z = Cs + off[:, None] * left(ts)
     lam = float(params.uw_spline_length) ** 4 / ds
-    w = w / w.mean()
-    sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
-    sy = make_smoothing_spline(ss, Z[:, 1], w=w, lam=lam)
-    sf = np.arange(ss[0], ss[-1], 0.0005)
-    F = np.c_[sx(sf), sy(sf)]
+    side = str(params.uw_spline_side)
+    if side not in ("centre", "base"):
+        raise ValueError(f"-uw_spline_side must be centre or base, not {side!r}")
+    # pass 1: bin medians about the marched line -> the centre line; with side "base", pass 2: about that centre
+    # line, the quantile with 10 % of the band toward the plate interior beyond it (the layer's base, as the envelope)
+    for stat in ("median",) + (("base",) if side == "base" else ()):
+        sc = np.r_[0, np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))]
+        Cd = np.c_[np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 0]), np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 1])]
+        s_d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(Cd, axis=0), axis=1))]
+        tg = np.gradient(Cd, axis=0)
+        tg /= np.linalg.norm(tg, axis=1)[:, None]
+        _, k = cKDTree(Cd).query(M)
+        rel = M - Cd[k]
+        s_p, n_p = s_d[k] + (rel * tg[k]).sum(1), (rel * left(tg[k])).sum(1)
+        inb = (np.abs(n_p) < band) & (s_p > s_d[0]) & (s_p < s_d[-1])
+        b = np.digitize(s_p[inb], np.arange(s_d[0], s_d[-1] + ds, ds))
+        ss, off, cnt = [], [], []
+        for j in np.unique(b):
+            v = n_p[inb][b == j]
+            if len(v) >= 3:
+                ss.append(s_p[inb][b == j].mean())
+                # + inc * left points into the plate interior (the march runs from the incoming plate to the slab)
+                off.append(np.median(v) if stat == "median" else inc * np.quantile(inc * v, 0.9))
+                cnt.append(len(v))
+        ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
+        if len(ss) < 12:
+            uw.pprint("  crust fault (spline): too few crust bins along the layer")
+            return None
+        Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
+        ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
+        ts /= np.linalg.norm(ts, axis=1)[:, None]
+        Z = Cs + off[:, None] * left(ts)
+        w = w / w.mean()
+        sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
+        sy = make_smoothing_spline(ss, Z[:, 1], w=w, lam=lam)
+        sf = np.arange(ss[0], ss[-1], 0.0005)
+        F = np.c_[sx(sf), sy(sf)]
+        C = F                                        # the next pass's reference
     fd = -F[:, 1]
     sF = np.r_[0, np.cumsum(np.linalg.norm(np.diff(F, axis=0), axis=1))]
     flat = (sF > 0.02) & (sF < 0.15)
@@ -2963,7 +2991,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_spline_side", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
@@ -3124,8 +3152,13 @@ for k in range(k0, k0 + params.uw_steps):
                 and "fit_points" in faults[0]):
             # the Lagrangian curve has moved a threshold: the ladder is built on its blend with the
             # latest particle fit, smoothed
-            refit = relax_fault(faults[0], faults[0]["fit_points"], float(params.uw_fault_lagrange_rebuild_fit),
-                                smooth=True)
+            if params.uw_fault_fit == "spline" and float(params.uw_fault_lagrange_rebuild_fit) >= 1.0:
+                # the spline as it is: relax_fault's place_line would refit it as x(depth) and re-attach a straight
+                # top dipping at least uw_fault_top_dip_min (Louis, 2026-11-12: "a spline fit when we rebuild")
+                refit = fault_from_points(np.asarray(faults[0]["fit_points"]))
+            else:
+                refit = relax_fault(faults[0], faults[0]["fit_points"], float(params.uw_fault_lagrange_rebuild_fit),
+                                    smooth=True)
             if refit is not None:
                 poly_r, theta_r, dip_r, depth_r = refit
                 faults[0].update({"points": poly_r.tolist(), "theta": theta_r, "dip": dip_r, "depth": depth_r})
