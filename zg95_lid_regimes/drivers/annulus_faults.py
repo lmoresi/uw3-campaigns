@@ -148,6 +148,12 @@ params = uw.Params(
                                 #   uw_fault_lagrange_rebuild_fit of the way to the latest particle fit and smoothed,
                                 #   and the ladder is built on that
     uw_fault_lagrange_rebuild_fit=1.0,  # with refit "rebuild": the share of the particle fit at a rebuild (1: the fit)
+    uw_fault_crust_side="base",  # the envelope locator follows the crust cloud's "base" (its 10th percentile toward the
+                                #   incoming plate, as before: the crust then lies above the fault, on the overriding side;
+                                #   earth_thin_w05_lag3 had ~90 % of the crust along the fault on the hanging-wall side)
+                                #   or its "top" (the 10th percentile toward the overriding plate: the crust lies under the
+                                #   fault, in the subducting plate; Louis, 2026-11-11: "It's clear that the crust should be
+                                #   on the slab side")
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -456,6 +462,8 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 LINE = str(params.uw_crust_mode) == "line"
 SPLIT_ADVECT = str(params.uw_crust_advect) == "split"
+if str(params.uw_fault_crust_side) not in ("base", "top"):
+    raise ValueError(f"-uw_fault_crust_side {params.uw_fault_crust_side}: 'base' or 'top'")
 if str(params.uw_fault_lagrange_refit) not in ("detect", "rebuild"):
     raise ValueError(f"-uw_fault_lagrange_refit {params.uw_fault_lagrange_refit}: 'detect' or 'rebuild'")
 if str(params.uw_crust_advect) not in ("base", "split") or (SPLIT_ADVECT and SCALED):
@@ -1271,7 +1279,8 @@ def crust_envelope_points(faults):
         a, b = min(zip(np.r_[0, cut], np.r_[cut, len(xs)]), key=lambda ab: np.abs(xs[ab[0]:ab[1]] - prev).min())
         if np.abs(xs[a:b] - prev).min() > 2 * ct:
             continue
-        base[j] = wquantile(xs[a:b], ws[a:b], q if inc < 0 else 1 - q)
+        toward_inc = str(params.uw_fault_crust_side) != "top"     # the base faces the incoming plate, the top away
+        base[j] = wquantile(xs[a:b], ws[a:b], (q if inc < 0 else 1 - q) if toward_inc else (1 - q if inc < 0 else q))
         prev = base[j]
     ok = np.isfinite(base)
     zk, bk = zs[ok][::-1], base[ok][::-1]            # shallow to deep
@@ -2676,7 +2685,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
