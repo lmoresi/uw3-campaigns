@@ -3475,3 +3475,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-12: CORRECTION (K1): the three 127b220 base-spline runs refused only 3 fits each and placed the fault every
   step since; not compromised, records stand with a 3-step pause (the "frozen fault after step 22" above was wrong).
   The *_fix restarts 4397/4398/4400 now serve as a check that d358b97 changes nothing else. READMEs corrected.
+- 2026-11-12: K1 overnight report draft on movie page v50 (#overnight). K1's findings: the Lagrangian lag is not
+  essential; crust weakness is not the key (with a base fit, passive matches x0.5); the base spline holds the top dip
+  at 24-25 deg through t 5.2e-4 and its plates overtake lag3 late, while lag3's envelope steepens to 35 deg; the
+  oceanic-crust line stays intact on the slab top. Still running: earth_lag3_floor10 and the three *_fix checks.
