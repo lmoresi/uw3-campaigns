@@ -261,6 +261,13 @@ params = uw.Params(
     uw_fault_fit="envelope",    # crust law locator: "envelope" (the crust base marched up from the cap,
                                 #   crust_envelope_points; ruled by the go on the Earth plan, 2026-10-29, locator A/B
                                 #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
+                                #   or "spline" (crust_spline_points: a smoothing spline in arc length through the
+                                #   crust's centre line, from the incoming plate through the bend down the slab; no
+                                #   level of the layer chosen, no straight top, no dip floor. Louis, 2026-11-12: "a
+                                #   smooth fit with finite curvature (a spline is a plate bending solution of sorts)",
+                                #   "let the dynamics control the shape and not the other way around")
+    uw_spline_length=0.02,      # spline: its smoothing length L (layer depths): lam = L^4 / 0.005 (offline on 12 stored
+                                #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
                                 #   point to the wall; the unfloored dip is recorded
     uw_fault_top_dip_fix=0.0,   # > 0: the fault's top prescribed at this dip (deg) down to uw_fault_top_fix_depth, blended
@@ -1385,6 +1392,144 @@ def crust_envelope_points(faults):
             "particle_trench": float(xt / r_o), "raw": np.c_[raw[:, 0] / r_o, raw[:, 1]].round(6).tolist()}
     uw.pprint(f"  crust fault (envelope): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
               f"data {top_dip:.1f}{' (floored)' if info['top_dip_floored'] else ''}, trench gap {gap:.3f}")
+    return poly, theta_t, dip, float((r_o - rp).max()), info
+
+
+def crust_spline_points(faults):
+    """The crust law's fault on a smoothing spline through the crust's centre line, in arc length
+    (uw_fault_fit "spline"). In map coordinates (X = r_o theta about the trench hint, Y = -depth):
+    marching from the incoming plate 0.35 outboard of the hint toward the trench in steps of
+    0.005, each point re-centred on the median normal offset of the crust within +-0.005 along and
+    +-3 thicknesses across, the direction the chord over the last 4 steps, down to the cap + 0.06;
+    then the crust within 3 thicknesses of that line binned by arc length (0.005), the bin medians
+    fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length^4 / 0.005, weights
+    sqrt(count)). The fault is the curve from where it lies one crust thickness deeper than its
+    level on the incoming plate (the trench) to the depth cap; above that point it runs to the
+    wall along its own mean slope over the next 0.015 of depth (under a rung: the split stops one
+    rung down, so the bridge carries it), with a stub to 0.02 above the wall; resampled at the rung
+    spacing. The curve may turn past vertical. Collective. Returns (points, theta, dip, depth,
+    info) or None, as crust_envelope_points; tested offline on 12 stored checkpoints
+    (scratchpad arcfit_centre, 2026-11-12)."""
+    from scipy.interpolate import make_smoothing_spline
+    from scipy.spatial import cKDTree
+    cap, ct, ds, band = fault_depth_cap(), crust_thick, 0.005, 3.0 * crust_thick
+    xy = np.asarray(swarm_xy(), dtype=float)
+    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+    keep = marker > 0.5
+    P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
+    depth = r_o - np.hypot(P[:, 0], P[:, 1])
+    theta = np.arctan2(P[:, 1], P[:, 0])
+    if faults:
+        hint = float(faults[0]["theta"])
+    else:                                            # the subducted cluster that goes deepest
+        sub = (depth > 1.25 * ct) & (depth <= cap + 2 * ct)
+        if sub.sum() < 12:
+            return None
+        o = np.argsort(theta[sub])
+        pieces = np.split(o, np.flatnonzero(np.diff(theta[sub][o]) > 0.03) + 1)
+        piece = max(pieces, key=lambda p: depth[sub][p].max())
+        hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
+    X0 = r_o * hint
+    M = np.c_[r_o * (hint + wrap(theta - hint)), -depth]
+    M = M[(np.abs(M[:, 0] - X0) < r_o * 0.4) & (depth < cap + 0.11)]
+    dep = -M[:, 1]
+    sh = dep < 0.5 * ct
+    deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - X0) < 0.3)
+    if sh.sum() < 4 or deep.sum() < 12:
+        uw.pprint("  crust fault (spline): no subducted crust below cap/2, or none at the wall")
+        return None
+    inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
+    left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
+    tree = cKDTree(M)
+    pts, t, miss = [np.array([X0 + inc * 0.35, -0.5 * ct])], np.array([-inc, 0.0]), 0
+    for _ in range(600):                             # the march along the layer's centre
+        q = pts[-1] + ds * t
+        idx = tree.query_ball_point(q, 0.02)
+        if idx:
+            rel = M[idx] - q
+            a, n = rel @ t, rel @ left(t)
+            m = (np.abs(a) < ds) & (np.abs(n) < band)
+            if m.sum() >= 3:
+                q, miss = q + np.median(n[m]) * left(t), -1
+        miss += 1
+        if miss > 6:
+            break
+        pts.append(q)
+        if len(pts) >= 5:
+            d = pts[-1] - pts[-5]
+            t = d / np.linalg.norm(d)
+        if -q[1] > cap + 0.06:
+            break
+    C = np.array(pts)
+    if -C[-1, 1] < cap:
+        uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
+        return None
+    sc = np.r_[0, np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))]
+    Cd = np.c_[np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 0]), np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 1])]
+    s_d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(Cd, axis=0), axis=1))]
+    tg = np.gradient(Cd, axis=0)
+    tg /= np.linalg.norm(tg, axis=1)[:, None]
+    _, k = cKDTree(Cd).query(M)
+    rel = M - Cd[k]
+    s_p, n_p = s_d[k] + (rel * tg[k]).sum(1), (rel * left(tg[k])).sum(1)
+    inb = (np.abs(n_p) < band) & (s_p > s_d[0]) & (s_p < s_d[-1])
+    b = np.digitize(s_p[inb], np.arange(s_d[0], s_d[-1] + ds, ds))
+    ss, off, cnt = [], [], []
+    for j in np.unique(b):
+        v = n_p[inb][b == j]
+        if len(v) >= 3:
+            ss.append(s_p[inb][b == j].mean())
+            off.append(np.median(v))
+            cnt.append(len(v))
+    ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
+    if len(ss) < 12:
+        uw.pprint("  crust fault (spline): too few crust bins along the layer")
+        return None
+    Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
+    ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
+    ts /= np.linalg.norm(ts, axis=1)[:, None]
+    Z = Cs + off[:, None] * left(ts)
+    lam = float(params.uw_spline_length) ** 4 / ds
+    w = w / w.mean()
+    sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
+    sy = make_smoothing_spline(ss, Z[:, 1], w=w, lam=lam)
+    sf = np.arange(ss[0], ss[-1], 0.0005)
+    F = np.c_[sx(sf), sy(sf)]
+    fd = -F[:, 1]
+    sF = np.r_[0, np.cumsum(np.linalg.norm(np.diff(F, axis=0), axis=1))]
+    flat = (sF > 0.02) & (sF < 0.15)
+    z_flat = float(np.median(fd[flat])) if flat.any() else 0.5 * ct
+    kd = int(np.argmax(fd > 0.05))
+    above = np.flatnonzero(fd[:kd] <= z_flat + ct)
+    kt = int(above[-1]) + 1 if len(above) else 0
+    if not (fd[kt:] >= cap).any():
+        uw.pprint("  crust fault (spline): the curve does not reach the cap")
+        return None
+    kc = kt + int(np.argmax(fd[kt:] >= cap))
+    seg = F[kt:kc + 1]
+    k15 = int(np.argmax(-seg[:, 1] >= -seg[0, 1] + 0.015))
+    d = seg[k15] - seg[0]                            # the run to the wall: the curve's own slope over the next 0.015
+    d = d / np.linalg.norm(d)
+    to_wall = -seg[0, 1] / max(-d[1], 1e-6)
+    wall = seg[0] - to_wall * d
+    pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
+    radius = r_o + pol[:, 1]
+    poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
+                             S, 2 ** int(params.uw_chain))
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(rp <= r_o))
+    wk = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + wk * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
+            "spline_run_to_wall": float(to_wall), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
+    uw.pprint(f"  crust fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
+              f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
@@ -2818,7 +2963,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_fault_fit", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
@@ -3159,6 +3304,8 @@ for k in range(k0, k0 + params.uw_steps):
         # trench down to the depth cap; it forms at the first detection and never retires
         if params.uw_fault_fit == "envelope":
             found = crust_envelope_points(faults)
+        elif params.uw_fault_fit == "spline":
+            found = crust_spline_points(faults)
         else:
             found = crust_fault_points(faults)
             found = found + ({"locator": "parabola"},) if found is not None else None
