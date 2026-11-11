@@ -3381,3 +3381,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the single-cell width, in the cold region of the hanging wall" (in lag3 the weak crust that acted lay just outside the
   fault band in the top ~0.04). Run: earth_top_zone02 with -uw_fault_zone_weak 0.2 -uw_fault_zone_width 0.015625
   -uw_fault_zone_T 0.5, on the crust-top recipe with the crust passive, from 30ebfa8.
+- 2026-11-11: earth_top_zone02 (4375, 30ebfa8) at t 3.2e-4: the cold one-cell hanging-wall zone does not restore the
+  shallow fault: dip 59 deg, plates 67 / -188, against crust top alone 55 deg, 132 / -221, and recipe lag3 29 deg,
+  1757 / -1324. The crust stays on the slab side. Close-ups on movie page v37. Run continuing; awaiting Louis.
