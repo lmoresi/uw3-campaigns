@@ -162,6 +162,11 @@ params = uw.Params(
     uw_fault_zone_width=0.0,    # the zone's width from the fault line (layer depths); 0: two base cells
     uw_fault_zone_T=0.0,        # the zone weakens only where T is below this (a tanh over 0.02; Louis, 2026-11-11: "in the
                                 #   cold region of the hanging wall"); 0: uw_heal_T, the temperature above which damage heals
+    uw_fault_zone_floor=0.0,    # > 0: the zone weakens down to this effective viscosity and no further, with no T limit
+                                #   (Louis, 2026-11-11: "limit the damage to a weakening factor 10 times lower than the
+                                #   strong lithosphere and let already weak-material not get any weaker"): viscosity and
+                                #   yield stress times max(uw_fault_zone_weak, min(1, floor / eta_eff)), eta_eff the
+                                #   unweakened min(eta(T), tau_y / 2 edot_II); uw_fault_zone_T is then unused
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -1519,7 +1524,18 @@ class FaultedMesh:
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
-        if self.fault_zone is not None:
+        yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
+            self.gamma.sym[0] / params.uw_strain_crit, 1))
+        if self.fault_zone is not None and params.uw_fault_zone_floor > 0:
+            # the zone's factor from the unweakened effective viscosity (the yield law's, without its softness)
+            x, y = mesh.X
+            E = (self.v.sym.jacobian(mesh.X) + self.v.sym.jacobian(mesh.X).T) / 2
+            edot = sympy.sqrt((E[0, 0] ** 2 + E[1, 1] ** 2 + 2 * E[0, 1] ** 2) / 2)
+            tau_y = (tau0 + tau1 * (r_o - sympy.sqrt(x ** 2 + y ** 2))) * yield_factor
+            eta_eff = sympy.Min(sympy.exp(sympy.log(deta) * (1 - self.T.sym[0])), tau_y / (2 * edot + 1.0e-12))
+            floor = sympy.Max(params.uw_fault_zone_weak, sympy.Min(1, params.uw_fault_zone_floor / eta_eff))
+            weak = weak * (1 - (1 - floor) * self.fault_zone.sym[0] * (1 - M))
+        elif self.fault_zone is not None:
             T_zone = float(params.uw_fault_zone_T) or float(params.uw_heal_T)
             cold = (1 - sympy.tanh((self.T.sym[0] - T_zone) / 0.02)) / 2 if T_zone > 0 else 1
             weak = weak * (1 - (1 - params.uw_fault_zone_weak) * self.fault_zone.sym[0] * cold * (1 - M))
@@ -1528,8 +1544,6 @@ class FaultedMesh:
         if over_on:
             weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta, mask=M,
                                          window=marker_rheo_window(mesh))
-        yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
-            self.gamma.sym[0] / params.uw_strain_crit, 1))
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
                 if params.uw_asth < 1 else None)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
@@ -2722,7 +2736,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
