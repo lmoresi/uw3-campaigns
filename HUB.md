@@ -3454,3 +3454,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   interior) and, with spline + Lagrangian rebuild_fit 1, a rebuild builds the ladder on the spline as it is (no x(depth)
   refit, no straight top). Defaults unchanged. Louis: "Lag3 but with a thin, weak upper layer that we follow the base,
   and a line representing the oceanic crust just below that." Gates K1's overnight fault-fit-variant campaign.
+- 2026-11-12: overnight array 4393 from 127b220 (= 6f5f0d1), each lag3 + oceanic-crust line 0.006, 120 steps:
+  earth_sb_every, earth_sb_lag, earth_sb_every_passive running; earth_env_every, earth_lag3_floor10 queued.
+  earth_spline_passive (4391_1) continues; earth_lag3_passive (4387) and earth_spline_w05 (4391_0) stopped with Louis's
+  approval. K1 morning summary to follow.
