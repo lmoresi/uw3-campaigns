@@ -167,6 +167,13 @@ params = uw.Params(
                                 #   strong lithosphere and let already weak-material not get any weaker"): viscosity and
                                 #   yield stress times max(uw_fault_zone_weak, min(1, floor / eta_eff)), eta_eff the
                                 #   unweakened min(eta(T), tau_y / 2 edot_II); uw_fault_zone_T is then unused
+    uw_fault_band_weak=1.0,     # < 1 (Louis, 2026-11-11: "Why don't we just weaken the upper part of the ladder"): the
+                                #   fault band's cells (outside the bridge, which has uw_eta_w) whose centroid is shallower
+                                #   than uw_fault_band_depth have viscosity and yield stress times this; with
+                                #   uw_fault_zone_floor > 0 no weaker than that floor (the zone's rule). Otherwise the band
+                                #   has the host's own rheology (uw_fault_precedence 1 only turns the crust and zone off
+                                #   there), as strong as the plate around it. 1: none
+    uw_fault_band_depth=0.05,   # the depth (layer depths) above which uw_fault_band_weak acts
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -1484,6 +1491,11 @@ class FaultedMesh:
             near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
+        # the upper ladder (uw_fault_band_weak): band cells outside the bridge above uw_fault_band_depth
+        self.band_upper = None
+        if params.uw_fault_band_weak < 1 and self.faults:
+            self.band_upper = uw.discretisation.MeshVariable(f"bandup_{tag}", mesh, 1, degree=0, continuous=False)
+            self.band_upper.array[:, 0, 0] = (band & ~bridge & (r_o - radius < params.uw_fault_band_depth)).astype(float)
         # the fault's band (uw_fault_precedence): every band cell, the zone included, where the
         # fault's own rheology alone applies
         self.band_mask = None
@@ -1526,15 +1538,21 @@ class FaultedMesh:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
-        if self.fault_zone is not None and params.uw_fault_zone_floor > 0:
-            # the zone's factor from the unweakened effective viscosity (the yield law's, without its softness)
+        floored = None
+        if params.uw_fault_zone_floor > 0 and (self.fault_zone is not None or self.band_upper is not None):
+            # a factor f no weaker than the floor, from the unweakened effective viscosity (the yield law's,
+            # without its softness)
             x, y = mesh.X
             E = (self.v.sym.jacobian(mesh.X) + self.v.sym.jacobian(mesh.X).T) / 2
             edot = sympy.sqrt((E[0, 0] ** 2 + E[1, 1] ** 2 + 2 * E[0, 1] ** 2) / 2)
             tau_y = (tau0 + tau1 * (r_o - sympy.sqrt(x ** 2 + y ** 2))) * yield_factor
             eta_eff = sympy.Min(sympy.exp(sympy.log(deta) * (1 - self.T.sym[0])), tau_y / (2 * edot + 1.0e-12))
-            floor = sympy.Max(params.uw_fault_zone_weak, sympy.Min(1, params.uw_fault_zone_floor / eta_eff))
-            weak = weak * (1 - (1 - floor) * self.fault_zone.sym[0] * (1 - M))
+            floored = lambda f: sympy.Max(f, sympy.Min(1, params.uw_fault_zone_floor / eta_eff))
+        if self.band_upper is not None:
+            f = floored(params.uw_fault_band_weak) if floored else params.uw_fault_band_weak
+            weak = weak * (1 - (1 - f) * self.band_upper.sym[0])
+        if self.fault_zone is not None and floored:
+            weak = weak * (1 - (1 - floored(params.uw_fault_zone_weak)) * self.fault_zone.sym[0] * (1 - M))
         elif self.fault_zone is not None:
             T_zone = float(params.uw_fault_zone_T) or float(params.uw_heal_T)
             cold = (1 - sympy.tanh((self.T.sym[0] - T_zone) / 0.02)) / 2 if T_zone > 0 else 1
@@ -2736,7 +2754,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
