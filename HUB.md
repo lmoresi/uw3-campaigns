@@ -3458,3 +3458,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_sb_every, earth_sb_lag, earth_sb_every_passive running; earth_env_every, earth_lag3_floor10 queued.
   earth_spline_passive (4391_1) continues; earth_lag3_passive (4387) and earth_spline_w05 (4391_0) stopped with Louis's
   approval. K1 morning summary to follow.
+- 2026-11-12: kaiju/fault-spline-base 6f5f0d1 -> 31c7e08 (K1's d358b97, driver blob a85fca4; mbox sha256 matched,
+  py_compile clean). earth_sb_every's spline refused from step 23 (stretched slab crust left an empty depth band near
+  the cap); the fit now accepts a march to cap-0.03, counts single-particle bins, and carries the curve on to the cap
+  along its own direction. Not flag-gated: changes every spline run's fit (K1: stored checkpoints unchanged to 0.1 deg).
+  Restart as earth_sb_every_fix from checkpoint 20. K1 asked to record each run's driver in its README.
