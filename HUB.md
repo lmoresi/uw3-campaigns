@@ -3401,3 +3401,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the upper part of the ladder".
 - 2026-11-11: earth_top_band launched (4378): band x0.1 above depth 0.05, floor 100, no hanging-wall zone; from K1's local
   efce945 (same driver blob c405e07 as the pushed 05a260c); the README quotes both.
+- 2026-11-11: Louis: "moving that floor down until something happens". Job array 4379: earth_top_band_f30 / f10 / f3
+  (upper ladder x0.001, floor 30 / 10 / 3, from efce945 = 05a260c); earth_top_band (floor 100, 4378) continues.
+  earth_top_zone02 (4375) and earth_top_floor (4377) cancelled, having answered their questions (READMEs say why).
