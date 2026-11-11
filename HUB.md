@@ -3429,3 +3429,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (default 0.03), blended into the curve below; default 0 unchanged.
 - 2026-11-12: arm B, earth_top_dip30, launched (4388): crust top, crust passive, fault top fixed at 30 deg; from K1's local
   a0da6d4 (same blob f1abfe2 as the pushed 6fabce3), the README quotes both. Arm A, earth_lag3_passive (4387), running.
+- 2026-11-12: arm B (earth_top_dip30, 4388) CANCELLED: its crust-top fit was refused from step 9 and the fault drifted into
+  the mantle wedge. Arm A (earth_lag3_passive, 4387) keeps lag3's shallow top but, per Louis, is "overturning and
+  pinching off". Louis: let the dynamics set the fault's shape. Next: an offline test of a smoothing-spline fit along the
+  crust's arc length, to replace the straight top and the 30 deg floor. Wide renders on movie page v45.
