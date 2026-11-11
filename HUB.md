@@ -3376,3 +3376,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   that results from the presence of the fault rather than some complicated formulation with additional parameters".
   Run: earth_top_zone02 = the recipe + -uw_fault_crust_side top + -uw_crust_weak 0.999 (crust passive) +
   -uw_fault_zone_weak 0.2.
+- 2026-11-11: follow-up on kaiju/fault-zone-weak (K1's 0da99e0 -> 30ebfa8 on 999a3f8; mbox sha256 matched, blob 3c3a166,
+  py_compile clean): -uw_fault_zone_T, the zone weakens only where T is below it (default uw_heal_T). Louis: "Let's try
+  the single-cell width, in the cold region of the hanging wall" (in lag3 the weak crust that acted lay just outside the
+  fault band in the top ~0.04). Run: earth_top_zone02 with -uw_fault_zone_weak 0.2 -uw_fault_zone_width 0.015625
+  -uw_fault_zone_T 0.5, on the crust-top recipe with the crust passive, from 30ebfa8.
