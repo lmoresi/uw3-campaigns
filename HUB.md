@@ -3440,3 +3440,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-12: K1 launched array 4389 from 78ba3c4 (blob c11a047 = 777d432): earth_spline_w05 (crust x0.5) and
   earth_spline_passive (passive crust). Both: fault on the centre-line spline refit each step (not Lagrangian), split
   one rung below the surface, TI bridge to the surface, oceanic-crust line at 0.006. READMEs quote both hashes.
+- 2026-11-12: 4389 cancelled at step 2. The spline places the fault one step later than lag3 (step 2, not 1) because the
+  starting crust reaches only 0.142; delay accepted, no code change. Relaunched as array 4391 (same two runs, first try
+  kept as *_try1) with lag3's isotropic bridge instead of -uw_bridge_ti 1 (Louis: "TI or weak patch is probably not so
+  important"). Driver still 78ba3c4 = 777d432.
