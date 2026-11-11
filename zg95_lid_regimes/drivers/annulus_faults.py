@@ -1481,7 +1481,7 @@ def crust_spline_points(faults):
         if -q[1] > cap + 0.06:
             break
     C = np.array(pts)
-    if -C[-1, 1] < cap:
+    if -C[-1, 1] < cap - 0.03:                       # the envelope's tolerance: the slab's stretched crust thins out
         uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
         return None
     lam = float(params.uw_spline_length) ** 4 / ds
@@ -1504,7 +1504,7 @@ def crust_spline_points(faults):
         ss, off, cnt = [], [], []
         for j in np.unique(b):
             v = n_p[inb][b == j]
-            if len(v) >= 3:
+            if len(v) >= 1:                          # weighted by sqrt(count): the slab's stretched crust is sparse
                 ss.append(s_p[inb][b == j].mean())
                 # + inc * left points into the plate interior (the march runs from the incoming plate to the slab)
                 off.append(np.median(v) if stat == "median" else inc * np.quantile(inc * v, 0.9))
@@ -1530,9 +1530,23 @@ def crust_spline_points(faults):
     kd = int(np.argmax(fd > 0.05))
     above = np.flatnonzero(fd[:kd] <= z_flat + ct)
     kt = int(above[-1]) + 1 if len(above) else 0
-    if not (fd[kt:] >= cap).any():
-        uw.pprint("  crust fault (spline): the curve does not reach the cap")
+    if fd.max() < cap - 0.03:
+        uw.pprint(f"  crust fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
         return None
+    if not (fd[kt:] >= cap).any():
+        # within 0.03 of the cap (the envelope's tolerance: the starting slab's crust reaches ~0.142, and the subducted
+        # crust's lattice stretches until a 0.01 of depth can hold no particle): the curve carried on to the cap
+        # along its own direction over its last 0.01
+        kd = int(np.argmax(fd))
+        ke = int(np.argmax(sF >= sF[kd] - 0.01))
+        e = F[kd] - F[ke]
+        e = e / max(np.linalg.norm(e), 1e-12)
+        if e[1] >= -1e-3:
+            uw.pprint("  crust fault (spline): the curve's deep end does not descend")
+            return None
+        F = np.vstack([F[:kd + 1], F[kd] + np.outer(np.arange(0.0005, (cap - fd[kd]) / -e[1] + 0.001, 0.0005), e)])
+        fd = -F[:, 1]
+        uw.pprint(f"  crust fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
     kc = kt + int(np.argmax(fd[kt:] >= cap))
     seg = F[kt:kc + 1]
     k15 = int(np.argmax(-seg[:, 1] >= -seg[0, 1] + 0.015))
