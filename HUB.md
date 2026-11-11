@@ -3466,3 +3466,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-12: earth_sb_every_fix queued as job 4397 (checkpoint 20, d358b97 = 31c7e08). READMEs record drivers: all
   4393 runs 127b220 = 6f5f0d1; earth_spline_passive 78ba3c4 = 777d432. Original earth_sb_every (4393_0) runs on with
   a frozen fault after step 22; cancelling it needs Louis.
+- 2026-11-12: earth_sb_every_passive refused its spline fit from step 26 (same failure); earth_sb_every_passive_fix
+  queued as job 4398 from its checkpoint 25 on d358b97 = 31c7e08. earth_sb_lag: no refusals yet.
