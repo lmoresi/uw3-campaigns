@@ -3479,3 +3479,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   essential; crust weakness is not the key (with a base fit, passive matches x0.5); the base spline holds the top dip
   at 24-25 deg through t 5.2e-4 and its plates overtake lag3 late, while lag3's envelope steepens to 35 deg; the
   oceanic-crust line stays intact on the slab top. Still running: earth_lag3_floor10 and the three *_fix checks.
+- 2026-11-12: overnight report revised, movie page v53. Lag not needed; weak layer not the key, the fault's position
+  relative to the crust is; base spline holds a 25 deg top and overtakes lag3 late (plates 1886-2031 vs 1760 at 5.2e-4);
+  lowering lag3's top-dip floor to 10 deg helps by 6-13 %. Side finding routed to the dev hub (not filed):
+  earth_sb_lag_fix had two failed placements, kept its previous mesh: after step 81 place_thin_volume ribbon area
+  mismatch against CAD; after step 107 "fault_split: the fault touches the domain boundary". No other run had either.
