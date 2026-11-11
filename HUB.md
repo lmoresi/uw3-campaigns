@@ -3412,3 +3412,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   30 / 10 / 3 / 1, from 6c350cf (= 120ad1d). earth_top_band and earth_top_band_f30 / f10 / f3 (4378, 4379) cancelled:
   they weakened both sides, not what Louis meant (READMEs record it). Louis: hanging wall first, then the two-sided weak
   ladder to see whether the crust survives.
+- 2026-11-11: earth_top_hw_f30 / f10 / f3 / f1 (4382) at t 9e-5: the fault is freed: slip 680-760 vs 510 for crust top,
+  subducting plate 240-280 (as lag3 or faster); dip still 48 deg; crust on the slab side at 0.07 cells. Close-ups on movie
+  page v40.
