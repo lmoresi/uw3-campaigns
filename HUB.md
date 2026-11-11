@@ -3384,3 +3384,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-11: earth_top_zone02 (4375, 30ebfa8) at t 3.2e-4: the cold one-cell hanging-wall zone does not restore the
   shallow fault: dip 59 deg, plates 67 / -188, against crust top alone 55 deg, 132 / -221, and recipe lag3 29 deg,
   1757 / -1324. The crust stays on the slab side. Close-ups on movie page v37. Run continuing; awaiting Louis.
+- 2026-11-11: kaiju/fault-zone-cap pushed (K1's c0db29f -> 16bad51 on 30ebfa8; fault-zone-floor.mbox sha256 matched, blob
+  51d3e26, py_compile clean): -uw_fault_zone_floor F weakens the hanging-wall zone down to an effective viscosity F and no
+  further, with no T limit; default 0 unchanged. Louis ruled a fixed hanging-wall zone with about x0.1 weakening, no T
+  limit, and no weakening of material already below the floor ("limit the damage to a weakening factor 10 times lower
+  than the strong lithosphere and let already weak-material not get any weaker"). K1 launches from 16bad51.
