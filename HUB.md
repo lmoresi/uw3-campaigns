@@ -3468,3 +3468,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   a frozen fault after step 22; cancelling it needs Louis.
 - 2026-11-12: earth_sb_every_passive refused its spline fit from step 26 (same failure); earth_sb_every_passive_fix
   queued as job 4398 from its checkpoint 25 on d358b97 = 31c7e08. earth_sb_lag: no refusals yet.
+- 2026-11-12: earth_sb_lag refused from step 27 (Lagrangian mode would rebuild onto a stale spline); earth_sb_lag_fix
+  queued as job 4400 from checkpoint 25 on d358b97 = 31c7e08. All three base-spline runs on 127b220 compromised after
+  steps 22-26 and still running (cancelling needs Louis; READMEs say so). earth_spline_passive finished;
+  earth_env_every running.
