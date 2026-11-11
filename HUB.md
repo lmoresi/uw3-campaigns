@@ -3415,3 +3415,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-11: earth_top_hw_f30 / f10 / f3 / f1 (4382) at t 9e-5: the fault is freed: slip 680-760 vs 510 for crust top,
   subducting plate 240-280 (as lag3 or faster); dip still 48 deg; crust on the slab side at 0.07 cells. Close-ups on movie
   page v40.
+- 2026-11-11: earth_top_hw floors 30 / 10 / 3 / 1 at t 2e-4: the early gain fades and the runs stall like crust top; dip
+  48-51 deg, subducting plate 228-252, against lag3's 33 deg and 654. Movie page v41.
