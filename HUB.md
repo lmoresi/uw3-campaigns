@@ -3389,3 +3389,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   further, with no T limit; default 0 unchanged. Louis ruled a fixed hanging-wall zone with about x0.1 weakening, no T
   limit, and no weakening of material already below the floor ("limit the damage to a weakening factor 10 times lower
   than the strong lithosphere and let already weak-material not get any weaker"). K1 launches from 16bad51.
+- 2026-11-11: earth_top_floor launched (4377): zone x0.1, one cell wide, floor 100. Kaiju's proxy refused github.com, so by
+  Louis's decision it runs from K1's local c0db29f, which carries the same driver blob 51d3e26 as the pushed 16bad51; the
+  README quotes both. Process note: while github.com is refused on kaiju, "launch from a pushed commit" is met by blob
+  identity, not by fetching.
