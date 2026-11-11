@@ -3433,3 +3433,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the mantle wedge. Arm A (earth_lag3_passive, 4387) keeps lag3's shallow top but, per Louis, is "overturning and
   pinching off". Louis: let the dynamics set the fault's shape. Next: an offline test of a smoothing-spline fit along the
   crust's arc length, to replace the straight top and the 30 deg floor. Wide renders on movie page v45.
+- 2026-11-12: kaiju/fault-spline pushed (on 6fabce3; K1's 23f062f -> 6c3ac8a, uw_ocrust_depth, a passive oceanic-crust
+  line; 78ba3c4 -> 777d432, uw_fault_fit spline, the fault on a smoothing spline through the crust's centre line;
+  fault-spline.mbox sha256 matched, final driver blob c11a047 as stated, py_compile clean); defaults unchanged. Louis
+  approved two arms, crust x0.5 and passive, with a TI bridge to the surface.
