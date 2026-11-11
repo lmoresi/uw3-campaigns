@@ -3463,3 +3463,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the cap); the fit now accepts a march to cap-0.03, counts single-particle bins, and carries the curve on to the cap
   along its own direction. Not flag-gated: changes every spline run's fit (K1: stored checkpoints unchanged to 0.1 deg).
   Restart as earth_sb_every_fix from checkpoint 20. K1 asked to record each run's driver in its README.
+- 2026-11-12: earth_sb_every_fix queued as job 4397 (checkpoint 20, d358b97 = 31c7e08). READMEs record drivers: all
+  4393 runs 127b220 = 6f5f0d1; earth_spline_passive 78ba3c4 = 777d432. Original earth_sb_every (4393_0) runs on with
+  a frozen fault after step 22; cancelling it needs Louis.
