@@ -3437,3 +3437,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   line; 78ba3c4 -> 777d432, uw_fault_fit spline, the fault on a smoothing spline through the crust's centre line;
   fault-spline.mbox sha256 matched, final driver blob c11a047 as stated, py_compile clean); defaults unchanged. Louis
   approved two arms, crust x0.5 and passive, with a TI bridge to the surface.
+- 2026-11-12: K1 launched array 4389 from 78ba3c4 (blob c11a047 = 777d432): earth_spline_w05 (crust x0.5) and
+  earth_spline_passive (passive crust). Both: fault on the centre-line spline refit each step (not Lagrangian), split
+  one rung below the surface, TI bridge to the surface, oceanic-crust line at 0.006. READMEs quote both hashes.
