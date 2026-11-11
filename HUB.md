@@ -3427,3 +3427,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   pushed (K1's a0da6d4 -> 6fabce3 on 120ad1d; fault-top-dip-fix.mbox sha256 matched, blob f1abfe2 as stated,
   py_compile clean): -uw_fault_top_dip_fix a prescribes the fault's top at dip a down to -uw_fault_top_fix_depth
   (default 0.03), blended into the curve below; default 0 unchanged.
+- 2026-11-12: arm B, earth_top_dip30, launched (4388): crust top, crust passive, fault top fixed at 30 deg; from K1's local
+  a0da6d4 (same blob f1abfe2 as the pushed 6fabce3), the README quotes both. Arm A, earth_lag3_passive (4387), running.
