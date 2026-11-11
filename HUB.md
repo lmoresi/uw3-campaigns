@@ -3348,3 +3348,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   entry with the full flag set (fbbb886); both merged to main. Recipe flags: thin crust 0.00390625, weak 0.5, ppc 48,
   refill every 5, split advection; spacing 0.0078125, split_inset_along 1, cap 0.15, rebuild_cells 0.5; fault_lagrange 1,
   refit rebuild, rebuild_fit 1; underworld3 80d3ebe9. Driver defaults unchanged: the recipe is the launch line.
+- 2026-11-11: kaiju/fault-crust-top pushed (K1's 673f1af -> e4337fd on fbbb886; mbox sha256 matched, blob 88e68d1,
+  py_compile clean): -uw_fault_crust_side top makes the envelope locator follow the crust cloud's top, so the crust lies
+  in the subducting plate; default "base" leaves the recipe unchanged. Why: in earth_thin_w05_lag3 ~90 % of the crust
+  along the fault sits on the hanging-wall side. Louis: "It's clear that the crust should be on the slab side. The
+  question is only whether the presence of a slightly-weak crust obducted onto the over-riding plate is needed to create
+  the fault geometry"; he chose this option. Run: earth_thin_w05_lag3_top (the recipe + -uw_fault_crust_side top).
