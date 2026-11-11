@@ -46,15 +46,16 @@ Every session reads this file when it starts and when it meets a session ID it d
 | C3 | **docs hub** | `session_01HxWvn87HYCEJodpgCdaBro` | cloud | Louis | orchestration of docs, technical notes, examples; DOCS-HUB.md | technical work |
 | W1 | **integration** | `session_01HxWvn5rMK67zasgirdXszQ` | wombat, serial only | C1 | library code: solvers, rotated BC, custom MG, convergence policy | MPI runs |
 | W2 | **notes** | `session_011S876ckjYqqth1aPyojrhh` | wombat (assumed; confirm) | C3 | UWTN technical notes | |
-| H1 | **worker** | `session_01HxWvn98DsWPTz4ZpKByzQM` | hyperion, 16 cores | C1 | parallel suites, reviews, PRs, issues (no merge, approve or close) | science runs |
+| H1 | **worker** | `session_01HxWvn98DsWPTz4ZpKByzQM` | hyperion, 12 cores | C1 | parallel suites, reviews, PRs, issues (no merge, approve or close) | science runs |
 | H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | |
-| H3 | **units** | `session_01HxWvn7YfEseX8cKRcgzW9Z` | hyperion, up to 8 cores | C1 | units: the dimensional / non-dimensional boundary (issue-sweep cluster C6, #763, #765) | |
-| H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, up to 8 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4) | |
+| H3 | **units** | `session_01HxWvn7YfEseX8cKRcgzW9Z` | hyperion, 6 cores | C1 | units: the dimensional / non-dimensional boundary (issue-sweep cluster C6, #763, #765) | |
+| H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, 6 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4) | |
+| H5 | **restart** | `session_01HxWvn6CL6S3R1ELzJHJEay` | hyperion, 8 cores | C1 | parallel checkpoint reload of refined meshes and FMG hierarchy restart (#690) | |
 | K1 | **science** | `session_01HX67HY6xwuJivHKLLXrR3H` | kaiju (Slurm) | C2 | science campaigns (zg95), renders; owns the campaign drivers | library runs |
 | K2 | **dev runner** | `session_01HxWvn9ik2HHt9ANKndJRDr` | kaiju (Slurm) | C1 | library runs at scale: A/B evidence, scaling, leak checks | science runs |
 | K3 | **3-D add-on mesh** | `session_01HxWvn87Vw8gzXsEHJ7iF8u` | kaiju | C1 | 3-D add-on mesh, milestones M0-M4 | |
 
-Hyperion core budgets (C1, 2026-11-11; total 48, counting MPI ranks, pytest workers and background jobs): H1 16, H2 16, H3 8, H4 8. Reachability: H1 has no remote send_message tool. Sessions on hyperion exchange messages through a file mailbox: each reads `$HYPERION_WORK/mail/<code>/` and writes to the recipient's folder, one file per message named `<date>-<from>-<topic>.md`, starting with the header. Milestones to hubs still go by send_message; C1 relays when a session cannot send. Hyperion setup for new sessions: `$HYPERION_WORK/HYPERION-SESSION-SETUP.md` on hyperion (H1's).
+Hyperion core budgets (C1, 2026-11-11; total 48, counting MPI ranks, pytest workers and background jobs): H1 12, H2 16, H3 6, H4 6, H5 8 (re-split 2026-11-11 for H5). Reachability: H1 has no remote send_message tool. Sessions on hyperion exchange messages through a file mailbox: each reads `$HYPERION_WORK/mail/<code>/` and writes to the recipient's folder, one file per message named `<date>-<from>-<topic>.md`, starting with the header. Milestones to hubs still go by send_message; C1 relays when a session cannot send. Hyperion setup for new sessions: `$HYPERION_WORK/HYPERION-SESSION-SETUP.md` on hyperion (H1's).
 
 Retired (do not message): `session_01HxWvn8uLiybpyPgjwGunRf` (empty fork of K2),
 `session_01HxWvn65HBbkFbSxnYfNuxR`, `session_01HxWvnAXb5n85uEcw711tJC`,
