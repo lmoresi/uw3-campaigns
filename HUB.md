@@ -3472,3 +3472,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   queued as job 4400 from checkpoint 25 on d358b97 = 31c7e08. All three base-spline runs on 127b220 compromised after
   steps 22-26 and still running (cancelling needs Louis; READMEs say so). earth_spline_passive finished;
   earth_env_every running.
+- 2026-11-12: CORRECTION (K1): the three 127b220 base-spline runs refused only 3 fits each and placed the fault every
+  step since; not compromised, records stand with a 3-step pause (the "frozen fault after step 22" above was wrong).
+  The *_fix restarts 4397/4398/4400 now serve as a check that d358b97 changes nothing else. READMEs corrected.
