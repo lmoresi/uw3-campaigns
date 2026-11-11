@@ -148,6 +148,43 @@ params = uw.Params(
                                 #   uw_fault_lagrange_rebuild_fit of the way to the latest particle fit and smoothed,
                                 #   and the ladder is built on that
     uw_fault_lagrange_rebuild_fit=1.0,  # with refit "rebuild": the share of the particle fit at a rebuild (1: the fit)
+    uw_fault_crust_side="base",  # the envelope locator follows the crust cloud's "base" (its 10th percentile toward the
+                                #   incoming plate, as before: the crust then lies above the fault, on the overriding side;
+                                #   earth_thin_w05_lag3 had ~90 % of the crust along the fault on the hanging-wall side)
+                                #   or its "top" (the 10th percentile toward the overriding plate: the crust lies under the
+                                #   fault, in the subducting plate; Louis, 2026-11-11: "It's clear that the crust should be
+                                #   on the slab side")
+    uw_fault_zone_weak=1.0,     # < 1 (Louis, 2026-11-11: "instantaneous damage that results from the presence of the
+                                #   fault rather than some complicated formulation with additional parameters"): every cell
+                                #   of the faulted mesh within uw_fault_zone_width of the built fault, on its hanging-wall
+                                #   side, has its viscosity and yield stress multiplied by this, outside the fault band;
+                                #   the zone is rebuilt with the fault. 1: none
+    uw_fault_zone_width=0.0,    # the zone's width from the fault line (layer depths); 0: two base cells
+    uw_fault_zone_T=0.0,        # the zone weakens only where T is below this (a tanh over 0.02; Louis, 2026-11-11: "in the
+                                #   cold region of the hanging wall"); 0: uw_heal_T, the temperature above which damage heals
+    uw_fault_zone_floor=0.0,    # > 0: the zone weakens down to this effective viscosity and no further, with no T limit
+                                #   (Louis, 2026-11-11: "limit the damage to a weakening factor 10 times lower than the
+                                #   strong lithosphere and let already weak-material not get any weaker"): viscosity and
+                                #   yield stress times max(uw_fault_zone_weak, min(1, floor / eta_eff)), eta_eff the
+                                #   unweakened min(eta(T), tau_y / 2 edot_II); uw_fault_zone_T is then unused
+    uw_fault_band_weak=1.0,     # < 1 (Louis, 2026-11-11: "Why don't we just weaken the upper part of the ladder"): the
+                                #   fault band's cells (outside the bridge, which has uw_eta_w) whose centroid is shallower
+                                #   than uw_fault_band_depth have viscosity and yield stress times this; with
+                                #   uw_fault_zone_floor > 0 no weaker than that floor (the zone's rule). Otherwise the band
+                                #   has the host's own rheology (uw_fault_precedence 1 only turns the crust and zone off
+                                #   there), as strong as the plate around it. 1: none
+    uw_fault_band_depth=0.05,   # the depth (layer depths) above which uw_fault_band_weak acts; 0: the whole band
+    uw_fault_band_side="both",  # which of the band's halves uw_fault_band_weak weakens: "both", or "hanging", the half on
+                                #   the fault's hanging-wall (overriding-plate) side (Louis, 2026-11-11: "the true
+                                #   hanging-wall which is the upper half of the ladder")
+    uw_ocrust_depth=0.0,        # > 0 (layer mode): a passive oceanic-crust line, marker "ocrust": particles every
+                                #   line_spacing() this deep under the subducting plate's surface and into the slab's top
+                                #   face (below the weak crust layer when deeper than uw_crust_thick), its gaps filled like
+                                #   the crust line's; carried and written, never in the rheology or the fault's placement
+                                #   (Louis, 2026-11-12: "we treat a slightly deeper layer as the oceanic crust itself for the
+                                #   purpose of tracking deep advection of the oceanic crust and locations for dehydration
+                                #   reactions", "I'd trace the oceanic crust as a near-line. We don't need to know its
+                                #   thickness, just its location"). 0: none
     uw_crust_line_depth=0.0,    # line mode: the line's depth below the surface; 0: a quarter of uw_crust_thick
     uw_crust_line_spacing=0.0,  # line mode: the particle spacing along the line; 0: a quarter of the rung spacing S
     # a compositional slab on the same particles: the subducting plate and its slab as a
@@ -224,8 +261,24 @@ params = uw.Params(
     uw_fault_fit="envelope",    # crust law locator: "envelope" (the crust base marched up from the cap,
                                 #   crust_envelope_points; ruled by the go on the Earth plan, 2026-10-29, locator A/B
                                 #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
+                                #   or "spline" (crust_spline_points: a smoothing spline in arc length through the
+                                #   crust's centre line, from the incoming plate through the bend down the slab; no
+                                #   level of the layer chosen, no straight top, no dip floor. Louis, 2026-11-12: "a
+                                #   smooth fit with finite curvature (a spline is a plate bending solution of sorts)",
+                                #   "let the dynamics control the shape and not the other way around")
+    uw_spline_side="centre",    # spline: "centre" (the layer's median line) or "base" (Louis, 2026-11-12: "a thin, weak upper
+                                #   layer that we follow the base": a second pass about the centre line takes the quantile
+                                #   with 10 % of the layer beyond it toward the plate interior, as the envelope does)
+    uw_spline_length=0.02,      # spline: its smoothing length L (layer depths): lam = L^4 / 0.005 (offline on 12 stored
+                                #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_fault_top_dip_min=30.0,  # envelope: the least dip (deg) of the base's straight extension from its shallowest
                                 #   point to the wall; the unfloored dip is recorded
+    uw_fault_top_dip_fix=0.0,   # > 0: the fault's top prescribed at this dip (deg) down to uw_fault_top_fix_depth, blended
+                                #   into the curve's own slope over the next 0.02, in the envelope fit and the Lagrangian
+                                #   fault's line alike (Louis, 2026-11-12: "if we prescribed a near-surface dip of 30
+                                #   degrees, would the fault fitted to the crust-top actually match the lag3 case");
+                                #   uw_fault_top_dip_min is then unused. 0: none
+    uw_fault_top_fix_depth=0.03,  # the depth (layer depths) over which uw_fault_top_dip_fix holds
     uw_fault_trench_tol=0.15,   # envelope: no fault when that extension meets the wall further than this (arc, layer
                                 #   depths) from the particle trench
     uw_fault_realisation="split",  # "split": the fault cut and split, a frictionless contact; "ti": the band painted
@@ -456,6 +509,8 @@ edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 # cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
 LINE = str(params.uw_crust_mode) == "line"
 SPLIT_ADVECT = str(params.uw_crust_advect) == "split"
+if str(params.uw_fault_crust_side) not in ("base", "top"):
+    raise ValueError(f"-uw_fault_crust_side {params.uw_fault_crust_side}: 'base' or 'top'")
 if str(params.uw_fault_lagrange_refit) not in ("detect", "rebuild"):
     raise ValueError(f"-uw_fault_lagrange_refit {params.uw_fault_lagrange_refit}: 'detect' or 'rebuild'")
 if str(params.uw_crust_advect) not in ("base", "split") or (SPLIT_ADVECT and SCALED):
@@ -474,6 +529,7 @@ over_on = params.uw_over_dT != 0 or params.uw_over_eta != 1   # a negative uw_ov
 swarm_on = crust_on or comp_on or over_on
 crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
                else float(params.uw_cell) / 2 ** int(params.uw_refinement))
+ocrust_on = crust_on and not LINE and params.uw_ocrust_depth > 0
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
 markers = {}
@@ -481,6 +537,7 @@ if swarm_on:
     crust_swarm = uw.swarm.Swarm(base)
     # populated by the initial state: fresh particles for the slab state, the saved ones on a restart
 for name, on, geometry in (("crust", crust_on, lambda xy: layer_marker(xy, crust_thick)),
+                           ("ocrust", ocrust_on, lambda xy: np.zeros(len(xy))),   # 1 on its line's particles only
                            ("slab", comp_on, lambda xy: layer_marker(xy, float(params.uw_comp_thick))),
                            ("over", over_on, lambda xy: over_marker(xy, float(params.uw_over_comp_thick)))):
     if on:
@@ -1082,6 +1139,20 @@ def crust_fault_points(faults):
     return poly, theta_t, dip, float((r_o - radius).max())
 
 
+def fixed_top(zg, sm, inc):
+    """uw_fault_top_dip_fix: a fault curve x(depth) on the grid zg (ascending) with its top at the prescribed dip down to
+    uw_fault_top_fix_depth, its own slope below that depth plus 0.02 and a linear blend between, integrated up from the
+    deepest point so the curve below the blend is unchanged; and the run to the wall at the prescribed dip. ``inc`` is
+    the incoming plate's side: going up the fault moves toward it."""
+    zf = float(params.uw_fault_top_fix_depth)
+    s_fix = -inc / np.tan(np.radians(float(params.uw_fault_top_dip_fix)))
+    w = np.clip((zg - zf) / 0.02, 0.0, 1.0)
+    sl = w * np.gradient(sm, zg) + (1 - w) * s_fix
+    seg = 0.5 * (sl[1:] + sl[:-1]) * np.diff(zg)
+    out = sm[-1] - np.r_[np.cumsum(seg[::-1])[::-1], 0.0]
+    return out, float(-s_fix * inc)
+
+
 def wquantile(x, w, q):
     """The q-quantile of x with weights w."""
     o = np.argsort(x)
@@ -1117,6 +1188,8 @@ def place_line(zk, xk, inc, smooth=True):
     top = zg <= zg[0] + 0.03
     slope = np.polyfit(zg[top], sm[top], 1)[0]
     run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    if params.uw_fault_top_dip_fix > 0:
+        sm, run_len = fixed_top(zg, sm, inc)
     xa = sm[0] + inc * run_len * zg[0]
     raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]
     d = raw[1] - raw[0]
@@ -1192,6 +1265,23 @@ def advect_fault(f, faulted_mesh, dt):
     poly, theta_t, dip, depth = placed
     f.update({"points": poly.tolist(), "theta": theta_t, "dip": dip, "depth": depth})
     return True
+
+
+def fault_from_points(poly):
+    """(points, theta, dip, depth) of a placed fault polyline as it is: the trench where it crosses the wall, the dip of
+    its chord from there to 0.03 deep, its deepest point. Returns None for a polyline that does not cross the wall."""
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    if not (rp[0] > r_o and (rp <= r_o).any()):
+        return None
+    k = int(np.argmax(rp <= r_o))
+    w = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + w * (poly[k] - poly[k - 1])
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    return poly, float(np.arctan2(at_wall[1], at_wall[0])), dip, float((r_o - rp).max())
 
 
 def relax_fault(f, fit_points, alpha, smooth=False):
@@ -1271,7 +1361,8 @@ def crust_envelope_points(faults):
         a, b = min(zip(np.r_[0, cut], np.r_[cut, len(xs)]), key=lambda ab: np.abs(xs[ab[0]:ab[1]] - prev).min())
         if np.abs(xs[a:b] - prev).min() > 2 * ct:
             continue
-        base[j] = wquantile(xs[a:b], ws[a:b], q if inc < 0 else 1 - q)
+        toward_inc = str(params.uw_fault_crust_side) != "top"     # the base faces the incoming plate, the top away
+        base[j] = wquantile(xs[a:b], ws[a:b], (q if inc < 0 else 1 - q) if toward_inc else (1 - q if inc < 0 else q))
         prev = base[j]
     ok = np.isfinite(base)
     zk, bk = zs[ok][::-1], base[ok][::-1]            # shallow to deep
@@ -1293,6 +1384,8 @@ def crust_envelope_points(faults):
     slope = np.polyfit(zg[top], sm[top], 1)[0]       # dx/dz; going up the base moves toward inc
     top_dip = float(np.degrees(np.arctan2(1.0, max(-slope * inc, 1e-12))))
     run_len = float(np.clip(-slope * inc, 0.0, 1.0 / np.tan(np.radians(params.uw_fault_top_dip_min))))
+    if params.uw_fault_top_dip_fix > 0:
+        sm, run_len = fixed_top(zg, sm, inc)
     xa = sm[0] + inc * run_len * zg[0]
     gap = abs(xa - xt)
     if gap > params.uw_fault_trench_tol:
@@ -1319,6 +1412,166 @@ def crust_envelope_points(faults):
             "particle_trench": float(xt / r_o), "raw": np.c_[raw[:, 0] / r_o, raw[:, 1]].round(6).tolist()}
     uw.pprint(f"  crust fault (envelope): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, top dip from the "
               f"data {top_dip:.1f}{' (floored)' if info['top_dip_floored'] else ''}, trench gap {gap:.3f}")
+    return poly, theta_t, dip, float((r_o - rp).max()), info
+
+
+def crust_spline_points(faults):
+    """The crust law's fault on a smoothing spline through the crust's centre line, in arc length
+    (uw_fault_fit "spline"). In map coordinates (X = r_o theta about the trench hint, Y = -depth):
+    marching from the incoming plate 0.35 outboard of the hint toward the trench in steps of
+    0.005, each point re-centred on the median normal offset of the crust within +-0.005 along and
+    +-3 thicknesses across, the direction the chord over the last 4 steps, down to the cap + 0.06;
+    then the crust within 3 thicknesses of that line binned by arc length (0.005), the bin medians
+    fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length^4 / 0.005, weights
+    sqrt(count)). The fault is the curve from where it lies one crust thickness deeper than its
+    level on the incoming plate (the trench) to the depth cap; above that point it runs to the
+    wall along its own mean slope over the next 0.015 of depth (under a rung: the split stops one
+    rung down, so the bridge carries it), with a stub to 0.02 above the wall; resampled at the rung
+    spacing. The curve may turn past vertical. Collective. Returns (points, theta, dip, depth,
+    info) or None, as crust_envelope_points; tested offline on 12 stored checkpoints
+    (scratchpad arcfit_centre, 2026-11-12)."""
+    from scipy.interpolate import make_smoothing_spline
+    from scipy.spatial import cKDTree
+    cap, ct, ds, band = fault_depth_cap(), crust_thick, 0.005, 3.0 * crust_thick
+    xy = np.asarray(swarm_xy(), dtype=float)
+    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+    keep = marker > 0.5
+    P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
+    depth = r_o - np.hypot(P[:, 0], P[:, 1])
+    theta = np.arctan2(P[:, 1], P[:, 0])
+    if faults:
+        hint = float(faults[0]["theta"])
+    else:                                            # the subducted cluster that goes deepest
+        sub = (depth > 1.25 * ct) & (depth <= cap + 2 * ct)
+        if sub.sum() < 12:
+            return None
+        o = np.argsort(theta[sub])
+        pieces = np.split(o, np.flatnonzero(np.diff(theta[sub][o]) > 0.03) + 1)
+        piece = max(pieces, key=lambda p: depth[sub][p].max())
+        hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
+    X0 = r_o * hint
+    M = np.c_[r_o * (hint + wrap(theta - hint)), -depth]
+    M = M[(np.abs(M[:, 0] - X0) < r_o * 0.4) & (depth < cap + 0.11)]
+    dep = -M[:, 1]
+    sh = dep < 0.5 * ct
+    deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - X0) < 0.3)
+    if sh.sum() < 4 or deep.sum() < 12:
+        uw.pprint("  crust fault (spline): no subducted crust below cap/2, or none at the wall")
+        return None
+    inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
+    left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
+    tree = cKDTree(M)
+    pts, t, miss = [np.array([X0 + inc * 0.35, -0.5 * ct])], np.array([-inc, 0.0]), 0
+    for _ in range(600):                             # the march along the layer's centre
+        q = pts[-1] + ds * t
+        idx = tree.query_ball_point(q, 0.02)
+        if idx:
+            rel = M[idx] - q
+            a, n = rel @ t, rel @ left(t)
+            m = (np.abs(a) < ds) & (np.abs(n) < band)
+            if m.sum() >= 3:
+                q, miss = q + np.median(n[m]) * left(t), -1
+        miss += 1
+        if miss > 6:
+            break
+        pts.append(q)
+        if len(pts) >= 5:
+            d = pts[-1] - pts[-5]
+            t = d / np.linalg.norm(d)
+        if -q[1] > cap + 0.06:
+            break
+    C = np.array(pts)
+    if -C[-1, 1] < cap - 0.03:                       # the envelope's tolerance: the slab's stretched crust thins out
+        uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
+        return None
+    lam = float(params.uw_spline_length) ** 4 / ds
+    side = str(params.uw_spline_side)
+    if side not in ("centre", "base"):
+        raise ValueError(f"-uw_spline_side must be centre or base, not {side!r}")
+    # pass 1: bin medians about the marched line -> the centre line; with side "base", pass 2: about that centre
+    # line, the quantile with 10 % of the band toward the plate interior beyond it (the layer's base, as the envelope)
+    for stat in ("median",) + (("base",) if side == "base" else ()):
+        sc = np.r_[0, np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))]
+        Cd = np.c_[np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 0]), np.interp(np.arange(0, sc[-1], 0.001), sc, C[:, 1])]
+        s_d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(Cd, axis=0), axis=1))]
+        tg = np.gradient(Cd, axis=0)
+        tg /= np.linalg.norm(tg, axis=1)[:, None]
+        _, k = cKDTree(Cd).query(M)
+        rel = M - Cd[k]
+        s_p, n_p = s_d[k] + (rel * tg[k]).sum(1), (rel * left(tg[k])).sum(1)
+        inb = (np.abs(n_p) < band) & (s_p > s_d[0]) & (s_p < s_d[-1])
+        b = np.digitize(s_p[inb], np.arange(s_d[0], s_d[-1] + ds, ds))
+        ss, off, cnt = [], [], []
+        for j in np.unique(b):
+            v = n_p[inb][b == j]
+            if len(v) >= 1:                          # weighted by sqrt(count): the slab's stretched crust is sparse
+                ss.append(s_p[inb][b == j].mean())
+                # + inc * left points into the plate interior (the march runs from the incoming plate to the slab)
+                off.append(np.median(v) if stat == "median" else inc * np.quantile(inc * v, 0.9))
+                cnt.append(len(v))
+        ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
+        if len(ss) < 12:
+            uw.pprint("  crust fault (spline): too few crust bins along the layer")
+            return None
+        Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
+        ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
+        ts /= np.linalg.norm(ts, axis=1)[:, None]
+        Z = Cs + off[:, None] * left(ts)
+        w = w / w.mean()
+        sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
+        sy = make_smoothing_spline(ss, Z[:, 1], w=w, lam=lam)
+        sf = np.arange(ss[0], ss[-1], 0.0005)
+        F = np.c_[sx(sf), sy(sf)]
+        C = F                                        # the next pass's reference
+    fd = -F[:, 1]
+    sF = np.r_[0, np.cumsum(np.linalg.norm(np.diff(F, axis=0), axis=1))]
+    flat = (sF > 0.02) & (sF < 0.15)
+    z_flat = float(np.median(fd[flat])) if flat.any() else 0.5 * ct
+    kd = int(np.argmax(fd > 0.05))
+    above = np.flatnonzero(fd[:kd] <= z_flat + ct)
+    kt = int(above[-1]) + 1 if len(above) else 0
+    if fd.max() < cap - 0.03:
+        uw.pprint(f"  crust fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
+        return None
+    if not (fd[kt:] >= cap).any():
+        # within 0.03 of the cap (the envelope's tolerance: the starting slab's crust reaches ~0.142, and the subducted
+        # crust's lattice stretches until a 0.01 of depth can hold no particle): the curve carried on to the cap
+        # along its own direction over its last 0.01
+        kd = int(np.argmax(fd))
+        ke = int(np.argmax(sF >= sF[kd] - 0.01))
+        e = F[kd] - F[ke]
+        e = e / max(np.linalg.norm(e), 1e-12)
+        if e[1] >= -1e-3:
+            uw.pprint("  crust fault (spline): the curve's deep end does not descend")
+            return None
+        F = np.vstack([F[:kd + 1], F[kd] + np.outer(np.arange(0.0005, (cap - fd[kd]) / -e[1] + 0.001, 0.0005), e)])
+        fd = -F[:, 1]
+        uw.pprint(f"  crust fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
+    kc = kt + int(np.argmax(fd[kt:] >= cap))
+    seg = F[kt:kc + 1]
+    k15 = int(np.argmax(-seg[:, 1] >= -seg[0, 1] + 0.015))
+    d = seg[k15] - seg[0]                            # the run to the wall: the curve's own slope over the next 0.015
+    d = d / np.linalg.norm(d)
+    to_wall = -seg[0, 1] / max(-d[1], 1e-6)
+    wall = seg[0] - to_wall * d
+    pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
+    radius = r_o + pol[:, 1]
+    poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
+                             S, 2 ** int(params.uw_chain))
+    rp = np.hypot(poly[:, 0], poly[:, 1])
+    k = int(np.argmax(rp <= r_o))
+    wk = (rp[k - 1] - r_o) / max(rp[k - 1] - rp[k], 1e-12)
+    at_wall = poly[k - 1] + wk * (poly[k] - poly[k - 1])
+    theta_t = float(np.arctan2(at_wall[1], at_wall[0]))
+    below = poly[np.argmin(np.abs(r_o - rp - 0.03))]
+    r_hat = at_wall / np.linalg.norm(at_wall)
+    t_hat = np.array([-r_hat[1], r_hat[0]])
+    down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
+    dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
+    info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
+            "spline_run_to_wall": float(to_wall), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
+    uw.pprint(f"  crust fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
+              f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
@@ -1395,6 +1648,26 @@ def ti_band_viscosity(s, faulted, footprint, tag):
             "tau_y": tau_y, "on_yield": 1 - at_floor - at_host, "at_floor": at_floor, "at_host": at_host}
 
 
+def fault_side(points, pieces, r_o):
+    """The distance of each point from the nearest built fault line (its spine inside the wall) and its side of it:
+    > 0 on the overriding (hanging-wall) side, the side the segment normal with an outward radial part points to."""
+    best, side = np.full(len(points), np.inf), np.zeros(len(points))
+    for name, (spine, trace) in pieces.items():
+        sp = spine[np.hypot(spine[:, 0], spine[:, 1]) <= r_o + 1e-12]
+        for a, b in zip(sp[:-1], sp[1:]):
+            ab = b - a
+            L2 = max(ab @ ab, 1e-30)
+            t = np.clip(((points - a) @ ab) / L2, 0.0, 1.0)
+            q = a + t[:, None] * ab
+            d = np.linalg.norm(points - q, axis=1)
+            n = np.array([-ab[1], ab[0]]) / np.sqrt(L2)
+            if n @ (0.5 * (a + b)) < 0:
+                n = -n
+            upd = d < best
+            best[upd], side[upd] = d[upd], (points[upd] - q[upd]) @ n
+    return best, side
+
+
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
     solver, the bridge zones and the P1 fields the renders read."""
@@ -1462,12 +1735,36 @@ class FaultedMesh:
             near = polyline_distance(centroids, spine) < 2.0 * W
             bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
         self.zone.array[:, 0, 0] = bridge.astype(float)
+        # the weakened ladder (uw_fault_band_weak): band cells outside the bridge above uw_fault_band_depth (0: all),
+        # on both sides of the fault or (uw_fault_band_side "hanging") on its hanging-wall side
+        self.band_upper = None
+        if params.uw_fault_band_weak < 1 and self.faults:
+            if params.uw_fault_band_side not in ("both", "hanging"):
+                raise ValueError(f"uw_fault_band_side must be both or hanging, not {params.uw_fault_band_side!r}")
+            sel = band & ~bridge
+            if params.uw_fault_band_depth > 0:
+                sel &= r_o - radius < params.uw_fault_band_depth
+            if params.uw_fault_band_side == "hanging":
+                sel &= fault_side(centroids, self.pieces, r_o)[1] >= 0
+            self.band_upper = uw.discretisation.MeshVariable(f"bandup_{tag}", mesh, 1, degree=0, continuous=False)
+            self.band_upper.array[:, 0, 0] = sel.astype(float)
         # the fault's band (uw_fault_precedence): every band cell, the zone included, where the
         # fault's own rheology alone applies
         self.band_mask = None
         if params.uw_fault_precedence:
             self.band_mask = uw.discretisation.MeshVariable(f"band_{tag}", mesh, 1, degree=0, continuous=False)
             self.band_mask.array[:, 0, 0] = (band | bridge).astype(float)
+        # the fault's damage zone (uw_fault_zone_weak): the cells within its width of a built fault's line, on the
+        # overriding side (the side its segment normal with an outward radial part points to)
+        self.fault_zone = None
+        if params.uw_fault_zone_weak < 1 and self.pieces:
+            width = float(params.uw_fault_zone_width) or 2.0 * H_B
+            hang = np.zeros(len(centroids), dtype=bool)
+            for name, piece in self.pieces.items():
+                best, side = fault_side(centroids, {name: piece}, r_o)
+                hang |= (best < width) & (side >= 0)
+            self.fault_zone = uw.discretisation.MeshVariable(f"fzone_{tag}", mesh, 1, degree=0, continuous=False)
+            self.fault_zone.array[:, 0, 0] = hang.astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
         bridge_ti = bool(params.uw_bridge_ti) and not TI and bool(self.faults)
@@ -1477,13 +1774,32 @@ class FaultedMesh:
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
+        yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
+            self.gamma.sym[0] / params.uw_strain_crit, 1))
+        floored = None
+        if params.uw_fault_zone_floor > 0 and (self.fault_zone is not None or self.band_upper is not None):
+            # a factor f no weaker than the floor, from the unweakened effective viscosity (the yield law's,
+            # without its softness)
+            x, y = mesh.X
+            E = (self.v.sym.jacobian(mesh.X) + self.v.sym.jacobian(mesh.X).T) / 2
+            edot = sympy.sqrt((E[0, 0] ** 2 + E[1, 1] ** 2 + 2 * E[0, 1] ** 2) / 2)
+            tau_y = (tau0 + tau1 * (r_o - sympy.sqrt(x ** 2 + y ** 2))) * yield_factor
+            eta_eff = sympy.Min(sympy.exp(sympy.log(deta) * (1 - self.T.sym[0])), tau_y / (2 * edot + 1.0e-12))
+            floored = lambda f: sympy.Max(f, sympy.Min(1, params.uw_fault_zone_floor / eta_eff))
+        if self.band_upper is not None:
+            f = floored(params.uw_fault_band_weak) if floored else params.uw_fault_band_weak
+            weak = weak * (1 - (1 - f) * self.band_upper.sym[0])
+        if self.fault_zone is not None and floored:
+            weak = weak * (1 - (1 - floored(params.uw_fault_zone_weak)) * self.fault_zone.sym[0] * (1 - M))
+        elif self.fault_zone is not None:
+            T_zone = float(params.uw_fault_zone_T) or float(params.uw_heal_T)
+            cold = (1 - sympy.tanh((self.T.sym[0] - T_zone) / 0.02)) / 2 if T_zone > 0 else 1
+            weak = weak * (1 - (1 - params.uw_fault_zone_weak) * self.fault_zone.sym[0] * cold * (1 - M))
         if comp_on:
             weak = weak * comp_factor_on(self.slab.sym[0], params.uw_comp_eta, mask=M)
         if over_on:
             weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta, mask=M,
                                          window=marker_rheo_window(mesh))
-        yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
-            self.gamma.sym[0] / params.uw_strain_crit, 1))
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
                 if params.uw_asth < 1 else None)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
@@ -1679,7 +1995,9 @@ class FaultedMesh:
         self.gamma.array[:, 0, 0] = np.asarray(
             uw.function.global_evaluate(gamma_b.sym[0], onto(model_xy(self.gamma)))).ravel()
         for name, (var, _, _) in markers.items():
-            mine = getattr(self, name)
+            mine = getattr(self, name, None)
+            if mine is None:               # a passive marker (ocrust) has no picture on the faulted mesh
+                continue
             mine.array[:, 0, 0] = np.asarray(
                 uw.function.global_evaluate(var.sym[0], onto(model_xy(mine)))).ravel()
         t_transfer = time.perf_counter() - wall
@@ -2354,6 +2672,8 @@ def refill_crust():
         for name, (var, _, _) in markers.items():
             if name == "crust":
                 var.array[-added:, 0, 0] = 1.0
+            elif name == "ocrust":
+                var.array[-added:, 0, 0] = 0.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
     for var, _, _ in markers.values():
@@ -2369,13 +2689,14 @@ def line_spacing():
     return float(params.uw_crust_line_spacing) or 0.25 * S
 
 
-def line_points():
-    """The crust line of the slab state: line_depth() under the subducting plate's surface from
-    the trench back to its ridge, and line_depth() into the subducting side of the slab's top
-    face from the trench to the slab's end, every line_spacing()."""
+def line_points(depth=None):
+    """The crust line of the slab state (or the oceanic-crust line, ``depth`` deep): line_depth()
+    under the subducting plate's surface from the trench back to its ridge, and line_depth() into
+    the subducting side of the slab's top face from the trench to the slab's end, every
+    line_spacing()."""
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
-    d, sp = line_depth(), line_spacing()
+    d, sp = line_depth() if depth is None else float(depth), line_spacing()
     rel = -np.arange(0.5 * sp / r_o, abs(float(params.uw_ridge_sub)), sp / r_o)
     th = theta_t + over * rel
     surface = np.c_[(r_o - d) * np.cos(th), (r_o - d) * np.sin(th)]
@@ -2389,7 +2710,7 @@ def line_points():
     return onto(np.vstack([surface, face]))
 
 
-def refill_line(faults):
+def refill_line(faults, target="crust", line_d=None):
     """Fill the crust line's gaps (in line mode the line stretches over the ridge and down the
     slab, and bunches harmlessly at the trench: bunching along a line does not move it). The
     line's particles are gathered to every rank and chained from the incoming plate's ridge end
@@ -2398,12 +2719,15 @@ def refill_line(faults):
     two neighbours on the chain are more than 1.5 spacings apart, evenly spaced points are put
     between them, down to the depth cap plus 0.05; every rank passes the same points and keeps
     its own (add_particles_with_coordinates). Other markers from the nearest particle.
-    Collective. Returns the particles added on this rank."""
+    ``target`` and ``line_d``: the oceanic-crust line ("ocrust", uw_ocrust_depth) the same way; a
+    new particle is that line's, not the other's. Collective. Returns the particles added on
+    this rank."""
     from scipy.spatial import cKDTree
     sp = line_spacing()
+    line_d = line_depth() if line_d is None else float(line_d)
     xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
     old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
-    mine = xy[old["crust"] > 0.5]
+    mine = xy[old[target] > 0.5]
     P = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
     cand = np.zeros((0, 2))
     if len(P) > 2:
@@ -2412,7 +2736,7 @@ def refill_line(faults):
         theta_t = float(faults[0]["theta"]) if faults else float(params.uw_theta_trench)
         over = 1.0 if params.uw_dip < 90 else -1.0
         rel = over * wrap(theta - theta_t)
-        shallow = np.flatnonzero(depth < 2.0 * line_depth())
+        shallow = np.flatnonzero(depth < 2.0 * line_d)
         start = int(shallow[np.argmin(rel[shallow])]) if len(shallow) else int(np.argmin(rel))
         tree = cKDTree(P)
         seen = np.zeros(len(P), dtype=bool)
@@ -2444,8 +2768,10 @@ def refill_line(faults):
         new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
         nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
         for name, (var, _, _) in markers.items():
-            if name == "crust":
+            if name == target:
                 var.array[-added:, 0, 0] = 1.0
+            elif name in ("crust", "ocrust"):
+                var.array[-added:, 0, 0] = 0.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
     for var, _, _ in markers.values():
@@ -2483,8 +2809,12 @@ def seed_swarm():
         return
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
-    for var, _, geometry in markers.values():
+    n_oc = (crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(line_points(params.uw_ocrust_depth)))
+            if ocrust_on else 0)
+    for name, (var, _, geometry) in markers.items():
         var.array[:, 0, 0] = geometry(swarm_xy())
+        if name == "ocrust" and n_oc:
+            var.array[-n_oc:, 0, 0] = 1.0
         var._update()
 
 
@@ -2675,8 +3005,8 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
-                "uw_fault_fit", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_fault_fit", "uw_spline_side", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
+                "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
 
 
@@ -2836,8 +3166,13 @@ for k in range(k0, k0 + params.uw_steps):
                 and "fit_points" in faults[0]):
             # the Lagrangian curve has moved a threshold: the ladder is built on its blend with the
             # latest particle fit, smoothed
-            refit = relax_fault(faults[0], faults[0]["fit_points"], float(params.uw_fault_lagrange_rebuild_fit),
-                                smooth=True)
+            if params.uw_fault_fit == "spline" and float(params.uw_fault_lagrange_rebuild_fit) >= 1.0:
+                # the spline as it is: relax_fault's place_line would refit it as x(depth) and re-attach a straight
+                # top dipping at least uw_fault_top_dip_min (Louis, 2026-11-12: "a spline fit when we rebuild")
+                refit = fault_from_points(np.asarray(faults[0]["fit_points"]))
+            else:
+                refit = relax_fault(faults[0], faults[0]["fit_points"], float(params.uw_fault_lagrange_rebuild_fit),
+                                    smooth=True)
             if refit is not None:
                 poly_r, theta_r, dip_r, depth_r = refit
                 faults[0].update({"points": poly_r.tolist(), "theta": theta_r, "dip": dip_r, "depth": depth_r})
@@ -2938,6 +3273,9 @@ for k in range(k0, k0 + params.uw_steps):
                 and (k + 1) % int(params.uw_crust_refill_every) == 0):
             n_refill = int(uw.utilities.gather_data(refill_line(faults) if LINE else refill_crust(),
                                                     bcast=True).sum())
+            if ocrust_on:
+                n_refill += int(uw.utilities.gather_data(refill_line(faults, "ocrust", params.uw_ocrust_depth),
+                                                         bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
     # the Lagrangian fault moves with the slab (after the particles, before any detection)
@@ -3013,6 +3351,8 @@ for k in range(k0, k0 + params.uw_steps):
         # trench down to the depth cap; it forms at the first detection and never retires
         if params.uw_fault_fit == "envelope":
             found = crust_envelope_points(faults)
+        elif params.uw_fault_fit == "spline":
+            found = crust_spline_points(faults)
         else:
             found = crust_fault_points(faults)
             found = found + ({"locator": "parabola"},) if found is not None else None
