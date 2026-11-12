@@ -1,7 +1,7 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-H6 curved walls, 2026-11-12, for Louis. Version 4: sections from reading, with the measured
-examples of sections 1, 5b and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
+H6 curved walls, 2026-11-12, for Louis. Version 5: sections from reading, with the measured
+examples of sections 1, 3, 5b and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -149,9 +149,39 @@ exact gauges the check passes trivially; it only bites when an approximate mode 
 is the case development allows by design. The extra residual costs one evaluation per solve. The
 `ref` and switch changes are not explained in his document and are stale against #1014's comment.
 
-**Measured example: PENDING.** Planned: The slid-wall annulus from `test_1142` (slide 3e-5, tol 1e-9) on
-both builds: loop `rnorm`, residual of the finalized fields, `ref`, `converged`, SNES reason. Then a
-nonlinear case for iteration counts and switch iteration.
+**Measured example (run).** The slid-wall annulus of `test_1142` (factory annulus, two refinements,
+custom FMG, default normal, wall vertices slid along their circles by `slide·sin 3θ`), serial.
+"Residual of the returned fields" is computed the same way on both builds by the probe
+`walk/probe_residual.py`: the SNES function at the fields the user gets back, rotated by `Q`, normal
+rows removed; at slide 0 it reproduces the loop's own number. The reference residual is 1.995e-2.
+The correct energy is 5.50595e-5 (development's four values agree to 9 digits; the slide moves no
+wall).
+
+| slide, tolerance | build | loop's reported residual | residual of the returned fields | energy ∫v·v | rotation rate |
+|---|---|---|---|---|---|
+| 0, 1e-9 | development | 6.7e-14 | 6.7e-14 | 5.505954e-5 | 2e-19 |
+| 0, 1e-9 | #1033 | 7.5e-14 | 7.5e-14 | **9.717185e-5** | -5.3e-3 |
+| 3e-5, 1e-9 | development | 4.7e-16 | **3.83e-8** (1.9e-6 relative, target 1e-9) | 5.505954e-5 | -1e-20 |
+| 3e-5, 1e-9 | #1033 | 6.3e-16 | 6.3e-16 | **6.554309e-5** | 2.7e-3 |
+| 3e-4, 1e-9 | development | 4.3e-16 | **3.85e-8** | 5.505954e-5 | -3e-20 |
+| 3e-4, 1e-9 | #1033 | 8.2e-12 | 8.2e-12 | **5.516560e-5** | 2.7e-4 |
+| 3e-4, 1e-5 | development | 1.9e-9 | **4.11e-7** (2.1e-5 relative, target 1e-5) | 5.505954e-5 | -2e-18 |
+| 3e-4, 1e-5 | #1033 | 2.0e-9 | 2.0e-9 | **7.738944e-5** | -3.9e-3 |
+
+Every solve on both builds reports converged. Two things are true at once:
+
+- gthyagi's measurement reproduces exactly on development. When the rotation is near-null but not
+  exact (slide 3e-5), development removes it after the loop has converged, and the fields it returns
+  have a residual of 3.83e-8, eight orders above the number it reports and 2,000 times the
+  tolerance asked for. That is a real gap in what our tool reports. The answer itself is unharmed:
+  the energy matches the unslid mesh to 9 digits.
+- #1033's returned fields do satisfy the equations to the reported residual, but its answer is wrong
+  by 0.2% to 76% in energy, differently in each case, because the rotation it declines to remove is
+  nearly free: a residual of 1e-14 does not control a mode the operator barely sees. Its residual
+  check passes every time.
+
+So the residual check is worth having as a report of what was returned; it cannot be the test of
+whether the gauge is right.
 
 **What the choice is.** The post-solve check can be taken alone, as a report or as a verdict; it does
 not need the rest. If section 1 stays as it is, a verdict would fail shell solves that pass today.
