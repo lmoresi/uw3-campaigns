@@ -5,7 +5,7 @@ Lengths are in units of the layer depth, so the annulus of the ZG95 campaign (in
 radius 0.55 of the outer) has r_o = 1 / 0.45 and r_i = 0.55 / 0.45, and every other
 parameter (Ra, H, tau0, tau1, time) is the box's without conversion.
 
-    eta(T)  = deta ** (1 - T)                (1 at the basal temperature)
+    eta(T)  = deta ** (1 - T)                (1 at the basal temperature; or Arrhenius, see eta_of_T)
     tau_y   = tau0 + tau1 * depth            (depth = r_o - r)
     eta_eff = softmin(eta(T), tau_y / (2 edot_II))
 """
@@ -81,21 +81,44 @@ def lower_mantle_factor(depth, factor, top, ramp):
     return 1 + (factor - 1) * (1 + sympy.tanh((depth - top) / ramp)) / 2
 
 
+def arrhenius_E(deta, T_i, T0):
+    """The activation term E for which exp(E / (T + T0)) has the Frank-Kamenetskii law's slope,
+    d ln(eta) / dT = -ln(deta), at the interior temperature ``T_i``."""
+    return float(np.log(float(deta)) * (T_i + T0) ** 2)
+
+
+def eta_of_T(T_sym, deta, arrhenius=None):
+    """The viscosity's temperature law. Frank-Kamenetskii (the default): deta ** (1 - T), 1
+    at the basal temperature. ``arrhenius`` = (E, T0, T_i, eta_max): exp(E / (T + T0)), scaled
+    to equal the Frank-Kamenetskii viscosity deta ** (1 - T_i) at the interior temperature
+    ``T_i`` (so Ra and the yield stresses keep their meaning) and capped at ``eta_max``; ``T0``
+    is the surface temperature in units of the temperature drop, and T is taken no lower than
+    0 (below -T0 an undershoot would turn the law over). With E from ``arrhenius_E`` the two
+    laws also have the same slope at T_i: the cold side is then stiffer than Frank-Kamenetskii
+    and the hot side less weak (the basal viscosity is above 1)."""
+    if arrhenius is None:
+        return sympy.exp(sympy.log(deta) * (1 - T_sym))
+    E, T0, T_i, eta_max = (float(a) for a in arrhenius)
+    rise = E * (1 / (sympy.Max(T_sym, 0) + T0) - 1 / (T_i + T0))
+    return sympy.exp(sympy.Min(sympy.log(deta) * (1 - T_i) + rise, float(np.log(eta_max))))
+
+
 def set_viscoplastic(stokes, T_sym, deta, tau0, tau1, softness, r_o, weak=1, yield_factor=1,
-                     asthenosphere=None, lower_mantle=None, eta_ref=None):
+                     asthenosphere=None, lower_mantle=None, eta_ref=None, arrhenius=None):
     """Temperature-dependent viscosity capped by a yield stress that grows with depth
     below the outer wall. ``weak`` (1 by default) multiplies both the viscosity and
     the yield stress, for a weak zone; ``yield_factor`` multiplies the yield stress
     alone (strain weakening); ``asthenosphere`` = (factor, top, bottom, ramp) multiplies
     the viscosity by ``factor`` in a depth channel (see ``asthenosphere_factor``);
     ``lower_mantle`` = (factor, top, ramp) multiplies it below ``top`` (see
-    ``lower_mantle_factor``). ``eta_ref`` (a units run): the viscosity at the basal
+    ``lower_mantle_factor``); ``arrhenius``: the temperature law's Arrhenius form (see
+    ``eta_of_T``; None is Frank-Kamenetskii). ``eta_ref`` (a units run): the viscosity at the basal
     temperature as an expression with units, which then also floors the viscosity;
     ``tau0`` and ``tau1`` are then a stress and a stress per length, and the solver
     non-dimensionalises all three. Returns eta(T) with those factors, the viscosity the
     yield law caps."""
     depth = r_o - radius_of(stokes.mesh)
-    eta_T = sympy.exp(sympy.log(deta) * (1 - T_sym))
+    eta_T = eta_of_T(T_sym, deta, arrhenius)
     if asthenosphere is not None:
         eta_T = eta_T * asthenosphere_factor(depth, *asthenosphere)
     if lower_mantle is not None:

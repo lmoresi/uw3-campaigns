@@ -47,6 +47,7 @@ rests on a kaiju measurement cited; "taken" means a default inherited without a 
 
 | knob | value | status | evidence / ruling |
 |---|---|---|---|
+| `uw_visc_law` (the viscosity's temperature law) | "fk" (Frank-Kamenetskii, `uw_deta ** (1 - T)`) in every run to 2026-11-12; "arrhenius" in the arm earth_young80_arr | the Arrhenius arm asked by Louis 2026-11-12 ("an Arrhenius version of the young slab run"); its parameters taken by the Kaiju session, not ruled | exp(E / (T + T0)) scaled to the fk viscosity at `uw_T_interior` (so Ra and the yield stresses are unchanged), `uw_arr_T0` 0.1092 (273 K / 2500 K), `uw_arr_E` 0 = the fk slope at the interior temperature (6.12 for deta 4e3, 127 kJ/mol), capped at `uw_arr_eta_max` 0 = `uw_deta`. Against fk at deta 4e3: the cap from T 0.35 down, x2.3 at T 0.5, x1.6 at the base. |
 | crust marker | one cell thick, x0.001 on viscosity and yield, `uw_crust_ppc` 12 | ruled 2026-10-27 (Louis: keep the thin crustal layer; its base is the fault's target, Sandiford & Moresi) | x0.001 is "very, very weak" (Louis); a crust-strength sweep is on the list. |
 | `uw_fault_precedence` | 1 in TAti and the Earth runs, 0 in TAf/TBf | ruled 2026-10-29 (fault rheology always wins; no double weakening) | the mask is the whole band. |
 | Earth setup | continent x1 (deforms), buoyant -0.5, lid age 0.000625, gate depth 0.12, Ra 2.386e7, over_gap 0.75, cont_extent 2.4315, ridge fixed | ruled 2026-10-29/30 ("the continent is fine to deform ... unless they are cratons") | run 1 complete at the base, 81 steps. |

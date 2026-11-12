@@ -43,8 +43,8 @@ from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
 from underworld3.utilities.place_surface import place_fault_ribbon_2d
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii,
-                           free_slip_walls, ridge_factor, set_viscoplastic)
+from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, arrhenius_E, clamp_radii,
+                           eta_of_T, free_slip_walls, ridge_factor, set_viscoplastic)
 from strain_band import (boundary_layer_depth, detect_fault, fit_fault_lines, polar_grid, rank_bands,
                          spine_separation)
 
@@ -226,6 +226,13 @@ params = uw.Params(
                                 #   the plates, the crust and the fault are
     uw_ra=9.1125e5,
     uw_deta=3.0e4,
+    uw_visc_law="fk",           # the viscosity's temperature law. "fk": Frank-Kamenetskii, uw_deta ** (1 - T). "arrhenius"
+                                #   (Louis, 2026-11-12: "an Arrhenius version of the young slab run"): exp(E / (T + T0)),
+                                #   equal to the fk viscosity at uw_T_interior and capped (annulus_model.eta_of_T)
+    uw_arr_T0=0.1092,           # arrhenius: the surface temperature over the temperature drop (273 K / 2500 K)
+    uw_arr_E=0.0,               # arrhenius: the activation term E (E* / R dT). 0: the fk law's slope at uw_T_interior,
+                                #   ln(uw_deta) (uw_T_interior + uw_arr_T0)^2 (6.12 for uw_deta 4e3: 127 kJ/mol at dT 2500 K)
+    uw_arr_eta_max=0.0,         # arrhenius: the viscosity's cap. 0: uw_deta, the fk law's surface viscosity
     uw_tau0=2.025e4,
     uw_tau1=1.366875e6,
     uw_heating=1.4175,
@@ -642,6 +649,14 @@ else:
               f"plate thickness 2 sqrt(age) = {_phys(2 * np.sqrt(params.uw_age_sub), LEN, 'km'):.4g} km; "
               f"interior viscosity (T {params.uw_T_interior:g}) deta^{1 - params.uw_T_interior:g} eta_ref = "
               f"{float(params.uw_deta) ** (1 - params.uw_T_interior):.4g} x eta_ref")
+
+if params.uw_visc_law not in ("fk", "arrhenius"):
+    raise ValueError(f"uw_visc_law must be fk or arrhenius, not {params.uw_visc_law!r}")
+ARRHENIUS = None        # (E, T0, T_i, eta_max) of annulus_model.eta_of_T; None: Frank-Kamenetskii
+if params.uw_visc_law == "arrhenius":
+    ARRHENIUS = (float(params.uw_arr_E) or arrhenius_E(params.uw_deta, params.uw_T_interior, params.uw_arr_T0),
+                 float(params.uw_arr_T0), float(params.uw_T_interior),
+                 float(params.uw_arr_eta_max) or float(params.uw_deta))
 
 adv = uw.systems.AdvDiffusion(base, T_b, V_b.sym, order=1)
 adv.constitutive_model = uw.constitutive_models.DiffusionModel
@@ -1795,7 +1810,7 @@ class FaultedMesh:
             E = (self.v.sym.jacobian(mesh.X) + self.v.sym.jacobian(mesh.X).T) / 2
             edot = sympy.sqrt((E[0, 0] ** 2 + E[1, 1] ** 2 + 2 * E[0, 1] ** 2) / 2)
             tau_y = (tau0 + tau1 * (r_o - sympy.sqrt(x ** 2 + y ** 2))) * yield_factor
-            eta_eff = sympy.Min(sympy.exp(sympy.log(deta) * (1 - self.T.sym[0])), tau_y / (2 * edot + 1.0e-12))
+            eta_eff = sympy.Min(eta_of_T(self.T.sym[0], deta, ARRHENIUS), tau_y / (2 * edot + 1.0e-12))
             floored = lambda f: sympy.Max(f, sympy.Min(1, params.uw_fault_zone_floor / eta_eff))
         if self.band_upper is not None:
             f = floored(params.uw_fault_band_weak) if floored else params.uw_fault_band_weak
@@ -1817,7 +1832,7 @@ class FaultedMesh:
                                       r_o, weak, yield_factor, asthenosphere=asth,
                                       lower_mantle=((params.uw_lm_eta, params.uw_lm_depth, params.uw_lm_ramp)
                                                     if params.uw_lm_eta != 1 else None),
-                                      eta_ref=eta_ref)
+                                      eta_ref=eta_ref, arrhenius=ARRHENIUS)
         if params.uw_eta_reg > 0:
             # in a units run a viscosity: uw_eta_reg times the basal viscosity
             s.constitutive_model.Parameters.plastic_rate_strengthening = (
@@ -2974,7 +2989,10 @@ _ra, _tau0, _tau1, _H = ((derived["Ra_solver"], derived["tau0"], derived["tau1"]
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
           f"{_tau1 / _ra:.3g}, tau0 {_tau0:.4g}, H {_H:.4g}, "
           f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
-          f"{len(faults)} fault(s); "
+          + (f"viscosity fk, deta {float(params.uw_deta):g}; " if ARRHENIUS is None else
+             f"viscosity arrhenius, E {ARRHENIUS[0]:.4g}, T0 {ARRHENIUS[1]:g}, the fk viscosity "
+             f"{float(params.uw_deta) ** (1 - ARRHENIUS[2]):.4g} at T {ARRHENIUS[2]:g}, cap {ARRHENIUS[3]:g}; ")
+          + f"{len(faults)} fault(s); "
           + (f"ridge x{params.uw_ridge_weak:g} at {', '.join(f'{np.degrees(a):.1f}' for a in ridges)} deg "
              f"(width {params.uw_ridge_width:g}, to {params.uw_ridge_depth:g}); " if ridges else "")
           + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {params.uw_crust_depth:g}; "
@@ -3022,7 +3040,8 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_n
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_spline_side", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
-                "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness"]
+                "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness",
+                "uw_visc_law", "uw_arr_T0", "uw_arr_E", "uw_arr_eta_max"]
 
 
 def write_choices(explicit, effective, info):
