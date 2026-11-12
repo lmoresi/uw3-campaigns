@@ -1,7 +1,7 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-H6 curved walls, 2026-11-12, for Louis. Version 3: sections from reading, with the measured
-examples of sections 1 and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
+H6 curved walls, 2026-11-12, for Louis. Version 4: sections from reading, with the measured
+examples of sections 1, 5b and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -206,7 +206,20 @@ it) is needed, and should then be an option a user can see and turn off.
 
 **Why he did it. This is a real defect in our tool.** The internal surface is made of flat triangles whose vertices are on the sphere. A tetrahedron just outside it can have all four vertices on r = R, and then its centroid is inside R. He found one on Gadi: four vertices at r = 2, centroid at r = 1.99706, labelled Inner by us and Outer by gmsh's own facet tags. `extract_region` then puts that cell on the wrong side.
 
-**Measured example: PENDING.** Planned: One shell mesh on both builds: cells labelled Inner and Outer; number of cells whose label differs; whether every Internal facet separates an Inner cell from an Outer cell.
+**Measured example (run).** Probe `walk/probe_labels.py`: for every Internal facet, is there an Inner
+cell on one side and an Outer cell on the other? On 12 unrefined or once-refined shells on hyperion,
+development's labels are correct: his single-tetrahedron case did not reproduce here. With two
+refinements it is systematic, because refinement leaves the new Internal vertices on the chords of
+the coarse surface, so cells just outside it have centroids below `radiusInternal`. Shell
+0.547 / 0.8 / 1.0, cell size 0.3, `refinement=2` (98,112 cells, 4,096 Internal facets):
+
+| build | Inner cells | Internal facets with Inner cells on both sides |
+|---|---|---|
+| development | 37,267 | 1,363 |
+| #1033 (flood fill) | 35,904 = 64 × 561, the unrefined count | 0 |
+
+This is now PR #1100 (his commit alone on development, plus a test of those two exact properties
+that fails on development); it passes at np 1 to 5.
 
 **The choice.** Take the fix. It is small (153 lines plus the constructor call), self-contained, and worth landing on its own as a bug fix with his test, rather than waiting for the spherical methods.
 
