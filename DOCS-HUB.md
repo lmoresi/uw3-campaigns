@@ -734,3 +734,7 @@ Measured here, not inherited.
   with its mystmd 1.6.7). The MMPDE note's listing thumbnail is probably its GIF (no
   `thumbnail:` set; the header itself is an Unsplash photo); the movie and still come
   from H2's rerun, the fault note's from the K1 runner.
+- 2026-11-12: Louis: the MMPDE note's movie is re-encoded from the June run's original
+  frames (wombat is finding them), not replaced by a new run; the fishing-net header
+  stays. Held until H2's rerun says whether the June run is affected by the older
+  moved-mesh defect; if it is, H2's frames are used instead.
