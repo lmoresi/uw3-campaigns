@@ -1,7 +1,8 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-H6 curved walls, 2026-11-12, for Louis. Version 5: sections from reading, with the measured
-examples of sections 1, 3, 5b and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
+H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
+examples of sections 1, 3, 5b and 6, the opt-in measurement, and the history of #857's recovery
+methods (section 7) filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -308,6 +309,76 @@ branch, and np above 1.
 **The choice (D1).** Port the methods onto development's solve and hold the solver-core changes. From reading, the port costs almost nothing in the methods themselves. The solver-core changes can then be judged on their own evidence, separately.
 
 ## 7. #857's recovery methods against what we already have
+
+### Why #1033 does not carry them: the history (stage 1, from reading)
+
+**Short answer.** They were neither lost nor declared unnecessary. gthyagi left them out on purpose
+when he rebuilt the work on a clean base, and he says so in the commits; he does not say they are
+superseded. Our reviews did not cause it: the rebuild started two days before our first review. What
+we did fail to do is the mathematical review he asked for, so #857 has sat with the recovery half
+unjudged since 29 October.
+
+**When and where they left.** They never left #1033, because they were never on it.
+- #857's algorithm commits are dated 23 to 25 October (recovery: `6649a609` "Add conservative spatial
+  annulus trace reconstruction and gauge consistency", `1e2d0a5e` "Recover full zero-slip annulus
+  traction on physical circles", both 25 October). *Read from git.*
+- #1033's lineage starts the next day from development, not from #857: `eb304238`, 26 October,
+  "Isolate cylindrical prescribed pressure-jump extraction on development". Its message: *"Port only
+  the Stokes pressure-lifting entry point, bounded circular-cut source helper and mathematical tests.
+  No wall transfer, traction recovery, gravity or analytical-module changes."* *Quoted.*
+- `908079a5`, 27 October: *"Add lagged rotated free-slip and full-vector zero-slip circle conditions
+  without topography or gravity APIs."* *Quoted.*
+- None of `_cylindrical_reactions.py`, `_cylindrical_reconstruction.py`,
+  `_cylindrical_dirichlet_traction.py`, nor any of the four methods, appears in any commit of #1033's
+  history. *Read from git (`git log -S`, path history).*
+
+**What he says about them.**
+- #1033 body: *"Numerical gravity/topography integration is outside scope."* Its review document:
+  *"Numerical topography/gravity integration is outside this change."* Its guide text on the lagged
+  walls: *"No topography or gravity calculation is needed."* *Quoted.*
+- Nowhere in #1033 (body, review document, guide, commit messages) are #857 or the four methods
+  named, and nowhere does he say the gap reactions replace them. *Read; searched for recover,
+  reconstruct, topograph, CBF, 857.*
+- On #857 itself, 29 October: *"Your separate mathematical-review requirement remains open; this PR
+  stays in draft, and I am not claiming that the structural checks validate the recovery
+  mathematics."* He has not commented on #857 since; the last entry is our review of 6 November.
+  *Quoted; read.*
+- So: deliberately out of scope for #1033, status of #857 unstated. Whether he still wants the
+  recovery methods in the library, or keeps them in his benchmark repository, he does not say.
+  **That question goes to gthyagi.** *Inferred from the above:* the rebuild looks like a move to
+  small, separately checkable pieces (pressure lift, then walls, then gap), with recovery and
+  gravity left in the benchmark drivers.
+
+**What replaced them, if anything.** *Read from code.*
+
+| #857 method | In #1033 | In development already |
+|---|---|---|
+| topography recovery (σ_nn moved from the polygon to the circle) | nothing for the lagged walls; the coupled gap solves return `normal_reaction`, the multiplier λ = −σ_nn on the true circle | `boundary_normal_traction`, `dynamic_topography` on a rotated free-slip wall (polygon, annulus and shell) |
+| boundary coefficient (cosine coefficient of a wall field) | nothing | `boundary_normal_traction_integral` gives harmonic coefficients from the reaction |
+| trace reconstruction (smoothing kernel keeping mean and resultant) | nothing | nothing |
+| zero-slip traction recovery (σ_nn and σ_rθ on the circle) | nothing for the lagged zero-slip wall; `solve_cylindrical_gap_zero_slip` returns `normal_reaction` and `tangential_reaction` | `boundary_flux(..., normal=)` at a prescribed-velocity wall (polygon; no circle correction, no shear field) |
+
+So a user of #1033's lagged walls who wants topography has only our existing reaction on the polygon.
+The two things #857 has that exist nowhere else are the trace reconstruction and the zero-slip shear
+on the true circle.
+
+**Our side of it.** *Read from the PR; H1's numbers were run on 2026-11-06 at 23c11aa8.*
+- 28 October: our first review covered structure only and said the algorithm and recovery
+  mathematics *"wants a reviewer with the annulus benchmark in hand"*. That review was never done.
+- 6 November: "not ready", for three blocking reasons, none about the mathematics: a merge that
+  dropped a datum (now fixed by #1097), a merge conflict with a shadowing trap, and tests that could
+  not fail on the core (14 of 18 mutants survived). The same review found the numerics held against
+  analytic cases: zero-slip σ_nn converging at second order, shear rms 6.1e-2 to 3.07e-3 with wall
+  updates and 5.9e-5 after reconstruction; and that the plain topography transfer was 9 to 22% worse
+  than our raw reaction on the smooth case, 23 to 51% better on the sheet case.
+- Nothing in either review asked for the methods to be dropped, and #1033's design predates both. He
+  has not replied to the 6 November review.
+
+**Stage 2 (measured, to come after the first unit PRs):** one annulus case with a known answer; for
+each recovered quantity, #857's method, #1033's gap reaction and development's reaction, with errors
+and convergence order. That decides whether #857 is finished or closed.
+
+### What each method does
 
 **Today.** After a rotated free-slip solve, the constraint's reaction is the wall normal traction. `boundary_normal_traction(boundary)` returns sigma_nn at the wall nodes, `dynamic_topography(boundary, field)` writes h = -(sigma_nn - mean)/(drho g), and `boundary_normal_traction_integral(boundary, fn)` gives harmonic coefficients without nodal recovery. For a wall with prescribed velocity, `boundary_flux(boundary, normal=...)` recovers the traction from the essential-condition reaction (consistent boundary flux). Our own docstrings carry the known weakness: on a curved wall the P2 vertex values converge slowly; midpoints and integrals are good.
 
