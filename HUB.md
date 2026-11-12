@@ -3637,3 +3637,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   running. K1 next: forced-refusal test of the stop and a restart from its checkpoint, then earth_young80_arr on
   21c23e6. K1 read "Fine to restart" as a yes to restarting the two FK young-slab arms from ~step 220 with ridge
   crust; hub asked K1 to hold that for Louis's explicit answer.
+- 2026-11-13: earth_young80_arr LAUNCHED: job 4567 on n7, 08:04 13 Nov, from step 0, 1200 steps; driver 21c23e6 =
+  52c6b5a, overlay-dev-80d3ebe9 explicit; launch line = earth_young80's + -uw_visc_law arrhenius -uw_ridge_crust 1.
+  placement_stop_test passed: job 4564 forced refusal at step 218 -> "STOPPED: ... refused at step 218; step 217
+  checkpointed", exit 3, step 217 files written; job 4565 restart from 217 ran 218-219, converged, exit 0.
+  earth_young80_ridgecrust_test (job 4563, restart from 215 with ridge crust): steps 216-230 converged, 15/15 fault fits
+  accepted (original refused from 225); first ridge fill step 219 (13,461 particles), then ~300 per refill; surface
+  crust continuous from the hot patch edge to the trench. Runs to 275; memory check past 240 still to come. FK arm
+  restarts held for Louis.
