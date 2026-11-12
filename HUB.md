@@ -3584,3 +3584,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   viscosity at T_interior (Ra and yield stresses unchanged); vs fk at deta 4e3: capped from T 0.35 down, x2.3 at T 0.5,
   x1.6 at the base. For an Arrhenius version of the young-slab run (Louis), to start when the FK arms reach ~350 Myr;
   2-step test first, then earth_young80_arr. PARAMETERS ARE K1's CHOICE, NOT RULED (flagged to Louis).
+- 2026-11-13: YOUNG-SLAB FAULT FROZEN: earth_young80 from step 225 (209 Myr) and earth_young80_deta from step 228
+  (~267 Myr): every fault fit refused ("the march along the crust stopped at depth 0.002 ... the fault keeps its
+  place"); results after those steps NOT VALID (the plate speed-up to 2.9 / 3.4 cm/yr comes after the freeze). Cause
+  (K1): the plate made at the ridge carries no crust (refill never makes crust where there was none); the original
+  3,900 km of crust has nearly all subducted, its trailing edge within ~930 km of the trench where the spline march
+  starts (earth_young80: 1,040 km at step 200, 731 at 224, 197 at 275). earth_recipe_movie: refusals only at steps 141,
+  149, 151 and 246-255 (a different message, recovered each time); its ridge is at the antipode. Deliveries to step 174
+  (movie page v64) unaffected. Arrhenius test (job 4507, 5 steps, 7581b89 = a5df984) converged; the Arrhenius run waits
+  on Louis (same young-slab setup).
