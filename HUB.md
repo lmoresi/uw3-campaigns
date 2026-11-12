@@ -3554,3 +3554,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   to the trench, and the mover gathers slowly (H2 testing a plate-boundary bump). Louis: "Currently nothing can work in
   parallel and this is holding up the session. I think this should be given a higher priority." Hub asked H2 to file
   the issue, take the fix on hyperion (np 2-5 tests), W1 to review; metric work behind it.
+- 2026-11-13: Louis approved H2 as owner of the parallel fix (W1 reviewing). Baseline check (K1): H2's uniform
+  refinement-4 run (hyperion, np 4, uw3 fe3219f5) reproduces kaiju's h2_small_ref4_x2 (16 ranks, 80d3ebe9) at t 1e-4..4e-4:
+  trench within 0.1 deg throughout (-0.9/-2.2/-4.1/-5.7 vs -0.93/-2.26/-4.11/-5.76); slip (610/1391/2318/2125 vs
+  610/1399/2337/1983) and vrms (222/358/668/624 vs 222/358/673/609) within 1 % to 3e-4; at 4e-4 slip 7 %, vrms 2.5 %,
+  inside kaiju's own step-to-step swing (slip 1924-2110 over steps 35-39). H2's MMPDE comparison rests on a matching
+  baseline; MMPDE numbers are H2's to report.
