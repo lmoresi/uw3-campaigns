@@ -715,3 +715,14 @@ Measured here, not inherited.
   "a few bands per rank" was wrong for the LU. Guide fixed (b74af785), correction posted
   on #862. 022 keeps its 25d62812 pin, so its "one block on each process" stands for that
   build; re-pinning is Louis's call and would mean rerunning the recipe and figure (c).
+- 2026-11-12: **the notes' correction convention is settled.** Louis asked for #51 to be
+  merged. Every build had been failing since 2026-11-11 because the unpinned MyST theme
+  outran the repository's mystmd; #63 pins the theme to 1.4.1 (merged, 79dcb33d), then #51
+  ("An updated note says what changed, and where the old one is": a `## History` section
+  per deposited version, dated, with the version DOI, what changed and what did not) was
+  updated and merged on green (352d44e3). Corrections to 2026-011 and 2026-014 follow this
+  form, if Louis decides on them. `preview` still fails on every PR (PREVIEW_TOKEN).
+  Movies: proposed MP4 in `{figure}` on the page, a still frame and DOI link in the PDF,
+  the file in the note's own Figshare record (needs `scripts/deposit.py` to accept
+  declared extra files; it refuses them today); waiting on Louis.
+
