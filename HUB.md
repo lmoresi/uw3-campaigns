@@ -3536,3 +3536,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   redrawn from step 0. Page mesh clip is a CRF 22 copy (15 MB limit); CRF 18 masters on kaiju in
   movies/out/earth_recipe_movie/earth_recipe_movie_{nice,nicefixed,mesh,meshfixed}_0-174.mp4. Young-slab arms
   (4434, 4435) running, all converged.
+- 2026-11-13: "WALL CONSTRAINT VIOLATED" lines in the fault runs are a driver false alarm (K1, from checkpoints of
+  earth_sb_lag_fix steps 35/105/120 and earth_recipe_movie steps 4/12/158-160/169): every flagged node is an interior
+  node of a sliver triangle at the outer wall, 1e-5 to 1.7e-4 below it, caught by the driver's 1e-4 (r_o - r_i) wall
+  tolerance. True wall nodes hold |v.n| to 1e-13; no wall vertex displaced more than the chord sagitta 1.4e-5. Sliver
+  coordinates sent to W1 (placement mesh quality). No driver change; C1's retry-on-refusal suggestion and a tighter
+  wall test are Louis's decision. Runs unaffected; movie run at step 180 (~211 Myr), all converged.
