@@ -672,8 +672,14 @@ The 25 are all in the rotated free-slip solve: `test_1131` 9 (rotation not remov
 annulus, moved and add_fault meshes, units shell), `test_1142` 10 (which rotations count as exact,
 and what is projected at tight tolerance), `test_1018_rotated_nodal_normal` 3, `test_1111` 2,
 `test_0022_rotated_adjoint` 1. These are the files #1033 edits. The other 142 files, including every
-Stokes test that does not use rotated free slip, give the same pass counts on both builds. Serial
-only so far; iteration counts are compared only where the tests assert them.
+Stokes test that does not use rotated free slip, give the same pass counts on both builds. Iteration
+counts are compared only where the tests assert them.
+
+**Run, np 2 and np 4.** The base commit's 35 parallel test files that use a Stokes solve or the
+rotated path, unmodified. On the base-commit build all 35 pass at both rank counts. On #1033, 3 of 35
+fail at both: `test_1112_rotated_fmg_coarse_shifted_lu_parallel`, `test_1114_mg_coarse_gamg_parallel`
+and `test_1131_rotated_nullspace_from_mesh_parallel`, the parallel counterparts of the serial
+failures; the other 32 match.
 
 ## D1 and D2 in the light of the tour
 
