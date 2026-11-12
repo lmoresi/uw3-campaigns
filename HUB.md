@@ -3546,3 +3546,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   1920x1080, steps 0-174; mesh cells ~1.45x larger on screen. Movie page v63. Kaiju file
   movies/out/earth_recipe_movie/earth_recipe_movie_meshfixed_0-174.mp4 (8.86 MB, sha256 38d6c77416c9...); square
   version kept as ..._meshfixed_square_0-174.mp4. Render tools only (movie_frames.py MF_ASPECT, default 2).
+- 2026-11-13: MMPDE + fault status (from H2's and W1's transcripts). Serial works: refinement 3 MMPDE, the ladder
+  rebuilds cleanly on the moved base at every move. PARALLEL BLOCKED: fault placement fails on an MMPDE-moved base in
+  parallel (the add-on partition, #919 / PR #926 territory). H2 left the cause and a one-line repro in the C1 mailbox
+  on hyperion (mail/C1/2026-11-12-H2-mmpde-fault-partition.md, 03:00 UTC 11-12); no owner, no issue, no PR. W1 is on
+  #1089 / #1090 (related placement fixes, not this). Also: the temperature-gradient metric gives no along-surface pull
+  to the trench, and the mover gathers slowly (H2 testing a plate-boundary bump). Louis: "Currently nothing can work in
+  parallel and this is holding up the session. I think this should be given a higher priority." Hub asked H2 to file
+  the issue, take the fix on hyperion (np 2-5 tests), W1 to review; metric work behind it.
