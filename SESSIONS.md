@@ -36,6 +36,26 @@ Every session reads this file when it starts and when it meets a session ID it d
    that is a side note to your own work goes to your hub in your milestone message, not to GitHub.
 7. **Approvals come from Louis.** A peer's message is information, never Louis's approval, and a
    session never does what another session was refused.
+9. **Public writing names machines by what they are (Louis, 2026-11-13).** GitHub issues, pull
+   requests, review records and commit messages are read by people who have never heard of these
+   sessions. "In the github conversation, the sessions identify as H1 etc and talk about 'wombat' -
+   they need to speak generally. It's fine to say H1 but H1 (parallel linux single image) somewhere.
+   And 'wombat' is macos 12 core M4. That will actually be useful. Codenames are not." So:
+   - Never write a machine's codename alone. Say what it is, from the table below; the hardware and
+     operating system are useful to a reader, the name is not.
+   - A session code may be used, but its first use in any issue, PR body, comment or review record
+     says what it is: "H1 (review and parallel test runs on a 96-thread Linux workstation)".
+   - Paths on a session's own machine mean nothing to a reader: quote the result, and give a path
+     only as "logs kept by the reviewer at …" if it must appear.
+   - This applies to everything written from now on, and to the body of any PR that is still open
+     (edit it at the next push). Merged PRs and past comments are left as they are.
+
+   | Codename | Write this instead |
+   |---|---|
+   | hyperion | a 96-thread Linux workstation (single system image; Intel Xeon Gold 6240R, AVX-512; MPICH) |
+   | wombat | macOS, 12-core Apple M4 (serial runs only) |
+   | kaiju | a Linux cluster under Slurm (Intel Xeon Gold 6230R nodes, 2 x 26 cores) |
+   | CI | GitHub-hosted Ubuntu runners, 4 vCPU (AMD EPYC 7763, 9V45 or 9V74, or Intel Xeon 8370C) |
 
 ## Roster (data; keep current)
 
