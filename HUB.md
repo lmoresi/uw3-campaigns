@@ -3614,3 +3614,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_young80's freeze point; (3) then earth_young80_arr, overlay-dev-80d3ebe9 passed explicitly, node memory watched
   from the start. Arrhenius parameters launched as K1's choice, still not ruled. Ridge noted as a likely next target of
   the realism sweep; K1 to record the ridge-crust choices for sweeping.
+- 2026-11-13: movie page v67: earth_young80 steps 0-514 and earth_young80_deta 0-633, three styles each (nice, whole
+  annulus fixed, fixed-frame mesh); valid only to steps 224 (209 Myr) / 227 (267 Myr), page says so.
+  earth_recipe_movie steps 0-449 (504 Myr): trench -20.2 deg, rollback 2,220 km, overriding plate stopped; run at step
+  732/800 at 07:30 13 Nov, all converged. Fixed-frame mesh style: trench leaves the window (-18.3 deg) ~step 320; needs
+  re-centring past 360 Myr. Page hit the 256 MiB per-version limit: 48 older figures to WebP q90, superseded 0-174
+  clips removed; now 222 MiB. K1 next: the ridge-crust driver change (mbox before its first job).
