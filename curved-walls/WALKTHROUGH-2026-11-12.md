@@ -254,7 +254,7 @@ were run against it:
 
 | group | files | result |
 |---|---|---|
-| analytic references, pressure split, cylindrical and spherical gap, spherical lift and sheet loads, fitted regions, diagnostics, observers | 30 | all pass (259 tests) |
+| analytic references, pressure split, cylindrical and spherical gap, spherical lift and sheet loads, fitted regions, diagnostics, observers | 30 | all pass (231 tests) |
 | lagged walls (`test_1098_cylindrical_wall`) | 1 | 8 pass, 1 fails: the free-slip history reads the report key `velocity_ksp_type`, which only #1033's solve writes (the two-line change predicted above) |
 | tests of the rotated-solve rewrite itself (`test_1018_rotated_pressure_coarse`, `_pressure_nullspace`, `_solver_options`) | 3 | fail, as they must: they test the held changes |
 | integral field offsets (`test_1115_integral_primary_layout`) | 1 | fails: it tests the held integral change |
