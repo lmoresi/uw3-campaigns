@@ -3529,3 +3529,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   recommended to H2; h2_small_ref4 (physical sizes kept, crust_ppc 384) 40/40 converged but the spline lost the slab
   top in 7/40 fits, 45 s/step, not recommended. Movie run at step 140 (t 6.03e-4, 161 Myr); young80 and young80_deta
   at step 50; all converged.
+- 2026-11-13: earth_recipe_movie past 200 Myr: step 176/800, every step converged. All four styles re-rendered to
+  step 174 (204.7 Myr), movie page v62 ("The publication movies"). At step 174: trench -13.2 deg (rollback 1,433 km
+  from the first fit, ~0.05 deg/Myr now); subducting plate 1.7 cm/yr, overriding 0.8 cm/yr toward the trench; top dip
+  24 deg; two plumes rising from the base. Fixed-frame mesh window now 0.8 across centred at -8 deg (was 0.7 at -4),
+  redrawn from step 0. Page mesh clip is a CRF 22 copy (15 MB limit); CRF 18 masters on kaiju in
+  movies/out/earth_recipe_movie/earth_recipe_movie_{nice,nicefixed,mesh,meshfixed}_0-174.mp4. Young-slab arms
+  (4434, 4435) running, all converged.
