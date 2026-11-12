@@ -2,7 +2,8 @@
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
-methods (section 7) and the generality of each method (section 8) filled in. Other measured examples are marked PENDING and will be filled as runs
+methods (section 7), the generality of each method (section 8) and the pick-apart plan (section 9)
+filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -476,6 +477,106 @@ cannot.
 
 So these are benchmark tools for the annulus and the shell, plus one general piece (the pressure
 split). They are not boundary conditions for a convecting model with a deforming or irregular wall.
+
+## 9. Pick-apart plan: which chunks of #1033 and #857 fit the library, and in what form
+
+Frame (Louis, 2026-11-12): take the chunks that fit our design; an analytic shortcut is legitimate
+where the geometry is known, the mesh is what declares it, and a mover must be able to invalidate
+that declaration.
+
+### A. The contract as the library has it today
+
+*Read from development 613ed1e0; nothing run. Detail with file and line: hyperion
+`runs/2026-11-12-h6/contract.md`.*
+
+**The declaration already exists, and #1033 does not read it.** Every annulus and shell constructor
+(`Annulus`, `AnnulusInternalBoundary`, `SphericalShell`, `SphericalShellInternalBoundary`,
+`CubedSphere`) registers each curved wall on `mesh.bounding_surfaces[label]` as a `BoundingSurface` of
+kind `radial`, with its centre and radius (`register_radial_surfaces`, `meshing/bounding_surface.py`).
+Internal surfaces are registered too, marked interior. The radii are stored nowhere else on the mesh.
+gthyagi's methods instead take `radius=` from the caller, assume the origin, and check the wall
+vertices against that number themselves.
+
+Two neighbours of that declaration:
+- `mesh.nullspace_rotations` (#906) is declared by the mesh and then verified at each solve: the
+  rotated solve trusts a declared rotation only while the wall vertices are equidistant from the
+  centre to 1e-9, checked collectively. This is the working precedent for "declared, then checked
+  against the actual wall".
+- `mesh.boundary_normals` / `canonical_normal` are stamped with the geometry version and raise once
+  the coordinates change.
+
+**What a move does to it today.**
+
+| move | bounding surfaces | rotation modes | declared normals |
+|---|---|---|---|
+| `mesh.deform` (the free surface uses it) | every `radial`/`plane` surface released to `free` | re-tested at the next solve | stale, raise |
+| MMPDE and smoothing movers (wall nodes slide on the surface) | kept | kept (the wall test passes) | stale, raise, although the wall has not moved |
+| `adapt`, fault-split children | not inherited (inferred: nothing copies them) | inherited | rebuilt |
+| checkpoint reload | absent (inferred) | from the constructor metadata | rebuilt |
+
+**One declaration that is present and false.** The constructor's `refinement=` path does not put new
+Internal-surface vertices back on the sphere (there is a `TODO(BUG)` in the source). That is the mesh
+behind the 1,363 mislabelled cells of section 5b: still registered `radial`, vertices on chords.
+
+**What is missing for these methods.** No single question a method can ask ("is this wall still the
+circle the mesh says it is, and what are its centre and radius?"), and nothing that checks wall
+vertices against the declared radius.
+
+**Proposal, with alternatives (a design decision for Louis).**
+- **(a) A query that verifies at use (recommended).** One method, for example
+  `mesh.analytic_surface(label)`, returns the registered surface only if it has not been released and
+  the label's vertices lie on it to a tolerance, checked collectively; otherwise it refuses and says
+  why. The wall methods call it in place of their `radius=` argument and their own checks, when they
+  are registered and again at each solve. It reuses `BoundingSurface`, the release already done by
+  `deform`, and the pattern of the rotated solve's wall test. No mover changes: whatever moved the
+  mesh, the method asks whether the wall is still where the mesh says it is. Children should also
+  inherit bounding surfaces as they inherit rotation modes. Small: one method, one collective check
+  over boundary vertices.
+- **(b) Version-stamped declarations** that movers re-validate. Cheaper per call, but every mover
+  must opt in, and today's stamp already goes stale under a move that preserves the wall.
+- **(c) Keep `radius=` and verify at each solve.** Least work; leaves the geometry with the caller,
+  which the frame rules out.
+
+Open questions. For H5: should `adapt` and fault-split children inherit bounding surfaces; is
+`release()` final; should constructor refinement snap the Internal surface. For W1: should the
+rotated wall test and this query be one implementation; should `canonical_normal` use the vertex
+check so a wall-preserving move does not stale it. For Louis: the tolerance (1e-9 relative in the
+rotation test, 1e-10 absolute in gthyagi's checks), and whether a method that finds the declaration
+invalid refuses or falls back to its chordal form.
+
+### B. The chunks
+
+Fit: (i) fits as it is; (ii) fits once it reads the mesh's declaration and refuses when that is
+invalid; (iii) duplicates what we have; (iv) does not fit. Hours are mine to a PR that meets the merge
+conditions, plus one review round; "author's part" is the share of that which is his unfinished work.
+
+| # | Chunk | What it does | Wall assumption, and where it comes from | Fit | Value | Hours (author's part) |
+|---|---|---|---|---|---|---|
+| 1 | Rotated datum collectives (#855) | fixes a hang when FE data prescribe wall-normal velocity | none | (i) | a bug fix | done: #1097, waiting on CI |
+| 2 | Shell region labels | Inner/Outer cells by connectivity | none; labels only | (i) | fixes mislabelled cells on refined shells | done: #1100 merged; 2 h for H3's two test gaps |
+| 3 | Spherical Kramer references, gravity kernels, harmonics | exact fields and kernels as formulae | none: data and formulae on a shell the user describes | (i) | the reference every spherical study needs; high | done: #1108 in review |
+| 4 | `pressure_split` | writes a prescribed interface pressure jump as p = q + p_J on fitted facets | none: named fitted facets, user's jump and normal | (i) | general; removes the jump from the pressure space on any fitted interface; high | 1 h to cut out of #1110 (none) |
+| 5 | `cylindrical_pressure_lifting` | the same for one harmonic on an exact circle, cut cells integrated exactly | origin-centred circle; `interface_radius=`, `outer_radius=` arguments | (ii), or (iii): `pressure_split` on a fitted mesh is its general form | benchmark only; low unless the paper uses unfitted interfaces | 3 h after the contract (refuse an unfitted mesh: his) |
+| 6 | Lagged circular walls, free slip and zero slip | corrects the polygon wall condition to the true circle over a few ordinary solves, on our rotated solve and essential conditions | origin-centred circle; `radius=` and `sign=` arguments, vertices re-checked | (ii) | the cheapest route to second-order wall stress on an annulus with our own solver; high for the cylindrical benchmark | 6 to 8 h after the contract (analytic non-zero-flow test, transcript record: his) |
+| 7 | Cylindrical coupled gap, free slip and zero slip | integrates over the true annulus (caps added and removed) with a wall multiplier; own matrix and solver | two radii as arguments; closed-form cap rule; isoviscous, linear | (ii) for the geometry; but it is a separate solver beside `Stokes` that refuses any registered condition, so it does not use our solve, multigrid or transcript: closer to (iv) as library code | carries the wall traction as an unknown on the true circle (the note's multiplier route); a benchmark reference rather than a tool; medium | 8 to 10 h (free-slip convergence test, np above 2: his) |
+| 8 | Spherical coupled gap | the same on tetrahedra with cut cells, curtains and its own preconditioner | concentric origin-centred spheres, hard-wired through about 2,000 lines; viscosity 1 for the preconditioner | (ii) in geometry; (iv) as a second solver | the only spherical route to wall traction on the true sphere; unproven (no analytic-flow test); high if it works | 2 to 3 days (any parallel test, any convergence test: his); recommend it goes back to him with the list |
+| 9 | Spherical pressure lift and sheet loads | 3-D lift on the true sphere; harmonic sheet loads as a right-hand side | sphere radius and one harmonic | (ii) for the lift; the sheet load is a benchmark forcing, better placed with the analytic references | medium for the spherical benchmark | 1 day (MPI, rank-0 gather: his) |
+| 10 | Diagnostics package | observers, norms, spherical reactions | reads the gap solves' state | follows 7 and 8; its plain Stokes observer is (i) | low on its own | half a day, H4, after 7 and 8 are decided |
+| 11 | #857 recovery (reaction moved to the circle, trace reconstruction, zero-slip shear on the circle) | post-processes the reaction we already return | circle, by argument | (ii) on top of (iii): the reaction itself is ours (`boundary_normal_traction`, `boundary_flux`; UWTN 2026-016) | only if pointwise wall stress from the lagged walls is wanted; decided by the stage 2 measurement | 1 day plus the mathematical review he asked for |
+| 12 | Rotated-solve rewrite (gauge verification, self-installing preconditioner, residual guard, loop reorder, second LU pin) | changes what the default rotated solve treats as a gauge | none | (iv): changes defaults; measured to return a rigid rotation (sections 1 and 3) | his observation that we under-report the residual is right and is with W1 | not landed |
+| 13 | Coordinate projection, integral field offsets, surface-mesh reaction normal | internal changes every mesh or integral sees | none | (iv) as bundled: not needed by any chunk (section 6, run); the first duplicates #902 | none shown | not landed |
+
+**Recommended order** (fit and value first, cost second):
+1. Chunks 1 to 3: in hand.
+2. Chunk 4, `pressure_split`: general, fits now. Cut #1110 down to it.
+3. The contract of part A, as one small PR of its own once Louis has chosen (my estimate 4 to 6 hours
+   with tests at np 1 to 5, in H5's and W1's territory, so through the hub).
+4. Chunk 6, the lagged walls, reading the declaration: the piece with the most value per hour for the
+   annulus benchmark, and it runs on our solver. Chunk 5 with it or dropped.
+5. Stage 2 of section 7 (the note's Kramer table with the lagged walls, the gap reaction and #857's
+   recovery side by side). That measurement decides chunks 7 and 11.
+6. Chunks 8 and 9 (spherical): return to gthyagi with the list of what is missing, unless the
+   publication needs them from us; they are the bulk of the unfinished work.
 
 ## The opt-in claim, measured
 
