@@ -3599,3 +3599,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   overlay-dev-80d3ebe9, driver 7581b89 = a5df984; no result yet. "Louis has been told" was also premature. FK arms
   still frozen, now at steps 514 (earth_young80) and 581 (earth_young80_deta); earth_young80_deta passed 350 Myr at
   step 445 on the frozen fault, so that mark is not a valid result. Nothing after the freeze is a result.
+- 2026-11-13: K1 (replaces the correction above on job 4507): (1) Arrhenius test job 4511 (7581b89 = a5df984,
+  overlay-dev-80d3ebe9, np 26, n8) passed: 5/5 steps converged, 2-5 Newton its, 45-74 s/step, 26 GB, exit 0.
+  (2) Job 4507 on overlay-dev-f631ce42 did run, 17:40-21:16, step 0 converged (same vrms 28.69) in 12,404 s; the
+  slowness is that build (coarse solver 'svd'), not the law. (3) earth_young80 (4434) and earth_young80_deta (4435)
+  cancelled at 22:45 (K1's jobs). Besides the frozen fault, both grew ~0.41 GB/step from ~step 240 (29 GB before; cause
+  not determined): young80 filled n6 (136/140 GB) at step 514, steps went to 25-40 min; young80_deta 184/188 GB on n7 at
+  step 633. VALID RESULTS END at steps 224 (209 Myr) and 227 (~267 Myr); READMEs say so. earth_recipe_movie (4417)
+  unaffected: step 443, 31 GB. (4) earth_young80_arr NOT launched: waits on Louis's decision about crust on plate made
+  at the ridge (without it the run freezes the same way). Open: the 0.41 GB/step growth (began just after the freeze).
