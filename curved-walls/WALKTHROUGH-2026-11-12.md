@@ -356,11 +356,56 @@ unjudged since 29 October.
 | topography recovery (σ_nn moved from the polygon to the circle) | nothing for the lagged walls; the coupled gap solves return `normal_reaction`, the multiplier λ = −σ_nn on the true circle | `boundary_normal_traction`, `dynamic_topography` on a rotated free-slip wall (polygon, annulus and shell) |
 | boundary coefficient (cosine coefficient of a wall field) | nothing | `boundary_normal_traction_integral` gives harmonic coefficients from the reaction |
 | trace reconstruction (smoothing kernel keeping mean and resultant) | nothing | nothing |
-| zero-slip traction recovery (σ_nn and σ_rθ on the circle) | nothing for the lagged zero-slip wall; `solve_cylindrical_gap_zero_slip` returns `normal_reaction` and `tangential_reaction` | `boundary_flux(..., normal=)` at a prescribed-velocity wall (polygon; no circle correction, no shear field) |
+| zero-slip traction recovery (σ_nn and σ_rθ on the circle) | nothing for the lagged zero-slip wall; `solve_cylindrical_gap_zero_slip` returns `normal_reaction` and `tangential_reaction` | `boundary_flux(boundary)` at a prescribed-velocity wall returns the full traction vector (polygon; no circle correction) |
 
 So a user of #1033's lagged walls who wants topography has only our existing reaction on the polygon.
 The two things #857 has that exist nowhere else are the trace reconstruction and the zero-slip shear
 on the true circle.
+
+**Against the technical note (UWTN 2026-016, "Free-Slip boundary conditions on curved boundaries").**
+The note's finding is that the wall traction should be carried, as the constraint reaction (the
+consistent boundary flux, σ_nn = −M_Γ⁻¹(Au − b)|_Γ) or as a multiplier, and not recovered by
+projecting a differentiated velocity; the two carried forms are the same computation. Against that
+frame, *read from the code at 23c11aa8*:
+
+- **None of #857's four methods is a projection recovery.** All four are post-processors applied to
+  the reaction development already returns. The zero-slip traction recovery calls
+  `stokes.boundary_flux(wall, mass="consistent")` itself; the topography recovery takes the rotated
+  constraint's reaction (`_cylindrical_reactions.py`: "The consistent boundary flux (CBF) principle
+  recovers surface stress from the discrete momentum balance"). So #857 does not replace the note's
+  method; it sits on top of it.
+- **What they add to the reaction** is two things the note does not have. A geometric correction:
+  the reaction lives on the polygonal wall, and #857 moves its moments to the true circle with a
+  Taylor shift ("UW3 geometry adaptations, not a scheme or stability result established in that
+  paper", his words). And a smoother: the trace reconstruction, a polynomial-reproducing convolution
+  of the reaction trace that keeps its mean and resultant, aimed at the slow convergence of P2
+  vertex values on curved walls that our own docstrings warn about (#414).
+- **Zero slip, the case to check hardest.** Development does give the wall traction on a Dirichlet
+  wall by the same consistent boundary flux: `boundary_flux(boundary)` on a Stokes solver returns the
+  full traction vector σ·n̂ from the essential-condition reaction, or its normal component with
+  `normal=`. So #857's zero-slip recovery is not the only route to a no-slip wall traction, and its
+  absence from #1033 is not a gap in kind. (My table above said "no shear field"; the vector is
+  returned at the wall nodes, so the shear is available, on the polygon.) What #857 adds there is
+  the split into σ_nn and σ_rθ on the true circle, with the same correction and smoothing. The note's
+  benchmark has free slip on the outer wall only, so it has no number for a no-slip wall; H1's
+  6 November runs are the only measurements (shear rms 6.1e-2 raw, 3.07e-3 with wall updates,
+  5.9e-5 after reconstruction).
+- **The boundary coefficient** is the amplitude of one harmonic of the reaction on the circle; the
+  note measures exactly this quantity, and `boundary_normal_traction_integral` returns it.
+- **#1033's coupled gap follows the note's finding.** It carries the traction as an unknown: the
+  multiplier on the true circle, returned as `normal_reaction` (λ = −σ_nn) and, for zero slip,
+  `tangential_reaction`. This is the note's multiplier route moved from the polygon to the physical
+  wall, so there is nothing to recover and no geometric correction to apply afterwards. gthyagi's
+  docstring says the multiplier keeps "the returned reaction equal to physical normal stress"; he
+  does not cite the note or state the comparison himself. *Read; quoted phrase from
+  `solve_cylindrical_gap`.*
+
+**What this means for decision 2.** In the note's terms nothing essential was dropped: the carried
+traction is in development (reaction, on the polygon) and in #1033 (multiplier, on the true circle).
+What exists only in #857 is the correction of a polygon reaction to the circle and the smoothing of
+its trace (570 lines in three modules). Those matter only if the publication uses the lagged walls, or plain rotated free slip,
+rather than the coupled gap, and wants pointwise wall stress rather than harmonic amplitudes.
+Whether they are worth carrying is what stage 2 measures, against the note's own table.
 
 **Our side of it.** *Read from the PR; H1's numbers were run on 2026-11-06 at 23c11aa8.*
 - 28 October: our first review covered structure only and said the algorithm and recovery
@@ -374,9 +419,9 @@ on the true circle.
 - Nothing in either review asked for the methods to be dropped, and #1033's design predates both. He
   has not replied to the 6 November review.
 
-**Stage 2 (measured, to come after the first unit PRs):** one annulus case with a known answer; for
-each recovered quantity, #857's method, #1033's gap reaction and development's reaction, with errors
-and convergence order. That decides whether #857 is finished or closed.
+**Stage 2 (measured, to come after the first unit PRs):** the note's Kramer annulus case and its
+table (cell sizes 0.15 to 0.05, error in the cos 2θ amplitude of σ_rr), with columns added for
+#857's recovery, #1033's gap reaction and a no-slip wall, with convergence order. That decides whether #857 is finished or closed.
 
 ### What each method does
 
