@@ -3542,3 +3542,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   tolerance. True wall nodes hold |v.n| to 1e-13; no wall vertex displaced more than the chord sagitta 1.4e-5. Sliver
   coordinates sent to W1 (placement mesh quality). No driver change; C1's retry-on-refusal suggestion and a tighter
   wall test are Louis's decision. Runs unaffected; movie run at step 180 (~211 Myr), all converged.
+- 2026-11-13: fixed-frame mesh movie redrawn at 2:1 (Louis): window 0.8 wide (centre -8 deg), half as deep (~1,100 km),
+  1920x1080, steps 0-174; mesh cells ~1.45x larger on screen. Movie page v63. Kaiju file
+  movies/out/earth_recipe_movie/earth_recipe_movie_meshfixed_0-174.mp4 (8.86 MB, sha256 38d6c77416c9...); square
+  version kept as ..._meshfixed_square_0-174.mp4. Render tools only (movie_frames.py MF_ASPECT, default 2).
