@@ -3521,3 +3521,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   downgoing slab thanks to the fault. This is visible in the slight encroachment of the green weak tracers as the
   fault steps back slightly. That's good from the modelling point of view - it fits what we set out to solve (whether
   realistic or not !)". Tool changes local only (movie_frames.py, render and encode job scripts).
+- 2026-11-13: MMPDE + fault integration started: at Louis's direction K1 sent H2 the recipe of earth_recipe_movie
+  (driver d358b97 = 31c7e08, underworld3 development 80d3ebe9, no library patches): per-step order, solver and hierarchy
+  requirements, build, where a moving base is expected to hurt (two messages, 2026-11-12). Supersedes the hub's
+  pending "brief H2" item. K1 small test configs (job 4454, 16 ranks, 40 steps, same driver): h2_small_ref4_x2
+  (refinement 4, rung 0.015625, crust 0.0078125, ocrust line 0.012) 40/40 converged and rebuilt, 38 s/step, the one
+  recommended to H2; h2_small_ref4 (physical sizes kept, crust_ppc 384) 40/40 converged but the spline lost the slab
+  top in 7/40 fits, 45 s/step, not recommended. Movie run at step 140 (t 6.03e-4, 161 Myr); young80 and young80_deta
+  at step 50; all converged.
