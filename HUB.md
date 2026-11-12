@@ -3501,3 +3501,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   subducting ridge (latent: matters only when uw_ridge_sub != uw_ridge_over; no earlier run affected). 2-step test
   earth_young_test (job 4433) running. K1 measured on earth_recipe_movie: slab age at trench ~1000 Myr (~360 km plate),
   thermal parameter ~18,000-21,000 km.
+- 2026-11-13: Louis: H2's MMPDE work is mostly done; next is making it work with K1's fault models. Hub recommends
+  H2 (hyperion, env hyperion:+Underworld) as owner, W1 as fault-library adviser, K2 for kaiju-scale validation later.
+  Wombat (W sessions) is the laptop: fine for bursts, not 24/7. Design (Louis): MMPDE moves the BASE mesh only, to
+  resolve the smooth fields; the fault is added on as a sub-mesh (the discontinuity). MMPDE keeps the FMG topology
+  fixed, not the coordinates. A demonstrator coupling the two techniques. Awaiting Louis's go to brief H2.
