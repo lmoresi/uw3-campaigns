@@ -281,7 +281,14 @@ params = uw.Params(
     uw_fault_surface_gap=2.0,   # crust law: the fit's up-dip end may stop this many crust thicknesses below the
                                 #   wall (its shallowest point: the crust base on the incoming plate); deeper, no fault
     uw_weld_ok=0,               # 1: a refused chain level is welded and the build goes on (the old behaviour);
-                                #   0: the build is refused and the previous faults kept
+                                #   0: the build is refused (uw_placement_refused says what happens then)
+    uw_placement_refused="stop",  # a set of faults the placement refuses after all its attempts (and, for a new fault
+                                #   among several, the retry without the weakest old one). "stop" (Louis, 2026-11-13:
+                                #   "Stop - and checkpoint the final step. Fine to restart"): the run ends there with
+                                #   exit code 3, after writing the last finished step's checkpoint if the cadence had
+                                #   not, so it can be restarted. "keep" (every run to 2026-11-13): the previous faults
+                                #   stay and the run goes on with the fault where it was
+    uw_refuse_at=-1,            # tests of uw_placement_refused: the build at this step is made, and refused
     uw_fault_fit="envelope",    # crust law locator: "envelope" (the crust base marched up from the cap,
                                 #   crust_envelope_points; ruled by the go on the Earth plan, 2026-10-29, locator A/B
                                 #   page TAUT7fi5cM75zkbna7gm9R) or "parabola" (crust_fault_points, the old behaviour)
@@ -830,7 +837,10 @@ def placed_ladders(host, faults, coarsening):
                           f"seams {seams}, mesher {mesher}")
             return mesh, info, {name: (spine, trace) for name, spine, trace in pieces}
         except (RuntimeError, ValueError) as err:
-            retryable = any(s in str(err) for s in ("crosses itself", "domain wall", "ligament", "seam"))
+            # "touches the domain boundary" (fault_split) and "meshed to area ... against CAD" (the ribbon assembly)
+            # are job 4400's two refusals (earth_recipe_movie's first try, steps 107 and 81): a wider band places both
+            retryable = any(s in str(err) for s in ("crosses itself", "domain wall", "ligament", "seam",
+                                                    "touches the domain boundary", "meshed to area"))
             if not retryable or n == len(attempts) - 1:
                 raise RuntimeError(str(err))
 
@@ -3109,7 +3119,7 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_n
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_spline_side", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
                 "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
-                "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness",
+                "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_placement_refused", "uw_yield_softness",
                 "uw_visc_law", "uw_arr_T0", "uw_arr_E", "uw_arr_eta_max"]
 
 
@@ -3255,6 +3265,10 @@ def local_dt_estimates():
 
 
 # ----------------------------------------------------------------------------- time loop
+if str(params.uw_placement_refused) not in ("stop", "keep"):
+    raise ValueError(f"-uw_placement_refused {params.uw_placement_refused}: stop or keep")
+stopped = None                              # why the run ended early (uw_placement_refused stop)
+last_ckpt = int(params.uw_restart)          # the last step with a checkpoint on disk (-1: none)
 for k in range(k0, k0 + params.uw_steps):
     wall = time.perf_counter()
     events = []
@@ -3264,7 +3278,9 @@ for k in range(k0, k0 + params.uw_steps):
     faults_before = list(faulted.names)
     mesh_rec = faulted.mesh_record if k == k0 else None
     t_build = t_warm = 0.0
-    if needs_rebuild(faults, faulted.faults) or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing):
+    if (needs_rebuild(faults, faulted.faults) or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing)
+            or step == int(params.uw_refuse_at)):
+        asked = [dict(f) for f in faults]       # the set as the last step left it: what a stop's checkpoint holds
         if (params.uw_fault_lagrange and str(params.uw_fault_lagrange_refit) == "rebuild" and faults
                 and "fit_points" in faults[0]):
             # the Lagrangian curve has moved a threshold: the ladder is built on its blend with the
@@ -3281,9 +3297,11 @@ for k in range(k0, k0 + params.uw_steps):
                 faults[0].update({"points": poly_r.tolist(), "theta": theta_r, "dip": dip_r, "depth": depth_r})
         previous = faulted
         try:
+            if step == int(params.uw_refuse_at):
+                raise RuntimeError("refused for a test (-uw_refuse_at)")
             faulted = FaultedMesh(faults, f"f{n_built}")
         except RuntimeError as err:
-            uw.pprint(f"  placement of {[f['name'] for f in faults]} failed ({str(err)[:120]})")
+            uw.pprint(f"  placement of {[f['name'] for f in faults]} failed ({err})")
             # A set the surgery refuses: usually a new fault whose band collides with a
             # fading neighbour's. Try again without the weakest-damage old fault (the new
             # one keeps its place); if that fails too, keep the previous set.
@@ -3299,9 +3317,22 @@ for k in range(k0, k0 + params.uw_steps):
                     events.append(f"retired {weakest['name']} at {np.degrees(weakest['theta']):.1f} deg "
                                   f"(its band collided with {new_names})")
                 except RuntimeError as err2:
-                    uw.pprint(f"  retry without {weakest['name']} failed ({str(err2)[:80]})")
+                    uw.pprint(f"  retry without {weakest['name']} failed ({err2})")
             if retry is not None:
                 faulted = retry
+            elif str(params.uw_placement_refused) == "stop":
+                # the run ends here rather than going on with the fault where it was. The last finished step is
+                # checkpointed if the cadence did not (on the mesh it was solved on, with the faults it asked for),
+                # so a restart from it makes this build again
+                stopped = f"the placement of {[f['name'] for f in faults]} was refused at step {step}"
+                if step - 1 > last_ckpt:
+                    checkpoint(step - 1, t, records, previous, asked, next_id,
+                               {"k": k, "n_built": n_built, "refused": refused, "last_damage": last_damage})
+                    last_ckpt = step - 1
+                    stopped += f"; step {last_ckpt} checkpointed"
+                elif last_ckpt >= 0:
+                    stopped += f"; the last checkpoint is step {last_ckpt}"
+                break
             else:
                 uw.pprint("  keeping the previous faults")
                 for f in faults:
@@ -3659,10 +3690,14 @@ for k in range(k0, k0 + params.uw_steps):
         t_phase = time.perf_counter()
         checkpoint(step, t, records, faulted, faults, next_id,
                    {"k": k + 1, "n_built": n_built, "refused": refused, "last_damage": last_damage})
+        last_ckpt = step
         # the next checkpoint writes it; the last one is written here
         solver["wall"]["checkpoint"] = round(time.perf_counter() - t_phase, 3)
         if k == k0 + params.uw_steps - 1:
             write_records(records)
     step += 1
 
+if stopped:
+    uw.pprint(f"STOPPED: {stopped}", flush=True)
+    sys.exit(3)
 uw.pprint("done")
