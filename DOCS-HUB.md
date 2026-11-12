@@ -726,3 +726,11 @@ Measured here, not inherited.
   the file in the note's own Figshare record (needs `scripts/deposit.py` to accept
   declared extra files; it refuses them today); waiting on Louis.
 
+- 2026-11-12 (later): Louis's go on movie preparation and pinning. Notes #65 (movie
+  figures: MP4 plays on the site, `build_pdf.py` swaps it for its `:placeholder:` still
+  for the PDF, `deposit.py` uploads each movie to the record, CONTRIBUTING convention,
+  tests) and #64 (mystmd pinned to 1.10.1 with the theme): both green on `build` and
+  `test`, not merged, Louis to say. The journal's theme pinned to 1.4.1 (0713e7a, built
+  with its mystmd 1.6.7). The MMPDE note's listing thumbnail is probably its GIF (no
+  `thumbnail:` set; the header itself is an Unsplash photo); the movie and still come
+  from H2's rerun, the fault note's from the K1 runner.
