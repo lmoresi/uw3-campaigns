@@ -3620,3 +3620,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   732/800 at 07:30 13 Nov, all converged. Fixed-frame mesh style: trench leaves the window (-18.3 deg) ~step 320; needs
   re-centring past 360 Myr. Page hit the 256 MiB per-version limit: 48 older figures to WebP q90, superseded 0-174
   clips removed; now 222 MiB. K1 next: the ridge-crust driver change (mbox before its first job).
+- 2026-11-13: ridge crust pushed: kaiju/arrhenius a5df984 -> 0b85d5a (K1's 5e805bd; annulus_faults.py f3e95e6,
+  DECISIONS.md 1017b49; mbox sha256 matched, py_compile clean; merges cleanly into the campaign branch, not merged).
+  -uw_ridge_crust 1 fills the subducting plate's surface layer with crust particles wherever none, at every refill,
+  from the edge of the ridge's hot patch to -uw_ridge_crust_stop (0.1, 290 km) short of the current trench; the
+  oceanic-crust line likewise. Default 0 unchanged. Choices for the ridge sweep (K1's, not ruled, in DECISIONS): crust
+  thickness the recipe's; made by density fill at the refill cadence, not a source at the axis; the window's two ends.
+  Next: restart test of earth_young80 from step 215 with the flag (first ridge fill step 219; freeze was 225), 60 steps,
+  memory watched past 240; then earth_young80_arr.
