@@ -752,3 +752,13 @@ Measured here, not inherited.
   version 1.1.0 with a History entry. Its checks: validate passes; #65's swap leaves
   the still only. The PDF build needs #65 merged first. Renderer not shipped (June
   watcher, old data access); accepted, the encode script names it.
+- 2026-11-12 (wrap-up, on Louis's "get this wrapped, I'll approve whatever you need"):
+  notes #65 (movie figures) and #64 (mystmd pin) merged; Louis's #66 (UWTN 2026-011's
+  movie from the run's own frames) updated from main, its PDF built here and inspected
+  (step-65 still, caption, History, version 1.1.0), merged; site deployed; the
+  `new-version` deposit run published record 33241170 v2
+  (10.6084/m9.figshare.33241170.v2) with the PDF, `adaptive-convection.mp4` and the
+  archive; #67 (identifiers) and #68 (the version DOI in the History entry) merged.
+  CI's `pdf` job on a PR skips the build unless asked, so a movie note's PDF is first
+  proven at deposit unless built by hand. Standing: Louis approves prompts; ask before
+  publishing a note, not for green infrastructure PRs.
