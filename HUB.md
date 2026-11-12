@@ -3645,3 +3645,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   accepted (original refused from 225); first ridge fill step 219 (13,461 particles), then ~300 per refill; surface
   crust continuous from the hot patch edge to the trench. Runs to 275; memory check past 240 still to come. FK arm
   restarts held for Louis.
+- 2026-11-13: earth_young80_ridgecrust_test (job 4563) finished 09:04, exit 0: steps 216-275 converged, 60/60 crust fits
+  accepted (earth_young80 refused every step from 225). Surface crust continuous hot-patch edge to trench (~2,500 km)
+  from step 219; ridge fills 295-366 particles per refill after the first (13,461). At step 275 vs frozen earth_young80:
+  plate speed 1,779 vs 2,670 (model units), max slip 1,877 vs 3,682; the plate still speeds up with a working fault,
+  +37 % over steps 215-275 (201-250 Myr), ~a third of the frozen run's rise. Memory 22.6 -> 23.4 GB over steps 222-275
+  (0.015 GB/step): the frozen runs' 0.41 GB/step did not appear (so that growth went with the frozen-fault path).
+  Details runs/earth_young80_ridgecrust_test/README.md on kaiju. earth_young80_arr (4567) ~step 40, all converged, no
+  refused fits. n6 and n8 idle; FK arm restarts held for Louis.
