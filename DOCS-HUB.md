@@ -744,3 +744,11 @@ Measured here, not inherited.
   checkpoints; it was sent #65's form (MP4 + still + placeholder + thumbnail, script in
   figures/src, GIF removed, a `## History` entry per #51). This hub checks the branch
   builds before it goes to Louis.
+- 2026-11-12: the "OT movie / MMPDE" session reports the UWTN 2026-011 movie done on a
+  local wombat branch `movie/moving-the-mesh-without-remaking-it` (851e135, off main,
+  six files in the note's folder), NOT pushed: its standing rule needs Louis's word.
+  864x864 H.264, 24 fps, 250 frames from the clean render set (the set the GIF was cut
+  from), CRF 23, 7.5 MB; still = step 65; `figures/src/encode_movie.py`; GIF removed;
+  version 1.1.0 with a History entry. Its checks: validate passes; #65's swap leaves
+  the still only. The PDF build needs #65 merged first. Renderer not shipped (June
+  watcher, old data access); accepted, the encode script names it.
