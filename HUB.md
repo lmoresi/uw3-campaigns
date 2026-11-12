@@ -3608,3 +3608,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   step 633. VALID RESULTS END at steps 224 (209 Myr) and 227 (~267 Myr); READMEs say so. earth_recipe_movie (4417)
   unaffected: step 443, 31 GB. (4) earth_young80_arr NOT launched: waits on Louis's decision about crust on plate made
   at the ridge (without it the run freezes the same way). Open: the 0.41 GB/step growth (began just after the freeze).
+- 2026-11-13: Louis: "Add crust at the ridge, then launch the Arrhenius run - the ridge might need to be the next target
+  of our realism sweep anyway." Relayed to K1: (1) a flag-gated driver change making crust on plate created at the ridge
+  (mbox to the hub for push; base kaiju/arrhenius a5df984); (2) a short test showing the spline keeps placing past
+  earth_young80's freeze point; (3) then earth_young80_arr, overlay-dev-80d3ebe9 passed explicitly, node memory watched
+  from the start. Arrhenius parameters launched as K1's choice, still not ruled. Ridge noted as a likely next target of
+  the realism sweep; K1 to record the ridge-crust choices for sweeping.
