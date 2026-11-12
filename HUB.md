@@ -3510,3 +3510,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   base ~step 80; trench rolled back -0.5 -> -9.2 deg; plates 1.6 / -0.7 cm/yr. Movies steps 0-110 (nice, mesh, mesh
   fixed frame) on movie page v59. movie_frames.py (local tool) now skips a checkpoint whose record is not yet written.
   Young-slab arms earth_young80 (4434) and earth_young80_deta (4435) running, ~20 steps in.
+- 2026-11-13: Louis rules the runs continue to at least 200 Myr (all three already go past it; earth_recipe_movie
+  passes 200 Myr near step 190). Nice movie now has a surface-velocity strip above the close-up (cm/yr, + toward
+  +theta, limits +-3); all nice frames redrawn; movies steps 0-113 (133 Myr) on movie page v60. Tool change local
+  only (movie_frames.py).
