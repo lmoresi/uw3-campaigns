@@ -119,6 +119,17 @@ params = uw.Params(
                                 #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
     uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the crust on the subducting
                                 #   plate's surface topped up to the uw_crust_ppc spacing where it has thinned
+    uw_ridge_crust=0,           # 1 (layer mode, with uw_crust_ppc and uw_crust_refill_every): crust on plate made at the
+                                #   ridge. At every refill the subducting plate's surface layer is brought to the
+                                #   uw_crust_ppc spacing wherever it holds no crust particle, from the edge of its ridge's
+                                #   hot patch (uw_top_hot 2, uw_ridge_patch; from the ridge itself without one) to
+                                #   uw_ridge_crust_stop short of the trench, and the oceanic-crust line (uw_ocrust_depth)
+                                #   is carried on the same way. 0: crust only where the start put it and where the refill
+                                #   finds it, so plate made at the ridge carries none, and the crust fault law has
+                                #   nothing to follow once that plate nears the trench (earth_young80, ridge 0.6 rad
+                                #   behind the trench, 2026-11-12: every fit refused from step 225)
+    uw_ridge_crust_stop=0.1,    # uw_ridge_crust: no crust is made within this arc (layer depths) of the trench, where
+                                #   the layer bends under and the refill's own rule (crust only where its proxy is) holds
     uw_crust_mode="layer",      # "line" (Louis, 2026-11-10: "we can also make it a line dense with particles rather
                                 #   than a layer. We do not really need the thickness"): the crust particles are one line
                                 #   on the subducting plate's top surface and the slab's top face, uw_crust_line_depth
@@ -533,6 +544,10 @@ if str(params.uw_crust_advect) not in ("base", "split") or (SPLIT_ADVECT and SCA
 if str(params.uw_crust_mode) not in ("layer", "line"):
     raise ValueError(f"-uw_crust_mode {params.uw_crust_mode}: 'layer' or 'line'")
 crust_on = params.uw_crust_weak < 1 or LINE         # a line is tracked even when it carries no weakness
+RIDGE_CRUST = bool(int(params.uw_ridge_crust))
+if RIDGE_CRUST and (LINE or not crust_on or params.uw_crust_ppc <= 0 or params.uw_crust_refill_every <= 0):
+    raise ValueError("-uw_ridge_crust 1 makes crust at the refill: it needs the crust layer (uw_crust_weak < 1, "
+                     "uw_crust_mode layer) with uw_crust_ppc > 0 and uw_crust_refill_every > 0")
 TI = params.uw_fault_realisation == "ti"
 if TI and SCALED:
     raise ValueError("-uw_fault_realisation ti is not set up for a units run (-uw_scaled 1)")
@@ -2710,6 +2725,57 @@ def refill_crust():
     return int(added)
 
 
+def ridge_crust_window(xy, faults):
+    """True where uw_ridge_crust makes crust: on the subducting plate, past the edge of its
+    ridge's hot patch (uw_top_hot 2: uw_ridge_patch from the ridge, which stays uw_ridge_sub
+    behind uw_theta_trench; the ridge itself without a patch) and more than uw_ridge_crust_stop
+    (arc) short of the trench as it is now."""
+    theta = np.arctan2(xy[:, 1], xy[:, 0])
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    from_ridge = r_o * (abs(float(params.uw_ridge_sub)) + over * wrap(theta - float(params.uw_theta_trench)))
+    theta_t = float(faults[0]["theta"]) if faults else float(params.uw_theta_trench)
+    to_trench = -r_o * over * wrap(theta - theta_t)
+    patch = float(params.uw_ridge_patch) if int(params.uw_top_hot) == 2 else 0.0
+    return (from_ridge > patch) & (to_trench > float(params.uw_ridge_crust_stop))
+
+
+def ridge_crust(faults):
+    """Crust on plate made at the ridge (uw_ridge_crust). refill_crust never makes crust where
+    there was none, so plate that has left the ridge since the start carries none. Here lattice
+    points of the dense crust (uw_crust_ppc spacing) in the subducting plate's surface layer,
+    inside ridge_crust_window, with no crust particle on this rank within 0.75 spacing become
+    crust particles, whatever the crust's proxy says there; the oceanic-crust line's surface
+    points (uw_ocrust_depth, line_spacing()) the same way. Other markers from the nearest
+    particle. Collective. Returns the particles added on this rank."""
+    from scipy.spatial import cKDTree
+    targets = [("crust", crust_layer_points(crust_spacing(), surface_only=True), crust_spacing())]
+    if ocrust_on:
+        targets.append(("ocrust", line_points(params.uw_ocrust_depth, surface_only=True), line_spacing()))
+    total = 0
+    for target, cand, spacing in targets:
+        cand = cand[ridge_crust_window(cand, faults)]
+        xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+        old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
+        mine = xy[old[target] > 0.5]
+        if len(mine) and len(cand):
+            cand = cand[cKDTree(mine).query(cand)[0] > 0.75 * spacing]
+        added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
+        if added:
+            new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
+            nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
+            for name, (var, _, _) in markers.items():
+                if name == target:
+                    var.array[-added:, 0, 0] = 1.0
+                elif name in ("crust", "ocrust"):
+                    var.array[-added:, 0, 0] = 0.0
+                elif nearest is not None:
+                    var.array[-added:, 0, 0] = old[name][nearest]
+        for var, _, _ in markers.values():
+            var._update()
+        total += int(added)
+    return total
+
+
 def line_depth():
     return float(params.uw_crust_line_depth) or 0.25 * crust_thick
 
@@ -2718,17 +2784,19 @@ def line_spacing():
     return float(params.uw_crust_line_spacing) or 0.25 * S
 
 
-def line_points(depth=None):
+def line_points(depth=None, surface_only=False):
     """The crust line of the slab state (or the oceanic-crust line, ``depth`` deep): line_depth()
-    under the subducting plate's surface from the trench back to its ridge, and line_depth() into
-    the subducting side of the slab's top face from the trench to the slab's end, every
-    line_spacing()."""
+    under the subducting plate's surface from the trench back to its ridge, and, unless
+    ``surface_only``, line_depth() into the subducting side of the slab's top face from the
+    trench to the slab's end, every line_spacing()."""
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
     d, sp = line_depth() if depth is None else float(depth), line_spacing()
     rel = -np.arange(0.5 * sp / r_o, abs(float(params.uw_ridge_sub)), sp / r_o)
     th = theta_t + over * rel
     surface = np.c_[(r_o - d) * np.cos(th), (r_o - d) * np.sin(th)]
+    if surface_only:
+        return onto(surface)
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
     down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
@@ -2997,6 +3065,7 @@ uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
              f"(width {params.uw_ridge_width:g}, to {params.uw_ridge_depth:g}); " if ridges else "")
           + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {params.uw_crust_depth:g}; "
              if crust_on else "")
+          + (f"crust made on new plate to {params.uw_ridge_crust_stop:g} short of the trench; " if RIDGE_CRUST else "")
           + (f"compositional slab {params.uw_comp_thick:g} thick, dT {params.uw_comp_dT:g}, eta x{params.uw_comp_eta:g}, "
              f"thermal buoyancy x{params.uw_buoy_T:g}; " if comp_on else "")
           + (f"compositional overriding plate {params.uw_over_comp_thick:g} thick from {params.uw_over_gap:g} "
@@ -3039,7 +3108,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_chain", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_fault_realisation", "uw_fault_law",
                 "uw_fault_fit", "uw_spline_side", "uw_spline_length", "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_resample_restored", "uw_wall_normal", "uw_wall_check",
-                "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
+                "uw_crust_ppc", "uw_ocrust_depth", "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop", "uw_crust_mode", "uw_crust_advect", "uw_fault_crust_side", "uw_fault_zone_weak", "uw_fault_zone_width", "uw_fault_zone_T", "uw_fault_zone_floor", "uw_fault_band_weak", "uw_fault_band_depth", "uw_fault_band_side", "uw_fault_top_dip_fix", "uw_fault_top_fix_depth", "uw_fault_lagrange", "uw_fault_lagrange_relax", "uw_fault_lagrange_refit", "uw_fault_lagrange_rebuild_fit", "uw_crust_line_depth", "uw_crust_line_spacing", "uw_rebuild_cells", "uw_spacing", "uw_dt_mult",
                 "uw_courant", "uw_dt_max", "uw_ckpt_every", "uw_yield_softness",
                 "uw_visc_law", "uw_arr_T0", "uw_arr_E", "uw_arr_eta_max"]
 
@@ -3312,6 +3381,10 @@ for k in range(k0, k0 + params.uw_steps):
                                                          bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
+            if RIDGE_CRUST:
+                n_ridge = int(uw.utilities.gather_data(ridge_crust(faults), bcast=True).sum())
+                if n_ridge:
+                    events.append(f"ridge crust: {n_ridge} particles")
     # the Lagrangian fault moves with the slab (after the particles, before any detection)
     if params.uw_fault_lagrange and params.uw_fault_law == "crust" and faults and "points" in faults[0]:
         if not advect_fault(faults[0], faulted, dt):
