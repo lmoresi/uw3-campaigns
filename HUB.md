@@ -3653,3 +3653,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (0.015 GB/step): the frozen runs' 0.41 GB/step did not appear (so that growth went with the frozen-fault path).
   Details runs/earth_young80_ridgecrust_test/README.md on kaiju. earth_young80_arr (4567) ~step 40, all converged, no
   refused fits. n6 and n8 idle; FK arm restarts held for Louis.
+- 2026-11-13: EARTH_RECIPE_MOVIE COMPLETE (job 4417): ended 09:08 13 Nov, exit 0, 800 steps, 1,105 Myr, every step
+  converged, a checkpoint per step. Trench rolled back 2,230 km to -20.3 deg at step 460 (516 Myr), then came forward
+  to -15.4 deg; subducting plate 1.8 -> 0.7 cm/yr. 28 refused crust fits, the last at step 349. A plume reaches the lid
+  by step 300 (339 Myr): the movie covers initiation to past the first plume (Louis to judge whether to extend).
+  Movies of all 800 steps (nice, nice fixed frame, mesh fixed frame) on movie page v68 ("The publication movies");
+  full-quality files on kaiju movies/out/earth_recipe_movie/.
+  earth_young80_arr (4567, 21c23e6 = 52c6b5a, n7) step 54/1,200, 213 Myr, all converged. Arrhenius slab starts slowly:
+  0.8 cm/yr and 1 deg rollback at 212 Myr vs FK 1.4 cm/yr and 8 deg at 201 Myr. Crust fit refused steps 44-51 ("the
+  curve reaches only 0.095 ... 0.119, short of the cap less 0.03"), accepted from 52; slip 1040 -> 1465 in one step
+  (53); K1 watching. FK restarts still held for Louis.
