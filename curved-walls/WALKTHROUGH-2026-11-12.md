@@ -1,7 +1,7 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-H6 curved walls, 2026-11-12, for Louis. Version 2: sections from reading, with the measured
-examples of sections 1 and 6 filled in. Other measured examples are marked PENDING and will be filled as runs
+H6 curved walls, 2026-11-12, for Louis. Version 3: sections from reading, with the measured
+examples of sections 1 and 6 and the opt-in measurement filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -281,6 +281,24 @@ branch, and np above 1.
 **Measured example: PENDING.** Planned: One analytic annulus, free slip and zero slip, three resolutions: rms error in sigma_nn (and sigma_rtheta) from (a) our reaction alone, (b) our reaction after wall updates, (c) #857's transfer and reconstruction, (d) the gap multiplier.
 
 **The choice (D2).** If the gap multiplier measures as well as (c), #857's recovery is superseded and can close. If the publication uses the lagged walls, then the reconstruction, and the zero-slip shear recovery, are the parts with something our tools lack, and they need the mathematical review gthyagi asked for. The boundary coefficient and the plain topography transfer add little over what we have.
+
+## The opt-in claim, measured
+
+**Run.** The 147 serial test files of #1033's own base commit (abe5e0ca) that use a Stokes solve or
+the rotated path, unmodified, against a build of that commit and a build of #1033 (hyperion
+`optin/`):
+
+| build | passed | failed |
+|---|---|---|
+| base commit abe5e0ca | 1261 | 0 (3 source-scan tests cannot run from a copied test directory; they pass in the #1033 worktree) |
+| #1033 | 1236 | 25, in 5 files |
+
+The 25 are all in the rotated free-slip solve: `test_1131` 9 (rotation not removed on the shell,
+annulus, moved and add_fault meshes, units shell), `test_1142` 10 (which rotations count as exact,
+and what is projected at tight tolerance), `test_1018_rotated_nodal_normal` 3, `test_1111` 2,
+`test_0022_rotated_adjoint` 1. These are the files #1033 edits. The other 142 files, including every
+Stokes test that does not use rotated free slip, give the same pass counts on both builds. Serial
+only so far; iteration counts are compared only where the tests assert them.
 
 ## D1 and D2 in the light of the tour
 
