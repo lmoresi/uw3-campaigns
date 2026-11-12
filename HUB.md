@@ -3628,3 +3628,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   thickness the recipe's; made by density fill at the refill cadence, not a source at the axis; the window's two ends.
   Next: restart test of earth_young80 from step 215 with the flag (first ridge fill step 219; freeze was 225), 60 steps,
   memory watched past 240; then earth_young80_arr.
+- 2026-11-13: placement stop pushed: kaiju/arrhenius 0b85d5a -> 52c6b5a (K1's 21c23e6; annulus_faults.py 4125c9c,
+  DECISIONS.md 675e1da; mbox sha256 matched, py_compile clean; merges cleanly into the campaign branch). Louis (to K1,
+  on the dev hub's item 9): "Stop - and checkpoint the final step. Fine to restart". -uw_placement_refused stop is the
+  NEW DEFAULT on this branch (keep = old behaviour): a refused set ends the run, exit 3, "STOPPED: ...", after
+  checkpointing the last finished step. placed_ladders also widens on job 4400's two refusals (domain boundary; CAD
+  area); full refusal message logged; a refused crust-law fit is unchanged. Ridge-crust test job 4563 (n6, 5e805bd)
+  running. K1 next: forced-refusal test of the stop and a restart from its checkpoint, then earth_young80_arr on
+  21c23e6. K1 read "Fine to restart" as a yes to restarting the two FK young-slab arms from ~step 220 with ridge
+  crust; hub asked K1 to hold that for Louis's explicit answer.
