@@ -3568,3 +3568,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   on unmoved bases; recorded kaiju results stand. MMPDE young-slab repeats at np > 1 wait for W1's fix.
   H2 refinement-3 comparison: MMPDE ref 3 (7,936 cells) follows the ref-4 baseline's trench to ~0.1 deg with a quarter
   of the cells; uniform ref 3 lags 0.5-1 deg; ref-3 slip noisy either way; 103 s/step serial.
+- 2026-11-13: young-slab arms, first numbers and movies (steps 0-174), movie page v64 ("the younger slab"). Runs
+  earth_young80 (4434) and earth_young80_deta (4435), driver 8018b79 = ede44b6, running to 1,200 steps, all converged.
+  At step 174 (run / t / trench / plates cm/yr / slab age at trench / thermal parameter):
+  young80 168 Myr, -7.7 deg, 1.5/-0.4, 165 Myr, 2,000 km; young80_deta 225 Myr, -4.8 deg, 1.5/-0.2, 244 Myr, 2,600 km;
+  old-slab earth_recipe_movie 205 Myr, -13.2 deg, -, 899 Myr, 13,700 km. K1 findings: (1) the slab does not stay
+  80 Myr old: ridge 3,900 km away at ~1.6 cm/yr ages it toward ~240 Myr; (2) 80 % / 90 % of crust reaching the trench
+  stays in a wedge on the overriding side of the fault (2,280 of 2,840 km; 2,350 of 2,600 km), vs 29 % (1,210 of
+  4,100 km) in the old-slab run; counted from crust particles (crust_budget.py, thermal_parameter.py, K1 scratchpad).
+  Movies, all four styles, on kaiju ~/+Claude/kaiju/movies/out/earth_young80{,_deta}; page has nice + fixed mesh.
