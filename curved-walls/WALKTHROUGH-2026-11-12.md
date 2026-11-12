@@ -1,7 +1,7 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-H6 curved walls, 2026-11-12, for Louis. Version 1: sections from reading, with the first measured
-example (section 1) filled in. Other measured examples are marked PENDING and will be filled as runs
+H6 curved walls, 2026-11-12, for Louis. Version 2: sections from reading, with the measured
+examples of sections 1 and 6 filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -247,7 +247,20 @@ flood-fill labels ──< spherical pressure lift ; solver Jacobian ──< shee
 all of the above ──< diagnostics (read-only)
 ```
 
-**Measured example: PENDING.** Planned: Each unit's tests run against development with only that unit's files added: pass counts, and the first failure if any.
+**Measured example (run).** A scratch branch on development f8c60140 with every file #1033 adds and
+its new solver methods, and development's `rotated_bc.py`, mesh, integral and multigrid code
+untouched (hyperion `wt-h6-port`, logs in `port/logs/`). All 35 of #1033's new serial test files
+were run against it:
+
+| group | files | result |
+|---|---|---|
+| analytic references, pressure split, cylindrical and spherical gap, spherical lift and sheet loads, fitted regions, diagnostics, observers | 30 | all pass (259 tests) |
+| lagged walls (`test_1098_cylindrical_wall`) | 1 | 8 pass, 1 fails: the free-slip history reads the report key `velocity_ksp_type`, which only #1033's solve writes (the two-line change predicted above) |
+| tests of the rotated-solve rewrite itself (`test_1018_rotated_pressure_coarse`, `_pressure_nullspace`, `_solver_options`) | 3 | fail, as they must: they test the held changes |
+| integral field offsets (`test_1115_integral_primary_layout`) | 1 | fails: it tests the held integral change |
+
+So the reading holds: no new method needs the rewrite. Not yet run: #1033's parallel tests on this
+branch, and np above 1.
 
 **The choice (D1).** Port the methods onto development's solve and hold the solver-core changes. From reading, the port costs almost nothing in the methods themselves. The solver-core changes can then be judged on their own evidence, separately.
 
@@ -272,8 +285,7 @@ all of the above ──< diagnostics (read-only)
 ## D1 and D2 in the light of the tour
 
 **D1. What happens to #1033's changes to the rotated solve.**
-The new methods do not need them (section 6, read; to be confirmed by running each unit's tests on
-development). The changes themselves are a mixed bag:
+The new methods do not need them (section 6, run: their tests pass on development's solver core). The changes themselves are a mixed bag:
 - The rotation test (section 1) must not land as it is: it reintroduces the #906 rotation on the
   default path (run). His underlying point, that removing an approximate mode leaves a residual, is
   right and deserves an answer of its own: option (c) in section 1, measure and report it.
