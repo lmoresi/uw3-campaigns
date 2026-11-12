@@ -49,7 +49,7 @@ Every session reads this file when it starts and when it meets a session ID it d
 | H1 | **worker** | `session_01HxWvn98DsWPTz4ZpKByzQM` | hyperion, 12 cores | C1 | parallel suites, reviews, PRs, issues (no merge, approve or close) | science runs |
 | H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | |
 | H3 | **units** | `session_01HxWvn7YfEseX8cKRcgzW9Z` | hyperion, 6 cores | C1 | units: the dimensional / non-dimensional boundary (issue-sweep cluster C6, #763, #765); second review desk from 2026-11-12 until Louis rules on units | |
-| H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, 6 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4) | |
+| H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, 6 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4); from 2026-11-12 whole curved-wall units handed over by H6 | |
 | H5 | **restart** | `session_01HxWvn6CL6S3R1ELzJHJEay` | hyperion, 8 cores | C1 | parallel checkpoint reload of refined meshes and FMG hierarchy restart (#690); then uw.visualisation for higher-order fields (#1057), then the per-step diagnostics log (#1060) | |
 | H6 | **curved walls** | `session_01HxWvn9MVb36F3u3GyKv8pV` | hyperion, 8 cores | C1 | review and corrections of gthyagi's curved-wall boundary work (#1033, #857, #855), for a publication (Louis 2026-11-12) | |
 | K1 | **science** | `session_01HX67HY6xwuJivHKLLXrR3H` | kaiju (Slurm) | C2 | science campaigns (zg95), renders; owns the campaign drivers | library runs |
