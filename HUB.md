@@ -3669,3 +3669,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   re-fitted fault's deep end lay ~50 km to the overriding side of the slab top, back along the slab by 59: steps 44-60
   carry a fault-placement transient (K1's reading of frames, not a test; in the README). Arrhenius vs FK: plate reaches
   0.6 cm/yr at 194 Myr vs 53 Myr; at 222 Myr the cold slab ends near 700 km with a thin warm tail to ~1,700 km.
+- 2026-11-13: CORRECTION (K1) to the entry above: the step-53 slip jump is NOT a re-fit transient after the refused
+  streak; a second jump at step 67 had no refused step before it. Step 53: slip 1,040 -> 1,465 (x1.41), plate 0.86 ->
+  1.16 cm/yr; step 67: slip 1,454 -> 2,203 (x1.52), plate 1.18 -> 1.70 cm/yr. Each is the first step solved on a fit
+  that prints "the curve carried from 0.127 [0.124] to the cap along its own direction": crust stopped between 350 km
+  and the fault's end at 435 km and the fit drew the rest straight (the cap extension of d358b97 = 31c7e08, in the
+  ruled recipe); at step 53 that straight end lies ~50 km to the overriding side of the slab top. earth_recipe_movie
+  shows it too: slip x1.45 at step 27, x0.77 at 29; slip halves at 257 and 351 (after its two long refused streaks).
+  Three episodes of three, no controlled test. Consequence: slip and plate speed in earth_young80_arr depend on how
+  the last 60-90 km of the fault is drawn: NOT YET A RESULT. The Arrhenius-vs-FK comparison at step 50 (before the
+  first jump) stands. Any change to the fit's deep end is Louis's decision; no driver change. Run: 4567 step 72/1,200,
+  232 Myr, all converged, 27.6 GB steady. Movie page v71 (#young-slab-arr) corrected.
