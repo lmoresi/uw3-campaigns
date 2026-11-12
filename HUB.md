@@ -3689,3 +3689,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   distance alone does not set the slip (5-8 km gave 719 at 72 but 1,280-1,700 elsewhere); step 72 unexplained. Plate
   speeds in this run NOT YET A RESULT; the step-50 Arrhenius-vs-FK comparison predates the swings. Driver unchanged;
   deep-end treatment with Louis. 4567 at step 81/1,200 (10:13). Movie page v72.
+- 2026-11-13: LOUIS ON THE FIT AND PRIORITIES (to K1, on the slip swings): "It seems inappropriate to insist that the
+  fault goes deep in the fit and refusing. If we want to initiate subduction, we are going to have to detect damage /
+  crust and fit a short fault. Again, we are seeing the curve fit drive the dynamics. I would suggest we end the fault
+  where we cannot contrain it and see if that results in a shutdown of the slab or not. This feels to me like
+  diminuishing returns - we will need to get the rest of the boundary layer to work like real plates before we can
+  genuinely make these kinds of decisions." K1 will do no more fit tuning beyond this test without him.
+  Pushed kaiju/arrhenius 52c6b5a -> 818d43f (K1's 8fff721; driver blob 5024689; mbox sha256 matched, py_compile clean;
+  merges cleanly into the campaign branch): -uw_spline_end crust ends the fault where the crust layer does (first 0.005
+  arc bin below -uw_spline_end_frac 0.5 of the incoming plate's median count; nothing carried; refused only above
+  uw_fault_depth_min). Default "cap" unchanged (offline it reproduces stored fits of steps 1-98 exactly). Offline on the
+  control's particles the end is at 266-279 km for steps 23-80 (cap 435 km), steady to ~5 km/step, never refused. Not
+  yet tested in a run: the mesher with a fault that short. Half-count threshold is K1's choice. Run
+  earth_young80_arr_crustend, job 4593 on n2 from 10:52, earth_young80_arr's line + -uw_spline_end crust, step 0, 1200
+  steps; earth_young80_arr (4567, step 100 at 10:50) continues as the control.
