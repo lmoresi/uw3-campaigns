@@ -3494,3 +3494,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-13: earth_recipe_movie (4417) past step 30. Test clips for steps 0-29 on movie page v55 (#recipe-movie), two
   styles: "nice" (talks) and "mesh" (solver mesh, split, next fit); white backgrounds (Louis's standing rule); frames
   rendered only from checkpoints (kaiju launch/movies/movie_frames.py).
+- 2026-11-13: kaiju/young-slab pushed on 31c7e08 (K1's 8018b79 -> ede44b6; annulus_faults.py b0d91bc, annulus_model.py
+  c5caa22; mbox sha256 matched, py_compile clean). For a younger, more Earth-like slab (Louis): the subducting plate's
+  ridge moved toward the trench (uw_ridge_sub; uw_top_hot 2 now holds the ridge there), a graded mesh refined at the
+  surface (uw_cell_outer / uw_cell_inner), and a deta x10 arm. Also fixes the uw_ridge_weak seam side for the
+  subducting ridge (latent: matters only when uw_ridge_sub != uw_ridge_over; no earlier run affected). 2-step test
+  earth_young_test (job 4433) running. K1 measured on earth_recipe_movie: slab age at trench ~1000 Myr (~360 km plate),
+  thermal parameter ~18,000-21,000 km.
