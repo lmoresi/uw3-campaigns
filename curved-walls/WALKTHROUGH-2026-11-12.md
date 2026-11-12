@@ -2,8 +2,8 @@
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
-methods (section 7), the generality of each method (section 8) and the pick-apart plan (section 9)
-filled in. Other measured examples are marked PENDING and will be filled as runs
+methods (section 7), the generality of each method (section 8) and the pick-apart plan (section 9,
+with the tangential-move runs in A2) filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -544,6 +544,76 @@ check so a wall-preserving move does not stale it. For Louis: the tolerance (1e-
 rotation test, 1e-10 absolute in gthyagi's checks), and whether a method that finds the declaration
 invalid refuses or falls back to its chordal form.
 
+### A2. Tangential moves: telling "slid along the surface" from "left the surface"
+
+Louis's subtlety: MMPDE with boundary slip moves wall nodes along the circle or sphere, and the
+special case is still true afterwards, so "a mover touched the boundary" is the wrong trigger. The
+candidate rule is to verify the declaration rather than infer it: ask whether the wall's nodes are
+still on the declared surface.
+
+**Run** (serial, development 93e66eed, probe and logs in hyperion `runs/2026-11-12-h6/contract/`).
+The check is the largest |‖x − c‖ − R| / R over the vertices of a labelled boundary, against the
+surface registered in `mesh.bounding_surfaces`.
+
+| case | largest relative distance from the declared surface | the check |
+|---|---|---|
+| annulus and shell as built | ≤ 2.2e-16 | passes |
+| MMPDE slip on the registered surfaces (wall nodes moved by 2.0e-2) | 2.2e-16; surfaces still registered `radial` | passes: the special case survives |
+| the same move with the surfaces unregistered (slip along facets) | 4.4e-3 at h = 0.1, 6.3e-4 at h = 0.05 | fails, correctly (O(h²)) |
+| `deform` with topography of 1e-3 on the outer wall | 1.0e-3; both walls released | fails |
+| rigid translation by 0.01 with `deform` | 2.0e-2 and 1.0e-2 against the declared centre; 1.1e-16 against the moved centre | fails |
+| internal surfaces as built, 2-D and 3-D | ≤ 2.8e-16 | passes |
+| `SphericalShellInternalBoundary`, one or two refinements | walls ≤ 6.1e-16; Internal 2.9e-2 | walls pass, Internal fails |
+
+So the check separates the cases by ten orders of magnitude: every true declaration is at round-off,
+every false one at 2e-4 or worse. Three things the runs showed that reading had not:
+- the refined shell's Internal surface is off its declared sphere by 2.9% after one refinement
+  already; walls are snapped on refinement, the Internal surface is not;
+- `deform` releases every surface even when no coordinate changed: today's release is "who moved",
+  not "what moved";
+- the movers do not bump `_mesh_version` (still 0 after the MMPDE move) but do bump
+  `_geometry_version` (11), so only the latter could serve as a stamp.
+
+**Assessment of the candidate.** It is right, and it is alternative (a) above with a stamp added.
+- Tolerance: 1e-9 relative to the radius, the value the rotated solve's wall test already uses;
+  anything from 1e-12 to 1e-6 gives the same verdicts on these cases.
+- Cost: one pass over the boundary's vertices and one collective reduction (254 vertices on the
+  coarse shell, 4,004 at two refinements). Mesh coordinates are degree 1, so vertices suffice.
+- Lazy, at use. I would go one step further than the candidate and check at every use, without a
+  stamp: the check is cheap, and then no coordinate writer can get behind it. If a stamp is wanted
+  for cost, it must be `_geometry_version`.
+- Already there: `BoundingSurface.restore` (why the slip case passes) and the rotated solve's
+  declared-rotation wall test, which is the same check; the two should become one.
+
+**Where it needs a decision.**
+- Translation: refuse, or re-fit the centre? I recommend refuse: gthyagi's methods assume the origin,
+  and #969 (open) proposes no fit yet.
+- With the check in place, should `deform` still release every surface unconditionally? (H5.)
+- The refined Internal surface is declared and false from construction; snapping it is the open
+  `TODO(BUG)`. Until then a method relying on it refuses, which is the right answer. (H5.)
+- Child meshes and checkpoint reloads appear to carry no surfaces (inferred), so a method refuses
+  there until they inherit.
+
+**The other half: what each chunk builds from node positions, and when.** *Read.* None of gthyagi's
+modules reads a geometry version or `bounding_surfaces`, and none refuses a moved mesh.
+
+| chunk | built | after a tangential slide |
+|---|---|---|
+| `pressure_split` | once, when called | stale, silently (the guide says "Reconstruct the split after changing mesh geometry"; nothing enforces it) |
+| `cylindrical_pressure_lifting` | once | stale, silently |
+| lagged walls | once, in the handle at registration; updates reuse it | stale, silently |
+| cylindrical and spherical gap | at every call | right, provided the walls still verify |
+| spherical pressure lift | once | stale, silently |
+| sheet loads | once | not established |
+| fitted regions | at construction, connectivity only | right |
+| #857 recovery | per call, on the wall handle | stale with the handle (inferred) |
+
+Work to make the once-built chunks honest: lagged walls about 3 hours (rebuild the handle's geometry
+at each update when the geometry version has changed); `pressure_split` and each lift about 2 hours
+each (refuse a split built at an older geometry version). This moves `pressure_split` from "fits as
+it is" to "fits with a 2-hour guard": it needs no wall geometry, but it must not silently outlive a
+mesh move.
+
 ### B. The chunks
 
 Fit: (i) fits as it is; (ii) fits once it reads the mesh's declaration and refuses when that is
@@ -555,7 +625,7 @@ conditions, plus one review round; "author's part" is the share of that which is
 | 1 | Rotated datum collectives (#855) | fixes a hang when FE data prescribe wall-normal velocity | none | (i) | a bug fix | done: #1097, waiting on CI |
 | 2 | Shell region labels | Inner/Outer cells by connectivity | none; labels only | (i) | fixes mislabelled cells on refined shells | done: #1100 merged; 2 h for H3's two test gaps |
 | 3 | Spherical Kramer references, gravity kernels, harmonics | exact fields and kernels as formulae | none: data and formulae on a shell the user describes | (i) | the reference every spherical study needs; high | done: #1108 in review |
-| 4 | `pressure_split` | writes a prescribed interface pressure jump as p = q + p_J on fitted facets | none: named fitted facets, user's jump and normal | (i) | general; removes the jump from the pressure space on any fitted interface; high | 1 h to cut out of #1110 (none) |
+| 4 | `pressure_split` | writes a prescribed interface pressure jump as p = q + p_J on fitted facets | none: named fitted facets, user's jump and normal | (i), with a guard: built once, so it must refuse after a mesh move (A2) | general; removes the jump from the pressure space on any fitted interface; high | 3 h: cut out of #1110, add the guard and its test (the guard: his) |
 | 5 | `cylindrical_pressure_lifting` | the same for one harmonic on an exact circle, cut cells integrated exactly | origin-centred circle; `interface_radius=`, `outer_radius=` arguments | (ii), or (iii): `pressure_split` on a fitted mesh is its general form | benchmark only; low unless the paper uses unfitted interfaces | 3 h after the contract (refuse an unfitted mesh: his) |
 | 6 | Lagged circular walls, free slip and zero slip | corrects the polygon wall condition to the true circle over a few ordinary solves, on our rotated solve and essential conditions | origin-centred circle; `radius=` and `sign=` arguments, vertices re-checked | (ii) | the cheapest route to second-order wall stress on an annulus with our own solver; high for the cylindrical benchmark | 6 to 8 h after the contract (analytic non-zero-flow test, transcript record: his) |
 | 7 | Cylindrical coupled gap, free slip and zero slip | integrates over the true annulus (caps added and removed) with a wall multiplier; own matrix and solver | two radii as arguments; closed-form cap rule; isoviscous, linear | (ii) for the geometry; but it is a separate solver beside `Stokes` that refuses any registered condition, so it does not use our solve, multigrid or transcript: closer to (iv) as library code | carries the wall traction as an unknown on the true circle (the note's multiplier route); a benchmark reference rather than a tool; medium | 8 to 10 h (free-slip convergence test, np above 2: his) |
@@ -568,7 +638,8 @@ conditions, plus one review round; "author's part" is the share of that which is
 
 **Recommended order** (fit and value first, cost second):
 1. Chunks 1 to 3: in hand.
-2. Chunk 4, `pressure_split`: general, fits now. Cut #1110 down to it.
+2. Chunk 4, `pressure_split`: general; fits once it refuses a split older than the mesh geometry.
+   Cut #1110 down to it and add that guard.
 3. The contract of part A, as one small PR of its own once Louis has chosen (my estimate 4 to 6 hours
    with tests at np 1 to 5, in H5's and W1's territory, so through the hub).
 4. Chunk 6, the lagged walls, reading the declaration: the piece with the most value per hour for the
