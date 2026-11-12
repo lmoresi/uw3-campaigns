@@ -44,7 +44,7 @@ Every session reads this file when it starts and when it meets a session ID it d
 | C1 | **dev hub** | `session_01HxWvn6vA38fdYLUxnxDk4g` | cloud | Louis | orchestration of library work: PRs, merges, issue tracking; DEV-HUB.md | science, technical work |
 | C2 | **science hub** | `session_013CgVT1Gx9WTvaZVqU58HsQ` | cloud | Louis | orchestration of science campaigns and results; HUB.md | library work, technical work |
 | C3 | **docs hub** | `session_01HxWvn87HYCEJodpgCdaBro` | cloud | Louis | orchestration of docs, technical notes, examples; DOCS-HUB.md | technical work |
-| W1 | **integration** | `session_01HxWvn5rMK67zasgirdXszQ` | wombat, serial only | C1 | library code: solvers, rotated BC, custom MG, convergence policy | MPI runs |
+| W1 | **integration** | `session_01HxWvn5rMK67zasgirdXszQ` | wombat, serial only | C1 | library code: solvers, rotated BC, custom MG, convergence policy, fault placement (line_cut, fault_split, place_surface) | MPI runs |
 | W2 | **notes** | `session_011S876ckjYqqth1aPyojrhh` | wombat (assumed; confirm) | C3 | UWTN technical notes | |
 | H1 | **worker** | `session_01HxWvn98DsWPTz4ZpKByzQM` | hyperion, 12 cores | C1 | parallel suites, reviews, PRs, issues (no merge, approve or close) | science runs |
 | H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | |
