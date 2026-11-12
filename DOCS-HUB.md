@@ -762,3 +762,14 @@ Measured here, not inherited.
   CI's `pdf` job on a PR skips the build unless asked, so a movie note's PDF is first
   proven at deposit unless built by hand. Standing: Louis approves prompts; ask before
   publishing a note, not for green infrastructure PRs.
+- 2026-11-12, captured for later (from the "OT movie / MMPDE" session, at Louis's
+  request): **the notes' PR previews have not deployed since late October.** The
+  `preview` workflow fails at its publish step on every PR: `Authentication failed` for
+  `underworldcode.org-preview.git`, pushed with `secrets.PREVIEW_TOKEN`
+  (`.github/workflows/preview.yml`, line 129). Last success 2026-10-02 (run
+  36973392038); first failure 2026-10-25; all 29 runs since failed, #65-#69 included.
+  Likely an expired personal token (not checked). `preview` is not a required check, so
+  merges and deposits go through, but no PR gets a preview link, and the MMPDE 1.1.0
+  change was published without one. **Louis's to fix:** a new token with push access to
+  `Underworld-Technical-Notes/underworldcode.org-preview`, saved as `PREVIEW_TOKEN` on
+  `underworldcode.org`; re-run a recent preview job to confirm.
