@@ -3506,3 +3506,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Wombat (W sessions) is the laptop: fine for bursts, not 24/7. Design (Louis): MMPDE moves the BASE mesh only, to
   resolve the smooth fields; the fault is added on as a sub-mesh (the discontinuity). MMPDE keeps the FMG topology
   fixed, not the coordinates. A demonstrator coupling the two techniques. Awaiting Louis's go to brief H2.
+- 2026-11-13: earth_recipe_movie (4417) at step 110/800, t 4.85e-4 (130 Myr), every step converged. Slab reached the
+  base ~step 80; trench rolled back -0.5 -> -9.2 deg; plates 1.6 / -0.7 cm/yr. Movies steps 0-110 (nice, mesh, mesh
+  fixed frame) on movie page v59. movie_frames.py (local tool) now skips a checkpoint whose record is not yet written.
+  Young-slab arms earth_young80 (4434) and earth_young80_deta (4435) running, ~20 steps in.
