@@ -3560,3 +3560,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   610/1399/2337/1983) and vrms (222/358/668/624 vs 222/358/673/609) within 1 % to 3e-4; at 4e-4 slip 7 %, vrms 2.5 %,
   inside kaiju's own step-to-step swing (slip 1924-2110 over steps 35-39). H2's MMPDE comparison rests on a matching
   baseline; MMPDE numbers are H2's to report.
+- 2026-11-13: the parallel blocker is filed as underworld3 #1091 (04:10 UTC): the add-on partition locates each fine
+  cell's parent at its MOVED centroid, so after an MMPDE move a parent can sit on another rank (refusal "no local parent
+  cell") or be silently wrong; affects place_fault_ribbon_2d(seams="gather"), Mesh.add_fault, add_conforming_sheet at
+  np >= 2. C1 routed the fix to W1, so H2 told to stand down on the fix and supply its np-4 zg95 repro as W1's
+  acceptance test. K1: no kaiju run used a moved base; "no local parent cell" in none of 144 run logs; 4417/4434/4435
+  on unmoved bases; recorded kaiju results stand. MMPDE young-slab repeats at np > 1 wait for W1's fix.
+  H2 refinement-3 comparison: MMPDE ref 3 (7,936 cells) follows the ref-4 baseline's trench to ~0.1 deg with a quarter
+  of the cells; uniform ref 3 lags 0.5-1 deg; ref-3 slip noisy either way; 103 s/step serial.
