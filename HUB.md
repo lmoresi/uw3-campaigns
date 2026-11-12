@@ -3577,3 +3577,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   stays in a wedge on the overriding side of the fault (2,280 of 2,840 km; 2,350 of 2,600 km), vs 29 % (1,210 of
   4,100 km) in the old-slab run; counted from crust particles (crust_budget.py, thermal_parameter.py, K1 scratchpad).
   Movies, all four styles, on kaiju ~/+Claude/kaiju/movies/out/earth_young80{,_deta}; page has nice + fixed mesh.
+- 2026-11-13: kaiju/arrhenius pushed on ede44b6 (K1's 7581b89 -> a5df984; annulus_faults.py 5d778b1, annulus_model.py
+  62124ba, DECISIONS.md 8354bf1; mbox sha256 matched, py_compile clean; merges cleanly into the campaign branch, not
+  merged). Adds uw_visc_law (fk default, unchanged; arrhenius), uw_arr_T0 0.1092 (273 K / 2500 K), uw_arr_E (0: fk
+  slope at T_interior; 6.12 = 127 kJ/mol for deta 4e3), uw_arr_eta_max (0: deta). Arrhenius is scaled to the fk
+  viscosity at T_interior (Ra and yield stresses unchanged); vs fk at deta 4e3: capped from T 0.35 down, x2.3 at T 0.5,
+  x1.6 at the base. For an Arrhenius version of the young-slab run (Louis), to start when the FK arms reach ~350 Myr;
+  2-step test first, then earth_young80_arr. PARAMETERS ARE K1's CHOICE, NOT RULED (flagged to Louis).
