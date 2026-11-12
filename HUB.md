@@ -3680,3 +3680,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the last 60-90 km of the fault is drawn: NOT YET A RESULT. The Arrhenius-vs-FK comparison at step 50 (before the
   first jump) stands. Any change to the fit's deep end is Louis's decision; no driver change. Run: 4567 step 72/1,200,
   232 Myr, all converged, 27.6 GB steady. Movie page v71 (#young-slab-arr) corrected.
+- 2026-11-13: CORRECTION (K1), replaces the entry above: the "carried to the cap" fit is not the only cause of the
+  one-step slip changes in earth_young80_arr. Changes so far: step 53 x1.41, 67 x1.52, 72 x0.33 (plate 1.7 -> 0.6
+  cm/yr), 73 x2.83. Not solver noise: four restarts at uw_tol 1e-5 (runs/arr_tol_test, job 4589) reproduce the slips
+  (719 / 2,034 / 2,203; 1.3 % off at step 53), and a control restart reproduces them at the run's tolerance. Each change
+  coincides with the fault's last 90 km (350-435 km) moving relative to the slab top (mean distance 10 -> 31 km,
+  5 -> 41, 21 -> 5, 5 -> 15); 53 and 67 are "carried" fits; 73 followed stray crust in the wedge, no log message. The
+  distance alone does not set the slip (5-8 km gave 719 at 72 but 1,280-1,700 elsewhere); step 72 unexplained. Plate
+  speeds in this run NOT YET A RESULT; the step-50 Arrhenius-vs-FK comparison predates the swings. Driver unchanged;
+  deep-end treatment with Louis. 4567 at step 81/1,200 (10:13). Movie page v72.
