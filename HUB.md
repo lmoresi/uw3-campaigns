@@ -3593,3 +3593,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   149, 151 and 246-255 (a different message, recovered each time); its ridge is at the antipode. Deliveries to step 174
   (movie page v64) unaffected. Arrhenius test (job 4507, 5 steps, 7581b89 = a5df984) converged; the Arrhenius run waits
   on Louis (same young-slab setup).
+- 2026-11-13: CORRECTION (K1) to the entry above: the Arrhenius test had NOT converged. Job 4507 completed no step: it
+  was submitted without the overlay argument, so ran on overlay-dev-f631ce42 instead of the young-slab runs'
+  overlay-dev-80d3ebe9, and sat in its first solve 55 min; cancelled (K1's own job), resubmitted as job 4511 on
+  overlay-dev-80d3ebe9, driver 7581b89 = a5df984; no result yet. "Louis has been told" was also premature. FK arms
+  still frozen, now at steps 514 (earth_young80) and 581 (earth_young80_deta); earth_young80_deta passed 350 Myr at
+  step 445 on the frozen fault, so that mark is not a valid result. Nothing after the freeze is a result.
