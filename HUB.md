@@ -3514,3 +3514,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   passes 200 Myr near step 190). Nice movie now has a surface-velocity strip above the close-up (cm/yr, + toward
   +theta, limits +-3); all nice frames redrawn; movies steps 0-113 (133 Myr) on movie page v60. Tool change local
   only (movie_frames.py).
+- 2026-11-13: fourth movie style "nicefixed" (Louis: "a non-rotating equivalent as well ... the degree of rollback is
+  helpful for the idea that the mesh is continually updating"): whole annulus in the planet's frame, start tick,
+  rollback arc and distance, close-up window outlined. Steps 0-117 (137 Myr; rollback 1,030 km / 9.2 deg) on movie
+  page v61. Louis's observation (not measured): "there is almost no ablation of the over-riding plate by the
+  downgoing slab thanks to the fault. This is visible in the slight encroachment of the green weak tracers as the
+  fault steps back slightly. That's good from the modelling point of view - it fits what we set out to solve (whether
+  realistic or not !)". Tool changes local only (movie_frames.py, render and encode job scripts).
