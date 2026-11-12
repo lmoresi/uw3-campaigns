@@ -1,8 +1,8 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
-examples of sections 1, 3, 5b and 6, the opt-in measurement, and the history of #857's recovery
-methods (section 7) filled in. Other measured examples are marked PENDING and will be filled as runs
+examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
+methods (section 7) and the generality of each method (section 8) filled in. Other measured examples are marked PENDING and will be filled as runs
 finish.
 
 Heads: development f8c60140 (measured build: 93e66eed, which differs only in the MMPDE mover);
@@ -440,6 +440,42 @@ table (cell sizes 0.15 to 0.05, error in the cos 2θ amplitude of σ_rr), with c
 **Measured example: PENDING.** Planned: One analytic annulus, free slip and zero slip, three resolutions: rms error in sigma_nn (and sigma_rtheta) from (a) our reaction alone, (b) our reaction after wall updates, (c) #857's transfer and reconstruction, (d) the gap multiplier.
 
 **The choice (D2).** If the gap multiplier measures as well as (c), #857's recovery is superseded and can close. If the publication uses the lagged walls, then the reconstruction, and the zero-slip shear recovery, are the parts with something our tools lack, and they need the mathematical review gthyagi asked for. The boundary coefficient and the plain topography transfer add little over what we have.
+
+## 8. Are the new methods general, or tools for an exact circle and sphere?
+
+*All from reading the code at 1b740463; quotes are gthyagi's. Detail with file and line: hyperion
+`runs/2026-11-12-h6/generality.md`.*
+
+**Short answer.** Two pieces are general: the fitted pressure split and the region labels. Every wall
+method, and the spherical lift and sheet loads, takes a radius, assumes the centre is the origin, and
+checks that the mesh's wall vertices lie on that circle or sphere. None accepts a surface the user
+supplies, and none runs on a deformed wall, a wall with topography or a moved mesh: they refuse.
+
+| Method | What it needs to know about the wall | Verdict |
+|---|---|---|
+| `pressure_split` | named fitted interior facets, the user's jump and normal | general (2-D and 3-D, straight facets) |
+| `cylindrical_pressure_lifting` | one origin-centred circle and one cos nθ harmonic | circle only; `pressure_split` is its general form |
+| lagged walls | a boundary label and a radius ("The labelled boundary must lie on the requested centered circle"); both walls together; fixed mesh; free slip needs constant viscosity | circle only. General with work: the wall geometry (about 680 lines) would be rewritten against a surface the user can evaluate; roughly two weeks plus validation |
+| cylindrical coupled gap | two labels and two radii; a closed-form circular-cap rule; a multiplier that is P2 in angle; isoviscous | annulus only. General with substantial work; in practice a new method |
+| spherical coupled gap | concentric origin-centred spheres; radial projection; cells cut against a concentric ball; linear, isoviscous | sphere only; generalising it is research |
+| spherical pressure lift | a sphere radius (the interface area must equal 4πR²); the jump is any coordinate expression | sphere only, general jump |
+| spherical sheet loads | a sphere and one spherical harmonic | sphere and harmonic only: a benchmark load |
+| fitted regions (merged, #1100) | three labels and connectivity | general |
+
+**Is the circle or sphere essential?** Not for the lagged walls or the cylindrical gap: the ideas he
+cites (shifted boundary, Gap-SBM) are posed for general smooth boundaries, and the circle is how he
+implemented them. For the spherical gap the sphere is used throughout its roughly 2,000 lines.
+
+**What he says.** #1033 body: *"for cylindrical and spherical P2/P1 benchmarks"*. #857 body: *"The
+supported scope is a nondimensional, origin-centred, isoviscous 2-D annulus"*. Guide: the gap solve is
+*"an explicitly selected research alternative for the same constant-viscosity P2/P1 annulus"*;
+`cylindrical_pressure_lifting` *"remains the specialised exact-circle method"* while *"The general API
+instead uses the fitted polygon/polyhedron geometry"*. He uses "general" only for the pressure split.
+He nowhere says the wall methods extend to general or deformed boundaries, and nowhere says they
+cannot.
+
+So these are benchmark tools for the annulus and the shell, plus one general piece (the pressure
+split). They are not boundary conditions for a convecting model with a deforming or irregular wall.
 
 ## The opt-in claim, measured
 
