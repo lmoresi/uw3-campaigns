@@ -585,9 +585,17 @@ every false one at 2e-4 or worse. Three things the runs showed that reading had 
 - Already there: `BoundingSurface.restore` (why the slip case passes) and the rotated solve's
   declared-rotation wall test, which is the same check; the two should become one.
 
-**Where it needs a decision.**
-- Translation: refuse, or re-fit the centre? I recommend refuse: gthyagi's methods assume the origin,
-  and #969 (open) proposes no fit yet.
+**The proposal in one paragraph.** Registration is the declaration, and the distance check is its
+verification. A curved wall is declared analytic by its entry in `mesh.bounding_surfaces` (centre and
+radius, put there by the constructor). A mover that slides nodes restores them to that registered
+surface (`BoundingSurface.restore`; run: 2.2e-16 after an MMPDE slip of 2.0e-2), so the special case
+survives. A method that uses the shortcut asks the mesh for the surface, and the mesh answers only if
+the wall's vertices lie on it to 1e-9 of the radius; otherwise the method refuses with a message
+saying the wall no longer lies on the declared surface. A rigid translation of the whole mesh is out
+of scope (Louis, 2026-11-12): the wall then fails the check against the declared centre and the
+method refuses; there is no re-fitting of the centre and no special case.
+
+**Where it still needs a decision.**
 - With the check in place, should `deform` still release every surface unconditionally? (H5.)
 - The refined Internal surface is declared and false from construction; snapping it is the open
   `TODO(BUG)`. Until then a method relying on it refuses, which is the right answer. (H5.)
