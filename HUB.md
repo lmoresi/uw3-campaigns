@@ -3663,3 +3663,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   0.8 cm/yr and 1 deg rollback at 212 Myr vs FK 1.4 cm/yr and 8 deg at 201 Myr. Crust fit refused steps 44-51 ("the
   curve reaches only 0.095 ... 0.119, short of the cap less 0.03"), accepted from 52; slip 1040 -> 1465 in one step
   (53); K1 watching. FK restarts still held for Louis.
+- 2026-11-13: earth_young80_arr first 60 steps, figures on movie page v70. Slip jump settled (1040 -> 1465 at 53, peak
+  1474 at 54, 1306 at 60; all converged). Fit refused at 44-51 because the Arrhenius slab stretched: the full crust
+  layer ended ~275 km deep and the fit must reach 350 km; back at 52 as the layer was carried deeper. At step 53 the
+  re-fitted fault's deep end lay ~50 km to the overriding side of the slab top, back along the slab by 59: steps 44-60
+  carry a fault-placement transient (K1's reading of frames, not a test; in the README). Arrhenius vs FK: plate reaches
+  0.6 cm/yr at 194 Myr vs 53 Myr; at 222 Myr the cold slab ends near 700 km with a thin warm tail to ~1,700 km.
