@@ -738,3 +738,9 @@ Measured here, not inherited.
   frames (wombat is finding them), not replaced by a new run; the fishing-net header
   stays. Held until H2's rerun says whether the June run is affected by the older
   moved-mesh defect; if it is, H2's frames are used instead.
+- 2026-11-12 (later): Louis lifts the hold: the June run's movie goes in whatever
+  #1037's answer ("I think it must be OK and I can live with it"). The wombat session
+  "OT movie / MMPDE" (session_01HxWvn6XCQDRSUeRvJZX1kq) has the 239 PNG frames and the
+  checkpoints; it was sent #65's form (MP4 + still + placeholder + thumbnail, script in
+  figures/src, GIF removed, a `## History` entry per #51). This hub checks the branch
+  builds before it goes to Louis.
