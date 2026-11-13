@@ -3887,3 +3887,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   top is 10.6 deg vs the control's 19.6, trench 55 km seaward. Rerun pairs for W1 (job 4620: tight Schur; hash seed 0)
   queued behind 4619, numbers ~10:00. No full-length rerun of the control's configuration (recipe cancelled by Louis).
   Next: spec step 2 (inputs in Earth units).
+- 2026-11-14: kaiju/slab-workbench f0e5fec -> fa5b2bf (K1's ed79763; slab_workbench.py a6a435f, new earth_units.py
+  06157ff; mbox sha256 matched; py_compile and pyflakes clean): spec step 2, physical options in Earth units with the
+  unit in the name (uw_age_sub_myr, uw_T_potential_c, uw_eta_ref_pas, uw_activation_kj_mol, uw_tau0_mpa, ...);
+  earth_units.py converts in one place and logs each beside its model value; uw_ra, uw_deta, uw_arr_E, uw_arr_T0 gone
+  (a retired option stops the run and names its replacement); model unchanged. Check: the control's options in Earth
+  units give back its 44 model numbers (37 exactly, the rest within 2.3e-16). Job 4621 (n8, ~15 min): steps 0-2 before
+  and after, plus a restart from step 195. Hub note to Louis: earth_units.py is its own converter beside the library's
+  units system (uw.quantity / Pint), which the cut dropped with the units mode.
