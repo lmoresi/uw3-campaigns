@@ -3929,3 +3929,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   runs'. PYTHONHASHSEED=0: slip 156.616 / 156.586, first-iteration difference 4e-9. Mesh checksums (4620 step 1): tight
   pair differs in vertex coordinates at round-off; seed0 pair also in cell-vertex numbering, yet has the closest first
   iteration. Not available: cells per rank; 4617's step-1 meshes.
+- 2026-11-14: W1's reading: the runs don't start from the same bits (step-1 meshes differ at round-off, start
+  residuals 1e-11 to 6e-11), and the gap after iteration 1 follows the start gap in every pair with one amplification
+  of ~1e5 (12-digit-equal starts stay 12-digit equal): a deterministic solve with a soft direction, not a random source
+  inside the solve. Cell numbering and Python hash order ruled out; inner tolerances don't set the gap. Open: physics
+  (a sliding fault is a soft mode) or poor conditioning in the fault solve (one rank, direct solve: factor 2 only).
+  Deciding run (relayed to K1): two solves of step 1 from the same bits (restart twice from one saved state, or solve,
+  restore, re-solve in one run; cold starts). Optional: a pair at uw_tol 1e-6 to show whether the ~1 % slip spread is
+  the solve's accuracy at 1e-3. Mesher tie-branching noted, no action unless Louis wants bit-identical meshes.
