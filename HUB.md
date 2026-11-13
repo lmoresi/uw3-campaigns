@@ -3991,3 +3991,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   traceback of job 4635/4637 at the refusal; (b) the probe's first attempt with the trace on 80d3ebe9 at 26 ranks;
   (c) the same on development af84cfcd (needs a newer overlay; K1's call), which decides whether a library issue
   exists. Plus: is K1's "host" the base mesh or the mesh after the placement's partition? No library change until (c).
+- 2026-11-14: MESH STRATEGY (Louis): "We need to resolve the TBL - mmpde can do that. Mmpde can also tighten around the
+  slab and the fault cut-in can deal with the fault resolution. The missing piece is coarse in the lower mantle and
+  coarse around the annulus. We need enough resolution in our test space that mmpde can work. It can do about a factor
+  of four so that is the guide. Try it and see." Hub prototype, geometry only (no uw3 in the hub container): main
+  b536c21 mesh-design/graded-base/ (gmsh size callback; finest-level targets TBL 40 km, 200-660 km 80 km, LM to 200 km,
+  optional 16 km trench window). Radial-only 27,913 cells; with window 37,396; with window + 80 km CMB layer 39,747;
+  vs ~120,000 uniform and 304,064 for the 4 km box. Open: the grading must survive at the COARSE level of uw3's
+  refinement hierarchy (sizes x 2^r). Sent to H2 to try on hyperion (hierarchy, MMPDE x4 on the base, fault placement
+  now #1091 is fixed on development via PR #1094, cost). #1091 note: kaiju's overlay 80d3ebe9 predates the fix.
+  Louis talks to K1 directly on the workbench.
