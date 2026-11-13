@@ -2,8 +2,10 @@
 the strain-weakening annulus.
 
 The driver forked from ``annulus_faults.py`` at 8fff721 for Louis's Earth-scaled plate
-model. This commit is the cut only: what the plate model needs is kept as it was, with no
-change of behaviour, and the rest of the parent is gone. Kept: the slab initial state
+model. What the plate model needs is kept and the rest of the parent is gone. The physical
+inputs are in Earth units (degrees C, Myr, km, cm/yr, Pa s, MPa, kJ/mol); ``earth_units.py``
+turns them into the model's numbers, used here as ``model.<name>``, and the log shows both. The
+mesh and solver options stay in model lengths. Kept: the slab initial state
 (plate ages, ridge positions, the overriding plate and the continent), the fixed ridge
 patch, the crust particles advected with the split velocity and refilled, the fault fitted
 to the crust by a smoothing spline and ended at the depth cap, the frictionless split with
@@ -18,6 +20,7 @@ import json
 import os
 import sys
 import time
+import types
 import warnings
 
 import numpy as np
@@ -28,55 +31,64 @@ from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
 from underworld3.utilities.place_surface import place_fault_ribbon_2d
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, arrhenius_E, clamp_radii,
-                           free_slip_walls, set_viscoplastic)
+from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, free_slip_walls,
+                           set_viscoplastic)
+import earth_units
 
 params = uw.Params(
     uw_out="~/+Simulations/zg95/slab_workbench/runs/test",
+    # Inputs in Earth units (earth_units.py turns them into the model's numbers, and the log shows both).
+    # The unit is the option's last word: _c degrees C (the surface is 0 C), _myr, _km (depths, and
+    # distances along the surface), _cm_yr, _pas, _mpa, _kj_mol, _kg_m3, _nw_m3. The defaults are the
+    # young-slab control's values (runs/earth_young80_arr) in round numbers. Mesh and solver options stay
+    # in model lengths (one is the mantle's depth, 2900 km).
+    uw_T_base_c=2500.0,         # the temperature at the base of the mantle: the model's T = 1
+    uw_T_potential_c=1875.0,    # the mantle's interior temperature, where uw_eta_ref_pas is given
     # the "slab" state (half-space cooling referenced to an age line): the plate age along
-    # the surface ramps from zero at each plate's ridge to uw_age_sub (subducting side) or
-    # uw_age_over (overriding side, the side the fault dips under) at the trench; the age
+    # the surface ramps from zero at each plate's ridge to uw_age_sub_myr (subducting side) or
+    # uw_age_over_myr (overriding side, the side the fault dips under) at the trench; the age
     # continues down the slab's upper surface, the fault plane, as the trench age plus the
-    # distance down-dip over uw_slab_rate; T = T_i erf(d / 2 sqrt(age)) with d the distance
+    # distance down-dip over uw_slab_rate_cm_yr; T = T_i erf(d / 2 sqrt(kappa age)) with d the distance
     # to the age line (the depth below the surface, or the distance into the subducting side
-    # of the slab plane), the colder of the two where both apply. Plate thickness 2 sqrt(age):
-    # age 0.0025 is a 0.1 d plate.
-    uw_T_interior=0.75,
-    uw_age_sub=0.0025,
-    uw_age_over=0.001,
-    uw_ridge_sub=3.14159,       # angle from the trench to the subducting plate's ridge (radians)
-    uw_ridge_over=3.14159,      # angle from the trench to the overriding plate's ridge (radians)
-    uw_age_thin=2.0e-5,         # the age of the surface where there is no plate (a 0.009 d boundary layer)
+    # of the slab plane), the colder of the two where both apply. Plate thickness 2 sqrt(kappa age):
+    # 80 Myr is a 100 km plate.
+    uw_age_sub_myr=80.0,
+    uw_age_over_myr=933.0,
+    uw_ridge_sub_km=3870.0,     # from the trench to the subducting plate's ridge, along the surface (the
+                                #   circumference is 40,492 km)
+    uw_ridge_over_km=0.0,       # from the trench to the overriding plate's ridge; 0: the rest of the circumference,
+                                #   so the two plates share one ridge
+    uw_age_thin_myr=5.3,        # the age of the surface where there is no plate (a 26 km boundary layer)
     uw_over_plate=1,            # 0: no overriding plate, the thin boundary layer instead
-    uw_top_hot=0,               # 2: a fixed ridge (uw_ridge_patch); 0: none
-    uw_ridge_patch=0.05,        # uw_top_hot 2 (a fixed ridge): only a patch of this half-width (arc, layer depths) at the
-                                #   subducting plate's ridge (uw_ridge_sub behind the trench: the antipode by default) is
-                                #   held at T_interior, tanh ramps of uw_over_ramp; T = 0 elsewhere
-    uw_cont_extent=0.0,         # > 0: the compositional overriding plate (the continent) ends this angle (radians) from the
-                                #   trench (uw_theta_trench) instead of at the overriding plate's ridge. Measured from the
-                                #   trench, not from the continent's start: 1/3 of the annulus from the start at
-                                #   uw_over_gap is 2.094 + uw_over_gap / r_o (2.4315 for a 0.75 gap)
-    uw_cont_age=0.0,            # > 0: a uniform thermal age (layer depths^2) under the continent in the slab state, in place
-                                #   of the ocean's ramp (0.000625: a 0.05 d, ~145 km, conductive lid)
-    uw_lm_eta=1.0,              # a viscosity factor below uw_lm_depth (the 670 km step; 1 = none); Ra and the yield
-                                #   stresses stay referenced to the upper mantle
-    uw_lm_depth=0.231,          # layer depths (670 km of a 2900 km mantle)
-    uw_lm_ramp=0.02,
+    uw_top_hot=0,               # 2: a fixed ridge (uw_ridge_patch_km); 0: none
+    uw_ridge_patch_km=145.0,    # uw_top_hot 2 (a fixed ridge): only a patch of this half-width along the surface at the
+                                #   subducting plate's ridge (uw_ridge_sub_km behind the trench) is held at the
+                                #   interior temperature, tanh ramps of uw_over_ramp_km; T = 0 elsewhere
+    uw_cont_extent_km=15670.0,  # > 0: the compositional overriding plate (the continent) ends this far along the
+                                #   surface from the trench (uw_theta_trench) instead of at the overriding plate's
+                                #   ridge. Measured from the trench, not from the continent's start: 1/3 of the
+                                #   circumference from a start at uw_over_gap_km 2175 is 15,670
+    uw_cont_age_myr=167.0,      # > 0: a uniform thermal age under the continent in the slab state, in place
+                                #   of the ocean's ramp (167 Myr: a 145 km conductive lid)
+    uw_lm_eta=1.0,              # a viscosity factor below uw_lm_depth_km (the 670 km step; 1 = none); the reference
+                                #   viscosity and the yield stresses stay referenced to the upper mantle
+    uw_lm_depth_km=670.0,
+    uw_lm_ramp_km=58.0,
     uw_fault_precedence=0,      # 1: inside a fault's band the fault's own rheology alone: the crust and continent
                                 #   factors are off there (Louis: "the fault rheology should always win")
-    uw_marker_rheo_depth=0.0,   # > 0: below this depth (layer depths) the crust and continent factors fade out
-                                #   (tanh, uw_marker_rheo_ramp); their markers are still advected, recorded and drawn,
+    uw_marker_rheo_depth_km=348.0,  # > 0: below this depth the crust and continent factors fade out
+                                #   (tanh, uw_marker_rheo_ramp_km); their markers are still advected, recorded and drawn,
                                 #   so entrained material is tracked without acting (Louis: "change the material
                                 #   index so we track it but it does not have a rheological influence")
-    uw_marker_rheo_ramp=0.02,
-    uw_over_gap=0.0,            # the overriding plate starts this arc length (layer depths) from the trench
-    uw_over_ramp=0.03,          # over which its age ramps up from the thin layer's
-    # a weak oceanic crust carried by particles: a layer uw_crust_thick thick (< 0: one cell)
+    uw_marker_rheo_ramp_km=58.0,
+    uw_over_gap_km=2175.0,      # the overriding plate starts this far along the surface from the trench
+    uw_over_ramp_km=87.0,       # over which its age ramps up from the thin layer's
+    # a weak oceanic crust carried by particles: a layer uw_crust_thick_km thick (< 0: one cell)
     # on the subducting plate's surface and down the slab's top face, its viscosity and yield
-    # stress times uw_crust_weak (1 = no crust), the weakness fading below uw_crust_depth
+    # stress times uw_crust_weak (1 = no crust), the weakness fading below uw_crust_depth_km
     uw_crust_weak=1.0,
-    uw_crust_thick=-1.0,
-    uw_crust_depth=0.5,
+    uw_crust_thick_km=11.3,
+    uw_crust_depth_km=1450.0,
     uw_crust_fill=1,            # particles per cell parameter (1: about 3 per cell)
     uw_crust_ppc=0,             # > 0: the crust layer seeded denser than the swarm, about this many
                                 #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
@@ -85,38 +97,38 @@ params = uw.Params(
     uw_ridge_crust=0,           # 1 (with uw_crust_ppc and uw_crust_refill_every): crust on plate made at the
                                 #   ridge. At every refill the subducting plate's surface layer is brought to the
                                 #   uw_crust_ppc spacing wherever it holds no crust particle, from the edge of its ridge's
-                                #   hot patch (uw_top_hot 2, uw_ridge_patch; from the ridge itself without one) to
-                                #   uw_ridge_crust_stop short of the trench, and the oceanic-crust line (uw_ocrust_depth)
+                                #   hot patch (uw_top_hot 2, uw_ridge_patch_km; from the ridge itself without one) to
+                                #   uw_ridge_crust_stop_km short of the trench, and the oceanic-crust line (uw_ocrust_depth_km)
                                 #   is carried on the same way. 0: crust only where the start put it and where the refill
                                 #   finds it, so plate made at the ridge carries none, and the fault has
-                                #   nothing to follow once that plate nears the trench (earth_young80, ridge 0.6 rad
+                                #   nothing to follow once that plate nears the trench (earth_young80, ridge 3,870 km
                                 #   behind the trench, 2026-11-12: every fit refused from step 225)
-    uw_ridge_crust_stop=0.1,    # uw_ridge_crust: no crust is made within this arc (layer depths) of the trench, where
+    uw_ridge_crust_stop_km=290.0,  # uw_ridge_crust: no crust is made within this distance of the trench, where
                                 #   the layer bends under and the refill's own rule (crust only where its proxy is) holds
-    uw_ocrust_depth=0.0,        # > 0: a passive oceanic-crust line, marker "ocrust": particles every
+    uw_ocrust_depth_km=17.4,    # > 0: a passive oceanic-crust line, marker "ocrust": particles every
                                 #   line_spacing() this deep under the subducting plate's surface and into the slab's top
-                                #   face (below the weak crust layer when deeper than uw_crust_thick), its gaps filled at
+                                #   face (below the weak crust layer when deeper than uw_crust_thick_km), its gaps filled at
                                 #   the refill (refill_line); carried and written, never in the rheology or the fault's placement
                                 #   (Louis, 2026-11-12: "we treat a slightly deeper layer as the oceanic crust itself for the
                                 #   purpose of tracking deep advection of the oceanic crust and locations for dehydration
                                 #   reactions", "I'd trace the oceanic crust as a near-line. We don't need to know its
                                 #   thickness, just its location"). 0: none
-    uw_crust_line_spacing=0.0,  # the particle spacing along the oceanic-crust line; 0: a quarter of the rung spacing S
+    uw_crust_line_spacing_km=0.0,  # the particle spacing along the oceanic-crust line; 0: a quarter of the rung spacing S
     uw_buoy_T=1.0,              # scales the thermal buoyancy
-    # the compositional overriding plate (stage 3): a layer uw_over_comp_thick thick from
-    # uw_over_gap behind the trench to its ridge, viscosity x uw_over_eta, deficit uw_over_dT (negative: buoyant;
-    # a 0.05 d continent over a uniform lid of age 0.000625 is neutral at about -0.39)
-    uw_over_dT=0.0,
+    # the compositional overriding plate (stage 3): a layer uw_over_comp_thick_km thick from
+    # uw_over_gap_km behind the trench to its ridge, viscosity x uw_over_eta, density uw_over_drho_kg_m3 above the
+    # mantle's (negative: buoyant; a 145 km continent over a uniform lid of age 167 Myr is neutral at about -97)
+    uw_over_drho_kg_m3=-124.0,
     uw_over_eta=1.0,
-    uw_over_comp_thick=0.1,
-    uw_slab_length=0.35,
-    uw_slab_rate=1000.0,        # the convergence rate the slab went down at (its age continuation); at
-                                #   100 (the model's own plate speed at Ra 3e6) a 0.35 d slab has warmed through
-    uw_slab_contact=-1.0,       # the slab's top stays cold (against the overriding plate) to this depth and
+    uw_over_comp_thick_km=145.0,
+    uw_slab_length_km=580.0,
+    uw_slab_rate_cm_yr=1.09,    # the convergence rate the slab went down at (its age continuation); at
+                                #   0.11 a 1,000 km slab has warmed through
+    uw_slab_contact_km=-1.0,    # the slab's top stays cold (against the overriding plate) to this depth and
                                 #   is heated by the mantle below it; < 0: the overriding plate's thickness at
-                                #   the trench, 2 sqrt(uw_age_over) (zero without an overriding plate)
-    uw_slab_wedge_age=6.25e-4,  # the slab's top is cold (T = 0 on the plane): the wedge is cooled beside the slab over
-                                #   2 sqrt(this) (0.05 d), continuous across the plane, no mask
+                                #   the trench, 2 sqrt(kappa uw_age_over_myr) (zero without an overriding plate)
+    uw_slab_wedge_age_myr=167.0,  # the slab's top is cold (T = 0 on the plane): the wedge is cooled beside the slab over
+                                #   2 sqrt(kappa this) (145 km), continuous across the plane, no mask
     uw_restart=-1,
     uw_cell=0.5,
     uw_refinement=4,
@@ -125,24 +137,24 @@ params = uw.Params(
                                 #   coarse cell at the inner wall; 0 = uw_cell. Then the base cell H_B (the crust lattice,
                                 #   the rung spacing by default, the rebuild threshold) is the outer wall's cell, where
                                 #   the plates, the crust and the fault are
-    uw_ra=9.1125e5,
-    uw_deta=3.0e4,
     # the viscosity's temperature law is Arrhenius (Louis, 2026-11-12: "an Arrhenius version of the young slab
-    # run"): exp(E / (T + T0)), equal to uw_deta ** (1 - T) at uw_T_interior and capped (annulus_model.eta_of_T)
-    uw_arr_T0=0.1092,           # the surface temperature over the temperature drop (273 K / 2500 K)
-    uw_arr_E=0.0,               # the activation term E (E* / R dT). 0: the slope of uw_deta ** (1 - T) at uw_T_interior,
-                                #   ln(uw_deta) (uw_T_interior + uw_arr_T0)^2 (6.12 for uw_deta 4e3: 127 kJ/mol at dT 2500 K)
-    uw_arr_eta_max=0.0,         # the viscosity's cap. 0: uw_deta
-    uw_tau0=2.025e4,
-    uw_tau1=1.366875e6,
-    uw_heating=1.4175,
+    # run"): uw_eta_ref_pas at uw_T_potential_c, exp(E* / R T) about it with T the absolute temperature, capped at
+    # uw_eta_max_pas (annulus_model.eta_of_T). Its floor is the model's viscosity unit (earth_units.py; the log
+    # states it): 2.48e21 Pa s with these defaults
+    uw_eta_ref_pas=1.97e22,
+    uw_activation_kj_mol=127.0,
+    uw_eta_max_pas=1.0e25,
+    # the yield stress: uw_tau0_mpa at the surface, rising by uw_tau1_mpa_km with depth
+    uw_tau0_mpa=528.0,
+    uw_tau1_mpa_km=24.3,
+    uw_heating_nw_m3=1.32,      # internal heating
     uw_yield_softness=0.2,
     # an asthenosphere: the viscosity times uw_asth in a channel between two depths
     uw_asth=1.0,                # 1: no channel; 0.01-0.1 for a weak channel under the lid
-    uw_asth_top=0.3,
-    uw_asth_bottom=0.7,
-    uw_asth_ramp=0.05,
-    # the trench and the dip of the slab state
+    uw_asth_top_km=348.0,
+    uw_asth_bottom_km=670.0,
+    uw_asth_ramp_km=58.0,
+    # the trench (its angle in the model's frame, radians) and the dip (degrees) of the slab state
     uw_theta_trench=0.0,
     uw_dip=45.0,
     # the fault band
@@ -171,12 +183,12 @@ params = uw.Params(
     # from the incoming plate through the bend down the slab; no level of the layer chosen, no straight top, no dip
     # floor (Louis, 2026-11-12: "a smooth fit with finite curvature (a spline is a plate bending solution of
     # sorts)", "let the dynamics control the shape and not the other way around"). The fault ends at the depth cap,
-    # uw_fault_depth_max: a curve ending within 0.03 of it is carried to it along its own direction, one ending
+    # uw_fault_depth_max_km: a curve ending within 0.03 of it is carried to it along its own direction, one ending
     # higher is refused
     uw_spline_side="centre",    # "centre" (the layer's median line) or "base" (Louis, 2026-11-12: "a thin, weak upper
                                 #   layer that we follow the base": a second pass about the centre line takes the quantile
                                 #   with 10 % of the layer beyond it toward the plate interior)
-    uw_spline_length=0.02,      # the smoothing length L (layer depths): lam = L^4 / 0.005 (offline on 12 stored
+    uw_spline_length_km=58.0,   # the smoothing length L: lam = L^4 / 0.005 in model lengths (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
                                 #   "geometric" (the library default: facet normals summed across ranks)
@@ -192,9 +204,9 @@ params = uw.Params(
     uw_strain_crit=0.5,
     uw_weak_min=0.5,
     uw_yield_boost=1.25,
-    uw_eta_reg=10.0,
-    uw_heal_time=0.002,
-    uw_heal_T=0.7,
+    uw_eta_reg_pas=2.5e22,      # the plastic rate strengthening (the library's plastic_rate_strengthening); 0: none
+    uw_heal_time_myr=533.0,     # plastic strain heals over this time (0: no healing)
+    uw_heal_T_c=1750.0,         # above this temperature (0: everywhere)
     # fitting the fault
     uw_detect_every=5,
     uw_detect_start=0,          # steps before the first detection (a prescribed slab needs a few to
@@ -216,8 +228,8 @@ params = uw.Params(
                                 #   along the fault short of that (refinement 6: first split node 1.8 cells deep). 0 keeps
                                 #   the depth rule (the recipe until ruled). Along the fault the first split node is also
                                 #   at least half a rung deep (cut_of): what a fault shallower than 30 degrees needs
-    uw_fault_depth_max=0.25,
-    uw_advect_offset=0.1,       # a record's plate speeds are sampled this arc (layer depths) on each side of the trench
+    uw_fault_depth_max_km=435.0,
+    uw_advect_offset_km=290.0,  # a record's plate speeds are sampled this far along the surface on each side of the trench
     # solver and time stepping
     uw_tol=1.0e-3,
     uw_pres_rtol=1.0e-2,        # > 0: the Schur (pressure) KSP rtol, overriding the library's 0.1 x uw_tol (the
@@ -243,7 +255,7 @@ params = uw.Params(
     uw_verbose=0,
     uw_dt_mult=3.0,
     uw_courant=1.0,
-    uw_dt_max=5.0e-3,
+    uw_dt_max_myr=1330.0,
     uw_steps=20,
     uw_ckpt_every=10,
 )
@@ -251,6 +263,17 @@ params = uw.Params(
 out = os.path.expanduser(params.uw_out)
 os.makedirs(out, exist_ok=True)
 r_o, r_i = annulus_radii()
+# the model's numbers of the Earth-unit options, as model.age_sub, model.ra, model.tau0, ... (earth_units.py)
+_retired = [f"-{old} (now -{new})" for old, new in earth_units.RETIRED.items() if uw.options.hasName(old[3:])]
+if _retired:
+    raise ValueError("options in model units that this driver no longer reads: " + ", ".join(_retired))
+EARTH = {option: getattr(params, option) for option in earth_units.OPTIONS}
+MODEL, MODEL_UNIT = earth_units.to_model(EARTH, r_o)
+model = types.SimpleNamespace(**MODEL)
+# as written: the library's display cleaning would run the table's lines together
+uw.pprint("\n".join(earth_units.table(EARTH, MODEL, MODEL_UNIT)), clean_display=False)
+
+
 def effective_spacing(p):
     """The rung spacing a parameter set means: uw_spacing, or one base cell (uw_cell / 2**uw_refinement) when 0."""
     sp = float(p.get("uw_spacing", 0.0) or 0.0)
@@ -297,11 +320,11 @@ if RIDGE_CRUST and (not crust_on or params.uw_crust_ppc <= 0 or params.uw_crust_
                      "with uw_crust_ppc > 0 and uw_crust_refill_every > 0")
 if not crust_on:
     raise ValueError("the fault follows the crust layer: it needs one (uw_crust_weak < 1)")
-over_on = params.uw_over_dT != 0 or params.uw_over_eta != 1   # a negative uw_over_dT is a buoyant block
+over_on = model.over_dT != 0 or params.uw_over_eta != 1   # a negative uw_over_drho_kg_m3 is a buoyant block
 swarm_on = crust_on or over_on
-crust_thick = (float(params.uw_crust_thick) if params.uw_crust_thick > 0
+crust_thick = (float(model.crust_thick) if model.crust_thick > 0
                else H_B)
-ocrust_on = crust_on and params.uw_ocrust_depth > 0
+ocrust_on = crust_on and model.ocrust_depth > 0
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
 markers = {}
@@ -310,7 +333,7 @@ if swarm_on:
     # populated by the initial state: fresh particles for the slab state, the saved ones on a restart
 for name, on, geometry in (("crust", crust_on, lambda xy: layer_marker(xy, crust_thick)),
                            ("ocrust", ocrust_on, lambda xy: np.zeros(len(xy))),   # 1 on its line's particles only
-                           ("over", over_on, lambda xy: over_marker(xy, float(params.uw_over_comp_thick)))):
+                           ("over", over_on, lambda xy: over_marker(xy, float(model.over_comp_thick)))):
     if on:
         markers[name] = (uw.swarm.SwarmVariable(name, crust_swarm, 1, proxy_location="cells", proxy_degree=1),
                          uw.discretisation.MeshVariable(name, base, 1, degree=1), geometry)
@@ -323,20 +346,20 @@ def clamp01(sym):
 
 
 def marker_rheo_window(mesh):
-    """1 above uw_marker_rheo_depth, fading to 0 below it (tanh, uw_marker_rheo_ramp): where a
+    """1 above uw_marker_rheo_depth_km, fading to 0 below it (tanh, uw_marker_rheo_ramp_km): where a
     marker's rheology acts; 1 everywhere when the gate is off."""
-    if params.uw_marker_rheo_depth <= 0:
+    if model.marker_rheo_depth <= 0:
         return 1
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
-    return (1 - sympy.tanh((depth - params.uw_marker_rheo_depth) / params.uw_marker_rheo_ramp)) / 2
+    return (1 - sympy.tanh((depth - model.marker_rheo_depth) / model.marker_rheo_ramp)) / 2
 
 
 def crust_factor_on(mesh, crust_sym, mask=0):
     """The viscosity (and yield stress) factor of the crust proxy ``crust_sym`` on ``mesh``:
-    uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth (and below
-    uw_marker_rheo_depth), and 1 where ``mask`` (the fault band, uw_fault_precedence) is 1."""
+    uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth_km (and below
+    uw_marker_rheo_depth_km), and 1 where ``mask`` (the fault band, uw_fault_precedence) is 1."""
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
-    window = (1 - sympy.tanh((depth - params.uw_crust_depth) / 0.05)) / 2 * marker_rheo_window(mesh)
+    window = (1 - sympy.tanh((depth - model.crust_depth) / 0.05)) / 2 * marker_rheo_window(mesh)
     return 1 - (1 - params.uw_crust_weak) * clamp01(crust_sym) * window * (1 - mask)
 
 
@@ -346,17 +369,15 @@ def comp_factor_on(marker_sym, eta, mask=0, window=1):
     return 1 + (eta - 1) * clamp01(marker_sym) * window * (1 - mask)
 
 
-Ra = uw.expression(r"\mathrm{Ra}", params.uw_ra, "Rayleigh number on the basal viscosity")
-deta = uw.expression(r"\Delta\eta", params.uw_deta, "viscosity contrast across the layer")
-tau0 = uw.expression(r"\tau_0", params.uw_tau0, "yield stress at the surface")
-tau1 = uw.expression(r"\tau_1", params.uw_tau1, "yield stress gradient with depth")
-H = uw.expression(r"H", params.uw_heating, "internal heating rate")
-heating = params.uw_heating
+Ra = uw.expression(r"\mathrm{Ra}", model.ra, "Rayleigh number on the basal viscosity")
+deta = uw.expression(r"\Delta\eta", model.deta, "viscosity contrast across the layer")
+tau0 = uw.expression(r"\tau_0", model.tau0, "yield stress at the surface")
+tau1 = uw.expression(r"\tau_1", model.tau1, "yield stress gradient with depth")
+H = uw.expression(r"H", model.heating, "internal heating rate")
+heating = model.heating
 
 # (E, T0, T_i, eta_max) of annulus_model.eta_of_T
-ARRHENIUS = (float(params.uw_arr_E) or arrhenius_E(params.uw_deta, params.uw_T_interior, params.uw_arr_T0),
-             float(params.uw_arr_T0), float(params.uw_T_interior),
-             float(params.uw_arr_eta_max) or float(params.uw_deta))
+ARRHENIUS = (model.arr_E, model.arr_T0, model.T_interior, model.arr_eta_max)
 
 adv = uw.systems.AdvDiffusion(base, T_b, V_b.sym, order=1)
 adv.constitutive_model = uw.constitutive_models.DiffusionModel
@@ -366,14 +387,14 @@ adv.f = H
 
 def hot_top_window(rel_arc, lib=np):
     """1 where the surface is held hot (uw_top_hot 2, a fixed ridge): a patch of half-width
-    uw_ridge_patch about the subducting plate's ridge, uw_ridge_sub behind the trench (the
-    antipode by default), with tanh ramps of uw_over_ramp; numpy or sympy."""
-    ramp = max(float(params.uw_over_ramp), 1e-6)
+    uw_ridge_patch_km about the subducting plate's ridge, uw_ridge_sub_km behind the trench, with
+    tanh ramps of uw_over_ramp_km; numpy or sympy."""
+    ramp = max(float(model.over_ramp), 1e-6)
     # dist is the arc to the ridge, either way round
-    a = rel_arc / r_o + abs(float(params.uw_ridge_sub))
+    a = rel_arc / r_o + abs(float(model.ridge_sub))
     dist = (lib.Abs(sympy.atan2(sympy.sin(a), sympy.cos(a))) if lib is sympy
             else np.abs(np.arctan2(np.sin(a), np.cos(a)))) * r_o
-    return (1 - lib.tanh((dist - float(params.uw_ridge_patch)) / ramp)) / 2
+    return (1 - lib.tanh((dist - float(model.ridge_patch)) / ramp)) / 2
 
 
 if int(params.uw_top_hot) not in (0, 2):
@@ -384,7 +405,7 @@ if params.uw_top_hot:
     over_sign = 1.0 if params.uw_dip < 90 else -1.0
     rel_sym = over_sign * sympy.atan2(sympy.sin(sympy.atan2(y_s, x_s) - th_t),
                                       sympy.cos(sympy.atan2(y_s, x_s) - th_t)) * r_o
-    adv.add_dirichlet_bc([float(params.uw_T_interior) * hot_top_window(rel_sym, sympy)], "Upper")
+    adv.add_dirichlet_bc([float(model.T_interior) * hot_top_window(rel_sym, sympy)], "Upper")
 else:
     adv.add_dirichlet_bc(0.0, "Upper")
 adv.add_dirichlet_bc(1.0, "Lower")
@@ -395,10 +416,10 @@ strain_adv = uw.systems.AdvDiffusion(base, gamma_b, V_b.sym, order=1)
 strain_adv.constitutive_model = uw.constitutive_models.DiffusionModel
 strain_adv.constitutive_model.Parameters.diffusivity = 1.0e-6
 heal_rate = 0
-if params.uw_heal_time > 0:
-    heal_rate = 1 / params.uw_heal_time
-    if params.uw_heal_T > 0:
-        heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - params.uw_heal_T) / 0.02)) / 2
+if model.heal_time > 0:
+    heal_rate = 1 / model.heal_time
+    if model.heal_T > 0:
+        heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - model.heal_T) / 0.02)) / 2
 strain_adv.f = edot_p_b.sym[0] - gamma_b.sym[0] * heal_rate
 
 
@@ -498,8 +519,8 @@ def placed_ladders(host, faults, coarsening):
 
 
 def fault_depth_cap():
-    """The deepest a fault may reach: uw_fault_depth_max."""
-    return float(params.uw_fault_depth_max)
+    """The deepest a fault may reach: uw_fault_depth_max_km."""
+    return float(model.fault_depth_max)
 
 
 def segment_distance(points, a, b):
@@ -613,7 +634,7 @@ def crust_spline_points(faults):
     0.005, each point re-centred on the median normal offset of the crust within +-0.005 along and
     +-3 thicknesses across, the direction the chord over the last 4 steps, down to the cap + 0.06;
     then the crust within 3 thicknesses of that line binned by arc length (0.005), the bin medians
-    fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length^4 / 0.005, weights
+    fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length_km^4 / 0.005, weights
     sqrt(count)). The fault is the curve from where it lies one crust thickness deeper than its
     level on the incoming plate (the trench) to the depth cap; above that point it runs to the
     wall along the curve's own tangent there, with a stub to 0.02 above the wall; resampled at the
@@ -679,7 +700,7 @@ def crust_spline_points(faults):
     if -C[-1, 1] < reach:                            # the slab's stretched crust thins out
         uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
         return None
-    lam = float(params.uw_spline_length) ** 4 / ds
+    lam = float(model.spline_length) ** 4 / ds
     side = str(params.uw_spline_side)
     if side not in ("centre", "base"):
         raise ValueError(f"-uw_spline_side must be centre or base, not {side!r}")
@@ -832,19 +853,19 @@ class FaultedMesh:
         if over_on:
             weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta, mask=M,
                                          window=marker_rheo_window(mesh))
-        asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
+        asth = ((params.uw_asth, model.asth_top, model.asth_bottom, model.asth_ramp)
                 if params.uw_asth < 1 else None)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
                                       r_o, weak, yield_factor, asthenosphere=asth,
-                                      lower_mantle=((params.uw_lm_eta, params.uw_lm_depth, params.uw_lm_ramp)
+                                      lower_mantle=((params.uw_lm_eta, model.lm_depth, model.lm_ramp)
                                                     if params.uw_lm_eta != 1 else None),
                                       arrhenius=ARRHENIUS)
-        if params.uw_eta_reg > 0:
-            s.constitutive_model.Parameters.plastic_rate_strengthening = params.uw_eta_reg
+        if model.eta_reg > 0:
+            s.constitutive_model.Parameters.plastic_rate_strengthening = model.eta_reg
         self.host_cm = s.constitutive_model
         buoyancy = params.uw_buoy_T * self.T.sym[0]
         if over_on:
-            buoyancy = buoyancy - params.uw_over_dT * clamp01(self.over.sym[0])
+            buoyancy = buoyancy - model.over_dT * clamp01(self.over.sym[0])
         s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
         free_slip_walls(s, params.uw_wall_normal)
         for name in self.names:
@@ -1098,7 +1119,7 @@ class FaultedMesh:
 
 
 def plate_velocities(faults):
-    """Tangential surface velocity (positive toward +theta) uw_advect_offset on each side
+    """Tangential surface velocity (positive toward +theta) uw_advect_offset_km on each side
     of every trench, just inside the outer wall: {name: (v at -theta side, v at +theta
     side)}. Collective."""
     if not faults:
@@ -1106,7 +1127,7 @@ def plate_velocities(faults):
     pts = []
     for f in faults:
         for sign in (-1.0, 1.0):
-            th = f["theta"] + sign * params.uw_advect_offset / r_o
+            th = f["theta"] + sign * model.advect_offset / r_o
             pts.append([(r_o - 0.01) * np.cos(th), (r_o - 0.01) * np.sin(th)])
     pts = np.array(pts)
     v = np.asarray(uw.function.global_evaluate(V_b.sym, onto(pts))).reshape(-1, 2)
@@ -1181,7 +1202,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     with uw.selective_ranks(0) as selected:
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
-                json.dump({"step": step, "t": t, "params": params.to_dict(), "faults": faults,
+                json.dump({"step": step, "t": t, "params": params.to_dict(), "model": MODEL, "model_unit": MODEL_UNIT,
+                           "faults": faults,
                            "next_id": next_id, "ridge_origin": theta_0, "ridges": ridges,
                            # the first fault, for the single-fault readers (renders)
                            "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
@@ -1211,35 +1233,35 @@ def slab_temperature(xy):
     depth = np.maximum(r_o - r, 0.0)
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0            # the overriding plate's side (+theta for a dip below 90)
-    T_i = float(params.uw_T_interior)
+    T_i = float(model.T_interior)
 
     def half_space(dist, age):
         return T_i * erf(dist / (2.0 * np.sqrt(np.maximum(age, 1e-8))))
 
     # the surface age: a ramp from the ridge to the trench on each side, each plate measured from
     # the trench round to its own ridge (an overriding plate may reach past the antipode, to a
-    # subducting plate's ridge near the trench: uw_ridge_over 2 pi - uw_ridge_sub)
+    # subducting plate's ridge near the trench: uw_ridge_over_km 0, the one ridge)
     rel = over * wrap(theta - theta_t)                    # positive on the overriding side
     rel_o = np.mod(over * (theta - theta_t), 2 * np.pi)   # the angle into the overriding side, 0 to 2 pi
     rel_s = 2 * np.pi - rel_o                             # the angle into the subducting side
-    ridge_o, ridge_s = abs(float(params.uw_ridge_over)), abs(float(params.uw_ridge_sub))
-    age_thin = float(params.uw_age_thin)
-    age_o = params.uw_age_over * np.clip(1 - rel_o / max(ridge_o, 1e-6), 0, 1)
-    age_s = params.uw_age_sub * np.clip(1 - rel_s / max(ridge_s, 1e-6), 0, 1)
+    ridge_o, ridge_s = abs(float(model.ridge_over)), abs(float(model.ridge_sub))
+    age_thin = float(model.age_thin)
+    age_o = model.age_over * np.clip(1 - rel_o / max(ridge_o, 1e-6), 0, 1)
+    age_s = model.age_sub * np.clip(1 - rel_s / max(ridge_s, 1e-6), 0, 1)
     if not params.uw_over_plate:                          # no overriding plate: the thin layer
         age_o = np.full_like(age_o, age_thin)
-    elif params.uw_over_gap > 0:                          # the plate set back from the trench
-        w = np.clip((rel_o * r_o - params.uw_over_gap) / max(params.uw_over_ramp, 1e-6), 0, 1)
+    elif model.over_gap > 0:                          # the plate set back from the trench
+        w = np.clip((rel_o * r_o - model.over_gap) / max(model.over_ramp, 1e-6), 0, 1)
         age_o = age_thin + (age_o - age_thin) * w
-    if params.uw_cont_age > 0:                            # the continent: a uniform, old lid
-        cont_end = float(params.uw_cont_extent) or ridge_o
-        in_cont = (rel_o * r_o >= float(params.uw_over_gap)) & (rel_o < cont_end)
-        age_o = np.where(in_cont, float(params.uw_cont_age), age_o)
+    if model.cont_age > 0:                            # the continent: a uniform, old lid
+        cont_end = float(model.cont_extent) or ridge_o
+        in_cont = (rel_o * r_o >= float(model.over_gap)) & (rel_o < cont_end)
+        age_o = np.where(in_cont, float(model.cont_age), age_o)
     age_surface = np.maximum(np.where(rel_s <= ridge_s, age_s, age_o), age_thin)
     T_plate = half_space(depth, age_surface)
     if params.uw_top_hot:                                 # no cooling at all where the surface is held hot
         T_plate = np.maximum(T_plate, T_i * hot_top_window(rel * r_o))
-    # the slab: the age line is the fault plane from the trench, down-dip to uw_slab_length
+    # the slab: the age line is the fault plane from the trench, down-dip to uw_slab_length_km
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
     down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
@@ -1247,24 +1269,24 @@ def slab_temperature(xy):
     a = r_hat * r_o
     rel_xy = xy - a
     s_raw = rel_xy @ down
-    s_along = np.clip(s_raw, 0.0, params.uw_slab_length)
+    s_along = np.clip(s_raw, 0.0, model.slab_length)
     n_into = rel_xy @ n_sub
     # one-sided along the plane: on the overriding side the slab does not cool the wedge;
     # beyond the tip the profile wraps round (a rounded end)
     # time since the slab's top left the overriding plate's base (cold against the plate above it)
-    contact = float(params.uw_slab_contact)
+    contact = float(model.slab_contact)
     if contact < 0:
-        contact = 2.0 * np.sqrt(float(params.uw_age_over)) if params.uw_over_plate else 0.0
+        contact = 2.0 * np.sqrt(float(model.age_over)) if params.uw_over_plate else 0.0
     s_contact = contact / max(abs(np.sin(phi)), 0.1)
-    tau = np.maximum(s_along - s_contact, 0.0) / max(float(params.uw_slab_rate), 1e-6)
+    tau = np.maximum(s_along - s_contact, 0.0) / max(float(model.slab_rate), 1e-6)
     # cold top: T = 0 on the plane, the plate's half-space profile into the subducting
     # side (its age continued down-dip) and a short cooled halo into the wedge, so the
     # field is continuous across the plane; the profile fades beyond either end of the
     # segment over its own diffusion length, so the tip is rounded on both sides
-    age_end = float(params.uw_age_sub) + tau
-    overshoot = np.maximum(s_raw - params.uw_slab_length, 0.0) + np.maximum(-s_raw, 0.0)
+    age_end = float(model.age_sub) + tau
+    overshoot = np.maximum(s_raw - model.slab_length, 0.0) + np.maximum(-s_raw, 0.0)
     end_factor = erfc(overshoot / (2.0 * np.sqrt(age_end)))
-    scale = np.where(n_into >= 0, 2.0 * np.sqrt(age_end), 2.0 * np.sqrt(float(params.uw_slab_wedge_age)))
+    scale = np.where(n_into >= 0, 2.0 * np.sqrt(age_end), 2.0 * np.sqrt(float(model.slab_wedge_age)))
     T_slab = T_i - T_i * end_factor * erfc(np.abs(n_into) / scale)
     return np.minimum(T_plate, T_slab)
 
@@ -1281,7 +1303,7 @@ def layer_marker(xy, thick):
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
     rel = over * wrap(theta - theta_t)
-    ridge_s = abs(float(params.uw_ridge_sub))
+    ridge_s = abs(float(model.ridge_sub))
     plate = (rel < 0) & (np.abs(rel) < ridge_s) & (depth < crust_thick)
     r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
@@ -1289,13 +1311,13 @@ def layer_marker(xy, thick):
     n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
     rel_xy = xy - r_hat * r_o
     s_raw, n_into = rel_xy @ down, rel_xy @ n_sub
-    slab = (s_raw >= 0) & (s_raw <= params.uw_slab_length - crust_thick) & (n_into >= 0) & (n_into < crust_thick)
+    slab = (s_raw >= 0) & (s_raw <= model.slab_length - crust_thick) & (n_into >= 0) & (n_into < crust_thick)
     return (plate | slab).astype(float)
 
 
 def over_marker(xy, thick):
     """1 in the compositional overriding plate of the slab state: a layer ``thick`` thick
-    at the surface on the overriding side, from uw_over_gap (arc length) behind the trench
+    at the surface on the overriding side, from uw_over_gap_km (arc length) behind the trench
     to the overriding plate's ridge."""
     xy = np.asarray(xy, dtype=float)
     r = np.hypot(xy[:, 0], xy[:, 1])
@@ -1303,8 +1325,8 @@ def over_marker(xy, thick):
     depth = np.maximum(r_o - r, 0.0)
     over = 1.0 if params.uw_dip < 90 else -1.0
     rel = over * wrap(theta - float(params.uw_theta_trench))
-    ridge_o = float(params.uw_cont_extent) or abs(float(params.uw_ridge_over))
-    plate = (rel * r_o >= float(params.uw_over_gap)) & (rel < ridge_o) & (depth < thick)
+    ridge_o = float(model.cont_extent) or abs(float(model.ridge_over))
+    plate = (rel * r_o >= float(model.over_gap)) & (rel < ridge_o) & (depth < thick)
     return plate.astype(float)
 
 
@@ -1319,7 +1341,7 @@ def crust_layer_points(spacing, surface_only=False):
     layer's own frame (along it and across it), kept where layer_marker says crust."""
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
-    ridge_s = abs(float(params.uw_ridge_sub))
+    ridge_s = abs(float(model.ridge_sub))
     across = np.arange(0.5 * spacing, crust_thick, spacing)
     rel = -np.arange(0.5 * spacing / r_o, ridge_s, spacing / r_o)
     R, D = np.meshgrid(rel, across, indexing="ij")
@@ -1330,7 +1352,7 @@ def crust_layer_points(spacing, surface_only=False):
         t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
         down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
         n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
-        sa = np.arange(0.5 * spacing, float(params.uw_slab_length) - crust_thick, spacing)
+        sa = np.arange(0.5 * spacing, float(model.slab_length) - crust_thick, spacing)
         Sg, Ng = np.meshgrid(sa, across, indexing="ij")
         pts.append(r_hat * r_o + Sg.ravel()[:, None] * down + Ng.ravel()[:, None] * n_sub)
     xy = onto(np.vstack(pts))
@@ -1371,16 +1393,16 @@ def refill_crust():
 
 def ridge_crust_window(xy, faults):
     """True where uw_ridge_crust makes crust: on the subducting plate, past the edge of its
-    ridge's hot patch (uw_top_hot 2: uw_ridge_patch from the ridge, which stays uw_ridge_sub
-    behind uw_theta_trench; the ridge itself without a patch) and more than uw_ridge_crust_stop
+    ridge's hot patch (uw_top_hot 2: uw_ridge_patch_km from the ridge, which stays uw_ridge_sub_km
+    behind uw_theta_trench; the ridge itself without a patch) and more than uw_ridge_crust_stop_km
     (arc) short of the trench as it is now."""
     theta = np.arctan2(xy[:, 1], xy[:, 0])
     over = 1.0 if params.uw_dip < 90 else -1.0
-    from_ridge = r_o * (abs(float(params.uw_ridge_sub)) + over * wrap(theta - float(params.uw_theta_trench)))
+    from_ridge = r_o * (abs(float(model.ridge_sub)) + over * wrap(theta - float(params.uw_theta_trench)))
     theta_t = float(faults[0]["theta"]) if faults else float(params.uw_theta_trench)
     to_trench = -r_o * over * wrap(theta - theta_t)
-    patch = float(params.uw_ridge_patch) if int(params.uw_top_hot) == 2 else 0.0
-    return (from_ridge > patch) & (to_trench > float(params.uw_ridge_crust_stop))
+    patch = float(model.ridge_patch) if int(params.uw_top_hot) == 2 else 0.0
+    return (from_ridge > patch) & (to_trench > float(model.ridge_crust_stop))
 
 
 def ridge_crust(faults):
@@ -1389,12 +1411,12 @@ def ridge_crust(faults):
     points of the dense crust (uw_crust_ppc spacing) in the subducting plate's surface layer,
     inside ridge_crust_window, with no crust particle on this rank within 0.75 spacing become
     crust particles, whatever the crust's proxy says there; the oceanic-crust line's surface
-    points (uw_ocrust_depth, line_spacing()) the same way. Other markers from the nearest
+    points (uw_ocrust_depth_km, line_spacing()) the same way. Other markers from the nearest
     particle. Collective. Returns the particles added on this rank."""
     from scipy.spatial import cKDTree
     targets = [("crust", crust_layer_points(crust_spacing(), surface_only=True), crust_spacing())]
     if ocrust_on:
-        targets.append(("ocrust", line_points(params.uw_ocrust_depth, surface_only=True), line_spacing()))
+        targets.append(("ocrust", line_points(model.ocrust_depth, surface_only=True), line_spacing()))
     total = 0
     for target, cand, spacing in targets:
         cand = cand[ridge_crust_window(cand, faults)]
@@ -1421,7 +1443,7 @@ def ridge_crust(faults):
 
 
 def line_spacing():
-    return float(params.uw_crust_line_spacing) or 0.25 * S
+    return float(model.crust_line_spacing) or 0.25 * S
 
 
 def line_points(depth, surface_only=False):
@@ -1432,7 +1454,7 @@ def line_points(depth, surface_only=False):
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
     d, sp = float(depth), line_spacing()
-    rel = -np.arange(0.5 * sp / r_o, abs(float(params.uw_ridge_sub)), sp / r_o)
+    rel = -np.arange(0.5 * sp / r_o, abs(float(model.ridge_sub)), sp / r_o)
     th = theta_t + over * rel
     surface = np.c_[(r_o - d) * np.cos(th), (r_o - d) * np.sin(th)]
     if surface_only:
@@ -1441,7 +1463,7 @@ def line_points(depth, surface_only=False):
     t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
     down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
     n_sub = -np.sign(np.cos(phi)) * (np.sin(phi) * t_hat + np.cos(phi) * r_hat)
-    sa = np.arange(0.5 * sp, float(params.uw_slab_length), sp)
+    sa = np.arange(0.5 * sp, float(model.slab_length), sp)
     face = r_hat * r_o + sa[:, None] * down + d * n_sub
     face = face[np.hypot(face[:, 0], face[:, 1]) < r_o - d]   # below the surface part, which already covers the trench
     return onto(np.vstack([surface, face]))
@@ -1540,7 +1562,7 @@ def seed_swarm():
     crust_swarm.populate(fill_param=int(params.uw_crust_fill))
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
-    n_oc = (crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(line_points(params.uw_ocrust_depth)))
+    n_oc = (crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(line_points(model.ocrust_depth)))
             if ocrust_on else 0)
     for name, (var, _, geometry) in markers.items():
         var.array[:, 0, 0] = geometry(swarm_xy())
@@ -1652,18 +1674,18 @@ elif params.uw_restart >= 0:
     # pressure), not from rest: measured from 3580 at np 16, 17 iterations against 33
     faulted.warm_start(V_b)
     restart_transfer = "base_V"
-_ra, _tau0, _tau1, _H = params.uw_ra, params.uw_tau0, params.uw_tau1, params.uw_heating
+_ra, _tau0, _tau1, _H = model.ra, model.tau0, model.tau1, model.heating
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
           f"{_tau1 / _ra:.3g}, tau0 {_tau0:.4g}, H {_H:.4g}, "
-          f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
+          f"asthenosphere {params.uw_asth:g} in {model.asth_top:g}-{model.asth_bottom:g}; "
           + (f"viscosity arrhenius, E {ARRHENIUS[0]:.4g}, T0 {ARRHENIUS[1]:g}, the fk viscosity "
-             f"{float(params.uw_deta) ** (1 - ARRHENIUS[2]):.4g} at T {ARRHENIUS[2]:g}, cap {ARRHENIUS[3]:g}; ")
+             f"{float(model.deta) ** (1 - ARRHENIUS[2]):.4g} at T {ARRHENIUS[2]:g}, cap {ARRHENIUS[3]:g}; ")
           + f"{len(faults)} fault(s); "
-          + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {params.uw_crust_depth:g}; "
+          + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {model.crust_depth:g}; "
              if crust_on else "")
-          + (f"crust made on new plate to {params.uw_ridge_crust_stop:g} short of the trench; " if RIDGE_CRUST else "")
-          + (f"compositional overriding plate {params.uw_over_comp_thick:g} thick from {params.uw_over_gap:g} "
-             f"behind the trench, dT {params.uw_over_dT:g}, eta x{params.uw_over_eta:g}; " if over_on else "")
+          + (f"crust made on new plate to {model.ridge_crust_stop:g} short of the trench; " if RIDGE_CRUST else "")
+          + (f"compositional overriding plate {model.over_comp_thick:g} thick from {model.over_gap:g} "
+             f"behind the trench, dT {model.over_dT:g}, eta x{params.uw_over_eta:g}; " if over_on else "")
           + (f"{int(uw.utilities.gather_data(crust_swarm.local_size, bcast=True).sum())} particles; "
              if swarm_on else "")
           + f"from t {t:.4f}; output {out}")
@@ -1700,12 +1722,13 @@ def git_head(path):
 
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
-                "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length",
+                "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along",
-                "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth",
-                "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop", "uw_crust_line_spacing",
-                "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max", "uw_ckpt_every",
-                "uw_placement_refused", "uw_yield_softness", "uw_arr_T0", "uw_arr_E", "uw_arr_eta_max"]
+                "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
+                "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
+                "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max_myr", "uw_ckpt_every",
+                "uw_placement_refused", "uw_yield_softness", "uw_T_base_c", "uw_T_potential_c", "uw_eta_ref_pas",
+                "uw_activation_kj_mol", "uw_eta_max_pas"]
 
 
 def write_choices(explicit, effective, info):
@@ -1747,7 +1770,8 @@ def write_run_info():
             "uw3_path": uw.__file__, "uw3_commit": uw3_commit, "uw3_branch": uw3_branch,
             "driver_commit": os.environ.get("DRIVER_COMMIT") or git_head(os.path.dirname(os.path.abspath(__file__))),
             "petsc": ".".join(str(v) for v in PETSc.Sys.getVersion()), "argv": sys.argv,
-            "params": params.to_dict(), "restart_from": int(params.uw_restart) if params.uw_restart >= 0 else None,
+            "params": params.to_dict(), "model": MODEL, "model_unit": MODEL_UNIT,
+            "restart_from": int(params.uw_restart) if params.uw_restart >= 0 else None,
             "slurm_job": os.environ.get("SLURM_JOB_ID")}
     # the choices this run depends on: which knobs the launch line set (the rest are defaults taken), and the
     # effective values the library derives or the driver hard-codes (Louis, 2026-11-01: every such choice is stated)
@@ -1759,6 +1783,7 @@ def write_run_info():
                  "pressure_rtol_rule": "cold solves (the first solve and any cold retry) take the cold rtol, warm "
                                        "solves the warm; an unconverged cold first solve stops a fresh run",
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
+                 "rayleigh_number": model.ra, "viscosity_unit_and_floor_pas": MODEL_UNIT["pas"],
                  "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
                  else "one base cell (uw_cell / 2**uw_refinement)",
                  "rebuild_threshold": REBUILD,
@@ -1862,7 +1887,7 @@ for k in range(k0, k0 + params.uw_steps):
     dt_accuracy = params.uw_dt_mult * float(adv.estimate_dt())
     adv.estimate_dt(basis="resolution", direction_aware=True)
     dt_crossing = adv.dt_adv
-    dt = min(dt_accuracy, params.uw_courant * dt_crossing, params.uw_dt_max)
+    dt = min(dt_accuracy, params.uw_courant * dt_crossing, model.dt_max)
     adv.solve(timestep=dt)
     strain_adv.solve(timestep=dt)
     gamma_b.array[:, 0, 0] = np.maximum(gamma_b.array[:, 0, 0], 0.0)
@@ -1876,7 +1901,7 @@ for k in range(k0, k0 + params.uw_steps):
                 and (k + 1) % int(params.uw_crust_refill_every) == 0):
             n_refill = int(uw.utilities.gather_data(refill_crust(), bcast=True).sum())
             if ocrust_on:
-                n_refill += int(uw.utilities.gather_data(refill_line(faults, "ocrust", params.uw_ocrust_depth),
+                n_refill += int(uw.utilities.gather_data(refill_line(faults, "ocrust", model.ocrust_depth),
                                                          bcast=True).sum())
             if n_refill:
                 events.append(f"crust refill: {n_refill} particles")
