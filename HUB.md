@@ -3711,3 +3711,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   and ~20 km of it changes slip by a third (110 <-> 150, steps 31-35); the crust count falls gradually there, so a
   count threshold has no sharp end. Driver 8fff721 = 818d43f unchanged; threshold 0.5; no fit tuning without Louis.
   4593 step 35/1,200 and control 4567 step 125, all converged. Movie page v75 (#short-fault).
+- 2026-11-13: CORRECTION (K1) to the entry above: in the short-fault run slip is set almost entirely by where the fit
+  ends the fault. Steps 21-43 (177-253 Myr): slip = 2.0 model units per km x (fault end - 215 km), rms scatter 5.5, over
+  ends 253-306 km and slips 85-190. The end moves up to 50 km between steps, so slip doubles and halves step to step
+  (steps 39-44: 190, 148, 87, 91, 173, 101); "20 km changes slip by a third" came from steps 31-35 only; the swings are
+  no smaller in proportion than the control's. Plate speed moves with it (0.16-0.22 cm/yr) on a slow rise. Headline
+  stands: no shutdown, plate below 0.23 cm/yr against the control's 0.8 and more. Nothing changed in either run.
+  Movie page v77.
