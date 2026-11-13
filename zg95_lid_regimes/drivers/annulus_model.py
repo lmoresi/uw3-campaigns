@@ -21,12 +21,19 @@ def annulus_radii(ratio=RADIUS_RATIO):
     return 1.0 / (1.0 - ratio), ratio / (1.0 - ratio)
 
 
-def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO):
+def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None):
     """The unit-depth annulus with its refinement hierarchy (the multigrid levels);
-    refined boundary nodes are snapped to the circles."""
+    refined boundary nodes are snapped to the circles. ``cell_inner`` (coarse-level size at
+    the inner boundary) grades the cell size radially, from ``cell`` at the outer boundary."""
     r_o, r_i = annulus_radii(ratio)
-    return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
-                              refinement=int(refinement), qdegree=3)
+    if cell_inner is None or float(cell_inner) == float(cell):
+        return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
+                                  refinement=int(refinement), qdegree=3)
+    # Annulus caches the .msh under a name built from cellSize alone, so a graded mesh needs its own file name.
+    from underworld3.meshing.annulus import mesh_file_dir
+    name = f"{mesh_file_dir()}/uw_annulus_ro{r_o}_ri{r_i}_csize{float(cell)}_inner{float(cell_inner)}.msh"
+    return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell), cellSizeOuter=float(cell),
+                              cellSizeInner=float(cell_inner), refinement=int(refinement), qdegree=3, filename=name)
 
 
 def radius_of(mesh):

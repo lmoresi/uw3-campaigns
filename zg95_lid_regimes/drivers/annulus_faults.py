@@ -217,6 +217,8 @@ params = uw.Params(
                                 #    form); 0: the contact side is masked and the slab keeps its erf profile
     uw_restart=-1,
     uw_cell=0.5,
+    uw_cell_inner=0.0,          # > 0: a radially graded base, uw_cell at the outer boundary and this at the inner one
+                                #   (coarse-level sizes; the base cell H_B stays the outer one)
     uw_refinement=4,
     uw_ra=9.1125e5,
     uw_deta=3.0e4,
@@ -508,7 +510,7 @@ if params.uw_fault_seams != "gather" and int(params.uw_chain) > 0:
                      "run it with -uw_chain 0")
 W = 2.0 * S
 
-base = annulus_mesh(params.uw_cell, params.uw_refinement)
+base = annulus_mesh(params.uw_cell, params.uw_refinement, cell_inner=float(params.uw_cell_inner) or None)
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
