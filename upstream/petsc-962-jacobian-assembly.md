@@ -1,9 +1,9 @@
 # Draft upstream report: PETSc, #962
 
-*Status: DRAFT for Louis to send in his name (where: PETSc's GitLab issues or petsc-maint). Drafted by
+*Status: READY FOR LOUIS (complete 2026-11-13): DRAFT for Louis to send in his name (where: PETSc's GitLab issues or petsc-maint). Drafted by
 H1 (the parallel review desk) from the PETSc source, 2026-11-13; placed here by the dev hub. The
 reproducer is W1's (the integration session; macOS, 12-core Apple M4, serial runs only), run there on one rank;
-H1 runs it at np 2 and 4 on 3.25.3 and fills the bracketed paragraph. The second observation below the
+H1 ran it at np 1, 2 and 4 on 3.25.3 (Linux workstation, MPICH); its results are in the reproducer section. The second observation below the
 line is W1's, measured on one rank.*
 
 ---
@@ -51,11 +51,43 @@ One quadrilateral cell on two ranks, or two cells on four, leaves a rank without
 -dm_plex_box_faces 2,1    [0] cells 2    two matrices:  |J| = 3.286710990611e-01  |P| = 6.573421981222e-01
 ```
 
-[H1: what the np 2 and np 4 runs do on 3.25.3 (the cells per rank the program prints, then the abort
-or the hang), and whether `-assemble_on_empty_ranks` completes with the one-rank norms. That option
-makes each rank without cells call `MatAssemblyBegin/End(J)` once after `SNESComputeJacobian` returns,
-which is the call the ranks with cells made inside `DMPlexComputeJacobianByKey`. W1 has run the program
-on one rank only; nothing here is measured on more.]
+On more than one rank (PETSc 3.25.3, conda-forge build, MPICH; Linux, Intel Xeon), every run that leaves a
+rank without a cell returns a Jacobian of norm zero from `SNESComputeJacobian(snes, X, J, P)`, on every
+rank including the one that holds the cell, while P is correct. The job then hangs and has to be killed.
+Making the ranks without cells assemble J once more after the call restores the one-rank norms, and the
+job exits cleanly:
+
+```
+$ mpiexec -n 1 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1
+[0] cells 2
+two matrices:        |J| = 3.286710990611e-01  |P| = 6.573421981222e-01
+one matrix twice:    |K| = 3.286710990611e-01  |K - J| = 0.000000000000e+00        (exit 0)
+
+$ mpiexec -n 2 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 1,1
+[0] cells 0
+[1] cells 1
+two matrices:        |J| = 0.000000000000e+00  |P| = 3.928371006592e-01
+one matrix twice:    |K| = 0.000000000000e+00  |K - J| = 3.928371006592e-01
+(hangs after this; killed by the timeout)
+
+$ mpiexec -n 4 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1
+[0] cells 0
+[1] cells 0
+[2] cells 0
+[3] cells 2
+two matrices:        |J| = 0.000000000000e+00  |P| = 3.286710990611e-01
+one matrix twice:    |K| = 0.000000000000e+00  |K - J| = 3.286710990611e-01
+(hangs after this; killed by the timeout)
+
+$ mpiexec -n 4 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1 -assemble_on_empty_ranks
+[0] cells 0   [1] cells 0   [2] cells 0   [3] cells 2
+two matrices:        |J| = 3.286710990611e-01  |P| = 6.573421981222e-01
+one matrix twice:    |K| = 3.286710990611e-01  |K - J| = 0.000000000000e+00        (exit 0)
+```
+
+So the call returns, with a wrong J; the hang comes later, from the collective left unpaired. (With
+`-boundary` at np 2, |P| comes out as 1.4407e+01, the one-rank |J| rather than the one-rank |P| of
+2.8814e+01, which suggests the cell rank's J assembly paired with the empty rank's P assembly; not traced.)
 
 **How we met it:** Stokes solves in Underworld3 (a separate pressure-Schur preconditioner matrix) on meshes
 where a rank holds no cells, which happens routinely for extracted submeshes and for coarse refined bases
