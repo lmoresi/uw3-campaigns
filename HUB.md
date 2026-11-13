@@ -3741,3 +3741,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   limit above which a fit is refused and the fault left in place; none refused yet. Both plates speed up together
   (subducting 0.17 -> 0.32, overriding 0.13 -> 0.26 cm/yr, steps 60-90); trench advance 1.0 deg; shared drift's cause
   not looked at. vrms levelled near 600 since step 80. All converged; both runs untouched. Movie page v82.
+- 2026-11-13 ~12:50: DIRECTION (Louis, relayed by K1): FAULT-FIT WORK CLOSED; next, preparatory work for a
+  parameter-study subduction model. Decoupling on Earth is ~80-100 km deep; present models scale out 2-3x larger with a
+  much thicker cold wedge nose (heat-flow scaling, viscosity layering, no phase boundaries, no slab dehydration; later).
+  Reaching scale = focus on upper mantle and subduction region, de-resolve the lower mantle and everything away from
+  active plate boundaries. Short-fault reading: "the fault really does have to cross the whole lithosphere"; subduction
+  dies quickly when the fault shortens, so initiation needs damage or water-rich weak material propagating into the
+  proto-subduction zone. "I have the movies I need for my talk" (closes the movie-extension question). Parameters to
+  explore: plate age, phase changes on/off, mantle viscosity (Newtonian, non-Newtonian), asthenosphere ... Short-fault
+  run at ruling: step 100, 381 Myr, fault 175-178 km, slip 30, convergence 0.045 vs control 1.25 cm/yr. K1 inventorying
+  what the driver already switches (plate age, asthenosphere, lower-mantle viscosity, viscosity law, graded mesh) and
+  what is missing (phase changes, strain-rate-dependent mantle law, angular mesh grading) for a design note to Louis;
+  no driver change or runs yet. Recorded in DECISIONS (6dd3577 on zg95-annulus-for-kaiju). Still open with Louis: the
+  two Arrhenius runs (4567, 4593) still running; FK young-slab restarts (likely moot).
