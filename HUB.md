@@ -3844,3 +3844,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   PARENT's own rerun differs from the control by up to 1e-2 from step 1 on the same code path: reruns do not repeat
   digit for digit, cause not established. Hub asked K1 whether rank count, node layout and overlay matched; if so it is
   a determinism finding for C1.
+- 2026-11-14: kaiju/slab-workbench 680485d -> f0e5fec (K1's 5629dd9; blob e09089b; mbox sha256 matched; py_compile
+  clean): the split's first node is at least half a rung (8.5 km) below the wall. Why: follow-up 18 from step 0 placed
+  every fault (top 20 -> 11.6 deg); the restart from the control's step 193 ran four steps at 10.8-10.4 deg, then the
+  placement was refused at step 198 ("the fault touches the domain boundary") and the run stopped (first node 3.3 km,
+  0.20 rungs; 4.4 km placed, 4.2 placed on the wider band). Steeper than 30 deg cut as before. First job: restart from
+  step 195 of the follow-up 18 test.
+  REPEAT TEST (job 4617, steps 0-2; 26 ranks alone on a node, same binding, overlay 80d3ebe9): step 0 (no fault) all
+  eight runs agree to 3e-13 in vrms, 10 digits in every residual; step 1 (first faulted mesh, same 120208 cells, same
+  band rank) starting residual agrees to 10 digits, after one nonlinear iteration differs 5e-7 to 1.5e-6, end-of-step
+  slip differs up to 1.1 %. Same driver same node twice: 157.83 vs 156.62 (0.8 %). Nonlinear stop near rel. residual
+  4e-4 (uw_tol 1e-3); final residual varies 6 %; by step 15 single steps differ up to 7 % in slip. Comparison rule:
+  check step 0 and step 1's starting residual exactly; later steps spread ~1 %/step. Routed as a determinism item:
+  C1 refused (trusted device), so sent to W1 to triage or forward; Louis can relay to C1 directly.
