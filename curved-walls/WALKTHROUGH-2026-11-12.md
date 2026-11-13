@@ -1,5 +1,13 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
+> **For the hub, 2026-11-13.** Changed since v10: nothing in the sections. State: #1116 (pressure
+> split alone) is at 378f7e58 with development ba68af0a merged, the np 4 CI line, and a solve-time
+> warning when the mesh geometry has changed since the split was built (a warning, not a refusal;
+> nine lines in the Stokes solve notes outside the new method); 19 tests pass at np 1, 2, 4. #1110
+> (held circle pieces) is at 67dea5f1, development merged, not rebuilt. Waiting on: Louis's choice on
+> the contract (section 9 A; I recommend the query that verifies at use), H3's re-check of #1116.
+> Working on: the stage 2 baseline, the note's Kramer table reproduced on development.
+
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
 methods (section 7), the generality of each method (section 8) and the pick-apart plan (section 9,
