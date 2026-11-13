@@ -3857,3 +3857,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   4e-4 (uw_tol 1e-3); final residual varies 6 %; by step 15 single steps differ up to 7 % in slip. Comparison rule:
   check step 0 and step 1's starting residual exactly; later steps spread ~1 %/step. Routed as a determinism item:
   C1 refused (trusted device), so sent to W1 to triage or forward; Louis can relay to C1 directly.
+- 2026-11-14: W1 keeps the determinism item (faulted path is its territory); not forwarded to C1; nothing filed. W1
+  serial measurements (one rank, development bc3d5362 + PR #1156, split box, one Coulomb fault, direct inner solve, no
+  rotated walls, no MG tail): five runs over Python hash seeds bit-identical; a 1e-13 wall-velocity perturbation moves
+  slip 2e-13 (no amplification) at tol 1e-3 and 1e-6; tol 1e-3 vs 1e-6 differ 0.6 % in slip from one extra nonlinear
+  iteration, the size of K1's run-to-run difference. W1's asks, relayed to K1: for two runs of job 4617 at step 1, the
+  linear iteration counts per level in the first nonlinear iteration (if any differ: a tolerance matter; if all match
+  yet the residual differs 1e-6: a library defect), the nonlinear iteration count and residuals, and the solver
+  options; optional reruns (a) tighter inner tolerances, (b) PYTHONHASHSEED=0 on every rank. Probes in W1's
+  issue_sweep/repeat_faulted/.
