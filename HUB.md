@@ -3903,3 +3903,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   cells in every run and still diverged, so both effects may be present.
   Louis 07:55 on the fault top (recorded in the spec, doc rev 17; no code yet): the fit is the ideal fault to the
   surface; the ladder runs along it and may stop short; TI or other weakness continues above.
+- 2026-11-14: kaiju/slab-workbench fa5b2bf -> f044f27 (K1's 2bc7b9a; blob 6115be5; mbox sha256 matched; py_compile and
+  pyflakes clean). Louis: "make sure that we are using the existing fault machinery to describe and implement the fault
+  once it has been fitted". The fitted fault is now a uw.meshing.FaultNetwork (prepare, build with the ladder mesher on
+  the base, max_levels 0, apply_contact); the driver no longer calls place_fault_ribbon_2d; uw_band_widen removed;
+  physics meant unchanged. Regression job 4628 running (np 26, steps 0-1 and restart from 195 vs follow-up 20).
+  Probe (jobs 4624/4625/4627): the network reproduces the driver's counts (120,165 cells, band 218, footprint 185).
+  LIBRARY GAP: the footprint is keyed to the cut, covering only the last ~7 km of the 56.5 km of fitted fault above the
+  cut, and build takes no spine beyond the trace, so the weak continuation above the cut stays driver code; two library
+  routes (band-confined yield, or a TI weak plane needing a library change) are Louis's choice. W1 told for awareness.
+  Job 4619 (wb_floor_late, f0e5fec, restart from 195) ended exit 0: steps 196-255, 331.1-387.5 Myr, all converged, no
+  refused placement; top dip 10.5 -> 9.4 deg, trench -4.04 -> -3.41 deg, fault slip 1.57 -> 0.85 cm/yr. Results page
+  https://claude.ai/artifact/XurJPaaY5vUXJeTAsF76gH updated.
