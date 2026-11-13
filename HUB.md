@@ -3766,3 +3766,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   deep ... more shallow ... it should not apply to the slab" (as coded depth-only, x0.1 in 348-670 km, weakens the slab
   too). K1 next: a referenced specification for Louis before any driver fork or run; patch page stays v17. Plan in
   DECISIONS on zg95-annulus-for-kaiju.
+- 2026-11-13: K1 wrote the Earth-scaled plate model specification as a Claude Doc (private to Louis until shared):
+  https://claude.ai/artifact/Fi245APWKhTXyGN2kFUaGV. Published value and source per quantity (51 works, with a list of
+  what was read only in abstract or second-hand), nine ordered steps for the forked driver, eight calls for Louis (fault
+  side of the crust, temperature and viscosity, yield cap, asthenosphere, overriding plate, age cap, ridge, mesh and
+  crust). Records on the present recipe (earth_young80_arr, 8fff721 = 818d43f): interior 1,875 K vs ~1,350 K on Earth;
+  mantle between plate and 348 km ~56x Earth's upper-mantle viscosity, so boundary layers 2.4-3.4x too thick (matches
+  Louis's "two or three times larger"); yield at laboratory strength (528 MPa + friction 0.75, no cap); overriding plate
+  343 km thick; one ridge, a fixed 145 km hot patch making crust on the subducting side. New measurement on the two
+  cancelled runs: the crust does not subduct, it piles up above the fault on the overriding side (control, steps
+  60-193: crust above the fault 1,355 -> 3,321 km of plate's worth against 1,613 km of convergence); cause from the
+  code: a frictionless fault fitted to the base of a crust that is not weak. No driver change, patch, or job.
