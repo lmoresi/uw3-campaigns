@@ -1,5 +1,12 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
+> **For the hub, 2026-11-14.** Docs PR **#1160** is open for W1 (rotated-first ruling, Nitsche numbers
+> after #1145). It carries a finding that needs an owner: on the elliptical annulus the free-slip
+> methods split into two groups 45 % apart in rms velocity, independent of cell size (penalty and
+> rotated with default normal at 1.445e-2; Nitsche at high gamma and rotated with the analytical
+> normal near 9.3e-3). Table in the PR body. W1's round 1 on #1148 and #1152 is being fixed (movers
+> release an unpinned, unslipped declared wall; one call in `mmpde.py`).
+>
 > **For the hub, 2026-11-13 (after the ruling).** Louis ruled "Yes to all five" on section 9 A-bis.
 > Step 1 is open: **PR #1148**, `Mesh.analytic_surface(label)`, head ab64608c, for W1 (6 tests, serial
 > and np 2 and 3; nothing calls it yet, so no run can newly refuse). Next from me, in the ruled order:
