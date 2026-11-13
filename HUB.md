@@ -3915,3 +3915,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Job 4619 (wb_floor_late, f0e5fec, restart from 195) ended exit 0: steps 196-255, 331.1-387.5 Myr, all converged, no
   refused placement; top dip 10.5 -> 9.4 deg, trench -4.04 -> -3.41 deg, fault slip 1.57 -> 0.85 cm/yr. Results page
   https://claude.ai/artifact/XurJPaaY5vUXJeTAsF76gH updated.
+- 2026-11-14: W1 on the non-repeat: the mesher (1.5e-13 in the fault points -> 120,205 or 120,207 cells) is one
+  source; job 4617 (equal 120,208 cells, yet a 7th-digit residual spread at equal counts) doesn't fit, since equal
+  count doesn't show equal meshes. Asks, relayed to K1: step-1 starting residual in all five 4617 runs to all digits
+  (12+ digits agreeing = same mesh, difference made in the first linear solve; 7th-9th digit = mesher again); if they
+  agree, a per-run mesh checksum (sum and sum of squares of owned vertex coordinates, cells per rank). Same two numbers
+  from job 4620. W1's reading: the 4617 values look like a few discrete states, not continuous noise. FaultNetwork
+  gap: W1 acts only once Louis picks a route; a TI weak plane request should come via C1.
