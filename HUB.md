@@ -3961,3 +3961,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the science asks (slip at a stated nonlinear tolerance) and report the spread against that tolerance. Library side
   closed; nothing filed; stash-order hypothesis not pursued; the matstash pair cancelled (K1 told). Job 4632's result
   still welcome, notably the uw_tol 1e-6 pair.
+- 2026-11-14: job 4632 result (runs/wb_same_bits/README.md; matstash pair not run): from bit-identical checkpoints and
+  rebuilt meshes, starting residuals equal in all 17 digits, every restart parts after the first nonlinear iteration
+  (3e-13 at step 1, 2e-14 at step 196); end-of-step slip 6e-8 / 1.5e-8 apart. At uw_tol 1e-6 (one pair, step 1 only):
+  7 Newton its vs 5, slip agrees to 4.4e-8 where the 1e-3 runs spread 5e-5, vrms 2.6e-8 vs 1e-5; Stokes 87 s vs 53 s.
+  Linear history not captured (job 4633 monitors on the wrong prefix; the Stokes solve runs under rotfs1_); not
+  pursued. Relayed to W1. Question for Louis: tighter uw_tol in the workbench (~1.6x Stokes cost at step 1).
