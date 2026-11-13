@@ -71,3 +71,14 @@ Built at 8edbea80 and run on a 96-thread Linux workstation (single system image;
 **For the clamp PR (#682, mine, in progress).** It moves the clamp out of `_apply_monotone_limit` into the evaluator, so test_0791's `limiter` case would no longer inject anything. I'll adapt that case when I rebase onto #1142. Nothing in #1142 needs to change for it.
 
 Underworld development team with AI support from Claude Code
+
+---
+
+# Re-check at 7416d3e1 (the merge condition and the low item): READY
+
+- **Merge condition met.** test_0791's fifth case is the hook probe. Rank 1 fails inside the semi-Lagrangian DDt's `on_remesh` remap, after the collectives. It asserts four things: both ranks raise after the move; both are at the new coordinates; the failed history is kept identically on both ranks; the others transfer. At 7416d3e1 the file passes, 5 of 5 (100 s). My own probe of the same path at 79f79511 raised on neither rank, which is the case's failing-first half.
+- **Low item fixed.** `_remesh_failed_transfer` is cleared at the top of the outer call only. A nested call returns before that line, so it cannot wipe the outer call's list. That is right.
+
+**Verdict: READY at 7416d3e1.**
+
+Underworld development team with AI support from Claude Code
