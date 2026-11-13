@@ -1,0 +1,3 @@
+_plain: mutant killed at test line 110: assert not _has_the_one_pass_assembly_of_petsc(stokes.dm)
+_nitsche: mutant killed at test line 110: assert not _has_the_one_pass_assembly_of_petsc(stokes.dm)
+_constrained: mutant killed at test line 110: assert not _has_the_one_pass_assembly_of_petsc(stokes.dm)

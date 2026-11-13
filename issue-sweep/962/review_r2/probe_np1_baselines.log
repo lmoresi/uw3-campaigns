@@ -1,0 +1,7 @@
+PROBE_DIR/review_r2/probe_np1_baselines.py:22: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+  stokes.solve()
+Structured box element resolution 1 2
+box: cells [2], reason 2, snes its 1, ksp its 1, speed 3.5798925e-02, recorded 3.5798925e-02, rel diff 1.40e-09, moving nodes 10 of 15
+triangle n=4: cells [16], reason 2, snes its 1, ksp its 1, speed 2.4923109e-03, recorded 2.4923109e-03, rel diff 1.00e-08, moving nodes 21 of 45
+triangle n=8: cells [64], reason 2, snes its 1, ksp its 1, speed 2.5355659e-03, recorded 2.5355659e-03, rel diff 2.89e-09, moving nodes 105 of 153
+region: cells [42], reason 2, snes its 1, ksp its 1, speed 8.1535981e-05, recorded 8.1535981e-05, rel diff 3.85e-09, moving nodes 61 of 109

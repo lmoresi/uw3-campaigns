@@ -1,0 +1,5 @@
+cells 2744, unknowns 12415
+UW_DMPlexSetSNESLocalFEM reachable through ctypes: True
+block 0: two calls 0.2623 s, PETSc one pass 0.2600 s, ratio 1.009
+block 1: two calls 0.2621 s, PETSc one pass 0.2576 s, ratio 1.018
+block 2: two calls 0.2620 s, PETSc one pass 0.2590 s, ratio 1.012

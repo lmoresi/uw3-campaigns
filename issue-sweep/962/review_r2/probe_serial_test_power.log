@@ -1,0 +1,24 @@
+== _plain: stokes.dm handle == snes dm handle: True; routine on snes dm is PETSc's: False
+   branch routine: DMPlexJacobianFE events per computeJacobian = 2
+   one matrix (J == P): |J_one - J_two| / |J_two| = 0.000000e+00
+   one matrix (J == P): |J_one - P_two| / |P_two| = 8.813200e-04
+   |P - J| / |J| = 8.813203e-04
+   blocks where P != J: [(1, 1, 0.0945434148360412)]
+   PETSc routine: DMPlexJacobianFE events per computeJacobian = 1; J equal True, P equal True
+   PETSc routine, one matrix: equals the branch's one-matrix result: True
+== _nitsche: stokes.dm handle == snes dm handle: True; routine on snes dm is PETSc's: False
+   branch routine: DMPlexJacobianFE events per computeJacobian = 2
+   one matrix (J == P): |J_one - J_two| / |J_two| = 2.640406e-01
+   one matrix (J == P): |J_one - P_two| / |P_two| = 2.640418e-01
+   |P - J| / |J| = 8.406681e-04
+   blocks where P != J: [(1, 1, 0.0945434148360412)]
+   PETSc routine: DMPlexJacobianFE events per computeJacobian = 1; J equal True, P equal True
+   PETSc routine, one matrix: equals the branch's one-matrix result: True
+== _constrained: stokes.dm handle == snes dm handle: True; routine on snes dm is PETSc's: False
+   branch routine: DMPlexJacobianFE events per computeJacobian = 2
+   one matrix (J == P): |J_one - J_two| / |J_two| = 9.964998e-01
+   one matrix (J == P): |J_one - P_two| / |P_two| = 9.964998e-01
+   |P - J| / |J| = 2.222325e-05
+   blocks where P != J: [(1, 1, 0.0945434148360412)]
+   PETSc routine: DMPlexJacobianFE events per computeJacobian = 1; J equal True, P equal True
+   PETSc routine, one matrix: equals the branch's one-matrix result: True

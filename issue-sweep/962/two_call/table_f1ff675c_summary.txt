@@ -1,0 +1,164 @@
+test_0014_transcript_file exit 0 underworld3: transcript -> TMP_DIR
+test_0004_pointwise_fns exit 0 3 passed in 4.25s
+test_0013_step_record_fidelity exit 0 5 passed in 6.31s
+test_0015_transcript_report exit 0 34 passed in 0.82s
+test_0016_solver_description_contract exit 0 6 passed in 0.38s
+test_0017_solve_outcome_transcript exit 0 10 passed in 3.65s
+test_0017_describe_and_render exit 0 10 passed, 1 warning in 6.41s
+test_0019_mcp_server exit 5 1 skipped in 0.07s
+test_0018_adjoint_support_record exit 0 14 passed in 13.23s
+test_0019_adjoint_solve exit 0 8 passed, 12 warnings in 38.98s
+test_0021_adjoint_misfit_through_gradient exit 0 1 passed, 2 warnings in 11.75s
+test_0022_adjoint_operator_from_kernels exit 0 2 passed, 3 warnings in 8.15s
+test_0006_memory_leak exit 1 1 failed, 2 warnings in 85.56s (0:01:25)
+test_0020_transcript_adjoint exit 0 5 passed, 15 warnings in 59.18s
+test_0022_unwrap_memoised_matches_fixed_point exit 0 10 passed in 6.08s
+test_0024_adjoint_boundary_misfit_and_boundary_sensitivity exit 0 2 passed, 5 warnings in 10.36s
+test_0023_field_realness_and_derivatives exit 0 9 passed, 4 warnings in 14.91s
+test_0024_jit_graph_lowering exit 0 16 passed in 7.68s
+test_0026_adjoint_dirichlet_datum_sensitivity exit 0 3 passed, 3 warnings in 13.01s
+test_0026_jit_route_switch exit 0 5 passed, 10 warnings in 18.35s
+test_0027_adjoint_solve_guards exit 0 8 passed, 10 warnings in 27.28s
+test_0020_restore_continuation exit 0 7 passed, 6 warnings in 116.63s (0:01:56)
+test_0030_capability_guides exit 0 3 passed in 0.11s
+test_0028_convergence_reference exit 0 9 passed, 6 warnings in 14.74s
+test_0031_continuation_stages_on_solve_report exit 0 2 passed, 3 warnings in 3.62s
+test_0027_jit_source_independent_of_dummy_names exit 0 1 passed, 1 warning in 27.76s
+test_0050_utils exit 0 3 passed, 2 warnings in 3.10s
+test_0062_rotated_constraint_exclusivity exit 0 5 passed in 0.46s
+test_0032_adjoint_peel_keeps_dimensional_leaves exit 0 6 passed, 5 warnings in 20.53s
+test_0034_transcript_adjoint_in_a_units_model exit 0 1 passed, 5 warnings in 17.17s
+test_0033_adjoint_gradients_in_a_units_model exit 0 7 passed, 12 warnings in 25.28s
+test_0067_integration_point_proxy exit 0 11 passed, 1 warning in 14.03s
+test_0071_index_swarm_proxy_location exit 0 16 passed, 45 warnings in 16.21s
+test_0072_material_swarm exit 0 13 passed, 1 warning in 15.94s
+test_0073_material_regions exit 0 14 passed, 1 warning in 10.84s
+test_0077_model_registry_does_not_pin exit 0 underworld3: transcript -> TMP_DIR
+test_0103_jit_rampable_constants exit 0 6 passed, 1 warning in 3.98s
+test_0104_expression_parameter_guards exit 0 4 passed in 0.38s
+test_0070_ve_stress_history_on_particles exit 0 3 passed, 4 warnings in 39.36s
+test_0112_swarm_add_particles exit 0 15 passed, 19 warnings in 5.77s
+test_0201_solver_has_solution_warmstart exit 0 9 passed, 2 warnings in 1.19s
+test_0200_solver_smoke exit 0 8 passed, 3 warnings in 5.16s
+test_0204_owned_option_latch exit 0 3 passed in 0.33s
+test_0203_solver_wallclock_guard exit 0 10 passed, 12 warnings in 4.97s
+test_0503_integral_expression_constants exit 0 5 passed in 5.32s
+test_0205_subsolve_cap_detection exit 0 3 passed, 7 warnings in 13.87s
+test_0610_constitutive_tensor_regression exit 0 20 passed in 0.75s
+test_0506_tensor_evaluate exit 0 3 passed in 5.68s
+test_0610_navier_stokes_slcn_projection exit 0 1 passed in 2.24s
+test_0641_wave_c_api_shims exit 0 44 passed in 0.81s
+test_0650_recursion_prevention_regression exit 0 12 passed in 0.38s
+test_0786_stokes_jacobian_and_preconditioner_one_call_each exit 0 3 passed in 3.77s
+test_0810_bc_unit_conversion exit 0 6 passed in 0.57s
+test_0764_petsc_index_boundary_conditions exit 0 5 passed, 5 warnings in 13.69s
+test_0206_automatic_penalty_pairing exit 0 5 passed in 41.41s
+test_0075_lagrangian_history_inflow_value exit 0 1 passed, 1 warning in 73.23s (0:01:13)
+test_0819_units_nondim_regressions exit 0 3 passed, 2 warnings in 2.16s
+test_0818_stokes_nd exit 0 5 passed, 4 warnings in 5.96s
+test_0820_template_parameter_propagation exit 0 8 passed, 1 skipped in 0.65s
+test_0820_deform_mesh_solver_rebuild_regression exit 0 1 passed, 2 warnings in 7.03s
+test_0835_sbr_adapt_on_top exit 0 10 passed in 14.24s
+test_0844_line_cut exit 0 62 passed, 1 warning in 11.90s
+test_0836_nvb_graded_adapt exit 0 18 passed in 15.42s
+test_0846_fault_contact exit 0 8 passed in 16.83s
+test_0850_fault_network_toolkit exit 0 3 passed in 5.71s
+test_0857_network_mesher exit 0 4 passed in 2.91s
+test_0847_fault_api exit 0 8 passed in 19.30s
+test_0858_fault_network_realisations exit 0 9 passed in 5.26s
+test_0859_fault_network_junction_glue exit 0 5 passed, 1 warning in 5.76s
+test_0861_daylighting_kinematics exit 0 4 passed in 6.71s
+test_0866_fault_pair_sign_at_a_junction exit 0 3 passed, 1 warning in 1.95s
+test_0851_fault_network_3d exit 0 6 passed, 28 warnings in 42.60s
+test_1001_poisson_constants exit 0 6 passed, 2 warnings in 8.68s
+test_1011_bodyforce_units exit 0 2 passed in 0.35s
+test_1010_stokesCart exit 0 6 passed, 5 warnings in 3.86s
+test_1013_stokes_pressure_nullspace exit 0 1 passed, 1 warning in 0.36s
+test_1014_stokes_multigrid exit 0 11 passed, 2 warnings in 2.24s
+test_0848_fault_split_3d exit 0 14 passed in 71.22s (0:01:11)
+test_1011_stokesSph exit 0 3 passed, 8 warnings in 13.72s
+test_1014_stokes_shell_nullspace exit 0 2 passed, 2 warnings in 4.20s
+test_1016_analytic_contract exit 0 23 passed, 1 warning in 3.91s
+test_1015_analytic_solcx exit 0 4 passed, 1 warning in 10.71s
+test_1016_snes_update_callbacks exit 0 8 passed, 5 warnings in 8.95s
+test_1017_custom_mg_stokes exit 0 5 passed, 1 warning in 22.56s
+test_1018_rotated_nodal_normal exit 0 6 passed in 20.46s
+test_0863_fault_network_3d_width exit 0 9 passed, 76 warnings in 119.23s (0:01:59)
+test_1018_rotated_freeslip exit 0 27 passed, 5 warnings in 73.76s (0:01:13)
+test_1020_fmg_single_field_lockout exit 0 7 passed, 1 warning in 4.49s
+test_1019_boundary_flux exit 0 15 passed, 3 warnings in 21.60s
+test_1022_composed_ribbon_fmg exit 0 2 passed in 2.06s
+test_1022_velocity_block_size_gate exit 0 2 passed, 2 warnings in 3.06s
+test_1021_mg_option_bundle exit 0 22 passed in 11.08s
+test_1023_saddle_tolerance_ownership exit 0 7 passed, 6 warnings in 2.61s
+test_1024_multiplier_schur_pc exit 0 6 passed in 2.65s
+test_1029_analytic_faulted_medium exit 0 18 passed in 5.88s
+test_1050_VEstokesCart exit 0 5 passed, 6 warnings in 17.46s
+test_1051_VE_shear_box exit 0 4 passed, 4 warnings in 39.98s
+test_1019_analytic_transcription exit 0 37 passed in 136.46s (0:02:16)
+test_1053_ve_etd_variable_maxwell_time exit 0 7 passed, 11 warnings in 54.53s
+test_1055_yield_smoother exit 0 7 passed, 1 warning in 21.66s
+test_1056_navier_stokes_supg_api exit 0 7 passed, 8 warnings in 17.31s
+test_1056_navier_stokes_surface_mesh_sizing exit 0 3 passed in 0.39s
+test_1018_rotated_freeslip_every_rheology exit 0 26 passed, 4 warnings in 269.54s (0:04:29)
+test_1058_solve_report exit 0 11 passed, 4 warnings in 3.47s
+test_1057_yield_homotopy_solve exit 0 21 passed, 10 warnings in 33.38s
+test_1052_VEP_stability_regression exit 0 5 passed, 9 warnings in 177.58s (0:02:57)
+test_1059_yield_anchor exit 0 7 passed in 0.72s
+test_1060_nitsche_freeslip exit 0 10 passed, 2 warnings in 3.57s
+test_1059_yield_stress_min_units exit 0 10 passed in 12.95s
+test_1060_variable_timestep_extrapolation exit 0 4 passed, 1 warning in 2.97s
+test_1054_multimaterial_viscoelastic exit 0 23 passed, 47 warnings in 152.42s (0:02:32)
+test_1062_constrained_solcx exit 0 1 passed, 2 warnings in 13.45s
+test_1061_constrained_freeslip exit 0 15 passed, 8 warnings in 27.22s
+test_1063_constrained_traction exit 0 1 passed, 1 warning in 14.75s
+test_1063_stress_history_restart exit 0 4 passed, 4 warnings in 25.93s
+test_1059_stress_transport exit 0 28 passed, 41 warnings in 499.97s (0:08:19)
+test_1064_stress_history_units exit 0 10 passed, 15 warnings in 549.53s (0:09:09)
+test_1065_nitsche_local_h exit 0 4 passed, 2 warnings in 4.28s
+test_1065_rotation_gauge_freeslip exit 0 1 passed, 2 warnings in 7.73s
+test_1066_rotated_meets_essential exit 0 19 passed, 1 warning in 33.22s
+test_1066_stokes_jacobian_layout exit 0 7 passed in 8.80s
+test_1067_newton_cold_start exit 0 4 passed, 6 warnings in 11.34s
+test_1068_picard_warmup_is_a_frozen_tangent_step exit 0 17 passed, 27 warnings in 46.20s
+test_1069_pressure_gauge_is_recorded exit 0 7 passed, 6 warnings in 14.55s
+test_1070_free_surface_plume exit 0 7 passed, 1 skipped, 24 warnings in 105.02s (0:01:45)
+test_1070_postprocessing_geoid exit 0 13 passed in 7.82s
+test_1071_plastic_rate_strengthening exit 0 7 passed, 5 warnings in 14.15s
+test_1072_free_surface_spherical exit 0 3 passed, 2 warnings in 86.27s (0:01:26)
+test_1073_postprocessing_cylindrical_geoid exit 0 21 passed in 3.47s
+test_1074_free_surface_config_drift exit 0 4 passed, 2 warnings in 4.47s
+test_1077_quiet_unsetup_fieldsplit exit 0 4 passed, 5 warnings in 12.21s
+test_1082_flux_jacobian_closure exit 0 2 passed, 3 warnings in 5.94s
+test_1083_thin_thick_alignment exit 0 4 passed, 1 warning in 145.91s (0:02:25)
+test_1085_build_rotation_setup exit 0 1 passed in 0.50s
+test_1087_fault_split_multigrid exit 0 5 passed, 6 warnings in 19.21s
+test_1094_maxwell_step_load_history_flavours exit 0 5 passed, 5 warnings in 24.13s
+test_1096_addon_cut_child_tail exit 0 3 passed in 2.45s
+test_1111_rotated_fmg_coarse_shifted_lu exit 0 3 passed in 18.73s
+test_1113_rotated_fmg_one_coarse_factorisation exit 0 1 passed in 0.97s
+test_1115_rotated_solve_raises_on_failure exit 0 7 passed in 5.20s
+test_1131_rotated_nullspace_from_mesh exit 0 28 passed in 159.85s (0:02:39)
+test_1136_rotated_loop_honours_snes_max_it exit 0 7 passed in 9.34s
+test_1141_rotated_traction_constrained_node exit 0 11 passed in 7.29s
+test_1143_rotated_loop_user_snes_tolerances exit 0 2 passed in 3.55s
+test_1065_log_conformation exit 0 17 passed, 17 warnings in 1073.15s (0:17:53)
+test_1146_custom_mg_after_deform exit 0 4 passed, 2 warnings in 3.84s
+test_1148_changing_timestep_keeps_the_snes exit 0 13 passed, 1 warning in 23.72s
+test_1145_stokes_adjoint_keeps_custom_mg exit 0 5 passed in 71.00s (0:01:10)
+test_1149_custom_mg_hierarchy_lifecycle exit 0 12 passed, 3 warnings in 12.91s
+test_1151_first_solve_after_a_mesh_move exit 0 2 passed, 2 warnings in 4.43s
+test_1154_a_deleted_solver_is_freed exit 0 5 passed, 3 warnings in 5.30s
+test_1153_timestep_estimates_and_setters exit 0 18 passed in 8.93s
+test_1158_rotated_cache_watches_new_coefficients exit 0 1 passed in 2.38s
+test_1157_rotated_warm_resolve_at_roundoff exit 0 3 passed in 4.56s
+test_1160_a_capped_sub_solve_says_so exit 1 1 failed, 3 passed in 3.93s
+test_1161_a_diverged_solve_warns exit 1 1 failed, 2 passed in 1.70s
+test_1163_options_changed_after_a_solve_take_effect exit 0 9 passed in 7.07s
+test_1164_swarm_registration_and_slcn_default_bodyforce exit 0 4 passed in 2.51s
+test_1060_stress_store_smoothing exit 0 1 passed, 2 warnings in 1652.19s (0:27:32)
+test_1064_constrained_spherical_shell_response exit 0 4 passed, 1 xfailed, 7 warnings in 1598.56s (0:26:38)
+test_1184_general_pressure_split exit 0 11 passed, 5 warnings in 24.01s
+test_1176_custom_mg_transfer_after_a_move exit 0 29 passed, 7 warnings in 38.59s
+test_1159_thin_sheet_solve_takes_picard exit 0 6 passed in 139.11s (0:02:19)
+test_1174_a_second_add_fault_keeps_the_first exit 1 1 failed, 27 passed in 147.16s (0:02:27)

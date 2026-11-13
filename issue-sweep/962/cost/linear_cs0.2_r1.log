@@ -1,0 +1,40 @@
+one_pass 0 cells 5592 rows 19130 reason 2
+snes its [1, 1, 1] ksp its [1, 1, 1] max speed ['1.434149959586e-03', '1.434149959586e-03', '1.434149959586e-03']
+SNESSolve          count     3  time    35.084 s  flops 3.240401e+10
+SNESFunctionEval   count    12  time     4.879 s  flops 2.686653e+09
+SNESJacobianEval   count     3  time    24.911 s  flops 3.752561e+09
+DMPlexJacobianFE   count     6  time    24.638 s  flops 3.745228e+09
+DMPlexResidualFE   count    12  time     3.784 s  flops 2.657318e+09
+MatAssemblyEnd     count    39  time     0.000 s  flops 0.000000e+00
+KSPSolve           count     3  time     5.812 s  flops 2.582507e+10
+PCSetUp            count     6  time     0.737 s  flops 2.971020e+09
+one_pass 1 cells 5592 rows 19130 reason 2
+snes its [1, 1, 1] ksp its [1, 1, 1] max speed ['1.434149959586e-03', '1.434149959586e-03', '1.434149959586e-03']
+SNESSolve          count     3  time    34.247 s  flops 3.240401e+10
+SNESFunctionEval   count    12  time     4.426 s  flops 2.686653e+09
+SNESJacobianEval   count     3  time    24.918 s  flops 3.752561e+09
+DMPlexJacobianFE   count     3  time    24.663 s  flops 3.745228e+09
+DMPlexResidualFE   count    12  time     3.404 s  flops 2.657318e+09
+MatAssemblyEnd     count    39  time     0.000 s  flops 0.000000e+00
+KSPSolve           count     3  time     5.259 s  flops 2.582507e+10
+PCSetUp            count     6  time     0.709 s  flops 2.971020e+09
+one_pass 0 cells 5592 rows 19130 reason 2
+snes its [1, 1, 1] ksp its [1, 1, 1] max speed ['1.434149959586e-03', '1.434149959586e-03', '1.434149959586e-03']
+SNESSolve          count     3  time    30.398 s  flops 3.240401e+10
+SNESFunctionEval   count    12  time     3.889 s  flops 2.686653e+09
+SNESJacobianEval   count     3  time    22.134 s  flops 3.752561e+09
+DMPlexJacobianFE   count     6  time    21.909 s  flops 3.745228e+09
+DMPlexResidualFE   count    12  time     2.993 s  flops 2.657318e+09
+MatAssemblyEnd     count    39  time     0.000 s  flops 0.000000e+00
+KSPSolve           count     3  time     4.579 s  flops 2.582507e+10
+PCSetUp            count     6  time     0.655 s  flops 2.971020e+09
+one_pass 1 cells 5592 rows 19130 reason 2
+snes its [1, 1, 1] ksp its [1, 1, 1] max speed ['1.434149959586e-03', '1.434149959586e-03', '1.434149959586e-03']
+SNESSolve          count     3  time    30.479 s  flops 3.240401e+10
+SNESFunctionEval   count    12  time     3.933 s  flops 2.686653e+09
+SNESJacobianEval   count     3  time    22.172 s  flops 3.752561e+09
+DMPlexJacobianFE   count     3  time    21.945 s  flops 3.745228e+09
+DMPlexResidualFE   count    12  time     3.031 s  flops 2.657318e+09
+MatAssemblyEnd     count    39  time     0.000 s  flops 0.000000e+00
+KSPSolve           count     3  time     4.607 s  flops 2.582507e+10
+PCSetUp            count     6  time     0.656 s  flops 2.971020e+09

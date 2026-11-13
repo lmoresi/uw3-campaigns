@@ -1,0 +1,6 @@
+test_1161_a_diverged_solve_warns plain exit 0 3 passed in 9.10s
+test_1160_a_capped_sub_solve_says_so plain exit 0 4 passed in 9.13s
+test_0006_memory_leak plain exit 0 1 passed, 3 warnings in 74.43s (0:01:14)
+test_1174_a_second_add_fault_keeps_the_first plain exit 0 28 passed in 170.50s (0:02:50)
+test_1060_stress_store_smoothing plain exit 0 1 passed, 5 warnings in 1264.16s (0:21:04)
+test_0006_memory_leak plugin exit 0 1 passed, 2 warnings in 85.73s (0:01:25)

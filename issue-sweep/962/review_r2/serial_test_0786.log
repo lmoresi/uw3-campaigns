@@ -1,0 +1,4 @@
+...                                                                      [100%]
+3 passed in 5.13s
+OMP_NUM_THREADS=1 pixi run -e runtime pytest  -p no:cacheprovider -q 2>&1  3.26s user 0.59s system 44% cpu 8.629 total
+tail -8  0.00s user 0.00s system 0% cpu 8.629 total

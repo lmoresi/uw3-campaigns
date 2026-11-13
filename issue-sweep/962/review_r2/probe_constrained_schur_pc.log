@@ -1,0 +1,8 @@
+UW3_WORKTREE/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: UserWarning: [Solver_24_] multiplier_schur_pc=True has no effect under pc_fieldsplit_schur_precondition='selfp' with diag_use_amat: the 1/mu multiplier Schur mass is written into the Pmat (h,h) block, which selfp never reads (Sp is built from the Amat). Use petsc_options['pc_fieldsplit_schur_precondition'] = 'a11' to make it live. See solver.pc_fallbacks.
+  result = routine(*args, **kwargs)
+== multiplier_schur_pc = False: converged reason 5
+   fields 4; blocks where P != J: [(1, 1, 0.0945434148360412)]
+   PETSc one pass: J equal True, P equal True
+== multiplier_schur_pc = True: converged reason 5
+   fields 4; blocks where P != J: [(1, 1, 0.0945434148360412), (2, 2, 0.00851069990448984), (3, 3, 0.008061766192363068)]
+   PETSc one pass: J equal True, P equal True
