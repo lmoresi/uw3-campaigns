@@ -3777,3 +3777,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   cancelled runs: the crust does not subduct, it piles up above the fault on the overriding side (control, steps
   60-193: crust above the fault 1,355 -> 3,321 km of plate's worth against 1,613 km of convergence); cause from the
   code: a frictionless fault fitted to the base of a crust that is not weak. No driver change, patch, or job.
+- 2026-11-13: library changes passed on (W1 via C1 via K1), for the forked driver:
+  (1) PR #1128 merged to development (70b240cb): pull_vertex_onto no longer moves a domain-boundary vertex onto a
+  target inside the mesh. A fault tip within ~0.05-0.09 of a cell height of a wall is now REFUSED (ValueError naming
+  min_quality or "domain boundary"); a tip 0.1-0.4 cell height under the wall is now placed where it used to fail; on
+  an annulus's inner circle a tip on the true circle is refused. W1: end the split fault a cell or more from the wall
+  and carry the rest as a welded TI zone; do not lower min_quality. Campaign refusals go to C1 (for W1) with the mesh
+  call and fault trace. (2) #962: a Stokes solve aborts (MPI "message truncated") or hangs at the first Jacobian when
+  any rank holds no cells; a refined mesh keeps its base's partition, so a coarse base can leave ranks empty. Until
+  fixed (refusal message in PR #1137): a finer base with one refinement fewer. (3) Watch item: each coarse level should
+  list every fault on the place_fault_ribbon_2d route.
+  K1: the annulus driver (8fff721 = 818d43f) insets the split one rung from the outer wall and its faults end far from
+  the inner wall, so the new refusals should be rare; runs so far on build 80d3ebe9, so nothing changes until the build
+  moves. The driver's retry list lacks "min_quality": on a newer build such a refusal stops the run at once instead of
+  retrying wider (check when the forked driver moves build). No "message truncated" or min_quality refusal in any
+  campaign slurm log. The planned focused mesh (coarse away from the margin) is where #962 could bite.
