@@ -3955,3 +3955,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   not a library defect. Optional test relayed to K1: a step-195 restart pair with -matstash_legacy
   -matstash_reproduce (bit-equal throughout supports it). W1 passes 4632's result to C1, who takes the accuracy
   question (tol 1e-3 vs 1e-6, and the 1e5) to Louis.
+- 2026-11-14: RULED (Louis, in the C1 session, relayed C1 -> W1 -> hub): "I'm not too worried about the fault
+  non-linearity amplifying ... perfect reproducibility does not have to mean that all runs produce the same output. It
+  means that they come up with the same answer to an answerable question." C1's reading: compare runs on the quantities
+  the science asks (slip at a stated nonlinear tolerance) and report the spread against that tolerance. Library side
+  closed; nothing filed; stash-order hypothesis not pursued; the matstash pair cancelled (K1 told). Job 4632's result
+  still welcome, notably the uw_tol 1e-6 pair.
