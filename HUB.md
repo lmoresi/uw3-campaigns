@@ -3792,3 +3792,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   moves. The driver's retry list lacks "min_quality": on a newer build such a refusal stops the run at once instead of
   retrying wider (check when the forked driver moves build). No "message truncated" or min_quality refusal in any
   campaign slurm log. The planned focused mesh (coarse away from the margin) is where #962 could bite.
+- 2026-11-13: Louis: "Nitsche seems fixed - I wonder if it is possible to mix this with the fault and allow wall
+  placements to work". (PR #1145, the Nitsche continuity-row term, #1072, merged 10:51 UTC.) Question sent to W1:
+  whether a Nitsche outer wall would let the split fault run through to the wall, whether the blocker is the BC (a
+  split wall vertex under the rotated constraint) or the placement surgery (#1128, "fault touches the domain boundary"),
+  and whether Nitsche now composes with the fault's TI rheology and geometric FMG. Awaiting W1.
