@@ -3754,3 +3754,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   what is missing (phase changes, strain-rate-dependent mantle law, angular mesh grading) for a design note to Louis;
   no driver change or runs yet. Recorded in DECISIONS (6dd3577 on zg95-annulus-for-kaiju). Still open with Louis: the
   two Arrhenius runs (4567, 4593) still running; FK young-slab restarts (likely moot).
+- 2026-11-13: runs closed on Louis's instruction ("Cancel those"), checkpointed at last step, restartable, READMEs
+  closed: earth_young80_arr (4567) cancelled 13:20 at step 193, 329 Myr, convergence 1.26 cm/yr;
+  earth_young80_arr_crustend (4593) cancelled 13:40 at step 158, 465 Myr (steps 91-158: fault 174-203 km, convergence
+  0.045-0.053 cm/yr; first refused fits at 149-156, crust layer above uw_fault_depth_min, fault kept). Movie page stays
+  v82. No K1 jobs queued or running. FK young-slab restarts dropped (superseded).
+  PLAN (Louis): an Earth-scaled plate model with a faulted convergent boundary and a symmetrically spreading, moving MOR
+  that creates crust/markers; markers dense enough to survive stretching; Earth-like rheology and heat flow;
+  well-referenced choices; goal: dial up the plate needed with Earth-like evolution (maybe longer-term). Driver: "I
+  don't like vestigial code, so I'd be inclined to fork and simplify the current driver." Asthenosphere: "it feels quite
+  deep ... more shallow ... it should not apply to the slab" (as coded depth-only, x0.1 in 348-670 km, weakens the slab
+  too). K1 next: a referenced specification for Louis before any driver fork or run; patch page stays v17. Plan in
+  DECISIONS on zg95-annulus-for-kaiju.
