@@ -4017,3 +4017,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   a library issue on current development; relayed to W1 to file and fix. Reproduction inputs: K1's
   launch/prep/focused_place_probe.py (workbench 30f847b = 9e9ed27) and the 214-point fault in
   runs/wb_focus_run/box4/records.json; K1 offers them on the patch page. Campaign stays on 80d3ebe9.
+- 2026-11-14: W1 filed underworld3 #1172 and takes the fix. Cause (measured, one rank): the ladder's outcrop cap runs
+  3*size + width along the end tangent from the last rung wholly inside the domain; at a low dip the wall doesn't clip
+  it, so the band reaches past the partition's rule (mark_band, one band width of margin): dip 60 none outside, dip 20
+  with a two-rung band 3-7 vertices, up to 6 cells. The shallower fault top (follow-up 18) is what exposes it. Driver
+  work-around stands (retry x1.25; a second margin ring also helps; a deeper cut top makes it worse). W1 needs nothing
+  more now; will ask for one 26-rank run of K1's probe on the fix branch. K1 told.
