@@ -9,6 +9,8 @@ parameter (Ra, H, tau0, tau1, time) is the box's without conversion.
     tau_y   = tau0 + tau1 * depth            (depth = r_o - r)
     eta_eff = softmin(eta(T), tau_y / (2 edot_II))
 """
+from enum import Enum
+
 import numpy as np
 import sympy
 import underworld3 as uw
@@ -35,6 +37,82 @@ def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, outer=0.0, inner=0.0, fil
     return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=max(outer, inner),
                               cellSizeOuter=outer, cellSizeInner=inner,
                               refinement=int(refinement), qdegree=3, filename=filename)
+
+
+def focused_annulus_mesh(refinement, fine, theta, half_arc, depth, growth, outer, inner, filename,
+                         ratio=RADIUS_RATIO):
+    """The unit-depth annulus with a fine region and its refinement hierarchy. The coarse cells are ``fine``
+    within the arc ``half_arc`` (measured at the surface) either side of the angle ``theta`` and above the depth
+    ``depth``; outside that box they grow by ``growth`` per unit distance from it, up to the background, which
+    runs linearly in depth from ``outer`` at the outer wall to ``inner`` at the inner one. uw.meshing.Annulus
+    takes sizes at its walls only, so this is its construction (the same boundary names and tags, snapping of
+    the refined wall nodes, null space and wall surfaces) with a gmsh size callback in place of the point sizes."""
+    from underworld3.coordinates import CoordinateSystemType
+    from underworld3.meshing._mesh_files import write_gmsh
+    from underworld3.meshing.bounding_surface import register_radial_surfaces
+    r_o, r_i = annulus_radii(ratio)
+
+    class boundaries(Enum):
+        Lower = 1
+        Upper = 2
+        Centre = 10
+
+    def size(dim, tag, x, y, z, lc):
+        d = r_o - np.hypot(x, y)
+        h = outer + (inner - outer) * min(max(d / (r_o - r_i), 0.0), 1.0)
+        along = r_o * abs((np.arctan2(y, x) - theta + np.pi) % (2.0 * np.pi) - np.pi)
+        return min(h, fine + growth * np.hypot(max(0.0, along - half_arc), max(0.0, d - depth)))
+
+    if uw.mpi.rank == 0:
+        import gmsh
+        gmsh.initialize()
+        gmsh.option.setNumber("General.Verbosity", 0)
+        gmsh.model.add("Annulus")
+        centre = gmsh.model.geo.add_point(0.0, 0.0, 0.0)
+        curves = {}
+        for name, radius in (("Lower", r_i), ("Upper", r_o)):
+            east = gmsh.model.geo.add_point(radius, 0.0, 0.0)
+            west = gmsh.model.geo.add_point(-radius, 0.0, 0.0)
+            curves[name] = [gmsh.model.geo.add_circle_arc(east, centre, west),
+                            gmsh.model.geo.add_circle_arc(west, centre, east)]
+        loops = [gmsh.model.geo.add_curve_loop(curves[name]) for name in ("Upper", "Lower")]
+        surface = gmsh.model.geo.add_plane_surface(loops)
+        gmsh.model.geo.synchronize()
+        for name in ("Lower", "Upper"):
+            gmsh.model.addPhysicalGroup(1, curves[name], boundaries[name].value, name=name)
+        gmsh.model.addPhysicalGroup(2, [surface], 666666, "Elements")
+        gmsh.model.mesh.setSizeCallback(size)
+        for option in ("MeshSizeExtendFromBoundary", "MeshSizeFromPoints", "MeshSizeFromCurvature"):
+            gmsh.option.setNumber(f"Mesh.{option}", 0)
+        gmsh.model.mesh.generate(2)
+        write_gmsh(filename)
+        gmsh.finalize()
+
+    def snap_walls(dm):
+        coords = dm.getCoordinatesLocal()
+        xy = coords.array.reshape(-1, 2)
+        radius = np.hypot(xy[:, 0], xy[:, 1])
+        for name, target in (("Upper", r_o), ("Lower", r_i)):
+            nodes = uw.cython.petsc_discretisation.petsc_dm_find_labeled_points_local(dm, name)
+            xy[nodes] *= target / radius[nodes].reshape(-1, 1)
+        coords.array[...] = xy.reshape(-1)
+        dm.setCoordinatesLocal(coords)
+
+    def inside_walls(coords):
+        radius = np.hypot(coords[:, 0], coords[:, 1])
+        outside, inside = radius > r_o, radius < r_i
+        coords[outside] *= 0.99 * r_o / radius[outside].reshape(-1, 1)
+        coords[inside] *= 1.01 * r_i / radius[inside].reshape(-1, 1)
+        return coords
+
+    mesh = uw.discretisation.Mesh(
+        filename, degree=1, qdegree=3, useMultipleTags=True, useRegions=True, markVertices=True,
+        boundaries=boundaries, coordinate_system_type=CoordinateSystemType.CYLINDRICAL2D,
+        refinement=int(refinement), refinement_callback=snap_walls, return_coords_to_bounds=inside_walls)
+    x, y = mesh.X
+    mesh._nullspace_rotations = [sympy.Matrix([-y, x])]
+    register_radial_surfaces(mesh, centre=(0.0, 0.0), label_radius={"Upper": r_o, "Lower": r_i})
+    return mesh
 
 
 def radius_of(mesh):

@@ -30,8 +30,8 @@ from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, free_slip_walls,
-                           set_viscoplastic)
+from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, focused_annulus_mesh,
+                           free_slip_walls, set_viscoplastic)
 import earth_units
 
 params = uw.Params(
@@ -136,6 +136,19 @@ params = uw.Params(
                                 #   coarse cell at the inner wall; 0 = uw_cell. Then the base cell H_B (the crust lattice,
                                 #   the rung spacing by default, the rebuild threshold) is the outer wall's cell, where
                                 #   the plates, the crust and the fault are
+    uw_focus_cell_km=0.0,       # > 0: a focused mesh. The finest level's cells are this size in a box around the
+                                #   subduction zone: within uw_focus_arc_km along the surface either side of a centre
+                                #   uw_focus_centre_km from uw_theta_trench (positive: towards the overriding plate)
+                                #   and above uw_focus_depth_km. Outside the box the cells grow by uw_focus_growth
+                                #   per unit distance, up to the graded mesh's sizes (uw_cell_outer at the surface,
+                                #   uw_cell_inner at the base, linear in depth between them). The mesh is fixed: the
+                                #   box has to hold the fault for the whole run. The rung spacing's default and the
+                                #   rebuild threshold's cell are then this cell; the crust lattice keeps the
+                                #   surface's cell outside the box, so the crust's particles per area do not change
+    uw_focus_arc_km=750.0,
+    uw_focus_centre_km=-150.0,  # the control's fault lies from 734 km behind the first trench to 436 km ahead of it
+    uw_focus_depth_km=700.0,    #   over 387 Myr, to 435 km depth (runs/wb_floor_late)
+    uw_focus_growth=0.3,
     # the viscosity's temperature law is Arrhenius (Louis, 2026-11-12: "an Arrhenius version of the young slab
     # run"): uw_eta_ref_pas at uw_T_potential_c, exp(E* / R T) about it with T the absolute temperature, capped at
     # uw_eta_max_pas (annulus_model.eta_of_T). Its floor is the model's viscosity unit (earth_units.py; the log
@@ -157,7 +170,8 @@ params = uw.Params(
     uw_theta_trench=0.0,
     uw_dip=45.0,
     # the fault band
-    uw_spacing=0.0,             # the ladder's rung spacing S. 0 (the default): one base cell, uw_cell / 2**uw_refinement, so S
+    uw_spacing=0.0,             # the ladder's rung spacing S. 0 (the default): one base cell where the fault is (the
+                                #   focused box's uw_focus_cell_km, else the surface's cell / 2**uw_refinement), so S
                                 #   follows the refinement (0.0156 at refinement 5). Louis (2026-11-02): S matched to the base
                                 #   mesh; 0.004 before (ratio 3.9). Kaiju arms (page 7cbuaxBnoZrfjdPioMHroT, chain 0, np 16):
                                 #   the serial FAC patch 3.2x smaller and 2.3-4.5x cheaper, 14 % less per step on the
@@ -273,18 +287,24 @@ uw.pprint("\n".join(earth_units.table(EARTH, MODEL, MODEL_UNIT)), clean_display=
 
 
 def effective_spacing(p):
-    """The rung spacing a parameter set means: uw_spacing, or one base cell (uw_cell / 2**uw_refinement) when 0."""
+    """The rung spacing a parameter set means: uw_spacing, or when that is 0 one base cell where the fault is: the
+    focused box's (uw_focus_cell_km), else the surface's ((uw_cell_outer or uw_cell) / 2**uw_refinement)."""
     sp = float(p.get("uw_spacing", 0.0) or 0.0)
-    return sp if sp > 0 else float(p.get("uw_cell", 0.5)) / 2 ** int(p.get("uw_refinement", 4))
+    focus = float(p.get("uw_focus_cell_km", 0.0) or 0.0) / earth_units.DEPTH_KM
+    top = float(p.get("uw_cell_outer", 0.0) or p.get("uw_cell", 0.5))
+    return sp if sp > 0 else focus if focus > 0 else top / 2 ** int(p.get("uw_refinement", 4))
 
 
+SPACING_KEYS = ("uw_spacing", "uw_focus_cell_km", "uw_cell_outer", "uw_cell", "uw_refinement")
 CELL_TOP = float(params.uw_cell_outer or params.uw_cell)          # the coarse cell at the surface (graded or not)
-S = effective_spacing({"uw_spacing": params.uw_spacing, "uw_cell": CELL_TOP, "uw_refinement": params.uw_refinement})
-H_B = CELL_TOP / 2 ** int(params.uw_refinement)    # the base cell at the surface (effective_spacing's derivation)
+S = effective_spacing({key: getattr(params, key) for key in SPACING_KEYS})
+H_B = CELL_TOP / 2 ** int(params.uw_refinement)    # the base cell at the surface, outside any focused box
+FOCUS = float(params.uw_focus_cell_km) / MODEL_UNIT["km"]         # the focused box's base cell; 0: no box
+H_F = FOCUS if FOCUS > 0 else H_B                  # the base cell where the fault is
 PRES_RTOL_WARM = float(params.uw_pres_rtol) if float(params.uw_pres_rtol) > 0 else 0.1 * float(params.uw_tol)
 PRES_RTOL_COLD = float(params.uw_pres_rtol_cold) if float(params.uw_pres_rtol_cold) > 0 else PRES_RTOL_WARM
 FIRST_SOLVE = True             # the run's first solve: an unconverged cold one stops a fresh run
-REBUILD = float(params.uw_rebuild_cells) * H_B                  # the rebuild threshold, a distance (needs_rebuild)
+REBUILD = float(params.uw_rebuild_cells) * H_F                  # the rebuild threshold, a distance (needs_rebuild)
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
@@ -298,8 +318,31 @@ FAULT_PARTITION = ("serial" if uw.mpi.size == 1 else
                    if _addon_partition else "gather by the placement (the region moved onto one rank)")
 W = 2.0 * S
 
-base = annulus_mesh(params.uw_cell, params.uw_refinement, outer=params.uw_cell_outer, inner=params.uw_cell_inner,
-                    filename=f"{out}/annulus_graded.msh")
+if FOCUS > 0:
+    # the box's centre: along the surface from the trench, positive towards the overriding plate (+theta for a
+    # dip below 90). Sizes go in as coarse cells; the uniform refinement divides every one by 2**uw_refinement
+    _towards_over = 1.0 if params.uw_dip < 90 else -1.0
+    _theta = float(params.uw_theta_trench) + _towards_over * float(params.uw_focus_centre_km) / MODEL_UNIT["arc_km"]
+    _cell_base = float(params.uw_cell_inner or params.uw_cell)
+    base = focused_annulus_mesh(
+        params.uw_refinement, FOCUS * 2 ** int(params.uw_refinement), _theta,
+        float(params.uw_focus_arc_km) / MODEL_UNIT["km"], float(params.uw_focus_depth_km) / MODEL_UNIT["km"],
+        float(params.uw_focus_growth), CELL_TOP, _cell_base, f"{out}/annulus_focused.msh")
+    BASE_MESH = (f"focused: {float(params.uw_focus_cell_km):g} km cells within {float(params.uw_focus_arc_km):g} km "
+                 f"along the surface of a centre {float(params.uw_focus_centre_km):g} km from the trench (theta "
+                 f"{_theta:.6g}) and above {float(params.uw_focus_depth_km):g} km, growing by "
+                 f"{float(params.uw_focus_growth):g} per unit distance to {H_B * MODEL_UNIT['km']:.4g} km at the "
+                 f"surface and {_cell_base * MODEL_UNIT['km'] / 2 ** int(params.uw_refinement):.4g} km at the base")
+else:
+    base = annulus_mesh(params.uw_cell, params.uw_refinement, outer=params.uw_cell_outer,
+                        inner=params.uw_cell_inner, filename=f"{out}/annulus_graded.msh")
+    BASE_MESH = ("graded between the walls" if (params.uw_cell_outer or params.uw_cell_inner) else "uniform") + \
+        f": {H_B * MODEL_UNIT['km']:.4g} km cells at the surface"
+uw.pprint(f"base mesh: {BASE_MESH}; rung spacing {S * MODEL_UNIT['km']:.4g} km")
+# what decides the base mesh, for a restart to compare with its checkpoint's
+MESH_KEYS = ["uw_cell", "uw_cell_outer", "uw_cell_inner", "uw_refinement", "uw_focus_cell_km"] + (
+    ["uw_focus_arc_km", "uw_focus_centre_km", "uw_focus_depth_km", "uw_focus_growth", "uw_theta_trench"]
+    if FOCUS > 0 else [])
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
@@ -1603,6 +1646,17 @@ else:
     missing = [name for name in state.get("checkpoint_files", []) if not os.path.exists(os.path.join(out, name))]
     if missing:
         raise FileNotFoundError(f"checkpoint {params.uw_restart} in {out} lists files that are missing: {missing}")
+    _saved = state.get("params") or {}
+    _changed = [key for key in MESH_KEYS if float(_saved.get(key, 0.0) or 0.0) != float(getattr(params, key) or 0.0)]
+    if _changed:
+        # a different base mesh from the checkpoint's: the fields below are read by nearest position. The base
+        # mesh's own file is written once per directory, so the checkpoint's would be paired with this run's fields
+        if os.path.exists(os.path.join(out, "annulus.mesh.00000.h5")):
+            raise ValueError(f"restart {params.uw_restart}: {', '.join(_changed)} differ from the checkpoint's, and "
+                             f"{out} holds the checkpoint's base mesh file (annulus.mesh.00000.h5). Restart in a "
+                             f"new directory holding copies of the checkpoint's files (state, records, step files)")
+        uw.pprint(f"restart: the base mesh differs from the checkpoint's ({', '.join(_changed)}): T, V and plastic "
+                  f"strain are read by nearest position")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
     if swarm_on:
@@ -1730,7 +1784,9 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
                 "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max_myr", "uw_ckpt_every",
                 "uw_placement_refused", "uw_yield_softness", "uw_T_base_c", "uw_T_potential_c", "uw_eta_ref_pas",
-                "uw_activation_kj_mol", "uw_eta_max_pas"]
+                "uw_activation_kj_mol", "uw_eta_max_pas", "uw_cell", "uw_cell_outer", "uw_cell_inner",
+                "uw_refinement", "uw_focus_cell_km", "uw_focus_arc_km", "uw_focus_centre_km", "uw_focus_depth_km",
+                "uw_focus_growth"]
 
 
 def write_choices(explicit, effective, info):
@@ -1786,10 +1842,12 @@ def write_run_info():
                                        "solves the warm; an unconverged cold first solve stops a fresh run",
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
                  "rayleigh_number": model.ra, "viscosity_unit_and_floor_pas": MODEL_UNIT["pas"],
+                 "base_mesh": BASE_MESH,
                  "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
-                 else "one base cell (uw_cell / 2**uw_refinement)",
+                 else "the focused box's cell (uw_focus_cell_km)" if FOCUS > 0
+                 else "one base cell at the surface (cell / 2**uw_refinement)",
                  "rebuild_threshold": REBUILD,
-                 "rebuild_threshold_source": f"uw_rebuild_cells {float(params.uw_rebuild_cells):g} x base cell {H_B:g} "
+                 "rebuild_threshold_source": f"uw_rebuild_cells {float(params.uw_rebuild_cells):g} x base cell {H_F:g} "
                                              "(a distance, independent of S)",
                  "fault_seams": str(params.uw_fault_seams),
                  "fault_mesher": "ladder" if params.uw_fault_seams == "gather" else "network",
