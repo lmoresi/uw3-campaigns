@@ -3948,3 +3948,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   pair). Datum: two restarts from the same step-195 files (5629dd9 vs ed79763) agree to 12 digits for the start and
   three Newton iterations, then part at the fourth (8525.27048021 vs 8525.27047586; final 642.253470 vs 642.253659).
   Relayed to W1.
+- 2026-11-14: W1 revises: the step-195 datum shows a run-to-run source INSIDE the solve, at round-off size (~1e-15
+  born in iteration 3 becomes 5e-10 at iteration 4 under the ~1e5 amplification), not firing every iteration; the 1e5
+  amplification remains the larger question. Hypothesis (by reading PETSc 3.25.0, unmeasured): matrix-stash entries
+  from other ranks summed in MPI arrival order (MatStashScatterGetMesg_BTS, MPI_Waitsome), ordinary PETSc behaviour,
+  not a library defect. Optional test relayed to K1: a step-195 restart pair with -matstash_legacy
+  -matstash_reproduce (bit-equal throughout supports it). W1 passes 4632's result to C1, who takes the accuracy
+  question (tol 1e-3 vs 1e-6, and the 1e5) to Louis.
