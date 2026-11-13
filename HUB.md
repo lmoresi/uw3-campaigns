@@ -3895,3 +3895,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   units give back its 44 model numbers (37 exactly, the rest within 2.3e-16). Job 4621 (n8, ~15 min): steps 0-2 before
   and after, plus a restart from step 195. Hub note to Louis: earth_units.py is its own converter beside the library's
   units system (uw.quantity / Pint), which the cut dropped with the units mode.
+- 2026-11-14: Earth-units regression passed (jobs 4621-4623, np 26; runs/wb_earth_units/README.md): step 0 six runs
+  agree to 10 digits in all residuals, vrms to 13; restart from 195 agrees to 9-10 digits, top dip 10.4678949 deg in
+  both. Lead for W1 (relayed): step 1 is built on one of two meshes (120,205 or 120,207 cells) with either driver, its
+  starting residual following the mesh; fault points to the mesher agree to 1.5e-13; K1: the mesher is where round-off
+  becomes visible (in wb_repeat cell counts first differed at step 2). Hub note to W1: job 4617 had the same 120,208
+  cells in every run and still diverged, so both effects may be present.
+  Louis 07:55 on the fault top (recorded in the spec, doc rev 17; no code yet): the fit is the ideal fault to the
+  surface; the ladder runs along it and may stop short; TI or other weakness continues above.
