@@ -3815,3 +3815,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-13: Louis: "Useful - a it is." Option (a): no library change; the split stays one rung inside the wall with
   the welded bridge. No probe (c), no wall-end rule (b) for now; (b) may return if the Earth-scaled plate model gets a
   free surface. W1 told; it corrects the guide's outdated Nitsche/TI sentence when convenient (by reading).
+- 2026-11-14: SLAB WORKBENCH started (Louis: "Let's keep working on making a slab workbench as described earlier").
+  Step 1 of K1's spec (fork and cut): new driver zg95_lid_regimes/drivers/slab_workbench.py on kaiju/slab-workbench off
+  kaiju/arrhenius (8fff721 = 818d43f); first commit behaviour-neutral, checked parent vs fork side by side; patch on the
+  patch page v18 before any job. (The fork starts from the latest driver line, which settles the hub's merge-first
+  question.) Louis on the fault top: the fit "should not enforce a steep continuation of the fault". Measured on
+  earth_young80_arr: from 22 km the spline runs straight to the surface at the slope over the next 43.5 km (31 deg at
+  13 Myr, 19.5 at 329 Myr; the curve itself 24 and 13 deg below the join). Workbench fit will set no top dip (own
+  commit after the cut); the mesh limits how shallow, found by a placement test. Ledger on zg95-annulus-for-kaiju.
