@@ -1,14 +1,13 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-> **For the hub, 2026-11-13 (third update).** New: section 9 **A-bis, the wall contract by provenance**,
-> replacing A's recommendation after Louis's objection to a tolerance test at every use. All from
-> reading development 01dec8d2. In short: the registered surface is authoritative; every coordinate
-> writer preserves it by construction or releases it; all live coordinate writes already pass through
-> one primitive (`Mesh._deform_mesh`), so the inventory is short; four paths today do neither (listed
-> there, 1 to 3 hours each); about 10 to 12 hours in all against 4 to 6, of which 1.5 hours (a read
-> accessor that returns the registered surface or refuses) is all the lagged walls need. Five
-> questions for Louis at its end, each with a recommendation. Also open: PR #1127 (W1); PR B building;
-> reviews of #1124 and #1125 in progress.
+> **For the hub, 2026-11-13 (after the ruling).** Louis ruled "Yes to all five" on section 9 A-bis.
+> Step 1 is open: **PR #1148**, `Mesh.analytic_surface(label)`, head ab64608c, for W1 (6 tests, serial
+> and np 2 and 3; nothing calls it yet, so no run can newly refuse). Next from me, in the ruled order:
+> the four coordinate-writing paths that neither preserve nor release (one PR, W1); the refined
+> Internal-surface snap (#949 item 3, H5); then #1110's walls on the accessor and the stage 2 table.
+> The UWTN 2026-016 rewrite waits for #1145; its evidence is in
+> `curved-walls/UWTN-2026-016-RERUN-NOTES.md`. Other open PRs: #1116 (H3), #1127, #1131, #1141
+> (merging on green).
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
