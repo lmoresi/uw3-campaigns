@@ -1,13 +1,14 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-> **For the hub, 2026-11-13 (second update).** Changed: section 7 gains the stage 2 baseline, the
-> note's Kramer table reproduced on development (reaction and multiplier columns match the note; the
-> Nitsche column is about a third worse than the note printed, flagged there for its owner). State:
-> #1116 at 378f7e58 (development merged, np 4 CI line, solve-time warning for a stale split; 19 tests
-> pass at np 1, 2, 4); #1110 at 67dea5f1, held. Open PR bodies no longer name a machine by codename.
-> Waiting on: Louis's choice on the contract (section 9 A); H3's re-check of #1116. Next, needing no
-> decision: nothing further. The remaining stage 2 columns need the circle pieces, which wait on the
-> contract.
+> **For the hub, 2026-11-13 (third update).** New: section 9 **A-bis, the wall contract by provenance**,
+> replacing A's recommendation after Louis's objection to a tolerance test at every use. All from
+> reading development 01dec8d2. In short: the registered surface is authoritative; every coordinate
+> writer preserves it by construction or releases it; all live coordinate writes already pass through
+> one primitive (`Mesh._deform_mesh`), so the inventory is short; four paths today do neither (listed
+> there, 1 to 3 hours each); about 10 to 12 hours in all against 4 to 6, of which 1.5 hours (a read
+> accessor that returns the registered surface or refuses) is all the lagged walls need. Five
+> questions for Louis at its end, each with a recommendation. Also open: PR #1127 (W1); PR B building;
+> reviews of #1124 and #1125 in progress.
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
@@ -556,6 +557,8 @@ behind the 1,363 mislabelled cells of section 5b: still registered `radial`, ver
 circle the mesh says it is, and what are its centre and radius?"), and nothing that checks wall
 vertices against the declared radius.
 
+*Superseded: Louis (2026-11-13) does not accept a tolerance test at every use; see A-bis below, which replaces this recommendation. The alternatives are kept for the record.*
+
 **Proposal, with alternatives (a design decision for Louis).**
 - **(a) A query that verifies at use (recommended).** One method, for example
   `mesh.analytic_surface(label)`, returns the registered surface only if it has not been released and
@@ -577,6 +580,95 @@ rotated wall test and this query be one implementation; should `canonical_normal
 check so a wall-preserving move does not stale it. For Louis: the tolerance (1e-9 relative in the
 rotation test, 1e-10 absolute in gthyagi's checks), and whether a method that finds the declaration
 invalid refuses or falls back to its chordal form.
+
+### A-bis. The wall contract by provenance (replaces the recommendation in A)
+
+*Read from development 01dec8d2 unless marked; nothing was run for this page. "Measured" refers to
+the runs of A2 (serial, development 93e66eed).*
+
+**The contract.** The `BoundingSurface` registered in `mesh.bounding_surfaces[label]` is the
+declaration, and it is authoritative while it is registered as `radial` or `plane` and not released.
+A method that uses an analytic shortcut reads the centre and radius from it and uses them; it
+measures nothing. Every operation that writes mesh coordinates either keeps the wall on the declared
+surface by construction, or releases the declaration. A method that finds no registered analytic
+surface for its wall refuses and says so. No tolerance appears at run time.
+
+**What exists.** *Read.* Kinds are `radial`, `plane`, `facet` and `free`; only the first two are
+analytic. `restore()` on a radial surface rescales each point to the radius about the centre, which
+is exact to round-off; on a plane it projects orthogonally; on a free surface it does nothing.
+`release()` turns a radial or plane surface into `free` and remembers the old kind; there is no
+un-release, but `register_tangent_slip_provider(label, surface)` replaces a surface, so a caller can
+declare again. All coordinate writes on a live mesh already pass through one guarded primitive,
+`Mesh._deform_mesh`, which refuses outside a sanctioned scope once the mesh carries variables. So
+the inventory is short and closed.
+
+**Every path that writes coordinates.**
+
+| Path (file, function) | Today | How, or the smallest change |
+|---|---|---|
+| `Mesh.deform` (`discretisation_mesh.py`) | releases | releases every radial and plane surface, then moves |
+| Free-surface update (`free_surface.py`, calls `deform`) | releases | as `deform`; all labels, including walls it did not move |
+| MMPDE mover (`smoothing/mmpde.py`) with slip, through `Mesh.boundary_slip` | preserves | slides the node in the tangent, then `restore()` onto the registered surface (measured: 2.2e-16 after a slide of 2.0e-2); junction and interior-surface nodes are pinned |
+| Smoothing movers (`smoothing/api.py`, `_smooth_mesh_interior_bare`) | preserves | boundary nodes pinned, or slip as above |
+| Slip on a label passed as free (`boundary_slip`, dict value `False`) | **neither** | slides without restore while the surface stays registered. Release that label's surface in `boundary_slip`. About 1 hour with a test |
+| `Mesh.ephemeral_coords`; old-frame sampling (`ddt.py`); `remap_var_set` (`remesh.py`) | preserves | trial coordinates are put back before the scope ends |
+| `adapt` (`_adapt_nested`) | preserves, child undeclared | each generation is snapped with `restore()` onto the parent's surfaces, interior ones included; the child mesh carries no surfaces (inferred) |
+| Constructor `refinement=`: `Annulus`, `AnnulusInternalBoundary`, `SphericalShell` | preserves | the callback rescales wall (and, in 2-D, Internal) vertices to their radii |
+| Constructor `refinement=`: `SphericalShellInternalBoundary` | **neither** | walls are snapped, the Internal surface is not (`TODO(BUG)` in the source; measured 2.9e-2 off after one refinement; #949 item 3). Snap `Internal` in the callback: about 5 lines, 2 to 3 hours with the anchors that move |
+| `_apply_refinement_callback`, vertices put back to avoid an inverted cell (`CubedSphere` creases, #949 item 1) | **neither** | it returns the count of wall vertices not where the callback meant; the surface stays registered. Release that label when the count is not zero: about 1.5 hours |
+| A write to `mesh.X.coords` on a mesh with no variables yet (`_mesh_coords_update_callback`) | **neither** | the guard lets it through and nothing is released. Release all surfaces there, as `deform` does: about 1 hour |
+| Reload with a moved-mesh stamp (`Mesh.__init__`, the hierarchy stamp) | **neither** | a constructor-built mesh keeps its surfaces while saved, deformed coordinates are written. Release when the stamp moves a vertex: about 1 hour |
+| `apply_snapshot_payload` | conservative | coordinates return; a surface released since the snapshot stays released |
+| Fault split, `line_cut`, `place_surface`, `extract_region`, checkpoint reload from file | undeclared | new meshes that carry no surfaces (inferred: nothing copies them, nothing in `checkpoint/` names them) |
+| Generators that never register (`QuarterAnnulus`, `SegmentofAnnulus`, `AnnulusWithSpokes`, `DiscInternalBoundaries`, `SegmentofSphere`, the segmented and geographic meshes) | undeclared | methods refuse on them |
+
+Four defects under this contract, each small, and one of them (the refined Internal surface) already
+known. "Undeclared" is the safe failure: the method refuses on a mesh that would have qualified.
+
+**`deform`.** It releases unconditionally (measured: even when no coordinate changes), and by
+provenance that is right: a caller who wants to keep the declaration moves nodes through a path that
+restores onto the surface, and a raw `deform` makes no such promise. For the uses we know: MMPDE
+along the wall keeps the declaration (it restores); free-surface topography releases, correctly; a
+rigid translation releases, correctly, and is out of scope. The only caller of `deform` in the
+library is the free-surface update. Its cost is that it also releases the walls it did not move, so
+an annulus with a free upper surface loses its analytic lower wall.
+
+**What survives of the measurement.** Only tests, and an optional debug helper (say
+`mesh.check_bounding_surfaces()`), asserting that each preserving operation kept its promise: the
+largest distance of a label's vertices from its registered surface, with the tolerance stated as a
+small multiple of machine epsilon times the radius (measured: at most 6e-16 relative for every true
+declaration). One test per preserving row of the table. Never a gate in a solve.
+
+**Units.** *Read.* The surface holds its centre and radius as plain floats in model coordinates, the
+frame the DM holds. The annulus constructors non-dimensionalise their radii on entry;
+`BoundingSurface` non-dimensionalises a radius that arrives as a quantity; `restore()` acts on the
+model coordinates the movers pass. In a units model the shell test builds with plain radii, which
+are model coordinates. Not checked by a run: a spherical constructor given radii with units.
+gthyagi's methods refuse dimensional data, so they read the same frame.
+
+**Cost, against 4 to 6 hours for the verified query.**
+- Needed before the lagged walls can read the declaration: a read accessor that returns the
+  registered, unreleased radial surface or refuses (1.5 hours, in `discretisation_mesh.py`, the mesh
+  desk's file).
+- Needed before a pressure lift on a refined shell: the Internal snap (2 to 3 hours, the generator
+  file; it moves recorded anchors).
+- The other three defects: about 3.5 hours, in `discretisation_mesh.py`.
+- Tests and the debug helper for every preserving row: about 3 hours.
+- Optional: children of `adapt` inherit (they are snapped already), 2 to 3 hours; surfaces persisted
+  in a checkpoint, about 3 hours.
+
+About 10 to 12 hours in all, of which 1.5 gate the annulus work.
+
+**Questions for Louis.**
+1. Refuse when the wall is undeclared, with no chordal fallback? *Recommend: refuse.*
+2. Should `deform` take the labels it leaves alone (`keep=`), so a free surface does not release the
+   lower wall? *Recommend: not now; add it when a model needs it.*
+3. Snap the refined Internal surface (#949 item 3) now? *Recommend: yes; it is the one declaration
+   that is false today in an ordinary mesh.*
+4. Should `adapt` children inherit the surfaces they were snapped to? *Recommend: yes, later.*
+5. `canonical_normal` keeps its own geometry-version stamp, which goes stale after a move that
+   preserved the wall. Should it follow the surface's registration instead? *Recommend: yes, as a
+   separate change for the desk that owns the rotated solve.*
 
 ### A2. Tangential moves: telling "slid along the surface" from "left the surface"
 
