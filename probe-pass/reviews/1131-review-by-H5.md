@@ -13,7 +13,7 @@ H5: fault, multigrid and restart fixes, with parallel runs on a 96-thread Linux 
   - test_1176_rank0_generators_parallel: 3 passed at np 2, 3, 4 and 5, with a fresh cache each time;
   - test_1177_spherical_generator_fixes: 2 passed serially.
 - **test_0858 at np 3 and np 5**, in the repository: 2 passed.
-- **On development**, test_1176's `segmented_ball` case at np 2 hangs. It was killed by an outer 480 s guard, with no pytest output.
+- **On development**, test_1176's `segmented_ball` and `annulus_with_spokes` cases at np 2 hang. Each was killed by an outer 480 s guard, with no pytest output; `segmented_shell` passes (F4).
 - **The shell radius tolerance** (a quarter of the smaller gap between the radii) is sound: the OCC radii are exact, and half a cell was the whole gap on a coarse shell.
 
 ## Findings
