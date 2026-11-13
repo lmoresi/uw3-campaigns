@@ -24,3 +24,15 @@ The exception matches Louis's sense: a reload on a different partition, the tole
 **Verdict: ready once 1 and the template line are in; 2 is a suggestion.**
 
 Underworld development team with AI support from Claude Code
+
+---
+
+# Re-check at 33c3ce30: READY
+
+- **Tie-break:** H1 kept the coordinate order and reworded it. Topology fixes the candidates, the same on every rank, and coordinates only rank them. That is right, and my suggested key was wrong: a DMPlex global point number (`DMPlexCreatePointNumbering`) is assigned rank by rank, so it follows the partition. The sentence no longer reads as licence to identify by coordinates.
+- **Template:** the S12 line is in the PR template's checklist.
+- **Survey figures:** unchanged; that was a suggestion, not a condition.
+
+**Verdict: READY at 33c3ce30.**
+
+Underworld development team with AI support from Claude Code
