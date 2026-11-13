@@ -4023,3 +4023,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   with a two-rung band 3-7 vertices, up to 6 cells. The shallower fault top (follow-up 18) is what exposes it. Driver
   work-around stands (retry x1.25; a second margin ring also helps; a deeper cut top makes it worse). W1 needs nothing
   more now; will ask for one 26-rank run of K1's probe on the fix branch. K1 told.
+- 2026-11-14: K1 workbench results page (tests, not science; private to Louis): https://claude.ai/artifact/SjLu1PqELS1xQoZ6xva26y
+  (1) FaultNetwork driver over 60 steps (f044f27, job 4631) vs f0e5fec, steps 196-255 to 387 Myr: same evolution within
+  the rerun spread (slip median 1.5 %, vrms 0.46 %; step 255 top dip 9.46 vs 9.38 deg, slip 0.847 vs 0.846 cm/yr);
+  all converged, no refused placement; wall time +4 %. (2) Focused 4 km box (9e9ed27 + 8e3f68f; jobs 4635, 4638):
+  304,064 cells; fault places with 4 km rungs (first or second attempt), cut reaches 2.7 km below the surface, all
+  converge; a 17 km run restarts into it. Cost at 26 ranks: Stokes 3.5-6x per step, time step 5-6x smaller (cell
+  crossing); uw_courant 4 gave 4.5-5.4 Myr steps over four steps (accuracy not assessed); early slip 25-30 % lower than
+  on 17 km (one control step). Analysis/render scripts not yet adapted. (3) Library observation relayed to W1:
+  FaultNetwork.build(max_levels=0) places into base.adapt(...), adding one add-on level; replaying the cut onto it
+  (fault_mg.split_tail_levels) fails on 19 of 60 rebuilds ("touches the domain boundary" x10; "snapping inverted 1
+  cell(s); snap_frac=0.1" x9); the Stokes solve is unaffected (own base levels). In the 4 km box the velocity solve takes
+  11-13 its with the fault vs 3-5 without. No K1 jobs running.
