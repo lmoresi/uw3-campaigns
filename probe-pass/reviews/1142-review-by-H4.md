@@ -51,3 +51,23 @@ H1 amended the PR twice after the review above. At 01cabe81 each variable's outc
 Fix: decide eligibility before the call, from the expression alone. `meshVariable_lookup_by_symbol(mesh, var.sym)` decides the single-variable condition, and `uw.mpi.size > 1` decides `pick`. Call with the limiter only for an eligible expression, and catch nothing: any error then goes through the agreement.
 
 **Verdict.** READY at 79f79511 for the default configuration. Recommended before merge, or as an immediate follow-up: the eligibility change (for `REMESH_MONOTONE` on), and routing the DDt hook's failure to the end-of-move raise.
+
+---
+
+# Re-check at 8edbea80 (the two items only): READY, one merge condition
+
+Built at 8edbea80 and run on a 96-thread Linux workstation (single system image; Intel Xeon Gold 6240R, AVX-512; MPICH), np 2.
+
+**1. Limiter eligibility: fixed.** `_limiter_applies(expr)` decides from the expression and the rank count before any evaluation, and the `(ValueError, NotImplementedError)` retry is gone. An error inside the evaluation is now a failure agreed by every rank. test_0791 passes at the head, 4 of 4 (96 s), including the new `limiter` case, which is my probe (`REMESH_MONOTONE=clamp`, a ValueError on rank 1).
+
+**2. The DDt hook's failure reaches the caller: fixed.** Probe `p_hook.py`: an `AdvDiffusionSLCN` whose DDt takes the ALE opt-out REMAP path, with rank 1 failing once after the evaluation's collectives, inside `on_remesh`'s `remap_var_set`.
+- With the failure, both ranks raise the #960 error after the move. Both ranks are at the new coordinates. The failed variable (`T`, which the DDt owns) keeps its old values on both ranks, and the two `psi_star` histories are transferred.
+- Without it, nothing is raised.
+
+**Merge condition: a test of the hook path.** The hook change is a fix, and the rule is that a fix ships a test shown failing first. At 79f79511 the same probe would raise on neither rank, because the dispatcher swallows the hook's raise. Nothing else covers the path: test_0855 and test_1071 run the hook but never fail inside it. The probe is about 40 lines and would fit test_0791 as a fifth case (`hook`), with the same worker and supervisor.
+
+**Low, not a condition.** A stale list can raise spuriously. `_remesh_failed_transfer` is seeded only after a move happened. If an earlier remesh raised inside the impl after the hooks had added names, and the next call's mover then short-circuits (`moved` false), that call raises the old names. Clearing the attribute at the top of `remesh_with_field_transfer` closes it.
+
+**For the clamp PR (#682, mine, in progress).** It moves the clamp out of `_apply_monotone_limit` into the evaluator, so test_0791's `limiter` case would no longer inject anything. I'll adapt that case when I rebase onto #1142. Nothing in #1142 needs to change for it.
+
+Underworld development team with AI support from Claude Code
