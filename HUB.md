@@ -4001,3 +4001,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   refinement hierarchy (sizes x 2^r). Sent to H2 to try on hyperion (hierarchy, MMPDE x4 on the base, fault placement
   now #1091 is fixed on development via PR #1094, cost). #1091 note: kaiju's overlay 80d3ebe9 predates the fix.
   Louis talks to K1 directly on the workbench.
+- 2026-11-14: "not rank-local" trace (job 4639, 26 ranks, 80d3ebe9, first attempt; output place-trace-80d3ebe9.txt on
+  the patch page v26, sha256 46018d7c...): (a) the first check raised, after the band placement (fault_network.py:410
+  -> place_surface.py:9363 -> addon_partition.py:265). (b) partition_addon (layers 2) moved 7462 units to owner rank 18;
+  then the placement's own _gather_regions (layers 1) moved 2 cells: it marks 4 vertices on rank 18 the partition's rule
+  does not, 90-94 km behind the trench, 0-6.9 km deep (cut top at 69 km, 2.7 km deep); 2 region cells lay outside the
+  partition's region on rank 20; the check then finds 2 cells on rank 18 that are the same cells as on rank 20. K1's
+  "host" = the mesh after the placement's partition, so the gather (not the partition) moved them. (c) pending: K1
+  building an af84cfcd overlay. Relayed to W1. Job 4638: the 4 km box ran steps 0-3, each faulted step placed on the
+  second attempt (x1.25) and converged. CORRECTION (K1): the binding time-step limit is the cell-crossing (resolution
+  Courant) one, not fault-crossing; the hub's earlier note to Louis said fault-crossing.
