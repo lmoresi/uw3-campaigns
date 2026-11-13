@@ -43,3 +43,11 @@ Fix, in each of these generators: `viewer.destroy()` inside the rank-0 block, th
 
 - The rank-0 write on a parallel filesystem (F1 is by reading).
 - Any MPI other than MPICH.
+
+## Re-check at 17eaebb4: READY
+
+- **F1 fixed.** All four generators (the three segmented ones and AnnulusWithSpokes) destroy the viewer inside the rank-0 block, and a `uw.mpi.barrier()` at function level, reached by every rank, comes before the collective `Mesh(... .h5)` read.
+  - Measured: every generator that goes through the conversion, at np 2, 3, 4 and 5, each with an empty mesh cache: all 10 build, with the same cell counts as serial (66, 16, 144, 422, 177, 256, 570, 1087, 507, 413).
+  - test_1176: 3 passed at np 2, 3, 4 and 5.
+- **F2 fixed:** `comm is None or comm.getSize() > 1`. One note, not blocking: `getSize` is petsc4py's spelling, so an mpi4py communicator would raise AttributeError here. Every current caller passes a PETSc communicator.
+- **F3 and F4:** the comment and the docstring now say what was measured.
