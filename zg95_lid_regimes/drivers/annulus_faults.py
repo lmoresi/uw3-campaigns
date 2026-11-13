@@ -2939,6 +2939,15 @@ else:
         raise FileNotFoundError(f"checkpoint {params.uw_restart} in {out} lists files that are missing: {missing}")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+    if int(params.uw_mmpde_every) > 0 and int(params.uw_mmpde_init) > 0:
+        # a restart of a moving-mesh run: the checkpoint does not carry the moved base, so this base is the unmoved
+        # one. Adapt it to the checkpoint's temperature (uw_mmpde_init moves, as at a slab start) and read the base
+        # fields again after each move, so the last read lands on nodes close to the checkpoint's own.
+        for _ in range(int(params.uw_mmpde_init)):
+            mmpde_move()
+            for var in (T_b, V_b, gamma_b):
+                var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+        uw.pprint(f"restart: base re-adapted to the checkpoint's T in {int(params.uw_mmpde_init)} moves")
     if swarm_on:
         restore_swarm(out, params.uw_restart)
     with open(os.path.join(out, "records.json")) as f:
