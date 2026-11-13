@@ -3967,3 +3967,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   7 Newton its vs 5, slip agrees to 4.4e-8 where the 1e-3 runs spread 5e-5, vrms 2.6e-8 vs 1e-5; Stokes 87 s vs 53 s.
   Linear history not captured (job 4633 monitors on the wrong prefix; the Stokes solve runs under rotfs1_); not
   pursued. Relayed to W1. Question for Louis: tighter uw_tol in the workbench (~1.6x Stokes cost at step 1).
+- 2026-11-14: kaiju/slab-workbench f044f27 -> 9e9ed27 (K1's 30f847b; slab_workbench.py bdb65a2, annulus_model.py
+  0655786; mbox sha256 matched; py_compile and pyflakes clean; annulus_model change additive (focused_annulus_mesh), the
+  parent driver unaffected; merges cleanly). Spec step 3, focused base mesh: -uw_focus_cell_km (0 = off, default
+  unchanged) and four companions give fine cells in a fixed box around the subduction zone. Geometry (job 4634, np 26
+  and 52): a 4 km box 1,500 km wide to 700 km depth gives 304,064 cells vs 119,936; no refinement warning, wall nodes on
+  the circles, no empty rank. The constructor copies the body of uw.meshing.Annulus to add a gmsh size callback:
+  candidate library request (a size callback on Annulus), not filed. Not yet run with a solve; first job (box off
+  control, then first steps with the box) going in. #962 (empty ranks) is the limit to watch. Job 4631 due ~10:55.
