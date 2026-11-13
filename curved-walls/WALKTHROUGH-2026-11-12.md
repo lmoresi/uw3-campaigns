@@ -453,8 +453,8 @@ written: Nitsche's recovered stress error is now 7.8e-2, 3.3e-2, 2.0e-2, 8.6e-3 
 5.8e-2, 2.4e-2, 1.5e-2, 6.3e-3, about a third larger at every resolution. That is outside this
 work; it is reported here for whoever owns the Nitsche condition.
 
-The rotated reaction converges at about first order in this amplitude (6.8e-3 to 1.1e-3 over a
-factor of 3 in cell size, observed order 1.7 between the ends, uneven between steps). This is the
+The rotated reaction's error in this amplitude falls from 6.8e-3 to 1.1e-3 over a factor of 3 in
+cell size: an observed order of about 1.7 between the ends, uneven between steps. This is the
 number the lagged walls, the gap multiplier on the true circle and #857's recovery have to beat. Those
 columns need the circle pieces to run on current development, so they follow the contract decision.
 
