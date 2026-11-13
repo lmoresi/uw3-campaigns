@@ -3735,3 +3735,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   all converged; both runs untouched. Movie page v81 (#short-fault: both plates and convergence; frames at 46, 57, 64).
   Hub note: plate speeds recorded earlier in this log (movie run, young-slab, Arrhenius) are mostly subducting-plate
   speeds; comparisons should use convergence.
+- 2026-11-13: short-fault run to step 90 (371 Myr): the fit has stayed short since step 73. Steps 73-90: fault ends at
+  177-226 km, slip 29-52, convergence 0.043-0.064 cm/yr (0.14 at step 10; control 1.2 cm/yr at 302 Myr). Last long
+  fault step 72 (286 km, slip 163, x4.5 in one step). Steps 86-89: four accepted fits at 177 km, 3 km from the 174 km
+  limit above which a fit is refused and the fault left in place; none refused yet. Both plates speed up together
+  (subducting 0.17 -> 0.32, overriding 0.13 -> 0.26 cm/yr, steps 60-90); trench advance 1.0 deg; shared drift's cause
+  not looked at. vrms levelled near 600 since step 80. All converged; both runs untouched. Movie page v82.
