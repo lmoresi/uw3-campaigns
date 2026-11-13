@@ -214,7 +214,8 @@ params = uw.Params(
                                 #   not as depth below the wall. Louis (2026-11-08): the split should run to one element
                                 #   from the boundary, as the ladder does; by depth, a 27-degree fault's cut stopped ~2 cells
                                 #   along the fault short of that (refinement 6: first split node 1.8 cells deep). 0 keeps
-                                #   the depth rule (the recipe until ruled)
+                                #   the depth rule (the recipe until ruled). Along the fault the first split node is also
+                                #   at least half a rung deep (cut_of): what a fault shallower than 30 degrees needs
     uw_fault_depth_max=0.25,
     uw_advect_offset=0.1,       # a record's plate speeds are sampled this arc (layer depths) on each side of the trench
     # solver and time stepping
@@ -432,7 +433,13 @@ def fault_trace(fault, coarsening=1):
 def cut_of(spine):
     """The part of a spine to cut: the points trace_inset() rungs inside the wall, by depth, or with
     uw_split_inset_along by distance along the spine from its wall crossing, so the
-    cut runs as close to the wall along the fault as the ladder does."""
+    cut runs as close to the wall along the fault as the ladder does, and at least half a rung
+    deep: a split node nearer the wall than a fraction of a cell shares a cell with a wall edge,
+    which the split refuses ("the fault touches the domain boundary"). Along the fault alone, a
+    fault dipping 10 degrees at the wall has its first node as little as 0.17 rungs deep; measured
+    there, 0.20 rungs was refused at every band width, 0.24 placed on a wider band, 0.26 and
+    deeper placed. Half a rung is what one rung along gives at 30 degrees, so steeper faults
+    are cut as before."""
     r = np.hypot(spine[:, 0], spine[:, 1])
     if not params.uw_split_inset_along or r[0] <= r_o:
         return spine[r <= r_o - trace_inset() * S]
@@ -441,7 +448,7 @@ def cut_of(spine):
     cross = spine[k - 1] + f * (spine[k] - spine[k - 1])
     along = np.r_[np.zeros(k), np.linalg.norm(spine[k] - cross)
                   + np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(spine[k:], axis=0), axis=1))]]
-    return spine[(np.arange(len(spine)) >= k) & (along >= trace_inset() * S - 1e-12)]
+    return spine[(np.arange(len(spine)) >= k) & (along >= trace_inset() * S - 1e-12) & (r <= r_o - 0.5 * S)]
 
 
 def trace_inset():
