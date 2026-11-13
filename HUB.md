@@ -4011,3 +4011,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   building an af84cfcd overlay. Relayed to W1. Job 4638: the 4 km box ran steps 0-3, each faulted step placed on the
   second attempt (x1.25) and converged. CORRECTION (K1): the binding time-step limit is the cell-crossing (resolution
   Courant) one, not fault-crossing; the hub's earlier note to Louis said fault-crossing.
+- 2026-11-14: "not rank-local" reproduces on development af84cfcd (K1 overlay job 4640, trace job 4641; output
+  place-trace-af84cfcd.txt on patch page v27, sha256 de2d5dae...): same partition (rank 18), same gather moving 2
+  cells via the same 4 extra vertices, same refusal (place_surface.py:9414, addon_partition.py:292). By W1's criterion
+  a library issue on current development; relayed to W1 to file and fix. Reproduction inputs: K1's
+  launch/prep/focused_place_probe.py (workbench 30f847b = 9e9ed27) and the 214-point fault in
+  runs/wb_focus_run/box4/records.json; K1 offers them on the patch page. Campaign stays on 80d3ebe9.
