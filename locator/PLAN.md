@@ -43,3 +43,17 @@ Louis's framing: "The in-cell check is exact for degree one meshes so it is the 
 ## Open questions for C1 or Louis
 - (a) Should a swarm's migration pass each particle's previous cell as the walk's start? That is the largest win, but it touches swarm code: in this PR, or a follow-up?
 - (b) Should 2-manifold cells get barycentric in their tangent plane now, or later with quads and hexes?
+
+## Step 1 result (2026-11-13; serial, warm; probe `runs/2026-11-13-h4/locator/bench_incell.py` on the 96-thread Linux workstation)
+Cost per point of testing one candidate cell, 1e6 points:
+- **Face-pair:** the library's `_test_if_points_in_cells_internal`.
+- **Barycentric:** numpy, with each cell's inverse affine map precomputed, which costs (dim^2 + dim) floats per cell.
+
+| mesh | points | face-pair | barycentric |
+|---|---|---|---|
+| 2-D simplex, h = 1/64 | random in cell | 237-246 ns | 110-115 ns |
+| 2-D | within 1e-6 of a vertex | 233 ns | 105 ns |
+| 3-D simplex, h = 1/16 | random in cell | 365 ns | 174-176 ns |
+| 3-D | within 1e-6 of a vertex | 354 ns | 169 ns |
+
+Both classify every sample as inside. Barycentric is about 2.1 times faster and returns the reference coordinates, so it is the choice. (The first face-pair call costs about 1 µs/pt in 2-D and 4.8 µs/pt in 3-D, which is its one-time face set-up.)
