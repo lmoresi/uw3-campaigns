@@ -773,3 +773,7 @@ Measured here, not inherited.
   change was published without one. **Louis's to fix:** a new token with push access to
   `Underworld-Technical-Notes/underworldcode.org-preview`, saved as `PREVIEW_TOKEN` on
   `underworldcode.org`; re-run a recent preview job to confirm.
+- 2026-11-13: **PR previews work again.** Louis created a fine-grained token (Contents
+  read and write on `underworldcode.org-preview`) and saved it as `PREVIEW_TOKEN`; the
+  re-run of #66's preview job (run 43151396657, attempt 2) published and was served.
+  The token has an expiry: the next silent failure of `preview` on every PR means renew.
