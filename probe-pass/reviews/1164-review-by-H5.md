@@ -42,3 +42,16 @@ Every rank answers `hasLabel` the same, so the warning is collective-safe.
 ## Tests
 
 Not rerun here; the PR reports 6 of 8 segfault on development and 8 pass at np 1 to 4. F1 needs a case in the same file.
+
+---
+
+# Round 2 (head ec9890c2): READY
+
+Re-checked on a build of ec9890c2 (hyperion, MPICH):
+
+- **F1 fixed.** `add_rotated_freeslip_bc("Lower")` on `Annulus(radiusInner=0)` now raises `ValueError: ... the mesh holds no boundary labelled 'Lower'; the boundaries it holds are ['Upper', 'All_Boundaries']` at the call (it segfaulted at solve). `_wall_vertex_rows(dm, "Lower")` returns 0 rows; `"Upper"` still 32. The refusal is on `hasLabel`, the same on every rank; `SHEET_TANGENCY` does not pass through `add_rotated_freeslip_bc`, so it is unaffected.
+- **F2 fixed.** `_setup_region_ds` tests `hasLabel` before `getLabel`, so its "not found" error fires.
+- **M1 done as recommended.** An annulus with `Upper` and `Lower` removed, smoothed with the defaults, warns "the mesh holds no label for any of its boundaries ['Lower', 'Upper'], so no boundary vertex is pinned". An explicit name the DM lacks warns; the solid disc is silent. Warnings are on rank 0 from a rank-uniform test.
+- `test_0856_boundary_label_the_mesh_does_not_hold.py`: 14 passed serially and at np 3.
+
+Optional nit, not blocking: the explicit-name warning lists every DM label, including PETSc's internal ones (`depth`, `celltype`, ...); listing the `mesh.boundaries` names the DM holds would read better.
