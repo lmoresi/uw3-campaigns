@@ -1,8 +1,10 @@
 # UWTN 2026-016: evidence for the version 1.1 correction
 
-> **For the hub, 2026-11-13.** The cause of the note's unreproducible annulus Nitsche numbers is
-> confirmed by a bracket of two adjacent commits. Nothing else in the annulus tables needs correcting
-> on this evidence. The rewrite itself waits for #1145 to merge.
+> **For the hub, 2026-11-14.** The correction is open as a PR for Louis in the technical-notes
+> repository: **Underworld-Technical-Notes/underworldcode.org#70**, branch
+> `correction/uwtn-2026-016-nitsche`, version 1.1.0. Rerun on development eb3d2f02 (contains #1145).
+> Four things for Louis to decide are listed in its body (one removed sentence of judgement; the
+> History entry's DOI and date; the top notice; timings not re-measured). The library docs PR is next.
 
 All runs: the note's own `examples/stress.py both`, unmodified (note repository at 39335ce), serial, on
 a 96-thread Linux workstation (single system image, Intel Xeon Gold 6240R, MPICH, PETSc int32).
@@ -33,3 +35,15 @@ Entries are leak / stress error for the Nitsche column at gamma = 10.
 
 So the correction note has three things to say: the published annulus Nitsche numbers belong to the
 code before #694 at gamma = 10; #1145 changes them slightly; #1145 changes SolCx materially.
+
+## The rerun on development eb3d2f02 (contains #1145)
+
+| table | Nitsche, version 1.1 | version 1.0 |
+|---|---|---|
+| annulus, leak / stress, cell 0.15 to 0.05 | 1.6e-2/7.5e-2, 4.3e-3/3.2e-2, 2.3e-3/1.9e-2, 5.0e-4/8.4e-3 | 1.0e-2/5.8e-2, 2.4e-3/2.4e-2, 1.2e-3/1.5e-2, 2.7e-4/6.3e-3 |
+| gamma, leak at 1, 10, 100, 1000, 1e4 (1e5: 1.5e-5) | 1.1e-2, 1.8e-3, 3.3e-4, 2.8e-5, 3.5e-5 | diverged, 1.7e-3, 2.7e-4, 3.0e-5, diverged |
+| SolCx stress error, contrast 10, 1e2, 1e3, 1e4, 1e6 | 0.049/0.055, 0.073/0.082, 0.076/0.085, 0.076/0.085, 0.076/0.085 | no column |
+| SolCx at 1e6, gamma 1, 10, 100, 1000: stress error; leak, soft half | 0.079, 0.076, 0.076, 0.076; 7.2e-3, 9.8e-4, 2.1e-5, 2.0e-6 | not converged |
+| projection error at cell 0.0125 | 4.9e-4 | 3.6e-4 |
+
+Non-Nitsche entries came back within one unit in the last printed digit and are left as published.
