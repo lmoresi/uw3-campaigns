@@ -28,7 +28,6 @@ import sympy
 import underworld3 as uw
 from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
-from underworld3.utilities.place_surface import place_fault_ribbon_2d
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, free_slip_walls,
@@ -167,7 +166,6 @@ params = uw.Params(
                                 #   S = h_b the 1-rung inset is one base cell deep (the cut's top ~0.020 below the surface),
                                 #   so the early-slab near-surface slip is 10-18 % lower than the old recipe's
     uw_eta_w=1.0e-3,
-    uw_band_widen=1,
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -442,12 +440,11 @@ def wrap(angle):
     return (angle + np.pi) % (2 * np.pi) - np.pi
 
 
-def fault_trace(fault, coarsening=1):
+def fault_trace(fault):
     """A fault's spine (from just above the outer wall to its tip) and the trace to cut
-    (trace_inset() finest rungs inside the wall), at ``coarsening`` times the rung
-    spacing: the fault's ``points``, a polyline already at the rung spacing with its
-    surface end above the wall."""
-    spine = np.asarray(fault["points"], dtype=float)[::coarsening]
+    (trace_inset() rungs inside the wall): the fault's ``points``, a polyline already at
+    the rung spacing with its surface end above the wall."""
+    spine = np.asarray(fault["points"], dtype=float)
     return spine, cut_of(spine)
 
 
@@ -478,13 +475,16 @@ def trace_inset():
     return float(params.uw_split_inset)
 
 
-def placed_ladders(host, faults, coarsening):
-    """Every fault's ladder band placed on ``host`` at ``coarsening`` times the rung
-    spacing, each split along its own rungs. The fill-ring self-crossing check gives a
-    false positive when a ring runs along mesh nodes collinear to round-off (the annulus
-    has a line of them at theta = 0); a wider band or margin moves the ring off it."""
-    pieces = [(f["name"],) + fault_trace(f, coarsening) for f in faults]
-    width = W * coarsening if params.uw_band_widen else W
+def fault_network(host, faults):
+    """The fitted faults as one library fault network (uw.meshing.FaultNetwork: each fault
+    given once, the part to cut as its trace), realised on ``host`` as ladder bands split
+    along their rungs, with no refinement of the network's own (max_levels=0: the host is
+    the base mesh, whose coarse levels the solver keeps). Returns the network (its mesh,
+    its band and footprint masks in ``info``, a retained uw.meshing.Surface per fault)
+    and each fault's spine and cut. The fill-ring self-crossing check gives a false
+    positive when a ring runs along mesh nodes collinear to round-off (the annulus has a
+    line of them at theta = 0); a wider band or margin moves the ring off it."""
+    pieces = [(f["name"],) + fault_trace(f) for f in faults]
     # Every set places in serial; in parallel the "gather" seam handling can reach
     # the domain wall when several bands sit close together (measured: four bands
     # within 11 degrees on 7 ranks), so the ligament seams are the last resort.
@@ -495,20 +495,21 @@ def placed_ladders(host, faults, coarsening):
     # 2026-10-18: one rank raised inside the CAD call, the others waited; not retried)
     seams = str(params.uw_fault_seams)      # "gather" (one rank carves a straddling band) or "conform" (2-D: the
                                              # band meshed through the partition seam, each rank its own side)
-    # the ladder only takes "gather"; any other seam mode needs the network mesher (place_fault_ribbon_2d)
+    # the ladder only takes "gather"; any other seam mode needs the network mesher
     mesher = "ladder" if seams == "gather" else "network"
     attempts = [(1, 0.7, 1.0, seams, mesher), (1, 0.7, 1.25, seams, mesher),
                 (2, 0.7, 1.0, seams, mesher), (1, 0.7, 1.5, seams, mesher)]
     for n, (rings, clearance, widen, seams, mesher) in enumerate(attempts):
         try:
-            mesh, info = place_fault_ribbon_2d(
-                host, [(name, trace) for name, _, trace in pieces], width * widen,
-                spines=[(name, spine) for name, spine, _ in pieces], margin_rings=rings,
-                clearance=clearance, split=True, mesher=mesher, seams=seams)
+            net = uw.meshing.FaultNetwork([(name, trace) for name, _, trace in pieces])
+            net.prepare(h=S, verbose=False)
+            net.build(base=host, width=W * widen, realisation="split", mesher=mesher, max_levels=0,
+                      margin_rings=rings, carve_clearance=clearance, seams=seams)
             if n:
                 uw.pprint(f"  placed with margin_rings {rings}, clearance {clearance}, width x{widen}, "
                           f"seams {seams}, mesher {mesher}")
-            return mesh, info, {name: (spine, trace) for name, spine, trace in pieces}
+            cuts = dict(net.prepared)           # the traces as the network cut them
+            return net, {name: (spine, np.asarray(cuts[name], dtype=float)) for name, spine, _ in pieces}
         except (RuntimeError, ValueError) as err:
             # "touches the domain boundary" (fault_split) and "meshed to area ... against CAD" (the ribbon assembly)
             # are job 4400's two refusals (earth_recipe_movie's first try, steps 107 and 81): a wider band places both
@@ -805,11 +806,12 @@ class FaultedMesh:
         self.names = [f["name"] for f in self.faults]
         if self.faults:
             self.levels = levels
-            self.mesh, info, self.pieces = placed_ladders(base, self.faults, 1)
+            self.network, self.pieces = fault_network(base, self.faults)
+            self.mesh, info = self.network.mesh, self.network.info
             band = np.asarray(info["band"], dtype=bool)
             self.width = float(info["width"])
         else:                  # no fault: the base mesh is the solver's mesh
-            self.levels, self.mesh, self.pieces = levels[:-1], base, {}
+            self.network, self.levels, self.mesh, self.pieces = None, levels[:-1], base, {}
             band = None
             self.width = W
         mesh = self.mesh
@@ -868,10 +870,10 @@ class FaultedMesh:
             buoyancy = buoyancy - model.over_dT * clamp01(self.over.sym[0])
         s.bodyforce = Ra * buoyancy * mesh.CoordinateSystem.unit_e_0
         free_slip_walls(s, params.uw_wall_normal)
-        for name in self.names:
+        if self.network is not None:
             # on a curved or kinked trace the per-node normals partly lock a frictionless contact (box
             # probe: one face carries shear, the normal traction jumps); "trace" smooths them
-            s.add_fault_bc(0, boundary=name, **({"normal": "trace"} if params.uw_fault_normal == "trace" else {}))
+            self.network.apply_contact(s, conds=0, normal="trace" if params.uw_fault_normal == "trace" else None)
         s.tolerance = params.uw_tol
         if params.uw_pres_rtol > 0:
             s._rotated_pres_rtol = float(params.uw_pres_rtol)
