@@ -3718,3 +3718,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   no smaller in proportion than the control's. Plate speed moves with it (0.16-0.22 cm/yr) on a slow rise. Headline
   stands: no shutdown, plate below 0.23 cm/yr against the control's 0.8 and more. Nothing changed in either run.
   Movie page v77.
+- 2026-11-13: short-fault run at step 53: slip now swings x3 in one step, as much as the control's largest. Fault end
+  257-290 km over steps 21-37, 235-328 km since; steps 51-53: end 247, 328, 260 km; slip 75, 246, 89 (x3.3, then x0.36).
+  Slip still on one line over steps 21-52: 2.0 units/km x (end - 214 km), rms 7. Plate 0.28 cm/yr at step 52, 0.18 at 53
+  (292 Myr); no shutdown; control at 1.3-2.5 cm/yr. Ending the fault with the crust lowers plate speed ~5x but does not
+  stop the fit driving the slip. Nothing changed; no fit tuning without Louis. Movie page v80.
