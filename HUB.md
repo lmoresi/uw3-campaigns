@@ -3922,3 +3922,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   agree, a per-run mesh checksum (sum and sum of squares of owned vertex coordinates, cells per rank). Same two numbers
   from job 4620. W1's reading: the 4617 values look like a few discrete states, not continuous noise. FaultNetwork
   gap: W1 acts only once Louis picks a route; a TI weak plane request should come via C1.
+- 2026-11-14: K1's numbers for W1 (relayed; runs/wb_repeat/README.md): step-1 starting residuals agree to 11 digits
+  in all 4617/4620 runs (same 120,208 cells, band and FAC patch), so the difference is made inside the first nonlinear
+  iteration; two runs (fork_n7_b, parent_n7) identical to 12 digits through two iterations. Job 4620: neither pair
+  repeats. Tight Schur (pres_rtol 1e-5): slip 156.870 / 156.884, first-iteration difference 7e-6, LARGER than the loose
+  runs'. PYTHONHASHSEED=0: slip 156.616 / 156.586, first-iteration difference 4e-9. Mesh checksums (4620 step 1): tight
+  pair differs in vertex coordinates at round-off; seed0 pair also in cell-vertex numbering, yet has the closest first
+  iteration. Not available: cells per rank; 4617's step-1 meshes.
