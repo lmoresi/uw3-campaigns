@@ -3797,3 +3797,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   whether a Nitsche outer wall would let the split fault run through to the wall, whether the blocker is the BC (a
   split wall vertex under the rotated constraint) or the placement surgery (#1128, "fault touches the domain boundary"),
   and whether Nitsche now composes with the fault's TI rheology and geometric FMG. Awaiting W1.
+- 2026-11-13: W1's answer (read on development bc3d5362, nothing measured): (1) the blocker is the SURGERY, not the wall
+  condition: fault_split refuses any chain vertex with a domain-boundary facet ("only strictly interior faults ... are
+  supported"); a wall end needs a second end rule, the edge label on both copies, and the parallel version: not built.
+  place_surface's end-at-the-wall settling works in 2-D on one rank, refused in parallel. (2) Kinematics: a fault that
+  reaches a wall with v.n = 0 has zero slip there for any dip (s (t_f.n_w) = 0), whether the wall is rotated (exact) or
+  Nitsche (~1e-3 leak); running the split to a free-slip wall buys the last cell only, which the welded bridge already
+  carries. A fault that slips at the surface needs a moving surface (free surface or open/traction boundary).
+  (3) Composition by reading: Nitsche penalty now scales by the model's K (TI's bulk eta_0, #463); boundary Jacobian
+  FD-tested with TI (test_1066); rotated + Nitsche not refused and should assemble; Galerkin coarse operators carry
+  wall terms to every FMG level; none measured together. The guide's "Nitsche incompatible with TI" sentence is older
+  than the code. Options for Louis: (a) present driver: nothing changes, keep the inset split and welded bridge;
+  (b) a fault that breaks a FREE surface: W1's split wall-end rule + parallel end settling, medium-large design item,
+  needs Louis's go and a queue slot; (c) one serial probe (~half a day, after the #962 PR): rotated vs Nitsche wall with
+  a welded TI zone reaching it, same FMG tail, comparing slip, wall leak, iterations; then W1 corrects the guide.
+  W1's reading: the split cannot run to the wall under Nitsche, and it would not help. Awaiting Louis: a, b or c.
