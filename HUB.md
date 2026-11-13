@@ -3937,3 +3937,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Deciding run (relayed to K1): two solves of step 1 from the same bits (restart twice from one saved state, or solve,
   restore, re-solve in one run; cold starts). Optional: a pair at uw_tol 1e-6 to show whether the ~1 % slip spread is
   the solve's accuracy at 1e-3. Mesher tie-branching noted, no action unless Louis wants bit-identical meshes.
+- 2026-11-14: FaultNetwork regression (job 4628, 2bc7b9a = f044f27 vs ed79763): same cell counts, band and Newton
+  counts, exit 0, but NOT 10 digits: start residual equal to 2e-9 at step 1, 2e-4 at step 196, a third lower at step
+  197 (286,224 vs 429,707; cause not established); vrms and slip after two steps inside the rerun spread. Why (jobs
+  4629/4630, geometry): FaultNetwork gives exactly the mesh of place_fault_ribbon_2d WITHOUT spines; the old driver
+  passed the fitted curve above the cut as the spine; without it ~100-135 cells near the fault top move (<0.7 m and
+  <48 m on two 10-deg tops; up to 6 km, a different mesher state, on step 0's 20-deg top). So the FaultNetwork gap also
+  changes the mesh near the top. 60-step side-by-side job 4631 (runs/wb_fnet_late vs runs/wb_floor_late). Same-bits
+  job 4632 for W1 submitted (two restarts each from step 0 and step 195, mesh/field checksums, plus a uw_tol 1e-6
+  pair). Datum: two restarts from the same step-195 files (5629dd9 vs ed79763) agree to 12 digits for the start and
+  three Newton iterations, then part at the fourth (8525.27048021 vs 8525.27047586; final 642.253470 vs 642.253659).
+  Relayed to W1.
