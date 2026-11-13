@@ -64,7 +64,7 @@ Built at 8edbea80 and run on a 96-thread Linux workstation (single system image;
 - With the failure, both ranks raise the #960 error after the move. Both ranks are at the new coordinates. The failed variable (`T`, which the DDt owns) keeps its old values on both ranks, and the two `psi_star` histories are transferred.
 - Without it, nothing is raised.
 
-**Merge condition: a test of the hook path.** The hook change is a fix, and the rule is that a fix ships a test shown failing first. At 79f79511 the same probe would raise on neither rank, because the dispatcher swallows the hook's raise. Nothing else covers the path: test_0855 and test_1071 run the hook but never fail inside it. The probe is about 40 lines and would fit test_0791 as a fifth case (`hook`), with the same worker and supervisor.
+**Merge condition: a test of the hook path.** The hook change is a fix, and the rule is that a fix ships a test shown failing first. Measured at 79f79511, the same probe raises on neither rank (`raised=['none', 'none']`), because the dispatcher swallows the hook's raise; at 8edbea80 it raises on both. That is the failing-first pair. Nothing else covers the path: test_0855 and test_1071 run the hook but never fail inside it. The probe is about 40 lines and would fit test_0791 as a fifth case (`hook`), with the same worker and supervisor.
 
 **Low, not a condition.** A stale list can raise spuriously. `_remesh_failed_transfer` is seeded only after a move happened. If an earlier remesh raised inside the impl after the hooks had added names, and the next call's mover then short-circuits (`moved` false), that call raises the old names. Clearing the attribute at the top of `remesh_with_field_transfer` closes it.
 
