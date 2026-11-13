@@ -1,12 +1,13 @@
 # How gthyagi's curved-wall work (#1033) meets the existing tools: a walkthrough
 
-> **For the hub, 2026-11-13.** Changed since v10: nothing in the sections. State: #1116 (pressure
-> split alone) is at 378f7e58 with development ba68af0a merged, the np 4 CI line, and a solve-time
-> warning when the mesh geometry has changed since the split was built (a warning, not a refusal;
-> nine lines in the Stokes solve notes outside the new method); 19 tests pass at np 1, 2, 4. #1110
-> (held circle pieces) is at 67dea5f1, development merged, not rebuilt. Waiting on: Louis's choice on
-> the contract (section 9 A; I recommend the query that verifies at use), H3's re-check of #1116.
-> Working on: the stage 2 baseline, the note's Kramer table reproduced on development.
+> **For the hub, 2026-11-13 (second update).** Changed: section 7 gains the stage 2 baseline, the
+> note's Kramer table reproduced on development (reaction and multiplier columns match the note; the
+> Nitsche column is about a third worse than the note printed, flagged there for its owner). State:
+> #1116 at 378f7e58 (development merged, np 4 CI line, solve-time warning for a stale split; 19 tests
+> pass at np 1, 2, 4); #1110 at 67dea5f1, held. Open PR bodies no longer name a machine by codename.
+> Waiting on: Louis's choice on the contract (section 9 A); H3's re-check of #1116. Next, needing no
+> decision: nothing further. The remaining stage 2 columns need the circle pieces, which wait on the
+> contract.
 
 H6 curved walls, 2026-11-12, for Louis. Version 6: sections from reading, with the measured
 examples of sections 1, 3, 5b and 6, the opt-in measurement, the history of #857's recovery
@@ -431,6 +432,31 @@ Whether they are worth carrying is what stage 2 measures, against the note's own
 **Stage 2 (measured, to come after the first unit PRs):** the note's Kramer annulus case and its
 table (cell sizes 0.15 to 0.05, error in the cos 2θ amplitude of σ_rr), with columns added for
 #857's recovery, #1033's gap reaction and a no-slip wall, with convergence order. That decides whether #857 is finished or closed.
+
+### Stage 2 baseline: the note's Kramer table reproduced on development (run)
+
+The note's own script (`examples/stress.py sweep`, unmodified) on development 93e66eed, serial, on a
+96-thread Linux workstation (Intel Xeon Gold 6240R, MPICH, PETSc int32). Kramer smooth case n = 2,
+k = 3, annulus 0.5 to 1, free slip on the outer wall, exact velocity on the inner; relative error in
+the cos 2θ amplitude of σ_rr on the outer wall, exact value 0.1506696429.
+
+| cell size | recovered by projection (rotated solve) | rotated, reaction | multiplier, traction | note: rotated reaction / multiplier |
+|---|---|---|---|---|
+| 0.150 | 2.44e-2 | 6.82e-3 | 8.57e-3 | 6.8e-3 / 8.6e-3 |
+| 0.100 | 9.87e-3 | 3.27e-3 | 8.46e-4 | 3.3e-3 / 8.5e-4 |
+| 0.075 | 6.30e-3 | 2.08e-3 | 1.70e-3 | 2.1e-3 / 1.7e-3 |
+| 0.050 | 2.68e-3 | 1.08e-3 | 1.41e-3 | 1.1e-3 / 1.4e-3 |
+
+The reaction and multiplier columns reproduce the note to the digits it prints, as does the
+projection column (note: 2.4e-2, 1.0e-2, 6.3e-3, 2.7e-3). One column has moved since the note was
+written: Nitsche's recovered stress error is now 7.8e-2, 3.3e-2, 2.0e-2, 8.6e-3 against the note's
+5.8e-2, 2.4e-2, 1.5e-2, 6.3e-3, about a third larger at every resolution. That is outside this
+work; it is reported here for whoever owns the Nitsche condition.
+
+The rotated reaction converges at about first order in this amplitude (6.8e-3 to 1.1e-3 over a
+factor of 3 in cell size, observed order 1.7 between the ends, uneven between steps). This is the
+number the lagged walls, the gap multiplier on the true circle and #857's recovery have to beat. Those
+columns need the circle pieces to run on current development, so they follow the contract decision.
 
 ### What each method does
 
