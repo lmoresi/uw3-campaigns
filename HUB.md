@@ -3866,3 +3866,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yet the residual differs 1e-6: a library defect), the nonlinear iteration count and residuals, and the solver
   options; optional reruns (a) tighter inner tolerances, (b) PYTHONHASHSEED=0 on every rank. Probes in W1's
   issue_sweep/repeat_faulted/.
+- 2026-11-14: f0e5fec's test placed the previously refused step 198 at the first attempt (run continuing to 255).
+  K1's answers for W1 (relayed): first nonlinear iteration in all five runs: outer 1, Schur 7, last inner velocity 6
+  (only these counts are recorded; no KSP monitor) and the residual after it already differs (31033.7577 / .7114 /
+  .7104 / .7114 / .7279 from 107801.333). Step 1: 5 nonlinear iterations each (3 Picard, 2 Newton, alpha 1.0); first
+  differing count at iteration 4 or 5; final residuals 374.6-398.8. Solver: uw_tol 1e-3, continuation, custom FMG with
+  FAC patch, Schur 1/mu mass, rotated walls, PETSc 3.25.0; the record's pres_rtol reads 1.5e-3 / 0.1 / 2.3e-2 at steps
+  0/1/2 against requested 1e-2 warm and 1e-4 cold. Optional reruns submitted (Schur tolerances x1e-3 tighter;
+  PYTHONHASHSEED=0 on every rank), steps 0-1 on 3381347.
