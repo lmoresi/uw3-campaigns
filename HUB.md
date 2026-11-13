@@ -3975,3 +3975,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the circles, no empty rank. The constructor copies the body of uw.meshing.Annulus to add a gmsh size callback:
   candidate library request (a size callback on Annulus), not filed. Not yet run with a solve; first job (box off
   control, then first steps with the box) going in. #962 (empty ranks) is the limit to watch. Job 4631 due ~10:55.
+- 2026-11-14: focused mesh first job (4635, np 26): box off unchanged (10 digits vs before, 120,205 cells). 4 km box
+  (304,064 cells): step 0 converged in 6 nonlinear its; Stokes 3.4x the control per step; time step 6x smaller (the
+  fault-crossing limit binds), so 387 Myr would take ~1,500+ steps at the present courant dial. Step 1 stopped: library
+  refused placement as "not rank-local" (addon_partition). Geometry repeat (job 4637, launch/prep/focused_place_probe.py,
+  runs/wb_focus_run/place_probe): the first attempt gives the band's rank two host-size surface cells ~30 km past the
+  cut's shallow end that the host had on the neighbouring rank; the three later attempts all place. Pushed
+  kaiju/slab-workbench 9e9ed27 -> 8e3f68f (K1's 701e452; blob 42f592e; mbox sha256 matched; py_compile clean): "not
+  rank-local" joins the retried refusals. Library finding passed to W1 (not filed). First job: 4 km box from step 0,
+  four steps.
