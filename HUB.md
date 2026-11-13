@@ -3823,3 +3823,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_young80_arr: from 22 km the spline runs straight to the surface at the slope over the next 43.5 km (31 deg at
   13 Myr, 19.5 at 329 Myr; the curve itself 24 and 13 deg below the join). Workbench fit will set no top dip (own
   commit after the cut); the mesh limits how shallow, found by a placement test. Ledger on zg95-annulus-for-kaiju.
+- 2026-11-14: kaiju/slab-workbench pushed, new branch on 818d43f: K1's 3381347 -> 0467268. One new file
+  zg95_lid_regimes/drivers/slab_workbench.py (blob 5264c5f, 1,959 lines, 96 options; parent 3,745 lines, 184 options);
+  no existing file touched. mbox sha256 matched; py_compile clean; pyflakes clean (no names left dangling by the cut).
+  The cut only, no intended behaviour change on the kept path. Kept: slab initial state, fixed ridge patch, split-
+  advected crust with refill and ridge crust, ocrust line, spline fault to the cap, frictionless split with ladder and
+  bridge, strain weakening/healing, Arrhenius, asthenosphere and lower-mantle factors, graded mesh, solver retries,
+  placement stop, wall check, records/checkpoints/restart (formats unchanged). Dropped: rate/lines laws, parabola /
+  envelope / fixed-top locators, crust-ending fault, Lagrangian fault, units mode, TI realisation and bridge, timing
+  add-on, fault-zone/band weakening, convection-checkpoint start, compositional slab, ridge weak seam, split chain
+  levels, warm-top slab, line crust mode, the FK law. Next: parent 8fff721 vs fork side by side on the earth_young80_arr
+  options, 20 steps from 0 plus a restart from 10, records compared step by step; then the no-top-dip commit.
