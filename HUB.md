@@ -3723,3 +3723,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Slip still on one line over steps 21-52: 2.0 units/km x (end - 214 km), rms 7. Plate 0.28 cm/yr at step 52, 0.18 at 53
   (292 Myr); no shutdown; control at 1.3-2.5 cm/yr. Ending the fault with the crust lowers plate speed ~5x but does not
   stop the fit driving the slip. Nothing changed; no fit tuning without Louis. Movie page v80.
+- 2026-11-13: CORRECTION (K1) to the three short-fault entries above, which led with subducting-plate speed: that speed
+  includes a drift the overriding plate shares (relative to the solver's rotation convention under free slip); the
+  measure of subduction is CONVERGENCE (subducting less overriding), which matches slip within 17 %. Convergence follows
+  the fit's fault end step by step: 0.14 cm/yr at step 10; 0.26-0.27 on ends at 335-338 km (steps 55, 57); 0.05-0.06 on
+  214-237 km (56, 58); 0.045 on 205-216 km for seven steps (60-66, 317-334 Myr). Control: 1.4 cm/yr at 288 Myr. On those
+  seven steps both plates move nearly together, trench advancing. Single-step slip changes reached x7 (282 -> 40 -> 288,
+  steps 55-57), more than the control's x3: ending the fault with the crust makes subduction switch between slow and
+  nearly stopped; the fit still drives the dynamics. Cold slab a stub to ~350 km whatever the fit; vrms rises (458 at
+  step 66) from the deep mantle (old slab tail at the base, two plumes by step 64), not the plate's feed. No fit refused,
+  all converged; both runs untouched. Movie page v81 (#short-fault: both plates and convergence; frames at 46, 57, 64).
+  Hub note: plate speeds recorded earlier in this log (movie run, young-slab, Arrhenius) are mostly subducting-plate
+  speeds; comparisons should use convergence.
