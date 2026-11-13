@@ -3881,3 +3881,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   MG levels and custom FMG, five hash seeds, free-slip and viscous faults: bit-identical on one rank. K1's reruns
   decide: hash seed fixed and agreement to ~1e-10 -> (i), library defect W1 takes on; Schur x1e-3 shrinking the spread
   -> (ii). If both still differ: one pair with fieldsplit_velocity_ksp_converged_reason (K1's call). Relayed to K1.
+- 2026-11-14: workbench fault-top results page (white): https://claude.ai/artifact/XurJPaaY5vUXJeTAsF76gH. Depth floor
+  (5629dd9 = f0e5fec), job 4619, runs/wb_floor_late, restart from step 195: steps 196-201 all placed first attempt
+  (198 refused before); top 10.2-10.6 deg, first cut node 9.3 km deep; on to step 255 (~09:20). At 329 Myr the unforced
+  top is 10.6 deg vs the control's 19.6, trench 55 km seaward. Rerun pairs for W1 (job 4620: tight Schur; hash seed 0)
+  queued behind 4619, numbers ~10:00. No full-length rerun of the control's configuration (recipe cancelled by Louis).
+  Next: spec step 2 (inputs in Earth units).
