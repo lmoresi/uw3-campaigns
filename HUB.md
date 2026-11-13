@@ -3984,3 +3984,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   kaiju/slab-workbench 9e9ed27 -> 8e3f68f (K1's 701e452; blob 42f592e; mbox sha256 matched; py_compile clean): "not
   rank-local" joins the retried refusals. Library finding passed to W1 (not filed). First job: 4 km box from step 0,
   four steps.
+- 2026-11-14: W1 triaged "not rank-local" by reading: no mechanism, no matching issue, nothing filed; the refusal is
+  inherit_provenance (three possible calls: band placement, cut, split); 80d3ebe9 predates #1089, #1091, #1099, part of
+  #874 on this path. W1's trace (main 70a16ad, issue-sweep/placement-not-rank-local/trace_placement.py, sha256
+  9bb4dc94...; wraps four library functions in memory) relayed to K1 inline (kaiju can't fetch GitHub). Asks: (a) the
+  traceback of job 4635/4637 at the refusal; (b) the probe's first attempt with the trace on 80d3ebe9 at 26 ranks;
+  (c) the same on development af84cfcd (needs a newer overlay; K1's call), which decides whether a library issue
+  exists. Plus: is K1's "host" the base mesh or the mesh after the placement's partition? No library change until (c).
