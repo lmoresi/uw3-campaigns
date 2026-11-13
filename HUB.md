@@ -3874,3 +3874,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   FAC patch, Schur 1/mu mass, rotated walls, PETSc 3.25.0; the record's pres_rtol reads 1.5e-3 / 0.1 / 2.3e-2 at steps
   0/1/2 against requested 1e-2 warm and 1e-4 cold. Optional reruns submitted (Schur tolerances x1e-3 tighter;
   PYTHONHASHSEED=0 on every rank), steps 0-1 on 3381347.
+- 2026-11-14: W1's reading: equal recorded counts yet a 5.6e-7 relative residual spread after the first nonlinear
+  iteration (step 0 repeats to 3e-13): not a tolerance matter alone. Two readings: (i) faulted set-up differs run to
+  run on 26 ranks (multi-rank order dependence); (ii) assembly round-off amplified by the faulted operator or by one
+  of six unrecorded inner velocity solves stopping an iteration apart. W1 serial: split fault on add-on mesh with split
+  MG levels and custom FMG, five hash seeds, free-slip and viscous faults: bit-identical on one rank. K1's reruns
+  decide: hash seed fixed and agreement to ~1e-10 -> (i), library defect W1 takes on; Schur x1e-3 shrinking the spread
+  -> (ii). If both still differ: one pair with fieldsplit_velocity_ksp_converged_reason (K1's call). Relayed to K1.
