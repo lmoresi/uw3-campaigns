@@ -16,8 +16,9 @@ For each wall this prints, at the rank count it is run with:
      keeps, the global count (kept unknowns at owned points), the wall points a
      rank holds and pins, and the shared wall points on which the ranks that hold
      them disagree (kept by some, pinned by others).
-  D  every field together: the shared points where a rank's count of free
-     unknowns differs from the owner's, read from the global section.
+  D  every field together, then each field: the shared points where a rank's
+     count of free unknowns differs from the owner's, which is fetched over the
+     point SF.
   E  the assembled residual, with no solve: for two states set from the
      coordinates (every field zero, which leaves the load; and a smooth
      velocity, pressure and multiplier) each rank's own integrals are
@@ -104,7 +105,6 @@ uw.pprint(0, f"ranks {uw.mpi.size} | cell size {CELL_SIZE} | cells {n_cells} | m
              f"| overlap {dm.getDistributionOverlap() if hasattr(dm, 'getDistributionOverlap') else 'n/a'}")
 
 section = dm.getLocalSection()
-global_section = dm.getGlobalSection()
 label = dm.getLabel("UW_Boundaries")
 
 for constraint in stokes._block_constraint_bcs:
@@ -194,17 +194,43 @@ for constraint in stokes._block_constraint_bcs:
                  f"owner pins: {sum(1 for g in split if not owner_keeps.get(g))}) "
                  f"| wall points no rank keeps: {ids_by_depth(none)}")
 
-# D. every field: a shared point's free unknowns here against the owner's
-mismatch = []
-for point in range(p_start, p_end):
-    if owned[point - p_start]:
-        continue
-    here = section.getDof(point) - section.getConstraintDof(point)
-    at_owner = -(global_section.getDof(point) + 1)
-    if here != at_owner:
-        mismatch.append(point)
+# D. every field: a shared point's free unknowns here against the owner's.
+# The owner's count comes over the point SF. The global section cannot give it:
+# at a point this rank does not own it holds minus one minus the TOTAL unknowns
+# there, constraints included, which PETSc already checks against the local total.
+def from_owner(values):
+    """Each point's value as its owner holds it (its own, where this rank owns it)."""
+    received = values.copy()
+    if N_ROOTS is not None:
+        point_sf.bcastBegin(INT_UNIT, values, received, uw.MPI.REPLACE)
+        point_sf.bcastEnd(INT_UNIT, values, received, uw.MPI.REPLACE)
+    return received
+
+
+def free_unknowns(count, constrained):
+    """The free unknowns at every point of the SF's root space (the chart, from 0)."""
+    values = np.zeros(max(N_ROOTS or 0, p_end), dtype=PETSc.IntType)
+    for point in range(p_start, p_end):
+        values[point] = count(point) - constrained(point)
+    return values
+
+
+point_sf = dm.getPointSF()
+# on one rank the SF has no graph, and petsc4py's getGraph() raises on it
+N_ROOTS = point_sf.getGraph()[0] if uw.mpi.size > 1 else None
+INT_UNIT = uw.MPI.INT64_T if np.dtype(PETSc.IntType).itemsize == 8 else uw.MPI.INT
 uw.pprint(0, "--- all fields")
-report("D. shared points whose free unknowns differ from the owner's", everywhere(by_depth(mismatch)))
+counts = {"every field": free_unknowns(section.getDof, section.getConstraintDof)}
+for number in range(section.getNumFields()):
+    counts[section.getFieldName(number) or f"field {number}"] = free_unknowns(
+        lambda p, n=number: section.getFieldDof(p, n),
+        lambda p, n=number: section.getFieldConstraintDof(p, n))
+for name, here in counts.items():
+    at_owner = from_owner(here)
+    mismatch = [p for p in range(p_start, p_end) if here[p] != at_owner[p]]
+    assert all(not owned[p - p_start] for p in mismatch)
+    report(f"D. shared points whose free unknowns differ from the owner's | {name}",
+           everywhere(by_depth(mismatch)))
 
 
 # E. moments of the residual, summed over the ranks' own integrals

@@ -1,3 +1,4 @@
+0 ranks 1 | cell size 0.2 | cells 3220 | multiplier degree 2 | overlap n/a
 0 --- Upper (label value 13, multiplier is solver field 2)
 0 A. wall points, counted once: labelled 408 vertices, 1218 edges, 812 faces | union of the closures 408 vertices, 1218 edges, 812 faces
 0 A. on each rank: labelled | closure of the labelled | held without a labelled point above
@@ -19,7 +20,15 @@
 0 rank 0: 135 vertices, 399 edges, 0 faces | 0 vertices, 0 edges, 0 faces / 0 vertices, 0 edges, 0 faces | 0 vertices, 0 edges, 0 faces
 0 C. shared wall points whose ranks disagree: 0 vertices, 0 edges, 0 faces (owner keeps: 0, owner pins: 0) | wall points no rank keeps: 0 vertices, 0 edges, 0 faces
 0 --- all fields
-0 D. shared points whose free unknowns differ from the owner's
+0 D. shared points whose free unknowns differ from the owner's | every field
+0 rank 0: 0 vertices, 0 edges, 0 faces
+0 D. shared points whose free unknowns differ from the owner's | velocity
+0 rank 0: 0 vertices, 0 edges, 0 faces
+0 D. shared points whose free unknowns differ from the owner's | pressure
+0 rank 0: 0 vertices, 0 edges, 0 faces
+0 D. shared points whose free unknowns differ from the owner's | multiplier_0
+0 rank 0: 0 vertices, 0 edges, 0 faces
+0 D. shared points whose free unknowns differ from the owner's | multiplier_1
 0 rank 0: 0 vertices, 0 edges, 0 faces
 0 --- residual moments (three weights; a fourth for a vector field)
 0 E. every field zero | pressure: +0.000000000000e+00 +0.000000000000e+00 +0.000000000000e+00
