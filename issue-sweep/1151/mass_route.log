@@ -1,0 +1,18 @@
+plain | res 4 | snes ksponly | preonly + lu | saddle_preconditioner = 1/lambda, penalty 0
+lambda  1.0e+00 | snes reason  5 ksp reason  4 | |F|/|F0| 3.38e-02 | |P_pp| 1.111e-01 | v test-ref0 3.694e-01 | p test-ref0 7.989e-01 | div test 1.959e-02 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.479759e-02
+lambda  1.0e+02 | snes reason  5 ksp reason  4 | |F|/|F0| 1.45e-03 | |P_pp| 1.111e-03 | v test-ref0 1.744e-02 | p test-ref0 4.367e-02 | div test 4.775e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.233818e-02
+lambda  1.0e+03 | snes reason  5 ksp reason  4 | |F|/|F0| 1.51e-04 | |P_pp| 1.111e-04 | v test-ref0 1.813e-03 | p test-ref0 4.566e-03 | div test 4.715e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.228082e-02
+lambda  1.0e+04 | snes reason  5 ksp reason  4 | |F|/|F0| 1.51e-05 | |P_pp| 1.111e-05 | v test-ref0 1.820e-04 | p test-ref0 4.587e-04 | div test 4.716e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.227497e-02
+lambda  1.0e+05 | snes reason  5 ksp reason  4 | |F|/|F0| 1.51e-06 | |P_pp| 1.111e-06 | v test-ref0 1.821e-05 | p test-ref0 4.589e-05 | div test 4.716e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.227438e-02
+lambda  1.0e+06 | snes reason  5 ksp reason  4 | |F|/|F0| 1.51e-07 | |P_pp| 1.111e-07 | v test-ref0 1.821e-06 | p test-ref0 4.589e-06 | div test 4.716e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.227432e-02
+lambda  1.0e+07 | snes reason  5 ksp reason  4 | |F|/|F0| 1.51e-08 | |P_pp| 1.111e-08 | v test-ref0 1.821e-07 | p test-ref0 4.589e-07 | div test 4.716e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.227432e-02
+lambda  1.0e+08 | snes reason  5 ksp reason  4 | |F|/|F0| 1.55e-09 | |P_pp| 1.111e-09 | v test-ref0 1.821e-08 | p test-ref0 4.603e-08 | div test 4.716e-03 ref0 4.716e-03 | speed ref0 2.227432e-02 test 2.227432e-02
+plain | res 16 | snes ksponly | preonly + lu | saddle_preconditioner = 1/lambda, penalty 0
+lambda  1.0e+00 | snes reason  5 ksp reason  4 | |F|/|F0| 4.52e-02 | |P_pp| 3.038e-02 | v test-ref0 3.695e-01 | p test-ref0 7.949e-01 | div test 1.944e-02 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.527160e-02
+lambda  1.0e+02 | snes reason  5 ksp reason  4 | |F|/|F0| 1.93e-03 | |P_pp| 3.038e-04 | v test-ref0 1.721e-02 | p test-ref0 4.265e-02 | div test 1.906e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.239794e-02
+lambda  1.0e+03 | snes reason  5 ksp reason  4 | |F|/|F0| 2.00e-04 | |P_pp| 3.038e-05 | v test-ref0 1.788e-03 | p test-ref0 4.454e-03 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233949e-02
+lambda  1.0e+04 | snes reason  5 ksp reason  4 | |F|/|F0| 2.01e-05 | |P_pp| 3.038e-06 | v test-ref0 1.795e-04 | p test-ref0 4.473e-04 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233353e-02
+lambda  1.0e+05 | snes reason  5 ksp reason  4 | |F|/|F0| 2.01e-06 | |P_pp| 3.038e-07 | v test-ref0 1.796e-05 | p test-ref0 4.475e-05 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233294e-02
+lambda  1.0e+06 | snes reason  5 ksp reason  4 | |F|/|F0| 2.01e-07 | |P_pp| 3.038e-08 | v test-ref0 1.796e-06 | p test-ref0 4.476e-06 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233288e-02
+lambda  1.0e+07 | snes reason  5 ksp reason  4 | |F|/|F0| 2.01e-08 | |P_pp| 3.038e-09 | v test-ref0 1.796e-07 | p test-ref0 4.476e-07 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233287e-02
+lambda  1.0e+08 | snes reason  5 ksp reason  4 | |F|/|F0| 2.01e-09 | |P_pp| 3.038e-10 | v test-ref0 1.796e-08 | p test-ref0 4.476e-08 | div test 1.741e-03 ref0 1.741e-03 | speed ref0 2.233287e-02 test 2.233287e-02

@@ -1,0 +1,32 @@
+0 --- Upper (label value 13, multiplier is solver field 2)
+0 A. wall points, counted once: labelled 408 vertices, 1218 edges, 812 faces | union of the closures 408 vertices, 1218 edges, 812 faces
+0 A. on each rank: labelled | closure of the labelled | held without a labelled point above
+0 rank 0: 408 vertices, 1218 edges, 812 faces | 408 vertices, 1218 edges, 812 faces | 0 vertices, 0 edges, 0 faces
+0 B. label completion against the union
+0 rank 0: completed 408 vertices, 1218 edges, 812 faces | in the union only 0 vertices, 0 edges, 0 faces | in the completion only 0 vertices, 0 edges, 0 faces
+0 C. multiplier unknowns in the global system: 1626 | unknowns the wall's points carry: 1626
+0 C. on each rank: kept | wall points pinned (owned / not owned) | kept off the wall
+0 rank 0: 408 vertices, 1218 edges, 0 faces | 0 vertices, 0 edges, 0 faces / 0 vertices, 0 edges, 0 faces | 0 vertices, 0 edges, 0 faces
+0 C. shared wall points whose ranks disagree: 0 vertices, 0 edges, 0 faces (owner keeps: 0, owner pins: 0) | wall points no rank keeps: 0 vertices, 0 edges, 0 faces
+0 --- Lower (label value 11, multiplier is solver field 3)
+0 A. wall points, counted once: labelled 135 vertices, 399 edges, 266 faces | union of the closures 135 vertices, 399 edges, 266 faces
+0 A. on each rank: labelled | closure of the labelled | held without a labelled point above
+0 rank 0: 135 vertices, 399 edges, 266 faces | 135 vertices, 399 edges, 266 faces | 0 vertices, 0 edges, 0 faces
+0 B. label completion against the union
+0 rank 0: completed 135 vertices, 399 edges, 266 faces | in the union only 0 vertices, 0 edges, 0 faces | in the completion only 0 vertices, 0 edges, 0 faces
+0 C. multiplier unknowns in the global system: 534 | unknowns the wall's points carry: 534
+0 C. on each rank: kept | wall points pinned (owned / not owned) | kept off the wall
+0 rank 0: 135 vertices, 399 edges, 0 faces | 0 vertices, 0 edges, 0 faces / 0 vertices, 0 edges, 0 faces | 0 vertices, 0 edges, 0 faces
+0 C. shared wall points whose ranks disagree: 0 vertices, 0 edges, 0 faces (owner keeps: 0, owner pins: 0) | wall points no rank keeps: 0 vertices, 0 edges, 0 faces
+0 --- all fields
+0 D. shared points whose free unknowns differ from the owner's
+0 rank 0: 0 vertices, 0 edges, 0 faces
+0 --- residual moments (three weights; a fourth for a vector field)
+0 E. every field zero | pressure: +0.000000000000e+00 +0.000000000000e+00 +0.000000000000e+00
+0 E. every field zero | velocity: +2.734483412024e-01 +1.034985771820e+00 -5.307192259573e-01 +5.196992804056e-01
+0 E. every field zero | multiplier_0: +0.000000000000e+00 +0.000000000000e+00 +0.000000000000e+00
+0 E. every field zero | multiplier_1: +0.000000000000e+00 +0.000000000000e+00 +0.000000000000e+00
+0 E. smooth state | pressure: +2.089343745740e+00 +9.117438412696e-01 -3.598569394404e-01
+0 E. smooth state | velocity: +4.557573666204e+04 +2.954977971040e+04 +1.708940233452e+04 +1.190880547762e+03
+0 E. smooth state | multiplier_0: +1.017156852808e+00 +7.714894665228e-01 +2.130028050029e+00
+0 E. smooth state | multiplier_1: -3.120565428329e-01 -1.791556205872e-02 -8.002968732491e-01
