@@ -3834,3 +3834,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   add-on, fault-zone/band weakening, convection-checkpoint start, compositional slab, ridge weak seam, split chain
   levels, warm-top slab, line crust mode, the FK law. Next: parent 8fff721 vs fork side by side on the earth_young80_arr
   options, 20 steps from 0 plus a restart from 10, records compared step by step; then the no-top-dip commit.
+- 2026-11-14: kaiju/slab-workbench 0467268 -> 680485d (K1's aa31955; slab_workbench.py blob e76b07c; mbox sha256
+  matched; py_compile and pyflakes clean): the fault's run to the wall takes the fitted curve's tangent at its top, not
+  the mean slope over the next 43.5 km. On the control: 31.3 -> 21.4 deg at step 1; 19.0-19.5 -> 10.6-11.3 deg from step
+  80 to 193. No floor, no switch; a curve not descending at its top gives no fault; records gain spline_top_dip. Run to
+  the wall becomes 61 km at step 1, 109-118 km from step 40 (43-67 before); at 11 deg the first split node is 3.3 km deep,
+  a fifth of the outer cell. Not yet run; placement test (from step 0 and from the control's step 193) after pair job
+  4613. Pair job so far (steps 0-5): the fork matches the stored control to 3e-11 at step 0 and within 1e-4 after; the
+  PARENT's own rerun differs from the control by up to 1e-2 from step 1 on the same code path: reruns do not repeat
+  digit for digit, cause not established. Hub asked K1 whether rank count, node layout and overlay matched; if so it is
+  a determinism finding for C1.
