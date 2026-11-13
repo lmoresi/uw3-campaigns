@@ -1,0 +1,18 @@
+uw: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+
+fixtures: {'split sphere: pull beside the fault': 300, 'split sphere inside out: pull beside the fault': 300, 'grid on the sphere, outward: pull': 300, 'grid on the sphere, inward: pull': 300, 'sphere: cut along an arc': 12, 'sphere inside out: cut along an arc': 12}
+head: refused {'split sphere: pull beside the fault': 52, 'split sphere inside out: pull beside the fault': 52, 'grid on the sphere, outward: pull': 44, 'grid on the sphere, inward: pull': 44, 'sphere: cut along an arc': 0, 'sphere inside out: cut along an arc': 0}
+mutant [pull: the vote inverted]: 0 of 1224 calls differ from the head
+mutant [pull: no vote, convention fixed (flip False)]: 0 of 1224 calls differ from the head
+mutant [pull: each reading votes for itself (flip None)]: 0 of 1224 calls differ from the head
+mutant [snap: the vote inverted]: 2 of 1224 calls differ from the head {'sphere: cut along an arc': 1, 'sphere inside out: cut along an arc': 1}
+mutant [snap: each reading votes for itself (flip None)]: 0 of 1224 calls differ from the head
+mutant [cut: inversion count on the rank's own vote]: 0 of 1224 calls differ from the head
+mutant [cut: inversion count with the vote inverted]: 24 of 1224 calls differ from the head {'sphere: cut along an arc': 12, 'sphere inside out: cut along an arc': 12} | e.g. snapping inverted 806 cell(s); snap_frac=0.0 is too large for this mesh.
+
+test (b), (counted, truth) per emulated rank count; the test asserts counted == truth
+  PR head                                        as written {2: (2, 2), 3: (4, 4), 4: (6, 6)} passes | majority inward {2: (2, 2), 3: (4, 4), 4: (6, 6)} passes
+  development (rank's own vote)                  as written {2: (1, 2), 3: (2, 4), 4: (3, 6)} FAILS | majority inward {2: (1, 2), 3: (2, 4), 4: (3, 6)} FAILS
+  mutant: _global_flip returns False             as written {2: (2, 2), 3: (4, 4), 4: (6, 6)} passes | majority inward {2: (7, 2), 3: (11, 4), 4: (15, 6)} FAILS
+  mutant: _global_flip votes on the rank alone   as written {2: (1, 2), 3: (2, 4), 4: (3, 6)} FAILS | majority inward {2: (1, 2), 3: (2, 4), 4: (3, 6)} FAILS
+  mutant: _global_flip inverted                  as written {2: (7, 2), 3: (11, 4), 4: (15, 6)} FAILS | majority inward {2: (7, 2), 3: (11, 4), 4: (15, 6)} FAILS

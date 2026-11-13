@@ -1,0 +1,58 @@
+uw: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+development ref: d66c7da0f06a71610daca6ebf9a220696efec7ea
+sphere surface: cells 804 | wound inward 0 | vote False
+sphere surface 0.2 | vote False
+sphere surface 0.2 inside out | vote True
+split sphere: boundary vertices 14
+18-triangle grid on the sphere, anticlockwise / outward | vote False
+18-triangle grid on the sphere, clockwise / inward | vote True
+
+case                                                                                    calls  placed/cut  refused  equal to development
+box 1/12 regular: cut, straight                                                             4           4        0      4
+box 1/12 regular: cut, straight reversed                                                    4           4        0      4
+box 1/12 regular: cut, kinked                                                               4           4        0      4
+box 1/12 regular: cut, kinked reversed                                                      4           4        0      4
+box 1/12 regular: pull, two tips                                                            2           2        0      2
+box 1/12 regular: cut after the pull                                                        2           2        0      2
+box 1/12 regular: pull, target beside a wall                                              300         274       26    300
+box 1/12 regular: pull, target anywhere                                                   300         295        5    300
+box 1/12 regular: pull, four targets in one call                                           75          52       23     75
+box 1/12 regular mirrored (clockwise): pull beside a wall                                 300         274       26    300
+box 1/12 regular mirrored (clockwise): cut                                                  1           0        1      1
+box 1/12 irregular: cut, straight                                                           4           4        0      4
+box 1/12 irregular: cut, straight reversed                                                  4           4        0      4
+box 1/12 irregular: cut, kinked                                                             4           4        0      4
+box 1/12 irregular: cut, kinked reversed                                                    4           4        0      4
+box 1/12 irregular: pull, two tips                                                          2           2        0      2
+box 1/12 irregular: cut after the pull                                                      2           2        0      2
+box 1/12 irregular: pull, target beside a wall                                            300         290       10    300
+box 1/12 irregular: pull, target anywhere                                                 300         293        7    300
+box 1/12 irregular: pull, four targets in one call                                         75          65       10     75
+box 1/12 irregular mirrored (clockwise): pull beside a wall                               300         290       10    300
+box 1/12 irregular mirrored (clockwise): cut                                                1           0        1      1
+annulus 0.1: pull, target beside a curved wall                                            300         290       10    300
+annulus 0.1: pull, arc control points                                                       2           2        0      2
+annulus 0.1: cut along the arc                                                              2           2        0      2
+annulus 0.1: cut wall to wall                                                               3           3        0      3
+sphere surface 0.2: pull, arc control points                                                6           6        0      6
+sphere surface 0.2: cut along the arc                                                      24          24        0     24
+sphere surface 0.2: pull, target anywhere                                                 300         300        0    300
+sphere surface 0.2 inside out: pull, arc control points                                     6           6        0      6
+sphere surface 0.2 inside out: cut along the arc                                           24          24        0     24
+sphere surface 0.2 inside out: pull, target anywhere                                      300         300        0    300
+split sphere surface: pull, target beside the fault                                       300         258       42    300
+split sphere surface inside out: pull, target beside the fault                            300         258       42    300
+18-triangle grid flat, anticlockwise / outward: pull, one target                         1200         984      216   1200
+18-triangle grid flat, anticlockwise / outward: pull, two targets in one call             300         197      103    300
+18-triangle grid flat, anticlockwise / outward: pull, floor off                           300         256       44    300
+18-triangle grid on the sphere, anticlockwise / outward: pull, one target                1200         988      212   1200
+18-triangle grid on the sphere, anticlockwise / outward: pull, two targets in one call    300         200      100    300
+18-triangle grid on the sphere, anticlockwise / outward: pull, floor off                  300         257       43    300
+18-triangle grid flat, clockwise / inward: pull, one target                              1200         984      216   1200
+18-triangle grid flat, clockwise / inward: pull, two targets in one call                  300         197      103    300
+18-triangle grid flat, clockwise / inward: pull, floor off                                300         256       44    300
+18-triangle grid on the sphere, clockwise / inward: pull, one target                     1200         988      212   1200
+18-triangle grid on the sphere, clockwise / inward: pull, two targets in one call         300         200      100    300
+18-triangle grid on the sphere, clockwise / inward: pull, floor off                       300         257       43    300
+
+TOTAL calls 10759 | equal 10759 | every case bit-identical to development: True

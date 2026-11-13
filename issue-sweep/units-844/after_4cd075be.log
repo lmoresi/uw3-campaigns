@@ -1,0 +1,74 @@
+4cd075be evaluate: the far-outside refusal is rank-uniform in global_evaluate (#786)
+== no reference quantities ==
+Stokes(mesh)
+   u kept=- p kept=-  u: V6 P2 units=None   p: P6 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, v P2, p P1)
+   u kept=True p kept=True  u: Uq P2 units=None   p: Pq P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P2)
+   u kept=True p kept=-  u: Uq P2 units=None   p: P35 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, pressureField=p P1)
+   u kept=- p kept=True  u: V49 P2 units=None   p: Pq P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P1)
+   u kept=True p kept=-  u: Uq P1 units=None   p: P63 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u 19bef4bcf0 p 086c08c107 max|stored u| 4.323881463733e-02 max|stored p| 1.236435040687e+00
+   max|u.array| 4.323881463733e-02 max|p.array| 1.236435040687e+00
+Stokes(mesh, velocityField=v P3)
+   u kept=True p kept=-  u: Uq P3 units=None   p: P77 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u 5f1383461e p 6ee06e09d3 max|stored u| 4.425977421095e-02 max|stored p| 4.166141510531e-01
+   max|u.array| 4.425977421095e-02 max|p.array| 4.166141510531e-01
+Stokes(mesh, velocityField=v P3, degree=3)
+   u kept=True p kept=-  u: Uq P3 units=None   p: P91 P2 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u 14bc7811ee p d41c9b5097 max|stored u| 4.424680605803e-02 max|stored p| 4.130924023997e-01
+   max|u.array| 4.424680605803e-02 max|p.array| 4.130924023997e-01
+Stokes(mesh, pressureField=p P2)
+   u kept=- p kept=True  u: V105 P2 units=None   p: Pq P2 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u ddcd743bcb p 637c1fec72 max|stored u| 4.426654939539e-02 max|stored p| 5.076680474747e-01
+   max|u.array| 4.426654939539e-02 max|p.array| 5.076680474747e-01
+Stokes(mesh, pressureField=p P0 discontinuous)
+   u kept=- p kept=True  u: V119 P2 units=None   p: Pq P0 continuous=False units=None
+   snes reason 2 its 1 ksp its 1  stored u 5658766eaf p 59a8585e9b max|stored u| 4.441350612939e-02 max|stored p| 3.818558753210e-01
+   max|u.array| 4.441350612939e-02 max|p.array| 3.818558753210e-01
+Stokes(mesh, velocityField=v P2, p_continuous=False)
+   u kept=True p kept=-  u: Uq P2 units=None   p: P133 P1 continuous=False units=None
+   snes reason 2 its 1 ksp its 1  stored u 63b912ffc5 p 83ad2f9a87 max|stored u| 4.423488544421e-02 max|stored p| 7.742069087344e-01
+   max|u.array| 4.423488544421e-02 max|p.array| 7.742069087344e-01
+== reference quantities: length 30 km, viscosity 1e24 Pa s, velocity 2.5 mm/year ==
+   fundamental scales: ['length', 'mass', 'time']
+Stokes(mesh), plain viscosity 1 and plain force
+   u kept=- p kept=-  u: V6 P2 units=meter / second   p: P6 P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 3.508233613118e-12 max|p.array| 1.099914412484e+09
+Stokes(mesh), viscosity 1e24 Pa s, force 3300 kg/m3 x 10 m/s2
+   u kept=- p kept=-  u: V20 P2 units=meter / second   p: P20 P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.315251824864e-12 max|p.array| 4.123626296734e+08
+Stokes(mesh, v m/s, p Pa), viscosity 1e24 Pa s, force with units
+   u kept=True p kept=True  u: Uq P2 units=meter / second   p: Pq P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.315251824864e-12 max|p.array| 4.123626296734e+08
+Stokes(mesh, velocityField=v without units), viscosity and force with units
+   u kept=True p kept=-  u: Uq P2 units=None   p: P61 P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.660247639533e-02 max|p.array| 4.123626296734e+08
+Stokes(mesh, velocityField=v in cm/year), viscosity and force with units
+   u kept=True p kept=-  u: Uq P2 units=centimeter / year   p: P81 P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 4.150619098832e-03 max|p.array| 4.123626296734e+08
+Stokes(mesh, pressureField=p without units), viscosity and force with units
+   u kept=- p kept=True  u: V101 P2 units=meter / second   p: Pq P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.315251824864e-12 max|p.array| 1.561580990662e-01
+== reference quantities without a mass scale: length and time only ==
+   fundamental scales: ['length', 'time']
+Stokes(mesh), plain viscosity and force
+   u kept=- p kept=-  u: V6 P2 units=meter / second   p: P6 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.209880335742e-11 max|p.array| 4.165279087610e-01

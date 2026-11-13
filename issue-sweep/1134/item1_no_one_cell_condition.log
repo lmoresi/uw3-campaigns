@@ -1,0 +1,20 @@
+...F..                                                                   [100%]
+=================================== FAILURES ===================================
+___________ test_reproduces_an_arbitrary_coarse_field[3d-every-pass] ___________
+tests/test_0753_nested_mg_prolongation.py:265: in test_reproduces_an_arbitrary_coarse_field
+    assert not wrong, (
+E   AssertionError: 6 of 44 rows whose fine vertex lies strictly inside a coarse cell are not the coarse P1 value there: [(1, 1255), (1, 1256), (2, 1848), (2, 1893), (2, 1980)]
+E   assert not [(1, 1255), (1, 1256), (2, 1848), (2, 1893), (2, 1980), (2, 1981)]
+============================= slowest 8 durations ==============================
+72.87s call     test_0753_nested_mg_prolongation.py::test_a_fine_vertex_on_a_coarse_edge_depends_only_on_that_edge[3d-every-pass]
+72.86s call     test_0753_nested_mg_prolongation.py::test_reproduces_an_arbitrary_coarse_field[3d-every-pass]
+7.40s call     test_0753_nested_mg_prolongation.py::test_every_pass_records_a_prolongation[3d-every-pass]
+7.34s call     test_0753_nested_mg_prolongation.py::test_reproduces_a_linear_field_exactly[3d-every-pass]
+7.32s call     test_0753_nested_mg_prolongation.py::test_partition_of_unity_and_no_zero_columns[3d-every-pass]
+7.30s call     test_0753_nested_mg_prolongation.py::test_transfer_is_sparser_than_point_location[3d-every-pass]
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/test_0753_nested_mg_prolongation.py::test_reproduces_an_arbitrary_coarse_field[3d-every-pass]
+1 failed, 5 passed, 20 deselected in 175.23s (0:02:55)
+CASE no_one_cell_condition: pytest exit 1 in 176 s

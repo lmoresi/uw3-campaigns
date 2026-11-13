@@ -1,0 +1,4 @@
+gamma=10.0
+gamma 10: surface 1.006611e-02 (0.061 % from Zhong) cmb 1.182188e-02 (0.321 %) snes reason 5 ksp reason 2 linear 1 ksp residual 1.060e-09 |F(x)| 1.060e-09
+gamma=12.5
+gamma 12.5: surface 1.006935e-02 (0.093 % from Zhong) cmb 1.183799e-02 (0.186 %) snes reason 5 ksp reason 3 linear 1 ksp residual 7.245e-10 |F(x)| 7.245e-10

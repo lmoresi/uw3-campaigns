@@ -1,0 +1,30 @@
+part=sweep
+| case | wall | reason | newton | linear | leak soft | leak stiff | velocity | stress | stress trimmed |
+|---|---|---|---|---|---|---|---|---|---|
+| res 16 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 1.41e-04 | 1.05e-01 | 1.35e-01 |
+| res 16 | nitsche | 2 | 1 | 1 | 7.79e-03 | 1.15e-08 | 2.38e-03 | 1.09e-01 | 1.39e-01 |
+| res 32 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 8.84e-06 | 7.56e-02 | 8.48e-02 |
+| res 32 | nitsche | 2 | 1 | 1 | 9.77e-04 | 1.50e-09 | 2.15e-04 | 7.61e-02 | 8.53e-02 |
+| res 64 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 5.46e-07 | 5.39e-02 | 5.70e-02 |
+| res 64 | nitsche | 2 | 2 | 2 | 1.22e-04 | 1.92e-10 | 1.92e-05 | 5.40e-02 | 5.71e-02 |
+part=contrast
+| case | wall | reason | newton | linear | leak soft | leak stiff | velocity | stress | stress trimmed |
+|---|---|---|---|---|---|---|---|---|---|
+| contrast 1e+01 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 1.74e-03 | 4.80e-02 | 5.42e-02 |
+| contrast 1e+01 | nitsche | 2 | 1 | 1 | 4.34e-04 | 5.64e-05 | 1.74e-03 | 4.85e-02 | 5.47e-02 |
+| contrast 1e+02 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 9.44e-04 | 7.22e-02 | 8.11e-02 |
+| contrast 1e+02 | nitsche | 2 | 1 | 1 | 8.53e-04 | 1.24e-05 | 9.63e-04 | 7.28e-02 | 8.16e-02 |
+| contrast 1e+03 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 1.12e-04 | 7.52e-02 | 8.44e-02 |
+| contrast 1e+03 | nitsche | 2 | 1 | 1 | 9.63e-04 | 1.47e-06 | 2.40e-04 | 7.58e-02 | 8.50e-02 |
+| contrast 1e+04 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 1.28e-05 | 7.55e-02 | 8.47e-02 |
+| contrast 1e+04 | nitsche | 2 | 1 | 1 | 9.75e-04 | 1.50e-07 | 2.15e-04 | 7.61e-02 | 8.53e-02 |
+| contrast 1e+06 | dirichlet | 2 | 1 | 1 | 0.00e+00 | 0.00e+00 | 8.84e-06 | 7.56e-02 | 8.48e-02 |
+| contrast 1e+06 | nitsche | 2 | 1 | 1 | 9.77e-04 | 1.50e-09 | 2.15e-04 | 7.61e-02 | 8.53e-02 |
+part=gamma
+| case | wall | reason | newton | linear | leak soft | leak stiff | velocity | stress | stress trimmed |
+|---|---|---|---|---|---|---|---|---|---|
+| gamma 1 | nitsche | 2 | 2 | 2 | 7.21e-03 | 1.35e-08 | 9.94e-04 | 7.87e-02 | 8.76e-02 |
+| gamma 10 | nitsche | 2 | 1 | 1 | 9.77e-04 | 1.50e-09 | 2.15e-04 | 7.61e-02 | 8.53e-02 |
+| gamma 12.5 | nitsche | 2 | 1 | 1 | 4.34e-04 | 6.37e-10 | 9.60e-05 | 7.58e-02 | 8.50e-02 |
+| gamma 100 | nitsche | 2 | 1 | 1 | 2.12e-05 | 2.95e-11 | 9.99e-06 | 7.56e-02 | 8.48e-02 |
+| gamma 1000 | nitsche | 2 | 1 | 1 | 1.97e-06 | 2.73e-12 | 8.85e-06 | 7.56e-02 | 8.48e-02 |

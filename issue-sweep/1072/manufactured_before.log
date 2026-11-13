@@ -1,0 +1,12 @@
+res=8 gamma=0.0 qdegree=4 tol=1e-09
+essential res   8: reason   2, newton 1, linear    1, |u - u_e| 1.260741e-03, |p - p_e| 4.515363e-03, max|u.n| wall 0.000e+00
+rotated   res   8: reason   2, newton 0, linear    0, |u - u_e| 1.260741e-03, |p - p_e| 4.515363e-03, max|u.n| wall 0.000e+00
+nitsche   res   8: reason  -6, newton 17, linear   19, |u - u_e| 1.319376e-03, |p - p_e| 1.997523e-02, max|u.n| wall 4.501e-03
+res=16 gamma=0.0 qdegree=4 tol=1e-09
+essential res  16: reason   2, newton 1, linear    1, |u - u_e| 1.652015e-04, |p - p_e| 1.113662e-03, max|u.n| wall 0.000e+00
+rotated   res  16: reason   2, newton 0, linear    0, |u - u_e| 1.652015e-04, |p - p_e| 1.113662e-03, max|u.n| wall 0.000e+00
+nitsche   res  16: reason  -6, newton 16, linear   18, |u - u_e| 1.766691e-04, |p - p_e| 3.910686e-03, max|u.n| wall 5.831e-04
+res=32 gamma=0.0 qdegree=4 tol=1e-09
+essential res  32: reason   2, newton 1, linear    1, |u - u_e| 2.077954e-05, |p - p_e| 2.756301e-04, max|u.n| wall 0.000e+00
+rotated   res  32: reason   2, newton 0, linear    0, |u - u_e| 2.077954e-05, |p - p_e| 2.756301e-04, max|u.n| wall 0.000e+00
+nitsche   res  32: reason  -6, newton 21, linear   22, |u - u_e| 2.264564e-05, |p - p_e| 7.579557e-04, max|u.n| wall 7.354e-05

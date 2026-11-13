@@ -1,0 +1,12 @@
+......                                                                   [100%]
+============================= slowest 8 durations ==============================
+72.54s call     test_0753_nested_mg_prolongation.py::test_a_fine_vertex_on_a_coarse_edge_depends_only_on_that_edge[3d-every-pass]
+72.45s call     test_0753_nested_mg_prolongation.py::test_reproduces_an_arbitrary_coarse_field[3d-every-pass]
+8.04s call     test_0753_nested_mg_prolongation.py::test_every_pass_records_a_prolongation[3d-every-pass]
+7.43s call     test_0753_nested_mg_prolongation.py::test_transfer_is_sparser_than_point_location[3d-every-pass]
+7.38s call     test_0753_nested_mg_prolongation.py::test_reproduces_a_linear_field_exactly[3d-every-pass]
+7.33s call     test_0753_nested_mg_prolongation.py::test_partition_of_unity_and_no_zero_columns[3d-every-pass]
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+6 passed, 20 deselected in 175.25s (0:02:55)
+CASE head: pytest exit 0 in 176 s

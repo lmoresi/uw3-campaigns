@@ -1,0 +1,65 @@
+route=native cell_size=0.5 refinement=1 band=0.2
+  pass 0: coarse vertices 231, fine vertices 383
+    dms    : wrong rows 0 of 383, worst 1.11e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 0 of 383, worst 1.11e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+             rows resolved after round 1: 0; with more than one matching pair: 0; with a matching pair that spans two coarse cells: 0
+    rule   : wrong rows 0 of 383, worst 1.11e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 1: coarse vertices 383, fine vertices 836
+    dms    : wrong rows 0 of 836, worst 1.83e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 0 of 836, worst 1.83e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+             rows resolved after round 1: 0; with more than one matching pair: 0; with a matching pair that spans two coarse cells: 0
+    rule   : wrong rows 0 of 836, worst 1.83e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 2: coarse vertices 836, fine vertices 1862
+    dms    : wrong rows 1 of 1862, worst 0.13; rows whose support is in no single coarse cell 1; worst |P x_c - x_f| 0
+      row 1813 x=[0.0836, 0.5992, 0.2193] support=[296, 612] weights=[0.5, 0.5] in one coarse cell: False error 0.13
+    first  : wrong rows 1 of 1862, worst 0.13; rows whose support is in no single coarse cell 1; worst |P x_c - x_f| 0
+      row 1813 x=[0.0836, 0.5992, 0.2193] support=[296, 612] weights=[0.5, 0.5] in one coarse cell: False error 0.13 | round 2, matching pairs 2, of which in one coarse cell 1
+             rows resolved after round 1: 8; with more than one matching pair: 6; with a matching pair that spans two coarse cells: 3
+    rule   : wrong rows 0 of 1862, worst 4.44e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 3: coarse vertices 1862, fine vertices 4374
+    dms    : wrong rows 4 of 4374, worst 1.12; rows whose support is in no single coarse cell 4; worst |P x_c - x_f| 0
+      row 4145 x=[0.0469, 0.3438, 0.7656] support=[508, 1733] weights=[0.5, 0.5] in one coarse cell: False error 1.12
+      row 4147 x=[0.1333, 0.1406, 0.8198] support=[693, 1598] weights=[0.5, 0.5] in one coarse cell: False error 0.0681
+      row 4247 x=[0.6701, 0.9555, 0.2193] support=[135, 165, 619] weights=[0.25, 0.25, 0.5] in one coarse cell: False error 0.888
+      row 4307 x=[0.0694, 0.7399, 0.252] support=[516, 1001] weights=[0.5, 0.5] in one coarse cell: False error 1.1
+    first  : wrong rows 4 of 4374, worst 1.12; rows whose support is in no single coarse cell 4; worst |P x_c - x_f| 0
+      row 4145 x=[0.0469, 0.3438, 0.7656] support=[508, 1733] weights=[0.5, 0.5] in one coarse cell: False error 1.12 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 4147 x=[0.1333, 0.1406, 0.8198] support=[693, 1598] weights=[0.5, 0.5] in one coarse cell: False error 0.0681 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 4247 x=[0.6701, 0.9555, 0.2193] support=[135, 165, 619] weights=[0.25, 0.25, 0.5] in one coarse cell: False error 0.888 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 4307 x=[0.0694, 0.7399, 0.252] support=[516, 1001] weights=[0.5, 0.5] in one coarse cell: False error 1.1 | round 2, matching pairs 2, of which in one coarse cell 1
+             rows resolved after round 1: 16; with more than one matching pair: 13; with a matching pair that spans two coarse cells: 8
+    rule   : wrong rows 0 of 4374, worst 7.77e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 4: coarse vertices 4374, fine vertices 10283
+    dms    : wrong rows 9 of 10283, worst 2.78; rows whose support is in no single coarse cell 9; worst |P x_c - x_f| 0
+      row 8488 x=[0.3665, 0.0319, 0.4148] support=[2050, 2642] weights=[0.5, 0.5] in one coarse cell: False error 0.45
+      row 8490 x=[0.8001, 0.3294, 0.401] support=[2058, 3293] weights=[0.5, 0.5] in one coarse cell: False error 0.191
+      row 8492 x=[0.4746, 0.3106, 0.3926] support=[2126, 2181] weights=[0.5, 0.5] in one coarse cell: False error 1.32
+      row 8494 x=[0.4632, 0.684, 0.5957] support=[2119, 2714] weights=[0.5, 0.5] in one coarse cell: False error 1.03
+      row 8496 x=[0.2711, 0.9281, 0.7305] support=[758, 1076] weights=[0.5, 0.5] in one coarse cell: False error 0.823
+      row 8497 x=[0.8001, 0.3412, 0.444] support=[2058, 3102] weights=[0.5, 0.5] in one coarse cell: False error 0.277
+    first  : wrong rows 9 of 10283, worst 2.78; rows whose support is in no single coarse cell 9; worst |P x_c - x_f| 0
+      row 8488 x=[0.3665, 0.0319, 0.4148] support=[2050, 2642] weights=[0.5, 0.5] in one coarse cell: False error 0.45 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 8490 x=[0.8001, 0.3294, 0.401] support=[2058, 3293] weights=[0.5, 0.5] in one coarse cell: False error 0.191 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 8492 x=[0.4746, 0.3106, 0.3926] support=[2126, 2181] weights=[0.5, 0.5] in one coarse cell: False error 1.32 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 8494 x=[0.4632, 0.684, 0.5957] support=[2119, 2714] weights=[0.5, 0.5] in one coarse cell: False error 1.03 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 8496 x=[0.2711, 0.9281, 0.7305] support=[758, 1076] weights=[0.5, 0.5] in one coarse cell: False error 0.823 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 8497 x=[0.8001, 0.3412, 0.444] support=[2058, 3102] weights=[0.5, 0.5] in one coarse cell: False error 0.277 | round 2, matching pairs 3, of which in one coarse cell 2
+             rows resolved after round 1: 37; with more than one matching pair: 30; with a matching pair that spans two coarse cells: 16
+    rule   : wrong rows 0 of 10283, worst 1.2e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 5: coarse vertices 10283, fine vertices 24497
+    dms    : wrong rows 8 of 24497, worst 1.04; rows whose support is in no single coarse cell 8; worst |P x_c - x_f| 0
+      row 23072 x=[0.7891, 0.2227, 0.918] support=[600, 7776] weights=[0.5, 0.5] in one coarse cell: False error 0.579
+      row 23074 x=[0.098, 0.9553, 0.2044] support=[1049, 3780] weights=[0.5, 0.5] in one coarse cell: False error 0.0681
+      row 23081 x=[0.0503, 0.5546, 0.681] support=[5702, 5703] weights=[0.5, 0.5] in one coarse cell: False error 0.204
+      row 23083 x=[0.0319, 0.5935, 0.6521] support=[5397, 5703] weights=[0.5, 0.5] in one coarse cell: False error 0.241
+      row 23785 x=[0.8443, 0.8016, 0.2657] support=[2716, 4263] weights=[0.5, 0.5] in one coarse cell: False error 0.805
+      row 24077 x=[0.597, 0.5235, 0.293] support=[2314, 4341] weights=[0.5, 0.5] in one coarse cell: False error 0.276
+    first  : wrong rows 8 of 24497, worst 1.04; rows whose support is in no single coarse cell 8; worst |P x_c - x_f| 0
+      row 23072 x=[0.7891, 0.2227, 0.918] support=[600, 7776] weights=[0.5, 0.5] in one coarse cell: False error 0.579 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 23074 x=[0.098, 0.9553, 0.2044] support=[1049, 3780] weights=[0.5, 0.5] in one coarse cell: False error 0.0681 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 23081 x=[0.0503, 0.5546, 0.681] support=[5702, 5703] weights=[0.5, 0.5] in one coarse cell: False error 0.204 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 23083 x=[0.0319, 0.5935, 0.6521] support=[5397, 5703] weights=[0.5, 0.5] in one coarse cell: False error 0.241 | round 2, matching pairs 3, of which in one coarse cell 2
+      row 23785 x=[0.8443, 0.8016, 0.2657] support=[2716, 4263] weights=[0.5, 0.5] in one coarse cell: False error 0.805 | round 2, matching pairs 2, of which in one coarse cell 1
+      row 24077 x=[0.597, 0.5235, 0.293] support=[2314, 4341] weights=[0.5, 0.5] in one coarse cell: False error 0.276 | round 2, matching pairs 2, of which in one coarse cell 1
+             rows resolved after round 1: 61; with more than one matching pair: 48; with a matching pair that spans two coarse cells: 20
+    rule   : wrong rows 0 of 24497, worst 2.75e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0

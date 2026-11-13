@@ -1,0 +1,30 @@
+case=inflow res=8
+strong  : reason   2, newton 1, linear 1
+nitsche : reason  -3, newton 6, linear 109; |J_pu + J_up^T| 2.826e-01 of 8.632e-01
+nodal |v_nitsche - v_strong| / |v_strong| 2.503491e-03
+case=open res=8
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 2.857e-01 of 9.052e-01
+nodal |v_nitsche - v_strong| / |v_strong| 2.800234e-01
+case=resolve res=8
+strong  : reason   2, newton 1, linear 1
+strong  : second solve reason   2, newton 1, linear 1; |v2 - 2 v1| / |2 v1| 3.471e-11
+nitsche : reason  -6, newton 7, linear 180; |J_pu + J_up^T| 2.826e-01 of 8.632e-01
+nitsche : second solve reason  -6, newton 7, linear 180; |v2 - 2 v1| / |2 v1| 0.000e+00
+nodal |v_nitsche - v_strong| / |v_strong| 3.363112e-03
+case=open res=16
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 2.031e-01 of 8.907e-01
+nodal |v_nitsche - v_strong| / |v_strong| 5.132880e-02
+case=open res=32
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 1.440e-01 of 8.838e-01
+nodal |v_nitsche - v_strong| / |v_strong| 3.917602e-01
+case=open res=8
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 2.841e-01 of 8.841e-01
+nodal |v_nitsche - v_strong| / |v_strong| 2.479118e-03
+case=open res=16
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 2.025e-01 of 8.801e-01
+nodal |v_nitsche - v_strong| / |v_strong| 3.355194e-04

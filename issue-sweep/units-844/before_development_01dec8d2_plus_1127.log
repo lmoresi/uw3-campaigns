@@ -1,0 +1,74 @@
+07647295 The pinned-value check cannot raise, and says the value is read once (second review of #1127)
+== no reference quantities ==
+Stokes(mesh)
+   u kept=- p kept=-  u: V6 P2 units=None   p: P6 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, v P2, p P1)
+   u kept=True p kept=True  u: Uq P2 units=None   p: Pq P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P2)
+   u kept=False p kept=-  u: V35 P2 units=None   p: P35 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, pressureField=p P1)
+   u kept=- p kept=False  u: V50 P2 units=None   p: P50 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P1)
+   u kept=False p kept=-  u: V65 P2 units=None   p: P65 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P3)
+   u kept=False p kept=-  u: V80 P2 units=None   p: P80 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P3, degree=3)
+   u kept=False p kept=-  u: V95 P3 units=None   p: P95 P2 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u 14bc7811ee p d41c9b5097 max|stored u| 4.424680605803e-02 max|stored p| 4.130924023997e-01
+   max|u.array| 4.424680605803e-02 max|p.array| 4.130924023997e-01
+Stokes(mesh, pressureField=p P2)
+   u kept=- p kept=False  u: V110 P2 units=None   p: P110 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, pressureField=p P0 discontinuous)
+   u kept=- p kept=False  u: V125 P2 units=None   p: P125 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh, velocityField=v P2, p_continuous=False)
+   u kept=False p kept=-  u: V140 P2 units=None   p: P140 P1 continuous=False units=None
+   snes reason 2 its 1 ksp its 1  stored u 63b912ffc5 p 83ad2f9a87 max|stored u| 4.423488544421e-02 max|stored p| 7.742069087344e-01
+   max|u.array| 4.423488544421e-02 max|p.array| 7.742069087344e-01
+== reference quantities: length 30 km, viscosity 1e24 Pa s, velocity 2.5 mm/year ==
+   fundamental scales: ['length', 'mass', 'time']
+Stokes(mesh), plain viscosity 1 and plain force
+   u kept=- p kept=-  u: V6 P2 units=None   p: P6 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01
+Stokes(mesh), viscosity 1e24 Pa s, force 3300 kg/m3 x 10 m/s2
+   u kept=- p kept=-  u: V20 P2 units=None   p: P20 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.660247639533e-02 max|p.array| 1.561580990662e-01
+Stokes(mesh, v m/s, p Pa), viscosity 1e24 Pa s, force with units
+   u kept=True p kept=True  u: Uq P2 units=meter / second   p: Pq P1 continuous=True units=pascal
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.315251824864e-12 max|p.array| 4.123626296734e+08
+Stokes(mesh, velocityField=v without units), viscosity and force with units
+   u kept=False p kept=-  u: V61 P2 units=None   p: P61 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.660247639533e-02 max|p.array| 1.561580990662e-01
+Stokes(mesh, velocityField=v in cm/year), viscosity and force with units
+   u kept=False p kept=-  u: V82 P2 units=None   p: P82 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.660247639533e-02 max|p.array| 1.561580990662e-01
+Stokes(mesh, pressureField=p without units), viscosity and force with units
+   u kept=- p kept=False  u: V103 P2 units=None   p: P103 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u caac3bf16d p 95486fd97f max|stored u| 1.660247639533e-02 max|stored p| 1.561580990662e-01
+   max|u.array| 1.660247639533e-02 max|p.array| 1.561580990662e-01
+== reference quantities without a mass scale: length and time only ==
+   fundamental scales: ['length', 'time']
+Stokes(mesh), plain viscosity and force
+   u kept=- p kept=-  u: V6 P2 units=None   p: P6 P1 continuous=True units=None
+   snes reason 2 its 1 ksp its 1  stored u eb4d0b92a3 p ab5c9c8fdd max|stored u| 4.428457322774e-02 max|stored p| 4.165279087610e-01
+   max|u.array| 4.428457322774e-02 max|p.array| 4.165279087610e-01

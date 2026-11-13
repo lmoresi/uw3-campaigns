@@ -1,0 +1,12 @@
+case=box3d res=4
+strong  : reason   2, newton 1, linear 1
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 6.141e-18 of 3.255e-01
+nodal |v_nitsche - v_strong| / |v_strong| 3.200750e-02
+case=annulus res=8
+strong  : reason   2, newton 0, linear 0
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 3.808e-17 of 1.330e+00
+nodal |v_nitsche - v_strong| / |v_strong| 1.230603e-03
+case=annulus res=16
+strong  : reason   2, newton 0, linear 0
+nitsche : reason   2, newton 1, linear 1; |J_pu + J_up^T| 3.137e-17 of 1.339e+00
+nodal |v_nitsche - v_strong| / |v_strong| 1.866879e-04

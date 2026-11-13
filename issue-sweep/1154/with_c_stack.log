@@ -1,0 +1,35 @@
+(lldb) target create "/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/bin/python"
+Current executable set to '/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/bin/python' (arm64).
+(lldb) settings set -- target.run-args  "/Users/lmoresi/+Simulations/issue_sweep/probe_active_region/stokes_active_region.py" "-no_signal_handler"
+(lldb) run
+label Outer: region value 102, points at that value 38, points at value 1 0
+set_active_region called
+Process 94760 launched: '/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/bin/python' (arm64)
+Process 94760 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x1c0)
+    frame #0: 0x000000011d183374 libpetsc.3.25.3.dylib`ISGetIndices + 16
+libpetsc.3.25.3.dylib`ISGetIndices:
+->  0x11d183374 <+16>: ldr    x8, [x0, #0x1c0]
+    0x11d183378 <+20>: cbz    x8, 0x11d183394           ; <+48>
+    0x11d18337c <+24>: blr    x8
+    0x11d183380 <+28>: cbnz   w0, 0x11d1833f8           ; <+148>
+Target 0: (python) stopped.
+(lldb) bt 16
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x1c0)
+  * frame #0: 0x000000011d183374 libpetsc.3.25.3.dylib`ISGetIndices + 16
+    frame #1: 0x000000011d9384c0 libpetsc.3.25.3.dylib`DMProjectLocal_Generic_Plex + 4916
+    frame #2: 0x000000011d93e430 libpetsc.3.25.3.dylib`DMProjectFieldLabelLocal_Plex + 76
+    frame #3: 0x000000011da3ea98 libpetsc.3.25.3.dylib`DMProjectFieldLabelLocal + 44
+    frame #4: 0x000000011d890990 libpetsc.3.25.3.dylib`DMPlexInsertBoundaryValuesEssentialField + 228
+    frame #5: 0x000000011d891dc8 libpetsc.3.25.3.dylib`DMPlexInsertBoundaryValues_Plex + 636
+    frame #6: 0x000000011d892a2c libpetsc.3.25.3.dylib`DMPlexInsertBoundaryValues + 132
+    frame #7: 0x000000011ddb09d8 libpetsc.3.25.3.dylib`DMPlexSNESComputeBoundaryFEM + 84
+    frame #8: 0x000000011ddad28c libpetsc.3.25.3.dylib`SNESComputeFunction_DMLocal + 144
+    frame #9: 0x000000011dd724a8 libpetsc.3.25.3.dylib`SNESComputeFunction + 224
+    frame #10: 0x000000010fca001c PETSc.abi3.so`__pyx_pw_8petsc4py_5PETSc_4SNES_97computeFunction + 540
+    frame #11: 0x000000010fb91f74 PETSc.abi3.so`__Pyx_CyFunction_CallAsMethod + 124
+    frame #12: 0x0000000100074860 python`_PyObject_MakeTpCall + 312
+    frame #13: 0x0000000100076da4 python`PyObject_VectorcallMethod + 272
+    frame #14: 0x000000013b24bf8c generic_solvers.cpython-312-darwin.so`__pyx_pw_11underworld3_6cython_15generic_solvers_15SolverBaseClass_225_apply_convergence_reference [inlined] __pyx_pf_11underworld3_6cython_15generic_solvers_15SolverBaseClass_224_apply_convergence_reference(__pyx_self=<unavailable>, __pyx_v_self=0x0000000119ba7140, __pyx_v_gvec=0x00000003224770b0) at petsc_generic_snes_solvers.c:97667:17 [opt]
+    frame #15: 0x000000013b24bd58 generic_solvers.cpython-312-darwin.so`__pyx_pw_11underworld3_6cython_15generic_solvers_15SolverBaseClass_225_apply_convergence_reference(__pyx_self=<unavailable>, __pyx_args=<unavailable>, __pyx_nargs=<unavailable>, __pyx_kwds=<unavailable>) at petsc_generic_snes_solvers.c:97443:13 [opt]
+(lldb) quit

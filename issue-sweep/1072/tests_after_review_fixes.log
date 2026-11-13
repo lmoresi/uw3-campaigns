@@ -1,0 +1,121 @@
+........................................................................ [ 69%]
+.................x..............                                         [100%]
+=============================== warnings summary ===============================
+test_0028_convergence_reference.py::test_a_warm_start_stops_at_the_cold_start_target[saddle_point]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:98: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    solver.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_a_warm_start_stops_at_the_cold_start_target[saddle_point]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:101: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    solver.solve(zero_init_guess=False)
+
+test_0028_convergence_reference.py::test_the_saddle_point_route_keeps_eisenstat_walker
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:141: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_the_saddle_point_route_keeps_eisenstat_walker
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:150: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_a_weakly_imposed_datum_is_measured_against_the_step
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:234: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=True, picard=2)
+
+test_0028_convergence_reference.py::test_a_weakly_imposed_datum_is_measured_against_the_step
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:237: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=False)
+
+test_0028_convergence_reference.py::test_a_datum_that_starts_at_zero_counts_from_the_start
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:257: RuntimeWarning: [Solver_452_] the Picard warm-up step ended DIVERGED_LINE_SEARCH (-6); Newton continues from its iterate.
+    stokes.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_a_datum_that_starts_at_zero_counts_from_the_start
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:257: RuntimeWarning: SNES_Stokes: the solve diverged (DIVERGED_LINE_SEARCH) and its fields hold the initial guess. solver.solve_report records the solve (#1059).
+    stokes.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_a_datum_that_starts_at_zero_counts_from_the_start
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:257: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=True)
+
+test_0028_convergence_reference.py::test_a_datum_that_starts_at_zero_counts_from_the_start
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:259: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=True, picard=2)
+
+test_0028_convergence_reference.py::test_a_datum_that_starts_at_zero_counts_from_the_start
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_0028_convergence_reference.py:261: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve(zero_init_guess=False)
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/src/underworld3/constitutive_models.py:2136: SyntaxWarning: invalid escape sequence '\p'
+    :math:`\psi = \log(\sigma/G + I)` and the model reads
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/src/underworld3/utilities/multigrid_options.py:426: SyntaxWarning: invalid escape sequence '\e'
+    Spiegelman notch, :math:`\eta` contrast 1e26, nested 4-level hierarchy:
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/src/underworld3/systems/ddt.py:822: SyntaxWarning: invalid escape sequence '\k'
+    :math:`\kappa \nabla T`). Both are semi-Lagrangian, both follow the
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/src/underworld3/systems/thin_sheet.py:222: SyntaxWarning: invalid escape sequence '\m'
+    model is the in-plane one, :math:`\mathbf{P}\,\mathrm{sym}(\nabla_s
+
+test_1060_nitsche_freeslip.py::test_the_continuity_row_carries_the_nitsche_term
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1060_nitsche_freeslip.py:111: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve()
+
+test_1060_nitsche_freeslip.py::TestNitscheFreeslip::test_the_reference_solves_converge
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1060_nitsche_freeslip.py:95: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve()
+
+test_1064_constrained_spherical_shell_response.py::test_default_nitsche_matches_zhong_velocity_response
+test_1064_constrained_spherical_shell_response.py::test_default_constrained_matches_zhong_velocity_response
+test_1064_constrained_spherical_shell_response.py::test_fast_schur_constrained_matches_zhong_velocity_response
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1064_constrained_spherical_shell_response.py:152: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve()
+
+test_1064_constrained_spherical_shell_response.py::test_default_constrained_matches_zhong_velocity_response
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1064_constrained_spherical_shell_response.py:152: RuntimeWarning: SNES_Stokes_Constrained: the field-1 (pressure + multiplier_0 + multiplier_1) sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['1'].capped. A higher fieldsplit_1_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+    stokes.solve()
+
+test_1064_constrained_spherical_shell_response.py::test_direct_lu_diagnostic_constrained_matches_direct_lu_diagnostic_nitsche
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/systems/solvers.py:3286: UserWarning: Stokes_Constrained: a monolithic direct solve (pc_type='lu') of the constrained saddle point is a serial diagnostic only — it does not reproduce the validated grouped-Schur velocity response and segfaults in parallel. Use the default field-split (u | [p,h]) path for production runs.
+    self._warn_if_monolithic_direct()
+
+test_1064_constrained_spherical_shell_response.py::test_fast_schur_constrained_matches_zhong_velocity_response
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1064_constrained_spherical_shell_response.py:152: RuntimeWarning: SNES_Stokes_Constrained: the solve diverged (DIVERGED_LINEAR_SOLVE) and its fields hold the initial guess. solver.solve_report records the solve (#1059).
+    stokes.solve()
+
+test_1064_constrained_spherical_shell_response.py::test_fast_schur_constrained_matches_zhong_velocity_response
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1064_constrained_spherical_shell_response.py:152: RuntimeWarning: SNES_Stokes_Constrained: the velocity sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['velocity'].capped. A higher fieldsplit_velocity_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+    stokes.solve()
+
+test_1065_nitsche_local_h.py::test_local_h_freeslip_solution_is_correct
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1065_nitsche_local_h.py:250: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve()
+
+test_1065_rotation_gauge_freeslip.py::test_freeslip_velocity_has_no_rotation_gauge
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1065_rotation_gauge_freeslip.py:53: RuntimeWarning: SNES_Stokes_Constrained: the field-1 (pressure + multiplier_0 + multiplier_1) sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['1'].capped. A higher fieldsplit_1_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+    st.solve(zero_init_guess=True)
+
+test_1065_rotation_gauge_freeslip.py::test_freeslip_velocity_has_no_rotation_gauge
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1065_rotation_gauge_freeslip.py:53: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    st.solve(zero_init_guess=True)
+
+test_1066_rotated_meets_essential.py::test_rotated_lid_reproduces_the_component_condition
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/lu-pin/tests/test_1066_rotated_meets_essential.py:55: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    s.solve()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+XFAIL tests/test_1064_constrained_spherical_shell_response.py::test_fast_schur_constrained_matches_zhong_velocity_response - Known fast grouped-Schur constrained response failure for the 3-D SphericalShellInternalBoundary Zhong-style load.
+103 passed, 1 xfailed, 36 warnings in 1421.24s (0:23:41)

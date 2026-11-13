@@ -1,0 +1,46 @@
+res=8
+/Users/lmoresi/+Simulations/issue_sweep/p_blocks_1072/probe_p_blocks.py:73: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+  s.solve()
+
+none: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 646, p 98
+  uu: |J| 1.880852e+02  |P| 1.880852e+02  |J - P| 0.000000e+00
+  up: |J| 8.928460e-01  |P| 8.928460e-01  |J - P| 0.000000e+00
+  pu: |J| 8.928460e-01  |P| 8.928460e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 5.785956e-02  |J - P| 5.785956e-02
+/Users/lmoresi/+Simulations/issue_sweep/p_blocks_1072/probe_p_blocks.py:73: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+  s.solve()
+
+essential: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 616, p 98
+  uu: |J| 1.861453e+02  |P| 1.861453e+02  |J - P| 0.000000e+00
+  up: |J| 8.570209e-01  |P| 8.570209e-01  |J - P| 0.000000e+00
+  pu: |J| 8.570209e-01  |P| 8.570209e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 5.785956e-02  |J - P| 5.785956e-02
+/Users/lmoresi/+Simulations/issue_sweep/p_blocks_1072/probe_p_blocks.py:73: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+  s.solve()
+
+penalty: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 646, p 98
+  uu: |J| 3.038539e+03  |P| 3.038539e+03  |J - P| 0.000000e+00
+  up: |J| 8.928460e-01  |P| 8.928460e-01  |J - P| 0.000000e+00
+  pu: |J| 8.928460e-01  |P| 8.928460e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 5.785956e-02  |J - P| 5.785956e-02
+/Users/lmoresi/+Simulations/issue_sweep/p_blocks_1072/probe_p_blocks.py:73: RuntimeWarning: SNES_Stokes: the solve diverged (DIVERGED_LINE_SEARCH) and its fields hold the last iterate. solver.solve_report records the solve (#1059).
+  s.solve()
+/Users/lmoresi/+Simulations/issue_sweep/p_blocks_1072/probe_p_blocks.py:73: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+  s.solve()
+SNES solve diverged after 3 iterations: DIVERGED_LINE_SEARCH The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+
+nitsche: SNES reason -6, J and P are one matrix: False, types seqaij / seqaij, unknowns u 646, p 98
+  uu: |J| 1.905073e+02  |P| 1.905073e+02  |J - P| 0.000000e+00
+  up: |J| 8.631863e-01  |P| 8.631863e-01  |J - P| 0.000000e+00
+  pu: |J| 8.928460e-01  |P| 8.928460e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 5.785956e-02  |J - P| 5.785956e-02
+
+Change against the build with no condition on Top and Bottom:
+  penalty  uu: |dJ| 3.016160e+03  |dP| 3.016160e+03  |dJ - dP| 0.000000e+00
+  penalty  up: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  penalty  pu: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  penalty  pp: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  nitsche  uu: |dJ| 3.573012e+01  |dP| 3.573012e+01  |dJ - dP| 0.000000e+00
+  nitsche  up: |dJ| 2.825971e-01  |dP| 2.825971e-01  |dJ - dP| 0.000000e+00
+  nitsche  pu: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  nitsche  pp: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00

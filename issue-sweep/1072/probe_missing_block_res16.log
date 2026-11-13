@@ -1,0 +1,75 @@
+res=16
+
+none: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 2454, p 340
+  uu: |J| 3.657329e+02  |P| 3.657329e+02  |J - P| 0.000000e+00
+  up: |J| 8.847242e-01  |P| 8.847242e-01  |J - P| 0.000000e+00
+  pu: |J| 8.847242e-01  |P| 8.847242e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 3.035888e-02  |J - P| 3.035888e-02
+
+essential: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 2392, p 340
+  uu: |J| 3.635671e+02  |P| 3.635671e+02  |J - P| 0.000000e+00
+  up: |J| 8.663357e-01  |P| 8.663357e-01  |J - P| 0.000000e+00
+  pu: |J| 8.663357e-01  |P| 8.663357e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 3.035888e-02  |J - P| 3.035888e-02
+
+penalty: SNES reason 2, J and P are one matrix: False, types seqaij / seqaij, unknowns u 2454, p 340
+  uu: |J| 2.204357e+03  |P| 2.204357e+03  |J - P| 0.000000e+00
+  up: |J| 8.847242e-01  |P| 8.847242e-01  |J - P| 0.000000e+00
+  pu: |J| 8.847242e-01  |P| 8.847242e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 3.035888e-02  |J - P| 3.035888e-02
+
+nitsche: SNES reason -6, J and P are one matrix: False, types seqaij / seqaij, unknowns u 2454, p 340
+  uu: |J| 3.682563e+02  |P| 3.682563e+02  |J - P| 0.000000e+00
+  up: |J| 8.693832e-01  |P| 8.693832e-01  |J - P| 0.000000e+00
+  pu: |J| 8.847242e-01  |P| 8.847242e-01  |J - P| 0.000000e+00
+  pp: |J| 0.000000e+00  |P| 3.035888e-02  |J - P| 3.035888e-02
+
+Change against the build with no condition on Top and Bottom:
+  penalty  uu: |dJ| 2.149774e+03  |dP| 2.149774e+03  |dJ - dP| 0.000000e+00
+  penalty  up: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  penalty  pu: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  penalty  pp: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  nitsche  uu: |dJ| 5.286092e+01  |dP| 5.286092e+01  |dJ - dP| 0.000000e+00
+  nitsche  up: |dJ| 2.019867e-01  |dP| 2.019867e-01  |dJ - dP| 0.000000e+00
+  nitsche  pu: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+  nitsche  pp: |dJ| 0.000000e+00  |dP| 0.000000e+00  |dJ - dP| 0.000000e+00
+
+===== pressure row =====
+none: unknowns 2794 (u 2454, p 340); |J - dF/dx| u rows 5.484e-14, p rows 0.000e+00; |J| 3.657e+02
+  smallest singular values [0.00013919 0.00013983 0.0001404  0.00014056], largest 1.495e+01
+  right null vector: |u part| 7.972e-03, overlap with constant pressure 0.032062
+  left  null vector: |u part| 7.972e-03, overlap with constant pressure 0.032062
+  right-hand side |b| 2.271943e-02; along the left null vector 2.335977e-05; along constant pressure 0.000000e+00
+  least-squares residual |J x - b| 2.697045e-14
+nitsche: unknowns 2794 (u 2454, p 340); |J - dF/dx| u rows 5.600e-14, p rows 0.000e+00; |J| 3.683e+02
+  smallest singular values [6.81020876e-15 1.20717154e-04 1.22290276e-04 1.22980014e-04], largest 1.536e+01
+  right null vector: |u part| 3.421e-13, overlap with constant pressure 1.000000
+  left  null vector: |u part| 3.012e-03, overlap with constant pressure 0.999961
+  right-hand side |b| 2.271943e-02; along the left null vector 2.307988e-08; along constant pressure 0.000000e+00
+  least-squares residual |J x - b| 2.307988e-08
+essential: unknowns 2732 (u 2392, p 340); |J - dF/dx| u rows 5.437e-14, p rows 0.000e+00; |J| 3.636e+02
+  smallest singular values [6.62874773e-15 1.21185730e-04 1.22713773e-04 1.23584498e-04], largest 1.495e+01
+  right null vector: |u part| 3.145e-13, overlap with constant pressure 1.000000
+  left  null vector: |u part| 3.472e-13, overlap with constant pressure 1.000000
+  right-hand side |b| 2.262411e-02; along the left null vector 2.476942e-17; along constant pressure 0.000000e+00
+  least-squares residual |J x - b| 3.344168e-14
+
+residual at one random state, Nitsche minus no condition:
+  velocity rows 5.137148e+01
+  pressure rows 0.000000e+00
+Jacobian from residual differences, Nitsche minus no condition:
+  uu: 5.286092e+01
+  up: 2.019867e-01
+  pu: 0.000000e+00
+  pp: 0.000000e+00
+
+===== the missing block =====
+shared velocity unknowns 2392, wall-normal unknowns only Nitsche has 62
+essential: dense solve against its own SNES solution, shared unknowns: 1.282e-08
+as assembled      : smallest singular values 6.810e-15, 1.207e-04; right null vector on constant pressure 1.000000, left 0.999961; |l.b| 2.308e-08; least-squares residual 2.308e-08
+    velocity against essential on shared unknowns 4.3810e-04; largest wall-normal velocity 1.2720e-05; |J - J^T| 2.464e+00; |J_pu + J_up^T| 2.020e-01
+with the term, s=+1: smallest singular values 6.810e-15, 1.200e-04; right null vector on constant pressure 1.000000, left 0.999835; |l.b| 4.590e-08; least-squares residual 4.590e-08
+    velocity against essential on shared unknowns 8.9498e-04; largest wall-normal velocity 1.2884e-05; |J - J^T| 2.502e+00; |J_pu + J_up^T| 4.040e-01
+with the term, s=-1: smallest singular values 6.810e-15, 1.212e-04; right null vector on constant pressure 1.000000, left 1.000000; |l.b| 1.792e-16; least-squares residual 3.434e-14
+    velocity against essential on shared unknowns 4.5487e-05; largest wall-normal velocity 1.2660e-05; |J - J^T| 2.459e+00; |J_pu + J_up^T| 6.939e-18
+the SNES solution of the Nitsche solve: velocity against essential 4.4715e-04; largest wall-normal velocity 1.2720e-05

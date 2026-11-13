@@ -1,0 +1,31 @@
+route=native cell_size=0.4 refinement=1 band=0.2
+  pass 0: coarse vertices 423, fine vertices 710
+    dms    : wrong rows 0 of 710, worst 1.78e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 0 of 710, worst 1.78e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+             rows resolved after round 1: 0; with more than one matching pair: 0; with a matching pair that spans two coarse cells: 0
+    rule   : wrong rows 0 of 710, worst 1.78e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 1: coarse vertices 710, fine vertices 1566
+    dms    : wrong rows 0 of 1566, worst 4.44e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 0 of 1566, worst 4.44e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+             rows resolved after round 1: 0; with more than one matching pair: 0; with a matching pair that spans two coarse cells: 0
+    rule   : wrong rows 0 of 1566, worst 4.44e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 2: coarse vertices 1566, fine vertices 3423
+    dms    : wrong rows 0 of 3423, worst 9.99e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 2 of 3423, worst 1.22; rows whose support is in no single coarse cell 2; worst |P x_c - x_f| 0
+             rows resolved after round 1: 13; with more than one matching pair: 12; with a matching pair that spans two coarse cells: 5
+    rule   : wrong rows 0 of 3423, worst 9.99e-15; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 3: coarse vertices 3423, fine vertices 8005
+    dms    : wrong rows 0 of 8005, worst 1.29e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 5 of 8005, worst 1.72; rows whose support is in no single coarse cell 5; worst |P x_c - x_f| 0
+             rows resolved after round 1: 35; with more than one matching pair: 25; with a matching pair that spans two coarse cells: 10
+    rule   : wrong rows 0 of 8005, worst 1.29e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 4: coarse vertices 8005, fine vertices 19645
+    dms    : wrong rows 0 of 19645, worst 2.36e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 24 of 19645, worst 1.68; rows whose support is in no single coarse cell 24; worst |P x_c - x_f| 0
+             rows resolved after round 1: 115; with more than one matching pair: 93; with a matching pair that spans two coarse cells: 48
+    rule   : wrong rows 0 of 19645, worst 2.36e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+  pass 5: coarse vertices 19645, fine vertices 46546
+    dms    : wrong rows 0 of 46546, worst 3.49e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0
+    first  : wrong rows 20 of 46546, worst 1.92; rows whose support is in no single coarse cell 20; worst |P x_c - x_f| 0
+             rows resolved after round 1: 68; with more than one matching pair: 49; with a matching pair that spans two coarse cells: 32
+    rule   : wrong rows 0 of 46546, worst 3.49e-14; rows whose support is in no single coarse cell 0; worst |P x_c - x_f| 0

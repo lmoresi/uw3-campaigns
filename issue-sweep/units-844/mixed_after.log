@@ -1,0 +1,15 @@
+Stokes(mesh): u units=meter / second p units=pascal
+   evaluate(stress[0,1]) = UnitAwareArray([[[2.64067384e+09]]]), callbacks=0, units='kilogram / meter / second ** 2')
+   evaluate(u[0]) = UnitAwareArray([[[3.96101098e-11]]]), callbacks=0, units='meter / second')
+   evaluate(p) = UnitAwareArray([[[2.64067398e+09]]]), callbacks=0, units='kilogram / meter / second ** 2')
+   evaluate(stress[0,0] - p) = UnitAwareArray([[[-5.28134755e+09]]]), callbacks=0, units='kilogram / meter / second ** 2')
+Stokes(mesh, velocityField=v without units): u units=None p units=pascal
+   evaluate(stress[0,1]) RAISED ValueError: evaluate: this expression mixes fields without units (Uq) with leaves that have units (\eta), in a model with reference quantities. A field without units holds 
+   evaluate(u[0]) = array([[[0.5]]])
+   evaluate(p) = UnitAwareArray([[[2.64067398e+09]]]), callbacks=0, units='kilogram / meter / second ** 2')
+   evaluate(stress[0,0] - p) RAISED ValueError: evaluate: this expression mixes fields without units (Uq) with leaves that have units (P23, \eta), in a model with reference quantities. A field without units h
+Stokes(mesh, pressureField=p without units): u units=meter / second p units=None
+   evaluate(stress[0,1]) = UnitAwareArray([[[2.64067384e+09]]]), callbacks=0, units='kilogram / meter / second ** 2')
+   evaluate(u[0]) = UnitAwareArray([[[3.96101098e-11]]]), callbacks=0, units='meter / second')
+   evaluate(p) = array([[[1.]]])
+   evaluate(stress[0,0] - p) RAISED ValueError: evaluate: this expression mixes fields without units (Pq) with leaves that have units (V34, \eta), in a model with reference quantities. A field without units h

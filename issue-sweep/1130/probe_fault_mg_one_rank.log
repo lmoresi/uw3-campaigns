@@ -1,0 +1,51 @@
+/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/rotated_bc.py:2332: UserWarning: custom_mg: coarse level 2 and the level above it are not nested, and 1 coarse unknown(s) on level 2 were combinations of others with the same fine images; each was merged into them, which keeps the coarse space (#1101). Only coarse unknowns with at most 4 fine images are checked; dependent ones with wider support can remain.
+  Pl = rotated_split_transfers(solver, h, Ps, Q, normal_rows)
+uw: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/stokes-empty-rank/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+serial cell-located transfers built by the solve: 2
+pair 0: coarse cells 968 | fine cells 1268 | degree 2 | components 2 | fine level is the finest: False
+
+PR head
+  as built                                                   -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises LinAlgError on its call 1             -> RuntimeError: fault_mg: the cell-located transfer failed: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > _collective_raise
+  _node_weights raises LinAlgError on its call 2             -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises LinAlgError on its call 3             -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises its RuntimeError (node count)         -> RuntimeError: fault_mg: the cell-located transfer failed: fault_mg: 6 nodes per cell against 3 monomials
+            raised through: run > cell_located_transfer_parallel > _collective_raise
+  _node_weights raises IndexError                            -> IndexError: index out of bounds (forced)
+            raised through: run > cell_located_transfer_parallel > failing
+  a fine node belongs to no cell                             -> RuntimeError: fault_mg: a fine node belongs to no cell
+            raised through: run > cell_located_transfer_parallel > _collective_raise
+  a coarse cell of zero area (repeated vertex)               -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 1, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  a coarse cell collapsed to a point                         -> LinAlgError: Singular matrix
+            raised through: run > cell_located_transfer_parallel > locate_in_cells > _barycentric > solve > _raise_linalgerror_singular
+  answer stage: as built                                     -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 253, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  answer stage: _node_weights raises LinAlgError on its call 2 -> RuntimeError: fault_mg: the cell-located transfer failed: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > _collective_raise
+  clamped rest: as built                                     -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 253, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  clamped rest: _node_weights raises LinAlgError on its call 2 -> RuntimeError: fault_mg: the cell-located transfer failed: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > _collective_raise
+
+development
+  as built                                                   -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises LinAlgError on its call 1             -> LinAlgError: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing
+  _node_weights raises LinAlgError on its call 2             -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises LinAlgError on its call 3             -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 0, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  _node_weights raises its RuntimeError (node count)         -> RuntimeError: fault_mg: 6 nodes per cell against 3 monomials
+            raised through: run > cell_located_transfer_parallel > failing
+  _node_weights raises IndexError                            -> IndexError: index out of bounds (forced)
+            raised through: run > cell_located_transfer_parallel > failing
+  a fine node belongs to no cell                             -> RuntimeError: fault_mg: a fine node belongs to no cell
+            raised through: run > cell_located_transfer_parallel
+  a coarse cell of zero area (repeated vertex)               -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 1, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  a coarse cell collapsed to a point                         -> LinAlgError: Singular matrix
+            raised through: run > cell_located_transfer_parallel > locate_in_cells > _barycentric > solve > _raise_linalgerror_singular
+  answer stage: as built                                     -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 253, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  answer stage: _node_weights raises LinAlgError on its call 2 -> LinAlgError: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > failing > run > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing
+  clamped rest: as built                                     -> returned a (5056, 3714) matrix, stats {'owned_nodes': 2528, 'misses': 253, 'local_coarse_cells': [968], 'local_fine_cells': [1268]}
+  clamped rest: _node_weights raises LinAlgError on its call 2 -> LinAlgError: Singular matrix (forced)
+            raised through: run > cell_located_transfer_parallel > failing > run > cell_located_transfer_parallel > failing > run > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing > cell_located_transfer_parallel > failing
+
+parallel transfer on one rank: (5056, 3714) nnz 9724 | serial node transfer (2688, 2017) nnz 5038
