@@ -2,8 +2,9 @@
 
 *Status: DRAFT for Louis to send in his name (where: PETSc's GitLab issues or petsc-maint). Drafted by
 H1 (the parallel review desk) from the PETSc source, 2026-11-13; placed here by the dev hub. The
-reproducer section is to be filled from W1's standalone reproducer, run by H1 at np 2 and 4 on 3.25.3.
-W1 adds the second, boundary-routine observation below the line if it is confirmed.*
+reproducer is W1's (the integration session; macOS, 12-core Apple M4, serial runs only), run there on one rank;
+H1 runs it at np 2 and 4 on 3.25.3 and fills the bracketed paragraph. The second observation below the
+line is W1's, measured on one rank.*
 
 ---
 
@@ -29,8 +30,32 @@ end: {
 }
 ```
 
-**Reproducer:** [W1's standalone DMPlex with more ranks than cells, a two-field DS with a Jacobian
-preconditioner, `SNESComputeJacobian` with J != P; results at np 2 and 4 on 3.25.3 to be added].
+**Reproducer:** `petsc-962-reproducer.c` (beside this file; PETSc only, about 130 lines). Two P1 scalar
+fields on the default box mesh; the Jacobian is each field's mass matrix (`PetscDSSetJacobian`, g0 = 1)
+and the Jacobian preconditioner is twice that (`PetscDSSetJacobianPreconditioner`, g0 = 2); then
+`DMPlexSetSNESLocalFEM` and one `SNESComputeJacobian(snes, X, J, P)` on two matrices from `DMCreateMatrix`.
+
+```
+mpicc petsc-962-reproducer.c -o petsc-962-reproducer -I$PETSC_DIR/include -L$PETSC_DIR/lib -lpetsc -lm
+mpiexec -n 1 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1
+mpiexec -n 2 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 1,1
+mpiexec -n 4 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1
+mpiexec -n 4 ./petsc-962-reproducer -dm_plex_simplex 0 -dm_plex_box_faces 2,1 -assemble_on_empty_ranks
+```
+
+One quadrilateral cell on two ranks, or two cells on four, leaves a rank without a cell. On one rank
+(macOS arm64, conda-forge PETSc 3.25.3, Open MPI) the program prints:
+
+```
+-dm_plex_box_faces 1,1    [0] cells 1    two matrices:  |J| = 3.928371006592e-01  |P| = 7.856742013184e-01
+-dm_plex_box_faces 2,1    [0] cells 2    two matrices:  |J| = 3.286710990611e-01  |P| = 6.573421981222e-01
+```
+
+[H1: what the np 2 and np 4 runs do on 3.25.3 (the cells per rank the program prints, then the abort
+or the hang), and whether `-assemble_on_empty_ranks` completes with the one-rank norms. That option
+makes each rank without cells call `MatAssemblyBegin/End(J)` once after `SNESComputeJacobian` returns,
+which is the call the ranks with cells made inside `DMPlexComputeJacobianByKey`. W1 has run the program
+on one rank only; nothing here is measured on more.]
 
 **How we met it:** Stokes solves in Underworld3 (a separate pressure-Schur preconditioner matrix) on meshes
 where a rank holds no cells, which happens routinely for extracted submeshes and for coarse refined bases
@@ -38,6 +63,22 @@ at high rank counts.
 
 ---
 
-*Possible second item (W1, to confirm before sending):* `DMPlexComputeBdJacobianSingleByLabel` with the
-same matrix passed as J and P adds both the Jacobian and the Jacobian-preconditioner boundary kernels into
-it (no same-matrix guard); ask whether that is intended.
+**A second observation, a question rather than a report** (measured on one rank with the same
+program and `-boundary`, which adds a natural boundary on the `marker` label with a boundary Jacobian
+kernel, g0 = 10, and a boundary Jacobian-preconditioner kernel, g0 = 20, on field 0).
+
+When the same matrix is passed as J and P, `DMPlexComputeJacobianByKey` adds the Jacobian kernels only
+("user passed in the same matrix, avoid double contributions and only assemble the Jacobian").
+`DMPlexComputeBdJacobianSingleByLabel` has no such test, so it adds the boundary Jacobian kernels and the
+boundary preconditioner kernels into the one matrix. With K from `SNESComputeJacobian(snes, X, K, K)` and
+J from the two-matrix call:
+
+| mesh | \|J\| | \|K\| | \|K - J\| |
+|---|---|---|---|
+| 1 cell, no boundary kernels | 3.928371006592e-01 | 3.928371006592e-01 | 0 |
+| 2 cells, no boundary kernels | 3.286710990611e-01 | 3.286710990611e-01 | 0 |
+| 1 cell, `-boundary` | 1.440700275543e+01 | 4.268930244464e+01 | 2.828427124746e+01 |
+| 2 cells, `-boundary` | 1.197670063184e+01 | 3.554492028440e+01 | 2.357022603955e+01 |
+
+Is that intended? We met it through a penalty boundary term that we register for both matrices: a
+single-matrix Jacobian call then carries the boundary term twice.
