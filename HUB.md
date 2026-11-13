@@ -3703,3 +3703,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yet tested in a run: the mesher with a fault that short. Half-count threshold is K1's choice. Run
   earth_young80_arr_crustend, job 4593 on n2 from 10:52, earth_young80_arr's line + -uw_spline_end crust, step 0, 1200
   steps; earth_young80_arr (4567, step 100 at 10:50) continues as the control.
+- 2026-11-13: short-fault test (earth_young80_arr_crustend, 4593) first result to step 35: the plate does not shut down
+  but stops speeding up. At 212 Myr: control (step 50, fault to 435 km) slip 1,000, plate 0.83 cm/yr, 0.83 deg rollback
+  since step 10; short fault (step 31, fault to 269 km) slip 110, plate 0.17 cm/yr, 0.22 deg trench ADVANCE. Runs agree
+  to step 10. Step 35 (225 Myr): plate 0.19 cm/yr, vrms 148 (38 at step 10); cold slab thins to a thread near 300 km,
+  about where the fault ends; not detached, undecided. The fit still steers slip: the end moves 257-290 km from step 21
+  and ~20 km of it changes slip by a third (110 <-> 150, steps 31-35); the crust count falls gradually there, so a
+  count threshold has no sharp end. Driver 8fff721 = 818d43f unchanged; threshold 0.5; no fit tuning without Louis.
+  4593 step 35/1,200 and control 4567 step 125, all converged. Movie page v75 (#short-fault).
