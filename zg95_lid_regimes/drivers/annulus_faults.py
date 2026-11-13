@@ -319,6 +319,19 @@ params = uw.Params(
     uw_rebuild_dip=2.0,
     uw_depth_hysteresis=0.016,  # a fitted depth within this of the fault's keeps the fault's (two detection rows)
     uw_rebuild_newton_switch=1.0e-2,
+    # MMPDE (H2, 2026-11-12): the base mesh's nodes follow the temperature gradient; the ladder is then
+    # placed on the moved base. Coarse multigrid levels keep their geometry (underworld3 #1044).
+    uw_mmpde_every=0,           # move the base every this many steps (0: never)
+    uw_mmpde_ratio=8.0,         # the metric's finest/coarsest cell-size ratio
+    uw_mmpde_start=0,           # the first step that may move the base
+    uw_mmpde_init=0,            # slab start: this many moves on the initial temperature before the first build,
+                                #   the initial temperature re-evaluated on the moved nodes after each
+    uw_mmpde_fault_amp=0.0,     # plate-boundary term: the density is multiplied by 1 + this * exp(-(d / width)^2),
+    uw_mmpde_fault_width=0.08,  #   d the distance to the nearest fault trace (before a fault exists: the trench line)
+    uw_mmpde_spacing=0,         # 1 (Louis, 2026-11-12: "We need the ladder to see the refined mesh size"): after the initial
+                                #   moves the rung spacing S (and the band width 2S) shrink by the ratio moved / unmoved of the
+                                #   base's node spacing along the trench line, so the ladder keeps its size relative to the
+                                #   cells it replaces. Set once at a slab start; a restart of such a run is not supported
     # strain weakening, regularisation, healing
     uw_strain_crit=0.5,
     uw_weak_min=0.5,
@@ -2834,8 +2847,67 @@ def restore_swarm(path, index):
         var._update()
 
 
+def mmpde_move():
+    """The base's nodes follow |grad T| (the convection runs' mover settings); the mover remaps every
+    field on the base, the advection histories too."""
+    from mpi4py import MPI as _MPI
+    t_move = time.perf_counter()
+    h_before = float(base.get_min_radius())
+    rho_m = uw.meshing.metric_density_from_gradient(
+        base, T_b, refinement=float(params.uw_mmpde_ratio), coarsening="auto",
+        metric_choice="front-following", name="mmpde")
+    if float(params.uw_mmpde_fault_amp) > 0.0:
+        global _fault_bump
+        live = globals().get("faults") or [{"theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
+                                            "depth": float(params.uw_fault_depth_max)}]
+        if "_fault_bump" not in globals():
+            _fault_bump = uw.discretisation.MeshVariable("mmpde_fault_bump", base, 1, degree=1)
+        xy_f = np.asarray(model_xy(_fault_bump), dtype=float)
+        d_f = np.full(xy_f.shape[0], np.inf)
+        for f in live:
+            tr = np.asarray(fault_trace(f)[0], dtype=float)
+            for p0, p1 in zip(tr[:-1], tr[1:]):
+                s_f = np.clip(((xy_f - p0) @ (p1 - p0)) / ((p1 - p0) @ (p1 - p0)), 0.0, 1.0)
+                d_f = np.minimum(d_f, np.linalg.norm(xy_f - (p0 + s_f[:, None] * (p1 - p0)), axis=1))
+        _fault_bump.array[:, 0, 0] = np.exp(-(d_f / float(params.uw_mmpde_fault_width)) ** 2)
+        rho_m = rho_m * (1 + float(params.uw_mmpde_fault_amp) * _fault_bump.sym[0])
+    uw.meshing.smooth_mesh_interior(
+        base, metric=rho_m, method="mmpde", skip_threshold=None, boundary_slip="ring",
+        method_kwargs=dict(step_frac=0.2, accel="cg", momentum=0.0), verbose=False)
+    _Tl = np.asarray(T_b.array).ravel()
+    _Tlo = uw.mpi.comm.allreduce(float(_Tl.min()) if _Tl.size else np.inf, op=_MPI.MIN)
+    _Thi = uw.mpi.comm.allreduce(float(_Tl.max()) if _Tl.size else -np.inf, op=_MPI.MAX)
+    uw.pprint(f"  mmpde: base moved in {time.perf_counter() - t_move:.1f} s, min cell radius "
+              f"{h_before:.5f} -> {float(base.get_min_radius()):.5f}, T [{_Tlo:.4f}, {_Thi:.4f}]")
+
+
+def base_spacing_at_trench():
+    """The base's node spacing along the trench line: the median, over the T nodes within 2S of the line the first
+    fault starts on, of the mean distance to a node's six nearest neighbours."""
+    from scipy.spatial import cKDTree
+    xy = np.asarray(model_xy(T_b), dtype=float)
+    line = fault_trace({"theta": float(params.uw_theta_trench), "dip": float(params.uw_dip),
+                        "depth": float(params.uw_fault_depth_max)})[0]
+    near = polyline_distance(xy, line) < W
+    mean6 = cKDTree(xy).query(xy[near], k=7)[0][:, 1:].mean(axis=1) if near.any() else np.empty(0)
+    every = np.concatenate(uw.mpi.comm.allgather(mean6))
+    return float(np.median(every))
+
+
 if params.uw_init == "slab" and params.uw_restart < 0:     # a restart of a slab run reads its checkpoint
     T_b.array[:, 0, 0] = slab_temperature(model_xy(T_b))
+    follow = int(params.uw_mmpde_spacing) > 0 and int(params.uw_mmpde_init) > 0
+    h_unmoved = base_spacing_at_trench() if follow else None
+    for _ in range(int(params.uw_mmpde_init)):
+        mmpde_move()
+        T_b.array[:, 0, 0] = slab_temperature(model_xy(T_b))
+    if follow:
+        h_moved = base_spacing_at_trench()
+        S_nominal = S
+        S = S * min(1.0, h_moved / h_unmoved)
+        W = 2.0 * S
+        uw.pprint(f"  mmpde: the base's node spacing at the trench line {h_unmoved:.5f} -> {h_moved:.5f}; rung spacing S "
+                  f"{S_nominal:.5f} -> {S:.5f}, band width {W:.5f}")
     V_b.array[:, 0, :] = 0.0
     if swarm_on:
         seed_swarm()
@@ -2916,6 +2988,7 @@ def restored_decisions(state, records, faults):
 
 k0 = 0                         # the loop counter of the first step
 n_built = 1
+base_moved = False             # the MMPDE mover has moved the base since the last build
 refused = {}                   # formation trenches the surgery refused: no new fault within 3 deg for a while
 last_damage = {}               # each fault's line damage at the last detection
 built = faults
@@ -3161,7 +3234,7 @@ for k in range(k0, k0 + params.uw_steps):
     faults_before = list(faulted.names)
     mesh_rec = faulted.mesh_record if k == k0 else None
     t_build = t_warm = 0.0
-    if needs_rebuild(faults, faulted.faults) or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing):
+    if needs_rebuild(faults, faulted.faults) or base_moved or (params.uw_addon_timing and k0 < k <= k0 + params.uw_addon_timing):
         if (params.uw_fault_lagrange and str(params.uw_fault_lagrange_refit) == "rebuild" and faults
                 and "fit_points" in faults[0]):
             # the Lagrangian curve has moved a threshold: the ladder is built on its blend with the
@@ -3225,6 +3298,7 @@ for k in range(k0, k0 + params.uw_steps):
         t_build = time.perf_counter() - wall - t_warm
         del previous
         gc.collect()
+        base_moved = False
     rec = faulted.solve()
     t_stokes = time.perf_counter() - wall
     if params.uw_addon_timing:
@@ -3283,6 +3357,12 @@ for k in range(k0, k0 + params.uw_steps):
         if not advect_fault(faults[0], faulted, dt):
             uw.pprint("  lagrangian fault: the moved nodes do not reach the cap; the fault keeps its place")
     t_swarm = time.perf_counter() - t_phase
+    if (int(params.uw_mmpde_every) > 0 and k >= int(params.uw_mmpde_start)
+            and (k + 1) % int(params.uw_mmpde_every) == 0):
+        # the base's nodes follow |grad T| (after the step's advection, so the next build's ladder
+        # sits on the moved base); the mover remaps every field on the base, the advection histories too
+        mmpde_move()
+        base_moved = True
     t_phase = time.perf_counter()
     t += dt
     if trench_advect:
