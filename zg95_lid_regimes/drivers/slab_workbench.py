@@ -555,9 +555,13 @@ def fault_network(host, faults):
             return net, {name: (spine, np.asarray(cuts[name], dtype=float)) for name, spine, _ in pieces}
         except (RuntimeError, ValueError) as err:
             # "touches the domain boundary" (fault_split) and "meshed to area ... against CAD" (the ribbon assembly)
-            # are job 4400's two refusals (earth_recipe_movie's first try, steps 107 and 81): a wider band places both
+            # are job 4400's two refusals (earth_recipe_movie's first try, steps 107 and 81): a wider band places both.
+            # "not rank-local" (addon_partition, 2026-11-14): on a 4 km focused mesh at 26 ranks the placed mesh held,
+            # on the band's rank, two surface cells past the band's shallow end that the host had on the next rank;
+            # each of the three later attempts placed the same fault
             retryable = any(s in str(err) for s in ("crosses itself", "domain wall", "ligament", "seam",
-                                                    "touches the domain boundary", "meshed to area"))
+                                                    "touches the domain boundary", "meshed to area",
+                                                    "not rank-local"))
             if not retryable or n == len(attempts) - 1:
                 raise RuntimeError(str(err))
 
