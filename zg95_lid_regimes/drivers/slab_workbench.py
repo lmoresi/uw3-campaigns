@@ -609,9 +609,12 @@ def crust_spline_points(faults):
     fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length^4 / 0.005, weights
     sqrt(count)). The fault is the curve from where it lies one crust thickness deeper than its
     level on the incoming plate (the trench) to the depth cap; above that point it runs to the
-    wall along its own mean slope over the next 0.015 of depth (under a rung: the split stops one
-    rung down, so the bridge carries it), with a stub to 0.02 above the wall; resampled at the rung
-    spacing. The curve may turn past vertical. Collective. Returns (points, theta, dip, depth,
+    wall along the curve's own tangent there, with a stub to 0.02 above the wall; resampled at the
+    rung spacing. The fit sets no dip at the top (Louis, 2026-11-14: "the fit, at least should not
+    enforce a steep continuation of the fault"): the run was the curve's mean slope over the next
+    0.015 of depth, 1.3 to 1.5 times steeper than the curve where it starts. How shallow a fault the
+    mesh can carry is the placement's to refuse; info["spline_top_dip"] records the run's dip.
+    The curve may turn past vertical. Collective. Returns (points, theta, dip, depth,
     info) or None; tested offline on 12 stored checkpoints (scratchpad arcfit_centre,
     2026-11-12)."""
     from scipy.interpolate import make_smoothing_spline
@@ -735,9 +738,12 @@ def crust_spline_points(faults):
         uw.pprint(f"  crust fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
     kc = kt + int(np.argmax(fd[kt:] >= cap)) if (fd[kt:] >= cap).any() else len(F) - 1
     seg = F[kt:kc + 1]
-    k15 = int(np.argmax(-seg[:, 1] >= -seg[0, 1] + 0.015))
-    d = seg[k15] - seg[0]                            # the run to the wall: the curve's own slope over the next 0.015
+    d = seg[1] - seg[0]                              # the run to the wall: the curve's own tangent at its top
     d = d / np.linalg.norm(d)
+    if d[1] >= 0:
+        uw.pprint("  crust fault (spline): the curve does not descend where it leaves the incoming plate")
+        return None
+    top_dip = float(np.degrees(np.arctan2(-d[1], abs(d[0]))))
     to_wall = -seg[0, 1] / max(-d[1], 1e-6)
     wall = seg[0] - to_wall * d
     pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
@@ -755,9 +761,9 @@ def crust_spline_points(faults):
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
     info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
-            "spline_run_to_wall": float(to_wall), "spline_end": "cap", "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
+            "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": "cap", "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
     uw.pprint(f"  crust fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
-              f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f}")
+              f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f} dipping {top_dip:.1f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
