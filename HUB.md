@@ -3812,3 +3812,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   needs Louis's go and a queue slot; (c) one serial probe (~half a day, after the #962 PR): rotated vs Nitsche wall with
   a welded TI zone reaching it, same FMG tail, comparing slip, wall leak, iterations; then W1 corrects the guide.
   W1's reading: the split cannot run to the wall under Nitsche, and it would not help. Awaiting Louis: a, b or c.
+- 2026-11-13: Louis: "Useful - a it is." Option (a): no library change; the split stays one rung inside the wall with
+  the welded bridge. No probe (c), no wall-end rule (b) for now; (b) may return if the Earth-scaled plate model gets a
+  free surface. W1 told; it corrects the guide's outdated Nitsche/TI sentence when convenient (by reading).
