@@ -54,3 +54,30 @@ Reviewed at head `60defae8`, base `development` `01dec8d2` (one commit, 4 files,
 Above np 2; 3-D clamps and 3-D histories; a `read_timestep` into a swarm other than the one that wrote the file; the other five history classes the PR lists as still lacking the MATRIX shape; the author's full 70-file run.
 
 Underworld development team with AI support from Claude Code
+
+### Probe for the clamp defect on `development` (outside this PR)
+
+Run on `development` 01dec8d2, serially and with `mpirun -n 2`. Unclamped evaluation of a P1 field
+that is linear in x and y is exact; the clamp must not change it at interior points.
+
+```python
+"""Whole-variable clamp of a P1 linear scalar and vector at interior points, any rank count:
+how many of the returned values differ from the exact linear value (serial: the 3-nearest-node bound)."""
+import numpy as np, underworld3 as uw
+mesh = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1), cellSize=0.125)
+T = uw.discretisation.MeshVariable("T", mesh, 1, degree=1); V = uw.discretisation.MeshVariable("V", mesh, 2, degree=1)
+X = np.asarray(T.coords); T.array[:, 0, 0] = 3 * X[:, 0] + 2 * X[:, 1]
+XV = np.asarray(V.coords); V.array[:, 0, 0] = 3 * XV[:, 0] + 2 * XV[:, 1]; V.array[:, 0, 1] = XV[:, 0] - XV[:, 1]
+pts = np.random.default_rng(5).uniform(0.15, 0.85, size=(400, 2))
+exact = 3 * pts[:, 0] + 2 * pts[:, 1]
+plain = np.asarray(uw.function.global_evaluate(T.sym, pts)).ravel()
+c = np.asarray(uw.function.global_evaluate(T.sym, pts, monotone="clamp")).ravel()
+cv = np.asarray(uw.function.global_evaluate(V.sym, pts, monotone="clamp")).reshape(len(pts), -1)[:, 0]
+print(f"RESULT np {uw.mpi.size} rank {uw.mpi.rank}: unclamped max error {np.abs(plain - exact).max():.1e}; clamped scalar: {int(np.count_nonzero(np.abs(c - exact) > 1e-10))} of 400 differ, largest {np.abs(c - exact).max():.2e}; clamped vector entry 0: {int(np.count_nonzero(np.abs(cv - exact) > 1e-10))} differ, largest {np.abs(cv - exact).max():.2e}", flush=True)
+```
+
+Measured in this review: at one rank the unclamped maximum error is 9e-16 and the clamped scalar
+differs from the exact value at 5 of 400 points, by up to 1.7e-2 (the bound taken from the three
+nearest nodes does not always enclose the point). At two ranks, 48 of 400 points are wrong on one
+rank and 74 on the other, by up to 0.61; the whole-variable clamp of the vector does the same. The
+bound is taken from the evaluating rank's own nodes for points that rank does not own.
