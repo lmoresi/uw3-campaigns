@@ -4039,3 +4039,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   #1089, #1099 since). W1 reports the domain-boundary refusals to Louis per his #1089 request. Question relayed to K1:
   on the 19 failing rebuilds, does the build complete (replay failure caught, tail left without that level) or does a
   caller see the exception? W1: 11-13 vs 3-5 velocity its is the expected cost of coarse levels not seeing the cut.
+- 2026-11-14: Louis: "The newton tangent is NOT inconsistent for TI, but somewhere this has become accepted. Check".
+  K1 checked (jobs 4648-4650, one core, 80d3ebe9 and af84cfcd): test_1066 7 passed; -snes_test_jacobian rel. error
+  TI power law (eta_1 = 0.01 eta_0) 5.6e-6 to 7.9e-6 vs isotropic 5.2e-6 to 8.4e-6; TI-VEP at yield 2.3e-7 to 4.8e-7;
+  Newton 9 its (quadratic) vs Picard 23 and 28. The tangent is consistent; K1's earlier #457 citations withdrawn (spec
+  rev 22). Stale library claims at af84cfcd (#457 closed 3 Aug by PR #493): TODO(BUG) above TransverseIsotropicFlowModel
+  (04379583), TODO(DESIGN) in multigrid_options.py, docs/developer/subsystems/solvers.md symmetry table (c8beed03); the
+  velocity block's non-symmetry is real and not a defect. Also: TransverseIsotropicVEPFlowModel with a yield stress
+  fails with a ROW director ("Matrix size mismatch: (2, 2) * (1, 2)"), column works. Both relayed to W1 (library).
+  K1 answered W1: the 19 tail-replay failures are caught in split_tail_levels, the level stays welded, the build
+  completes. Consequence: the tangent is no reason against a TI weak plane above the cut; that choice stays Louis's.
