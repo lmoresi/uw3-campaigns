@@ -1,0 +1,15 @@
+k=1 add-on levels split 0 of 1 (tail 2 levels, split flags [False, False]); pc custom-FMG; converged True; velocity its per outer [3]; outer [1]; peak slip 0.158759; warned False
+k=1 add-on levels split 0 of 1 (tail 2 levels, split flags [False, False]); pc custom-FMG; converged True; velocity its per outer [3]; outer [1]; peak slip 0.158759; warned False
+k=2 add-on levels split 1 of 2 (tail 3 levels, split flags [False, False, True]); pc custom-FMG; converged True; velocity its per outer [5]; outer [1]; peak slip 0.159581; warned False
+k=2 add-on levels split 1 of 2 (tail 3 levels, split flags [False, False, True]); pc custom-FMG; converged True; velocity its per outer [5]; outer [1]; peak slip 0.159581; warned False
+k=2 add-on levels split 0 of 2 (tail 3 levels, split flags [False, False, False]); pc custom-FMG; converged True; velocity its per outer [4]; outer [1]; peak slip 0.159581; warned True
+k=3 add-on levels split 2 of 3 (tail 4 levels, split flags [False, False, True, True]); pc custom-FMG; converged True; velocity its per outer [5]; outer [1]; peak slip 0.158986; warned False
+k=3 add-on levels split 2 of 3 (tail 4 levels, split flags [False, False, True, True]); pc custom-FMG; converged True; velocity its per outer [5]; outer [1]; peak slip 0.158986; warned False
+k=3 add-on levels split 1 of 3 (tail 4 levels, split flags [False, False, False, True]); pc custom-FMG; converged True; velocity its per outer [9]; outer [1]; peak slip 0.158986; warned True
+k=3 add-on levels split 0 of 3 (tail 4 levels, split flags [False, False, False, False]); pc custom-FMG; converged True; velocity its per outer [5]; outer [1]; peak slip 0.158986; warned True
+k=4 add-on levels split 3 of 4 (tail 5 levels, split flags [False, False, True, True, True]); pc custom-FMG; converged True; velocity its per outer [4]; outer [1]; peak slip 0.159264; warned False
+k=4 add-on levels split 3 of 4 (tail 5 levels, split flags [False, False, True, True, True]); pc custom-FMG; converged True; velocity its per outer [4]; outer [1]; peak slip 0.159264; warned False
+k=4 add-on levels split 2 of 4 (tail 5 levels, split flags [False, False, False, True, True]); pc custom-FMG; converged True; velocity its per outer [7]; outer [1]; peak slip 0.159264; warned True
+k=4 add-on levels split 1 of 4 (tail 5 levels, split flags [False, False, False, False, True]); pc custom-FMG; converged True; velocity its per outer [11]; outer [1]; peak slip 0.159264; warned True
+k=4 add-on levels split 0 of 4 (tail 5 levels, split flags [False, False, False, False, False]); pc custom-FMG; converged True; velocity its per outer [6]; outer [1]; peak slip 0.159264; warned True
+done

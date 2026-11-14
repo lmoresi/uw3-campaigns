@@ -25,11 +25,13 @@ band or a second margin ring, and the campaign driver retries on this message.
   after the split (`fault_split.split_fault`). The last two run again for each coarse
   level the split is replayed on. The cut partitions a second time before it starts.
 - The band placement partitions first (`partition_addon` with `mark_band`, two layers) so
-  that the placement's own gather (one layer) moves nothing. By reading, the placement's
-  marks lie inside the partition's: the placement marks vertices within
-  `max(clearance h, 0.6 width) + h` of the band's skin, the partition within that plus one
-  band width of the band's path, and the cell size `h` at a vertex is reconciled across
-  ranks. So reading does not give a mechanism.
+  that the placement's own gather (one layer) moves nothing. An earlier version of this
+  note said that, by reading, the placement's marks lie inside the partition's. That was
+  wrong. Measured on one rank: the placement marks vertices from the band's skin, the
+  partition marked them from the band's path, and at a low dip the ladder's outcrop cap
+  carries the skin along the wall past the end of the path (dip 20 degrees, top one rung
+  deep: 7 vertices and 6 cells outside). This is underworld3 #1172, fixed by PR #1180
+  (the partition now reads the placement's own rule on the band's skin).
 - 80d3ebe9 is older than four changes to this path that are on `development`: the pull of
   a vertex onto the trace near the domain boundary (#1089), the as-built record that
   rewrote `inherit_provenance` (#1091), the second `add_fault` (#1099) and the collective
