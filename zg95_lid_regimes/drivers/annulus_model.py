@@ -21,19 +21,51 @@ def annulus_radii(ratio=RADIUS_RATIO):
     return 1.0 / (1.0 - ratio), ratio / (1.0 - ratio)
 
 
-def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None):
+def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None, window=None):
     """The unit-depth annulus with its refinement hierarchy (the multigrid levels);
     refined boundary nodes are snapped to the circles. ``cell_inner`` (coarse-level size at
-    the inner boundary) grades the cell size radially, from ``cell`` at the outer boundary."""
+    the inner boundary) grades the cell size radially, from ``cell`` at the outer boundary.
+    ``window`` = (theta, half_arc, depth, factor) multiplies the size by ``factor`` within
+    ``half_arc`` (arc length at the surface) of ``theta`` and above ``depth``, with Gaussian
+    tapers of half those lengths beyond: more nodes in the columns under the trench region."""
     r_o, r_i = annulus_radii(ratio)
-    if cell_inner is None or float(cell_inner) == float(cell):
+    if (cell_inner is None or float(cell_inner) == float(cell)) and window is None:
         return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
                                   refinement=int(refinement), qdegree=3)
     # Annulus caches the .msh under a name built from cellSize alone, so a graded mesh needs its own file name.
     from underworld3.meshing.annulus import mesh_file_dir
-    name = f"{mesh_file_dir()}/uw_annulus_ro{r_o}_ri{r_i}_csize{float(cell)}_inner{float(cell_inner)}.msh"
-    return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell), cellSizeOuter=float(cell),
-                              cellSizeInner=float(cell_inner), refinement=int(refinement), qdegree=3, filename=name)
+    c_o, c_i = float(cell), float(cell if cell_inner is None else cell_inner)
+    name = f"{mesh_file_dir()}/uw_annulus_ro{r_o}_ri{r_i}_csize{c_o}_inner{c_i}"
+    build = lambda: uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=c_o, cellSizeOuter=c_o,
+                                       cellSizeInner=c_i, refinement=int(refinement), qdegree=3, filename=name + ".msh")
+    if window is None:
+        return build()
+    # A trial route (2026-11-14): Annulus takes sizes at its boundary points only, so the window goes in as a gmsh
+    # size callback installed just before Annulus generates its mesh (rank 0 does the meshing).
+    th0, half, depth, factor = (float(v) for v in window)
+    name += f"_win{th0}_{half}_{depth}_{factor}"
+
+    def size(dim, tag, x, y, z, lc):
+        r = float(np.hypot(x, y))
+        arc = abs((np.arctan2(y, x) - th0 + np.pi) % (2 * np.pi) - np.pi) * r_o
+        a = 1.0 if arc < half else float(np.exp(-((arc - half) / (0.5 * half)) ** 2))
+        b = 1.0 if r_o - r < depth else float(np.exp(-((r_o - r - depth) / (0.5 * depth)) ** 2))
+        return (c_o + (c_i - c_o) * (r_o - r) / (r_o - r_i)) * (1.0 - (1.0 - factor) * a * b)
+
+    if uw.mpi.rank != 0:
+        return build()
+    import gmsh
+    generate = gmsh.model.mesh.generate
+
+    def generate_with_window(dim=3):
+        gmsh.model.mesh.setSizeCallback(size)
+        return generate(dim)
+
+    gmsh.model.mesh.generate = generate_with_window
+    try:
+        return build()
+    finally:
+        gmsh.model.mesh.generate = generate
 
 
 def radius_of(mesh):

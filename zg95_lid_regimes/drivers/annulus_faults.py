@@ -219,6 +219,9 @@ params = uw.Params(
     uw_cell=0.5,
     uw_cell_inner=0.0,          # > 0: a radially graded base, uw_cell at the outer boundary and this at the inner one
                                 #   (coarse-level sizes; the base cell H_B stays the outer one)
+    uw_cell_window=0.0,         # in (0, 1): the base's cell size is multiplied by this near the trench (uw_theta_trench),
+    uw_cell_window_arc=0.345,   #   within this arc length at the surface (1000 km) and above
+    uw_cell_window_depth=0.24,  #   this depth (700 km), tapering beyond: the mover has more nodes to work with there
     uw_refinement=4,
     uw_ra=9.1125e5,
     uw_deta=3.0e4,
@@ -510,7 +513,10 @@ if params.uw_fault_seams != "gather" and int(params.uw_chain) > 0:
                      "run it with -uw_chain 0")
 W = 2.0 * S
 
-base = annulus_mesh(params.uw_cell, params.uw_refinement, cell_inner=float(params.uw_cell_inner) or None)
+base = annulus_mesh(params.uw_cell, params.uw_refinement, cell_inner=float(params.uw_cell_inner) or None,
+                    window=((float(params.uw_theta_trench), float(params.uw_cell_window_arc),
+                             float(params.uw_cell_window_depth), float(params.uw_cell_window))
+                            if 0.0 < float(params.uw_cell_window) < 1.0 else None))
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
