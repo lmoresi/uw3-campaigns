@@ -21,15 +21,18 @@ def annulus_radii(ratio=RADIUS_RATIO):
     return 1.0 / (1.0 - ratio), ratio / (1.0 - ratio)
 
 
-def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None, window=None):
+def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None, window=None, band=None):
     """The unit-depth annulus with its refinement hierarchy (the multigrid levels);
     refined boundary nodes are snapped to the circles. ``cell_inner`` (coarse-level size at
     the inner boundary) grades the cell size radially, from ``cell`` at the outer boundary.
     ``window`` = (theta, half_arc, depth, factor) multiplies the size by ``factor`` within
     ``half_arc`` (arc length at the surface) of ``theta`` and above ``depth``, with Gaussian
-    tapers of half those lengths beyond: more nodes in the columns under the trench region."""
+    tapers of half those lengths beyond: more nodes in the columns under the trench region.
+    ``band`` = (depth, slope) replaces the linear radial ramp: ``cell`` down to ``depth`` (a typical
+    boundary-layer thickness), then growing by ``slope`` per unit depth up to ``cell_inner``.
+    With a band, the window caps the size at ``factor * cell`` instead (the slab region below the band)."""
     r_o, r_i = annulus_radii(ratio)
-    if (cell_inner is None or float(cell_inner) == float(cell)) and window is None:
+    if (cell_inner is None or float(cell_inner) == float(cell)) and window is None and band is None:
         return uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=float(cell),
                                   refinement=int(refinement), qdegree=3)
     # Annulus caches the .msh under a name built from cellSize alone, so a graded mesh needs its own file name.
@@ -38,19 +41,30 @@ def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None, window=N
     name = f"{mesh_file_dir()}/uw_annulus_ro{r_o}_ri{r_i}_csize{c_o}_inner{c_i}"
     build = lambda: uw.meshing.Annulus(radiusOuter=r_o, radiusInner=r_i, cellSize=c_o, cellSizeOuter=c_o,
                                        cellSizeInner=c_i, refinement=int(refinement), qdegree=3, filename=name + ".msh")
-    if window is None:
+    if window is None and band is None:
         return build()
     # A trial route (2026-11-14): Annulus takes sizes at its boundary points only, so the window goes in as a gmsh
     # size callback installed just before Annulus generates its mesh (rank 0 does the meshing).
-    th0, half, depth, factor = (float(v) for v in window)
-    name += f"_win{th0}_{half}_{depth}_{factor}"
+    th0, half, depth, factor = (float(v) for v in window) if window is not None else (0.0, 1.0, 1.0, 1.0)
+    name += f"_win{th0}_{half}_{depth}_{factor}" if window is not None else ""
+    name += f"_band{float(band[0])}_{float(band[1])}" if band is not None else ""
+
+    def radial(d):
+        if band is None:
+            return c_o + (c_i - c_o) * d / (r_o - r_i)
+        return min(c_i, c_o + float(band[1]) * max(0.0, d - float(band[0])))
 
     def size(dim, tag, x, y, z, lc):
         r = float(np.hypot(x, y))
         arc = abs((np.arctan2(y, x) - th0 + np.pi) % (2 * np.pi) - np.pi) * r_o
         a = 1.0 if arc < half else float(np.exp(-((arc - half) / (0.5 * half)) ** 2))
         b = 1.0 if r_o - r < depth else float(np.exp(-((r_o - r - depth) / (0.5 * depth)) ** 2))
-        return (c_o + (c_i - c_o) * (r_o - r) / (r_o - r_i)) * (1.0 - (1.0 - factor) * a * b)
+        rad = radial(r_o - r)
+        if band is None:
+            return rad * (1.0 - (1.0 - factor) * a * b)
+        if window is None:
+            return rad
+        return rad - (rad - min(rad, c_o * factor)) * a * b      # banded: the window holds the size at factor * cell
 
     if uw.mpi.rank != 0:
         return build()
@@ -59,6 +73,9 @@ def annulus_mesh(cell, refinement, ratio=RADIUS_RATIO, cell_inner=None, window=N
 
     def generate_with_window(dim=3):
         gmsh.model.mesh.setSizeCallback(size)
+        if band is not None:      # the callback alone sets the size: sizes extended from the boundary points would cap it
+            gmsh.option.setNumber("Mesh.MeshSizeExtendFromBoundary", 0)
+            gmsh.option.setNumber("Mesh.MeshSizeFromPoints", 0)
         return generate(dim)
 
     gmsh.model.mesh.generate = generate_with_window

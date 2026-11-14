@@ -219,7 +219,10 @@ params = uw.Params(
     uw_cell=0.5,
     uw_cell_inner=0.0,          # > 0: a radially graded base, uw_cell at the outer boundary and this at the inner one
                                 #   (coarse-level sizes; the base cell H_B stays the outer one)
+    uw_cell_band=0.0,           # > 0: uw_cell down to this depth (a typical boundary-layer thickness), then growing by
+    uw_cell_grow=1.0,           #   this much per unit depth up to uw_cell_inner (coarse-level sizes), not a linear ramp
     uw_cell_window=0.0,         # in (0, 1): the base's cell size is multiplied by this near the trench (uw_theta_trench),
+                                #   (with uw_cell_band: any value > 0, the cell size in the window in units of uw_cell)
     uw_cell_window_arc=0.345,   #   within this arc length at the surface (1000 km) and above
     uw_cell_window_depth=0.24,  #   this depth (700 km), tapering beyond: the mover has more nodes to work with there
     uw_refinement=4,
@@ -516,7 +519,10 @@ W = 2.0 * S
 base = annulus_mesh(params.uw_cell, params.uw_refinement, cell_inner=float(params.uw_cell_inner) or None,
                     window=((float(params.uw_theta_trench), float(params.uw_cell_window_arc),
                              float(params.uw_cell_window_depth), float(params.uw_cell_window))
-                            if 0.0 < float(params.uw_cell_window) < 1.0 else None))
+                            if 0.0 < float(params.uw_cell_window) < 1.0
+                            or (float(params.uw_cell_window) > 0.0 and float(params.uw_cell_band) > 0.0) else None),
+                    band=((float(params.uw_cell_band), float(params.uw_cell_grow))
+                          if float(params.uw_cell_band) > 0.0 else None))
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
