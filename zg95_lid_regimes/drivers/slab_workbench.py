@@ -9,7 +9,8 @@ mesh and solver options stay in model lengths. Kept: the slab initial state
 (plate ages, ridge positions, the overriding plate and the continent), the fixed ridge
 patch, the crust particles advected with the split velocity and refilled, the fault fitted
 to the crust by a smoothing spline and ended at the depth cap, the frictionless split with
-its ladder and bridge, strain weakening and healing, the Arrhenius viscosity, the
+its ladder, the transversely isotropic weak plane that carries the fault from the cut's top
+to the surface, strain weakening and healing, the Arrhenius viscosity, the
 asthenosphere and lower-mantle factors, the graded mesh, the solver with its retries,
 records, checkpoints and restart (``uw_restart`` in ``uw_out``).
 
@@ -26,8 +27,10 @@ import warnings
 import numpy as np
 import sympy
 import underworld3 as uw
+from underworld3.meshing.fault_network import _nearest_segment_normals
 from underworld3.utilities.custom_mg import set_custom_fmg
 from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
+from underworld3.utilities.place_surface import _footprints_by_user_polyline
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, focused_annulus_mesh,
@@ -179,7 +182,9 @@ params = uw.Params(
                                 #   the gain is fewer Newton increments (65 against 79 over 10 steps) and the patch. With
                                 #   S = h_b the 1-rung inset is one base cell deep (the cut's top ~0.020 below the surface),
                                 #   so the early-slab near-surface slip is 10-18 % lower than the old recipe's
-    uw_eta_w=1.0e-3,
+    uw_eta_w=1.0e-3,            # the weak plane above the cut (Louis, 2026-11-14: "Use TI for the weak continuation
+                                #   above the cut"): the shear viscosity along the plane, as a factor of the
+                                #   viscoplastic viscosity there. It has no floor and no yield stress of its own
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -514,7 +519,7 @@ def cut_of(spine):
 
 def trace_inset():
     """How many rungs inside the wall a trace stops: uw_split_inset (the cut cannot
-    reach the wall; the isotropic bridge covers the rest)."""
+    reach the wall; the weak plane covers the rest)."""
     return float(params.uw_split_inset)
 
 
@@ -845,7 +850,7 @@ def crust_spline_points(faults):
 
 class FaultedMesh:
     """All the faults placed into a copy of the base's finest level, with the Stokes
-    solver, the bridge zones and the P1 fields the renders read."""
+    solver, each fault's weak plane above its cut and the P1 fields the renders read."""
 
     def __init__(self, faults, tag):
         wall = time.perf_counter()
@@ -865,7 +870,6 @@ class FaultedMesh:
         self.T = uw.discretisation.MeshVariable(f"T_{tag}", mesh, 1, degree=2)
         self.v = uw.discretisation.MeshVariable(f"V_{tag}", mesh, mesh.dim, degree=2)
         self.p = uw.discretisation.MeshVariable(f"P_{tag}", mesh, 1, degree=1, continuous=True)
-        self.zone = uw.discretisation.MeshVariable(f"zone_{tag}", mesh, 1, degree=0, continuous=False)
         self.log_eta = uw.discretisation.MeshVariable(f"log10_eta_{tag}", mesh, 1, degree=1)
         self.yield_ratio = uw.discretisation.MeshVariable(f"yield_ratio_{tag}", mesh, 1, degree=1)
         self.gamma = uw.discretisation.MeshVariable(f"plastic_strain_{tag}", mesh, 1, degree=2)
@@ -875,25 +879,40 @@ class FaultedMesh:
                       if crust_on else None)
         self.over = (uw.discretisation.MeshVariable(f"over_{tag}", mesh, 1, degree=1, continuous=False)
                      if over_on else None)
-        # Each fault's bridge: its band cells outside its split's upper tip.
-        centroids = np.asarray(model_xy(self.zone))
-        radius = np.hypot(centroids[:, 0], centroids[:, 1])
-        bridge = np.zeros(len(centroids), dtype=bool)
-        if band is None:
-            band = bridge
-        for name, (spine, trace) in self.pieces.items():
-            near = polyline_distance(centroids, spine) < 2.0 * W
-            bridge |= band & near & (radius > np.hypot(*trace[0]) - 0.5 * W)
-        self.zone.array[:, 0, 0] = bridge.astype(float)
-        # the fault's band (uw_fault_precedence): every band cell, the zone included, where the
+        # Each fault's weak plane from its cut's top to the wall: the fitted curve goes on where the cut
+        # cannot (Louis, 2026-11-14: "The fit finds the ideal fault, the ladder should lie along the fault but
+        # will not be able to follow it all the way to the surface ... TI or other weakness can continue").
+        # Its cells and their directors are the library's weak-plane rules (FaultNetwork.ti_fields: the band
+        # cells within 0.6 band widths of the fault and not past its ends by more than half a rung; the
+        # normal of the fault's nearest segment), applied here to the uncut part of the fitted curve because
+        # the network's own footprint is keyed to the cut.
+        self.plane = self.director = None
+        plane_cells = 0
+        if self.faults:
+            self.plane = uw.discretisation.MeshVariable(f"plane_{tag}", mesh, 1, degree=0, continuous=False)
+            self.director = uw.discretisation.MeshVariable(f"director_{tag}", mesh, mesh.dim, degree=0,
+                                                           continuous=False)
+            centroids = np.asarray(model_xy(self.plane))
+            on = np.zeros(len(centroids), dtype=bool)
+            normals = np.tile([0.0, 1.0], (len(centroids), 1))     # any unit vector off the plane
+            for name, (spine, trace) in self.pieces.items():
+                uncut = spine[:int(np.argmin(np.linalg.norm(spine - trace[0], axis=1))) + 1]
+                cells = _footprints_by_user_polyline(mesh.dm, band, [(name, uncut)], half_reach=0.6 * self.width,
+                                                     overhang=0.5 * S)[name]
+                normals[cells] = _nearest_segment_normals(spine, centroids[cells])
+                on |= cells
+            self.plane.array[:, 0, 0] = on.astype(float)
+            self.director.array[:, 0, :] = normals
+            plane_cells = int(uw.utilities.gather_data(int(on.sum()), bcast=True).sum())
+        # the fault's band (uw_fault_precedence): every band cell, the weak plane's included, where the
         # fault's own rheology alone applies
         self.band_mask = None
-        if params.uw_fault_precedence:
+        if params.uw_fault_precedence and band is not None:
             self.band_mask = uw.discretisation.MeshVariable(f"band_{tag}", mesh, 1, degree=0, continuous=False)
-            self.band_mask.array[:, 0, 0] = (band | bridge).astype(float)
+            self.band_mask.array[:, 0, 0] = band.astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
-        weak = 1 - (1 - params.uw_eta_w) * self.zone.sym[0]
+        weak = 1
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
@@ -912,6 +931,14 @@ class FaultedMesh:
         if model.eta_reg > 0:
             s.constitutive_model.Parameters.plastic_rate_strengthening = model.eta_reg
         self.host_cm = s.constitutive_model
+        if self.plane is not None:
+            # the library's weak-plane model (what FaultNetwork.apply sets): eta_0 the viscoplastic viscosity
+            # everywhere, eta_1 = uw_eta_w eta_0 for shear along the plane on the plane's cells
+            eta_0 = self.host_cm.viscosity
+            s.constitutive_model = uw.constitutive_models.TransverseIsotropicFlowModel
+            s.constitutive_model.Parameters.shear_viscosity_0 = eta_0
+            s.constitutive_model.Parameters.shear_viscosity_1 = eta_0 * (1 - (1 - params.uw_eta_w) * self.plane.sym[0])
+            s.constitutive_model.Parameters.director = sympy.Matrix([self.director.sym[0], self.director.sym[1]])
         buoyancy = params.uw_buoy_T * self.T.sym[0]
         if over_on:
             buoyancy = buoyancy - model.over_dT * clamp01(self.over.sym[0])
@@ -932,14 +959,13 @@ class FaultedMesh:
         self.stokes = s
         self.has_guess = False
 
-        eta_eff = s.constitutive_model.viscosity
+        eta_eff = self.host_cm.viscosity       # the viscoplastic viscosity (the weak plane's eta_0)
         self.eta_projection = uw.systems.Projection(mesh, self.log_eta)
         self.eta_projection.uw_function = sympy.log(eta_eff) / sympy.log(10)
         self.ratio_projection = uw.systems.Projection(mesh, self.yield_ratio)
         self.ratio_projection.uw_function = eta_eff / self.eta_T
-        cm = self.host_cm      # the viscoplastic host: its strain-rate invariant
         self.edot_projection = uw.systems.Projection(mesh, self.edot_p)
-        self.edot_projection.uw_function = cm._strainrate_inv_II * sympy.Max(
+        self.edot_projection.uw_function = self.host_cm._strainrate_inv_II * sympy.Max(
             0, 1 - eta_eff / (self.eta_T * weak))
         self.diagnostics = AnnulusDiagnostics(T_b, self.v, eta_eff, self.eta_T, heating)
         self.t_build = time.perf_counter() - wall
@@ -958,14 +984,16 @@ class FaultedMesh:
                             "seams": str(params.uw_fault_seams), "partition": FAULT_PARTITION,
                             "band_cells_per_rank": band_per_rank,
                             "band_ranks": sum(1 for c in band_per_rank if c),
+                            "weak_plane_cells": plane_cells,
                             # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
                             # fault points and we can see if that is sufficient"): rungs, rung length, band width
                             "division": {name: division_record(spine, self.width)
                                          for name, (spine, _) in self.pieces.items()}}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
-        uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, "
-                  f"built in {self.t_build:.1f} s; band on {self.mesh_record['band_ranks']} rank(s), seams "
+        uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
+                  f"{plane_cells} cells, built in {self.t_build:.1f} s; band on "
+                  f"{self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
         for name, d in self.mesh_record["division"].items():
             uw.pprint(f"  {name} division: {d['rungs']} rungs, {d['rung_min']:.4f}-{d['rung_max']:.4f} (mean "
@@ -1783,7 +1811,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
-                "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along",
+                "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
                 "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max_myr", "uw_ckpt_every",
