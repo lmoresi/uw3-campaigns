@@ -186,6 +186,18 @@ params = uw.Params(
                                 #   above the cut"): the shear viscosity along the plane, as a factor of the
                                 #   viscoplastic viscosity there. It has no floor and no yield stress of its own;
                                 #   the host's yield stress there bounds the stress the plane leaves (see `felt`)
+    # Test dials for the weak plane (Louis, 2026-11-14: "Try the various suggestions overnight"), on the branch
+    # kaiju/weak-plane-tests only. The defaults are the plane as ruled; the others separate the plane's law from
+    # its cells (runs/wb_plane_tests)
+    uw_plane_law="ti",          # "ti": shear along the plane sees uw_eta_w of the host's viscosity. "iso": every
+                                #   deformation of the plane's cells does (the law of the zone before 965b421)
+    uw_plane_cells="curve",     # "curve": the library's footprint rule on the uncut fitted curve, among the band's
+                                #   cells. "wall": the same rule among all cells, so the plane reaches the wall
+                                #   where the band stops short of it (the band ends one to three rungs above the
+                                #   cut's top: runs/wb_plane_tests/probe). "zone": the cells of the zone before
+                                #   965b421 (band cells within two band widths of the fitted curve, to half a band
+                                #   width below the cut's top)
+    uw_plane_reach=0.6,         # "curve" and "wall": the footprint rule's reach in band widths (the library's is 0.6)
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -313,6 +325,12 @@ FIRST_SOLVE = True             # the run's first solve: an unconverged cold one 
 REBUILD = float(params.uw_rebuild_cells) * H_F                  # the rebuild threshold, a distance (needs_rebuild)
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
+if str(params.uw_plane_law) not in ("ti", "iso"):
+    raise ValueError(f"-uw_plane_law must be ti or iso, not {params.uw_plane_law!r}")
+if str(params.uw_plane_cells) not in ("curve", "wall", "zone"):
+    raise ValueError(f"-uw_plane_cells must be curve, wall or zone, not {params.uw_plane_cells!r}")
+if not 0 < float(params.uw_plane_reach) <= 2:
+    raise ValueError(f"-uw_plane_reach must be above 0 and at most 2 band widths, not {params.uw_plane_reach!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
     import underworld3.utilities.addon_partition  # noqa: F401  (development: the add-on is partitioned first)
     _addon_partition = True
@@ -894,12 +912,19 @@ class FaultedMesh:
             self.director = uw.discretisation.MeshVariable(f"director_{tag}", mesh, mesh.dim, degree=0,
                                                            continuous=False)
             centroids = np.asarray(model_xy(self.plane))
+            radius = np.hypot(centroids[:, 0], centroids[:, 1])
             on = np.zeros(len(centroids), dtype=bool)
             normals = np.tile([0.0, 1.0], (len(centroids), 1))     # any unit vector off the plane
             for name, (spine, trace) in self.pieces.items():
                 uncut = spine[:int(np.argmin(np.linalg.norm(spine - trace[0], axis=1))) + 1]
-                cells = _footprints_by_user_polyline(mesh.dm, band, [(name, uncut)], half_reach=0.6 * self.width,
-                                                     overhang=0.5 * S)[name]
+                if params.uw_plane_cells == "zone":
+                    cells = band & (polyline_distance(centroids, spine) < 2.0 * W) & (
+                        radius > np.hypot(*trace[0]) - 0.5 * W)
+                else:
+                    among = band if params.uw_plane_cells == "curve" else np.ones_like(band)
+                    cells = _footprints_by_user_polyline(
+                        mesh.dm, among, [(name, uncut)], half_reach=float(params.uw_plane_reach) * self.width,
+                        overhang=0.5 * S)[name]
                 normals[cells] = _nearest_segment_normals(spine, centroids[cells])
                 on |= cells
             self.plane.array[:, 0, 0] = on.astype(float)
@@ -910,10 +935,12 @@ class FaultedMesh:
         self.band_mask = None
         if params.uw_fault_precedence and band is not None:
             self.band_mask = uw.discretisation.MeshVariable(f"band_{tag}", mesh, 1, degree=0, continuous=False)
-            self.band_mask.array[:, 0, 0] = band.astype(float)
+            self.band_mask.array[:, 0, 0] = (band | on).astype(float)
 
         s = uw.systems.Stokes(mesh, velocityField=self.v, pressureField=self.p)
-        weak = 1
+        plane_ti = self.plane is not None and params.uw_plane_law == "ti"
+        # uw_plane_law iso: the plane's cells are uw_eta_w of the viscosity for every deformation
+        weak = 1 if self.plane is None or plane_ti else 1 - (1 - params.uw_eta_w) * self.plane.sym[0]
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
@@ -925,7 +952,7 @@ class FaultedMesh:
         # by a yield stress felt times larger. (Yielding on edot_II, the plane's own shear put the host at yield
         # and was recorded as plastic strain: 0.32 in the first faulted step, against 0.5 for full weakening.)
         felt = 1
-        if self.plane is not None:
+        if plane_ti:
             n = sympy.Matrix([self.director.sym[0], self.director.sym[1]])
             E = mesh.vector.strain_tensor(self.v.sym)
             En = E * n
@@ -947,7 +974,7 @@ class FaultedMesh:
         if model.eta_reg > 0:
             s.constitutive_model.Parameters.plastic_rate_strengthening = model.eta_reg
         self.host_cm = s.constitutive_model
-        if self.plane is not None:
+        if plane_ti:
             # the library's weak-plane model (what FaultNetwork.apply sets): eta_0 the viscoplastic viscosity
             # everywhere, eta_1 = uw_eta_w eta_0 for shear along the plane on the plane's cells
             eta_0 = self.host_cm.viscosity
@@ -1001,6 +1028,8 @@ class FaultedMesh:
                             "band_cells_per_rank": band_per_rank,
                             "band_ranks": sum(1 for c in band_per_rank if c),
                             "weak_plane_cells": plane_cells,
+                            "weak_plane": {"law": str(params.uw_plane_law), "cells": str(params.uw_plane_cells),
+                                           "reach": float(params.uw_plane_reach)},
                             # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
                             # fault points and we can see if that is sufficient"): rungs, rung length, band width
                             "division": {name: division_record(spine, self.width)
@@ -1828,6 +1857,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
+                "uw_plane_law", "uw_plane_cells", "uw_plane_reach",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
                 "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max_myr", "uw_ckpt_every",
