@@ -4035,3 +4035,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (fault_mg.split_tail_levels) fails on 19 of 60 rebuilds ("touches the domain boundary" x10; "snapping inverted 1
   cell(s); snap_frac=0.1" x9); the Stokes solve is unaffected (own base levels). In the 4 km box the velocity solve takes
   11-13 its with the fault vs 3-5 without. No K1 jobs running.
+- 2026-11-14: W1 on the tail-replay refusals: read, not triaged, queued behind #1172 (run on 80d3ebe9; development has
+  #1089, #1099 since). W1 reports the domain-boundary refusals to Louis per his #1089 request. Question relayed to K1:
+  on the 19 failing rebuilds, does the build complete (replay failure caught, tail left without that level) or does a
+  caller see the exception? W1: 11-13 vs 3-5 velocity its is the expected cost of coarse levels not seeing the cut.
