@@ -4049,3 +4049,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fails with a ROW director ("Matrix size mismatch: (2, 2) * (1, 2)"), column works. Both relayed to W1 (library).
   K1 answered W1: the 19 tail-replay failures are caught in split_tail_levels, the level stays welded, the build
   completes. Consequence: the tangent is no reason against a TI weak plane above the cut; that choice stays Louis's.
+- 2026-11-14: Louis: "Use TI for the weak continuation above the cut". Pushed kaiju/slab-workbench 8e3f68f -> bc45809
+  (K1's 965b421, blob fcaa8d7: from the cut's top to the surface the fault is a TransverseIsotropicFlowModel weak plane
+  along the fitted curve, eta_1 = uw_eta_w eta_0 on 17-46 band cells, director = nearest segment normal, replacing the
+  isotropic zone) -> 63504b1 (K1's f48729a, blob ea48543: on the plane's cells the host yields on the stress the plane
+  leaves; the first version yielded on strain rate and logged the plane's own shear as plastic strain, 0.32 in the first
+  faulted step). Both mbox sha256 matched; py_compile and pyflakes clean. Tests (60 steps from 331 Myr, jobs 4652/4653,
+  runs/wb_weak_plane; page https://claude.ai/artifact/CHsYbr1PgtwGetj1WxosCh): f48729a every step converged, no
+  refused placement; slip and convergence 11-12 % below the old zone (rerun spread 2 %), vrms 2 % lower; 39 % more
+  nonlinear its, 6 % more wall time. The old zone also weakened the lithosphere beside the first 80 km of the cut, not
+  separated from the change of law. Library record (texts to Louis): FaultNetwork takes no curve longer than the cut
+  (its footprint would paint 12 of 43 plane cells); FaultNetwork.apply takes the host viscosity as a number or field, so
+  a weak plane over a viscoplastic host is driver composition. Hub note: the driver now imports two private library
+  functions (_nearest_segment_normals, _footprints_by_user_polyline).
