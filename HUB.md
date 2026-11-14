@@ -4076,3 +4076,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   levels under a faulted mesh (the base's uncut levels, the placed mesh's own tail, or the base's with the finest
   replaced by the cut copy); records gain levels_fault_pairs. Since 2bc7b9a the solver has used uncut base levels.
   Short runs tonight in runs/wb_mg_levels; the seven 60-step weak-plane runs (job 4664) under way.
+- 2026-11-15: overnight results (tests of dials; jobs 4664 on 1909cc5, 4669 on fb80f85; runs/wb_plane_tests,
+  runs/wb_mg_levels; page https://claude.ai/artifact/SDFxn9kNWVy6fh4ocLdRQU). CORRECTION (K1): "slip 11-12 % lower with
+  the plane" was at equal step; at equal model time the plane is 9.9 % below the old zone (8.6 % after 365 Myr),
+  convergence 9.4 % (8.0 %); zone rerun spread 1.4 %. Law vs cells: iso law on plane cells -6.3 %, TI on zone cells
+  -9.0 %, both -9.9 %; they do not add. Half width and weakness x10 either way: <=1.1 %, inside the spread. Plane carried
+  to the wall: slip +1.9 %, fault top 7.4 vs 9.1 deg, 18 % more nonlinear its, two steps not converged (202, 206);
+  plastic strain beside the cut back to the zone's level (0.05-0.06) where planes stopping short leave 0.17-0.37. Cut
+  coarse levels for Stokes: 1.7-3.6x slower in all three settings, same answer; no case against base levels. Louis's
+  calls: plane to the wall by default or not; the yield correction; whether the test dials stay. Nothing queued.
