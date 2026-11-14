@@ -4071,3 +4071,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   cells. Overnight (runs/wb_plane_tests; job 4657 two-step checks, then a 60-step array from the step-195 checkpoint):
   seven variants separating law (TI/iso) from cells (plane/old zone), half width, weakness 0.01 and 0.0001, and the
   plane carried to the wall. Results page in the morning.
+- 2026-11-14: kaiju/weak-plane-tests 1909cc5 -> fb80f85 (K1's 1734e5b; blob 136b26e; mbox sha256 matched; py_compile
+  and pyflakes clean): test dial -uw_mg_levels base|tail|cut (default base, unchanged): the Stokes solver's coarse
+  levels under a faulted mesh (the base's uncut levels, the placed mesh's own tail, or the base's with the finest
+  replaced by the cut copy); records gain levels_fault_pairs. Since 2bc7b9a the solver has used uncut base levels.
+  Short runs tonight in runs/wb_mg_levels; the seven 60-step weak-plane runs (job 4664) under way.
