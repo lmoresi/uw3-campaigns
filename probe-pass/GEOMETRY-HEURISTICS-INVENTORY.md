@@ -64,6 +64,7 @@ The docstrings call this face-relative; the comment at 7549-7557 says the separa
 | geoid.py:945 | `_rotated_topography_coefficient` | round(12) | point SF |
 | level_set.py:543-59 | `_apply_boundary_neumann` | `np.unique` + isclose 1e-8 | labels plus adjacency |
 | petsc_generic_snes_solvers.pyx `_setup_discretisation` (three solver classes) | early return keyed on an xxhash of the rank's own `mesh.X.coords` (added 2026-11-14 from H1's .pyx collective scan; rank-local, not reachable by a one-rank deform at np 2 because deform resets the DM) | a declared mesh-state counter, the same on every rank |
+| discretisation_mesh.py `_boundary_facet_geometry` | the boundary-facet cache of the facet restore is kept while each rank's `(shape, sum of its coordinates)` is unchanged (added 2026-11-14 from the review of PR #1192, which makes the decision collective with an `allreduce`; `deform` and a direct coordinate write reset the cache, but moves inside `_coord_mutation` — the mover, a snapshot restore, the old-frame move in the semi-Lagrangian trace — rely on the sum alone; no failing case in hand) | a declared mesh-state counter, the same on every rank |
 
 Not answerable by topology (the point is not a mesh entity, or it is pre-mesh geometry):
 `swarm.py:2615` (saved particle to live particle); `place_surface.py` 315, 3873/4090, 4705,
