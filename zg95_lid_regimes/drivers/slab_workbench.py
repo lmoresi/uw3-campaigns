@@ -198,6 +198,11 @@ params = uw.Params(
                                 #   965b421 (band cells within two band widths of the fitted curve, to half a band
                                 #   width below the cut's top)
     uw_plane_reach=0.6,         # "curve" and "wall": the footprint rule's reach in band widths (the library's is 0.6)
+    uw_mg_levels="base",        # a test dial (2026-11-14): the Stokes solver's coarse levels under a faulted mesh.
+                                #   "base": the base mesh's levels, none of them cut. "tail": the placed mesh's own
+                                #   tail (the base's levels and, above them, the copy of the base's finest that the
+                                #   library cuts along the fault when it can). "cut": the base's levels with the
+                                #   finest replaced by that copy
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -329,6 +334,8 @@ if str(params.uw_plane_law) not in ("ti", "iso"):
     raise ValueError(f"-uw_plane_law must be ti or iso, not {params.uw_plane_law!r}")
 if str(params.uw_plane_cells) not in ("curve", "wall", "zone"):
     raise ValueError(f"-uw_plane_cells must be curve, wall or zone, not {params.uw_plane_cells!r}")
+if str(params.uw_mg_levels) not in ("base", "tail", "cut"):
+    raise ValueError(f"-uw_mg_levels must be base, tail or cut, not {params.uw_mg_levels!r}")
 if not 0 < float(params.uw_plane_reach) <= 2:
     raise ValueError(f"-uw_plane_reach must be above 0 and at most 2 band widths, not {params.uw_plane_reach!r}")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
@@ -879,6 +886,9 @@ class FaultedMesh:
             self.levels = levels
             self.network, self.pieces = fault_network(base, self.faults)
             self.mesh, info = self.network.mesh, self.network.info
+            tail = getattr(self.mesh, "_custom_mg_coarse_meshes", None)
+            if params.uw_mg_levels != "base" and tail:
+                self.levels = list(tail) if params.uw_mg_levels == "tail" else levels[:-1] + [tail[-1]]
             band = np.asarray(info["band"], dtype=bool)
             self.width = float(info["width"])
         else:                  # no fault: the base mesh is the solver's mesh
@@ -1014,11 +1024,16 @@ class FaultedMesh:
         self.t_build = time.perf_counter() - wall
         level_cells = [int(uw.utilities.gather_data(m.dm.getHeightStratum(0)[1], bcast=True).sum())
                        for m in self.levels + [mesh]]
+        # which levels carry the cut: each level's fault node pairs, summed over the ranks
+        level_cut = [int(uw.utilities.gather_data(sum(
+            len(p) for p in (getattr(m, "_fault_point_pairs", None) or {}).values()), bcast=True).sum())
+            for m in self.levels + [mesh]]
         band_per_rank = [int(c) for c in uw.utilities.gather_data(
             int(band.sum()) if band is not None else 0, bcast=True)]
         band_cells = int(sum(band_per_rank))
         # for the solver record of the step that solves on this mesh
         self.mesh_record = {"levels_cells": level_cells,
+                            "levels_fault_pairs": level_cut, "mg_levels": str(params.uw_mg_levels),
                             "band_cells_fraction": band_cells / max(level_cells[-1], 1),
                             "split_pairs": None, "chain_welded": [],
                             "realisation": "split", "width": self.width,
@@ -1036,7 +1051,8 @@ class FaultedMesh:
                                          for name, (spine, _) in self.pieces.items()}}
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
-        uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
+        uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, fault pairs "
+                  f"{level_cut}, weak plane above the cut "
                   f"{plane_cells} cells, built in {self.t_build:.1f} s; band on "
                   f"{self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
@@ -1857,7 +1873,7 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
-                "uw_plane_law", "uw_plane_cells", "uw_plane_reach",
+                "uw_plane_law", "uw_plane_cells", "uw_plane_reach", "uw_mg_levels",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
                 "uw_rebuild_cells", "uw_spacing", "uw_dt_mult", "uw_courant", "uw_dt_max_myr", "uw_ckpt_every",
