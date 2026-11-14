@@ -184,7 +184,8 @@ params = uw.Params(
                                 #   so the early-slab near-surface slip is 10-18 % lower than the old recipe's
     uw_eta_w=1.0e-3,            # the weak plane above the cut (Louis, 2026-11-14: "Use TI for the weak continuation
                                 #   above the cut"): the shear viscosity along the plane, as a factor of the
-                                #   viscoplastic viscosity there. It has no floor and no yield stress of its own
+                                #   viscoplastic viscosity there. It has no floor and no yield stress of its own;
+                                #   the host's yield stress there bounds the stress the plane leaves (see `felt`)
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -918,6 +919,21 @@ class FaultedMesh:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
+        # A yield stress bounds the stress, and shear along the weak plane raises only uw_eta_w of the stress it
+        # would in the host: the stress invariant there is 2 eta_0 sqrt(edot_II^2 - (1 - uw_eta_w^2) gdot^2), gdot
+        # the shear rate along the plane. So on the plane's cells the host yields on that rate, edot_II / felt,
+        # by a yield stress felt times larger. (Yielding on edot_II, the plane's own shear put the host at yield
+        # and was recorded as plastic strain: 0.32 in the first faulted step, against 0.5 for full weakening.)
+        felt = 1
+        if self.plane is not None:
+            n = sympy.Matrix([self.director.sym[0], self.director.sym[1]])
+            E = mesh.vector.strain_tensor(self.v.sym)
+            En = E * n
+            gdot2 = sympy.Max((En.T * En)[0] - ((n.T * En)[0]) ** 2, 0)
+            edot2 = (E ** 2).trace() / 2
+            felt = sympy.sqrt((edot2 + 1.0e-12) / (
+                edot2 - (1 - params.uw_eta_w ** 2) * self.plane.sym[0] * gdot2 + 1.0e-12))
+            yield_factor = yield_factor * felt
         if over_on:
             weak = weak * comp_factor_on(self.over.sym[0], params.uw_over_eta, mask=M,
                                          window=marker_rheo_window(mesh))
@@ -965,7 +981,7 @@ class FaultedMesh:
         self.ratio_projection = uw.systems.Projection(mesh, self.yield_ratio)
         self.ratio_projection.uw_function = eta_eff / self.eta_T
         self.edot_projection = uw.systems.Projection(mesh, self.edot_p)
-        self.edot_projection.uw_function = self.host_cm._strainrate_inv_II * sympy.Max(
+        self.edot_projection.uw_function = self.host_cm._strainrate_inv_II / felt * sympy.Max(
             0, 1 - eta_eff / (self.eta_T * weak))
         self.diagnostics = AnnulusDiagnostics(T_b, self.v, eta_eff, self.eta_T, heating)
         self.t_build = time.perf_counter() - wall
