@@ -4062,3 +4062,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (its footprint would paint 12 of 43 plane cells); FaultNetwork.apply takes the host viscosity as a number or field, so
   a weak plane over a viscoplastic host is driver composition. Hub note: the driver now imports two private library
   functions (_nearest_segment_normals, _footprints_by_user_polyline).
+- 2026-11-14: Louis: "Try the various suggestions overnight". Pushed new branch kaiju/weak-plane-tests on 63504b1 (K1's
+  24bad6f -> 1909cc5; blob 3005216; mbox sha256 matched; py_compile and pyflakes clean): test dials only
+  (uw_plane_law ti|iso, uw_plane_cells curve|wall|zone, uw_plane_reach; defaults reproduce f48729a); not for
+  kaiju/slab-workbench. CORRECTION (K1) to the weak-plane entry above: the band ends one to three rungs above the cut's
+  top short of the wall on many rebuilds, so the weak plane (and the old zone alike) holds only 17-34 km of the 53-61
+  km of fitted curve between wall and cut top on three late faults (steps 197, 225, 255); the rest lies in ordinary
+  cells. Overnight (runs/wb_plane_tests; job 4657 two-step checks, then a 60-step array from the step-195 checkpoint):
+  seven variants separating law (TI/iso) from cells (plane/old zone), half width, weakness 0.01 and 0.0001, and the
+  plane carried to the wall. Results page in the morning.
