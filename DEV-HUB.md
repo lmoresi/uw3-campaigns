@@ -94,6 +94,8 @@ GitHub, or in session transcripts. If it dies:
 
 ## Standing rules (team)
 
+- **Mesh geometry is degree 1; higher-order coordinates are refused** (Louis, 2026-11-12, on #978 / PR #1088, typed in the W1 session and told to the hub; ruled out earlier as infrastructure too hard to maintain alongside a particle code): "Raise, now, I think. This has never been supported, should be safe to set aside. A degree > 1 campaign would be a major undertaking that touches a lot of code, particularly with particles." `Mesh` and every `uw.meshing` constructor raise on a coordinate degree other than 1 (#1088, 93e66eed); #978 closed not planned. Reviews do not ask features to support curved geometry; a check that relies on affine cells or faces is correct by this rule. (Lost from C1's summaries until 2026-11-15; recorded here so it is not lost again.)
+
 - **No node-adding adaptation of the base in the fault add-on work** (Louis, 2026-11-03, to
   the integration session): "Don't use any node-adding adaptation of the base - we
   discussed this as being problematic because it creates a mess of the FMG strategy and is
