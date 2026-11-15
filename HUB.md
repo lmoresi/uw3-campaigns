@@ -4097,3 +4097,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   of the ref-5 moving-mesh cost. Open: an early slip rise on all graded bases (not lid resolution; H2 suspects the coarse
   interior, proposes a 100 km interior test). H2 asked for its undelivered message-for-C2.md, the driver commit/path
   with the uw_cell_* options and MMPDE hook, the full option line, and the uw3 commit.
+- 2026-11-15: K1 took the FMG ruling: no further multigrid experiments; -uw_mg_levels stays on kaiju/weak-plane-tests;
+  results page v2, spec and README reworded. K1 idle, nothing queued, waiting for the MMPDE brief.
