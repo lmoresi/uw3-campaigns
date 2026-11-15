@@ -4085,3 +4085,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   plastic strain beside the cut back to the zone's level (0.05-0.06) where planes stopping short leave 0.17-0.37. Cut
   coarse levels for Stokes: 1.7-3.6x slower in all three settings, same answer; no case against base levels. Louis's
   calls: plane to the wall by default or not; the yield correction; whether the test dials stay. Nothing queued.
+- 2026-11-15: Louis: FMG set-up settled ("stop messing with the FMG formula"): workbench keeps base levels; ledger
+  2f09d0e; K1 told (the -uw_mg_levels dial stays a test dial). Louis: K1 will take over bringing MMPDE into the
+  workbench once the plan is finished; delegate it then. H2's graded-base trial (underworld3 h2-renders 43184f4,
+  graded_base_trial.md): a smooth radial ramp survives refinement 1-2 (mostly 3, lost at 4); the mover gains only
+  ~1.3-2.3 (short of nodes, not ratio; redistributes radially, not round the annulus), so the base must be within ~2x
+  of target; current design (sec. 4 + 7): 22 km band in the top 100 km all round, 34 km slab region +-2000 km to 700 km,
+  fast growth below to ~220 km in the lower mantle, refinement 2, 40,928 cells; lid 12/17 km, slab 24-34 km to 660 km
+  after moves; 280 steps to t 9.06e-4, all converged, fault placed every step; vrms within 4 % of K1's uniform ref-5,
+  slip 8-12 % low to 7e-4 and 35 % low at 8e-4 (not explained), trench 1.5-2.2 deg ahead; about a quarter to a fifth
+  of the ref-5 moving-mesh cost. Open: an early slip rise on all graded bases (not lid resolution; H2 suspects the coarse
+  interior, proposes a 100 km interior test). H2 asked for its undelivered message-for-C2.md, the driver commit/path
+  with the uw_cell_* options and MMPDE hook, the full option line, and the uw3 commit.
