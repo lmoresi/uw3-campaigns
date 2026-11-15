@@ -1,0 +1,3 @@
+uw.unwrap(outer):                        3*a_{in}
+uw.unwrap(outer, keep_constants=False):  3*a_{in}
+expressions.unwrap(outer):               6*x

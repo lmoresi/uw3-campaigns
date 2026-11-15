@@ -1,0 +1,33 @@
+uw.function has evalf: False
+files calling uw.function.evalf: 28 (4 under WIP/)
+   docs/examples/WIP/Geographical/Geographic-Mesh-Simple.py
+   docs/examples/WIP/Geographical/Mesh-Adapted-2-Faults.py
+   docs/examples/WIP/developer_tools/SOpt.py
+   docs/examples/WIP/porous_flow/pramoda_stokes.ipynb
+   docs/examples/convection/advanced/Ex_AdvectionDiffusion_1dBlock.py
+   docs/examples/convection/advanced/Ex_Convection_Disc_InternalHeat.py
+   docs/examples/fluid_mechanics/advanced/Ex_Navier_Stokes_Benchmarks_NS_DFG_2d.py
+   docs/examples/fluid_mechanics/advanced/Ex_Navier_Stokes_Benchmarks_NS_DFG_2d_SLCN.py
+   docs/examples/fluid_mechanics/advanced/Ex_Stokes_Annulus_Benchmark_Kramer.py
+   docs/examples/fluid_mechanics/advanced/Ex_Stokes_Annulus_Benchmark_Thieulot.py
+   docs/examples/fluid_mechanics/advanced/Ex_Stokes_Spherical_Benchmark_Kramer.py
+   docs/examples/fluid_mechanics/advanced/Ex_Stokes_Spherical_Benchmark_Thieulot.py
+   docs/examples/fluid_mechanics/intermediate/Ex_Stokes_Flow_Internal_BC.py
+   docs/examples/fluid_mechanics/intermediate/Ex_Stokes_Flow_Obstruction-3D.py
+   docs/examples/fluid_mechanics/intermediate/Ex_Stokes_Flow_Obstruction.py
+   docs/examples/free_surface/advanced/AnnulusFS.py
+   docs/examples/free_surface/advanced/AnnulusND_FS-FullDiscMesh.py
+   docs/examples/free_surface/advanced/AnnulusND_FS-OuterSphere.py
+   docs/examples/free_surface/advanced/AnnulusND_FS.py
+   docs/examples/heat_transfer/advanced/Ex_Poisson_v.SLCN.py
+   docs/examples/heat_transfer/intermediate/Ex_DiffusionSLCN_Cartesian.py
+   docs/examples/heat_transfer/intermediate/Ex_Poisson_Cartesian.py
+   docs/examples/porous_flow/advanced/Ex_viscousFingering.py
+   docs/examples/solid_mechanics/intermediate/Ex_Compression_AnisotropicFault-3D.py
+   docs/examples/utilities/advanced/Ex_Stokes_Annulus_Benchmark_Kramer_etal.py
+   docs/examples/utilities/advanced/Ex_Stokes_Annulus_Benchmark_Thieulot.py
+   docs/examples/utilities/intermediate/CheckSwarmLayout.py
+   docs/examples/utilities/intermediate/Convection-AdaptedMesh.py
+files indexing stats()[5]: 2
+   docs/examples/utilities/advanced/Ex_Stokes_Annulus_Benchmark_Kramer_etal.py
+   docs/examples/utilities/advanced/Ex_Stokes_Annulus_Benchmark_Thieulot.py

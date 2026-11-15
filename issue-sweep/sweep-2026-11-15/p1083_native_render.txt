@@ -1,0 +1,7 @@
+P4 aspect 100: native table refused (None); warnings on render: 0
+P5 aspect 10: native table refused (None); warnings on render: 0
+P8 aspect 1: native table refused (None); warnings on render: 0
+Q3 aspect 100: native table refused (None); warnings on render: 0
+Q4 aspect 10: native table refused (None); warnings on render: 0
+P3 aspect 1: native table (72, 3); warnings on render: 0
+Q2 aspect 1: native table (16, 4); warnings on render: 0

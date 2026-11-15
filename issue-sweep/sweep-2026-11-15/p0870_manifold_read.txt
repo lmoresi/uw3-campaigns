@@ -1,0 +1,20 @@
+dim 2 cdim 3
+Traceback (most recent call last):
+  File "<probe dir>/p0870_manifold_read.py", line 16, in <module>
+    R.read_timestep("m", "T", 0, outputPath=out)
+  File "<env>/underworld3/discretisation/enhanced_variables.py", line 587, in read_timestep
+    return self._base_var.read_timestep(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<env>/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<env>/underworld3/discretisation/discretisation_mesh_variables.py", line 1553, in read_timestep
+    source_swarm.add_particles_with_global_coordinates(X_src, migrate=False)
+  File "<env>/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<env>/underworld3/swarm.py", line 4690, in add_particles_with_global_coordinates
+    raise ValueError(
+ValueError: The 'coordinateArray' must have shape (n, cdim), where 'n' is the
+                                number of particles to add, and 'cdim' is the embedding
+                                (coordinate) dimensionality of the supporting mesh (3).

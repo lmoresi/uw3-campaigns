@@ -1,0 +1,1 @@
+clock 1.0, solve(time=3.0): reason 2, bottom values min 1.000000 max 1.000000

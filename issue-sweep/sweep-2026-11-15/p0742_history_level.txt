@@ -1,0 +1,3 @@
+<probe dir>/p0742_history_level.py:36: RuntimeWarning: Stokes: the velocity block fell back to 'gamg' — no mesh hierarchy was available, so the custom-P multigrid could not be built. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+stokes after 5 solves: psi_star[0]_xy = 0.393469; exact(5) = 0.393469, exact(4) = 0.329680
+slcn   after 5 solves: psi_star[0]_xy = 0.329681; exact(5) = 0.393469, exact(4) = 0.329680

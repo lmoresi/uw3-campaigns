@@ -1,0 +1,6 @@
+build: boundary_residual_f0 entry: (UW_Boundaries, 12) (0, 0) UW8DBF482A_petsc_eqn_7
+build: kernels listed there: 1
+rewire1: boundary_residual_f0 entry: (UW_Boundaries, 12) (0, 0) UW8DBF482A_petsc_eqn_7, UW22243BB9_petsc_eqn_7
+rewire1: kernels listed there: 2
+rewire2: boundary_residual_f0 entry: (UW_Boundaries, 12) (0, 0) UW8DBF482A_petsc_eqn_7, UW22243BB9_petsc_eqn_7, UW346CC864_petsc_eqn_7
+rewire2: kernels listed there: 3

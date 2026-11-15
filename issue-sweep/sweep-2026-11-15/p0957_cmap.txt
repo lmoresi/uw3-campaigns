@@ -1,0 +1,5 @@
+pyvista 0.46.4
+plot_scalar default raised ValueError Invalid colormap ''
+plot_scalar {'cmap': 'viridis'} OK
+plot_vector default raised AttributeError 'MutableDenseMatrix' object has no attribute 'sym'
+plot_vector {'cmap': 'viridis'} raised AttributeError 'MutableDenseMatrix' object has no attribute 'sym'

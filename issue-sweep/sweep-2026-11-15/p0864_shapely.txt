@@ -1,0 +1,3 @@
+mcp missing: No module named 'mcp'
+shapely missing: No module named 'shapely'
+coverage check mentions 'could not import' / importorskip: False

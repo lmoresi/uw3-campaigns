@@ -1,0 +1,4 @@
+before the move: proxy error against the nodes 4.44e-16
+largest node move 1.954e-02
+after the move and rewrite: proxy error against moved nodes 1.94e-02, against pre-move nodes 4.44e-16
+_mesh_version 0 -> 0; _move_version 0 -> 1

@@ -1,0 +1,4 @@
+backward Euler 0.66958; Crank-Nicolson 0.60418 (k = pi^2)
+theta 0.0: DFDt Symbolic, ratio over one step 0.66958
+theta 0.5: DFDt Symbolic, ratio over one step 0.66958
+theta 1.0: DFDt Symbolic, ratio over one step 0.66958
