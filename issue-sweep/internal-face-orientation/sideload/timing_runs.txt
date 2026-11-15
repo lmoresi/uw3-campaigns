@@ -1,0 +1,9 @@
+START development (aee3fa65) refinement 1 19:52:44
+development (aee3fa65) | refinement 1: cells 19184, boundary faces 4800 (904 not at 0); best of 5: residual 0.5294 s without, 0.5992 s with (boundary 0.0698 s); Jacobian 12.0455 s without, 14.9745 s with (boundary 2.9290 s)
+START side-load refinement 1 19:56:01
+side-load | refinement 1: cells 19184, boundary faces 4800 (904 not at 0); best of 5: residual 0.5553 s without, 0.5751 s with (boundary 0.0199 s); Jacobian 12.0338 s without, 14.9737 s with (boundary 2.9398 s)
+START development (aee3fa65) refinement 2 19:59:17
+development (aee3fa65) | refinement 2: cells 153472, boundary faces 19200 (6270 not at 0); best of 5: residual 4.2207 s without, 4.4251 s with (boundary 0.2045 s); Jacobian 96.3848 s without, 108.1436 s with (boundary 11.7587 s)
+START side-load refinement 2 20:21:13
+side-load | refinement 2: cells 153472, boundary faces 19200 (6270 not at 0); best of 5: residual 4.2539 s without, 4.4477 s with (boundary 0.1938 s); Jacobian 96.4741 s without, 108.2597 s with (boundary 11.7857 s)
+ALL DONE 20:43:13

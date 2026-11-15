@@ -1,6 +1,6 @@
 # Draft upstream report: PETSc, #1188 (second item for Monday, with #962)
 
-*Status: NOT READY (C1 sets it). W1 added the C reproducer and the check of the mechanism on 2026-11-14 and corrected the Reach paragraph; a patched build has not been made. Louis sends it in his name. Facts below are W1's, measured on one rank, conda-forge PETSc 3.25.3, 2026-11-14. Probes: campaigns 9b95e07, `issue-sweep/internal-face-orientation/`. Issue: underworldcode/underworld3#1188.*
+*Status: NOT READY (C1, the session that tracks library fixes, sets it). W1 (the integration session, on macOS, 12-core Apple M4, serial runs only) added the C reproducer and the check of the mechanism on 2026-11-14 and corrected the Reach paragraph; a patched build has not been made. Louis sends it in his name. Facts below are W1's, measured on one rank, conda-forge PETSc 3.25.3, 2026-11-14. Probes: campaigns 9b95e07, `issue-sweep/internal-face-orientation/`. Issue: underworldcode/underworld3#1188.*
 
 ---
 
@@ -36,5 +36,30 @@
 
 **Still to do before sending:**
 1. Done: the reproducer above.
-2. Mechanism confirmed for positive orientations by the exact prediction. A patched build (`PetscDSPermuteQuadPoint` in place of the reversal) is not made: it needs a PETSc source build, which W1 has not started without Louis's word.
+2. Mechanism confirmed for positive orientations by the exact prediction, and for all six orientations by the remap below, which removes the error on every one. A patched PETSc build is not needed (C1, 2026-11-15).
 3. Done: the Nitsche probe above.
+
+---
+
+## Proposed fix (W1, 2026-11-15; measured on one rank, conda-forge PETSc 3.25.3)
+
+**What we offer upstream:** pair face quadrature point q with the cell's tabulation at the point the face orientation maps it to, for every orientation of a triangle, as the hybrid integrals already do with `PetscDSPermuteQuadPoint`. We have not built PETSc with the change; the measurements below are of a remap that gives the integrators the same pairing from outside.
+
+**What underworld3 runs until then** (`src/underworld3/cython/uw_face_orientation.h`, branch `bugfix/boundary-quadrature-face-orientation-1188`): a wrapper around PETSc's own `integratebdresidual`, `integratebdjacobian` and `integratebd` on each FE of a 3-D simplex mesh. For each face at orientation o != 0, it rewrites the face geometry's affine map so that face quadrature point q lands at the physical point of the cell's tabulation point q, and sets the face's orientation to 0. It then calls PETSc's integrator and restores the geometry and orientation.
+- The map T_o comes from PETSc itself: `DMPlexCreateReferenceCell(TRIANGLE)`, `DMPlexOrientPoint(refdm, 0, o)` and `DMPlexComputeCellGeometryFEM`.
+- Only the physical point reads the remapped map. detJ and the normal are per face, and gradients use the support cells' Jacobians.
+- Over a fixed PETSc it stays correct, because it hands every face over at orientation 0.
+- Nothing is copied from PETSc: the jet evaluation and element update are PETSC_INTERN, so the remap wraps the integrator and does not replace it.
+
+**Measured with the remap:**
+- PETSc-only reproducer, 135 runs over exterior walls, interior walls and swapped supports (walls that are whole planes). The error moves from 5.2e-3 to 9.4e-16 on exterior walls (orientations 0 to 2, 45 runs), from 1.6e-2 to 7.8e-16 on interior walls with negative orientations (33 runs), and from 6.5e-4 to 7.8e-16 on interior walls at positive orientations only (6 runs). The 3 runs with every face at 0 stay at 3.3e-16, and 2-D is unchanged.
+- Through underworld3:
+  - case A goes to 0 differing nodes at refinements 1 and 2;
+  - case B goes to no change (1e-17) on the 3-D shell;
+  - the Nitsche rigid rotation goes to 2.9e-16 (refinement 1) and 5.4e-16 (refinement 2).
+- Kramer et al. (2021) delta-forced Stokes on a spherical shell with an internal surface: the velocity and pressure errors move by about 0.3 % of themselves. Discretisation error dominates them, so this benchmark does not show the defect.
+
+**Cost of the remap:** residual and Jacobian assembly on the same shell, with and without a natural load on all three surfaces, best of 5, one rank. At refinement 2 (153472 cells, 19200 boundary faces, 6270 of them not at orientation 0), the boundary share of the Jacobian is 11.76 s on development and 11.79 s with the remap, out of 108 s. The boundary share of the residual is 0.20 s and 0.19 s, out of 4.4 s. At refinement 1 the differences are within the run-to-run spread of the load-free assembly. These are laptop wall times. Probes and outputs: `issue-sweep/internal-face-orientation/sideload/`.
+
+**Not covered:** quadrilateral faces of hexahedral meshes (not measured, no remap installed), and curved faces (underworld3 refuses coordinates of degree other than 1).
+

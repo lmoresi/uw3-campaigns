@@ -1,0 +1,9 @@
+START development (aee3fa65) refinement 1 17:44:19
+development (aee3fa65) | cell 0.5 refinement 1: cells 19184, velocity nodes 28852; Internal faces by orientation {0: 1237, 1: 198, 2: 93}; reason 2, Newton its 1, Krylov its (outer) 3; velocity rms error / rms 1.251078e-01; pressure rms error / rms 6.171417e-01; solve 174 s
+START side-load refinement 1 17:47:22
+side-load | cell 0.5 refinement 1: cells 19184, velocity nodes 28852; Internal faces by orientation {0: 1237, 1: 198, 2: 93}; reason 2, Newton its 1, Krylov its (outer) 3; velocity rms error / rms 1.254705e-01; pressure rms error / rms 6.186523e-01; solve 172 s
+START development (aee3fa65) refinement 2 17:50:18
+development (aee3fa65) | cell 0.5 refinement 2: cells 153472, velocity nodes 217718; Internal faces by orientation {0: 4077, 1: 1279, 2: 756}; reason 2, Newton its 1, Krylov its (outer) 8; velocity rms error / rms 4.833048e-02; pressure rms error / rms 4.549616e-01; solve 3671 s
+START side-load refinement 2 18:51:42
+side-load | cell 0.5 refinement 2: cells 153472, velocity nodes 217718; Internal faces by orientation {0: 4077, 1: 1279, 2: 756}; reason 2, Newton its 1, Krylov its (outer) 6; velocity rms error / rms 4.840668e-02; pressure rms error / rms 4.554647e-01; solve 2808 s
+ALL DONE 19:38:52

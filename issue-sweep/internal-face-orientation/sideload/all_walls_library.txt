@@ -1,0 +1,1620 @@
+pos -1 swap 0 axis 0 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 0 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 0.000e+00
+pos -1 swap 0 axis 0 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33105468750000 (exact 1/3), error -2.279e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24772135416667 (exact 1/4), error -2.279e-03
+int u x dS, u = x: 0.33105468750000 (exact 1/3), error -2.279e-03
+pos -1 swap 0 axis 0 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos -1 swap 0 axis 0 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  0: 56  1: 54  2: 18
+b.1 = 0.50000000000000 (exact 0.5), error 4.441e-16
+b.x = 0.33260091145833 (exact 1/3), error -7.324e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.24926757812500 (exact 1/4), error -7.324e-04
+int u x dS, u = x: 0.33260091145833 (exact 1/3), error -7.324e-04
+pos -1 swap 0 axis 0 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  0: 56  1: 54  2: 18
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos -1 swap 0 axis 0 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 0 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos -1 swap 0 axis 0 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 0 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.110e-16
+pos -1 swap 0 axis 0 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 0 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.110e-16
+pos -1 swap 0 axis 0 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  0: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33072916666667 (exact 1/3), error -2.604e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24843750000000 (exact 1/4), error -1.562e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos -1 swap 0 axis 0 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  0: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 0.000e+00
+pos -1 swap 0 axis 0 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  0: 25  1: 1  2: 6
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33219401041667 (exact 1/3), error -1.139e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24916992187500 (exact 1/4), error -8.301e-04
+int u x dS, u = x: 0.33219401041667 (exact 1/3), error -1.139e-03
+pos -1 swap 0 axis 0 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  0: 25  1: 1  2: 6
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 0.000e+00
+pos -1 swap 0 axis 0 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  0: 90  1: 10  2: 28
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33294677734375 (exact 1/3), error -3.866e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.24968058268229 (exact 1/4), error -3.194e-04
+int u x dS, u = x: 0.33294677734375 (exact 1/3), error -3.866e-04
+pos -1 swap 0 axis 0 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  0: 90  1: 10  2: 28
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos -1 swap 0 axis 0 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  1: 1  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -3.886e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 0 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  1: 1  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 0 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  0: 19  1: 6  2: 7
+b.1 = 0.50000000000000 (exact 0.5), error -6.106e-16
+b.x = 0.33121744791667 (exact 1/3), error -2.116e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.24783528645833 (exact 1/4), error -2.165e-03
+int u x dS, u = x: 0.33121744791667 (exact 1/3), error -2.116e-03
+pos -1 swap 0 axis 0 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  0: 19  1: 6  2: 7
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-16
+b.x = 0.33333333333333 (exact 1/3), error -3.886e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.331e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 0 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  0: 64  1: 28  2: 36
+b.1 = 0.50000000000000 (exact 0.5), error -8.882e-16
+b.x = 0.33268229166667 (exact 1/3), error -6.510e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -8.882e-16
+x.M.x = 0.24932352701823 (exact 1/4), error -6.765e-04
+int u x dS, u = x: 0.33268229166667 (exact 1/3), error -6.510e-04
+pos -1 swap 0 axis 0 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  0: 64  1: 28  2: 36
+b.1 = 0.50000000000000 (exact 0.5), error -8.882e-16
+b.x = 0.33333333333333 (exact 1/3), error -6.106e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -8.882e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -6.106e-16
+pos -1 swap 0 axis 0 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -3.886e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.996e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 0 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -3.886e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.996e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 0 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error -6.106e-16
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 0 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-16
+b.x = 0.33333333333333 (exact 1/3), error -3.886e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.106e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.053e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 0 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -9.437e-16
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -9.437e-16
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 0 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -8.882e-16
+b.x = 0.33333333333333 (exact 1/3), error -6.106e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -9.437e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -6.106e-16
+pos -1 swap 0 axis 1 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33072916666667 (exact 1/3), error -2.604e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24843750000000 (exact 1/4), error -1.563e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos -1 swap 0 axis 1 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos -1 swap 0 axis 1 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33203125000000 (exact 1/3), error -1.302e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.24905598958333 (exact 1/4), error -9.440e-04
+int u x dS, u = x: 0.33203125000000 (exact 1/3), error -1.302e-03
+pos -1 swap 0 axis 1 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos -1 swap 0 axis 1 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33286539713542 (exact 1/3), error -4.679e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.24962463378906 (exact 1/4), error -3.754e-04
+int u x dS, u = x: 0.33286539713542 (exact 1/3), error -4.679e-04
+pos -1 swap 0 axis 1 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -3.886e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.331e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 1 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 1 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.776e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos -1 swap 0 axis 1 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 1 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos -1 swap 0 axis 1 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 1 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos -1 swap 0 axis 1 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33072916666667 (exact 1/3), error -2.604e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.24843750000000 (exact 1/4), error -1.563e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos -1 swap 0 axis 1 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos -1 swap 0 axis 1 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33203125000000 (exact 1/3), error -1.302e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.24905598958333 (exact 1/4), error -9.440e-04
+int u x dS, u = x: 0.33203125000000 (exact 1/3), error -1.302e-03
+pos -1 swap 0 axis 1 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos -1 swap 0 axis 1 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -6.106e-16
+b.x = 0.33286539713542 (exact 1/3), error -4.679e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.24962463378906 (exact 1/4), error -3.754e-04
+int u x dS, u = x: 0.33286539713542 (exact 1/3), error -4.679e-04
+pos -1 swap 0 axis 1 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-16
+b.x = 0.33333333333333 (exact 1/3), error -4.441e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -4.441e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -4.441e-16
+pos -1 swap 0 axis 1 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33072916666667 (exact 1/3), error -2.604e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.24635416666667 (exact 1/4), error -3.646e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos -1 swap 0 axis 1 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos -1 swap 0 axis 1 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33203125000000 (exact 1/3), error -1.302e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.24833984375000 (exact 1/4), error -1.660e-03
+int u x dS, u = x: 0.33203125000000 (exact 1/3), error -1.302e-03
+pos -1 swap 0 axis 1 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos -1 swap 0 axis 1 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33286539713542 (exact 1/3), error -4.679e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.24943949381510 (exact 1/4), error -5.605e-04
+int u x dS, u = x: 0.33286539713542 (exact 1/3), error -4.679e-04
+pos -1 swap 0 axis 1 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -3.886e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.331e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos -1 swap 0 axis 1 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 1 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.110e-16
+pos -1 swap 0 axis 1 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 1 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos -1 swap 0 axis 1 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 4.441e-16
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 1 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 4.441e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.776e-16
+pos -1 swap 0 axis 2 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 2 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.110e-16
+pos -1 swap 0 axis 2 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33105468750000 (exact 1/3), error -2.279e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.24772135416667 (exact 1/4), error -2.279e-03
+int u x dS, u = x: 0.33105468750000 (exact 1/3), error -2.279e-03
+pos -1 swap 0 axis 2 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos -1 swap 0 axis 2 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  0: 56  1: 54  2: 18
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33260091145833 (exact 1/3), error -7.324e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24926757812500 (exact 1/4), error -7.324e-04
+int u x dS, u = x: 0.33260091145833 (exact 1/3), error -7.324e-04
+pos -1 swap 0 axis 2 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  0: 56  1: 54  2: 18
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos -1 swap 0 axis 2 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  1: 1  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 2 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  1: 1  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.776e-16
+pos -1 swap 0 axis 2 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  0: 19  1: 6  2: 7
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33121744791667 (exact 1/3), error -2.116e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.24783528645833 (exact 1/4), error -2.165e-03
+int u x dS, u = x: 0.33121744791667 (exact 1/3), error -2.116e-03
+pos -1 swap 0 axis 2 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  0: 19  1: 6  2: 7
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos -1 swap 0 axis 2 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  0: 64  1: 28  2: 36
+b.1 = 0.50000000000000 (exact 0.5), error -6.106e-16
+b.x = 0.33268229166667 (exact 1/3), error -6.510e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.24932352701823 (exact 1/4), error -6.765e-04
+int u x dS, u = x: 0.33268229166667 (exact 1/3), error -6.510e-04
+pos -1 swap 0 axis 2 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  0: 64  1: 28  2: 36
+b.1 = 0.50000000000000 (exact 0.5), error -6.106e-16
+b.x = 0.33333333333333 (exact 1/3), error -4.996e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -6.661e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -4.163e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -6.106e-16
+pos -1 swap 0 axis 2 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 2 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos -1 swap 0 axis 2 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 2 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 0.000e+00
+pos -1 swap 0 axis 2 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 2 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error 1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos -1 swap 0 axis 2 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33072916666667 (exact 1/3), error -2.604e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.24635416666667 (exact 1/4), error -3.646e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos -1 swap 0 axis 2 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  0: 7  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos -1 swap 0 axis 2 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33203125000000 (exact 1/3), error -1.302e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24833984375000 (exact 1/4), error -1.660e-03
+int u x dS, u = x: 0.33203125000000 (exact 1/3), error -1.302e-03
+pos -1 swap 0 axis 2 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  0: 24  1: 7  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos -1 swap 0 axis 2 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.33286539713542 (exact 1/3), error -4.679e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.24943949381510 (exact 1/4), error -5.605e-04
+int u x dS, u = x: 0.33286539713542 (exact 1/3), error -4.679e-04
+pos -1 swap 0 axis 2 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  0: 82  1: 36  2: 10
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.33333333333333 (exact 1/3), error -3.886e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.441e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.608e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -4.441e-16
+pos -1 swap 0 axis 2 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.32812500000000 (exact 1/3), error -5.208e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.24479166666667 (exact 1/4), error -5.208e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos -1 swap 0 axis 2 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  0: 6  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.25000000000000 (exact 1/4), error -2.776e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos -1 swap 0 axis 2 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33138020833333 (exact 1/3), error -1.953e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24804687500000 (exact 1/4), error -1.953e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos -1 swap 0 axis 2 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  0: 20  2: 12
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos -1 swap 0 axis 2 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33276367187500 (exact 1/3), error -5.697e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.24943033854167 (exact 1/4), error -5.697e-04
+int u x dS, u = x: 0.33276367187500 (exact 1/3), error -5.697e-04
+pos -1 swap 0 axis 2 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  0: 72  1: 2  2: 54
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos 0.5 swap 0 axis 0 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33221465964429 (exact 1/3), error -1.119e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24898304807760 (exact 1/4), error -1.017e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos 0.5 swap 0 axis 0 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos 0.5 swap 0 axis 0 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 23  1: 5
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33224637319959 (exact 1/3), error -1.087e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24888292532939 (exact 1/4), error -1.117e-03
+int u x dS, u = x: 0.33186848958333 (exact 1/3), error -1.465e-03
+pos 0.5 swap 0 axis 0 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 23  1: 5
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 0 axis 0 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 75  1: 32  2: 5
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33288955007484 (exact 1/3), error -4.438e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.24954846614956 (exact 1/4), error -4.515e-04
+int u x dS, u = x: 0.33280436197917 (exact 1/3), error -5.290e-04
+pos 0.5 swap 0 axis 0 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 75  1: 32  2: 5
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos 0.5 swap 0 axis 0 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  0: 13  1: 1  2: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16617838541667 (exact 1/3), error -1.672e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12462565104167 (exact 1/4), error -1.254e-01
+int u x dS, u = x: 0.16617838541667 (exact 1/3), error -1.672e-01
+pos 0.5 swap 0 axis 0 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  0: 13  1: 1  2: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  0: 44  1: 7  2: 13
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16646321614583 (exact 1/3), error -1.669e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12482808430990 (exact 1/4), error -1.252e-01
+int u x dS, u = x: 0.16646321614583 (exact 1/3), error -1.669e-01
+pos 0.5 swap 0 axis 0 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  0: 44  1: 7  2: 13
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.776e-16
+pos 0.5 swap 0 axis 0 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.776e-16
+pos 0.5 swap 0 axis 0 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  0: 29  1: 2  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.33284505208333 (exact 1/3), error -4.883e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.996e-16
+x.M.x = 0.24946289062500 (exact 1/4), error -5.371e-04
+int u x dS, u = x: 0.33284505208333 (exact 1/3), error -4.883e-04
+pos 0.5 swap 0 axis 0 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  0: 29  1: 2  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -3.886e-16
+b.x = 0.33333333333333 (exact 1/3), error -3.331e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -3.053e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.776e-16
+pos 0.5 swap 0 axis 0 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  0: 103  1: 17  2: 8
+b.1 = 0.50000000000000 (exact 0.5), error -7.772e-16
+b.x = 0.33307902018229 (exact 1/3), error -2.543e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -7.772e-16
+x.M.x = 0.24971974690755 (exact 1/4), error -2.803e-04
+int u x dS, u = x: 0.33307902018229 (exact 1/3), error -2.543e-04
+pos 0.5 swap 0 axis 0 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  0: 103  1: 17  2: 8
+b.1 = 0.50000000000000 (exact 0.5), error -7.772e-16
+b.x = 0.33333333333333 (exact 1/3), error -6.106e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -7.772e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -4.996e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-16
+pos 0.5 swap 0 axis 0 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  0: 12  1: 3  2: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16601562500000 (exact 1/3), error -1.673e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12434895833333 (exact 1/4), error -1.257e-01
+int u x dS, u = x: 0.16601562500000 (exact 1/3), error -1.673e-01
+pos 0.5 swap 0 axis 0 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  0: 12  1: 3  2: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  0: 37  1: 18  2: 9
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16639200846354 (exact 1/3), error -1.669e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12471872965495 (exact 1/4), error -1.253e-01
+int u x dS, u = x: 0.16639200846354 (exact 1/3), error -1.669e-01
+pos 0.5 swap 0 axis 0 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  0: 37  1: 18  2: 9
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 0 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos 0.5 swap 0 axis 0 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos 0.5 swap 0 axis 0 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  0: 29  1: 1  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33284505208333 (exact 1/3), error -4.883e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24962565104167 (exact 1/4), error -3.743e-04
+int u x dS, u = x: 0.33284505208333 (exact 1/3), error -4.883e-04
+pos 0.5 swap 0 axis 0 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  0: 29  1: 1  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos 0.5 swap 0 axis 0 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  0: 104  1: 11  2: 13
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33308919270833 (exact 1/3), error -2.441e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24978739420573 (exact 1/4), error -2.126e-04
+int u x dS, u = x: 0.33308919270833 (exact 1/3), error -2.441e-04
+pos 0.5 swap 0 axis 0 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  0: 104  1: 11  2: 13
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos 0.5 swap 0 axis 1 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33215056152550 (exact 1/3), error -1.183e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.24948500808581 (exact 1/4), error -5.150e-04
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos 0.5 swap 0 axis 1 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 1 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 24  1: 3  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33237804506336 (exact 1/3), error -9.553e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24927149056363 (exact 1/4), error -7.285e-04
+int u x dS, u = x: 0.33219401041667 (exact 1/3), error -1.139e-03
+pos 0.5 swap 0 axis 1 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 24  1: 3  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.388e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 1 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 82  1: 21  2: 9
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33295073249284 (exact 1/3), error -3.826e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.24968311381646 (exact 1/4), error -3.169e-04
+int u x dS, u = x: 0.33292643229167 (exact 1/3), error -4.069e-04
+pos 0.5 swap 0 axis 1 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 82  1: 21  2: 9
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.331e-16
+pos 0.5 swap 0 axis 1 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  0: 12  1: 2  2: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16601562500000 (exact 1/3), error -1.673e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12434895833333 (exact 1/4), error -1.257e-01
+int u x dS, u = x: 0.16601562500000 (exact 1/3), error -1.673e-01
+pos 0.5 swap 0 axis 1 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  0: 12  1: 2  2: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  0: 38  1: 12  2: 14
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16640218098958 (exact 1/3), error -1.669e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12472534179688 (exact 1/4), error -1.253e-01
+int u x dS, u = x: 0.16640218098958 (exact 1/3), error -1.669e-01
+pos 0.5 swap 0 axis 1 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  0: 38  1: 12  2: 14
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 2  0: 6
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.32879367844549 (exact 1/3), error -4.540e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24608971178528 (exact 1/4), error -3.910e-03
+int u x dS, u = x: 0.32812500000000 (exact 1/3), error -5.208e-03
+pos 0.5 swap 0 axis 1 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 2  0: 6
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 1 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 2  -1: 6  0: 19  1: 5
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33138257424854 (exact 1/3), error -1.951e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.24810463745183 (exact 1/4), error -1.895e-03
+int u x dS, u = x: 0.33138020833333 (exact 1/3), error -1.953e-03
+pos 0.5 swap 0 axis 1 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 2  -1: 6  0: 19  1: 5
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 0 axis 1 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 12  -1: 18  0: 60  1: 31  2: 5
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33268240945470 (exact 1/3), error -6.509e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.24934649787017 (exact 1/4), error -6.535e-04
+int u x dS, u = x: 0.33271280924479 (exact 1/3), error -6.205e-04
+pos 0.5 swap 0 axis 1 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 12  -1: 18  0: 60  1: 31  2: 5
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 1 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  0: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  0: 13  1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16617838541667 (exact 1/3), error -1.672e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12439778645833 (exact 1/4), error -1.256e-01
+int u x dS, u = x: 0.16617838541667 (exact 1/3), error -1.672e-01
+pos 0.5 swap 0 axis 1 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  0: 13  1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  0: 42  1: 19  2: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16644287109375 (exact 1/3), error -1.669e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12473449707031 (exact 1/4), error -1.253e-01
+int u x dS, u = x: 0.16644287109375 (exact 1/3), error -1.669e-01
+pos 0.5 swap 0 axis 1 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  0: 42  1: 19  2: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18598614350416 (exact 1/3), error -1.473e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13219384251335 (exact 1/4), error -1.178e-01
+int u x dS, u = x: 0.18489583333333 (exact 1/3), error -1.484e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 15  1: 3  2: 2
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18631424416456 (exact 1/3), error -1.470e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13195124898314 (exact 1/4), error -1.180e-01
+int u x dS, u = x: 0.18603515625000 (exact 1/3), error -1.473e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 15  1: 3  2: 2
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 47  1: 18  2: 15
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18707220792024 (exact 1/3), error -1.463e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13247489497556 (exact 1/4), error -1.175e-01
+int u x dS, u = x: 0.18701171875000 (exact 1/3), error -1.463e-01
+pos 0.5 swap 0 axis 1 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 47  1: 18  2: 15
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 0 axis 2 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 2 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  0: 8
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 2 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  0: 28  1: 2  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33268229166667 (exact 1/3), error -6.510e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24934895833333 (exact 1/4), error -6.510e-04
+int u x dS, u = x: 0.33268229166667 (exact 1/3), error -6.510e-04
+pos 0.5 swap 0 axis 2 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  0: 28  1: 2  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos 0.5 swap 0 axis 2 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  0: 98  1: 16  2: 14
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33302815755208 (exact 1/3), error -3.052e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24970499674479 (exact 1/4), error -2.950e-04
+int u x dS, u = x: 0.33302815755208 (exact 1/3), error -3.052e-04
+pos 0.5 swap 0 axis 2 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  0: 98  1: 16  2: 14
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 0 axis 2 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30986938441480 (exact 1/3), error -2.346e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23884721434798 (exact 1/4), error -1.115e-02
+int u x dS, u = x: 0.30989583333333 (exact 1/3), error -2.344e-02
+pos 0.5 swap 0 axis 2 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 3  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31118275078569 (exact 1/3), error -2.215e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24069810357546 (exact 1/4), error -9.302e-03
+int u x dS, u = x: 0.31136067708333 (exact 1/3), error -2.197e-02
+pos 0.5 swap 0 axis 2 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 3  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 52  1: 19  2: 9
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31204725397551 (exact 1/3), error -2.129e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24167862821398 (exact 1/4), error -8.321e-03
+int u x dS, u = x: 0.31211344401042 (exact 1/3), error -2.122e-02
+pos 0.5 swap 0 axis 2 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 52  1: 19  2: 9
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33070271774814 (exact 1/3), error -2.631e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24665971434798 (exact 1/4), error -3.340e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos 0.5 swap 0 axis 2 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 7
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos 0.5 swap 0 axis 2 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 23  1: 3  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33185332370235 (exact 1/3), error -1.480e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24823391086713 (exact 1/4), error -1.766e-03
+int u x dS, u = x: 0.33203125000000 (exact 1/3), error -1.302e-03
+pos 0.5 swap 0 axis 2 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 23  1: 3  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.110e-16
+pos 0.5 swap 0 axis 2 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 77  1: 20  2: 15
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33280937962655 (exact 1/3), error -5.240e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24938482531685 (exact 1/4), error -6.152e-04
+int u x dS, u = x: 0.33287556966146 (exact 1/3), error -4.578e-04
+pos 0.5 swap 0 axis 2 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 77  1: 20  2: 15
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 0 axis 2 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30986938441480 (exact 1/3), error -2.346e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23884721434798 (exact 1/4), error -1.115e-02
+int u x dS, u = x: 0.30989583333333 (exact 1/3), error -2.344e-02
+pos 0.5 swap 0 axis 2 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 4
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31118275078569 (exact 1/3), error -2.215e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24047023899213 (exact 1/4), error -9.530e-03
+int u x dS, u = x: 0.31136067708333 (exact 1/3), error -2.197e-02
+pos 0.5 swap 0 axis 2 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 4
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 51  1: 25  2: 4
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31203708144947 (exact 1/3), error -2.130e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24159165311633 (exact 1/4), error -8.408e-03
+int u x dS, u = x: 0.31210327148438 (exact 1/3), error -2.123e-02
+pos 0.5 swap 0 axis 2 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 51  1: 25  2: 4
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30986938441480 (exact 1/3), error -2.346e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23884721434798 (exact 1/4), error -1.115e-02
+int u x dS, u = x: 0.30989583333333 (exact 1/3), error -2.344e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  -1: 1  0: 5
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 2  2: 2
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31118275078569 (exact 1/3), error -2.215e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24063299940879 (exact 1/4), error -9.367e-03
+int u x dS, u = x: 0.31136067708333 (exact 1/3), error -2.197e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3  0: 16  1: 2  2: 2
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 53  1: 13  2: 14
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31205742650155 (exact 1/3), error -2.128e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24166286079862 (exact 1/4), error -8.337e-03
+int u x dS, u = x: 0.31212361653646 (exact 1/3), error -2.121e-02
+pos 0.5 swap 0 axis 2 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 6  -1: 9  0: 53  1: 13  2: 14
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 0 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 3  -1: 3  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.31991938588078 (exact 1/3), error -1.341e-02
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24091608231704 (exact 1/4), error -9.084e-03
+int u x dS, u = x: 0.32552083333333 (exact 1/3), error -7.812e-03
+pos 0.5 swap 1 axis 0 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 3  -1: 3  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 1 axis 0 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 3  -2: 14  -1: 11  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33004771964126 (exact 1/3), error -3.286e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.24790639378093 (exact 1/4), error -2.094e-03
+int u x dS, u = x: 0.33072916666667 (exact 1/3), error -2.604e-03
+pos 0.5 swap 1 axis 0 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 3  -2: 14  -1: 11  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 1 axis 0 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 14  -2: 59  -1: 39  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.33256501408077 (exact 1/3), error -7.683e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.24961063068522 (exact 1/4), error -3.894e-04
+int u x dS, u = x: 0.33259073893229 (exact 1/3), error -7.426e-04
+pos 0.5 swap 1 axis 0 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 14  -2: 59  -1: 39  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos 0.5 swap 1 axis 0 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16091829508336 (exact 1/3), error -1.724e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12101378019963 (exact 1/4), error -1.290e-01
+int u x dS, u = x: 0.15625000000000 (exact 1/3), error -1.771e-01
+pos 0.5 swap 1 axis 0 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 4  -1: 10
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16511305813966 (exact 1/3), error -1.682e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12389955186750 (exact 1/4), error -1.261e-01
+int u x dS, u = x: 0.16406250000000 (exact 1/3), error -1.693e-01
+pos 0.5 swap 1 axis 0 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 4  -1: 10
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 13  -2: 16  -1: 35
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16623605920890 (exact 1/3), error -1.671e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12467297184245 (exact 1/4), error -1.253e-01
+int u x dS, u = x: 0.16603597005208 (exact 1/3), error -1.673e-01
+pos 0.5 swap 1 axis 0 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 13  -2: 16  -1: 35
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 1  -1: 6
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.31835519835845 (exact 1/3), error -1.498e-02
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.23796595656537 (exact 1/4), error -1.203e-02
+int u x dS, u = x: 0.31770833333333 (exact 1/3), error -1.563e-02
+pos 0.5 swap 1 axis 0 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 1  -1: 6
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.776e-16
+pos 0.5 swap 1 axis 0 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 4  -2: 5  -1: 23
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.32948889392248 (exact 1/3), error -3.844e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.996e-16
+x.M.x = 0.24695355721169 (exact 1/4), error -3.046e-03
+int u x dS, u = x: 0.32910156250000 (exact 1/3), error -4.232e-03
+pos 0.5 swap 1 axis 0 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 4  -2: 5  -1: 23
+b.1 = 0.50000000000000 (exact 0.5), error -4.441e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.776e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -4.996e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.776e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -2.220e-16
+pos 0.5 swap 1 axis 0 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 17  -2: 26  -1: 85
+b.1 = 0.50000000000000 (exact 0.5), error -7.216e-16
+b.x = 0.33233685426044 (exact 1/3), error -9.965e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -7.772e-16
+x.M.x = 0.24923627686612 (exact 1/4), error -7.637e-04
+int u x dS, u = x: 0.33225504557292 (exact 1/3), error -1.078e-03
+pos 0.5 swap 1 axis 0 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 17  -2: 26  -1: 85
+b.1 = 0.50000000000000 (exact 0.5), error -7.216e-16
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -7.772e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -4.996e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -6.106e-16
+pos 0.5 swap 1 axis 0 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.15715039982430 (exact 1/3), error -1.762e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.11548080425602 (exact 1/4), error -1.345e-01
+int u x dS, u = x: 0.15625000000000 (exact 1/3), error -1.771e-01
+pos 0.5 swap 1 axis 0 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 7  -2: 6  -1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16370409679720 (exact 1/3), error -1.696e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12170403587138 (exact 1/4), error -1.283e-01
+int u x dS, u = x: 0.16406250000000 (exact 1/3), error -1.693e-01
+pos 0.5 swap 1 axis 0 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 7  -2: 6  -1: 3
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 27  -2: 27  -1: 10
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16570937578995 (exact 1/3), error -1.676e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12383511859597 (exact 1/4), error -1.262e-01
+int u x dS, u = x: 0.16603597005208 (exact 1/3), error -1.673e-01
+pos 0.5 swap 1 axis 0 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 27  -2: 27  -1: 10
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 0 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 7
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.32101873352792 (exact 1/3), error -1.231e-02
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24316945450804 (exact 1/4), error -6.831e-03
+int u x dS, u = x: 0.32031250000000 (exact 1/3), error -1.302e-02
+pos 0.5 swap 1 axis 0 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 7
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos 0.5 swap 1 axis 0 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 4  -1: 26
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33006891369397 (exact 1/3), error -3.264e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24836921995721 (exact 1/4), error -1.631e-03
+int u x dS, u = x: 0.32975260416667 (exact 1/3), error -3.581e-03
+pos 0.5 swap 1 axis 0 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 4  -1: 26
+b.1 = 0.50000000000000 (exact 0.5), error 2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos 0.5 swap 1 axis 0 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 13  -2: 20  -1: 95
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33244896628426 (exact 1/3), error -8.844e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.24961136970399 (exact 1/4), error -3.886e-04
+int u x dS, u = x: 0.33239746093750 (exact 1/3), error -9.359e-04
+pos 0.5 swap 1 axis 0 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 13  -2: 20  -1: 95
+b.1 = 0.50000000000000 (exact 0.5), error 3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error 2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 2.220e-16
+pos 0.5 swap 1 axis 1 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -1: 5  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.665e-16
+b.x = 0.31787016320144 (exact 1/3), error -1.546e-02
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.23605440980590 (exact 1/4), error -1.395e-02
+int u x dS, u = x: 0.32291666666667 (exact 1/3), error -1.042e-02
+pos 0.5 swap 1 axis 1 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -1: 5  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos 0.5 swap 1 axis 1 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 7  -2: 3  -1: 18  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.32907173244383 (exact 1/3), error -4.262e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24620098721239 (exact 1/4), error -3.799e-03
+int u x dS, u = x: 0.33040364583333 (exact 1/3), error -2.930e-03
+pos 0.5 swap 1 axis 1 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 7  -2: 3  -1: 18  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos 0.5 swap 1 axis 1 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 27  -2: 21  -1: 64  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -2.776e-16
+b.x = 0.33215030482771 (exact 1/3), error -1.183e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.24896456246970 (exact 1/4), error -1.035e-03
+int u x dS, u = x: 0.33255004882812 (exact 1/3), error -7.833e-04
+pos 0.5 swap 1 axis 1 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 27  -2: 21  -1: 64  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -2.220e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.886e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -2.220e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -3.886e-16
+pos 0.5 swap 1 axis 1 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -1: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.15994426703550 (exact 1/3), error -1.734e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.11933442411983 (exact 1/4), error -1.307e-01
+int u x dS, u = x: 0.15625000000000 (exact 1/3), error -1.771e-01
+pos 0.5 swap 1 axis 1 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -1: 2
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 8  -2: 2  -1: 6
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16508928453790 (exact 1/3), error -1.682e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12349919784609 (exact 1/4), error -1.265e-01
+int u x dS, u = x: 0.16406250000000 (exact 1/3), error -1.693e-01
+pos 0.5 swap 1 axis 1 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 8  -2: 2  -1: 6
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 32  -2: 12  -1: 20
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16631019460977 (exact 1/3), error -1.670e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12459872730437 (exact 1/4), error -1.254e-01
+int u x dS, u = x: 0.16604614257813 (exact 1/3), error -1.673e-01
+pos 0.5 swap 1 axis 1 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 32  -2: 12  -1: 20
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 3  0: 2
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.32610571668467 (exact 1/3), error -7.228e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24710559346533 (exact 1/4), error -2.894e-03
+int u x dS, u = x: 0.32291666666667 (exact 1/3), error -1.042e-02
+pos 0.5 swap 1 axis 1 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 3  0: 2
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.665e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 1 axis 1 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 6  -2: 8  -1: 10  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33167851843643 (exact 1/3), error -1.655e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.220e-16
+x.M.x = 0.24987047785801 (exact 1/4), error -1.295e-04
+int u x dS, u = x: 0.33024088541667 (exact 1/3), error -3.092e-03
+pos 0.5 swap 1 axis 1 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 6  -2: 8  -1: 10  0: 6  1: 2
+b.1 = 0.50000000000000 (exact 0.5), error -2.220e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.110e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 1 axis 1 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 23  -2: 40  -1: 33  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33303541888343 (exact 1/3), error -2.979e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -3.331e-16
+x.M.x = 0.25024585264817 (exact 1/4), error 2.459e-04
+int u x dS, u = x: 0.33249918619792 (exact 1/3), error -8.341e-04
+pos 0.5 swap 1 axis 1 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 23  -2: 40  -1: 33  0: 18  1: 12  2: 2
+b.1 = 0.50000000000000 (exact 0.5), error -3.331e-16
+b.x = 0.33333333333333 (exact 1/3), error -1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error -2.776e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 1 axis 1 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16020493702686 (exact 1/3), error -1.731e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.11953193225942 (exact 1/4), error -1.305e-01
+int u x dS, u = x: 0.15885416666667 (exact 1/3), error -1.745e-01
+pos 0.5 swap 1 axis 1 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 1
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 6  -2: 6  -1: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16518664958689 (exact 1/3), error -1.681e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12355617739538 (exact 1/4), error -1.264e-01
+int u x dS, u = x: 0.16455078125000 (exact 1/3), error -1.688e-01
+pos 0.5 swap 1 axis 1 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 6  -2: 6  -1: 4
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 21  -2: 28  -1: 15
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16634769575444 (exact 1/3), error -1.670e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12461701105545 (exact 1/4), error -1.254e-01
+int u x dS, u = x: 0.16613769531250 (exact 1/3), error -1.672e-01
+pos 0.5 swap 1 axis 1 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 21  -2: 28  -1: 15
+b.1 = 0.25000000000000 (exact 0.5), error -2.500e-01
+b.x = 0.16666666666667 (exact 1/3), error -1.667e-01
+1.M.1 = 0.25000000000000 (exact 1/2), error -2.500e-01
+x.M.x = 0.12500000000000 (exact 1/4), error -1.250e-01
+int u x dS, u = x: 0.16666666666667 (exact 1/3), error -1.667e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -1: 3  0: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18231593546942 (exact 1/3), error -1.510e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13125281073031 (exact 1/4), error -1.187e-01
+int u x dS, u = x: 0.17708333333333 (exact 1/3), error -1.563e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -1: 3  0: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 8  -2: 3  -1: 9  0: 3  1: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18689978988709 (exact 1/3), error -1.464e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13352280453818 (exact 1/4), error -1.165e-01
+int u x dS, u = x: 0.18473307291667 (exact 1/3), error -1.486e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 8  -2: 3  -1: 9  0: 3  1: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 33  -2: 18  -1: 29  0: 9  1: 6  2: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18763957882196 (exact 1/3), error -1.457e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13341493576241 (exact 1/4), error -1.166e-01
+int u x dS, u = x: 0.18679809570312 (exact 1/3), error -1.465e-01
+pos 0.5 swap 1 axis 1 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 33  -2: 18  -1: 29  0: 9  1: 6  2: 1
+b.1 = 0.31250000000000 (exact 0.5), error -1.875e-01
+b.x = 0.18750000000000 (exact 1/3), error -1.458e-01
+1.M.1 = 0.31250000000000 (exact 1/2), error -1.875e-01
+x.M.x = 0.13281250000000 (exact 1/4), error -1.172e-01
+int u x dS, u = x: 0.18750000000000 (exact 1/3), error -1.458e-01
+pos 0.5 swap 1 axis 2 shuffle 0 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 1  -1: 6
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.31947984304121 (exact 1/3), error -1.385e-02
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.23827526376580 (exact 1/4), error -1.172e-02
+int u x dS, u = x: 0.32552083333333 (exact 1/3), error -7.813e-03
+pos 0.5 swap 1 axis 2 shuffle 0 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 1  -1: 6
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -5.551e-17
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.665e-16
+pos 0.5 swap 1 axis 2 shuffle 0 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 5  -2: 5  -1: 22
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.32969021484912 (exact 1/3), error -3.643e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24661326613628 (exact 1/4), error -3.387e-03
+int u x dS, u = x: 0.33089192708333 (exact 1/3), error -2.441e-03
+pos 0.5 swap 1 axis 2 shuffle 0 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 5  -2: 5  -1: 22
+b.1 = 0.50000000000000 (exact 0.5), error -1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 0.000e+00
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -5.551e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 0.000e+00
+pos 0.5 swap 1 axis 2 shuffle 0 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 23  -2: 25  -1: 80
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33235276781189 (exact 1/3), error -9.806e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.24897734201323 (exact 1/4), error -1.023e-03
+int u x dS, u = x: 0.33264160156250 (exact 1/3), error -6.917e-04
+pos 0.5 swap 1 axis 2 shuffle 0 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 23  -2: 25  -1: 80
+b.1 = 0.50000000000000 (exact 0.5), error -5.551e-17
+b.x = 0.33333333333333 (exact 1/3), error -5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error -1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error -8.327e-17
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -5.551e-17
+pos 0.5 swap 1 axis 2 shuffle 1 refine 1 fix 0 | wall faces by orientation in their cell:  -2: 2  -1: 3  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30606351415306 (exact 1/3), error -2.727e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23811641356178 (exact 1/4), error -1.188e-02
+int u x dS, u = x: 0.29947916666667 (exact 1/3), error -3.385e-02
+pos 0.5 swap 1 axis 2 shuffle 1 refine 1 fix 1 | wall faces by orientation in their cell:  -2: 2  -1: 3  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 1 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 1  -2: 9  -1: 10  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31065686072109 (exact 1/3), error -2.268e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24080045737307 (exact 1/4), error -9.200e-03
+int u x dS, u = x: 0.30924479166667 (exact 1/3), error -2.409e-02
+pos 0.5 swap 1 axis 2 shuffle 1 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 1  -2: 9  -1: 10  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 1 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 9  -2: 37  -1: 34  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31198924829199 (exact 1/3), error -2.134e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24174998502748 (exact 1/4), error -8.250e-03
+int u x dS, u = x: 0.31167602539063 (exact 1/3), error -2.166e-02
+pos 0.5 swap 1 axis 2 shuffle 1 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 9  -2: 37  -1: 34  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 3 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -1: 5  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.32346568667886 (exact 1/3), error -9.868e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24395931749506 (exact 1/4), error -6.041e-03
+int u x dS, u = x: 0.32291666666667 (exact 1/3), error -1.042e-02
+pos 0.5 swap 1 axis 2 shuffle 3 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -1: 5  0: 1
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.25000000000000 (exact 1/4), error 0.000e+00
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 5.551e-17
+pos 0.5 swap 1 axis 2 shuffle 3 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 8  -2: 3  -1: 17  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33068151358184 (exact 1/3), error -2.652e-03
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.24820005766915 (exact 1/4), error -1.800e-03
+int u x dS, u = x: 0.33056640625000 (exact 1/3), error -2.767e-03
+pos 0.5 swap 1 axis 2 shuffle 3 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 8  -2: 3  -1: 17  0: 3  1: 1
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33333333333333 (exact 1/3), error 5.551e-17
+1.M.1 = 0.50000000000000 (exact 1/2), error 0.000e+00
+x.M.x = 0.25000000000000 (exact 1/4), error 1.110e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error 1.665e-16
+pos 0.5 swap 1 axis 2 shuffle 3 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 33  -2: 20  -1: 59  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error 0.000e+00
+b.x = 0.33263338025612 (exact 1/3), error -7.000e-04
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.24948412517160 (exact 1/4), error -5.159e-04
+int u x dS, u = x: 0.33260091145833 (exact 1/3), error -7.324e-04
+pos 0.5 swap 1 axis 2 shuffle 3 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 33  -2: 20  -1: 59  0: 9  1: 6  2: 1
+b.1 = 0.50000000000000 (exact 0.5), error 1.110e-16
+b.x = 0.33333333333333 (exact 1/3), error 1.665e-16
+1.M.1 = 0.50000000000000 (exact 1/2), error 1.110e-16
+x.M.x = 0.25000000000000 (exact 1/4), error 1.665e-16
+int u x dS, u = x: 0.33333333333333 (exact 1/3), error -1.110e-16
+pos 0.5 swap 1 axis 2 shuffle 5 refine 1 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 2  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30301012636207 (exact 1/3), error -3.032e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23264639380601 (exact 1/4), error -1.735e-02
+int u x dS, u = x: 0.30208333333333 (exact 1/3), error -3.125e-02
+pos 0.5 swap 1 axis 2 shuffle 5 refine 1 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 1  -1: 2  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 5 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 6  -2: 7  -1: 7  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30953208050493 (exact 1/3), error -2.380e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23873427498780 (exact 1/4), error -1.127e-02
+int u x dS, u = x: 0.30973307291667 (exact 1/3), error -2.360e-02
+pos 0.5 swap 1 axis 2 shuffle 5 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 6  -2: 7  -1: 7  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 5 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 22  -2: 34  -1: 24  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31156828186846 (exact 1/3), error -2.177e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24097112696587 (exact 1/4), error -9.029e-03
+int u x dS, u = x: 0.31178792317708 (exact 1/3), error -2.155e-02
+pos 0.5 swap 1 axis 2 shuffle 5 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 22  -2: 34  -1: 24  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 1 fix 0 | wall faces by orientation in their cell:  -2: 1  -1: 4  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.30466566286162 (exact 1/3), error -2.867e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.23569045834184 (exact 1/4), error -1.431e-02
+int u x dS, u = x: 0.30208333333333 (exact 1/3), error -3.125e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 1 fix 1 | wall faces by orientation in their cell:  -2: 1  -1: 4  0: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 2 fix 0 | wall faces by orientation in their cell:  -3: 2  -2: 5  -1: 13  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31029118294121 (exact 1/3), error -2.304e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24003064335689 (exact 1/4), error -9.969e-03
+int u x dS, u = x: 0.30989583333333 (exact 1/3), error -2.344e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 2 fix 1 | wall faces by orientation in their cell:  -3: 2  -2: 5  -1: 13  0: 3  1: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 3 fix 0 | wall faces by orientation in their cell:  -3: 14  -2: 22  -1: 44  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31188444477408 (exact 1/3), error -2.145e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24150267603090 (exact 1/4), error -8.497e-03
+int u x dS, u = x: 0.31183878580729 (exact 1/3), error -2.149e-02
+pos 0.5 swap 1 axis 2 shuffle 7 refine 3 fix 1 | wall faces by orientation in their cell:  -3: 14  -2: 22  -1: 44  0: 9  1: 6  2: 1
+b.1 = 0.43750000000000 (exact 0.5), error -6.250e-02
+b.x = 0.31250000000000 (exact 1/3), error -2.083e-02
+1.M.1 = 0.43750000000000 (exact 1/2), error -6.250e-02
+x.M.x = 0.24218750000000 (exact 1/4), error -7.812e-03
+int u x dS, u = x: 0.31250000000000 (exact 1/3), error -2.083e-02
