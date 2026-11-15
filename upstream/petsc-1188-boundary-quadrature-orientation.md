@@ -1,6 +1,6 @@
 # Draft upstream report: PETSc, #1188 (second item for Monday, with #962)
 
-*Status: NOT READY (C1, the session that tracks library fixes, sets it). W1 (the integration session, on macOS, 12-core Apple M4, serial runs only) added the C reproducer and the check of the mechanism on 2026-11-14 and corrected the Reach paragraph; a patched build has not been made. Louis sends it in his name. Facts below are W1's, measured on one rank, conda-forge PETSc 3.25.3, 2026-11-14. Probes: campaigns 9b95e07, `issue-sweep/internal-face-orientation/`. Issue: underworldcode/underworld3#1188.*
+*Status: READY FOR LOUIS (C1, 2026-11-15). Send the text from "Working title" to the end, leaving out the two internal parts: the paragraph "Our own exposure (not for the upstream text)" and the list "Still to do before sending". The reproducer and the probes are in campaigns `issue-sweep/internal-face-orientation/` (`petsc_only/` and `sideload/`). The facts are W1's (the integration session; macOS, Apple M4, one rank; conda-forge PETSc 3.25.3) and H1's (the parallel review desk; 96-thread Linux workstation). Issue: underworldcode/underworld3#1188; the workaround is merged as underworld3 PR #1195 (176958a9).*
 
 ---
 
@@ -28,7 +28,7 @@
 - **B. Interior face integrated from its second support cell** (the two support cells swapped before the build):
   - 2-D annulus: orientation 0 -> -1, and no node changes;
   - 3-D shell: orientations -1/-2/-3, and all 534 loaded nodes change, by up to 9.4e-3 against 1.9e-2, summing to 1e-17.
-- **In parallel**, an interior face whose two cells are on different ranks is integrated from the other cell on one of them. Measured once (underworld3#1150): at 8 ranks one face of 540 was held by two ranks and exactly its 6 nodes differed from the 1, 2 and 4 rank loads.
+- **In parallel**, an interior face whose two cells are on different ranks is integrated from the other cell on one of them. Measured once (underworld3#1150): at 8 ranks one face of 540 was held by two ranks and exactly its 6 nodes differed from the 1, 2 and 4 rank loads. So the assembled boundary load depends on the partition. With random partitions that split 400 to 478 of the 540 interior faces between ranks, the loads differ by up to 34 % at 4 and 8 ranks; with the remap below they agree within 5e-16 of the largest load, and a constrained Stokes solve at 8 ranks matches 4 ranks to 1.8e-8 where it differed by 1.55e-5.
 
 **Reach:** any boundary integrand that reads the coordinates at the quadrature point. Terms built from the solution, auxiliary fields or the face normal are evaluated at one consistent point. The error falls with h (b.x above: by 0.44, then 0.32, per refinement), which is slower than a P2 boundary term should converge. We have not run a convergence test of a solved problem through it. Only triangles are measured; quadrilateral faces of refined hexahedra are not.
 
@@ -36,16 +36,16 @@
 
 **Still to do before sending:**
 1. Done: the reproducer above.
-2. Mechanism confirmed for positive orientations by the exact prediction, and for all six orientations by the remap below, which removes the error on every one. A patched PETSc build is not needed (C1, 2026-11-15).
+2. Done: mechanism confirmed for positive orientations by the exact prediction, and for all six orientations by the remap below, which removes the error on every one. A patched PETSc build is not needed (C1, 2026-11-15).
 3. Done: the Nitsche probe above.
 
 ---
 
-## Proposed fix (W1, 2026-11-15; measured on one rank, conda-forge PETSc 3.25.3)
+## Proposed fix (measured on one rank, conda-forge PETSc 3.25.3, unless stated)
 
 **What we offer upstream:** pair face quadrature point q with the cell's tabulation at the point the face orientation maps it to, for every orientation of a triangle, as the hybrid integrals already do with `PetscDSPermuteQuadPoint`. We have not built PETSc with the change; the measurements below are of a remap that gives the integrators the same pairing from outside.
 
-**What underworld3 runs until then** (`src/underworld3/cython/uw_face_orientation.h`, branch `bugfix/boundary-quadrature-face-orientation-1188`): a wrapper around PETSc's own `integratebdresidual`, `integratebdjacobian` and `integratebd` on each FE of a 3-D simplex mesh. For each face at orientation o != 0, it rewrites the face geometry's affine map so that face quadrature point q lands at the physical point of the cell's tabulation point q, and sets the face's orientation to 0. It then calls PETSc's integrator and restores the geometry and orientation.
+**What underworld3 runs until then** (`src/underworld3/cython/uw_face_orientation.h`, merged as underworld3 PR #1195): a wrapper around PETSc's own `integratebdresidual`, `integratebdjacobian` and `integratebd` on each FE of a 3-D simplex mesh. For each face at orientation o != 0, it rewrites the face geometry's affine map so that face quadrature point q lands at the physical point of the cell's tabulation point q, and sets the face's orientation to 0. It then calls PETSc's integrator and restores the geometry and orientation.
 - The map T_o comes from PETSc itself: `DMPlexCreateReferenceCell(TRIANGLE)`, `DMPlexOrientPoint(refdm, 0, o)` and `DMPlexComputeCellGeometryFEM`.
 - Only the physical point reads the remapped map. detJ and the normal are per face, and gradients use the support cells' Jacobians.
 - Over a fixed PETSc it stays correct, because it hands every face over at orientation 0.
