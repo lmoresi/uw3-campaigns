@@ -4190,3 +4190,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   MPa/km) recovers most of the gap to the bridge (slip 0.51 vs 0.65 for C and 0.30 for D at 175 Myr, a broader slab);
   low friction as well (Y3 50 + 6, Y4 50 + 3) weakens the overriding plate: the trench stops retreating or advances,
   and Y4 becomes a two-sided drip.
+- 2026-11-17: crust-end faults stop the plate boundary (page v10, section "With the fault ending where the crust ends,
+  the plate boundary stops"; runs/wb_yield): Dc and Y1c (job 4733, -uw_spline_end crust) end the fault with the crust at
+  ~270 km every step, no freezes in 75-80 steps, but slip drops under 0.1 cm/yr within a few steps (Dc 0.06-0.09, Y1c
+  0.06-0.12, 225-375 Myr) vs 0.35-0.52 (D) and 0.96-2.27 (Y1) on their cap-frozen faults; the trench moves back toward
+  its start; mantle vrms unchanged. So the fault's depth extent decides convergence, as on 13 Nov; the hub's note that
+  ~270 km "keeps the fault across the lithosphere" was wrong in effect. The ~270 km end is where the subducted crust
+  markers thin out, not where the slab ends (the ocrust line reaches the core). K1 proposes to Louis: fit the deep fault
+  to the oceanic-crust line or the slab's temperature (fault-fit work, closed 13 Nov unless he reopens it). Y2 and Y3
+  (cap rule) froze from 205 and 259 Myr; Y4 (50 + 3) did not freeze, a two-sided drip.
