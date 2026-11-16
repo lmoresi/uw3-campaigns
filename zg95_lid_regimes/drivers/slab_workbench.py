@@ -411,6 +411,9 @@ MESH_KEYS = ["uw_cell", "uw_cell_outer", "uw_cell_inner", "uw_refinement", "uw_f
     ["uw_grade_band_km", "uw_grade_growth", "uw_grade_largest_km", "uw_grade_slab_km", "uw_grade_slab_arc_km",
      "uw_grade_slab_depth_km", "uw_theta_trench"] if GRADE > 0 else [])
 levels = base._coarse_level_meshes()[:-1] + [base]
+# a moving base's vertices as built (local, in the DM's order, which a move keeps): its checkpoints key the moved
+# positions on these, so a restart puts every vertex back where the checkpoint had it (write_base_nodes)
+BASE_XY0 = np.array(base.dm.getCoordinatesLocal().array).reshape(-1, 2) if MOVING else None
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
 log_eta_b = uw.discretisation.MeshVariable("log10_eta", base, 1, degree=1)
@@ -1336,6 +1339,39 @@ def read_solver_fields(faulted, files):
     return float(uw.utilities.gather_data(worst, bcast=True).max())
 
 
+def write_base_nodes(step):
+    """A moving base's vertex positions at checkpoint ``step``, keyed by their positions as built (BASE_XY0),
+    gathered to rank 0 in annulus.base_nodes.<step>.h5. Returns the file name."""
+    import h5py
+    name = f"annulus.base_nodes.{step:05d}.h5"
+    built = uw.utilities.gather_data(BASE_XY0.ravel())
+    moved = uw.utilities.gather_data(np.asarray(base.dm.getCoordinatesLocal().array).ravel())
+    with uw.selective_ranks(0) as selected:
+        if selected:
+            with h5py.File(os.path.join(out, name), "w") as h:
+                h["built"] = np.asarray(built).reshape(-1, 2)
+                h["moved"] = np.asarray(moved).reshape(-1, 2)
+    return name
+
+
+def restore_base_nodes(name):
+    """Move the base, built unmoved, to the vertex positions of ``name`` (write_base_nodes), inside the library's
+    field-transfer wrapper as its movers do. Returns the largest distance from a vertex as built to its key; the base
+    is moved only when that is round-off, i.e. when it was built as the checkpoint's was."""
+    import h5py
+    from scipy.spatial import cKDTree
+    from underworld3.discretisation.remesh import remesh_with_field_transfer
+    with h5py.File(os.path.join(out, name), "r") as h:
+        built, moved = h["built"][...], h["moved"][...]
+    xy = np.asarray(base.dm.getCoordinatesLocal().array).reshape(-1, 2)
+    dist, idx = cKDTree(built).query(xy)
+    worst = float(uw.utilities.gather_data(dist.max() if dist.size else 0.0, bcast=True).max())
+    if worst <= 1.0e-9:
+        target = moved[idx]
+        remesh_with_field_transfer(base, lambda: base._deform_mesh(target))
+    return worst
+
+
 def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     faulted.render_fields_to_base()
     mesh_vars = [V_b, T_b, log_eta_b, yield_ratio_b, gamma_b, edot_p_b]
@@ -1349,8 +1385,11 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     # a moving base writes its mesh at every checkpoint (annulus.mesh.<step>.h5); a fixed one once (00000)
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars, meshUpdates=MOVING)
     solver_files = write_solver_fields(faulted, step)
+    nodes = write_base_nodes(step) if MOVING else None
     # everything a restart from here reads: it refuses to start if any is missing
     needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
+    if nodes:
+        needed.append(nodes)
     if swarm_on:
         needed += [f"annulus.crust_swarm.{step:05d}.h5"] + [f"annulus.crust_swarm.{name}.{step:05d}.h5"
                                                           for name in markers]
@@ -1369,7 +1408,7 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
                            "traces": [faulted.pieces[f["name"]][1].tolist() for f in faulted.faults],
                            # what steers the next decisions (restored_decisions)
                            "decisions": dict(decisions, built=faulted.faults),
-                           "solver_checkpoint": solver_files, "checkpoint_files": needed},
+                           "solver_checkpoint": solver_files, "base_nodes": nodes, "checkpoint_files": needed},
                           f, indent=1, default=str)
     write_records(records)
 
@@ -1822,13 +1861,19 @@ else:
                              f"new directory holding copies of the checkpoint's files (state, records, step files)")
         uw.pprint(f"restart: the base mesh differs from the checkpoint's ({', '.join(_changed)}): T, V and plastic "
                   f"strain are read by nearest position")
+    # the base is built unmoved: a moving base's checkpoint puts its vertices back where they were, so its fields
+    # read back at their own positions
+    restored = (MOVING and state.get("base_nodes") and os.path.exists(os.path.join(out, state["base_nodes"]))
+                and restore_base_nodes(state["base_nodes"]) <= 1.0e-9)
+    if restored:
+        uw.pprint(f"restart: the base moved to the checkpoint's vertex positions ({state['base_nodes']})")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
-    if MOVING:
-        # the base is built unmoved and the checkpoint's was moved (its fields are read by nearest position): adapt it
-        # to the checkpoint's T as at the start (uw_mmpde_init moves, at least one), reading the fields again after
-        # each move, so the last read lands on nodes close to the checkpoint's own (H2, 6657044: steps after a restart
-        # within 0.5 % in slip of the first leg's)
+    if MOVING and not restored:
+        # a checkpoint without its vertex positions (H2's driver), or a base built differently from its: adapt the
+        # base to the checkpoint's T as at the start (uw_mmpde_init moves, at least one), reading the fields again
+        # after each move, so the last read lands on nodes close to the checkpoint's own (H2, 6657044: steps after a
+        # restart within 0.5 % in slip of the first leg's at step 100; at step 5 of runs/wb_mmpde/grade, vrms 8 % off)
         n_moves = max(1, int(params.uw_mmpde_init))
         for _ in range(n_moves):
             mmpde_move(rebin=False)                 # the particles are restored below, on the moved base
