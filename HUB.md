@@ -4131,3 +4131,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   earth_recipe_movie, 457 Myr; anumas_annulus_00400 (annulus + close-up) and anumas_mesh_00400 (base mesh grey, add-on
   band black, split thick black, T 0.5 isotherm blue, next fit red dashed; 990 x 560 km); 16 cm, PNG 600 dpi, PDF.
   Louis's download page: https://claude.ai/artifact/N2rBJdMu1iP5pocySpJdNV.
+  Updated (v2): anumas_mesh_00400_T (faded T behind the mesh, base mesh darker grey, isotherm dropped) added;
+  annulus figure's 500 km bar moved off the slab.
+- 2026-11-16: kaiju/slab-workbench c76bc28 -> 19a2b08 (K1's a042197; blob d33bb16; mbox sha256 matched; py_compile and
+  pyflakes clean): a moving base's checkpoint writes its vertex positions keyed by their as-built positions; a restart
+  puts them back (remesh_with_field_transfer + Mesh._deform_mesh), so it behaves like a fixed-mesh restart (H2's
+  re-adaptation restart was 8 % off in vrms at the first step; kept as fallback). Smoke job 4675 (36e39e4) all exit 0:
+  defaults to 12 digits at step 0; graded base + mover 40,928 cells as H2's, moves, rebuild on the moved base,
+  checkpoints, uw_mmpde_spacing (17 -> 10.2 km) and its restart work; ~30 s/step at 26 ranks vs ~70 s on the control's
+  base. Restart test job 4681: step 6 vrms +0.13 %, slip -1.0 %, within the rerun spread. Job 4679: the workbench's own
+  model on the control's base and on the graded base + mover to ~300 Myr (~4 h), the evidence for a default. Job 4674
+  (H2's 2000 km run on H2's code, 26 ranks) at step 49/280. Acceptance link: component equivalence (byte-identical
+  .msh, same mover calls/settings) plus H2's run on H2's code; whole-run port-vs-H2 not possible (models differ).
