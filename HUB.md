@@ -4099,3 +4099,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   with the uw_cell_* options and MMPDE hook, the full option line, and the uw3 commit.
 - 2026-11-15: K1 took the FMG ruling: no further multigrid experiments; -uw_mg_levels stays on kaiju/weak-plane-tests;
   results page v2, spec and README reworded. K1 idle, nothing queued, waiting for the MMPDE brief.
+- 2026-11-16: MMPDE INTO THE WORKBENCH DELEGATED TO K1 (Louis: K1 takes over once the plan is set). H2's answers via
+  Louis (H2's sends to C2 are refused, trusted device): driver lmoresi/uw3-campaigns h2/mmpde-fault 5c9082e (5 commits
+  on 31c7e08: annulus_faults.py options + mmpde_move hook; annulus_model.py size callback); option line of the 2000 km
+  run recorded in the brief; defaults ratio 8, no fault term, front-following metric, boundary_slip ring; uw3
+  development 613ed1e0 (contained in K1's af84cfcd overlay, with #1094). Packaged for kaiju as an artifact:
+  https://claude.ai/artifact/FJYmhYd1vZFkZWF97CETTC (h2-mmpde-fault.mbox, sha256 63e9d406...). Brief sent to K1: port
+  the graded base and the MMPDE hook into slab_workbench behind options (Earth units, one base-mesh route); run on
+  af84cfcd; acceptance = reproduce H2's 2000 km run at 26 ranks within spread at a stated tolerance. Fixed: FMG set-up,
+  fault machinery. Open (report, don't tune): early slip rise on graded bases; late slip deficit at 8e-4; weak-plane
+  calls unruled (keep current defaults). H2's own message-for-C2.md stays undelivered (on hyperion).
