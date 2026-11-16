@@ -276,6 +276,16 @@ params = uw.Params(
                                 #   the depth rule (the recipe until ruled). Along the fault the first split node is also
                                 #   at least half a rung deep (cut_of): what a fault shallower than 30 degrees needs
     uw_fault_depth_max_km=435.0,
+    uw_fault_depth_min_km=174.0,  # uw_spline_end crust: a fault whose crust layer ends above this depth is refused
+    uw_spline_end="cap",        # where the fault ends. "cap" (every workbench run to 2026-11-16): at the depth cap; a curve
+                                #   ending within 0.03 of it is carried to it along its own direction, one ending higher
+                                #   is refused and the fault keeps its place. "crust" (Louis, 2026-11-13: "end the fault
+                                #   where we cannot constrain it and see if that results in a shutdown of the slab or
+                                #   not"; annulus_faults.py 8fff721): where the crust layer ends down the slab, below
+                                #   uw_spline_end_frac of its particles on the incoming plate, or at the cap if the layer
+                                #   passes it; nothing is carried, and the fit is refused only above uw_fault_depth_min_km
+    uw_spline_end_frac=0.5,     # uw_spline_end crust: the layer ends where its particles per 0.005 of arc first fall
+                                #   below this fraction of their median on the incoming plate
     uw_advect_offset_km=290.0,  # a record's plate speeds are sampled this far along the surface on each side of the trench
     # solver and time stepping
     uw_tol=1.0e-3,
@@ -814,7 +824,10 @@ def crust_spline_points(faults):
         if -q[1] > cap + 0.06:
             break
     C = np.array(pts)
-    reach = cap - 0.03
+    end_at = str(params.uw_spline_end)
+    if end_at not in ("cap", "crust"):
+        raise ValueError(f"-uw_spline_end must be cap or crust, not {end_at!r}")
+    reach = cap - 0.03 if end_at == "cap" else float(model.fault_depth_min)
     if -C[-1, 1] < reach:                            # the slab's stretched crust thins out
         uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
         return None
@@ -852,11 +865,28 @@ def crust_spline_points(faults):
         ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
         ts /= np.linalg.norm(ts, axis=1)[:, None]
         Z = Cs + off[:, None] * left(ts)
+        s_end = None
+        if end_at == "crust" and stat == stats[-1]:  # the layer's end down the slab, and the bins beyond it dropped
+            n = np.array(cnt, float)
+            on_plate = (ss > ss[0] + 0.02) & (ss < ss[0] + 0.15)
+            thin = float(params.uw_spline_end_frac) * np.median(n[on_plate] if on_plate.any() else n)
+            low = np.flatnonzero((ss >= ss[0] + 0.15) & ((n < thin) | (np.diff(ss, prepend=ss[0]) > 1.5 * ds)))
+            if len(low):
+                j = int(low[0])
+                run, n_j = (ds, 0.0) if ss[j] - ss[j - 1] > 1.5 * ds else (ss[j] - ss[j - 1], n[j])
+                s_end = ss[j - 1] + run * float(np.clip((n[j - 1] - thin) / max(n[j - 1] - n_j, 1e-12), 0.0, 1.0))
+                ss, Z, w = ss[:j], Z[:j], w[:j]
+                if len(ss) < 12:
+                    uw.pprint("  crust fault (spline): too few crust bins along the layer")
+                    return None
         w = w / w.mean()
         sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
         sy = make_smoothing_spline(ss, Z[:, 1], w=w, lam=lam)
         sf = np.arange(ss[0], ss[-1], 0.0005)
         F = np.c_[sx(sf), sy(sf)]
+        if s_end is not None and s_end > sf[-1] and len(F) > 10:
+            e = F[-1] - F[-11]                       # straight over the part of a bin from the last one kept to the end
+            F = np.vstack([F, F[-1] + np.outer(np.arange(0.0005, s_end - sf[-1] + 1e-9, 0.0005), e / np.linalg.norm(e))])
         C = F                                        # the next pass's reference
     fd = -F[:, 1]
     sF = np.r_[0, np.cumsum(np.linalg.norm(np.diff(F, axis=0), axis=1))]
@@ -865,7 +895,13 @@ def crust_spline_points(faults):
     kd = int(np.argmax(fd > 0.05))
     above = np.flatnonzero(fd[:kd] <= z_flat + ct)
     kt = int(above[-1]) + 1 if len(above) else 0
-    if fd.max() < cap - 0.03:
+    if end_at == "crust":
+        if fd.max() < float(model.fault_depth_min):
+            uw.pprint(f"  crust fault (spline): the crust layer ends at depth {fd.max():.3f}, above uw_fault_depth_min_km")
+            return None
+        if not (fd[kt:] >= cap).any():
+            uw.pprint(f"  crust fault (spline): the fault ends with the crust layer, at depth {fd.max():.3f}")
+    elif fd.max() < cap - 0.03:
         uw.pprint(f"  crust fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
         return None
     elif not (fd[kt:] >= cap).any():
@@ -907,7 +943,7 @@ def crust_spline_points(faults):
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
     info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
-            "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": "cap", "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
+            "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
     uw.pprint(f"  crust fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
               f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f} dipping {top_dip:.1f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
@@ -2009,6 +2045,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
+                "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
