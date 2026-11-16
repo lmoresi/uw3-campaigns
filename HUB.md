@@ -4162,3 +4162,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   queued (job 4711, test dials 24bad6f): old zone in the new driver, iso law on plane cells, TI on zone cells, plane to
   the wall, from step 0, two per node one per socket (also Louis's throughput question). Renders every 15 min (job
   4707). Graded base + mover follows the control to ~230 Myr, then runs ahead (slip 0.69 vs 0.46 at 325 Myr).
+- 2026-11-16: ladder RESULT (page v3 https://claude.ai/artifact/W1hrXisyRdpoiiSdDuJh8n; runs/wb_ladder): from step 0,
+  same young-slab Arrhenius options, slip at 250 Myr (cm/yr): old driver 1.87; fork 2.12; + unforced top 2.54;
+  + FaultNetwork 2.94; + weak plane (current default) 0.41. vrms 0.40/0.44/0.51/0.56/0.23. All converged, no refusals.
+  Split (24bad6f dials): the old zone in the new driver reproduces rung 3; iso law on plane cells (0.38) or TI on zone
+  cells (0.61) each brings slip to the plane's level; plane to the wall (0.35) does not help. The old zone's fast
+  subduction needed both its isotropic law and its wide footprint (it weakened the lithosphere beside the first 80 km
+  of the cut). Renders (K1's reading): old zone, a thick cold slab sinks; plane or either half, a cold bulb stays under
+  the trench and a thin strand, mostly crust, goes down. Unforced top speeds the slab (+20 to +36 % in the rise);
+  FaultNetwork neutral. Throughput: two 26-rank runs per node (one per socket) give 1.4x the node's work on 120k cells
+  (each 1.44x slower). LOUIS'S CALL: which weak region above the cut the workbench should have.
