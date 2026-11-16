@@ -4152,3 +4152,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   3.37 h to 8.78e-4 (2.45 h Stokes) vs 6.48 h (5.91 h Stokes) for the movie run: 1.9x less wall, 2.4x less Stokes
   (H2's quarter-to-fifth was vs a 4-rank run elsewhere). README runs/h2_graded_kaiju/README.md. Workbench comparison
   (job 4679) to follow.
+- 2026-11-16: Louis to K1: "launch the ladder. I need to understand this better". Interim (page
+  https://claude.ai/artifact/W1hrXisyRdpoiiSdDuJh8n, updated as runs go): from step 0 on the same options (young-slab
+  Arrhenius) the workbench control and the old driver's earth_young80_arr part from ~150 Myr (by 312 Myr slip 0.48 vs
+  1.41 cm/yr). Ladder from step 0 (job 4703, af84cfcd), slip vs the previous rung at equal time to 175 Myr: fork
+  (3381347) within 2 % (4.6 % once); + unforced fault top (5629dd9) +4 to +11 %; + FaultNetwork (2bc7b9a) within 2 %;
+  + WEAK PLANE (f48729a defaults) -30 % at the first faulted steps growing to -54 % by 175 Myr, vrms -4 % growing to
+  -30 %: the plane is the change, largest while the slab forms (the 331 Myr overnight tests saw 10 %). Rung-4 split
+  queued (job 4711, test dials 24bad6f): old zone in the new driver, iso law on plane cells, TI on zone cells, plane to
+  the wall, from step 0, two per node one per socket (also Louis's throughput question). Renders every 15 min (job
+  4707). Graded base + mover follows the control to ~230 Myr, then runs ahead (slip 0.69 vs 0.46 at 325 Myr).
