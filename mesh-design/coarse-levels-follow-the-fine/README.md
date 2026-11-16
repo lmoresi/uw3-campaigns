@@ -63,6 +63,27 @@ Carry the displacement to the coarse levels.
 
 **No crossing at a fault.** A coarse vertex on a fault has one copy per side on a split level. Each copy takes its displacement from fine cells on its own side, chosen by the side label, not by distance. The two sides may then separate along the fault as the fine level does, and no copy is moved by the other side's motion. H5's runs moved the levels by an analytic field before the cut. In production the finest level moves after the split, and the cut vertices are not fine vertices, so this interpolation is the mechanism.
 
+### 2a. A required case: a level re-represented after a move (H1 and H5, #1206)
+
+The case: only the child (the finest add-on level) moves, the add-on levels stay where they were built, and then a fault is cut. The #1120 repair then differs between serial and parallel. H1 measured it at a move of 0.015 on #1120's fixture:
+
+| run | parent rows taken | weak copies left |
+|---|---|---|
+| serial | 0 | 13 |
+| np 3 | 31 | 2 |
+
+The cause (H5): the recorded parent's nesting reads each host level on the geometry it was built in (`_built_cell_table`, through `_moved_off_build`).
+- In serial the fine host is the child itself. It has moved, so it is read on its as-built vertices.
+- In parallel the fine host is the add-on partition's copy of the child, made after the move. That copy is a new mesh that has not moved since it was made, so it is read on the moved vertices.
+
+So one pair is nested on two different geometries, and the candidate pieces differ: where a level was built is lost when the add-on partition re-represents a moved level, and the transfer then depends on the rank count.
+
+The design must say which geometry a re-represented level is nested on. One of:
+- the partition's copy carries the as-built vertices of the level it copies, as `_addon_reference` already does for the parent lookup;
+- or the coarse levels move with the fine one (section 2), so the copy and the original stand on the same geometry and the question does not arise. H5 expects this.
+
+Either way, a test must hold the repair the same at every rank count after a move, at the fixture and move above.
+
 ### 3. When
 
 Lazily, at the hierarchy build of the next solve after a committed move. That build already happens on every rank, and the solve-entry sync already sees the geometry version.
