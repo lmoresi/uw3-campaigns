@@ -67,7 +67,7 @@ Every session reads this file when it starts and when it meets a session ID it d
 | W1 | **integration** | `session_01HxWvn5rMK67zasgirdXszQ` | wombat, serial only | C1 | library code: solvers, rotated BC, custom MG, convergence policy, fault placement (line_cut, fault_split, place_surface) | MPI runs |
 | W2 | **notes** | `session_011S876ckjYqqth1aPyojrhh` | wombat (assumed; confirm) | C3 | UWTN technical notes | |
 | H1 | **worker** | `session_01HxWvn98DsWPTz4ZpKByzQM` | hyperion, 12 cores | C1 | parallel suites, reviews, PRs, issues (no merge, approve or close) | science runs |
-| H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | |
+| H2 | **MMPDE** | `session_01HxWvn6QP8MysBnjgab6A5v` | hyperion, 16 cores | C1 | MMPDE annulus, FMG-preserving meshes | | ARCHIVED 2026-11-16 after handover. |
 | H3 | **units** | `session_01HxWvn7YfEseX8cKRcgzW9Z` | hyperion, 8 cores | C1 | units: the dimensional / non-dimensional boundary (issue-sweep cluster C6, #763, #765); second review desk from 2026-11-12 until Louis rules on units | |
 | H4 | **adjoint and ThinSheet** | `session_01HxWvn8tRQRV627A5SasDdq` | hyperion, 6 cores | C1 | adjoint re-verification and fixes (C13), then ThinSheet and manifold meshes (C4); from 2026-11-12 whole curved-wall units handed over by H6 | |
 | H5 | **restart** | `session_01HxWvn6CL6S3R1ELzJHJEay` | hyperion, 8 cores | C1 | parallel checkpoint reload of refined meshes and FMG hierarchy restart (#690); then uw.visualisation for higher-order fields (#1057), then the per-step diagnostics log (#1060) | |
