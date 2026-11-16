@@ -1,0 +1,23 @@
+adapt read=rebuilt move_coarse=0: 3 coarse levels
+step  0: reason 2, velocity its 2, outer its 1
+/Users/lmoresi/+Simulations/coarse_follows_fine/moving_wall_fmg2.py:82: UserWarning: custom_mg: the mesh of solver 'Solver_18_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+step  1: reason 2, velocity its 3, outer its 1
+step  2: reason 2, velocity its 4, outer its 1
+step  3: reason 2, velocity its 4, outer its 1
+step  4: reason 2, velocity its 5, outer its 1
+step  5: reason 2, velocity its 5, outer its 1
+step  6: reason 2, velocity its 6, outer its 1
+step  7: reason 2, velocity its 6, outer its 1
+step  8: reason 2, velocity its 6, outer its 1
+step  9: reason 2, velocity its 7, outer its 1
+step 10: reason 2, velocity its 7, outer its 1
+step 11: reason 2, velocity its 8, outer its 1
+step 12: reason 2, velocity its 8, outer its 1
+step 13: reason 2, velocity its 8, outer its 1
+step 14: reason 2, velocity its 9, outer its 1
+step 15: reason 2, velocity its 10, outer its 1
+step 16: reason 2, velocity its 10, outer its 1
+step 17: reason 2, velocity its 10, outer its 1
+step 18: reason 2, velocity its 11, outer its 1
+step 19: reason 2, velocity its 12, outer its 1
+step 20: reason 2, velocity its 12, outer its 1

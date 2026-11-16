@@ -75,11 +75,37 @@ Lazily, at the hierarchy build of the next solve after a committed move. That bu
 - **Non-nested tails:** one point location of each coarse level's vertices in the finest as-built mesh per committed move. The location's start cells are known from the nesting, so it is a walk, not a search.
 - **Cached transfers.** Simplex transfers stay kept (#1119), and moving the coarse coordinates does not change them, because a moved level is read as built. Quadrilateral transfers are rebuilt after a move today, and stay rebuilt under (b). Non-nested tails are rebuilt after a move today, and are then rebuilt on a pair that overlaps.
 
+## The second measurement
+
+`moving_wall_fmg2.py` takes the same wall and the same 20 steps, by cell type and by how the transfers are read. "kept, extended" is development's as-built read with its simplex test removed, so it reads quadrilateral and hexahedral levels where they were built too. The hexahedral box is 2 x 2 x 2 refined twice. The adapt child is an adapt of the refined triangle box, refined towards the top wall; its tail is the base's levels, which do not nest in it.
+
+Velocity-block iterations at steps 0 / 1 / 5 / 10 / 15 / 20; every solve converged:
+
+| cells | read | coarse levels | 0 | 1 | 5 | 10 | 15 | 20 |
+|---|---|---|---|---|---|---|---|---|
+| quadrilaterals | development (rebuilt) | as built | 3 | 4 | 6 | 8 | 9 | 11 |
+| quadrilaterals | development (rebuilt) | moved | 3 | 4 | 4 | 4 | 5 | 5 |
+| quadrilaterals | kept, extended | as built | 3 | 3 | 4 | 4 | 5 | 6 |
+| hexahedra | development (rebuilt) | as built | 3 | 4 | 4 | 5 | 6 | 7 |
+| hexahedra | development (rebuilt) | moved | 3 | 4 | 4 | 4 | 4 | 5 |
+| hexahedra | kept, extended | as built | 3 | 3 | 3 | 4 | 4 | 5 |
+| adapt child (triangles) | development (kept) | as built | 2 | 2 | 2 | 2 | 2 | 3 |
+| adapt child (triangles) | rebuilt | as built | 2 | 3 | 5 | 7 | 10 | 12 |
+| adapt child (triangles) | rebuilt | moved | 2 | 3 | 3 | 3 | 3 | 4 |
+
+What it shows:
+- **Quadrilaterals and hexahedra:** the as-built read extended to them holds about as well as moving their coarse levels (6 against 5, and 5 against 5, at step 20). It needs no coordinate work and gives one rule for every cell type: a move keeps the transfers. That is choice (a) of the design.
+- **The adapt child:** development already holds (2 to 3), because the child is a simplex mesh read where it was built. Its tail does not need to move for the solver. With the read switched off it degrades (12), and moving the tail recovers most of it (4). Carrying the displacement to a non-nested tail matters only where the transfers are built from the current geometry. Among the cases measured here, that is the add-on and split fault levels of #1120, whose cut is made where the host stands.
+
+So the design narrows to two changes:
+1. Extend the as-built read to quadrilateral and hexahedral levels (choice (a)).
+2. Carry the displacement to the add-on and split fault levels (section 2).
+
+Periodic meshes still need a record, or the move.
+
 ## Next measurements
 
-1. The quadrilateral arm with the as-built read extended to tensor cells: choice (a) against (b).
-2. An adapt-child tail under the same moving wall: development, then with the displacement carried to the tail.
-3. The hexahedral version of the quadrilateral arms, at one refinement.
-4. np 2 and 3 for every arm that changes the coarse levels, since the locating and the moving are collective.
+1. np 2 and 3 for the arms that change the read or move the coarse levels, since the reading, the locating and the moving are collective.
+2. The add-on and split fault levels under a moving finest level with the displacement carried to them. H5's #1206 runs moved them by hand.
 
 Underworld development team with AI support from Claude Code

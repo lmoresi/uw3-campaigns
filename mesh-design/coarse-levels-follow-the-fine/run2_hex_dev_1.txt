@@ -1,0 +1,22 @@
+hex read=dev move_coarse=1: 2 coarse levels
+step  0: reason 2, velocity its 3, outer its 1
+step  1: reason 2, velocity its 4, outer its 1
+step  2: reason 2, velocity its 4, outer its 1
+step  3: reason 2, velocity its 4, outer its 1
+step  4: reason 2, velocity its 4, outer its 1
+step  5: reason 2, velocity its 4, outer its 1
+step  6: reason 2, velocity its 4, outer its 1
+step  7: reason 2, velocity its 4, outer its 1
+step  8: reason 2, velocity its 4, outer its 1
+step  9: reason 2, velocity its 4, outer its 1
+step 10: reason 2, velocity its 4, outer its 1
+step 11: reason 2, velocity its 4, outer its 1
+step 12: reason 2, velocity its 4, outer its 1
+step 13: reason 2, velocity its 4, outer its 1
+step 14: reason 2, velocity its 4, outer its 1
+step 15: reason 2, velocity its 4, outer its 1
+step 16: reason 2, velocity its 5, outer its 1
+step 17: reason 2, velocity its 5, outer its 1
+step 18: reason 2, velocity its 5, outer its 1
+step 19: reason 2, velocity its 5, outer its 1
+step 20: reason 2, velocity its 5, outer its 1
