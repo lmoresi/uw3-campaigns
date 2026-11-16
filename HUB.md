@@ -4199,3 +4199,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   markers thin out, not where the slab ends (the ocrust line reaches the core). K1 proposes to Louis: fit the deep fault
   to the oceanic-crust line or the slab's temperature (fault-fit work, closed 13 Nov unless he reopens it). Y2 and Y3
   (cap rule) froze from 205 and 259 Myr; Y4 (50 + 3) did not freeze, a two-sided drip.
+- 2026-11-17: overnight yield-law end states (page v11, "Where the overnight runs ended"). Y4 (current workbench, TI
+  plane, no bridge, yield 50 MPa + 3 MPa/km): after a two-sided start, ONE-SIDED subduction by 195 Myr, subducting plate
+  2.8 cm/yr, overriding -0.4, thick near-vertical slab, trench back to -0.4 deg; fit froze on 4 steps only: the weak
+  hinge emerges from yielding here. Ran out of steps at 195 Myr; continued from step 139 (job 4735, alone on a node,
+  a042197 = 19a2b08). Dc and Y1c (crust-end fault): plate boundary stopped to the end (slip ~0.05 cm/yr, plates drift
+  together, trench advanced to +2.5 / +0.9 deg); their fault end rose to ~220 km, above the lid base (272 km): with the
+  174 km floor the fault no longer crosses the lithosphere. Y1-Y3 (cap rule) froze from 205-259 Myr; later steps not
+  results.
