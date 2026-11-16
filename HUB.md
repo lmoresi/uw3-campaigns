@@ -4109,3 +4109,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   af84cfcd; acceptance = reproduce H2's 2000 km run at 26 ranks within spread at a stated tolerance. Fixed: FMG set-up,
   fault machinery. Open (report, don't tune): early slip rise on graded bases; late slip deficit at 8e-4; weak-plane
   calls unruled (keep current defaults). H2's own message-for-C2.md stays undelivered (on hyperion).
+- 2026-11-16: ANUMAS 2027 proposal session asked for run sizes for its SU budget (branch push to
+  underworldcode/NCMAS-proposal); attaching that repo was refused by this session's permission check, not worked
+  around. Hub wrote run-sizes-C2.md (no data for the listed projects or Gadi; measured zg95 kaiju 2-D figures and H2's
+  workstation figures as a reference; SU conversion marked estimated); Louis given a download page
+  https://claude.ai/artifact/7MVPth2eBU3QpQufYNR7up to pass on.
+- 2026-11-16: MMPDE port pushed: kaiju/slab-workbench 63504b1 -> c76bc28 (K1's 36e39e4; slab_workbench.py 29e4a26,
+  annulus_model.py 79f30c4; mbox sha256 matched; py_compile and pyflakes clean; annulus_mesh signature kept for
+  annulus_faults.py). Base route: the driver's own gmsh construction with a size callback (shared by the focused box
+  and the graded base), byte-identical .msh to H2's for the 2000 km sizes (40,928 cells; levels 2,558 / 10,232 /
+  40,928). Fixed in the port: gather_data not mpi4py; particles re-binned after a move; moved mesh written at every
+  checkpoint; uw_mmpde_spacing's S kept in the checkpoint (restart works). Not ported: the metric's fault term (H2's run
+  with it marked suspect). Acceptance: the workbench is a different model (Arrhenius, own fit, weak plane), so H2's run
+  is reproduced on H2's own code (5c9082e applied as 138439a) at 26 ranks on af84cfcd: job 4674 (runs/h2_graded_kaiju,
+  ~27 s/step so far); smoke test of the port job 4675. Hub asked K1 to make the port-vs-H2-code link explicit. K1 notes
+  GitHub is fetchable from the kaiju login node.
