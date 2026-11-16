@@ -191,6 +191,20 @@ params = uw.Params(
     # the yield stress: uw_tau0_mpa at the surface, rising by uw_tau1_mpa_km with depth
     uw_tau0_mpa=528.0,
     uw_tau1_mpa_km=24.3,
+    # yielding only in a damage zone along the fault (Louis, 2026-11-17, after run Y4, yield 50 MPa + 3 MPa/km everywhere:
+    # "That's an extraordinary level of damage in the upper plate ... we don't really manage to decouple the two plates
+    # by the fault itself. ... keep the yielding only in the fault's damage zone. Let that be a plastic damage evolution
+    # too. Upper plate only v. Upper and lower")
+    uw_yield_zone="none",       # "none": the yield law above everywhere (every run to 2026-11-17). "upper": yielding only
+                                #   within uw_yield_zone_km of the fault on the overriding plate's side, "both": on both
+                                #   sides; there the yield stress is uw_zone_tau0_mpa + uw_zone_tau1_mpa_km x depth, with
+                                #   the same strain weakening and healing (the plastic strain is the damage); elsewhere
+                                #   no yielding. The zone follows the fault: it is rebuilt with the faulted mesh
+    uw_yield_zone_km=40.0,      #   its width from the fault's line
+    uw_yield_zone_depth_km=0.0,  #  only shallower than this; 0: along the whole fault
+    uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
+    uw_zone_tau1_mpa_km=3.0,
+    uw_reset_strain=0,          # 1: a restart sets the plastic strain (the damage) to zero: a reset strength profile
     uw_heating_nw_m3=1.32,      # internal heating
     uw_yield_softness=0.2,
     # an asthenosphere: the viscosity times uw_asth in a channel between two depths
@@ -494,6 +508,11 @@ Ra = uw.expression(r"\mathrm{Ra}", model.ra, "Rayleigh number on the basal visco
 deta = uw.expression(r"\Delta\eta", model.deta, "viscosity contrast across the layer")
 tau0 = uw.expression(r"\tau_0", model.tau0, "yield stress at the surface")
 tau1 = uw.expression(r"\tau_1", model.tau1, "yield stress gradient with depth")
+YIELD_ZONE = str(params.uw_yield_zone) != "none"
+if str(params.uw_yield_zone) not in ("none", "upper", "both"):
+    raise ValueError(f"-uw_yield_zone must be none, upper or both, not {params.uw_yield_zone!r}")
+zone_tau0 = uw.expression(r"\tau_{0,z}", model.zone_tau0, "yield stress at the surface in the damage zone")
+zone_tau1 = uw.expression(r"\tau_{1,z}", model.zone_tau1, "yield stress gradient in the damage zone")
 H = uw.expression(r"H", model.heating, "internal heating rate")
 heating = model.heating
 
@@ -730,6 +749,20 @@ def polyline_distance(points, poly):
     """The distance from each of ``points`` to the polyline ``poly``."""
     poly = np.asarray(poly, dtype=float)
     return np.min([segment_distance(points, poly[i], poly[i + 1]) for i in range(len(poly) - 1)], axis=0)
+
+
+def segment_side(points, poly):
+    """For each point: the distance to the polyline and the side of it (+1 / -1, the sign of the nearest segment's
+    direction crossed with the offset)."""
+    dist, side = np.full(len(points), np.inf), np.zeros(len(points))
+    for p, q in zip(poly[:-1], poly[1:]):
+        d = q - p
+        s = np.clip(((points - p) @ d) / max(d @ d, 1e-30), 0.0, 1.0)
+        off = points - (p + s[:, None] * d)
+        r = np.linalg.norm(off, axis=1)
+        m = r < dist
+        dist[m], side[m] = r[m], np.sign(d[0] * off[m, 1] - d[1] * off[m, 0])
+    return dist, side
 
 
 def polyline_gap(a, b):
@@ -1005,6 +1038,28 @@ class FaultedMesh:
             self.plane.array[:, 0, 0] = on.astype(float)
             self.director.array[:, 0, :] = normals
             plane_cells = int(uw.utilities.gather_data(int(on.sum()), bcast=True).sum())
+        # the damage zone (uw_yield_zone): the cells within uw_yield_zone_km of the fault's line, on the overriding
+        # side ("upper": the side of the trench's +theta for a dip below 90 degrees, as the slab state) or both
+        self.yzone = None
+        zone_cells = 0
+        if YIELD_ZONE and self.faults:
+            self.yzone = uw.discretisation.MeshVariable(f"yzone_{tag}", mesh, 1, degree=0, continuous=False)
+            centroids = np.asarray(model_xy(self.yzone))
+            inz = np.zeros(len(centroids), dtype=bool)
+            for name, (spine, trace) in self.pieces.items():
+                dist, side = segment_side(centroids, spine)
+                keep = dist < float(model.yield_zone)
+                if float(model.yield_zone_depth) > 0:
+                    keep &= (r_o - np.hypot(centroids[:, 0], centroids[:, 1])) < float(model.yield_zone_depth)
+                if str(params.uw_yield_zone) == "upper":
+                    a = spine[int(np.argmax(np.hypot(spine[:, 0], spine[:, 1]) < r_o))]   # the first point inside
+                    th = np.arctan2(a[1], a[0])
+                    over = 1.0 if params.uw_dip < 90 else -1.0
+                    probe = (r_o - 0.002) * np.array([np.cos(th + over * 0.02), np.sin(th + over * 0.02)])
+                    keep &= side == segment_side(probe[None, :], spine)[1][0]
+                inz |= keep
+            self.yzone.array[:, 0, 0] = inz.astype(float)
+            zone_cells = int(uw.utilities.gather_data(int(inz.sum()), bcast=True).sum())
         # the fault's band (uw_fault_precedence): every band cell, the weak plane's included, where the
         # fault's own rheology alone applies
         self.band_mask = None
@@ -1039,7 +1094,14 @@ class FaultedMesh:
                                          window=marker_rheo_window(mesh))
         asth = ((params.uw_asth, model.asth_top, model.asth_bottom, model.asth_ramp)
                 if params.uw_asth < 1 else None)
-        self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
+        y0, y1 = tau0, tau1
+        if YIELD_ZONE:
+            # in the zone the zone's yield law; elsewhere a yield stress no stress here reaches (10^4 x the surface's
+            # of the control's law): no yielding outside the zone
+            Z = self.yzone.sym[0] if self.yzone is not None else 0
+            y0 = zone_tau0 + (1 - Z) * 1.0e4 * tau0
+            y1 = zone_tau1
+        self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, y0, y1, params.uw_yield_softness,
                                       r_o, weak, yield_factor, asthenosphere=asth,
                                       lower_mantle=((params.uw_lm_eta, model.lm_depth, model.lm_ramp)
                                                     if params.uw_lm_eta != 1 else None),
@@ -1100,7 +1162,7 @@ class FaultedMesh:
                             "seams": str(params.uw_fault_seams), "partition": FAULT_PARTITION,
                             "band_cells_per_rank": band_per_rank,
                             "band_ranks": sum(1 for c in band_per_rank if c),
-                            "weak_plane_cells": plane_cells,
+                            "weak_plane_cells": plane_cells, "yield_zone_cells": zone_cells,
                             # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
                             # fault points and we can see if that is sufficient"): rungs, rung length, band width
                             "division": {name: division_record(spine, self.width)
@@ -1108,7 +1170,8 @@ class FaultedMesh:
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
-                  f"{plane_cells} cells, built in {self.t_build:.1f} s; band on "
+                  f"{plane_cells} cells" + (f", yield zone ({params.uw_yield_zone}) {zone_cells} cells" if YIELD_ZONE
+                                            else "") + f", built in {self.t_build:.1f} s; band on "
                   f"{self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
         for name, d in self.mesh_record["division"].items():
@@ -1905,6 +1968,9 @@ else:
         uw.pprint(f"restart: the base moved to the checkpoint's vertex positions ({state['base_nodes']})")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+    if int(params.uw_reset_strain):
+        gamma_b.array[:, 0, 0] = 0.0                # a reset strength profile (uw_reset_strain)
+        uw.pprint("restart: plastic strain set to zero (uw_reset_strain)")
     if MOVING and not restored:
         # a checkpoint without its vertex positions (H2's driver), or a base built differently from its: adapt the
         # base to the checkpoint's T as at the start (uw_mmpde_init moves, at least one), reading the fields again
@@ -2045,7 +2111,9 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
-                "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km",
+                "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone",
+                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_zone_tau0_mpa", "uw_zone_tau1_mpa_km",
+                "uw_reset_strain",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",

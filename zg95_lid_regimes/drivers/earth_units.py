@@ -69,6 +69,10 @@ SCALED = [
     ("uw_eta_reg_pas", "eta_reg", "pas"),
     ("uw_tau0_mpa", "tau0", "mpa"),
     ("uw_tau1_mpa_km", "tau1", "mpa_km"),
+    ("uw_yield_zone_km", "yield_zone", "km"),
+    ("uw_yield_zone_depth_km", "yield_zone_depth", "km"),
+    ("uw_zone_tau0_mpa", "zone_tau0", "mpa"),
+    ("uw_zone_tau1_mpa_km", "zone_tau1", "mpa_km"),
 ]
 # the options that set the scales themselves
 SCALES = ["uw_T_base_c", "uw_eta_ref_pas", "uw_activation_kj_mol"]
