@@ -777,3 +777,14 @@ Measured here, not inherited.
   read and write on `underworldcode.org-preview`) and saved it as `PREVIEW_TOKEN`; the
   re-run of #66's preview job (run 43151396657, attempt 2) published and was served.
   The token has an expiry: the next silent failure of `preview` on every PR means renew.
+- 2026-11-16: **NCI merit allocations acknowledged (Louis).** The 2025 and 2026 work used
+  NCI time under NCMAS and ANU MAS and nothing said so. Merged wording (as allowed): "This
+  research was supported by the Australian Government's National Collaborative Research
+  Infrastructure Strategy (NCRIS), with access to computational resources provided by the
+  National Computational Infrastructure (NCI Australia) through the National
+  Computational Merit Allocation Scheme and the ANU Merit Allocation Scheme." Notes:
+  Underworld-Technical-Notes/underworldcode.org#71 (17 notes on a new
+  `acknowledgements-nci.yml`; 4 with no computation left off). underworld3: #1208 (the
+  README's first Acknowledgements section, AuScope/NCRIS plus NCI, years stated).
+  Deposited PDFs change only with new versions: Louis's call. **2027:** allocation not
+  yet known; a scheduled check-in on 2026-12-15 (trig_013QcGYpAHga5J4mkeDUdsUN) asks Louis.
