@@ -33,8 +33,8 @@ from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
 from underworld3.utilities.place_surface import _footprints_by_user_polyline
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, clamp_radii, focused_annulus_mesh,
-                           free_slip_walls, set_viscoplastic)
+from annulus_model import (AnnulusDiagnostics, annulus_mesh, annulus_radii, banded_annulus_mesh, clamp_radii,
+                           focused_annulus_mesh, free_slip_walls, set_viscoplastic)
 import earth_units
 
 params = uw.Params(
@@ -152,6 +152,35 @@ params = uw.Params(
     uw_focus_centre_km=-150.0,  # the control's fault lies from 734 km behind the first trench to 436 km ahead of it
     uw_focus_depth_km=700.0,    #   over 387 Myr, to 435 km depth (runs/wb_floor_late)
     uw_focus_growth=0.3,
+    # the graded base (H2's trial, uw3-campaigns 5c9082e; science hub brief 2026-11-16, ORIGIN Louis: "We need to
+    # resolve the TBL - mmpde can do that. Mmpde can also tighten around the slab and the fault cut-in can deal with
+    # the fault resolution. The missing piece is coarse in the lower mantle and coarse around the annulus"). Sizes
+    # of the finest level's cells; the mover gains only 1.3 to 2.3 on them, so the base has to be within about 2 of
+    # the target, with the slab region's nodes already in it
+    uw_grade_cell_km=0.0,       # > 0: cells this size from the surface down to uw_grade_band_km all round (a typical
+                                #   boundary-layer thickness), growing below by uw_grade_growth km per km of depth up to
+                                #   uw_grade_largest_km; uw_cell, uw_cell_outer and uw_cell_inner are then not read. The
+                                #   rung spacing's default and the rebuild threshold's cell are this cell
+    uw_grade_band_km=101.5,
+    uw_grade_growth=0.5,
+    uw_grade_largest_km=226.5625,
+    uw_grade_slab_km=0.0,       # > 0: the slab region, cells at most this size within uw_grade_slab_arc_km along the
+    uw_grade_slab_arc_km=2001.0,  #   surface either side of uw_theta_trench and above uw_grade_slab_depth_km, with
+    uw_grade_slab_depth_km=696.0,  #  Gaussian tapers of half those lengths beyond. Fixed in the base: it has to hold the
+                                #   slab for the whole run (H2: 1000 km either side was outrun at 3.7e-4, 2000 km held)
+    # the moving mesh (MMPDE, H2's hook): the base's nodes follow |grad T| (metric_density_from_gradient,
+    # "front-following", then smooth_mesh_interior with the walls' nodes sliding on their circles). The library remaps
+    # every field on the base, the advection histories too; the crust's particles are re-binned; the faulted mesh is
+    # rebuilt on the moved base. The coarse multigrid levels keep their geometry (the FMG set-up is settled: Louis,
+    # 2026-11-15). Every checkpoint then writes its own base mesh file (annulus.mesh.<step>.h5)
+    uw_mmpde_every=0,           # move the base every this many steps (0: never)
+    uw_mmpde_init=0,            # moves on the slab state before the first build, the state re-evaluated on the moved nodes
+                                #   after each; a restart makes as many (at least one) on the checkpoint's fields
+    uw_mmpde_ratio=8.0,         # the metric's finest/coarsest cell-size ratio
+    uw_mmpde_start=0,           # the first loop step that may move the base
+    uw_mmpde_spacing=0,         # 1 (Louis, 2026-11-12: "We need the ladder to see the refined mesh size"): after the initial
+                                #   moves the rung spacing S shrinks by the base's node spacing along the slab state's fault
+                                #   line, moved / unmoved. Set once at the start; a restart keeps the checkpoint's S
     # the viscosity's temperature law is Arrhenius (Louis, 2026-11-12: "an Arrhenius version of the young slab
     # run"): uw_eta_ref_pas at uw_T_potential_c, exp(E* / R T) about it with T the absolute temperature, capped at
     # uw_eta_max_pas (annulus_model.eta_of_T). Its floor is the model's viscosity unit (earth_units.py; the log
@@ -294,15 +323,24 @@ uw.pprint("\n".join(earth_units.table(EARTH, MODEL, MODEL_UNIT)), clean_display=
 
 def effective_spacing(p):
     """The rung spacing a parameter set means: uw_spacing, or when that is 0 one base cell where the fault is: the
-    focused box's (uw_focus_cell_km), else the surface's ((uw_cell_outer or uw_cell) / 2**uw_refinement)."""
+    focused box's (uw_focus_cell_km), the graded base's (uw_grade_cell_km), else the surface's ((uw_cell_outer or
+    uw_cell) / 2**uw_refinement). Before uw_mmpde_spacing: a moving-mesh run's own S is in its checkpoints."""
     sp = float(p.get("uw_spacing", 0.0) or 0.0)
     focus = float(p.get("uw_focus_cell_km", 0.0) or 0.0) / earth_units.DEPTH_KM
+    grade = float(p.get("uw_grade_cell_km", 0.0) or 0.0) / earth_units.DEPTH_KM
     top = float(p.get("uw_cell_outer", 0.0) or p.get("uw_cell", 0.5))
-    return sp if sp > 0 else focus if focus > 0 else top / 2 ** int(p.get("uw_refinement", 4))
+    return (sp if sp > 0 else focus if focus > 0 else grade if grade > 0
+            else top / 2 ** int(p.get("uw_refinement", 4)))
 
 
-SPACING_KEYS = ("uw_spacing", "uw_focus_cell_km", "uw_cell_outer", "uw_cell", "uw_refinement")
-CELL_TOP = float(params.uw_cell_outer or params.uw_cell)          # the coarse cell at the surface (graded or not)
+SPACING_KEYS = ("uw_spacing", "uw_focus_cell_km", "uw_grade_cell_km", "uw_cell_outer", "uw_cell", "uw_refinement")
+GRADE = float(params.uw_grade_cell_km) / MODEL_UNIT["km"]         # the graded base's cell at the surface; 0: none
+if GRADE > 0 and (float(params.uw_focus_cell_km) > 0 or params.uw_cell_outer or params.uw_cell_inner):
+    raise ValueError("-uw_grade_cell_km sets the base's sizes: it does not combine with -uw_focus_cell_km, "
+                     "-uw_cell_outer or -uw_cell_inner")
+MOVING = int(params.uw_mmpde_every) > 0 or int(params.uw_mmpde_init) > 0     # the base moves (uw_mmpde_*)
+# the coarse cell at the surface (graded or not)
+CELL_TOP = GRADE * 2 ** int(params.uw_refinement) if GRADE > 0 else float(params.uw_cell_outer or params.uw_cell)
 S = effective_spacing({key: getattr(params, key) for key in SPACING_KEYS})
 H_B = CELL_TOP / 2 ** int(params.uw_refinement)    # the base cell at the surface, outside any focused box
 FOCUS = float(params.uw_focus_cell_km) / MODEL_UNIT["km"]         # the focused box's base cell; 0: no box
@@ -339,16 +377,39 @@ if FOCUS > 0:
                  f"{_theta:.6g}) and above {float(params.uw_focus_depth_km):g} km, growing by "
                  f"{float(params.uw_focus_growth):g} per unit distance to {H_B * MODEL_UNIT['km']:.4g} km at the "
                  f"surface and {_cell_base * MODEL_UNIT['km'] / 2 ** int(params.uw_refinement):.4g} km at the base")
+elif GRADE > 0:
+    # sizes go in as coarse cells (the finest level's x 2**uw_refinement); the region is centred on the trench
+    _coarse = 2 ** int(params.uw_refinement) / MODEL_UNIT["km"]
+    _slab = ((float(params.uw_theta_trench), float(params.uw_grade_slab_arc_km) / MODEL_UNIT["km"],
+              float(params.uw_grade_slab_depth_km) / MODEL_UNIT["km"], float(params.uw_grade_slab_km) * _coarse)
+             if float(params.uw_grade_slab_km) > 0 else None)
+    base = banded_annulus_mesh(
+        params.uw_refinement, CELL_TOP, float(params.uw_grade_band_km) / MODEL_UNIT["km"],
+        float(params.uw_grade_growth) * 2 ** int(params.uw_refinement), float(params.uw_grade_largest_km) * _coarse,
+        f"{out}/annulus_graded.msh", slab=_slab)
+    BASE_MESH = (f"graded: {float(params.uw_grade_cell_km):.4g} km cells to {float(params.uw_grade_band_km):g} km "
+                 f"depth, growing by {float(params.uw_grade_growth):g} km per km below to "
+                 f"{float(params.uw_grade_largest_km):.4g} km"
+                 + (f"; at most {float(params.uw_grade_slab_km):.4g} km within {float(params.uw_grade_slab_arc_km):g} "
+                    f"km along the surface of the trench and above {float(params.uw_grade_slab_depth_km):g} km"
+                    if _slab else ""))
 else:
     base = annulus_mesh(params.uw_cell, params.uw_refinement, outer=params.uw_cell_outer,
                         inner=params.uw_cell_inner, filename=f"{out}/annulus_graded.msh")
     BASE_MESH = ("graded between the walls" if (params.uw_cell_outer or params.uw_cell_inner) else "uniform") + \
         f": {H_B * MODEL_UNIT['km']:.4g} km cells at the surface"
-uw.pprint(f"base mesh: {BASE_MESH}; rung spacing {S * MODEL_UNIT['km']:.4g} km")
+if MOVING:
+    BASE_MESH += (f"; moved (MMPDE, ratio {float(params.uw_mmpde_ratio):g}) {int(params.uw_mmpde_init)} times "
+                  f"before the first build and every {int(params.uw_mmpde_every)} steps")
+_cells = base.dm.getHeightStratum(0)
+BASE_CELLS = int(uw.utilities.gather_data(np.array([_cells[1] - _cells[0]]), bcast=True).sum())
+uw.pprint(f"base mesh: {BASE_MESH}; {BASE_CELLS} cells; rung spacing {S * MODEL_UNIT['km']:.4g} km")
 # what decides the base mesh, for a restart to compare with its checkpoint's
-MESH_KEYS = ["uw_cell", "uw_cell_outer", "uw_cell_inner", "uw_refinement", "uw_focus_cell_km"] + (
+MESH_KEYS = ["uw_cell", "uw_cell_outer", "uw_cell_inner", "uw_refinement", "uw_focus_cell_km", "uw_grade_cell_km"] + (
     ["uw_focus_arc_km", "uw_focus_centre_km", "uw_focus_depth_km", "uw_focus_growth", "uw_theta_trench"]
-    if FOCUS > 0 else [])
+    if FOCUS > 0 else []) + (
+    ["uw_grade_band_km", "uw_grade_growth", "uw_grade_largest_km", "uw_grade_slab_km", "uw_grade_slab_arc_km",
+     "uw_grade_slab_depth_km", "uw_theta_trench"] if GRADE > 0 else [])
 levels = base._coarse_level_meshes()[:-1] + [base]
 T_b = uw.discretisation.MeshVariable("T", base, 1, degree=2)
 V_b = uw.discretisation.MeshVariable("V", base, base.dim, degree=2)
@@ -1285,7 +1346,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     if swarm_on:
         crust_swarm.write_timestep("annulus", "crust_swarm", index=step,
                                    swarmVars=[m[0] for m in markers.values()], outputPath=out)
-    base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars)
+    # a moving base writes its mesh at every checkpoint (annulus.mesh.<step>.h5); a fixed one once (00000)
+    base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars, meshUpdates=MOVING)
     solver_files = write_solver_fields(faulted, step)
     # everything a restart from here reads: it refuses to start if any is missing
     needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
@@ -1296,7 +1358,7 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
         if selected:
             with open(os.path.join(out, f"state_{step:05d}.json"), "w") as f:
                 json.dump({"step": step, "t": t, "params": params.to_dict(), "model": MODEL, "model_unit": MODEL_UNIT,
-                           "faults": faults,
+                           "faults": faults, "rung_spacing": S,
                            "next_id": next_id, "ridge_origin": theta_0, "ridges": ridges,
                            # the first fault, for the single-fault readers (renders)
                            "theta_trench": faults[0]["theta"] if faults else float(params.uw_theta_trench),
@@ -1680,8 +1742,63 @@ def restore_swarm(path, index):
         var._update()
 
 
+def mmpde_move(rebin=True):
+    """One move of the base (uw_mmpde_*, H2's hook): its nodes follow |grad T|. The library remaps every field on
+    the base and the advection histories; ``rebin`` re-bins the crust's particles into the moved cells and refreshes
+    their proxies (a particle keeps its place, its cell has moved). Returns the move's record."""
+    wall_move = time.perf_counter()
+    h_before = float(base.get_min_radius())
+    density = uw.meshing.metric_density_from_gradient(
+        base, T_b, refinement=float(params.uw_mmpde_ratio), coarsening="auto", metric_choice="front-following",
+        name="mmpde")
+    uw.meshing.smooth_mesh_interior(
+        base, metric=density, method="mmpde", skip_threshold=None, boundary_slip="ring",
+        method_kwargs=dict(step_frac=0.2, accel="cg", momentum=0.0), verbose=False)
+    if rebin and swarm_on:
+        crust_swarm.migrate()
+        for var, _, _ in markers.values():
+            var._update()
+    local = np.asarray(T_b.array).ravel()
+    move = {"wall": round(time.perf_counter() - wall_move, 2), "min_radius_before": h_before,
+            "min_radius": float(base.get_min_radius()),
+            # the remap's overshoot, if any: T outside [0, 1] after the move
+            "T_range": [float(uw.utilities.gather_data(local.min() if local.size else np.inf, bcast=True).min()),
+                        float(uw.utilities.gather_data(local.max() if local.size else -np.inf, bcast=True).max())]}
+    uw.pprint(f"  mmpde: base moved in {move['wall']:.1f} s, min cell radius {h_before:.5f} -> "
+              f"{move['min_radius']:.5f}, T [{move['T_range'][0]:.4f}, {move['T_range'][1]:.4f}]")
+    return move
+
+
+def base_spacing_on_fault_line():
+    """The base's node spacing along the slab state's fault line (from the trench down-dip to the depth cap): the
+    median, over the T nodes within a band width of the line, of the mean distance to a node's six nearest
+    neighbours on its rank (H2's measure for uw_mmpde_spacing)."""
+    from scipy.spatial import cKDTree
+    theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
+    r_hat = np.array([np.cos(theta_t), np.sin(theta_t)])
+    t_hat = np.array([-np.sin(theta_t), np.cos(theta_t)])
+    down = np.cos(phi) * t_hat - np.sin(phi) * r_hat
+    line = np.array([r_o * r_hat, r_o * r_hat + fault_depth_cap() / max(np.sin(phi), 0.1) * down])
+    xy = np.asarray(model_xy(T_b), dtype=float)
+    near = polyline_distance(xy, line) < W
+    mean6 = cKDTree(xy).query(xy[near], k=7)[0][:, 1:].mean(axis=1) if near.any() else np.empty(0)
+    return float(np.median(uw.utilities.gather_data(mean6, bcast=True)))
+
+
+S_NOMINAL = None               # with uw_mmpde_spacing: the rung spacing before it was scaled to the moved base
 if params.uw_restart < 0:      # the slab state; a restart reads its checkpoint
     T_b.array[:, 0, 0] = slab_temperature(model_xy(T_b))
+    follow = int(params.uw_mmpde_spacing) > 0 and int(params.uw_mmpde_init) > 0
+    h_unmoved = base_spacing_on_fault_line() if follow else None
+    for _ in range(int(params.uw_mmpde_init)):
+        mmpde_move(rebin=False)                     # the particles are seeded below, on the moved base
+        T_b.array[:, 0, 0] = slab_temperature(model_xy(T_b))
+    if follow:
+        h_moved = base_spacing_on_fault_line()
+        S_NOMINAL, S = S, S * min(1.0, h_moved / h_unmoved)
+        W = 2.0 * S
+        uw.pprint(f"  mmpde: the base's node spacing on the fault line {h_unmoved:.5f} -> {h_moved:.5f}; rung spacing "
+                  f"{S_NOMINAL * MODEL_UNIT['km']:.4g} -> {S * MODEL_UNIT['km']:.4g} km")
     V_b.array[:, 0, :] = 0.0
     if swarm_on:
         seed_swarm()
@@ -1707,6 +1824,25 @@ else:
                   f"strain are read by nearest position")
     for var in (T_b, V_b, gamma_b):
         var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+    if MOVING:
+        # the base is built unmoved and the checkpoint's was moved (its fields are read by nearest position): adapt it
+        # to the checkpoint's T as at the start (uw_mmpde_init moves, at least one), reading the fields again after
+        # each move, so the last read lands on nodes close to the checkpoint's own (H2, 6657044: steps after a restart
+        # within 0.5 % in slip of the first leg's)
+        n_moves = max(1, int(params.uw_mmpde_init))
+        for _ in range(n_moves):
+            mmpde_move(rebin=False)                 # the particles are restored below, on the moved base
+            for var in (T_b, V_b, gamma_b):
+                var.read_timestep("annulus", var.name, params.uw_restart, outputPath=out)
+        uw.pprint(f"restart: the base adapted to the checkpoint's T in {n_moves} move(s)")
+    if int(params.uw_mmpde_spacing) > 0 and state.get("rung_spacing"):
+        # the rung spacing the run set at its start from its moved base (S follows no option a restart could repeat)
+        S_NOMINAL, S = S, float(state["rung_spacing"])
+        W = 2.0 * S
+        uw.pprint(f"restart: rung spacing {S * MODEL_UNIT['km']:.4g} km, the checkpoint's (uw_mmpde_spacing)")
+    elif int(params.uw_mmpde_spacing) > 0:
+        raise ValueError(f"restart {params.uw_restart} with -uw_mmpde_spacing 1: the checkpoint does not record the "
+                         f"rung spacing its run set (written from this driver on); restart with -uw_mmpde_spacing 0 -uw_spacing <S>")
     if swarm_on:
         restore_swarm(out, params.uw_restart)
     with open(os.path.join(out, "records.json")) as f:
@@ -1750,7 +1886,8 @@ if params.uw_restart >= 0:
     # it, and every build places its ladder on those points, so a restart at a different -uw_spacing re-samples them
     # at this run's S before the first build (otherwise the old rungs last until the next re-fit). An unchanged S
     # leaves them alone, so restarts of existing runs stay bit-identical. -uw_resample_restored force|never: tests.
-    S_saved = effective_spacing(state.get("params") or {}) if (state.get("params") or {}) else S
+    S_saved = (float(state["rung_spacing"]) if state.get("rung_spacing")
+               else effective_spacing(state.get("params") or {}) if (state.get("params") or {}) else S)
     mode = str(params.uw_resample_restored)
     if mode == "force" or (mode == "auto" and abs(S_saved - S) > 1e-9 * S):
         n_resampled = 0
@@ -1834,7 +1971,9 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_placement_refused", "uw_yield_softness", "uw_T_base_c", "uw_T_potential_c", "uw_eta_ref_pas",
                 "uw_activation_kj_mol", "uw_eta_max_pas", "uw_cell", "uw_cell_outer", "uw_cell_inner",
                 "uw_refinement", "uw_focus_cell_km", "uw_focus_arc_km", "uw_focus_centre_km", "uw_focus_depth_km",
-                "uw_focus_growth"]
+                "uw_focus_growth", "uw_grade_cell_km", "uw_grade_band_km", "uw_grade_growth", "uw_grade_largest_km",
+                "uw_grade_slab_km", "uw_grade_slab_arc_km", "uw_grade_slab_depth_km", "uw_mmpde_every", "uw_mmpde_init",
+                "uw_mmpde_ratio", "uw_mmpde_start", "uw_mmpde_spacing"]
 
 
 def write_choices(explicit, effective, info):
@@ -1890,10 +2029,19 @@ def write_run_info():
                                        "solves the warm; an unconverged cold first solve stops a fresh run",
                  "velocity_rtol_rotated": 0.033 * float(params.uw_tol), "consistent_jacobian": "continuation",
                  "rayleigh_number": model.ra, "viscosity_unit_and_floor_pas": MODEL_UNIT["pas"],
-                 "base_mesh": BASE_MESH,
-                 "rung_spacing": S, "rung_spacing_source": "uw_spacing" if float(params.uw_spacing) > 0
+                 "base_mesh": BASE_MESH, "base_cells": BASE_CELLS,
+                 "rung_spacing": S, "rung_spacing_source": ("uw_spacing" if float(params.uw_spacing) > 0
                  else "the focused box's cell (uw_focus_cell_km)" if FOCUS > 0
-                 else "one base cell at the surface (cell / 2**uw_refinement)",
+                 else "the graded base's cell (uw_grade_cell_km)" if GRADE > 0
+                 else "one base cell at the surface (cell / 2**uw_refinement)")
+                 + (f", x {S / S_NOMINAL:.4g} for the moved base (uw_mmpde_spacing)" if S_NOMINAL else ""),
+                 "mmpde": ({"every": int(params.uw_mmpde_every), "init": int(params.uw_mmpde_init),
+                            "start": int(params.uw_mmpde_start), "ratio": float(params.uw_mmpde_ratio),
+                            "metric": "metric_density_from_gradient(T, front-following, coarsening auto)",
+                            "mover": "smooth_mesh_interior(mmpde, boundary_slip ring, step_frac 0.2, accel cg, "
+                                     "momentum 0, skip_threshold None)",
+                            "restart": "the unmoved base adapted to the checkpoint's T, fields read after each move"}
+                           if MOVING else None),
                  "rebuild_threshold": REBUILD,
                  "rebuild_threshold_source": f"uw_rebuild_cells {float(params.uw_rebuild_cells):g} x base cell {H_F:g} "
                                              "(a distance, independent of S)",
@@ -1931,6 +2079,7 @@ if str(params.uw_placement_refused) not in ("stop", "keep"):
     raise ValueError(f"-uw_placement_refused {params.uw_placement_refused}: stop or keep")
 stopped = None                              # why the run ended early (uw_placement_refused stop)
 last_ckpt = int(params.uw_restart)          # the last step with a checkpoint on disk (-1: none)
+base_moved = False                          # the base has moved since the faulted mesh was built (uw_mmpde_every)
 for k in range(k0, k0 + params.uw_steps):
     wall = time.perf_counter()
     events = []
@@ -1940,7 +2089,8 @@ for k in range(k0, k0 + params.uw_steps):
     faults_before = list(faulted.names)
     mesh_rec = faulted.mesh_record if k == k0 else None
     t_build = t_warm = 0.0
-    if needs_rebuild(faults, faulted.faults):
+    moved_only = base_moved and not needs_rebuild(faults, faulted.faults)
+    if base_moved or needs_rebuild(faults, faulted.faults):
         asked = [dict(f) for f in faults]       # the set as the last step left it: what a stop's checkpoint holds
         previous = faulted
         try:
@@ -1982,7 +2132,9 @@ for k in range(k0, k0 + params.uw_steps):
             faulted.stokes.newton_switch_rtol = params.uw_rebuild_newton_switch
             mesh_rec = faulted.mesh_record
             if k != k0:
-                kind = "rebuild_same_set" if faulted.names == previous.names else "rebuild_changed_set"
+                kind = ("rebuild_moved_base" if moved_only else
+                        "rebuild_same_set" if faulted.names == previous.names else "rebuild_changed_set")
+            base_moved = False
         t_build = time.perf_counter() - wall - t_warm
         del previous
         gc.collect()
@@ -2018,6 +2170,12 @@ for k in range(k0, k0 + params.uw_steps):
                 if n_ridge:
                     events.append(f"ridge crust: {n_ridge} particles")
     t_swarm = time.perf_counter() - t_phase
+    move = None
+    if (int(params.uw_mmpde_every) > 0 and k >= int(params.uw_mmpde_start)
+            and (k + 1) % int(params.uw_mmpde_every) == 0):
+        # after the step's advection, so the next step's faulted mesh is built on the moved base
+        move = mmpde_move()
+        base_moved = True
     t_phase = time.perf_counter()
     t += dt
 
@@ -2079,7 +2237,10 @@ for k in range(k0, k0 + params.uw_steps):
         "wall": {"build": round(t_build, 3), "transfer": round(t_warm + solver["wall"]["transfer"], 3),
                  "stokes": solver["wall"]["stokes"], "to_base": round(t_to_base, 3),
                  "energy_strain": round(t_energy_strain, 3), "swarm": round(t_swarm, 3),
-                 "detection": round(t_detection, 3), "checkpoint": 0.0, "step": record["t_step"]}})
+                 "detection": round(t_detection, 3), "mmpde": move["wall"] if move else 0.0, "checkpoint": 0.0,
+                 "step": record["t_step"]}})
+    if move:
+        record["mmpde"] = move
     records.append(record)
     described = " ".join(f"{f['name']}@{np.degrees(f['theta']):.1f}/{f['dip']:.0f}/{f['depth']:.2f}"
                          f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults) or "none"

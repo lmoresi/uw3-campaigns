@@ -44,9 +44,46 @@ def focused_annulus_mesh(refinement, fine, theta, half_arc, depth, growth, outer
     """The unit-depth annulus with a fine region and its refinement hierarchy. The coarse cells are ``fine``
     within the arc ``half_arc`` (measured at the surface) either side of the angle ``theta`` and above the depth
     ``depth``; outside that box they grow by ``growth`` per unit distance from it, up to the background, which
-    runs linearly in depth from ``outer`` at the outer wall to ``inner`` at the inner one. uw.meshing.Annulus
-    takes sizes at its walls only, so this is its construction (the same boundary names and tags, snapping of
-    the refined wall nodes, null space and wall surfaces) with a gmsh size callback in place of the point sizes."""
+    runs linearly in depth from ``outer`` at the outer wall to ``inner`` at the inner one."""
+    r_o, r_i = annulus_radii(ratio)
+
+    def size(x, y):
+        d = r_o - np.hypot(x, y)
+        h = outer + (inner - outer) * min(max(d / (r_o - r_i), 0.0), 1.0)
+        along = r_o * abs((np.arctan2(y, x) - theta + np.pi) % (2.0 * np.pi) - np.pi)
+        return min(h, fine + growth * np.hypot(max(0.0, along - half_arc), max(0.0, d - depth)))
+
+    return sized_annulus_mesh(refinement, size, filename, ratio)
+
+
+def banded_annulus_mesh(refinement, top, band, growth, largest, filename, slab=None, ratio=RADIUS_RATIO):
+    """The unit-depth annulus graded to a boundary layer (H2's graded base, uw3-campaigns 5c9082e) and its
+    refinement hierarchy. The coarse cells are ``top`` from the surface down to the depth ``band`` (a typical
+    boundary-layer thickness), then grow by ``growth`` per unit depth up to ``largest``. ``slab`` = (theta,
+    half_arc, depth, cap) holds them at most ``cap`` within the arc ``half_arc`` (measured at the surface)
+    either side of the angle ``theta`` and above the depth ``depth``, with Gaussian tapers of half those
+    lengths beyond: the region the slab goes down through."""
+    r_o, r_i = annulus_radii(ratio)
+
+    def size(x, y):
+        d = r_o - np.hypot(x, y)
+        h = min(largest, top + growth * max(0.0, d - band))
+        if slab is None:
+            return h
+        theta, half_arc, depth, cap = slab
+        along = r_o * abs((np.arctan2(y, x) - theta + np.pi) % (2.0 * np.pi) - np.pi)
+        a = 1.0 if along < half_arc else float(np.exp(-((along - half_arc) / (0.5 * half_arc)) ** 2))
+        b = 1.0 if d < depth else float(np.exp(-((d - depth) / (0.5 * depth)) ** 2))
+        return h - (h - min(h, cap)) * a * b
+
+    return sized_annulus_mesh(refinement, size, filename, ratio)
+
+
+def sized_annulus_mesh(refinement, size, filename, ratio=RADIUS_RATIO):
+    """The unit-depth annulus with its refinement hierarchy, the coarse cells sized by ``size(x, y)``.
+    uw.meshing.Annulus takes sizes at its walls only, so this is its construction (the same boundary names and
+    tags, snapping of the refined wall nodes, null space and wall surfaces) with a gmsh size callback as the only
+    source of sizes, in place of the point sizes."""
     from underworld3.coordinates import CoordinateSystemType
     from underworld3.meshing._mesh_files import write_gmsh
     from underworld3.meshing.bounding_surface import register_radial_surfaces
@@ -56,12 +93,6 @@ def focused_annulus_mesh(refinement, fine, theta, half_arc, depth, growth, outer
         Lower = 1
         Upper = 2
         Centre = 10
-
-    def size(dim, tag, x, y, z, lc):
-        d = r_o - np.hypot(x, y)
-        h = outer + (inner - outer) * min(max(d / (r_o - r_i), 0.0), 1.0)
-        along = r_o * abs((np.arctan2(y, x) - theta + np.pi) % (2.0 * np.pi) - np.pi)
-        return min(h, fine + growth * np.hypot(max(0.0, along - half_arc), max(0.0, d - depth)))
 
     if uw.mpi.rank == 0:
         import gmsh
@@ -81,7 +112,7 @@ def focused_annulus_mesh(refinement, fine, theta, half_arc, depth, growth, outer
         for name in ("Lower", "Upper"):
             gmsh.model.addPhysicalGroup(1, curves[name], boundaries[name].value, name=name)
         gmsh.model.addPhysicalGroup(2, [surface], 666666, "Elements")
-        gmsh.model.mesh.setSizeCallback(size)
+        gmsh.model.mesh.setSizeCallback(lambda dim, tag, x, y, z, lc: size(x, y))
         for option in ("MeshSizeExtendFromBoundary", "MeshSizeFromPoints", "MeshSizeFromCurvature"):
             gmsh.option.setNumber(f"Mesh.{option}", 0)
         gmsh.model.mesh.generate(2)
