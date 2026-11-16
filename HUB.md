@@ -4143,3 +4143,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   model on the control's base and on the graded base + mover to ~300 Myr (~4 h), the evidence for a default. Job 4674
   (H2's 2000 km run on H2's code, 26 ranks) at step 49/280. Acceptance link: component equivalence (byte-identical
   .msh, same mover calls/settings) plus H2's run on H2's code; whole-run port-vs-H2 not possible (models differ).
+- 2026-11-16: ACCEPTANCE: H2's 2000 km run reproduced on kaiju (job 4674; H2's code 5c9082e as 138439a; af84cfcd; 26
+  ranks): 280 steps to t 8.78e-4, every step converged, no refused placement, exit 0. Against H2's table at the same
+  tolerance (uw_tol 1e-3, pressure rtol 1e-2): to 6e-4 slip within 2.4 %, trench 0.23 deg, vrms 1.5 %; at 7e-4 and
+  8e-4 slip within 5 %, vrms 3 %, trench 0.3 deg: same answer within the rerun spread, different machine, build and
+  rank count. Both open items reproduce: vs the fixed-mesh ref-5 movie run, ahead on the rise (slip +29 % at 2e-4),
+  then slip 6-9 % low from 3.5e-4 to 7e-4 and 32 % low at 8e-4 (H2: 35 %), trench 1.4-2.3 deg ahead. Cost at 26 ranks:
+  3.37 h to 8.78e-4 (2.45 h Stokes) vs 6.48 h (5.91 h Stokes) for the movie run: 1.9x less wall, 2.4x less Stokes
+  (H2's quarter-to-fifth was vs a 4-rank run elsewhere). README runs/h2_graded_kaiju/README.md. Workbench comparison
+  (job 4679) to follow.
