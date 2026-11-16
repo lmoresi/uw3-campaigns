@@ -4207,3 +4207,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   together, trench advanced to +2.5 / +0.9 deg); their fault end rose to ~220 km, above the lid base (272 km): with the
   174 km floor the fault no longer crosses the lithosphere. Y1-Y3 (cap rule) froze from 205-259 Myr; later steps not
   results.
+- 2026-11-17: Louis after Y4: "That's an extraordinary level of damage in the upper plate ... we don't really manage to
+  decouple the two plates by the fault itself. ... keep the yielding only in the fault's damage zone. Let that be a
+  plastic damage evolution too. Upper plate only v. Upper and lower. We should be able to restart from a mature-ish
+  model, imposing the new yield condition on a reset strength profile." Pushed kaiju/slab-workbench 8dbeeac -> e094161
+  (K1's 6c2e7c6; slab_workbench.py 220ef4c, earth_units.py 621c9b6: -uw_yield_zone upper|both, yielding only within
+  uw_yield_zone_km (40) of the fitted fault with Y4's law 50 MPa + 3 MPa/km and the same weakening/healing, elsewhere no
+  yielding; -uw_reset_strain 1) -> 6e34a83 (K1's 1e30929; blob be0d781: renamed -uw_yield_zone_side, the first name
+  clashed with the retired-option guard and job 4743 was refused). Both mbox sha256 matched; py_compile and pyflakes
+  clean. Y5 (job 4744, 1e30929): restart from Y4 at 216 Myr, strain reset, 40 km zone. Early: both slower than Y4 at
+  equal time (Y5u slip 1.7 vs 2.7 cm/yr at 232 Myr; Y5b 2.6 vs 3.0 at 221 Myr); renders job 4745. Rank layout (Louis's
+  "13+13 ... but maybe 20+20 ?"): vs 13+13, 26 on one socket 1.27x slower, 26+14 1.08x faster, 26+26 1.31x faster; two
+  runs per node one per socket stays best (1.4x); --ntasks-per-socket on --exact steps didn't spread ranks (Slurm filled
+  socket 0 first), so it stays out of job scripts. Page v15.
