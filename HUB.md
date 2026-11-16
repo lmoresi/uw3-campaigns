@@ -4180,3 +4180,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (run D: current workbench a042197 = 19a2b08, TI plane, no bridge; from step 0, two per node one per socket, to ~250
   Myr): Y1 50 MPa + 24.3 MPa/km, Y2 100 + 6, Y3 50 + 6, Y4 50 + 3; renders job 4731. Watching for the crust fault fit
   freezing ("the fault keeps its place"), which made D's run after 271 Myr invalid.
+- 2026-11-17: kaiju/slab-workbench 19a2b08 -> 8dbeeac (K1's 784785f; slab_workbench.py 963299c, earth_units.py 37a1707;
+  mbox sha256 matched; py_compile and pyflakes clean): -uw_spline_end crust ported from annulus_faults 8fff721 (default
+  cap unchanged). The cap refusal froze run D's fault from 271 Myr and Y1's from ~205 Myr; those stretches are on a
+  frozen fault. Job 4733: D (from step 50) and Y1 (from step 40) carried on with it; the fault now ends with the crust
+  layer at ~270 km. Hub framing note to K1: 13 Nov set up a test; the ruling on it was "the fault really does have to
+  cross the whole lithosphere"; ~270 km keeps that (the short-fault test ended at 175-200 km).
+  Yield-law interim (page section "Can the weak hinge come from yielding?"): low cohesion alone (Y1, 50 MPa + 24.3
+  MPa/km) recovers most of the gap to the bridge (slip 0.51 vs 0.65 for C and 0.30 for D at 175 Myr, a broader slab);
+  low friction as well (Y3 50 + 6, Y4 50 + 3) weakens the overriding plate: the trench stops retreating or advances,
+  and Y4 becomes a two-sided drip.
