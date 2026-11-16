@@ -195,7 +195,7 @@ params = uw.Params(
     # "That's an extraordinary level of damage in the upper plate ... we don't really manage to decouple the two plates
     # by the fault itself. ... keep the yielding only in the fault's damage zone. Let that be a plastic damage evolution
     # too. Upper plate only v. Upper and lower")
-    uw_yield_zone="none",       # "none": the yield law above everywhere (every run to 2026-11-17). "upper": yielding only
+    uw_yield_zone_side="none",  # "none": the yield law above everywhere (every run to 2026-11-17). "upper": yielding only
                                 #   within uw_yield_zone_km of the fault on the overriding plate's side, "both": on both
                                 #   sides; there the yield stress is uw_zone_tau0_mpa + uw_zone_tau1_mpa_km x depth, with
                                 #   the same strain weakening and healing (the plastic strain is the damage); elsewhere
@@ -508,9 +508,9 @@ Ra = uw.expression(r"\mathrm{Ra}", model.ra, "Rayleigh number on the basal visco
 deta = uw.expression(r"\Delta\eta", model.deta, "viscosity contrast across the layer")
 tau0 = uw.expression(r"\tau_0", model.tau0, "yield stress at the surface")
 tau1 = uw.expression(r"\tau_1", model.tau1, "yield stress gradient with depth")
-YIELD_ZONE = str(params.uw_yield_zone) != "none"
-if str(params.uw_yield_zone) not in ("none", "upper", "both"):
-    raise ValueError(f"-uw_yield_zone must be none, upper or both, not {params.uw_yield_zone!r}")
+YIELD_ZONE = str(params.uw_yield_zone_side) != "none"
+if str(params.uw_yield_zone_side) not in ("none", "upper", "both"):
+    raise ValueError(f"-uw_yield_zone_side must be none, upper or both, not {params.uw_yield_zone_side!r}")
 zone_tau0 = uw.expression(r"\tau_{0,z}", model.zone_tau0, "yield stress at the surface in the damage zone")
 zone_tau1 = uw.expression(r"\tau_{1,z}", model.zone_tau1, "yield stress gradient in the damage zone")
 H = uw.expression(r"H", model.heating, "internal heating rate")
@@ -1038,7 +1038,7 @@ class FaultedMesh:
             self.plane.array[:, 0, 0] = on.astype(float)
             self.director.array[:, 0, :] = normals
             plane_cells = int(uw.utilities.gather_data(int(on.sum()), bcast=True).sum())
-        # the damage zone (uw_yield_zone): the cells within uw_yield_zone_km of the fault's line, on the overriding
+        # the damage zone (uw_yield_zone_side): the cells within uw_yield_zone_km of the fault's line, on the overriding
         # side ("upper": the side of the trench's +theta for a dip below 90 degrees, as the slab state) or both
         self.yzone = None
         zone_cells = 0
@@ -1051,7 +1051,7 @@ class FaultedMesh:
                 keep = dist < float(model.yield_zone)
                 if float(model.yield_zone_depth) > 0:
                     keep &= (r_o - np.hypot(centroids[:, 0], centroids[:, 1])) < float(model.yield_zone_depth)
-                if str(params.uw_yield_zone) == "upper":
+                if str(params.uw_yield_zone_side) == "upper":
                     a = spine[int(np.argmax(np.hypot(spine[:, 0], spine[:, 1]) < r_o))]   # the first point inside
                     th = np.arctan2(a[1], a[0])
                     over = 1.0 if params.uw_dip < 90 else -1.0
@@ -1170,7 +1170,7 @@ class FaultedMesh:
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
-                  f"{plane_cells} cells" + (f", yield zone ({params.uw_yield_zone}) {zone_cells} cells" if YIELD_ZONE
+                  f"{plane_cells} cells" + (f", yield zone ({params.uw_yield_zone_side}) {zone_cells} cells" if YIELD_ZONE
                                             else "") + f", built in {self.t_build:.1f} s; band on "
                   f"{self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
@@ -2111,7 +2111,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
-                "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone",
+                "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_zone_tau0_mpa", "uw_zone_tau1_mpa_km",
                 "uw_reset_strain",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
