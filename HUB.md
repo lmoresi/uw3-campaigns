@@ -4172,3 +4172,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the trench and a thin strand, mostly crust, goes down. Unforced top speeds the slab (+20 to +36 % in the rise);
   FaultNetwork neutral. Throughput: two 26-rank runs per node (one per socket) give 1.4x the node's work on 120k cells
   (each 1.44x slower). LOUIS'S CALL: which weak region above the cut the workbench should have.
+- 2026-11-16: Louis to K1: "Lets see if we can get this to emerge naturally. This would be more useful in the long run
+  when we want to initiate subduction." K1 measured (page sections "Why yielding does not do the bridge's job", "Is the
+  bridge the plate's stretched part?"): the plate's hinge sits at the viscosity cap (1e25 Pa s) and yields only in the
+  top 25-50 km (yield 528 MPa + 24.3 MPa/km, x1.25). Half of the old isotropic bridge was the plate's stretched top under
+  the trench; without it that region yields (72-80 %) but only ~10x weaker, vs the bridge's 1000x. Started job 4729
+  (run D: current workbench a042197 = 19a2b08, TI plane, no bridge; from step 0, two per node one per socket, to ~250
+  Myr): Y1 50 MPa + 24.3 MPa/km, Y2 100 + 6, Y3 50 + 6, Y4 50 + 3; renders job 4731. Watching for the crust fault fit
+  freezing ("the fault keeps its place"), which made D's run after 271 Myr invalid.
