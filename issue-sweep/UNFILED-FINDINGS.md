@@ -10,5 +10,6 @@ C1's attempt to file an issue on 2026-11-16 was refused by its permission check.
 | 4 | Two runs of the same development build at np 4 differ by up to 9.5e-14 (plain and constrained Stokes, 3-D box, FMG); the rotated free-slip annulus differs by 4.7e-16 even at np 1 and 2. Within tolerance under Louis's reproducibility principle; recorded, not chased. | H1, review of #1200 (item 4) | informational |
 | 5 | test_0768's odd-node-count manifold case always skips (every size tried has an even count); the file fails under `mpirun -n 2` because each rank gets its own tmp_path (harness). | H1, review of #1207 | small; any desk |
 | 6 | Case 2a: when only the finest level moves, serial and parallel nest a re-partitioned level on different geometries, so the #1120 repair differs with rank count (x 0.015: serial 0 rows / 13 weak, np 3 31 rows / 2 weak). | H1 and H5, #1206 | in W1's coarse-levels design note (required case 2a); awaits Louis's design decision |
+| 7 | At np 2, the placed ribbon in #1218's test fixture is refused collectively by partition_addon ("1332 fine cells have no local parent"), on development too: a genuine partition the placement cannot handle. | H5 and H1, #1218 | waiting on Louis (fix or file) |
 
 Underworld development team with AI support from Claude Code
