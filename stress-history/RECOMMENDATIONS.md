@@ -85,8 +85,14 @@ Other facts that bear on the recommendations:
 - **Integration-point history on a moving mesh:** the docstring says ALE and old-frame trace-back
   are "not here (yet)" (4974). It does not raise, so on a deforming or free-surface mesh it runs
   without the mesh-velocity correction. **Unmeasured.**
-- **Log-conformation and the deformation step** (PR #795, merged) work with every flavour. They are
-  2-D, first order and upper-convected only, and `NavierStokesSLCN` refuses them.
+- **Log-conformation and the deformation step** (PR #795, merged) are accepted by every flavour
+  (doc). They are 2-D, first order and upper-convected only, and `NavierStokesSLCN` refuses them.
+  **Known failure on development fafbecb8:** with the log-conformation history, decoding the stress
+  after a solve (`Stokes.tau`) raises. The error is a shape mismatch, (15,) into (45,), in the
+  `Tensor_Projection` into the SYM_TENSOR decode variable. W1 (the integration session) found it on
+  a StructuredQuadBox 4x2, VEP order 1, ETD, upper-convected, after one solve, and is fixing it in a
+  small PR. Until then, read the carried stress through `constitutive_model.stress_star`. Whether
+  this depends on the flavour is **unmeasured**.
 
 ### What is measured
 
