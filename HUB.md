@@ -4220,3 +4220,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   "13+13 ... but maybe 20+20 ?"): vs 13+13, 26 on one socket 1.27x slower, 26+14 1.08x faster, 26+26 1.31x faster; two
   runs per node one per socket stays best (1.4x); --ntasks-per-socket on --exact steps didn't spread ranks (Slurm filled
   socket 0 first), so it stays out of job scripts. Page v15.
+- 2026-11-17: Y5 interim (page v16): Y5u (overriding side only): damage gathers in the overriding plate's leading edge
+  beside the fault top (plastic strain >1 by 242 Myr); incoming plate at the viscosity cap through the hinge; slip 57 %
+  of Y4's at equal time (1.4 vs 2.5 cm/yr at 253 Myr). Y5b (both sides): most yielding on the lower side, the top 40 km
+  of the bending incoming plate under the fault's shallow part, plus along the slab top; slip 87 % of Y4's (2.5 vs 2.9
+  at 227 Myr). Y5b slower per Myr, reaches ~320 Myr within job 4744's 12 h limit.
