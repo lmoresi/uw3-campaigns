@@ -4124,3 +4124,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   is reproduced on H2's own code (5c9082e applied as 138439a) at 26 ranks on af84cfcd: job 4674 (runs/h2_graded_kaiju,
   ~27 s/step so far); smoke test of the port job 4675. Hub asked K1 to make the port-vs-H2-code link explicit. K1 notes
   GitHub is fetchable from the kaiju login node.
+- 2026-11-16: Louis needs two figures for the ANUMAS application (closes 17:00 AEDT today): a nice-style frame of the
+  annulus + close-up from earth_recipe_movie, and a mesh frame with the base mesh grey and the add-on fault mesh black.
+  Requested from K1 (white background, >=300 dpi at ~16 cm, PNG and PDF if cheap, captions with commit/run).
