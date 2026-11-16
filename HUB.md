@@ -4127,3 +4127,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-16: Louis needs two figures for the ANUMAS application (closes 17:00 AEDT today): a nice-style frame of the
   annulus + close-up from earth_recipe_movie, and a mesh frame with the base mesh grey and the add-on fault mesh black.
   Requested from K1 (white background, >=300 dpi at ~16 cm, PNG and PDF if cheap, captions with commit/run).
+- 2026-11-16: ANUMAS figures delivered by K1 (page https://claude.ai/artifact/CCfTMUjaEMTDSqKFiTNtfS): step 400 of
+  earth_recipe_movie, 457 Myr; anumas_annulus_00400 (annulus + close-up) and anumas_mesh_00400 (base mesh grey, add-on
+  band black, split thick black, T 0.5 isotherm blue, next fit red dashed; 990 x 560 km); 16 cm, PNG 600 dpi, PDF.
+  Louis's download page: https://claude.ai/artifact/N2rBJdMu1iP5pocySpJdNV.
