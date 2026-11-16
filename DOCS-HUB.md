@@ -786,5 +786,9 @@ Measured here, not inherited.
   Underworld-Technical-Notes/underworldcode.org#71 (17 notes on a new
   `acknowledgements-nci.yml`; 4 with no computation left off). underworld3: #1208 (the
   README's first Acknowledgements section, AuScope/NCRIS plus NCI, years stated).
-  Deposited PDFs change only with new versions: Louis's call. **2027:** allocation not
+  Deposited PDFs: Louis asked for new versions (he cites the DOIs). The two drafts
+  (fault, adjoint) were first published with it (.v1, #74); the other 14 published
+  records were re-deposited the same day as 1.1.0 (MMPDE 1.2.0), identifiers PRs #75-#88,
+  History DOIs in #89, which also corrects the August notes' 1.0.0 entries from .v1 (the
+  2026-08-09 first cut) to .v2. JOSS note: no Figshare record, site only. **2027:** allocation not
   yet known; a scheduled check-in on 2026-12-15 (trig_013QcGYpAHga5J4mkeDUdsUN) asks Louis.
