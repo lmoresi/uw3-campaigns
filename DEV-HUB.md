@@ -94,6 +94,8 @@ GitHub, or in session transcripts. If it dies:
 
 ## Standing rules (team)
 
+- **The FAC fault patch is distributed in the general case** (Louis, 2026-11-17, ruling on UWTN 2026-022, via the notes workbench session): "We have flip-flopped on this endlessly and I still think that the distributed fault is what we want in the general case. I don't really understand why this cannot be solved but it is mostly (right now) that it is just much more efficient in 2D to do the solve on one process. I feel that this is so marginal in 2D that we don't really need to mention it." Since #934 (60dbf0e4) every fault's structural rows are one LU on one rank: a 2-D efficiency choice, not the design (#895).
+
 - **A semi-Lagrangian trace-back must not cross a fault** (Louis, 2026-11-15, on #871: "as we found in the fault sessions, trace back should not actually cross the fault !"). A history sample taken across a split-node fault is a defect, not a tolerance question.
 
 - **Mesh geometry is degree 1; higher-order coordinates are refused** (Louis, 2026-11-12, on #978 / PR #1088, typed in the W1 session and told to the hub; ruled out earlier as infrastructure too hard to maintain alongside a particle code): "Raise, now, I think. This has never been supported, should be safe to set aside. A degree > 1 campaign would be a major undertaking that touches a lot of code, particularly with particles." `Mesh` and every `uw.meshing` constructor raise on a coordinate degree other than 1 (#1088, 93e66eed); #978 closed not planned. Reviews do not ask features to support curved geometry; a check that relies on affine cells or faces is correct by this rule. (Lost from C1's summaries until 2026-11-15; recorded here so it is not lost again.)
