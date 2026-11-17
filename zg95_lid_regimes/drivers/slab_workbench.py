@@ -1,5 +1,13 @@
-"""The slab workbench: one split-node fault fitted to the crust of a prescribed slab, in
+"""The slab workbench: one split-node fault fitted to the melange layer of a prescribed slab, in
 the strain-weakening annulus.
+
+Names (Louis, 2026-11-17: "The fault should be on top of the crust layer. We then introduced a weak upper layer or a
+marker zone that we allowed to be the "melange" zone where material is weakened by sediment, hydrated minerals, damage
+and so on."): the melange layer is the weak upper layer on the subducting plate and down the slab's top face, carried
+by particles; its marker and options keep the parent's name "crust" (marker ``crust``, ``uw_crust_*``,
+``uw_ridge_crust*``, ``uw_spline_end crust``). With ``-uw_spline_side base`` the fault is fitted to its base, on
+top of the oceanic crust (the default fits the layer's centre line). The oceanic crust is the passive line under it
+(marker ``ocrust``, ``uw_ocrust_depth_km``), never in the rheology.
 
 The driver forked from ``annulus_faults.py`` at 8fff721 for Louis's Earth-scaled plate
 model. What the plate model needs is kept and the rest of the parent is gone. The physical
@@ -7,8 +15,8 @@ inputs are in Earth units (degrees C, Myr, km, cm/yr, Pa s, MPa, kJ/mol); ``eart
 turns them into the model's numbers, used here as ``model.<name>``, and the log shows both. The
 mesh and solver options stay in model lengths. Kept: the slab initial state
 (plate ages, ridge positions, the overriding plate and the continent), the fixed ridge
-patch, the crust particles advected with the split velocity and refilled, the fault fitted
-to the crust by a smoothing spline and ended at the depth cap, the frictionless split with
+patch, the melange particles advected with the split velocity and refilled, the fault fitted
+to the melange layer by a smoothing spline and ended at the depth cap, the frictionless split with
 its ladder, the transversely isotropic weak plane that carries the fault from the cut's top
 to the surface, strain weakening and healing, the Arrhenius viscosity, the
 asthenosphere and lower-mantle factors, the graded mesh, the solver with its retries,
@@ -76,40 +84,43 @@ params = uw.Params(
                                 #   viscosity and the yield stresses stay referenced to the upper mantle
     uw_lm_depth_km=670.0,
     uw_lm_ramp_km=58.0,
-    uw_fault_precedence=0,      # 1: inside a fault's band the fault's own rheology alone: the crust and continent
+    uw_fault_precedence=0,      # 1: inside a fault's band the fault's own rheology alone: the melange and continent
                                 #   factors are off there (Louis: "the fault rheology should always win")
-    uw_marker_rheo_depth_km=348.0,  # > 0: below this depth the crust and continent factors fade out
+    uw_marker_rheo_depth_km=348.0,  # > 0: below this depth the melange and continent factors fade out
                                 #   (tanh, uw_marker_rheo_ramp_km); their markers are still advected, recorded and drawn,
                                 #   so entrained material is tracked without acting (Louis: "change the material
                                 #   index so we track it but it does not have a rheological influence")
     uw_marker_rheo_ramp_km=58.0,
     uw_over_gap_km=2175.0,      # the overriding plate starts this far along the surface from the trench
     uw_over_ramp_km=87.0,       # over which its age ramps up from the thin layer's
-    # a weak oceanic crust carried by particles: a layer uw_crust_thick_km thick (< 0: one cell)
-    # on the subducting plate's surface and down the slab's top face, its viscosity and yield
-    # stress times uw_crust_weak (1 = no crust), the weakness fading below uw_crust_depth_km
+    # the melange layer (the weak upper layer; marker and options "crust", the parent's name), carried by
+    # particles: a layer uw_crust_thick_km thick (< 0: one cell) on the subducting plate's surface and
+    # down the slab's top face, its viscosity and yield stress times uw_crust_weak (1 = no melange
+    # layer), the weakness fading below uw_crust_depth_km. The fault follows it; the oceanic crust is
+    # the passive line under it (uw_ocrust_depth_km)
     uw_crust_weak=1.0,
     uw_crust_thick_km=11.3,
     uw_crust_depth_km=1450.0,
     uw_crust_fill=1,            # particles per cell parameter (1: about 3 per cell)
-    uw_crust_ppc=0,             # > 0: the crust layer seeded denser than the swarm, about this many
+    uw_crust_ppc=0,             # > 0: the melange layer seeded denser than the swarm, about this many
                                 #   particles per cell on a lattice in the layer's own frame (0: the swarm's)
-    uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the crust on the subducting
-                                #   plate's surface topped up to the uw_crust_ppc spacing where it has thinned
-    uw_ridge_crust=0,           # 1 (with uw_crust_ppc and uw_crust_refill_every): crust on plate made at the
-                                #   ridge. At every refill the subducting plate's surface layer is brought to the
-                                #   uw_crust_ppc spacing wherever it holds no crust particle, from the edge of its ridge's
-                                #   hot patch (uw_top_hot 2, uw_ridge_patch_km; from the ridge itself without one) to
-                                #   uw_ridge_crust_stop_km short of the trench, and the oceanic-crust line (uw_ocrust_depth_km)
-                                #   is carried on the same way. 0: crust only where the start put it and where the refill
-                                #   finds it, so plate made at the ridge carries none, and the fault has
-                                #   nothing to follow once that plate nears the trench (earth_young80, ridge 3,870 km
-                                #   behind the trench, 2026-11-12: every fit refused from step 225)
-    uw_ridge_crust_stop_km=290.0,  # uw_ridge_crust: no crust is made within this distance of the trench, where
-                                #   the layer bends under and the refill's own rule (crust only where its proxy is) holds
+    uw_crust_refill_every=0,    # > 0 (with uw_crust_ppc): every this many steps, the melange layer on the
+                                #   subducting plate's surface topped up to the uw_crust_ppc spacing where it has thinned
+    uw_ridge_crust=0,           # 1 (with uw_crust_ppc and uw_crust_refill_every): melange layer on plate made at
+                                #   the ridge. At every refill the subducting plate's surface layer is brought to the
+                                #   uw_crust_ppc spacing wherever it holds no melange particle, from the edge of its
+                                #   ridge's hot patch (uw_top_hot 2, uw_ridge_patch_km; from the ridge itself without
+                                #   one) to uw_ridge_crust_stop_km short of the trench, and the oceanic-crust line
+                                #   (uw_ocrust_depth_km) is carried on the same way. 0: melange layer only where the
+                                #   start put it and where the refill finds it, so plate made at the ridge carries none,
+                                #   and the fault has nothing to follow once that plate nears the trench (earth_young80,
+                                #   ridge 3,870 km behind the trench, 2026-11-12: every fit refused from step 225)
+    uw_ridge_crust_stop_km=290.0,  # uw_ridge_crust: no melange layer is made within this distance of the trench,
+                                #   where the layer bends under and the refill's own rule (melange only where its proxy
+                                #   is) holds
     uw_ocrust_depth_km=17.4,    # > 0: a passive oceanic-crust line, marker "ocrust": particles every
                                 #   line_spacing() this deep under the subducting plate's surface and into the slab's top
-                                #   face (below the weak crust layer when deeper than uw_crust_thick_km), its gaps filled at
+                                #   face (below the melange layer when deeper than uw_crust_thick_km), its gaps filled at
                                 #   the refill (refill_line); carried and written, never in the rheology or the fault's placement
                                 #   (Louis, 2026-11-12: "we treat a slightly deeper layer as the oceanic crust itself for the
                                 #   purpose of tracking deep advection of the oceanic crust and locations for dehydration
@@ -136,9 +147,9 @@ params = uw.Params(
     uw_refinement=4,
     uw_cell_outer=0.0,          # > 0: a graded mesh, the coarse cell this size at the outer wall (Louis, 2026-11-13: refine
     uw_cell_inner=0.0,          #   near the surface to resolve a slab of half the age with fewer cells overall); > 0: the
-                                #   coarse cell at the inner wall; 0 = uw_cell. Then the base cell H_B (the crust lattice,
+                                #   coarse cell at the inner wall; 0 = uw_cell. Then the base cell H_B (the melange lattice,
                                 #   the rung spacing by default, the rebuild threshold) is the outer wall's cell, where
-                                #   the plates, the crust and the fault are
+                                #   the plates, the melange layer and the fault are
     uw_focus_cell_km=0.0,       # > 0: a focused mesh. The finest level's cells are this size in a box around the
                                 #   subduction zone: within uw_focus_arc_km along the surface either side of a centre
                                 #   uw_focus_centre_km from uw_theta_trench (positive: towards the overriding plate)
@@ -146,8 +157,8 @@ params = uw.Params(
                                 #   per unit distance, up to the graded mesh's sizes (uw_cell_outer at the surface,
                                 #   uw_cell_inner at the base, linear in depth between them). The mesh is fixed: the
                                 #   box has to hold the fault for the whole run. The rung spacing's default and the
-                                #   rebuild threshold's cell are then this cell; the crust lattice keeps the
-                                #   surface's cell outside the box, so the crust's particles per area do not change
+                                #   rebuild threshold's cell are then this cell; the melange lattice keeps the
+                                #   surface's cell outside the box, so the melange layer's particles per area do not change
     uw_focus_arc_km=750.0,
     uw_focus_centre_km=-150.0,  # the control's fault lies from 734 km behind the first trench to 436 km ahead of it
     uw_focus_depth_km=700.0,    #   over 387 Myr, to 435 km depth (runs/wb_floor_late)
@@ -170,7 +181,7 @@ params = uw.Params(
                                 #   slab for the whole run (H2: 1000 km either side was outrun at 3.7e-4, 2000 km held)
     # the moving mesh (MMPDE, H2's hook): the base's nodes follow |grad T| (metric_density_from_gradient,
     # "front-following", then smooth_mesh_interior with the walls' nodes sliding on their circles). The library remaps
-    # every field on the base, the advection histories too; the crust's particles are re-binned; the faulted mesh is
+    # every field on the base, the advection histories too; the melange particles are re-binned; the faulted mesh is
     # rebuilt on the moved base. The coarse multigrid levels keep their geometry (the FMG set-up is settled: Louis,
     # 2026-11-15). Every checkpoint then writes its own base mesh file (annulus.mesh.<step>.h5)
     uw_mmpde_every=0,           # move the base every this many steps (0: never)
@@ -240,7 +251,7 @@ params = uw.Params(
                                 #   exit code 3, after writing the last finished step's checkpoint if the cadence had
                                 #   not, so it can be restarted. "keep" (every run to 2026-11-13): the previous faults
                                 #   stay and the run goes on with the fault where it was
-    # the fault's locator (crust_spline_points): a smoothing spline in arc length through the crust's centre line,
+    # the fault's locator (crust_spline_points): a smoothing spline in arc length through the melange layer's centre line,
     # from the incoming plate through the bend down the slab; no level of the layer chosen, no straight top, no dip
     # floor (Louis, 2026-11-12: "a smooth fit with finite curvature (a spline is a plate bending solution of
     # sorts)", "let the dynamics control the shape and not the other way around"). The fault ends at the depth cap,
@@ -290,12 +301,12 @@ params = uw.Params(
                                 #   the depth rule (the recipe until ruled). Along the fault the first split node is also
                                 #   at least half a rung deep (cut_of): what a fault shallower than 30 degrees needs
     uw_fault_depth_max_km=435.0,
-    uw_fault_depth_min_km=174.0,  # uw_spline_end crust: a fault whose crust layer ends above this depth is refused
+    uw_fault_depth_min_km=174.0,  # uw_spline_end crust: a fault whose melange layer ends above this depth is refused
     uw_spline_end="cap",        # where the fault ends. "cap" (every workbench run to 2026-11-16): at the depth cap; a curve
                                 #   ending within 0.03 of it is carried to it along its own direction, one ending higher
                                 #   is refused and the fault keeps its place. "crust" (Louis, 2026-11-13: "end the fault
                                 #   where we cannot constrain it and see if that results in a shutdown of the slab or
-                                #   not"; annulus_faults.py 8fff721): where the crust layer ends down the slab, below
+                                #   not"; annulus_faults.py 8fff721): where the melange layer ends down the slab, below
                                 #   uw_spline_end_frac of its particles on the incoming plate, or at the cap if the layer
                                 #   passes it; nothing is carried, and the fit is refused only above uw_fault_depth_min_km
     uw_spline_end_frac=0.5,     # uw_spline_end crust: the layer ends where its particles per 0.005 of arc first fall
@@ -445,16 +456,16 @@ yield_ratio_b = uw.discretisation.MeshVariable("yield_ratio", base, 1, degree=1)
 gamma_b = uw.discretisation.MeshVariable("plastic_strain", base, 1, degree=2)
 edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
 
-# The crust: particles over the whole base mesh carrying a 0/1 crust marker; its proxy is
+# The melange layer: particles over the whole base mesh carrying a 0/1 marker "crust"; its proxy is
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
-# cell the crust has left); crust_b (P1) is the checkpointed picture for the renders.
+# cell the layer has left); crust_b (P1) is the checkpointed picture for the renders.
 crust_on = params.uw_crust_weak < 1
 RIDGE_CRUST = bool(int(params.uw_ridge_crust))
 if RIDGE_CRUST and (not crust_on or params.uw_crust_ppc <= 0 or params.uw_crust_refill_every <= 0):
-    raise ValueError("-uw_ridge_crust 1 makes crust at the refill: it needs the crust layer (uw_crust_weak < 1) "
+    raise ValueError("-uw_ridge_crust 1 makes melange layer at the refill: it needs the melange layer (uw_crust_weak < 1) "
                      "with uw_crust_ppc > 0 and uw_crust_refill_every > 0")
 if not crust_on:
-    raise ValueError("the fault follows the crust layer: it needs one (uw_crust_weak < 1)")
+    raise ValueError("the fault follows the melange layer (marker crust): it needs one (uw_crust_weak < 1)")
 over_on = model.over_dT != 0 or params.uw_over_eta != 1   # a negative uw_over_drho_kg_m3 is a buoyant block
 swarm_on = crust_on or over_on
 crust_thick = (float(model.crust_thick) if model.crust_thick > 0
@@ -490,7 +501,7 @@ def marker_rheo_window(mesh):
 
 
 def crust_factor_on(mesh, crust_sym, mask=0):
-    """The viscosity (and yield stress) factor of the crust proxy ``crust_sym`` on ``mesh``:
+    """The viscosity (and yield stress) factor of the melange proxy ``crust_sym`` on ``mesh``:
     uw_crust_weak where the marker is 1, fading to 1 below uw_crust_depth_km (and below
     uw_marker_rheo_depth_km), and 1 where ``mask`` (the fault band, uw_fault_precedence) is 1."""
     depth = r_o - sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
@@ -789,14 +800,14 @@ def division_record(spine, width):
 
 
 def crust_spline_points(faults):
-    """The fault on a smoothing spline through the crust's centre line, in arc length.
+    """The fault on a smoothing spline through the melange layer's centre line, in arc length.
     In map coordinates (X = r_o theta about the trench hint, Y = -depth):
     marching from the incoming plate 0.35 outboard of the hint toward the trench in steps of
-    0.005, each point re-centred on the median normal offset of the crust within +-0.005 along and
+    0.005, each point re-centred on the median normal offset of the melange within +-0.005 along and
     +-3 thicknesses across, the direction the chord over the last 4 steps, down to the cap + 0.06;
-    then the crust within 3 thicknesses of that line binned by arc length (0.005), the bin medians
+    then the melange within 3 thicknesses of that line binned by arc length (0.005), the bin medians
     fitted with a smoothing spline in X(s) and Y(s) (lam = uw_spline_length_km^4 / 0.005, weights
-    sqrt(count)). The fault is the curve from where it lies one crust thickness deeper than its
+    sqrt(count)). The fault is the curve from where it lies one melange thickness deeper than its
     level on the incoming plate (the trench) to the depth cap; above that point it runs to the
     wall along the curve's own tangent there, with a stub to 0.02 above the wall; resampled at the
     rung spacing. The fit sets no dip at the top (Louis, 2026-11-14: "the fit, at least should not
@@ -832,7 +843,7 @@ def crust_spline_points(faults):
     sh = dep < 0.5 * ct
     deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - X0) < 0.3)
     if sh.sum() < 4 or deep.sum() < 12:
-        uw.pprint("  crust fault (spline): no subducted crust below cap/2, or none at the wall")
+        uw.pprint("  melange fault (spline): no subducted melange below cap/2, or none at the wall")
         return None
     inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
     left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
@@ -861,8 +872,8 @@ def crust_spline_points(faults):
     if end_at not in ("cap", "crust"):
         raise ValueError(f"-uw_spline_end must be cap or crust, not {end_at!r}")
     reach = cap - 0.03 if end_at == "cap" else float(model.fault_depth_min)
-    if -C[-1, 1] < reach:                            # the slab's stretched crust thins out
-        uw.pprint(f"  crust fault (spline): the march along the crust stopped at depth {-C[-1, 1]:.3f}")
+    if -C[-1, 1] < reach:                            # the slab's stretched melange layer thins out
+        uw.pprint(f"  melange fault (spline): the march along the melange layer stopped at depth {-C[-1, 1]:.3f}")
         return None
     lam = float(model.spline_length) ** 4 / ds
     side = str(params.uw_spline_side)
@@ -885,14 +896,14 @@ def crust_spline_points(faults):
         ss, off, cnt = [], [], []
         for j in np.unique(b):
             v = n_p[inb][b == j]
-            if len(v) >= 1:                          # weighted by sqrt(count): the slab's stretched crust is sparse
+            if len(v) >= 1:                          # weighted by sqrt(count): the slab's stretched melange is sparse
                 ss.append(s_p[inb][b == j].mean())
                 # + inc * left points into the plate interior (the march runs from the incoming plate to the slab)
                 off.append(np.median(v) if stat == "median" else inc * np.quantile(inc * v, 0.9))
                 cnt.append(len(v))
         ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
         if len(ss) < 12:
-            uw.pprint("  crust fault (spline): too few crust bins along the layer")
+            uw.pprint("  melange fault (spline): too few melange bins along the layer")
             return None
         Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
         ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
@@ -910,7 +921,7 @@ def crust_spline_points(faults):
                 s_end = ss[j - 1] + run * float(np.clip((n[j - 1] - thin) / max(n[j - 1] - n_j, 1e-12), 0.0, 1.0))
                 ss, Z, w = ss[:j], Z[:j], w[:j]
                 if len(ss) < 12:
-                    uw.pprint("  crust fault (spline): too few crust bins along the layer")
+                    uw.pprint("  melange fault (spline): too few melange bins along the layer")
                     return None
         w = w / w.mean()
         sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
@@ -930,33 +941,33 @@ def crust_spline_points(faults):
     kt = int(above[-1]) + 1 if len(above) else 0
     if end_at == "crust":
         if fd.max() < float(model.fault_depth_min):
-            uw.pprint(f"  crust fault (spline): the crust layer ends at depth {fd.max():.3f}, above uw_fault_depth_min_km")
+            uw.pprint(f"  melange fault (spline): the melange layer ends at depth {fd.max():.3f}, above uw_fault_depth_min_km")
             return None
         if not (fd[kt:] >= cap).any():
-            uw.pprint(f"  crust fault (spline): the fault ends with the crust layer, at depth {fd.max():.3f}")
+            uw.pprint(f"  melange fault (spline): the fault ends with the melange layer, at depth {fd.max():.3f}")
     elif fd.max() < cap - 0.03:
-        uw.pprint(f"  crust fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
+        uw.pprint(f"  melange fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
         return None
     elif not (fd[kt:] >= cap).any():
-        # within 0.03 of the cap (the starting slab's crust reaches ~0.142, and the subducted
-        # crust's lattice stretches until a 0.01 of depth can hold no particle): the curve carried on to the cap
+        # within 0.03 of the cap (the starting slab's melange layer reaches ~0.142, and the subducted
+        # layer's lattice stretches until a 0.01 of depth can hold no particle): the curve carried on to the cap
         # along its own direction over its last 0.01
         kd = int(np.argmax(fd))
         ke = int(np.argmax(sF >= sF[kd] - 0.01))
         e = F[kd] - F[ke]
         e = e / max(np.linalg.norm(e), 1e-12)
         if e[1] >= -1e-3:
-            uw.pprint("  crust fault (spline): the curve's deep end does not descend")
+            uw.pprint("  melange fault (spline): the curve's deep end does not descend")
             return None
         F = np.vstack([F[:kd + 1], F[kd] + np.outer(np.arange(0.0005, (cap - fd[kd]) / -e[1] + 0.001, 0.0005), e)])
         fd = -F[:, 1]
-        uw.pprint(f"  crust fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
+        uw.pprint(f"  melange fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
     kc = kt + int(np.argmax(fd[kt:] >= cap)) if (fd[kt:] >= cap).any() else len(F) - 1
     seg = F[kt:kc + 1]
     d = seg[1] - seg[0]                              # the run to the wall: the curve's own tangent at its top
     d = d / np.linalg.norm(d)
     if d[1] >= 0:
-        uw.pprint("  crust fault (spline): the curve does not descend where it leaves the incoming plate")
+        uw.pprint("  melange fault (spline): the curve does not descend where it leaves the incoming plate")
         return None
     top_dip = float(np.degrees(np.arctan2(-d[1], abs(d[0]))))
     to_wall = -seg[0, 1] / max(-d[1], 1e-6)
@@ -977,7 +988,7 @@ def crust_spline_points(faults):
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
     info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
             "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
-    uw.pprint(f"  crust fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
+    uw.pprint(f"  melange fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
               f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f} dipping {top_dip:.1f}")
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
@@ -1008,7 +1019,7 @@ class FaultedMesh:
         self.yield_ratio = uw.discretisation.MeshVariable(f"yield_ratio_{tag}", mesh, 1, degree=1)
         self.gamma = uw.discretisation.MeshVariable(f"plastic_strain_{tag}", mesh, 1, degree=2)
         self.edot_p = uw.discretisation.MeshVariable(f"edot_plastic_{tag}", mesh, 1, degree=1)
-        # the crust marker on this mesh (DG1, filled from the particles' proxy at each solve)
+        # the melange marker (crust) on this mesh (DG1, filled from the particles' proxy at each solve)
         self.crust = (uw.discretisation.MeshVariable(f"crust_{tag}", mesh, 1, degree=1, continuous=False)
                       if crust_on else None)
         self.over = (uw.discretisation.MeshVariable(f"over_{tag}", mesh, 1, degree=1, continuous=False)
@@ -1624,14 +1635,14 @@ def over_marker(xy, thick):
 
 
 def crust_spacing():
-    """The lattice spacing of the dense crust: about uw_crust_ppc particles per (triangular) cell."""
+    """The lattice spacing of the dense melange layer: about uw_crust_ppc particles per (triangular) cell."""
     return H_B / np.sqrt(2.0 * float(params.uw_crust_ppc))
 
 
 def crust_layer_points(spacing, surface_only=False):
-    """A lattice at ``spacing`` through the slab state's crust layer: the subducting plate's
+    """A lattice at ``spacing`` through the slab state's melange layer: the subducting plate's
     surface layer (ridge to trench) and, unless ``surface_only``, the slab's top face, in the
-    layer's own frame (along it and across it), kept where layer_marker says crust."""
+    layer's own frame (along it and across it), kept where layer_marker says melange."""
     theta_t, phi = float(params.uw_theta_trench), np.deg2rad(float(params.uw_dip))
     over = 1.0 if params.uw_dip < 90 else -1.0
     ridge_s = abs(float(model.ridge_sub))
@@ -1653,10 +1664,10 @@ def crust_layer_points(spacing, surface_only=False):
 
 
 def refill_crust():
-    """Top up the crust on the subducting plate's surface: lattice points of the dense crust
-    (uw_crust_ppc spacing) where the crust is (its proxy >= 0.5) and no crust particle on this
-    rank lies within 0.75 spacing become crust particles; other markers from the nearest
-    particle. Crust is never made where there was none, and the slab's (stretched) crust is
+    """Top up the melange layer on the subducting plate's surface: lattice points of the dense layer
+    (uw_crust_ppc spacing) where the layer is (its proxy >= 0.5) and no melange particle on this
+    rank lies within 0.75 spacing become melange particles; other markers from the nearest
+    particle. Melange is never made where there was none, and the slab's (stretched) layer is
     left alone. Collective. Returns the particles added on this rank."""
     from scipy.spatial import cKDTree
     spacing = crust_spacing()
@@ -1685,7 +1696,7 @@ def refill_crust():
 
 
 def ridge_crust_window(xy, faults):
-    """True where uw_ridge_crust makes crust: on the subducting plate, past the edge of its
+    """True where uw_ridge_crust makes melange layer: on the subducting plate, past the edge of its
     ridge's hot patch (uw_top_hot 2: uw_ridge_patch_km from the ridge, which stays uw_ridge_sub_km
     behind uw_theta_trench; the ridge itself without a patch) and more than uw_ridge_crust_stop_km
     (arc) short of the trench as it is now."""
@@ -1699,11 +1710,11 @@ def ridge_crust_window(xy, faults):
 
 
 def ridge_crust(faults):
-    """Crust on plate made at the ridge (uw_ridge_crust). refill_crust never makes crust where
+    """Melange layer on plate made at the ridge (uw_ridge_crust). refill_crust never makes it where
     there was none, so plate that has left the ridge since the start carries none. Here lattice
-    points of the dense crust (uw_crust_ppc spacing) in the subducting plate's surface layer,
-    inside ridge_crust_window, with no crust particle on this rank within 0.75 spacing become
-    crust particles, whatever the crust's proxy says there; the oceanic-crust line's surface
+    points of the dense melange layer (uw_crust_ppc spacing) in the subducting plate's surface layer,
+    inside ridge_crust_window, with no melange particle on this rank within 0.75 spacing become
+    melange particles, whatever the layer's proxy says there; the oceanic-crust line's surface
     points (uw_ocrust_depth_km, line_spacing()) the same way. Other markers from the nearest
     particle. Collective. Returns the particles added on this rank."""
     from scipy.spatial import cKDTree
@@ -1772,7 +1783,7 @@ def refill_line(faults, target, line_d):
     two neighbours on the chain are more than 1.5 spacings apart, evenly spaced points are put
     between them, down to the depth cap plus 0.05; every rank passes the same points and keeps
     its own (add_particles_with_coordinates). Other markers from the nearest particle; a
-    new particle is that line's, not the crust's. Collective. Returns the particles added on
+    new particle is that line's, not the melange layer's. Collective. Returns the particles added on
     this rank."""
     from scipy.spatial import cKDTree
     sp = line_spacing()
@@ -1851,7 +1862,7 @@ def advect_split(faulted_mesh, dt):
 
 def seed_swarm():
     """Fresh particles over the base mesh with the slab state's markers; with uw_crust_ppc the
-    crust layer gets its own denser lattice on top of the swarm's fill."""
+    melange layer gets its own denser lattice on top of the swarm's fill."""
     crust_swarm.populate(fill_param=int(params.uw_crust_fill))
     if crust_on and params.uw_crust_ppc > 0:
         crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(crust_layer_points(crust_spacing())))
@@ -1882,7 +1893,7 @@ def restore_swarm(path, index):
 
 def mmpde_move(rebin=True):
     """One move of the base (uw_mmpde_*, H2's hook): its nodes follow |grad T|. The library remaps every field on
-    the base and the advection histories; ``rebin`` re-bins the crust's particles into the moved cells and refreshes
+    the base and the advection histories; ``rebin`` re-bins the melange particles into the moved cells and refreshes
     their proxies (a particle keeps its place, its cell has moved). Returns the move's record."""
     wall_move = time.perf_counter()
     h_before = float(base.get_min_radius())
@@ -2029,7 +2040,7 @@ last_damage = {}               # how far each fault's polyline moved at the last
 built = faults
 if params.uw_restart >= 0:
     k0, n_built, refused, last_damage, built = restored_decisions(state, records, faults)
-    # the restart rule (2026-11-02): a crust-law fault's stored polyline is at the rung spacing of the run that wrote
+    # the restart rule (2026-11-02): a fitted fault's stored polyline is at the rung spacing of the run that wrote
     # it, and every build places its ladder on those points, so a restart at a different -uw_spacing re-samples them
     # at this run's S before the first build (otherwise the old rungs last until the next re-fit). An unchanged S
     # leaves them alone, so restarts of existing runs stay bit-identical. -uw_resample_restored force|never: tests.
@@ -2043,7 +2054,7 @@ if params.uw_restart >= 0:
                 f["points"] = resample_polyline(np.asarray(f["points"], dtype=float), S,
                                                 1).tolist()
                 n_resampled += 1
-        uw.pprint(f"restart: {n_resampled} crust-law fault polyline(s) re-sampled from the checkpoint's S {S_saved:g} "
+        uw.pprint(f"restart: {n_resampled} fitted fault polyline(s) re-sampled from the checkpoint's S {S_saved:g} "
                   f"to this run's S {S:g} ({mode})")
 faulted = FaultedMesh(built, "f0")
 restart_transfer = "none"
@@ -2069,9 +2080,9 @@ uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
           + (f"viscosity arrhenius, E {ARRHENIUS[0]:.4g}, T0 {ARRHENIUS[1]:g}, the fk viscosity "
              f"{float(model.deta) ** (1 - ARRHENIUS[2]):.4g} at T {ARRHENIUS[2]:g}, cap {ARRHENIUS[3]:g}; ")
           + f"{len(faults)} fault(s); "
-          + (f"crust x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {model.crust_depth:g}; "
+          + (f"melange layer x{params.uw_crust_weak:g}, {crust_thick:.4f} thick, to depth {model.crust_depth:g}; "
              if crust_on else "")
-          + (f"crust made on new plate to {model.ridge_crust_stop:g} short of the trench; " if RIDGE_CRUST else "")
+          + (f"melange layer made on new plate to {model.ridge_crust_stop:g} short of the trench; " if RIDGE_CRUST else "")
           + (f"compositional overriding plate {model.over_comp_thick:g} thick from {model.over_gap:g} "
              f"behind the trench, dT {model.over_dT:g}, eta x{params.uw_over_eta:g}; " if over_on else "")
           + (f"{int(uw.utilities.gather_data(crust_swarm.local_size, bcast=True).sum())} particles; "
@@ -2314,11 +2325,11 @@ for k in range(k0, k0 + params.uw_steps):
                 n_refill += int(uw.utilities.gather_data(refill_line(faults, "ocrust", model.ocrust_depth),
                                                          bcast=True).sum())
             if n_refill:
-                events.append(f"crust refill: {n_refill} particles")
+                events.append(f"melange refill: {n_refill} particles")
             if RIDGE_CRUST:
                 n_ridge = int(uw.utilities.gather_data(ridge_crust(faults), bcast=True).sum())
                 if n_ridge:
-                    events.append(f"ridge crust: {n_ridge} particles")
+                    events.append(f"ridge melange: {n_ridge} particles")
     t_swarm = time.perf_counter() - t_phase
     move = None
     if (int(params.uw_mmpde_every) > 0 and k >= int(params.uw_mmpde_start)
@@ -2333,11 +2344,11 @@ for k in range(k0, k0 + params.uw_steps):
     detect_now = (k >= params.uw_detect_start
                   and (k - params.uw_detect_start) % params.uw_detect_every == 0)
     if detect_now:
-        # one fault following the weak crust on the slab's top, from the trench down to the
-        # depth cap; it forms at the first detection and never retires
+        # one fault following the melange layer on the slab's top (the weak upper layer above the oceanic crust),
+        # from the trench down to the depth cap; it forms at the first detection and never retires
         found = crust_spline_points(faults)
         if found is None:
-            uw.pprint("  crust fault: no slab top reaching the cap from the surface; the fault keeps its place")
+            uw.pprint("  melange fault: no slab top reaching the cap from the surface; the fault keeps its place")
         else:
             poly, theta_t, dip, depth, info = found
             if faults:
@@ -2351,7 +2362,7 @@ for k in range(k0, k0 + params.uw_steps):
                 faults.append({"name": f"F{next_id}", "points": poly.tolist(), "theta": theta_t,
                                "dip": dip, "depth": depth, **info})
                 next_id += 1
-                events.append(f"formed {faults[0]['name']} on the crust at {np.degrees(theta_t):.1f} deg, "
+                events.append(f"formed {faults[0]['name']} on the melange layer at {np.degrees(theta_t):.1f} deg, "
                               f"dip {dip:.1f}, depth {depth:.3f}, {len(poly)} points")
     if damage:
         last_damage = dict(damage)
