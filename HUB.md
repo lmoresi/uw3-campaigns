@@ -4234,3 +4234,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   crosses the fitted fault's top); Y4's damaged overriding plate smears the melange to 34-50 km vs 11-17 in P/C/D.
   Damage vs the ladder band: Y5 54-60 % in the band (83 % of Y5u's overriding-side damage within two rungs); Y4 28 %;
   D 74 %. Y5 now: Y5u slip 73 % of Y4's at 290 Myr; Y5b 91 % at 237 Myr.
+- 2026-11-17: kaiju/slab-workbench 6e34a83 -> fe3f03f (K1's cd17ccc; blob 19b9904; mbox sha256 matched; py_compile
+  clean): melange wording in comments and logs (Louis: "fix the driver wording"); hub checked the code token stream with
+  strings and comments ignored is identical (23,230 tokens). Four changed strings are record/log event texts ("crust
+  refill:" -> "melange refill:", "ridge crust:" -> "ridge melange:", banner "crust x", "on the crust at"); K1 asked to
+  grep its analysis scripts for the old texts. Y6 running (job 4749, 1e30929 = 6e34a83): Y5b with the yield zone cut to
+  the ladder band, 17 km either side of the fault (225 cells vs 547), restart from Y4 step 200 at np 52 (26+26); renders
+  job 4750; page v18.
