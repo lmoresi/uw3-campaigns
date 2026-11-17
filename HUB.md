@@ -4273,3 +4273,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   zone both sides 40 km, top 50 km only, damage threshold 0.1 (K1's pick). Y5b carried on (job 4754, 1e30929
   unchanged, no reset) from its newest checkpoint to step 400 at np 52. Movie remake received; starts after Y7
   launches.
+- 2026-11-17: mesh rollback movie remade (movie page v83 #meshfixed-anumas; kaiju
+  movies/out/earth_recipe_movie/earth_recipe_movie_meshfixedT_0-799.mp4, 23.6 MB; web copy 8 MB; renderer
+  launch/movies/meshfixed_T_frames.py, jobs 4761/4793): faded T, grey base mesh, black ladder, thick black split (fitted
+  to the melange base, so it shows that base), yellow ocrust line, red dashed next fit; window re-centred once at step
+  256 (290 Myr) from -8 to -17.8 deg. Added to Louis's download page N2rBJdMu1iP5pocySpJdNV (v3).
+- 2026-11-17: zone runs, fault slip vs Y4 at equal time: Y5b 95 % at 269 Myr (dip to 83 % at 261); Y6 (17 km band)
+  84 % at 290 Myr (low 57 %); Y5u low 57 % at 253 Myr, 2.3 cm/yr by 357 Myr (Y4 ends at 291); Y7 (failure only above
+  50 km within 40 km of the fault; damaged rock >= 0.1 yields anywhere; 60928a2 = 170fb5d) 51 % at 269 Myr after a low
+  of 45 % at 248, recovering. Y7's yield map at 259 Myr shows the mechanism: damage made near the trench carried down
+  the slab top to ~200 km, and yielding below 50 km follows that damaged strip. Page v23. UWTN 2026-022 trench-section
+  folder for the notes workbench: ~/campaigns/zg95/figures_out/uwtn_2026_022/ (Louis's rsync), preview
+  https://claude.ai/artifact/82n2Pepb8Y82vf7WSjT87y.
