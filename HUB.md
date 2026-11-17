@@ -4303,3 +4303,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   at 248 Myr; its damage (made near the surface) now lines the slab top through and past the fault's end. Y5b 119% at
   280 Myr (Y5b still has the pre-170fb5d zone bug; Y5b2 in job 4825 is the clean rerun). Y5u finished 200 steps:
   1.9 cm/yr at 376 Myr. Page W1hrXisyRdpoiiSdDuJh8n v25.
+- 2026-11-17: K1 (notice): job 4825 running on n7 since 16:01. Y5b2m smoke passed; reset printed 16,183 melange
+  cleared, 29,103 kept on the incoming plate, 5,258 marked in the fresh layer, 1,949 added. Both converged, no fit
+  refused. First fit after reset: trench -1.0 deg (Y5b2: -1.3 deg), so the reset shifts the fit ~0.3 deg (~34 km at
+  the surface) rather than returning the same fault exactly. Fixed zone 519 cells (Y5b 547). Render loop job 4827.
+  Y6 finished 200 steps. Hub asked K1 for slip averaged over a window (not single-time) for the Y4/Y5b/Y5b2/Y7 ranking.
