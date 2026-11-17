@@ -4315,3 +4315,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   trench). Trench -1.04 vs -1.22 deg at step 200 (0.18 deg, ~20 km); Y5b2 drifted 0.07 deg the other way. Correction
   to the hub's earlier "0.3 deg (~34 km)": that was Y5b2m vs Y5b2, i.e. both drifts added. Settling and windowed-slip
   ranking go in K1's next comparison.
+- 2026-11-17: K1 (notice), Y5b2/Y5b2m first windowed result (launch/prep/slip_window.py, 220-237 Myr, % of Y4 =
+  2.85 cm/yr): Y5b2m 89 (sd 0.04), Y5b 86, Y5b2 85, Y6 70, Y5u 61, Y7 53. Fixed zone changes nothing (85 vs 86); the
+  melange reset gives ~+4% early with a quarter of the spread. Fault top settled by step 210 (both trenches -1.4
+  deg); no fit refused. Y5b carried on: 3.56 cm/yr at 296 Myr. Page W1hrXisyRdpoiiSdDuJh8n v26.
+  Hub caveats: the window is 17 Myr just after the step-200 restart, i.e. the early transient (Y7 was 53% here but
+  114% at 288 Myr); the +4% is about one sd if sd is in units of Y4. Asked K1 to repeat on a later window
+  (~280-320 Myr) once Y5b2/Y5b2m get there, and to state sd units and the spread for every run.
