@@ -62,6 +62,7 @@ SCALED = [
     ("uw_spline_length_km", "spline_length", "km"),
     ("uw_fault_depth_max_km", "fault_depth_max", "km"),
     ("uw_fault_depth_min_km", "fault_depth_min", "km"),
+    ("uw_fault_above_ocrust_km", "fault_above_ocrust", "km"),
     ("uw_advect_offset_km", "advect_offset", "km"),
     ("uw_over_drho_kg_m3", "over_dT", "kg_m3"),
     ("uw_heating_nw_m3", "heating", "nw_m3"),

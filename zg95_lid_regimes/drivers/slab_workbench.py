@@ -275,6 +275,16 @@ params = uw.Params(
     uw_spline_side="centre",    # "centre" (the layer's median line) or "base" (Louis, 2026-11-12: "a thin, weak upper
                                 #   layer that we follow the base": a second pass about the centre line takes the quantile
                                 #   with 10 % of the layer beyond it toward the plate interior)
+    uw_fault_follow="melange",  # what the fit follows. "melange" (every run to 2026-11-18): the melange layer, as above.
+                                #   "ocrust": the oceanic-crust line (uw_ocrust_depth_km), which moves with the slab and
+                                #   does not pile up as the melange does on the overriding side; the fault is the
+                                #   fitted line moved uw_fault_above_ocrust_km toward the overriding plate, so the split
+                                #   does not disturb the markers it follows (Louis, 2026-11-18: "the fault itself
+                                #   disrupts its own markers if it fits to them exactly. Fitting to 7km above the base of
+                                #   a 7km crust is more stable"). The march and both passes keep to +-1.5 melange
+                                #   thicknesses of the line and take its lower edge (uw_spline_side base), so pieces of
+                                #   the line left above the fault do not pull the fit
+    uw_fault_above_ocrust_km=7.0,  # uw_fault_follow ocrust: the fault this far above the line
     uw_spline_length_km=58.0,   # the smoothing length L: lam = L^4 / 0.005 in model lengths (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
@@ -486,6 +496,11 @@ swarm_on = crust_on or over_on
 crust_thick = (float(model.crust_thick) if model.crust_thick > 0
                else H_B)
 ocrust_on = crust_on and model.ocrust_depth > 0
+FOLLOW_OCRUST = str(params.uw_fault_follow) == "ocrust"
+if str(params.uw_fault_follow) not in ("melange", "ocrust"):
+    raise ValueError(f"-uw_fault_follow must be melange or ocrust, not {params.uw_fault_follow!r}")
+if FOLLOW_OCRUST and not ocrust_on:
+    raise ValueError("-uw_fault_follow ocrust needs the oceanic-crust line (uw_ocrust_depth_km > 0)")
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
 markers = {}
@@ -859,8 +874,11 @@ def crust_spline_points(faults):
     from scipy.interpolate import make_smoothing_spline
     from scipy.spatial import cKDTree
     cap, ct, ds, band = fault_depth_cap(), crust_thick, 0.005, 3.0 * crust_thick
+    L0 = 0.0                                         # the followed layer's depth on the incoming plate (its top)
+    if FOLLOW_OCRUST:                                # the oceanic-crust line: a narrower band, from its own depth
+        band, L0 = 1.5 * crust_thick, float(model.ocrust_depth)
     xy = np.asarray(swarm_xy(), dtype=float)
-    marker = np.asarray(crust_var.array[:, 0, 0]).ravel()
+    marker = np.asarray((markers["ocrust"][0] if FOLLOW_OCRUST else crust_var).array[:, 0, 0]).ravel()
     keep = marker > 0.5
     P = np.c_[uw.utilities.gather_data(xy[keep, 0], bcast=True), uw.utilities.gather_data(xy[keep, 1], bcast=True)]
     depth = r_o - np.hypot(P[:, 0], P[:, 1])
@@ -868,7 +886,7 @@ def crust_spline_points(faults):
     if faults:
         hint = float(faults[0]["theta"])
     else:                                            # the subducted cluster that goes deepest
-        sub = (depth > 1.25 * ct) & (depth <= cap + 2 * ct)
+        sub = (depth > L0 + 1.25 * ct) & (depth <= cap + 2 * ct)
         if sub.sum() < 12:
             return None
         o = np.argsort(theta[sub])
@@ -879,7 +897,7 @@ def crust_spline_points(faults):
     M = np.c_[r_o * (hint + wrap(theta - hint)), -depth]
     M = M[(np.abs(M[:, 0] - X0) < r_o * 0.4) & (depth < cap + 0.11)]
     dep = -M[:, 1]
-    sh = dep < 0.5 * ct
+    sh = np.abs(dep - L0) < 0.5 * ct if FOLLOW_OCRUST else dep < 0.5 * ct
     deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - X0) < 0.3)
     if sh.sum() < 4 or deep.sum() < 12:
         uw.pprint("  melange fault (spline): no subducted melange below cap/2, or none at the wall")
@@ -887,7 +905,7 @@ def crust_spline_points(faults):
     inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
     left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
     tree = cKDTree(M)
-    pts, t, miss = [np.array([X0 + inc * 0.35, -0.5 * ct])], np.array([-inc, 0.0]), 0
+    pts, t, miss = [np.array([X0 + inc * 0.35, -(L0 if FOLLOW_OCRUST else 0.5 * ct)])], np.array([-inc, 0.0]), 0
     for _ in range(600):                             # the march along the layer's centre
         q = pts[-1] + ds * t
         idx = tree.query_ball_point(q, 0.02)
@@ -971,6 +989,11 @@ def crust_spline_points(faults):
             e = F[-1] - F[-11]                       # straight over the part of a bin from the last one kept to the end
             F = np.vstack([F, F[-1] + np.outer(np.arange(0.0005, s_end - sf[-1] + 1e-9, 0.0005), e / np.linalg.norm(e))])
         C = F                                        # the next pass's reference
+    if FOLLOW_OCRUST:
+        # the fault uw_fault_above_ocrust_km above the line, toward the overriding plate (- inc * left)
+        tf = np.gradient(F, axis=0)
+        tf /= np.linalg.norm(tf, axis=1)[:, None]
+        F = F - inc * float(model.fault_above_ocrust) * left(tf)
     fd = -F[:, 1]
     sF = np.r_[0, np.cumsum(np.linalg.norm(np.diff(F, axis=0), axis=1))]
     flat = (sF > 0.02) & (sF < 0.15)
@@ -1025,7 +1048,8 @@ def crust_spline_points(faults):
     t_hat = np.array([-r_hat[1], r_hat[0]])
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
-    info = {"locator": "spline", "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
+    info = {"locator": "spline", "spline_follow": str(params.uw_fault_follow),
+            "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
             "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
     uw.pprint(f"  melange fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
               f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f} dipping {top_dip:.1f}")
@@ -2223,7 +2247,8 @@ def git_head(path):
 
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
-                "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
+                "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
+                "uw_fault_above_ocrust_km", "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_zone_tau0_mpa",
                 "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
