@@ -4241,3 +4241,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   grep its analysis scripts for the old texts. Y6 running (job 4749, 1e30929 = 6e34a83): Y5b with the yield zone cut to
   the ladder band, 17 km either side of the fault (225 cells vs 547), restart from Y4 step 200 at np 52 (26+26); renders
   job 4750; page v18.
+- 2026-11-17: K1 checked: nothing in launch/, the run-clones' analysis/launch folders or its scratch scripts reads the
+  four changed event texts; the only consumer (render_annulus.py) matches startswith("formed"), still true. Two figure
+  labels in launch/prep/run_yield_maps.py still say "crust particles"; K1 changes them after the Y5/Y6 render loops end.
