@@ -4244,3 +4244,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-17: K1 checked: nothing in launch/, the run-clones' analysis/launch folders or its scratch scripts reads the
   four changed event texts; the only consumer (render_annulus.py) matches startswith("formed"), still true. Two figure
   labels in launch/prep/run_yield_maps.py still say "crust particles"; K1 changes them after the Y5/Y6 render loops end.
+- 2026-11-17: Louis: "a fault-adjacent damage zone that is fed by plastic failure near the surface is probably the
+  closest we will get to a self-consistent definition ... faults being the extreme manifestation of emerging damage
+  zones." (Ledger.) K1 measured plastic strain rate vs plastic strain within 40 km of the fault by depth (page v19): Y5/Y6
+  75-81 % of failure in the top 50 km, a quarter to a half of the damage deeper (made near the surface, carried down);
+  D 94 % of failure in the top 25 km, a third of damage deeper; 12-17 % of failure around the fault's deep end
+  (~400 km, where the split stops). QUIRK in e094161's zone: built from the whole stored fault line, which runs above the
+  surface over the incoming plate (up to 58 km high, 330-390 km out), so Y5b's and Y6's "both sides" zones also took in
+  the incoming plate's top for 100-200 km before the trench; Y5u unaffected. Fix (zone from the line inside the mantle
+  only) with the next driver change. Y5b/Y6 numbers carry this.
