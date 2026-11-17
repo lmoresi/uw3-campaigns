@@ -4225,3 +4225,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   of Y4's at equal time (1.4 vs 2.5 cm/yr at 253 Myr). Y5b (both sides): most yielding on the lower side, the top 40 km
   of the bending incoming plate under the fault's shallow part, plus along the slab top; slip 87 % of Y4's (2.5 vs 2.9
   at 227 Myr). Y5b slower per Myr, reaches ~320 Myr within job 4744's 12 h limit.
+- 2026-11-17: NAMING (Louis): the drivers' `crust` marker is the weak upper layer, the MELANGE zone; the OCEANIC CRUST is
+  the passive `ocrust` line (17.4 km); the fault is fitted to the melange's base, on top of the oceanic crust. Earlier
+  "crust" in this log, for the fit and the crust-end depth, means melange markers. Ledger entry on zg95-annulus-for-kaiju.
+  K1 analysis (launch/prep/slab_top_unrolled.py, unrolls the slab top along the fault; page v17): in P, C, D, Y4 and Y5
+  the ocrust line passes the hinge as one line ~10 km under the fault, no folds or gaps; Y4 stretches it more (1.16-1.6
+  vs 1.0-1.1); a folded piece above the fault down the slab is in every run, from step 0 (where the starting slab's line
+  crosses the fitted fault's top); Y4's damaged overriding plate smears the melange to 34-50 km vs 11-17 in P/C/D.
+  Damage vs the ladder band: Y5 54-60 % in the band (83 % of Y5u's overriding-side damage within two rungs); Y4 28 %;
+  D 74 %. Y5 now: Y5u slip 73 % of Y4's at 290 Myr; Y5b 91 % at 237 Myr.
