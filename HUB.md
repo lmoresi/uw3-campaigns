@@ -4328,3 +4328,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   at 291 Myr (339 steps): no baseline past 291 Myr unless Y4 is carried on; K1 has put that to Louis.
   Hub suggestion to Louis: rank on ~260-291 Myr (all runs incl. Y4, reachable ~20:20) in absolute cm/yr; carry Y4 on
   only if a %-of-Y4 baseline is wanted later.
+- 2026-11-17: Louis (via K1): "I'd like to see what happens when the damage window propagates down the slab in the Y5
+  runs." K1 (launch/prep/damage_cache.py, damage_spacetime.py, damage_movie.py; page v28 #damage-front): after the
+  reset a damage front runs down the slab top to the fault's end (435 km), ~25-30 Myr later in the 40 km zone runs
+  (Y5b, Y5b2, Y5b2m, Y6) at 1.1-1.7x the slip speed (damage made in place), ~55 Myr later in Y7 at the slip speed
+  (damage carried down). Slip rises 15-25 Myr after the front passes the fault end: Y5b 2.2 -> 3.5 cm/yr, Y7 1.2 -> 3.4.
+  Y6's fault flattened and was refused at every step from ~303 Myr (89 times): Y6 valid only to ~297 Myr.
+  Hub: this revises the window advice. Zone runs rise ~40-55 Myr after the reset, Y7 ~70-80 Myr, so 260-291 Myr
+  catches Y7 mid-rise; a post-rise window (~295-320 Myr, Y6 excluded) is needed, ranked in absolute cm/yr (Y4 ends
+  at 291 Myr). Front arrival time is itself a result worth reporting.
