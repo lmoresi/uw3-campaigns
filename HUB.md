@@ -4308,3 +4308,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   refused. First fit after reset: trench -1.0 deg (Y5b2: -1.3 deg), so the reset shifts the fit ~0.3 deg (~34 km at
   the surface) rather than returning the same fault exactly. Fixed zone 519 cells (Y5b 547). Render loop job 4827.
   Y6 finished 200 steps. Hub asked K1 for slip averaged over a window (not single-time) for the Y4/Y5b/Y5b2/Y7 ranking.
+- 2026-11-17: K1 (notice), Y5b2m first-fit shift explained (launch/prep/fault_shift.py, step 202 vs restored step
+  200, max distance by depth 0-25/25-50/50-100/100-200/200-450 km): Y5b2m 14.9/1.5/2.0/2.0/2.6 km; Y5b2 (no reset)
+  1.3/1.4/1.9/3.3/4.0 km. The fresh layer's base sits on the line (lattice offset irrelevant); only the fault's top
+  moved (the straight run from where the curve leaves the incoming plate to the surface, set by melange near the
+  trench). Trench -1.04 vs -1.22 deg at step 200 (0.18 deg, ~20 km); Y5b2 drifted 0.07 deg the other way. Correction
+  to the hub's earlier "0.3 deg (~34 km)": that was Y5b2m vs Y5b2, i.e. both drifts added. Settling and windowed-slip
+  ranking go in K1's next comparison.
