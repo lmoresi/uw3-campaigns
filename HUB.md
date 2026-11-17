@@ -4355,3 +4355,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   quite common in other models - it's physical". With run defaults (melange 11.3 km, ocrust line 17.4 km) the fault
   starts at 10.4 km depth on the incoming plate, ~1 km above the old melange-base fit. Next: Y5o and Y6o (Y5b's and
   Y6's zones) from Y4 step 200, each after a 2-step smoke check.
+- 2026-11-18: K1 follow-up 37, pushed: kaiju/slab-workbench 9a0c5a1 -> c2b0f61 (on e159f9e; blobs slab_workbench.py
+  52a2dd8, earth_units.py 0aa75c4 verified, mbox sha256 731bb530... verified, compiles). Louis 2026-11-18: "There is
+  a curve and there is the fault ... the main objection would be that the fault jumps from step to step"; "both as
+  two runs". `-uw_fault_top` tangent (default) | plate (straight link to where the last solve's surface tangential
+  velocity changes fastest, within 0.1 of the leaving point) | bounded (tangent run, surface point at most
+  -uw_fault_link_km 150 seaward). `-uw_fault_jump_rungs` (default 0): fault and fit paired by fraction of length from
+  the surface; if the largest gap exceeds the limit the fault moves the same fraction toward the fit everywhere; the
+  deep slab search is then centred on the fault in use below cap/2. Offline: Y5o step 202 reproduces; Y6o refused
+  steps 240/268 fit with the limit on. Runs next: Y5o_plate, Y5o_bound, Y6o_plate, Y6o_bound from Y4 step 200, limit
+  one rung.
+  Hub review note sent to K1: pairing by fraction of length counts movement along the fault (a change in top length
+  shifts every pair), so the gap and the uniform fraction can bind on a fit whose deep part has not moved, and the
+  interpolation cuts the corner at the bend; a uniform small fraction also makes the deep fault lag the slab while a
+  large top gap persists. Suggested measuring the jump with polyline_gap (already in the driver) or pairing by depth,
+  and logging how often and for how long the limit binds.
