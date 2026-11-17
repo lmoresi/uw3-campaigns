@@ -4264,3 +4264,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   background mesh still) in the ANUMAS figure style (faded T behind, grey base mesh, black ladder, thick black split)
   with the oceanic-crust (ocrust) line in yellow ("(base ?)" read as the ocrust line, possibly with the melange base).
   Requested from K1 (MP4 page copy + full quality on kaiju, a late still).
+- 2026-11-17: Louis to K1's proposal (zone near the surface only; damaged rock yields wherever it goes): "yes, do both".
+  Pushed kaiju/slab-workbench fe3f03f -> 170fb5d (K1's 60928a2; blob bf96fc9; mbox sha256 matched; py_compile and
+  pyflakes clean): -uw_yield_damage g (> 0 with -uw_yield_zone_side): zone weight max(zone cell, min(strain/g, 1)), so
+  damaged rock yields by the zone's law wherever the flow takes it; default 0 unchanged. And the yield zone is now built
+  from the fault line inside the mantle (fixes the quirk over the incoming plate; a restart of Y5u/Y5b/Y6 on this
+  commit would build a smaller zone). Y7 next on 60928a2 after a 2-step smoke: restart from Y4 step 200, strain reset,
+  zone both sides 40 km, top 50 km only, damage threshold 0.1 (K1's pick). Y5b carried on (job 4754, 1e30929
+  unchanged, no reset) from its newest checkpoint to step 400 at np 52. Movie remake received; starts after Y7
+  launches.
