@@ -4253,3 +4253,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   surface over the incoming plate (up to 58 km high, 330-390 km out), so Y5b's and Y6's "both sides" zones also took in
   the incoming plate's top for 100-200 km before the trench; Y5u unaffected. Fix (zone from the line inside the mantle
   only) with the next driver change. Y5b/Y6 numbers carry this.
+- 2026-11-17: the melange does not go down with the slab (page v21; launch/prep/melange_speed.py, speed along the fault
+  from the faulted-mesh velocity, per side). Because the fault is fitted to the melange's base, ~90 % of the melange is
+  on the hanging-wall side and all but still (-0.2 to +0.15 cm/yr), while the slab and the ocrust line under the fault
+  move at 0.4-2.3 cm/yr; true in every run (P old driver, D, Y4, Y5u, Y5b, Y6). So the melange sheet in the frames is
+  Y4's pre-restart sheet in all four restarts; the melange is scraped off at the trench, not subducted, and the DEEP
+  FAULT IS FITTED TO THAT STILL SHEET, not to the moving slab top (consistent with the 13 Nov pile-up finding). The runs
+  differ in slab speed (1.4-2.3 cm/yr at 242 Myr) and where the rock fails.
