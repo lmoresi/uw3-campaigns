@@ -285,6 +285,26 @@ params = uw.Params(
                                 #   thicknesses of the line and take its lower edge (uw_spline_side base), so pieces of
                                 #   the line left above the fault do not pull the fit
     uw_fault_above_ocrust_km=7.0,  # uw_fault_follow ocrust: the fault this far above the line
+    uw_fault_top="tangent",     # how the fault reaches the surface from where the fitted curve leaves the incoming plate
+                                #   (one melange thickness below the curve's level on the plate). "tangent" (every run to
+                                #   2026-11-18): on along the curve's tangent there to the wall; on a gently bending plate
+                                #   this run has no bound (Y6o, 2026-11-18: 355 km at 3.4 deg). Louis, 2026-11-18: "There
+                                #   is a curve and there is the fault. The curve describes where the fault will follow,
+                                #   but the curve can go off to infinity and that doesn't mean that the fault needs to do
+                                #   the same": the fault is the curve below that point plus one straight link to the
+                                #   surface, which meets the surface at "plate": where the plates part, the point within
+                                #   0.1 of the leaving point where the last solve's tangential surface velocity changes
+                                #   fastest (the link joins the curve at its first point landward of it), or "bounded":
+                                #   along the tangent as "tangent", but at most uw_fault_link_km seaward of the leaving point
+    uw_fault_link_km=150.0,     # uw_fault_top bounded: how far seaward of the leaving point the surface point may lie
+    uw_fault_jump_rungs=0.0,    # > 0 (Louis, 2026-11-18: "the main objection would be that the fault jumps from step to
+                                #   step ... but if it is correctly fitting points, it should be stable"): no point of the
+                                #   fault moves more than this many rungs at one detection. The fault in use and the new
+                                #   fit are paired by fraction of length from the surface down; where a pair lies further
+                                #   apart, the fault is the one in use moved toward the fit by the same fraction everywhere,
+                                #   so that the largest move is the limit. The search for the slab is centred on the fault
+                                #   in use at depth (its median angle below half the cap), not on its surface point.
+                                #   0 (every run to 2026-11-18): no limit, and the search centred on the surface point
     uw_spline_length_km=58.0,   # the smoothing length L: lam = L^4 / 0.005 in model lengths (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
@@ -501,6 +521,11 @@ if str(params.uw_fault_follow) not in ("melange", "ocrust"):
     raise ValueError(f"-uw_fault_follow must be melange or ocrust, not {params.uw_fault_follow!r}")
 if FOLLOW_OCRUST and not ocrust_on:
     raise ValueError("-uw_fault_follow ocrust needs the oceanic-crust line (uw_ocrust_depth_km > 0)")
+FAULT_TOP = str(params.uw_fault_top)
+if FAULT_TOP not in ("tangent", "plate", "bounded"):
+    raise ValueError(f"-uw_fault_top must be tangent, plate or bounded, not {FAULT_TOP!r}")
+JUMP_RUNGS = float(params.uw_fault_jump_rungs)
+FIT_NAME = "ocrust fault" if FOLLOW_OCRUST else "melange fault"     # the fit's log lines
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
 markers = {}
@@ -868,6 +893,9 @@ def crust_spline_points(faults):
     enforce a steep continuation of the fault"): the run was the curve's mean slope over the next
     0.015 of depth, 1.3 to 1.5 times steeper than the curve where it starts. How shallow a fault the
     mesh can carry is the placement's to refuse; info["spline_top_dip"] records the run's dip.
+    With uw_fault_top plate or bounded the run is replaced by a link to the surface point where the
+    plates part, or by the tangent run held within uw_fault_link_km of the leaving point; with
+    uw_fault_jump_rungs > 0 the result moves at most that many rungs from the fault in use.
     The curve may turn past vertical. Collective. Returns (points, theta, dip, depth,
     info) or None; tested offline on 12 stored checkpoints (scratchpad arcfit_centre,
     2026-11-12)."""
@@ -894,13 +922,20 @@ def crust_spline_points(faults):
         piece = max(pieces, key=lambda p: depth[sub][p].max())
         hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
     X0 = r_o * hint
+    Xd = X0                                          # where the slab is looked for at depth
+    if faults and JUMP_RUNGS > 0:                    # the fault in use below half the cap
+        old = np.asarray(faults[0]["points"], dtype=float)
+        at = (r_o - np.hypot(old[:, 0], old[:, 1]) > 0.5 * cap)
+        if at.any():
+            Xd = r_o * (hint + float(np.median(wrap(np.arctan2(old[at, 1], old[at, 0]) - hint))))
     M = np.c_[r_o * (hint + wrap(theta - hint)), -depth]
     M = M[(np.abs(M[:, 0] - X0) < r_o * 0.4) & (depth < cap + 0.11)]
     dep = -M[:, 1]
     sh = np.abs(dep - L0) < 0.5 * ct if FOLLOW_OCRUST else dep < 0.5 * ct
-    deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - X0) < 0.3)
+    deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - Xd) < 0.3)
     if sh.sum() < 4 or deep.sum() < 12:
-        uw.pprint("  melange fault (spline): no subducted melange below cap/2, or none at the wall")
+        where = "the fault in use at depth" if Xd != X0 else "the wall"
+        uw.pprint(f"  {FIT_NAME} (spline): no subducted marker below cap/2 within 0.3 of {where}, or none on the plate")
         return None
     inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
     left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
@@ -930,7 +965,7 @@ def crust_spline_points(faults):
         raise ValueError(f"-uw_spline_end must be cap or crust, not {end_at!r}")
     reach = cap - 0.03 if end_at == "cap" else float(model.fault_depth_min)
     if -C[-1, 1] < reach:                            # the slab's stretched melange layer thins out
-        uw.pprint(f"  melange fault (spline): the march along the melange layer stopped at depth {-C[-1, 1]:.3f}")
+        uw.pprint(f"  {FIT_NAME} (spline): the march along the melange layer stopped at depth {-C[-1, 1]:.3f}")
         return None
     lam = float(model.spline_length) ** 4 / ds
     side = str(params.uw_spline_side)
@@ -960,7 +995,7 @@ def crust_spline_points(faults):
                 cnt.append(len(v))
         ss, off, w = np.array(ss), np.array(off), np.sqrt(np.array(cnt, float))
         if len(ss) < 12:
-            uw.pprint("  melange fault (spline): too few melange bins along the layer")
+            uw.pprint(f"  {FIT_NAME} (spline): too few melange bins along the layer")
             return None
         Cs = np.c_[np.interp(ss, s_d, Cd[:, 0]), np.interp(ss, s_d, Cd[:, 1])]
         ts = np.c_[np.interp(ss, s_d, tg[:, 0]), np.interp(ss, s_d, tg[:, 1])]
@@ -978,7 +1013,7 @@ def crust_spline_points(faults):
                 s_end = ss[j - 1] + run * float(np.clip((n[j - 1] - thin) / max(n[j - 1] - n_j, 1e-12), 0.0, 1.0))
                 ss, Z, w = ss[:j], Z[:j], w[:j]
                 if len(ss) < 12:
-                    uw.pprint("  melange fault (spline): too few melange bins along the layer")
+                    uw.pprint(f"  {FIT_NAME} (spline): too few melange bins along the layer")
                     return None
         w = w / w.mean()
         sx = make_smoothing_spline(ss, Z[:, 0], w=w, lam=lam)
@@ -1003,12 +1038,12 @@ def crust_spline_points(faults):
     kt = int(above[-1]) + 1 if len(above) else 0
     if end_at == "crust":
         if fd.max() < float(model.fault_depth_min):
-            uw.pprint(f"  melange fault (spline): the melange layer ends at depth {fd.max():.3f}, above uw_fault_depth_min_km")
+            uw.pprint(f"  {FIT_NAME} (spline): the melange layer ends at depth {fd.max():.3f}, above uw_fault_depth_min_km")
             return None
         if not (fd[kt:] >= cap).any():
-            uw.pprint(f"  melange fault (spline): the fault ends with the melange layer, at depth {fd.max():.3f}")
+            uw.pprint(f"  {FIT_NAME} (spline): the fault ends with the melange layer, at depth {fd.max():.3f}")
     elif fd.max() < cap - 0.03:
-        uw.pprint(f"  melange fault (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
+        uw.pprint(f"  {FIT_NAME} (spline): the curve reaches only {fd.max():.3f}, short of the cap less 0.03")
         return None
     elif not (fd[kt:] >= cap).any():
         # within 0.03 of the cap (the starting slab's melange layer reaches ~0.142, and the subducted
@@ -1019,22 +1054,69 @@ def crust_spline_points(faults):
         e = F[kd] - F[ke]
         e = e / max(np.linalg.norm(e), 1e-12)
         if e[1] >= -1e-3:
-            uw.pprint("  melange fault (spline): the curve's deep end does not descend")
+            uw.pprint(f"  {FIT_NAME} (spline): the curve's deep end does not descend")
             return None
         F = np.vstack([F[:kd + 1], F[kd] + np.outer(np.arange(0.0005, (cap - fd[kd]) / -e[1] + 0.001, 0.0005), e)])
         fd = -F[:, 1]
-        uw.pprint(f"  melange fault (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
+        uw.pprint(f"  {FIT_NAME} (spline): the curve carried from {fd[kd]:.3f} to the cap along its own direction")
     kc = kt + int(np.argmax(fd[kt:] >= cap)) if (fd[kt:] >= cap).any() else len(F) - 1
     seg = F[kt:kc + 1]
     d = seg[1] - seg[0]                              # the run to the wall: the curve's own tangent at its top
     d = d / np.linalg.norm(d)
     if d[1] >= 0:
-        uw.pprint("  melange fault (spline): the curve does not descend where it leaves the incoming plate")
+        uw.pprint(f"  {FIT_NAME} (spline): the curve does not descend where it leaves the incoming plate")
         return None
     top_dip = float(np.degrees(np.arctan2(-d[1], abs(d[0]))))
     to_wall = -seg[0, 1] / max(-d[1], 1e-6)
     wall = seg[0] - to_wall * d
+    leave, extra = seg[0].copy(), {"spline_top": FAULT_TOP}
+    if FAULT_TOP == "bounded":                       # the surface point at most uw_fault_link_km seaward of the leaving point
+        if inc * (wall[0] - leave[0]) > float(model.fault_link):
+            wall = np.array([leave[0] + inc * float(model.fault_link), 0.0])
+    elif FAULT_TOP == "plate":                       # the surface point where the plates part in the last solve
+        Xs = leave[0] + inc * np.arange(-0.1, 0.1 + 1e-9, 0.001)
+        th = Xs / r_o
+        v = np.asarray(uw.function.global_evaluate(
+            V_b.sym, onto((r_o - 1.0e-4) * np.c_[np.cos(th), np.sin(th)]))).reshape(-1, 2)
+        g = np.abs(np.gradient(-v[:, 0] * np.sin(th) + v[:, 1] * np.cos(th), Xs))
+        Xp = float(Xs[int(np.argmax(g))])
+        landward = np.flatnonzero(inc * (seg[:, 0] - Xp) <= 0)
+        seg = seg[min(int(landward[0]) if len(landward) else 0, len(seg) - 2):]   # the link joins the curve below it
+        wall = np.array([Xp, 0.0])
+        extra.update({"spline_plate_theta": Xp / r_o, "spline_plate_dvdx": float(g.max()),
+                      "spline_join_depth": float(-seg[0, 1])})
+    if FAULT_TOP != "tangent":                       # the link from the surface point to the curve
+        to_wall = float(np.linalg.norm(seg[0] - wall))
+        d = (seg[0] - wall) / to_wall
+        extra.update({"spline_tangent_dip": top_dip, "spline_reach": float(inc * (wall[0] - leave[0]))})
+        top_dip = float(np.degrees(np.arctan2(-d[1], abs(d[0]))))
     pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
+    if faults and JUMP_RUNGS > 0:
+        # the fault in use and this fit, each from where it crosses the surface down, paired by fraction of length;
+        # moves measured and made in the plane
+        def from_surface(m):
+            k = int(np.argmax(m[:, 1] < 0))
+            f = m[k - 1, 1] / (m[k - 1, 1] - m[k, 1]) if k > 0 else 0.0
+            m = np.vstack([m[k - 1] + f * (m[k] - m[k - 1]), m[k:]]) if k > 0 else m
+            s = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(m, axis=0), axis=1))]
+            t = np.linspace(0.0, s[-1], 400)
+            m = np.c_[np.interp(t, s, m[:, 0]), np.interp(t, s, m[:, 1])]
+            return (r_o + m[:, 1:2]) * np.c_[np.cos(m[:, 0] / r_o), np.sin(m[:, 0] / r_o)]
+        old = np.asarray(faults[0]["points"], dtype=float)
+        A = from_surface(pol)
+        B = from_surface(np.c_[r_o * (hint + wrap(np.arctan2(old[:, 1], old[:, 0]) - hint)),
+                               np.hypot(old[:, 0], old[:, 1]) - r_o])
+        gap = float(np.linalg.norm(A - B, axis=1).max())
+        frac = min(1.0, JUMP_RUNGS * S / gap) if gap > 0 else 1.0
+        extra.update({"spline_jump": gap, "spline_jump_frac": frac})
+        if frac < 1.0:
+            L = B + frac * (A - B)
+            line = np.c_[r_o * (hint + wrap(np.arctan2(L[:, 1], L[:, 0]) - hint)), np.hypot(L[:, 0], L[:, 1]) - r_o]
+            line[0, 1] = 0.0
+            e = (line[1] - line[0]) / np.linalg.norm(line[1] - line[0])
+            pol = np.vstack([line[0] - (0.02 / max(-e[1], 1e-6)) * e, line])
+            uw.pprint(f"  {FIT_NAME} (spline): the fit lies up to {gap:.4f} from the fault in use; the fault moves "
+                      f"{frac:.2f} of the way ({JUMP_RUNGS:g} rung limit)")
     radius = r_o + pol[:, 1]
     poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
                              S, 1)
@@ -1049,10 +1131,13 @@ def crust_spline_points(faults):
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
     info = {"locator": "spline", "spline_follow": str(params.uw_fault_follow),
-            "spline_trench_depth": float(-seg[0, 1]), "spline_flat_depth": z_flat,
-            "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist()}
-    uw.pprint(f"  melange fault (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
-              f"leaves the incoming plate at depth {-seg[0, 1]:.4f}, run to the wall {to_wall:.4f} dipping {top_dip:.1f}")
+            "spline_trench_depth": float(-leave[1]), "spline_flat_depth": z_flat,
+            "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist(),
+            **extra}
+    uw.pprint(f"  {FIT_NAME} (spline): trench {np.degrees(theta_t):.2f} deg, dip {dip:.1f}, "
+              f"leaves the incoming plate at depth {-leave[1]:.4f}, "
+              + (f"run to the wall {to_wall:.4f} dipping {top_dip:.1f}" if FAULT_TOP == "tangent" else
+                 f"{FAULT_TOP} link {to_wall:.4f} dipping {top_dip:.1f}, reaching {extra['spline_reach']:.4f} seaward"))
     return poly, theta_t, dip, float((r_o - rp).max()), info
 
 
@@ -2248,7 +2333,8 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_spline_length_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs",
+                "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_zone_tau0_mpa",
                 "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
@@ -2475,7 +2561,7 @@ for k in range(k0, k0 + params.uw_steps):
         # from the trench down to the depth cap; it forms at the first detection and never retires
         found = crust_spline_points(faults)
         if found is None:
-            uw.pprint("  melange fault: no slab top reaching the cap from the surface; the fault keeps its place")
+            uw.pprint(f"  {FIT_NAME}: no slab top reaching the cap from the surface; the fault keeps its place")
         else:
             poly, theta_t, dip, depth, info = found
             if faults:
@@ -2489,7 +2575,8 @@ for k in range(k0, k0 + params.uw_steps):
                 faults.append({"name": f"F{next_id}", "points": poly.tolist(), "theta": theta_t,
                                "dip": dip, "depth": depth, **info})
                 next_id += 1
-                events.append(f"formed {faults[0]['name']} on the melange layer at {np.degrees(theta_t):.1f} deg, "
+                layer = "oceanic-crust line" if FOLLOW_OCRUST else "melange layer"
+                events.append(f"formed {faults[0]['name']} on the {layer} at {np.degrees(theta_t):.1f} deg, "
                               f"dip {dip:.1f}, depth {depth:.3f}, {len(poly)} points")
     if damage:
         last_damage = dict(damage)
