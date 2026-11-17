@@ -4260,3 +4260,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Y4's pre-restart sheet in all four restarts; the melange is scraped off at the trench, not subducted, and the DEEP
   FAULT IS FITTED TO THAT STILL SHEET, not to the moving slab top (consistent with the 13 Nov pile-up finding). The runs
   differ in slab speed (1.4-2.3 cm/yr at 242 Myr) and where the rock fails.
+- 2026-11-17: Louis asked to remake the earth_recipe_movie "Mesh, fixed frame" rollback movie (16:9 frame, 2:1 window,
+  background mesh still) in the ANUMAS figure style (faded T behind, grey base mesh, black ladder, thick black split)
+  with the oceanic-crust (ocrust) line in yellow ("(base ?)" read as the ocrust line, possibly with the melange base).
+  Requested from K1 (MP4 page copy + full quality on kaiju, a late still).
