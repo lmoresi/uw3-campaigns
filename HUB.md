@@ -4290,3 +4290,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fixed zone (170fb5d or later) as Y5b2, keeping 4754 as comparison; a default-off driver option to reset the melange
   (green) markers on restart, designed so the deep fault fit still has something to follow from the first step (the
   fit is to the melange base); if cheap, Y5b2 with and without the melange reset.
+- 2026-11-17: K1 follow-up 35, pushed: kaiju/slab-workbench a4e8583 -> 6c33a5d (on 170fb5d; slab_workbench.py
+  blob 63f4dcf verified, mbox sha256 4b94711a... verified, compiles). `-uw_reset_melange 1` (restart only, default
+  0): keeps melange on the incoming plate's surface (depth < 1.5 crust_thick, subducting side of the fault top),
+  clears the rest (trench wedge, hanging-wall sheet), lays a fresh crust_thick layer on the hanging-wall side of the
+  restored fault line with the line as its base (marks existing particles, adds lattice points at uw_crust_ppc
+  spacing), so the first fit after restart returns the same fault. Raises if swarm, crust or fault are missing.
+  line_inside() and overriding_side() factored out of the yield-zone code; zone unchanged. Job 4825 (Y5b2 fixed zone
+  only; Y5b2m fixed zone + melange reset, after a 2-step smoke check), both from Y4 step 200 with strain reset,
+  queued behind Y6's node (~16:20). Comparison: Y5b carry-on 4754.
