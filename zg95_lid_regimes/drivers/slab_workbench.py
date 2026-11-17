@@ -225,6 +225,12 @@ params = uw.Params(
     uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
     uw_zone_tau1_mpa_km=3.0,
     uw_reset_strain=0,          # 1: a restart sets the plastic strain (the damage) to zero: a reset strength profile
+    uw_reset_melange=0,         # 1: a restart clears the melange (marker "crust") the run has gathered (the wedge at
+                                #   the trench, the sheet on the fault's hanging-wall side) and lays a fresh layer
+                                #   uw_crust_thick_km thick on the hanging-wall side of the restored fault, the fault
+                                #   its base, keeping the incoming plate's surface layer (reset_melange). Louis,
+                                #   2026-11-17: "reset the green material when we restart so the pre-existing
+                                #   accumulation is not present"
     uw_heating_nw_m3=1.32,      # internal heating
     uw_yield_softness=0.2,
     # an asthenosphere: the viscosity times uw_asth in a channel between two depths
@@ -788,6 +794,27 @@ def segment_side(points, poly):
     return dist, side
 
 
+def line_inside(spine):
+    """The fault's line inside the mantle, from where it crosses the surface (the stored line runs on above the
+    surface over the incoming plate), and the angle of its first point inside."""
+    r = np.hypot(spine[:, 0], spine[:, 1])
+    k = int(np.argmax(r < r_o))                     # the first point inside
+    line = spine[k:]
+    if k > 0:
+        f = (r[k - 1] - r_o) / (r[k - 1] - r[k])
+        line = np.vstack([spine[k - 1] + f * (spine[k] - spine[k - 1]), line])
+    return line, np.arctan2(spine[k, 1], spine[k, 0])
+
+
+def overriding_side(line, th):
+    """segment_side's sign on the overriding plate's side of the fault ``line``: the side of a probe 0.02 rad
+    toward the overriding plate (+theta for a dip below 90 degrees) just under the surface at the fault's top
+    ``th``."""
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    probe = (r_o - 0.002) * np.array([np.cos(th + over * 0.02), np.sin(th + over * 0.02)])
+    return segment_side(probe[None, :], line)[1][0]
+
+
 def polyline_gap(a, b):
     """The largest distance between two polylines, either way (Hausdorff)."""
     a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
@@ -1070,22 +1097,13 @@ class FaultedMesh:
             centroids = np.asarray(model_xy(self.yzone))
             inz = np.zeros(len(centroids), dtype=bool)
             for name, (spine, trace) in self.pieces.items():
-                # the line inside the mantle, from where it crosses the surface
-                r = np.hypot(spine[:, 0], spine[:, 1])
-                k = int(np.argmax(r < r_o))                 # the first point inside
-                line = spine[k:]
-                if k > 0:
-                    f = (r[k - 1] - r_o) / (r[k - 1] - r[k])
-                    line = np.vstack([spine[k - 1] + f * (spine[k] - spine[k - 1]), line])
+                line, th = line_inside(spine)
                 dist, side = segment_side(centroids, line)
                 keep = dist < float(model.yield_zone)
                 if float(model.yield_zone_depth) > 0:
                     keep &= (r_o - np.hypot(centroids[:, 0], centroids[:, 1])) < float(model.yield_zone_depth)
                 if str(params.uw_yield_zone_side) == "upper":
-                    th = np.arctan2(spine[k, 1], spine[k, 0])
-                    over = 1.0 if params.uw_dip < 90 else -1.0
-                    probe = (r_o - 0.002) * np.array([np.cos(th + over * 0.02), np.sin(th + over * 0.02)])
-                    keep &= side == segment_side(probe[None, :], line)[1][0]
+                    keep &= side == overriding_side(line, th)
                 inz |= keep
             self.yzone.array[:, 0, 0] = inz.astype(float)
             zone_cells = int(uw.utilities.gather_data(int(inz.sum()), bcast=True).sum())
@@ -1897,6 +1915,61 @@ def seed_swarm():
         var._update()
 
 
+def reset_melange(faults):
+    """uw_reset_melange, on a restart: the melange the run has gathered is cleared and laid again as the run started
+    it, against the restored fault. Kept: the melange particles on the incoming plate's surface (on the subducting
+    side of the fault's top, shallower than 1.5 layer thicknesses). Cleared: all other melange (the wedge at the
+    trench and the sheet left on the fault's hanging-wall side, which the split carries no further). Laid: a layer
+    uw_crust_thick_km thick on the hanging-wall side of the fault's line inside the mantle, from the surface to the
+    fault's end, the line its base, as the fit places it (the base of the layer, -uw_spline_side base): the particles
+    there are marked melange, and lattice points at the uw_crust_ppc spacing are added where none lies within 0.75
+    spacing. The first fit after the restart then follows a layer whose base is the restored fault, so the fault
+    keeps its place rather than being refused. Collective. Returns this rank's (cleared, kept, laid, added)."""
+    from scipy.spatial import cKDTree
+    line, th = line_inside(np.asarray(faults[0]["points"], dtype=float))
+    sgn = overriding_side(line, th)
+    over = 1.0 if params.uw_dip < 90 else -1.0
+    var = markers["crust"][0]
+    xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+    was = np.asarray(var.array[:, 0, 0]) > 0.5
+    dist, side = segment_side(xy, line)
+    depth = r_o - np.hypot(xy[:, 0], xy[:, 1])
+    incoming = (over * wrap(np.arctan2(xy[:, 1], xy[:, 0]) - th) < 0) & (depth < 1.5 * crust_thick)
+    layer = (dist < crust_thick) & (side == sgn)
+    keep = was & incoming
+    var.array[:, 0, 0] = (keep | layer).astype(float)
+    # the dense lattice along the line: arc length s, offset n into the hanging wall
+    spacing = crust_spacing()
+    seg = np.diff(line, axis=0)
+    s_cum = np.r_[0.0, np.cumsum(np.linalg.norm(seg, axis=1))]
+    s = np.arange(0.5 * spacing, s_cum[-1], spacing)
+    j = np.clip(np.searchsorted(s_cum, s) - 1, 0, len(seg) - 1)
+    t = seg[j] / np.linalg.norm(seg[j], axis=1)[:, None]
+    base = line[j] + (s - s_cum[j])[:, None] * t
+    normal = sgn * np.c_[-t[:, 1], t[:, 0]]       # segment_side's +1 side is the left of the segment's direction
+    n = np.arange(0.5 * spacing, crust_thick, spacing)
+    cand = (base[:, None, :] + n[None, :, None] * normal[:, None, :]).reshape(-1, 2)
+    cand = cand[np.hypot(cand[:, 0], cand[:, 1]) < r_o]
+    old = {name: np.array(v.array[:, 0, 0]) for name, (v, _, _) in markers.items()}
+    mine = xy[old["crust"] > 0.5]
+    if len(mine) and len(cand):
+        cand = cand[cKDTree(mine).query(cand)[0] > 0.75 * spacing]
+    added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
+    if added:
+        new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
+        nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
+        for name, (v, _, _) in markers.items():
+            if name == "crust":
+                v.array[-added:, 0, 0] = 1.0
+            elif name == "ocrust":
+                v.array[-added:, 0, 0] = 0.0
+            elif nearest is not None:
+                v.array[-added:, 0, 0] = old[name][nearest]
+    for v, _, _ in markers.values():
+        v._update()
+    return int((was & ~keep & ~layer).sum()), int(keep.sum()), int((layer & ~keep).sum()), int(added)
+
+
 def restore_swarm(path, index):
     """The particles of checkpoint ``index`` in ``path``; a checkpoint without particles
     (an older run) gets fresh ones, and a marker the checkpoint lacks is seeded from the
@@ -2028,6 +2101,13 @@ else:
     with open(os.path.join(out, "records.json")) as f:
         records = [r for r in json.load(f) if r["step"] <= params.uw_restart]
     faults, next_id = state["faults"], int(state["next_id"])
+    if int(params.uw_reset_melange):
+        if not (swarm_on and crust_on and faults):
+            raise ValueError("-uw_reset_melange 1 needs the melange layer's particles and a fault in the checkpoint")
+        counts = [int(uw.utilities.gather_data(c, bcast=True).sum()) for c in reset_melange(faults)]
+        uw.pprint(f"restart: melange reset (uw_reset_melange): {counts[0]} particles cleared, {counts[1]} kept on the "
+                  f"incoming plate, a fresh layer on the fault's hanging-wall side of {counts[2]} particles marked "
+                  f"and {counts[3]} added")
 t, step = float(state["t"]), int(state["step"]) + 1
 # no ridge seam is imposed: the state keeps the two fields its readers know
 theta_0, ridges = float(faults[0]["theta"] if faults else params.uw_theta_trench), []
@@ -2146,7 +2226,7 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_zone_tau0_mpa",
-                "uw_zone_tau1_mpa_km", "uw_reset_strain",
+                "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
