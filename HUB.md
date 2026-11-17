@@ -4322,3 +4322,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub caveats: the window is 17 Myr just after the step-200 restart, i.e. the early transient (Y7 was 53% here but
   114% at 288 Myr); the +4% is about one sd if sd is in units of Y4. Asked K1 to repeat on a later window
   (~280-320 Myr) once Y5b2/Y5b2m get there, and to state sd units and the spread for every run.
+- 2026-11-17: K1 (notice), windowed-slip facts: Y5b2/Y5b2m ~0.6 Myr and ~150 s per step; reach 300 Myr ~21:00,
+  320 Myr ~23:00. Spreads are sd in cm/yr over the window's steps, on the page; 220-237 Myr: Y4 0.16, Y5b2m 0.04,
+  Y5b 0.11, Y5b2 0.11, Y6 0.16, Y5u 0.12, Y7 0.08. Reset's +4% = ~0.1 cm/yr = ~1 sd of Y5b2 (not resolved). Y4 ends
+  at 291 Myr (339 steps): no baseline past 291 Myr unless Y4 is carried on; K1 has put that to Louis.
+  Hub suggestion to Louis: rank on ~260-291 Myr (all runs incl. Y4, reachable ~20:20) in absolute cm/yr; carry Y4 on
+  only if a %-of-Y4 baseline is wanted later.
