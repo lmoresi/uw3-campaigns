@@ -4285,3 +4285,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the slab top to ~200 km, and yielding below 50 km follows that damaged strip. Page v23. UWTN 2026-022 trench-section
   folder for the notes workbench: ~/campaigns/zg95/figures_out/uwtn_2026_022/ (Louis's rsync), preview
   https://claude.ai/artifact/82n2Pepb8Y82vf7WSjT87y.
+- 2026-11-17: Louis: "Y5b is currently the leader, so it will be a good idea to re-run that case. Can we also reset the
+  green material when we restart so the pre-existing accumulation is not present." Relayed to K1: rerun Y5b on the
+  fixed zone (170fb5d or later) as Y5b2, keeping 4754 as comparison; a default-off driver option to reset the melange
+  (green) markers on restart, designed so the deep fault fit still has something to follow from the first step (the
+  fit is to the melange base); if cheap, Y5b2 with and without the melange reset.
