@@ -4337,3 +4337,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub: this revises the window advice. Zone runs rise ~40-55 Myr after the reset, Y7 ~70-80 Myr, so 260-291 Myr
   catches Y7 mid-rise; a post-rise window (~295-320 Myr, Y6 excluded) is needed, ranked in absolute cm/yr (Y4 ends
   at 291 Myr). Front arrival time is itself a result worth reporting.
+- 2026-11-17: K1 (notice): Y5b2m finished 200 steps (309 Myr), no refused fits; Y5b2 ending. Mean slip 289-309 Myr:
+  Y5b2m 3.63 +- 0.23, Y5b 3.56, Y5b2 3.53, Y7 3.17 cm/yr (Y6 frozen after ~303 Myr, excluded; no Y4 baseline past
+  291 Myr). Y5b2m peaked ~3.95 near 282 Myr, fell to 3.16 by 309: the melange reset brought the fast state on
+  earlier, not kept it faster. Why Y5b2m ran ahead (launch/prep/trench_offset.py, fault_vs_slabtop.py): not a pinned
+  fault top nor a deep fault drifting off the slab; its fault is shallower (top dip ~9 vs ~10 deg, overall ~17 vs ~19
+  deg) and ~90 km longer. Page v34.
+  Hub reading: the Y5b family converges within one sd (zone fix and melange reset don't change late slip); Y7 ~0.4
+  cm/yr lower (~2 sd). Y5b2m's slip is still falling at 309 Myr, so the window mean is not a steady value.
