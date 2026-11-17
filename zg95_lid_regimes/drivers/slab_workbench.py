@@ -210,9 +210,18 @@ params = uw.Params(
                                 #   within uw_yield_zone_km of the fault on the overriding plate's side, "both": on both
                                 #   sides; there the yield stress is uw_zone_tau0_mpa + uw_zone_tau1_mpa_km x depth, with
                                 #   the same strain weakening and healing (the plastic strain is the damage); elsewhere
-                                #   no yielding. The zone follows the fault: it is rebuilt with the faulted mesh
+                                #   no yielding. The zone follows the fault: it is rebuilt with the faulted mesh from the
+                                #   fault's line inside the mantle (to 6c2e7c6/1e30929 the whole stored line, which runs
+                                #   on above the surface over the incoming plate, so the zone took in its top before the
+                                #   trench)
     uw_yield_zone_km=40.0,      #   its width from the fault's line
     uw_yield_zone_depth_km=0.0,  #  only shallower than this; 0: along the whole fault
+    uw_yield_damage=0.0,        #   > 0: damaged rock yields too, wherever the flow takes it, by the zone's law: plastic
+                                #   strain at least this, partly below it (the zone's weight is min(strain / this, 1)).
+                                #   With uw_yield_zone_depth_km the zone near the surface is the source of the damage
+                                #   and the damage carries the zone (Louis, 2026-11-17: "a fault-adjacent damage zone
+                                #   that is fed by plastic failure near the surface is probably the closest we will get
+                                #   to a self-consistent definition"). 0: no
     uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
     uw_zone_tau1_mpa_km=3.0,
     uw_reset_strain=0,          # 1: a restart sets the plastic strain (the damage) to zero: a reset strength profile
@@ -522,6 +531,9 @@ tau1 = uw.expression(r"\tau_1", model.tau1, "yield stress gradient with depth")
 YIELD_ZONE = str(params.uw_yield_zone_side) != "none"
 if str(params.uw_yield_zone_side) not in ("none", "upper", "both"):
     raise ValueError(f"-uw_yield_zone_side must be none, upper or both, not {params.uw_yield_zone_side!r}")
+YIELD_DAMAGE = float(params.uw_yield_damage)
+if YIELD_DAMAGE < 0 or (YIELD_DAMAGE > 0 and not YIELD_ZONE):
+    raise ValueError("-uw_yield_damage is a plastic strain >= 0, and > 0 needs -uw_yield_zone_side upper or both")
 zone_tau0 = uw.expression(r"\tau_{0,z}", model.zone_tau0, "yield stress at the surface in the damage zone")
 zone_tau1 = uw.expression(r"\tau_{1,z}", model.zone_tau1, "yield stress gradient in the damage zone")
 H = uw.expression(r"H", model.heating, "internal heating rate")
@@ -1058,16 +1070,22 @@ class FaultedMesh:
             centroids = np.asarray(model_xy(self.yzone))
             inz = np.zeros(len(centroids), dtype=bool)
             for name, (spine, trace) in self.pieces.items():
-                dist, side = segment_side(centroids, spine)
+                # the line inside the mantle, from where it crosses the surface
+                r = np.hypot(spine[:, 0], spine[:, 1])
+                k = int(np.argmax(r < r_o))                 # the first point inside
+                line = spine[k:]
+                if k > 0:
+                    f = (r[k - 1] - r_o) / (r[k - 1] - r[k])
+                    line = np.vstack([spine[k - 1] + f * (spine[k] - spine[k - 1]), line])
+                dist, side = segment_side(centroids, line)
                 keep = dist < float(model.yield_zone)
                 if float(model.yield_zone_depth) > 0:
                     keep &= (r_o - np.hypot(centroids[:, 0], centroids[:, 1])) < float(model.yield_zone_depth)
                 if str(params.uw_yield_zone_side) == "upper":
-                    a = spine[int(np.argmax(np.hypot(spine[:, 0], spine[:, 1]) < r_o))]   # the first point inside
-                    th = np.arctan2(a[1], a[0])
+                    th = np.arctan2(spine[k, 1], spine[k, 0])
                     over = 1.0 if params.uw_dip < 90 else -1.0
                     probe = (r_o - 0.002) * np.array([np.cos(th + over * 0.02), np.sin(th + over * 0.02)])
-                    keep &= side == segment_side(probe[None, :], spine)[1][0]
+                    keep &= side == segment_side(probe[None, :], line)[1][0]
                 inz |= keep
             self.yzone.array[:, 0, 0] = inz.astype(float)
             zone_cells = int(uw.utilities.gather_data(int(inz.sum()), bcast=True).sum())
@@ -1110,6 +1128,8 @@ class FaultedMesh:
             # in the zone the zone's yield law; elsewhere a yield stress no stress here reaches (10^4 x the surface's
             # of the control's law): no yielding outside the zone
             Z = self.yzone.sym[0] if self.yzone is not None else 0
+            if YIELD_DAMAGE > 0:                    # and damaged rock wherever it is (uw_yield_damage)
+                Z = sympy.Max(Z, sympy.Min(self.gamma.sym[0] / YIELD_DAMAGE, 1))
             y0 = zone_tau0 + (1 - Z) * 1.0e4 * tau0
             y1 = zone_tau1
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, y0, y1, params.uw_yield_softness,
@@ -1182,7 +1202,9 @@ class FaultedMesh:
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
                   f"{plane_cells} cells" + (f", yield zone ({params.uw_yield_zone_side}) {zone_cells} cells" if YIELD_ZONE
-                                            else "") + f", built in {self.t_build:.1f} s; band on "
+                                            else "")
+                  + (f" and rock with plastic strain >= {YIELD_DAMAGE:g}" if YIELD_DAMAGE > 0 else "")
+                  + f", built in {self.t_build:.1f} s; band on "
                   f"{self.mesh_record['band_ranks']} rank(s), seams "
                   f"{params.uw_fault_seams} ({FAULT_PARTITION})")
         for name, d in self.mesh_record["division"].items():
@@ -2123,8 +2145,8 @@ def git_head(path):
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
-                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_zone_tau0_mpa", "uw_zone_tau1_mpa_km",
-                "uw_reset_strain",
+                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_zone_tau0_mpa",
+                "uw_zone_tau1_mpa_km", "uw_reset_strain",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
                 "uw_crust_refill_every", "uw_ridge_crust", "uw_ridge_crust_stop_km", "uw_crust_line_spacing_km",
