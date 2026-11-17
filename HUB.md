@@ -4299,3 +4299,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   line_inside() and overriding_side() factored out of the yield-zone code; zone unchanged. Job 4825 (Y5b2 fixed zone
   only; Y5b2m fixed zone + melange reset, after a 2-step smoke check), both from Y4 step 200 with strain reset,
   queued behind Y6's node (~16:20). Comparison: Y5b carry-on 4754.
+- 2026-11-17: K1 (notice): Y7 and Y5b pass Y4. Y7 fault slip 2.81 vs Y4 2.46 cm/yr at 288 Myr (114%), up from 1.06
+  at 248 Myr; its damage (made near the surface) now lines the slab top through and past the fault's end. Y5b 119% at
+  280 Myr (Y5b still has the pre-170fb5d zone bug; Y5b2 in job 4825 is the clean rerun). Y5u finished 200 steps:
+  1.9 cm/yr at 376 Myr. Page W1hrXisyRdpoiiSdDuJh8n v25.
