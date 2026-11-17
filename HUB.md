@@ -4345,3 +4345,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   deg) and ~90 km longer. Page v34.
   Hub reading: the Y5b family converges within one sd (zone fix and melange reset don't change late slip); Y7 ~0.4
   cm/yr lower (~2 sd). Y5b2m's slip is still falling at 309 Myr, so the window mean is not a steady value.
+- 2026-11-18: K1 follow-up 36, pushed: kaiju/slab-workbench 765babc -> e159f9e (on 6c33a5d; blobs slab_workbench.py
+  62cf0c3 and earth_units.py dd0c8e9 verified, mbox sha256 d8d93461... verified, compiles). (Container was rebuilt;
+  the uw3c-camp worktree was recreated on kaiju/slab-workbench.) `-uw_fault_follow ocrust` (default "melange",
+  unchanged): the fit marches along and fits the oceanic-crust line (band +-1.5 melange thicknesses, lower edge with
+  spline_side base), and the fault is the fit moved -uw_fault_above_ocrust_km (7) toward the overriding plate. Top and
+  deep-end rules unchanged, so a flat top to the outer rise stays allowed. State gains "spline_follow". Louis
+  2026-11-18: "Fitting to 7km above the base of a 7km crust is more stable ... the flat fault out to the outer-rise is
+  quite common in other models - it's physical". With run defaults (melange 11.3 km, ocrust line 17.4 km) the fault
+  starts at 10.4 km depth on the incoming plate, ~1 km above the old melange-base fit. Next: Y5o and Y6o (Y5b's and
+  Y6's zones) from Y4 step 200, each after a 2-step smoke check.
