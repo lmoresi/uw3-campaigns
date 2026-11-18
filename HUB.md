@@ -4416,3 +4416,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   and gap split if they appear.
   Hub reading: the thin zone's slip depends on the fault-top geometry, so Y6o_jump's answer will also depend on where
   the unbounded tangent top goes.
+- 2026-11-18: K1 follow-up 38, pushed: kaiju/slab-workbench d49a83a -> fd69b82 (on c2b0f61; slab_workbench.py
+  blob 2901e55 verified, mbox sha256 01c9ce0b... verified, compiles). Louis: "yes, add plastic strain rate to the
+  solver-mesh checkpoint". Each checkpoint also writes annulus.solver_mesh.edot_plastic / yield_ratio (V/P form,
+  nudged to each side of the split, rank 0), listed under "solver_diagnostics", not needed for restart. Hub check:
+  checkpoint() calls render_fields_to_base() first, so the yield ratio is current; faulted.edot_p and yield_ratio
+  exist. No run uses it yet. K1 correction: bounded runs had ~700 detections without limit triggers, not ~900.
