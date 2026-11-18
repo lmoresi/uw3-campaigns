@@ -4428,3 +4428,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   within ~1-10 points. The failure band is one 17 km cell each side in the solver mesh too.
   Hub reading: the band's width is set by the mesh, so the 17 km zone (Y6) is one cell and zone-width comparisons
   (17 vs 40 km) are partly resolution; resolving the width needs finer cells along the fault (MMPDE/graded base).
+- 2026-11-18: K1 follow-up 39 (bug fix), pushed: kaiju/slab-workbench 17ba48c -> 5eead70 (on fd69b82; blob 147ffca
+  verified, mbox sha256 852ea083... verified, compiles). The fault's stub above the wall (0.02 high along the top's
+  direction) was one straight chord in the plane; on tops flatter than ~3 deg it is hundreds of km long and dipped
+  under the curved wall, so the fault's wall crossing (start of the cut, yield zone, jump limit) was found on the
+  stub. Now laid in quarter-rung steps in map coordinates. Y6o_jump invalid from step 236 (242.5 Myr: top -4.5 ->
+  -9.5 deg, ~500 km, despite frac 0.03); its later 21 triggers are the bug; the only real trigger was step 235 (gap
+  23 km, frac 0.74). Y5o_jump unaffected (top 6.6 deg, 0 triggers). Next: Y6o_jump_fixed from its step-234 checkpoint.
+  Hub check: the chord goes under the wall near its wall end when L^2 > 0.04 r_o with L = 0.02/sin(dip), i.e. dip
+  < ~3.8-3.9 deg. Y6o's top was 3.4 deg ("355 km at 3.4 deg"), so Y6o's refusals and possibly Y6's refusals after
+  ~303 Myr may be this bug rather than the tangent top; asked K1 to refit those steps offline on 5eead70.
