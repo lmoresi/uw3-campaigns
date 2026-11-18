@@ -4438,3 +4438,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub check: the chord goes under the wall near its wall end when L^2 > 0.04 r_o with L = 0.02/sin(dip), i.e. dip
   < ~3.8-3.9 deg. Y6o's top was 3.4 deg ("355 km at 3.4 deg"), so Y6o's refusals and possibly Y6's refusals after
   ~303 Myr may be this bug rather than the tangent top; asked K1 to refit those steps offline on 5eead70.
+- 2026-11-18: K1 (notice), reach of the stub bug (page v47 #stub-bug), rebuilding the true top from each stored stub:
+  Y6 recorded top within 7 km to 292 Myr, off 169 km at 302 and 256 km from 309 Myr; Y6o right to 240 Myr, off 102 km
+  at 242 and 213 km from 245 Myr; every other run never had a top flatter than 5 deg, unaffected. Hub's check, fixed
+  fit (17ba48c = 5eead70), tangent top, no limit, fault in use, Y6o steps 240/268 and Y6 steps 312/330: from the
+  recorded top all 4 refused; from the true top all 4 fit, tops 13-258 km seaward of the true one (runs 271-575 km at
+  2.1-4.4 deg). So the freezes and late jumps were the bug; the tangent drift before them was real (Y6 225 km by 295
+  Myr, Y6o 173 km by 234 Myr). Supersedes "Y6 valid only to ~297 Myr": Y6 valid to ~292 Myr. DECISIONS corrected
+  (zg95-annulus-for-kaiju, fault-top entry); the no-free-bound ruling stands on its own grounds.
