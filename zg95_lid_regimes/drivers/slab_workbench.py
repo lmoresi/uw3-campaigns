@@ -1565,20 +1565,36 @@ def write_solver_fields(faulted, step):
     at np 16 and np 1), V and P as their values at their DOF coordinates nudged onto their
     own side of each fault (split_nudges), gathered to rank 0. A restart matches them to
     the rebuilt mesh's DOFs by position, on any rank count. Returns the file names."""
-    import h5py
     files = {"mesh": f"annulus.solver_mesh.{step:05d}.h5"}
     faulted.mesh.write(os.path.join(out, files["mesh"]))
     for name, var in (("V", faulted.v), ("P", faulted.p)):
-        values = var.array[:, 0, :]
-        xy = uw.utilities.gather_data((np.asarray(model_xy(var)) + faulted.split_nudges(var)).ravel())
-        vals = uw.utilities.gather_data(values.ravel())
-        files[name] = f"annulus.solver_mesh.{name}.{step:05d}.h5"
-        with uw.selective_ranks(0) as selected:
-            if selected:
-                with h5py.File(os.path.join(out, files[name]), "w") as h:
-                    h["coords"] = np.asarray(xy).reshape(-1, 2)
-                    h["values"] = np.asarray(vals).reshape(-1, values.shape[1])
+        files[name] = write_solver_var(faulted, var, name, step)
     return files
+
+
+def write_solver_var(faulted, var, name, step):
+    """One faulted-mesh variable at checkpoint ``step``, as write_solver_fields stores V and P (values at the DOF
+    coordinates nudged onto their own side of each fault, gathered to rank 0). Returns the file name."""
+    import h5py
+    values = var.array[:, 0, :]
+    xy = uw.utilities.gather_data((np.asarray(model_xy(var)) + faulted.split_nudges(var)).ravel())
+    vals = uw.utilities.gather_data(values.ravel())
+    fname = f"annulus.solver_mesh.{name}.{step:05d}.h5"
+    with uw.selective_ranks(0) as selected:
+        if selected:
+            with h5py.File(os.path.join(out, fname), "w") as h:
+                h["coords"] = np.asarray(xy).reshape(-1, 2)
+                h["values"] = np.asarray(vals).reshape(-1, values.shape[1])
+    return fname
+
+
+def write_solver_diagnostics(faulted, step):
+    """The plastic strain rate and the yield ratio on the solver's own (faulted, split) mesh at checkpoint ``step``
+    (Louis, 2026-11-18: "add plastic strain rate to the solver-mesh checkpoint"): the base mesh's copies are one
+    17 km cell across near the surface, as wide as a 17 km yield zone. Read by the analysis scripts only; a restart
+    does not need them. Returns the file names."""
+    return {name: write_solver_var(faulted, var, name, step)
+            for name, var in (("edot_plastic", faulted.edot_p), ("yield_ratio", faulted.yield_ratio))}
 
 
 def read_solver_fields(faulted, files):
@@ -1644,6 +1660,7 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
     # a moving base writes its mesh at every checkpoint (annulus.mesh.<step>.h5); a fixed one once (00000)
     base.write_timestep("annulus", index=step, outputPath=out, meshVars=mesh_vars, meshUpdates=MOVING)
     solver_files = write_solver_fields(faulted, step)
+    solver_diagnostics = write_solver_diagnostics(faulted, step)
     nodes = write_base_nodes(step) if MOVING else None
     # everything a restart from here reads: it refuses to start if any is missing
     needed = [f"annulus.mesh.{v.clean_name}.{step:05d}.h5" for v in (T_b, V_b, gamma_b)] + list(solver_files.values())
@@ -1667,7 +1684,8 @@ def checkpoint(step, t, records, faulted, faults, next_id, decisions):
                            "traces": [faulted.pieces[f["name"]][1].tolist() for f in faulted.faults],
                            # what steers the next decisions (restored_decisions)
                            "decisions": dict(decisions, built=faulted.faults),
-                           "solver_checkpoint": solver_files, "base_nodes": nodes, "checkpoint_files": needed},
+                           "solver_checkpoint": solver_files, "solver_diagnostics": solver_diagnostics,
+                           "base_nodes": nodes, "checkpoint_files": needed},
                           f, indent=1, default=str)
     write_records(records)
 
