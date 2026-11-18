@@ -4376,3 +4376,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (235-244 Myr). Bounded link holds: plate-parting point 44-50 km landward of the fault top in Y6o_bound (350 km in
   Y6o); the jump limit never fired in either bounded run, so the hub's deep-lag concern does not arise there (the
   measure itself is unchanged). Y5o_bound and Y6o_bound continue in job 4911.
+- 2026-11-18: K1 (notice): the bounded link's 150 km cap is active, at every detection since 224 Myr (Y6o_bound) and
+  232 Myr (Y5o_bound), 82% and 65% of all detections. Louis: "Worth trying. All the models I have seen in the
+  literature seem to have a very low angle plate bounding zone. Our models are similar - we need to find parameters
+  that do not overly influence the dynamics." Job 4914 (n4, n7): Y5o_b100, Y5o_b200, Y6o_b100, Y6o_b200 =
+  Y5o_bound/Y6o_bound with -uw_fault_link_km 100 / 200, same driver (local 9a0c5a1 = pushed c2b0f61), same restart
+  from Y4 step 200. Test: slip and trench position against link length; if they track it, the link sets the dynamics.
