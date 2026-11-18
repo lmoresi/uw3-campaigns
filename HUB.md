@@ -4370,3 +4370,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   interpolation cuts the corner at the bend; a uniform small fraction also makes the deep fault lag the slab while a
   large top gap persists. Suggested measuring the jump with polyline_gap (already in the driver) or pairing by depth,
   and logging how often and for how long the limit binds.
+- 2026-11-18: K1 (notice), follow-up 37 runs (ladder page v39 #bounded-top: strip, yield maps ~245 Myr, table).
+  Plate link stopped on Louis's word ("the plate runs can stop"): Y5o_plate at 290 Myr, Y6o_plate at 344 Myr. The
+  plate-parting point followed the fault, the link steepened to 75-82 deg, and slip fell to 62% and 27% of Y4
+  (235-244 Myr). Bounded link holds: plate-parting point 44-50 km landward of the fault top in Y6o_bound (350 km in
+  Y6o); the jump limit never fired in either bounded run, so the hub's deep-lag concern does not arise there (the
+  measure itself is unchanged). Y5o_bound and Y6o_bound continue in job 4911.
