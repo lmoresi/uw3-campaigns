@@ -4390,3 +4390,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub reading: Y5o_bound +12% on Y5b2 (~2.4 sd), Y6o_bound +11% on Y6, but each differs in two settings (ocrust
   follow and bounded top); asked K1 for Y5o (no bound) slip on the same window to separate them. The bounded top
   puts the fault closest to where the plates actually part.
+- 2026-11-18: K1 (notice), the Y5o row: Y5o (ocrust follow, tangent top) 3.56 +- 0.19 cm/yr over 273-283 Myr (134%
+  of Y4); 263-273 Myr 3.00 +- 0.16. Split of the gain over Y5b2 (3.12 +- 0.14): ocrust follow +14%; bounded top
+  (Y5o -> Y5o_bound 3.49 +- 0.17) -2%, inside the spread. In the 40 km zone the gain is the line fit; the bound
+  changes where the plates part relative to the fault top (98 -> 43 km at 283 Myr), not the slip.
+  Hub note: the bound is then neutral on slip at 150 km, which argues it is a geometry choice; the 100/200 km runs
+  (job 4914) test whether that holds across link lengths. The Y6 pair has no Y6o-unbounded row in this window
+  (Y6o refused fits), so the split there is not available.
