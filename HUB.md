@@ -4382,3 +4382,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   that do not overly influence the dynamics." Job 4914 (n4, n7): Y5o_b100, Y5o_b200, Y6o_b100, Y6o_b200 =
   Y5o_bound/Y6o_bound with -uw_fault_link_km 100 / 200, same driver (local 9a0c5a1 = pushed c2b0f61), same restart
   from Y4 step 200. Test: slip and trench position against link length; if they track it, the link sets the dynamics.
+- 2026-11-18: K1 (notice), bounded-top renders (page v40 #bounded-renders: movie 216-285 Myr, strip, yield maps
+  283 Myr, 100/150/200 km strip, table). Slip mean +- sd 273-283 Myr: Y4 2.66 +- 0.07, Y5b2 3.12 +- 0.14, Y5o_bound
+  3.49 +- 0.17, Y6 1.86 +- 0.05, Y6o_bound 2.07 +- 0.09 cm/yr. Plate parting landward of the fault top, 255-283 Myr:
+  bounded runs 38-43 km steady; Y6 125-174 km; Y5o (no bound) 76-98 km. No refused fits, no jump-limit triggers;
+  surface point on the 150 km cap since 224/232 Myr. 100/200 km runs (job 4914) at ~237 Myr.
+  Hub reading: Y5o_bound +12% on Y5b2 (~2.4 sd), Y6o_bound +11% on Y6, but each differs in two settings (ocrust
+  follow and bounded top); asked K1 for Y5o (no bound) slip on the same window to separate them. The bounded top
+  puts the fault closest to where the plates actually part.
