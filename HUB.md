@@ -4446,3 +4446,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   2.1-4.4 deg). So the freezes and late jumps were the bug; the tangent drift before them was real (Y6 225 km by 295
   Myr, Y6o 173 km by 234 Myr). Supersedes "Y6 valid only to ~297 Myr": Y6 valid to ~292 Myr. DECISIONS corrected
   (zg95-annulus-for-kaiju, fault-top entry); the no-free-bound ruling stands on its own grounds.
+- 2026-11-18: K1 (notice), job 4932 parameter-free top (page v48 #tangent-top). Y6o_jump_fixed (17 km zone, tangent
+  top, fixed driver): the fit's top flattens from 338 km at 3.6 deg (242 Myr) to 946 km at 1.3 deg (269 Myr); the jump
+  limit fired 42 times in 42 steps (frac 0.05-0.2), the top moving one rung per step from -4.8 to -10.6 deg; deep fault
+  lags the fresh fit by up to 2.8 km (245 Myr) and 8.9 km (264-270 Myr) at 300-440 km depth (the hub's predicted lag).
+  Slip 265-271 Myr 2.47 cm/yr vs 1.95/1.79/1.55 for the 200/150/100 km bounds. Y5o_jump_fixed (40 km zone): top 5-7
+  deg, 0 triggers, slip matches Y5o and Y5o_bound. K1 has taken it to Louis.
+  Hub reading: in the 17 km zone every top treatment sets the slip (bound length, or here the one-rung-per-step rate
+  of the limit, which fires every step), so no setting is parameter-free there; a 946 km top is well past any outer
+  rise. The 40 km zone is insensitive to all of them. The 17 km zone is one solver cell wide.
