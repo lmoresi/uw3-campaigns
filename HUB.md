@@ -4422,3 +4422,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   nudged to each side of the split, rank 0), listed under "solver_diagnostics", not needed for restart. Hub check:
   checkpoint() calls render_fields_to_base() first, so the yield ratio is current; faulted.edot_p and yield_ratio
   exist. No run uses it yet. K1 correction: bounded runs had ~700 detections without limit triggers, not ~900.
+- 2026-11-18: K1 (notice), follow-up 38 in use: job 4931 re-solved Y6o_bound, Y5o_bound, Y5b2 for 2 steps from ~283
+  Myr on fd69b82; converged, diagnostics written. Page v46 #failure-solver: above ~100-150 km fault depth the hanging
+  wall fails; below, the slab top fails to ~400 km; at the fault end both sides fail. Depth shares match the base mesh
+  within ~1-10 points. The failure band is one 17 km cell each side in the solver mesh too.
+  Hub reading: the band's width is set by the mesh, so the 17 km zone (Y6) is one cell and zone-width comparisons
+  (17 vs 40 km) are partly resolution; resolving the width needs finer cells along the fault (MMPDE/graded base).
