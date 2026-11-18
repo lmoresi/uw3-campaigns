@@ -1117,6 +1117,11 @@ def crust_spline_points(faults):
             pol = np.vstack([line[0] - (0.02 / max(-e[1], 1e-6)) * e, line])
             uw.pprint(f"  {FIT_NAME} (spline): the fit lies up to {gap:.4f} from the fault in use; the fault moves "
                       f"{frac:.2f} of the way ({JUMP_RUNGS:g} rung limit)")
+    # the stub above the wall (pol[0] -> pol[1]) in steps of a quarter rung in map coordinates, so that in the plane it
+    # follows the curved wall: on a top flatter than about 3 degrees the stub is hundreds of km long, and as one
+    # straight chord it dipped under the wall, which moved the fault's crossing (Y6o_jump, step 236: 500 km)
+    n = int(np.ceil(np.linalg.norm(pol[1] - pol[0]) / (0.25 * S)))
+    pol = np.vstack([pol[0] + np.outer(np.arange(n) / n, pol[1] - pol[0]), pol[1:]])
     radius = r_o + pol[:, 1]
     poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
                              S, 1)
