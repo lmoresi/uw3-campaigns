@@ -4408,3 +4408,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub note: the jump limit is now load-bearing (the tangent top runs far out on Y6o), so the hub's 2026-11-18 review
   point on its measure (pairing by fraction of length) is live for these two runs; asked K1 to log binds and the deep
   fault's offset from the ocrust line + 7 km.
+- 2026-11-18: K1 (notice), bound sensitivity (page v44 #bound-sensitivity), slip vs -uw_fault_link_km 100/150/200:
+  40 km zone 2.34/2.35/2.36 cm/yr at 250-260 Myr (within 4%, insensitive); 17 km zone 1.44/1.61/1.74 at 250-260 and
+  1.81/2.28/2.68 at 280-290 Myr (monotonic, the bound steers it), supporting the no-free-bound ruling. Added as
+  evidence to DECISIONS. Y6o_bound past 314 Myr, 0 refusals, 0 limit triggers; the jump limit has not triggered in any
+  bounded run (0 of ~900 detections). Job 4930's tangent runs at their first steps; K1 will report triggers, fraction
+  and gap split if they appear.
+  Hub reading: the thin zone's slip depends on the fault-top geometry, so Y6o_jump's answer will also depend on where
+  the unbounded tangent top goes.
