@@ -4397,3 +4397,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub note: the bound is then neutral on slip at 150 km, which argues it is a geometry choice; the 100/200 km runs
   (job 4914) test whether that holds across link lengths. The Y6 pair has no Y6o-unbounded row in this window
   (Y6o refused fits), so the split there is not available.
+- 2026-11-18: Louis (via K1): "If this thing is the megathrust, then it defines where the plates separate but it does
+  not mean there is no deformation in the over-riding plate / 'accretionary wedge'. I am uncomfortable introducing
+  another free parameter without a physical basis into our fit." The 150 km bound is not wanted in the fit. Job 4930
+  (n2): Y5o_jump (40 km zone) and Y6o_jump (17 km zone), tangent top + -uw_fault_jump_rungs 1, from Y4 step 200, driver
+  local 9a0c5a1 (= c2b0f61). Question: does the 17 km zone keep slipping on a long flat megathrust once no fit is
+  refused? 4914 (100/200 km) continues as a measure of how much the bound mattered. "Where the plates part" retired for
+  the 10/50/90 % surface-convergence spread (page #convergence-spread).
+  DECISIONS (zg95-annulus-for-kaiju 28e6e26): ocrust fit and no free bound on the fault top, both 2026-11-18.
+  Hub note: the jump limit is now load-bearing (the tangent top runs far out on Y6o), so the hub's 2026-11-18 review
+  point on its measure (pairing by fraction of length) is live for these two runs; asked K1 to log binds and the deep
+  fault's offset from the ocrust line + 7 km.
