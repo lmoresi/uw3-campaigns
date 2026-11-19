@@ -230,6 +230,8 @@ params = uw.Params(
                                 #   slip-weakening distance); the deposit is not divided by the band's width. The damage
                                 #   then moves, weakens and heals as the plastic strain does. With uw_yield_zone_km 0 and
                                 #   uw_yield_damage > 0 the rock yields only where damaged: the zone grows from the slip.
+                                #   Above the split (uw_split_inset) the fault's line to the surface takes the shallowest
+                                #   pair's slip rate.
                                 #   0: the slip makes no damage (every run to 2026-11-19)
     uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
     uw_zone_tau1_mpa_km=3.0,
@@ -1503,11 +1505,22 @@ class FaultedMesh:
             pts, rates = [np.zeros((0, 2))], [np.zeros(0)]
             for name in self.names:
                 c, j, nrm = fault_pair_jumps(self.stokes, name, info)
-                if len(c):
-                    pts.append(np.asarray(c)[:, :2])
-                    rates.append(np.abs(j[:, 0] * -nrm[:, 1] + j[:, 1] * nrm[:, 0]))
-            self.slip_xy = np.asarray(uw.utilities.gather_data(np.vstack(pts).ravel(), bcast=True)).reshape(-1, 2)
-            self.slip_rate = np.asarray(uw.utilities.gather_data(np.concatenate(rates), bcast=True)).ravel()
+                c = np.asarray(c)[:, :2] if len(c) else np.zeros((0, 2))
+                v = np.abs(j[:, 0] * -nrm[:, 1] + j[:, 1] * nrm[:, 0]) if len(c) else np.zeros(0)
+                c = np.asarray(uw.utilities.gather_data(c.ravel(), bcast=True)).reshape(-1, 2)
+                v = np.asarray(uw.utilities.gather_data(v, bcast=True)).ravel()
+                if len(v):
+                    # above the split (the weak plane's part, uw_split_inset) the fault's line up to the surface takes
+                    # the shallowest pair's slip rate (Louis, 2026-11-19: "extend damage to the surface")
+                    line, _ = line_inside(self.pieces[name][0])
+                    line = np.vstack([a + np.outer(np.arange(4) / 4, b - a) for a, b in zip(line[:-1], line[1:])]
+                                     + [line[-1:]])
+                    k = int(np.argmax(np.hypot(c[:, 0], c[:, 1])))
+                    up = np.hypot(line[:, 0], line[:, 1]) > np.hypot(*c[k])
+                    c, v = np.vstack([c, line[up]]), np.r_[v, np.full(int(up.sum()), v[k])]
+                pts.append(c)
+                rates.append(v)
+            self.slip_xy, self.slip_rate = np.vstack(pts), np.concatenate(rates)
         rec = solver_record(info, attempts, start, caught,
                             {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer})
         if params.uw_wall_check:
