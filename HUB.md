@@ -4455,3 +4455,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub reading: in the 17 km zone every top treatment sets the slip (bound length, or here the one-rung-per-step rate
   of the limit, which fires every step), so no setting is parameter-free there; a 946 km top is well past any outer
   rise. The 40 km zone is insensitive to all of them. The 17 km zone is one solver cell wide.
+- 2026-11-19: Louis: "Let's make sure the bug that was fixed recently is not contaminating our decision making."
+  Hub audit of the stub bug (follow-up 39) against the record; contamination windows Y6 > 292 Myr, Y6o > 240 Myr.
+  Clear: slip windows 220-237, 273-283 (Y6 before 292), 289-309 (Y6 excluded); damage front (~235-240 Myr); Y5b family,
+  melange reset; ocrust +14% (Y5b2 vs Y5o, 40 km zone); plate-link verdict (links 75-82 deg); bound sensitivity and
+  Y6o_bound (bounded tops > 5 deg, restarted from Y4); Y6o_jump_fixed (fixed driver); Y6 plate-parting 125-174 km
+  (255-283 Myr). Already corrected: Y6 valid to ~292 Myr (not 297); DECISIONS fault-top entry (freezes were the bug).
+  To confirm (sent to K1): (1) time of "Y6o 350 km" in the bounded-link comparison; (2) Y6o_jump steps 200-234
+  true-top check, since Y6o_jump_fixed restarted from step 234 on the buggy driver; (3) Y6's time in page v19 behind
+  the damage-zone ruling; (4) mark true-top vs bug in the fu36/fu37 motivations; (5) whether "no other run below 5
+  deg" covers Y4 and annulus_faults.py runs. Latent: annulus_faults.py on every branch (and h2/mmpde-fault) still has
+  the straight-chord stub; the envelope locator floors the top at 30 deg and recorded spline tops are 13-31 deg (ANUMAS
+  movie 24 deg), so past runs are expected clear; asked K1 whether to port the fix or add a guard.
