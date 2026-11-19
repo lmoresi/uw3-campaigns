@@ -130,13 +130,39 @@ the slip rate on the second step" (doc).
 local. On 2026-11-16 the local branch and origin are both at adb20e9d. The worktree has no diff, and
 the 2026-10-20 rescue copy holds only mesh caches. Nothing needs pushing.
 
+## Update, 2026-11-20: what the code work measured
+
+Louis ruled on 2026-11-19 (DEV-HUB): "Fixes, land them. OK to change defaults, this is not widely used yet." H7 then measured A1 before opening it, and **A1 no longer stands as written**.
+
+**PRs:**
+- **B1 is PR #1231.** The nodal history now carries its stress. On the rotation test it scores 0.285 against the rotated stress; development scores 1.538 and is identical to `"none"`. #1009's Waters and King bias is the trace's own error: with the trace velocity forced to $(u,0)$ the fixed history reproduces development, and the carried nodal history does not converge there at fixed Courant number. `test_1054` had relied on the defect and now pins `"none"`.
+- **A2 is PR #1232**, stacked on #1231: the fault guard.
+
+**A1 measurements** (serial, development + #1231 + A1):
+
+| case | grid | nodal (fixed) | IP + 0.07 | IP, no smoothing |
+|---|---|---|---|---|
+| DFG cylinder, Re 100, Wi 0.5, β 0.5, res 20: drag at t 2 (grid reference 4.593 at res 20, 4.134 at res 80) | 4.505 | 4.985 | 3.046 | 3.56 at t 0.6 (grid 4.74, nodal 5.57) |
+| Waters and King, 1/16, Δt 0.0125: error at t 2 | diverges (#749) | 2.3e-3 | 1.2e-2 | (running) |
+| Maxwell box, order 1 / 2 | 1.54e-2 / 9.3e-4 | the same | the same | — |
+
+**What this changes in the recommendations:**
+- The smoothed integration-point history is a quarter to a third low on the cylinder's drag. Even unsmoothed it is a quarter low, as the October campaign also saw at res 40.
+- The subsystem doc's statement that smoothing "costs nothing" when the solvent fraction is large does not hold here.
+- The smoothing's cost on Waters and King is about 2% at 1/16, falling as $h^2$. The "0.5%" in A1 below is the 1/32 figure.
+
+The default is back with Louis. The options are:
+- (a) keep the fixed nodal history;
+- (b) the grid history, closest on the cylinder but with #749 open;
+- (c) integration point, as ruled.
+
 ## 3. Recommendations
 
 ### A. Default and documentation changes (no new code)
 
 | # | recommendation | reason and evidence | closes |
 |---|---|---|---|
-| A1 | **Stokes VE: change the default to `integration_point`, with `store_smoothing` defaulting to 0.07.** Keep the nodal history selectable. | It is the only flavour with an acceptable result on all three benchmarks: Waters and King with smoothing (#737), the cylinder to Wi 0.6 (#768, doc), and the Maxwell box (a29a5b1f). The doc already recommends exactly this. Smoothing costs 0.5% on the peak and nothing when the solvent fraction is large (doc). The current default does not transport. | the 2026-09-11 guide ruling; #737 in practice |
+| A1 | **(Superseded by the 2026-11-20 update above.) Stokes VE: change the default to `integration_point`, with `store_smoothing` defaulting to 0.07.** Keep the nodal history selectable. | It is the only flavour with an acceptable result on all three benchmarks: Waters and King with smoothing (#737), the cylinder to Wi 0.6 (#768, doc), and the Maxwell box (a29a5b1f). The doc already recommends exactly this. Smoothing costs 0.5% on the peak and nothing when the solvent fraction is large (doc). The current default does not transport. | the 2026-09-11 guide ruling; #737 in practice |
 | A2 | **When the mesh has split-node faults** (`mesh._fault_point_pairs` non-empty), **default to `eulerian`, or to `none` when the step moves ≪ h; refuse the trace-back flavours** with a message citing #871. | Standing rule (DEV-HUB, 2026-11-15). ThinSheet already does this, and the grid history removed the oscillation (#871). The check is one test at history creation: `_create_stress_history_ddt`, `cython/petsc_generic_snes_solvers.pyx:5730`. This is a guard, not a fix. | #871's exposure on Stokes VE (the full fix is B3) |
 | A3 | **NavierStokes (composed): keep SUPG momentum. Give its stress history the A1 default for now. Move it to `eulerian` + DEVSS once B2 lands.** | Your SUPG preference is best supported on the cylinder: second-order drag convergence, and agreement with IP to 0.2% (#735). It is not ready while #749 is open and DEVSS is lagged. | — |
 | A4 | **ThinSheet: keep `eulerian`.** | Fault-safe, measured (#871, `thin-sheet.md:126`). | — |
