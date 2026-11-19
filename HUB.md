@@ -4467,3 +4467,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   deg" covers Y4 and annulus_faults.py runs. Latent: annulus_faults.py on every branch (and h2/mmpde-fault) still has
   the straight-chord stub; the envelope locator floors the top at 30 deg and recorded spline tops are 13-31 deg (ANUMAS
   movie 24 deg), so past runs are expected clear; asked K1 whether to port the fix or add a guard.
+- 2026-11-19: K1 answers to the stub-bug audit (true top rebuilt from each stored stub; rebuild noise 1-8 km on clean
+  steps). (1) "Y6o 350 km" was trench_offset at step 236 (241.9 Myr), the first contaminated step (top 102 km off);
+  true-top ~248 km. Quote the last clean value instead: Y6o 173 km at 234.3 Myr against Y6o_bound 44-50 km. (The
+  single steepest-step measure is retired for the 10/50/90 % spread.) (2) Y6o_jump steps 200-232 error <= 4.7 km;
+  step 234 (restart state) 8.2 km at top dip 3.95 deg, start of the bug, under half a rung; Y6o_jump_fixed's first step
+  built its yield zone 8 km off at the top for one step, then the fit moved 0.95 of an 18 km gap; clean from step 236:
+  restart treated as clean. (3) Page v19 / 17 Nov damage-zone ruling used Y6 at 289 Myr (step 290), error 1.5 km,
+  clean. (4) fu36: "Y6's top 225 km seaward" at 295 Myr real (~215 km); "the march along the smeared melange fell
+  short of the cap" NOT supported: Y6 has no march refusals; all 89 refusals from step 311 (303 Myr) were the window
+  check ("no subducted crust below cap/2") caused by the bugged top. fu37: "355 km at 3.4 deg" is real fit geometry;
+  "Y6o refused" was the bug. (5) Y4 in the scan, min top dip 9.2 deg, clean; annulus_faults.py runs rebuilt:
+  earth_recipe_movie all 800 checkpoints <= 1.3 km, h2_graded_kaiju/g2000_np26 <= 1.1 km: not hit. (6) Porting the
+  3-line quarter-rung fix to annulus_faults.py is a driver change: Louis's call (K1 recommends the port over a guard).
+  Audit closed: no decision rests on contaminated data. Corrections on record: Y6 valid to ~292 Myr; Y6o
+  plate-parting 173 km (234 Myr), not 350; fu36's march-shortfall motivation withdrawn; the Y6/Y6o refusals were
+  the bug.
