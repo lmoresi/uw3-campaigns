@@ -146,6 +146,15 @@ Louis ruled on 2026-11-19 (DEV-HUB): "Fixes, land them. OK to change defaults, t
 | Waters and King, 1/16, Δt 0.0125: error at t 2 | diverges (#749) | 2.3e-3 | 1.2e-2 | 6.6e-4 at t 2; rings by t 6.5 |
 | Maxwell box, order 1 / 2 | 1.54e-2 / 9.3e-4 | the same | the same | — |
 
+**Row (b), grid + DEVSS on Waters and King** (development's lagged DEVSS, same settings):
+
+| $\eta_a$ | 1/16, Δt 0.0125 | 1/32, Δt 0.00625 |
+|---|---|---|
+| $\eta/4$ | diverges at t 2.25 | diverges at t 1.625 |
+| $\eta$ | diverges at t 3.25 | t 2: 0.75601 (error 3.5e-2), $\max\lvert v_y\rvert \approx 1$ and growing |
+
+DEVSS does not rescue the grid history on Waters and King; #749 stands.
+
 **What this changes in the recommendations:**
 - The smoothed integration-point history is a quarter to a third low on the cylinder's drag. Even unsmoothed it is a quarter low, as the October campaign also saw at res 40.
 - The subsystem doc's statement that smoothing "costs nothing" when the solvent fraction is large does not hold here.
