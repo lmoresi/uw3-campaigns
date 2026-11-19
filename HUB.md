@@ -4493,3 +4493,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   live branches: zg95-annulus-for-kaiju, main, kaiju/arrhenius, kaiju/young-slab, kaiju/weak-plane-tests,
   kaiju/slab-workbench, h2/mmpde-fault (H2 to be told via Louis). Proposed to Louis: leave the ~18 closed experiment
   branches as the frozen record of their runs (none hit).
+- 2026-11-19: K1 follow-up 40 (NOT pushed: mbox not yet on the patch page, only described inline): local 3fafc59 on
+  kaiju/slab-workbench on 17ba48c (= 5eead70); blobs slab_workbench.py 1d44aee, earth_units.py ea87cf1; mbox sha256
+  462ed4ba..., on Kaiju ~/+Claude/kaiju/patches/workbench-slip-damage.mbox. `-uw_slip_damage_km` (default 0): damage
+  made by the fault's own slip: base nodes within S of the nearest ladder pair get |tangential jump| rate x
+  uw_strain_crit / slip_damage as a source in the strain advection (damage reaches strain_crit after that much slip).
+  Louis 19 Nov: "Let's take a look at the accumulated slip model. It's different enough that we should try it. Once
+  that is done, I feel like I will have enough information to make the call." Runs: from Y4 step 200, no fixed zone
+  (-uw_yield_zone_km 0, -uw_yield_damage 0.5), two critical slips, after a 2-step check. Hub asked K1 for the bytes
+  (push waits on sha check), the damaged band width in km (one rung/cell, mesh-set), confirmation that softening
+  saturates at strain_crit (slip -> damage -> weaker host -> slip loop bounded), and slip vs time per critical slip.
+  The annulus_faults.py stub port follows as a separate patch.
