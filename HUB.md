@@ -4504,3 +4504,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (push waits on sha check), the damaged band width in km (one rung/cell, mesh-set), confirmation that softening
   saturates at strain_crit (slip -> damage -> weaker host -> slip loop bounded), and slip vs time per critical slip.
   The annulus_faults.py stub port follows as a separate patch.
+- 2026-11-19: K1 follow-up 40 PUSHED: kaiju/slab-workbench 3fafc59 -> 6ee8e45 (on 5eead70). Mbox sent inline;
+  the message had stripped the diff's blank-context spaces and the "-- " separator; restored, then sha256 462ed4ba...
+  and size 9202 bytes matched; blobs slab_workbench.py 1d44aee, earth_units.py ea87cf1 verified; compiles.
+  fault_pair_jumps is in the underworld3 library (fault_contact.py). Hub checks on its own questions: softening
+  saturates (yield factor uses Min(gamma / uw_strain_crit, 1)), so the slip -> damage -> slip loop is bounded in
+  strength though damage keeps accumulating; the deposit is per node (mesh-independent amount) but the band is nodes
+  within one rung S of a pair, so its width is mesh-set.
