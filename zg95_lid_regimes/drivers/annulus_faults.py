@@ -1008,6 +1008,15 @@ def polyline_gap(a, b):
     return float(max(polyline_distance(a, b).max(), polyline_distance(b, a).max()))
 
 
+def stub_along_wall(pol):
+    """``pol`` (map coordinates: angle along the wall and depth or height) with its first segment, the stub above
+    the wall, laid in steps of a quarter rung, so that in the plane the stub follows the curved wall at its own
+    height. As one straight chord, a stub on a top flatter than about 3.8 degrees (hundreds of km long) dipped under
+    the wall, and the fault's crossing was found on it (slab_workbench 17ba48c: run Y6o_jump's top moved 500 km)."""
+    n = int(np.ceil(np.linalg.norm(pol[1] - pol[0]) / (0.25 * S)))
+    return np.vstack([pol[0] + np.outer(np.arange(n) / n, pol[1] - pol[0]), pol[1:]])
+
+
 def resample_polyline(poly, spacing, block):
     """``poly`` resampled by arc length at about ``spacing``, with a multiple of ``block``
     segments (the chain levels subsample by 2^k)."""
@@ -1254,6 +1263,7 @@ def place_line(zk, xk, inc, smooth=True):
     raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]
     d = raw[1] - raw[0]
     pol = np.vstack([raw[0] - d * (0.02 / max(d[1], 1e-12)), raw])
+    pol = stub_along_wall(pol)
     radius = r_o - pol[:, 1]
     poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
                              S, 2 ** int(params.uw_chain))
@@ -1454,6 +1464,7 @@ def crust_envelope_points(faults):
     raw = np.c_[np.r_[xa, sm], np.r_[0.0, zg]]       # (x, depth)
     d = raw[1] - raw[0]
     pol = np.vstack([raw[0] - d * (0.02 / d[1]), raw])
+    pol = stub_along_wall(pol)
     radius = r_o - pol[:, 1]
     poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
                              S, 2 ** int(params.uw_chain))
@@ -1648,6 +1659,7 @@ def crust_spline_points(faults):
     to_wall = -seg[0, 1] / max(-d[1], 1e-6)
     wall = seg[0] - to_wall * d
     pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
+    pol = stub_along_wall(pol)
     radius = r_o + pol[:, 1]
     poly = resample_polyline(np.c_[radius * np.cos(pol[:, 0] / r_o), radius * np.sin(pol[:, 0] / r_o)],
                              S, 2 ** int(params.uw_chain))
