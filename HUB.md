@@ -4535,3 +4535,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub reading: Ys10 is heavily damaged at depth yet slow, so deep damage is not enough; the shallow 25 km is the
   bottleneck, consistent with the 17 Nov near-surface-failure direction. Alternative to extrapolating the shallowest
   pair's rate: use the weak plane's own resolved shear above the cut as the source (measured rather than assumed).
+- 2026-11-19: Louis: "Go with K1's version - extend damage to the surface ... we can find a more physically-motivated
+  version of this once we know the effect it has." Relayed to K1: damage from the shallowest pair's slip rate laid
+  along the fault to the surface, no new parameter; rerun Ys10 and Ys100 from Y4 step 200; report slip by window vs
+  Y4/Y5o, median damage by fault depth, top-25 km failure share. Physically-motivated version deferred.
