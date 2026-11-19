@@ -639,10 +639,11 @@ if model.heal_time > 0:
     heal_rate = 1 / model.heal_time
     if model.heal_T > 0:
         heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - model.heal_T) / 0.02)) / 2
-strain_adv.f = edot_p_b.sym[0] - gamma_b.sym[0] * heal_rate
 SLIP_DAMAGE = float(model.slip_damage) > 0
-if SLIP_DAMAGE:                              # the fault's slip as a source of damage in its ladder
-    strain_adv.f = strain_adv.f + slip_src_b.sym[0]
+if SLIP_DAMAGE:                              # and the fault's slip as a source of damage in its ladder
+    strain_adv.f = edot_p_b.sym[0] + slip_src_b.sym[0] - gamma_b.sym[0] * heal_rate
+else:
+    strain_adv.f = edot_p_b.sym[0] - gamma_b.sym[0] * heal_rate
 
 
 def onto(points):
