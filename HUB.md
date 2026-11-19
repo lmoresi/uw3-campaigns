@@ -4544,3 +4544,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the shallowest split pair, sampled at a quarter rung, joins the pairs as a slip source at that pair's slip rate, so
   the ladder's damage reaches the surface; no new parameter; uw_slip_damage_km 0 unchanged. Runs: Ys10s and Ys100s
   (D_c 10 / 100 km) from Y4 step 200 after a 2-step check; Ys10 and Ys100 carry on as the no-surface reference.
+- 2026-11-20: K1 (notice), slip-made damage results (Ys10/Ys100 on fac0012, Ys10s/Ys100s on 3643ac9 = 285af6e). Band:
+  base nodes within 17 km (one rung) of the fault, ~34 km total, mesh-set. Slip cm/yr 216-225/225-235/235-245/245-255:
+  Y4 3.05/2.76/2.45/2.39; Y5o 2.61/2.42/2.24/2.28; Y6 2.21/1.90/1.63/1.53; Ys10 0.75/1.15/0.95/0.78; Ys10s
+  0.75/1.34/1.23/1.02; Ys100 = Ys100s 0.49/0.43/0.33/0.24. Long runs Ys10/Ys100 to step 400 (501/578 Myr), no lock,
+  settled 0.64-0.72 and 0.21-0.31 cm/yr over 300-570 Myr (Y6 2.1-2.2, Y5o 3.6 at 300-320 Myr). No refusals or limit
+  triggers in any Ys run. Median damage within 17 km at 250 Myr by depth 0-12/12-25/25-50/deeper: Ys10 0/0.35/3.0/8-12;
+  Ys10s 0.19/0.66/3.2/9-15; Ys100 0/0.14/0.35/0.45; Ys100s 0.03/0.16/0.35/0.45. Top-25 km failure share: Y6 62%, Ys10
+  10%, Ys10s 17%, Ys100(s) 0.3%. K1: surface damage +20-30% slip at D_c 10 km but not most of the gap; slip-made damage
+  alone holds the fault at ~1/3 of Y6. Ys10s/Ys100s continue to step 400.
+  Hub reading: even with damage to the surface the top 12 km stays below strain_crit (0.19 vs 0.5) in Ys10s: rock on
+  the moving side crosses the band before it is fully weakened, so its damage scales with band width / D_c, and the
+  band width is the mesh's (34 km vs D_c 10 km). Louis said he would make the call after this test.
