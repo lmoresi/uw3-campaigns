@@ -4523,3 +4523,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   then the annulus_faults.py port -> 8d0cea9. Closed experiment branches left as the frozen record.
   Louis: "We can decide if a smoother representation of the damage zone is a good idea. Let's first check if
   fault-mediated damage is viable." (No smoothing of the slip-damage band yet.)
+- 2026-11-19: K1 (notice), slip-made damage first result (job 4937, fac0012 = 7f18e47; no fixed zone): band = base
+  nodes within one rung (17 km) of a split pair, ~34 km total, mesh-set. Slip cm/yr 216-225/225-235/235-245/245-255 Myr:
+  Y4 3.05/2.76/2.45/2.39; Y5o 2.61/2.42/2.24/2.28; Ys10 (D_c 10 km) 0.75/1.15/0.95/0.82; Ys100 (100 km)
+  0.49/0.43/0.33/0.24. No refusals, no limit triggers, slip falling. Cause: the top 12 km never gets damage (split
+  starts 12 km down, uw_split_inset 1 along; the weak plane above carries the fault and its shear is not counted).
+  Median plastic strain within 17 km at 250 Myr by fault depth 0-12/12-25/25-50/deeper: Ys10 0.00/0.35/3.0/8-12;
+  Ys100 0.00/0.14/0.35/0.45. Failure share in the top 25 km: Y6 62%, Ys10 10%, Ys100 0.3%. K1: not yet a fair test;
+  proposed to Louis to lay damage from the shallowest pair's slip rate along the fault up to the surface (no new
+  parameter); awaiting his go.
+  Hub reading: Ys10 is heavily damaged at depth yet slow, so deep damage is not enough; the shallow 25 km is the
+  bottleneck, consistent with the 17 Nov near-surface-failure direction. Alternative to extrapolating the shallowest
+  pair's rate: use the weak plane's own resolved shear above the cut as the source (measured rather than assumed).
