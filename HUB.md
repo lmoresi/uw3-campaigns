@@ -4561,3 +4561,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   3.2 -> 9-15 in Ys10s). Rock on the slab side reaches strain_crit only after about D_c of slip, i.e. after travelling
   roughly D_c along the fault with the slab, so the top ~D_c of the fault's slab side stays below critical: set by
   D_c, not by the band width. Withdrawn: "its damage scales with band width / D_c".
+- 2026-11-20: Louis: "OK - I agree to have this as a secondary source. Let's introduce something like a gaussian damage
+  (source) away from the fault as a way to connect a natural length-scale that is not just the ladder width." Relayed
+  to K1: slip damage added on top of Y5o's set-up (not alone); source spread as a Gaussian in distance from the fault
+  line (width sigma km, both sides, to the surface, cut at ~3 sigma). Hub suggestion (Louis may overrule):
+  unit-integral normalisation, source = slip_rate exp(-d^2/2 sigma^2)/(sigma sqrt(2 pi)), i.e. the slip counted as the
+  equivalent distributed shear strain; then no separate D_c (full weakening after ~strain_crit sigma sqrt(2 pi) of
+  slip), one physical length. Alternative: peak strain_crit/D_c (keeps D_c, total grows with sigma). sigma must exceed
+  ~one base cell (17 km near the surface); suggested pair sigma 20 and 40 km.
