@@ -4511,3 +4511,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   saturates (yield factor uses Min(gamma / uw_strain_crit, 1)), so the slip -> damage -> slip loop is bounded in
   strength though damage keeps accumulating; the deposit is per node (mesh-independent amount) but the band is nodes
   within one rung S of a pair, so its width is mesh-set.
+- 2026-11-19: Stub fix ported everywhere live (Louis: "fix anywhere the bug is visible"). K1's b308083 (annulus_faults.py
+  stub_along_wall() in the spline, envelope and place_line locators; base64 mbox sha256 38dc4393... verified; blob
+  a85fca4 -> 629b417; K1 offline: earth_recipe_movie steps 100-700 crossing moves 0.01-0.22 km, lag3 envelope 0.02-0.08
+  km; synthetic 3.0/2.0/1.0 deg tops old 436/1215/3104 km off, patched 0.4/3.4/9.2 km; crust_fault_points confirmed
+  unaffected) applied with git am -3 and pushed: zg95-annulus-for-kaiju be807fb, kaiju/arrhenius 2bd2704,
+  kaiju/young-slab cb409ca, h2/mmpde-fault 45ba9e5 (H2 to pull; told via Louis), kaiju/weak-plane-tests 834b92d +
+  hand port of follow-up 39 to its older slab_workbench.py 9b2fcce, main be64edb (hand port: older annulus_faults.py,
+  envelope + place_line only). kaiju/slab-workbench: K1's follow-up 40 fix fac0012 first (slip-damage source written
+  whole; job 4935 stopped at start with a TypeError; base64 mbox sha256 f3238ab9... verified, blob 4ceea82) -> 7f18e47,
+  then the annulus_faults.py port -> 8d0cea9. Closed experiment branches left as the frozen record.
+  Louis: "We can decide if a smoother representation of the damage zone is a good idea. Let's first check if
+  fault-mediated damage is viable." (No smoothing of the slip-damage band yet.)
