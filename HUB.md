@@ -4539,3 +4539,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   version of this once we know the effect it has." Relayed to K1: damage from the shallowest pair's slip rate laid
   along the fault to the surface, no new parameter; rerun Ys10 and Ys100 from Y4 step 200; report slip by window vs
   Y4/Y5o, median damage by fault depth, top-25 km failure share. Physically-motivated version deferred.
+- 2026-11-20: K1 slip damage to the surface, pushed: kaiju/slab-workbench 3643ac9 -> 285af6e (on 8d0cea9; base64 mbox sha256
+  bf9db9f0... verified, blob slab_workbench.py f376c25 verified, compiles). The fault's line inside the mantle above
+  the shallowest split pair, sampled at a quarter rung, joins the pairs as a slip source at that pair's slip rate, so
+  the ladder's damage reaches the surface; no new parameter; uw_slip_damage_km 0 unchanged. Runs: Ys10s and Ys100s
+  (D_c 10 / 100 km) from Y4 step 200 after a 2-step check; Ys10 and Ys100 carry on as the no-surface reference.
