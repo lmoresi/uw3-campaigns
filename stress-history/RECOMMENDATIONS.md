@@ -136,14 +136,14 @@ Louis ruled on 2026-11-19 (DEV-HUB): "Fixes, land them. OK to change defaults, t
 
 **PRs:**
 - **B1 is PR #1231.** The nodal history now carries its stress. On the rotation test it scores 0.285 against the rotated stress; development scores 1.538 and is identical to `"none"`. #1009's Waters and King bias is the trace's own error: with the trace velocity forced to $(u,0)$ the fixed history reproduces development, and the carried nodal history does not converge there at fixed Courant number. `test_1054` had relied on the defect and now pins `"none"`.
-- **A2 is PR #1232**, stacked on #1231: the fault guard.
+- **A2 is PR #1232**, stacked on #1231: the fault guard. The docs PR is #1233, stacked on #1232.
 
 **A1 measurements** (serial, development + #1231 + A1):
 
 | case | grid | nodal (fixed) | IP + 0.07 | IP, no smoothing |
 |---|---|---|---|---|
-| DFG cylinder, Re 100, Wi 0.5, β 0.5, res 20: drag at t 2 (grid reference 4.593 at res 20, 4.134 at res 80) | 4.505 | 4.985 | 3.046 | 3.56 at t 0.6 (grid 4.74, nodal 5.57) |
-| Waters and King, 1/16, Δt 0.0125: error at t 2 | diverges (#749) | 2.3e-3 | 1.2e-2 | (running) |
+| DFG cylinder, Re 100, Wi 0.5, β 0.5, res 20: drag at t 2 (grid reference 4.593 at res 20, 4.134 at res 80) | 4.505 | 4.985 | 3.046 | 3.370 |
+| Waters and King, 1/16, Δt 0.0125: error at t 2 | diverges (#749) | 2.3e-3 | 1.2e-2 | 6.6e-4 at t 2; rings by t 6.5 |
 | Maxwell box, order 1 / 2 | 1.54e-2 / 9.3e-4 | the same | the same | — |
 
 **What this changes in the recommendations:**
