@@ -74,6 +74,7 @@ SCALED = [
     ("uw_yield_zone_km", "yield_zone", "km"),
     ("uw_yield_zone_depth_km", "yield_zone_depth", "km"),
     ("uw_slip_damage_km", "slip_damage", "km"),
+    ("uw_slip_damage_sigma_km", "slip_damage_sigma", "km"),
     ("uw_zone_tau0_mpa", "zone_tau0", "mpa"),
     ("uw_zone_tau1_mpa_km", "zone_tau1", "mpa_km"),
 ]

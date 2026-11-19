@@ -233,6 +233,15 @@ params = uw.Params(
                                 #   Above the split (uw_split_inset) the fault's line to the surface takes the shallowest
                                 #   pair's slip rate.
                                 #   0: the slip makes no damage (every run to 2026-11-19)
+    uw_slip_damage_sigma_km=0.0,  # > 0 (Louis, 2026-11-20: "introduce something like a gaussian damage (source) away from
+                                #   the fault as a way to connect a natural length-scale that is not just the ladder
+                                #   width"): the slip's damage is spread across the fault as a Gaussian of this width in
+                                #   the distance d from the fault's line (both sides, to the surface as above, cut off at
+                                #   3 sigma), normalised to unit integral across the fault: plastic strain rate = slip
+                                #   rate x exp(-d^2 / 2 sigma^2) / (sigma sqrt(2 pi)), the shear strain rate of the slip
+                                #   spread over a zone about sigma wide. No critical slip: rock reaches uw_strain_crit
+                                #   after about uw_strain_crit x sigma x sqrt(2 pi) of slip, and uw_slip_damage_km is
+                                #   not used. Keep it above the base cells along the fault (17 km near the surface)
     uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
     uw_zone_tau1_mpa_km=3.0,
     uw_reset_strain=0,          # 1: a restart sets the plastic strain (the damage) to zero: a reset strength profile
@@ -641,7 +650,8 @@ if model.heal_time > 0:
     heal_rate = 1 / model.heal_time
     if model.heal_T > 0:
         heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - model.heal_T) / 0.02)) / 2
-SLIP_DAMAGE = float(model.slip_damage) > 0
+SLIP_SIGMA = float(model.slip_damage_sigma)
+SLIP_DAMAGE = float(model.slip_damage) > 0 or SLIP_SIGMA > 0
 if SLIP_DAMAGE:                              # and the fault's slip as a source of damage in its ladder
     strain_adv.f = edot_p_b.sym[0] + slip_src_b.sym[0] - gamma_b.sym[0] * heal_rate
 else:
@@ -1518,6 +1528,12 @@ class FaultedMesh:
                     k = int(np.argmax(np.hypot(c[:, 0], c[:, 1])))
                     up = np.hypot(line[:, 0], line[:, 1]) > np.hypot(*c[k])
                     c, v = np.vstack([c, line[up]]), np.r_[v, np.full(int(up.sum()), v[k])]
+                    if SLIP_SIGMA > 0 and len(v) > 1:   # a dense line (an eighth of a rung): d is the distance to the fault
+                        o = np.argsort(-np.hypot(c[:, 0], c[:, 1]))
+                        c, v = c[o], v[o]
+                        f = np.arange(8) / 8
+                        c = np.vstack([a + np.outer(f, b - a) for a, b in zip(c[:-1], c[1:])] + [c[-1:]])
+                        v = np.r_[np.concatenate([a + f * (b - a) for a, b in zip(v[:-1], v[1:])]), v[-1:]]
                 pts.append(c)
                 rates.append(v)
             self.slip_xy, self.slip_rate = np.vstack(pts), np.concatenate(rates)
@@ -1566,13 +1582,18 @@ class FaultedMesh:
         edot = np.asarray(uw.function.global_evaluate(
             self.edot_p.sym[0], onto(model_xy(edot_p_b)))).ravel()
         edot_p_b.array[:, 0, 0] = np.maximum(edot, 0.0)
-        if SLIP_DAMAGE:                          # the slip's damage rate on the base nodes within the ladder
+        if SLIP_DAMAGE:                          # the slip's damage rate on the base nodes: in the ladder, or a Gaussian
             from scipy.spatial import cKDTree
             src = np.zeros(slip_src_b.array.shape[0])
             if len(self.slip_rate):
                 d, k = cKDTree(self.slip_xy).query(np.asarray(model_xy(slip_src_b)))
-                near = d < S
-                src[near] = self.slip_rate[k[near]] * params.uw_strain_crit / float(model.slip_damage)
+                if SLIP_SIGMA > 0:
+                    near = d < 3 * SLIP_SIGMA
+                    src[near] = (self.slip_rate[k[near]] * np.exp(-0.5 * (d[near] / SLIP_SIGMA) ** 2)
+                                 / (SLIP_SIGMA * np.sqrt(2 * np.pi)))
+                else:
+                    near = d < S
+                    src[near] = self.slip_rate[k[near]] * params.uw_strain_crit / float(model.slip_damage)
             slip_src_b.array[:, 0, 0] = src
 
     def render_fields_to_base(self):
@@ -2404,7 +2425,8 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
-                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km", "uw_zone_tau0_mpa",
+                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
+                "uw_slip_damage_sigma_km", "uw_zone_tau0_mpa",
                 "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
