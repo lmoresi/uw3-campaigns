@@ -37,7 +37,7 @@ import sympy
 import underworld3 as uw
 from underworld3.meshing.fault_network import _nearest_segment_normals
 from underworld3.utilities.custom_mg import set_custom_fmg
-from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_slip
+from underworld3.utilities.fault_contact import _fault_pair_nodes_on, fault_pair_jumps, fault_slip
 from underworld3.utilities.place_surface import _footprints_by_user_polyline
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -222,6 +222,15 @@ params = uw.Params(
                                 #   and the damage carries the zone (Louis, 2026-11-17: "a fault-adjacent damage zone
                                 #   that is fed by plastic failure near the surface is probably the closest we will get
                                 #   to a self-consistent definition"). 0: no
+    uw_slip_damage_km=0.0,      # > 0 (Louis, 2026-11-19: "the fault zone should be able to create damage - perhaps within
+                                #   the ladder itself"; "Let's take a look at the accumulated slip model"): the fault's
+                                #   own slip makes damage in its ladder. After each solve every base node within one rung
+                                #   of the split gains plastic strain at the local slip rate x uw_strain_crit / this, so
+                                #   this much accumulated slip brings the rock to full weakening (a critical slip, as a
+                                #   slip-weakening distance); the deposit is not divided by the band's width. The damage
+                                #   then moves, weakens and heals as the plastic strain does. With uw_yield_zone_km 0 and
+                                #   uw_yield_damage > 0 the rock yields only where damaged: the zone grows from the slip.
+                                #   0: the slip makes no damage (every run to 2026-11-19)
     uw_zone_tau0_mpa=50.0,      #   the yield law in the zone (run Y4's)
     uw_zone_tau1_mpa_km=3.0,
     uw_reset_strain=0,          # 1: a restart sets the plastic strain (the damage) to zero: a reset strength profile
@@ -500,6 +509,7 @@ log_eta_b = uw.discretisation.MeshVariable("log10_eta", base, 1, degree=1)
 yield_ratio_b = uw.discretisation.MeshVariable("yield_ratio", base, 1, degree=1)
 gamma_b = uw.discretisation.MeshVariable("plastic_strain", base, 1, degree=2)
 edot_p_b = uw.discretisation.MeshVariable("edot_plastic", base, 1, degree=1)
+slip_src_b = uw.discretisation.MeshVariable("slip_damage_rate", base, 1, degree=1)   # uw_slip_damage_km's source
 
 # The melange layer: particles over the whole base mesh carrying a 0/1 marker "crust"; its proxy is
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
@@ -630,6 +640,9 @@ if model.heal_time > 0:
     if model.heal_T > 0:
         heal_rate = heal_rate * (1 + sympy.tanh((T_b.sym[0] - model.heal_T) / 0.02)) / 2
 strain_adv.f = edot_p_b.sym[0] - gamma_b.sym[0] * heal_rate
+SLIP_DAMAGE = float(model.slip_damage) > 0
+if SLIP_DAMAGE:                              # the fault's slip as a source of damage in its ladder
+    strain_adv.f = strain_adv.f + slip_src_b.sym[0]
 
 
 def onto(points):
@@ -1299,6 +1312,7 @@ class FaultedMesh:
         set_custom_fmg(s, self.levels, field_id=0, fac_zone=None)
         self.stokes = s
         self.has_guess = False
+        self.slip_xy, self.slip_rate = np.zeros((0, 2)), np.zeros(0)   # uw_slip_damage_km: the last solve's slip
 
         eta_eff = self.host_cm.viscosity       # the viscoplastic viscosity (the weak plane's eta_0)
         self.eta_projection = uw.systems.Projection(mesh, self.log_eta)
@@ -1484,6 +1498,15 @@ class FaultedMesh:
             _, slip, _ = fault_slip(self.stokes, name, info)
             slips[name] = float(uw.utilities.gather_data(
                 np.abs(slip).max() if len(slip) else 0.0, bcast=True).max())
+        if SLIP_DAMAGE:                          # each split pair's place and slip rate, on every rank
+            pts, rates = [np.zeros((0, 2))], [np.zeros(0)]
+            for name in self.names:
+                c, j, nrm = fault_pair_jumps(self.stokes, name, info)
+                if len(c):
+                    pts.append(np.asarray(c)[:, :2])
+                    rates.append(np.abs(j[:, 0] * -nrm[:, 1] + j[:, 1] * nrm[:, 0]))
+            self.slip_xy = np.asarray(uw.utilities.gather_data(np.vstack(pts).ravel(), bcast=True)).reshape(-1, 2)
+            self.slip_rate = np.asarray(uw.utilities.gather_data(np.concatenate(rates), bcast=True)).ravel()
         rec = solver_record(info, attempts, start, caught,
                             {"transfer": t_transfer, "stokes": time.perf_counter() - wall - t_transfer})
         if params.uw_wall_check:
@@ -1529,6 +1552,14 @@ class FaultedMesh:
         edot = np.asarray(uw.function.global_evaluate(
             self.edot_p.sym[0], onto(model_xy(edot_p_b)))).ravel()
         edot_p_b.array[:, 0, 0] = np.maximum(edot, 0.0)
+        if SLIP_DAMAGE:                          # the slip's damage rate on the base nodes within the ladder
+            from scipy.spatial import cKDTree
+            src = np.zeros(slip_src_b.array.shape[0])
+            if len(self.slip_rate):
+                d, k = cKDTree(self.slip_xy).query(np.asarray(model_xy(slip_src_b)))
+                near = d < S
+                src[near] = self.slip_rate[k[near]] * params.uw_strain_crit / float(model.slip_damage)
+            slip_src_b.array[:, 0, 0] = src
 
     def render_fields_to_base(self):
         self.eta_projection.solve()
@@ -2359,7 +2390,7 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
-                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_zone_tau0_mpa",
+                "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km", "uw_zone_tau0_mpa",
                 "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",
