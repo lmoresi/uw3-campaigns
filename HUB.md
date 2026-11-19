@@ -4556,3 +4556,8 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Hub reading: even with damage to the surface the top 12 km stays below strain_crit (0.19 vs 0.5) in Ys10s: rock on
   the moving side crosses the band before it is fully weakened, so its damage scales with band width / D_c, and the
   band width is the mesh's (34 km vs D_c 10 km). Louis said he would make the call after this test.
+- 2026-11-20: Hub correction to its own reading in the previous entry: rock on the slab side moves ALONG the band, not
+  across it, so it stays in the band and gains damage as it goes down (hence damage rising with depth, 0.19 -> 0.66 ->
+  3.2 -> 9-15 in Ys10s). Rock on the slab side reaches strain_crit only after about D_c of slip, i.e. after travelling
+  roughly D_c along the fault with the slab, so the top ~D_c of the fault's slab side stays below critical: set by
+  D_c, not by the band width. Withdrawn: "its damage scales with band width / D_c".
