@@ -4483,3 +4483,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Audit closed: no decision rests on contaminated data. Corrections on record: Y6 valid to ~292 Myr; Y6o
   plate-parting 173 km (234 Myr), not 350; fu36's march-shortfall motivation withdrawn; the Y6/Y6o refusals were
   the bug.
+- 2026-11-19: Louis: "We should fix anywhere the bug is visible." Hub scan of every branch for the straight-chord stub
+  (map coordinates, converted to the plane after): three forms in annulus_faults.py, spline locator (wall stub),
+  envelope locator and place_line/relax_fault ((x, depth) stub; safe while the 30 deg top floor holds, open with
+  -uw_fault_top_dip_fix or a lower floor); slab_workbench.py on kaiju/weak-plane-tests (old copy, line 856).
+  crust_fault_points builds its stub in the plane with an exact crossing (read as unaffected; K1 to confirm). Not in
+  the underworld3 library. Asked K1 for one port patch on zg95-annulus-for-kaiju fixing all three forms, validated
+  offline (no change on steep tops incl. earth_recipe_movie; flat top crossing on the curve). Hub carries it to the
+  live branches: zg95-annulus-for-kaiju, main, kaiju/arrhenius, kaiju/young-slab, kaiju/weak-plane-tests,
+  kaiju/slab-workbench, h2/mmpde-fault (H2 to be told via Louis). Proposed to Louis: leave the ~18 closed experiment
+  branches as the frozen record of their runs (none hit).
