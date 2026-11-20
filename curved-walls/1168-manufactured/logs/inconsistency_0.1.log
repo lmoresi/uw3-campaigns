@@ -1,0 +1,10 @@
+cell 0.1: 160 wall nodes (80 vertices); sum |W| = 7.9279 (perimeter of the ellipse 7.9327)
+angle between default and given normal: vertices max 1.122e-01 deg, midpoints max 4.392e-13 deg
+r: sum +6.723e-12, sum |r| 2.283e-03, max |r| 6.459e-05
+largest |r| at theta (deg): 164.9 (+6.46e-05, vertex), -15.1 (+6.46e-05, vertex), -164.9 (-6.46e-05, vertex), 15.1 (-6.46e-05, vertex), -168.7 (-6.18e-05, vertex), 11.3 (-6.18e-05, vertex), -11.3 (+6.18e-05, vertex), 168.7 (+6.18e-05, vertex)
+(a) #1168's flow: slip rms 1.696e-02; sum r s = -4.221e-05; correlation -0.6164
+slip at the largest-|r| nodes: -2.00e-02, -2.00e-02, +2.00e-02, +2.00e-02, +1.55e-02, +1.55e-02, -1.55e-02, -1.55e-02
+(b) manufactured both: slip rms 2.283e+00; sum r s = -6.416e-12; correlation -0.0000
+slip at the largest-|r| nodes: -1.72e+00, -3.55e+00, -1.72e+00, -3.55e+00, -1.70e+00, -3.61e+00, -3.61e+00, -1.70e+00
+(c) manufactured both-xy: slip rms 2.409e+00; sum r s = +6.150e-03; correlation +0.6324
+slip at the largest-|r| nodes: +2.76e+00, +2.76e+00, -2.76e+00, -2.76e+00, -2.20e+00, -2.20e+00, +2.20e+00, +2.20e+00

@@ -1,0 +1,12 @@
+variant both-xy lambda 0.0 cell 0.1 cells 1680 outer perimeter/cell 79
+method gamma reason u L2 p L2 wall u wall u.n <p>-<p_e>
+SNES solve diverged after 4 iterations: DIVERGED_LINE_SEARCH The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+essential (control) None -6 3.121e-03 5.850e-02 1.805e-04 1.700e-03 +3.372e+09
+rotated, default normal None 2 5.701e-03 1.883e-01 4.449e-03 5.854e-04 +1.637e-05
+rotated, normal= exact None 2 6.256e-01 2.676e+01 8.369e-01 1.742e-03 -2.594e+04
+nitsche, default normal 12.5 2 5.073e-01 2.169e+01 6.777e-01 7.431e-02 +7.029e+03
+nitsche, default normal 1000.0 2 6.770e-01 2.898e+01 9.004e-01 1.192e-03 +9.407e+03
+nitsche, normal= exact 12.5 2 4.702e-01 2.016e+01 6.311e-01 4.198e-02 -1.949e+04
+nitsche, normal= exact 1000.0 2 5.981e-01 2.558e+01 8.007e-01 2.036e-03 -2.481e+04
+penalty, exact normal 10000.0 2 5.665e-03 1.939e-01 4.686e-03 4.175e-04 -5.536e+00
+penalty, exact normal 1000000.0 2 1.777e-02 7.461e-01 2.153e-02 2.261e-04 -5.442e+02

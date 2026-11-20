@@ -1,0 +1,3 @@
+variant both-xy lambda 0.0 pressure nullspace True cell 0.1 cells 1680 outer perimeter/cell 79
+method gamma reason u L2 p L2 wall u wall u.n <p>-<p_e>
+essential (control) None 4 3.121e-03 5.850e-02 1.805e-04 1.700e-03 -2.285e-05

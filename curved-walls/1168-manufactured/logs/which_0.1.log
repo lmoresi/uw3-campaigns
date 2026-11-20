@@ -1,0 +1,5 @@
+cell 0.1
+outer default inner default reason 2  rms 1.44370e-02  mean p +6.4131e-06  from default/default 0.0000e+00
+outer given   inner default reason 2  rms 9.59424e-03  mean p +1.7872e+02  from default/default 4.3717e-01
+outer default inner given   reason 2  rms 1.44370e-02  mean p +6.4131e-06  from default/default 1.3639e-10
+outer given   inner given   reason 2  rms 9.59424e-03  mean p +1.7872e+02  from default/default 4.3717e-01

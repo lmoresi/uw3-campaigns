@@ -1,0 +1,11 @@
+variant both cell 0.025 cells 25674 outer perimeter/cell 317
+method gamma reason u L2 p L2 wall u wall u.n <p>-<p_e>
+essential (control) None 2 5.579e-05 2.163e-03 3.940e-07 2.677e-05 +6.510e-05
+rotated, default normal None 2 1.277e-03 5.016e-03 1.366e-03 3.562e-05 +6.490e-05
+rotated, normal= exact None 2 1.253e-03 5.145e-03 1.344e-03 9.757e-08 +6.490e-05
+nitsche, default normal 12.5 2 1.354e-03 4.773e-03 1.436e-03 1.108e-04 +1.384e-02
+nitsche, default normal 1000.0 2 1.353e-03 4.772e-03 1.436e-03 1.068e-04 -7.955e-04
+nitsche, normal= exact 12.5 2 1.253e-03 5.144e-03 1.344e-03 6.972e-06 +2.369e-02
+nitsche, normal= exact 1000.0 2 1.253e-03 5.145e-03 1.344e-03 1.632e-07 +6.490e-05
+penalty, exact normal 10000.0 2 1.029e-03 5.240e-03 1.115e-03 9.582e-05 +1.850e-08
+penalty, exact normal 1000000.0 2 1.251e-03 5.145e-03 1.342e-03 9.622e-07 +8.141e-07
