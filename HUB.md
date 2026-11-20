@@ -4581,3 +4581,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Gaussian is needed to attribute any gain; asked K1.
 - 2026-11-20: K1 (notice): control Yd added, job 4940: Y5o's set-up + -uw_yield_damage 0.5, no slip damage, on
   9c16389 (= 073a1ee), from Y4 step 200, 200 steps. Results to come as Yg20 / Yg40 / Yd / Y5o over the same windows.
+- 2026-11-20: K1 (notice), Gaussian source with control, at 250 Myr. Slip cm/yr 216-225/225-235/235-245/245-255:
+  Y4 3.05/2.76/2.45/2.39; Y5o 2.61/2.42/2.24/2.28; Yd 2.61/2.42/2.24/2.31; Yg20 2.82/2.66/2.50/2.51; Yg40
+  2.83/2.68/2.48/2.48. Yd tracks Y5o within 0.03 (yield_damage alone adds nothing); +8-12% belongs to the Gaussian;
+  sigma 20 and 40 agree within ~1%. No refusals or limit triggers. Median damage within 17 km by fault depth
+  0-12/12-25/25-50/50-100/deeper: Y5o 0.08/0.32/0.54/0.51/0.23; Yd 0.09/0.29/0.52/0.46/0.22-0.25; Yg20
+  0.23/1.02/3.3/7.7/11-12; Yg40 0.20/0.72/1.9/4.1/6-7.5. Failure share top 25 km / deep end (300-440 km): Y5o 36/15%,
+  Yd 39/12%, Yg20 34/22%, Yg40 32/31%. K1: the source brings 12-25 km to full weakening (the gain); most of its damage
+  saturates along the slab. All continue to step 400.
+  Hub reading: gain consistent in all four windows (~1-1.5 sd each); insensitive to sigma, so not a length-scale knob
+  at 20-40 km; the top 12 km still below strain_crit (0.20-0.23); deep-end failure rises with sigma (15 -> 31%).
