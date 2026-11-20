@@ -4579,3 +4579,5 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Y4 step 200 after a 2-step check. Hub: yield_damage 0.5 is a second change relative to Y5o (damage from the zone's
   own yielding, carried outside 40 km, can also yield, as in Y7), so a control Y5o + yield_damage 0.5 without the
   Gaussian is needed to attribute any gain; asked K1.
+- 2026-11-20: K1 (notice): control Yd added, job 4940: Y5o's set-up + -uw_yield_damage 0.5, no slip damage, on
+  9c16389 (= 073a1ee), from Y4 step 200, 200 steps. Results to come as Yg20 / Yg40 / Yd / Y5o over the same windows.
