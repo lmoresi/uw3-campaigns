@@ -20,5 +20,6 @@ C1's attempt to file an issue on 2026-11-16 was refused by its permission check.
 | 14 | np 3 with an empty rank: after a viscoelastic solve, the next gmsh mesh load hangs in labelsLoad (ReadLabelStratumHDF5). Pre-existing; it is why test_1107's parallel file hangs at np 3 with emptyband. | H1, review of #1232 | owner: H5 (restart / mesh I/O), after its current queue |
 | 15 | np 2 with an empty rank: a MeshVariable on the add_fault child of the mesh fails on one rank in UW_DMCreateInterpolationWithinPlex, and the other rank waits. Pre-existing. | H1, review of #1232 | owner: H5 (faults), after its current queue |
 | 16 | global_evaluate hangs on NaN points at np 2, even with the same points on every rank (no refusal; Swarm.migrate's barrier). Pre-existing on #1243's head and development. | H1, review of #1246 | being FIXED by H6 (separate PR after #1246: refuse non-finite points collectively before the migrate) |
+| 17 | In a units model, `exp(A*T0/T)*exp(-A)` with A = E/(R*T0) a named expression evaluates to NaN. Pre-existing on development. (Related, being fixed in #1197: get_units reads a sum holding a mesh variable's dimensionless ratio, e.g. `T/T0 - 1`, as kelvin.) | H1, review of #1197 | owner: H3, after #1197 (cause first; fix PR with the test written first) |
 
 Underworld development team with AI support from Claude Code
