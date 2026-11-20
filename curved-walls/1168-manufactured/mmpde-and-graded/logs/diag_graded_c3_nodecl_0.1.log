@@ -1,0 +1,5 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+declare rotation False detorque False forcing torque T +9.793e-02 slide graded kind c3 cell 0.1 cells 612 pressure nullspace True omega_e +1.5641e-03
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+rotated, default normal 2 1.800e-01 8.605e+01 +6.650e+01 -4.096e-04

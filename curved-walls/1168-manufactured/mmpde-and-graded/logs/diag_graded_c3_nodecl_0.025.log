@@ -1,0 +1,24 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+declare rotation False detorque False forcing torque T +6.319e-03 slide graded kind c3 cell 0.025 cells 8904 pressure nullspace True omega_e +1.0139e-04
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+Traceback (most recent call last):
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/mmpde-and-graded/diag_graded.py", line 108, in <module>
+    reason, e_u, e_raw, om, dp = solve(method)
+                                 ^^^^^^^^^^^^^
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/mmpde-and-graded/diag_graded.py", line 91, in solve
+    stokes.solve(zero_init_guess=True)
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-1168/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-1168/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/utilities/memprobe.py", line 269, in wrapper
+    return func(*args, **kw)
+           ^^^^^^^^^^^^^^^^^
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-1168/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/systems/solvers.py", line 2286, in solve
+    super().solve(
+  File "/mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-1168/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/timing.py", line 383, in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "src/underworld3/cython/petsc_generic_snes_solvers.pyx", line 13757, in underworld3.cython.generic_solvers.SNES_Stokes_SaddlePt.solve
+  File "src/underworld3/cython/petsc_generic_snes_solvers.pyx", line 6533, in underworld3.cython.generic_solvers.SolverBaseClass._solve_rotated_if_registered
+RuntimeError: [rotated_bc] the rotated fieldsplit-Schur linear solve failed on the first Newton step of a cold start: KSP_DIVERGED_PCSETUP_FAILED (reason -11) after 3 iterations. No solution was produced and the fields were not written. Set solver.tolerate_linear_failure = True to warn and continue instead.
