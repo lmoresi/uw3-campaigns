@@ -1,0 +1,5 @@
+kind c3 cell 0.1 cells 612 pressure nullspace True omega_e +0.0000e+00
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+essential (control) 2 1.545e-02 1.545e-02 +2.261e-08 -3.099e-04
+rotated, default normal 2 1.669e-02 1.669e-02 +6.415e-09 -3.099e-04
+rotated, normal=X/|X| 2 1.669e-02 1.669e-02 +6.415e-09 -3.099e-04

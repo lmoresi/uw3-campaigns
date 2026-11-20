@@ -1,0 +1,16 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/circles/srun_tor_0.3/measure_shell.py:72: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+  stokes.solve(zero_init_guess=True)
+Created inner boundary surface
+Created outer boundary surface
+kind tor cell 0.3 cells 1023 |omega_e| 2.767e-04
+method reason u L2 |omega_h| <p>-<p_e>
+essential (control) 4 3.082e-03 2.699e-04 -1.550e-04
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+[rotated_bc] WARNING: rotated fieldsplit velocity sub-solve KSP did NOT converge (reason=-3, iterations=200, |r|=1.404e-11); proceeding with the last iterate.
+rotated, default normal 2 1.417e-02 6.803e-03 -2.172e-04
+[rotated_bc] WARNING: rotated free slip on ['Lower', 'Upper'] takes a given normal that varies along the wall, and the normal velocity is fixed on the whole boundary. The constant-pressure continuity row then holds a weighted sum of the wall slip fixed (the weights are where the given normal differs from the facet-weighted normal; the mean pressure is its multiplier), a constraint the continuous problem does not have. On a curved wall that is not a circle this can stop the velocity converging: 63 to 67 % error, not falling with refinement, on a manufactured free-slip solution on an elliptical annulus (#1168). Use normal=None (the default, facet-weighted normal) unless the given normal is needed for an exact rigid-rotation null mode.
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+[rotated_bc] WARNING: converged in the rotation-gauge QUOTIENT space, but the projected-out rigid-rotation component (6.92e-05) dominates the residual (1.17e-12): the forcing has a net torque, which free-slip walls cannot balance.
+rotated, normal=X/|X| 2 1.501e-02 6.840e-03 +8.600e-02
+wall 83.21 s, maxrss 465644 kB

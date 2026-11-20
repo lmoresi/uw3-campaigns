@@ -1,0 +1,12 @@
+kind s2: div u = 0
+  outer r=1: largest |u.n|, |tangential traction| at 40 points (50 digits) 5.61e-50; slip -1.500 to +1.500
+  inner r=1/2: largest |u.n|, |tangential traction| at 40 points (50 digits) 4.68e-51; slip -0.188 to +0.188
+kind c3: div u = 0
+  outer r=1: largest |u.n|, |tangential traction| at 40 points (50 digits) 6.68e-50; slip -1.500 to +1.500
+  inner r=1/2: largest |u.n|, |tangential traction| at 40 points (50 digits) 5.68e-51; slip -0.094 to +0.094
+kind circ: div u = 0
+  outer r=1: largest |u.n|, |tangential traction| at 40 points (50 digits) 1.12e-49; slip -1.500 to -1.500
+  inner r=1/2: largest |u.n|, |tangential traction| at 40 points (50 digits) 7.47e-51; slip +0.750 to +0.750
+kind s2circ: div u = 0
+  outer r=1: largest |u.n|, |tangential traction| at 40 points (50 digits) 1.39e-49; slip -3.000 to +0.000
+  inner r=1/2: largest |u.n|, |tangential traction| at 40 points (50 digits) 1.4e-50; slip +0.562 to +0.938

@@ -1,0 +1,12 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+slide graded kind c3 cell 0.025 cells 8904 pressure nullspace True omega_e +1.0139e-04
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+essential (control) 2 3.489e-04 3.489e-04 +1.014e-04 -2.504e-05
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+[rotated_bc] WARNING: rotated fieldsplit velocity sub-solve KSP did NOT converge (reason=-3, iterations=200, |r|=2.952e-01); proceeding with the last iterate.
+[rotated_bc] WARNING: converged in the rotation-gauge QUOTIENT space, but the projected-out rigid-rotation component (8.69e-05) dominates the residual (4.95e-11): the forcing has a net torque, which free-slip walls cannot balance.
+rotated, default normal 2 1.028e-02 5.171e-02 -3.914e-02 -2.705e+01
+[rotated_bc] WARNING: rotated free slip on ['Lower', 'Upper'] takes a given normal that varies along the wall, and the normal velocity is fixed on the whole boundary. The constant-pressure continuity row then holds a weighted sum of the wall slip fixed (the weights are where the given normal differs from the facet-weighted normal; the mean pressure is its multiplier), a constraint the continuous problem does not have. On a curved wall that is not a circle this can stop the velocity converging: 63 to 67 % error, not falling with refinement, on a manufactured free-slip solution on an elliptical annulus (#1168). Use normal=None (the default, facet-weighted normal) unless the given normal is needed for an exact rigid-rotation null mode.
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+[rotated_bc] WARNING: converged in the rotation-gauge QUOTIENT space, but the projected-out rigid-rotation component (8.69e-05) dominates the residual (8.28e-12): the forcing has a net torque, which free-slip walls cannot balance.
+rotated, normal=X/|X| 2 5.824e-04 5.050e-02 -3.900e-02 -2.076e-02

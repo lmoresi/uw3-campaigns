@@ -1,0 +1,5 @@
+kind circ cell 0.025 cells 8904 pressure nullspace True omega_e -4.8335e-01
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+essential (control) 2 2.846e-04 2.705e-04 -4.833e-01 -4.483e-05
+rotated, default normal 2 3.305e-04 3.299e-01 +2.962e-02 -4.478e-05
+rotated, normal=X/|X| 2 3.305e-04 3.299e-01 +2.962e-02 -4.478e-05

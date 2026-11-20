@@ -1,0 +1,6 @@
+cell 0.05: 380 wall nodes; angle default vs radial: vertices max 1.502e-08 deg, midpoints max 1.702e-13 deg; sum |r| 1.162e-10, max |r| 4.281e-12, sum r +3.182e-17
+slip s2 : correlation C -0.0011, sum r s -2.536e-13
+slip c3 : correlation C +0.0000, sum r s +8.583e-28
+slip circ : correlation C +0.0000, sum r s +4.419e-17
+slip s2circ : correlation C -0.0006, sum r s -2.536e-13
+s2 solves: max |v_default - v_radial| / max |v| = 1.165e-10

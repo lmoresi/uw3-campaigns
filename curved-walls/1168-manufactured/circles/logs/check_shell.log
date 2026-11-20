@@ -1,0 +1,2 @@
+kind tor: at 30 random points per wall (50 digits): max |u.n| 6.68e-52, max |tangential traction| 5.32e-51, max |div u| inside 1.08e-51; wall speed 0.022 to 0.993
+kind pol: at 30 random points per wall (50 digits): max |u.n| 1.88e-52, max |tangential traction| 1.21e-50, max |div u| inside 9.02e-53; wall speed 0.002 to 0.055
