@@ -1,0 +1,5 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+mesh trench kind s2 cell 0.05 method sep cells 2306
+RESULT u_L2 2.6462e-03 omega_h -1.5639e-03 omega_e +1.9188e-07 mean_p_offset +5.4537e-03 solve_s 6.92
+CONVERGENCE converged True rnorm 8.314e-14 rnorm0 5.606e+00 ksp_reason 4 ksp_its [1] nonlinear_its 1
+SEPARATED_GAUGE ['residual_A': 2.5316459206987966e-05, 'iterations': 12, 'kept_A': False, 'residual_B': 9.51421451287645e-10, 'B_minus_A': 2.444495161846305e-09, 'seconds': 0.08383668796159327]

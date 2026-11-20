@@ -1,0 +1,5 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+mesh graded kind c3 cell 0.05 method sep2 cells 2306
+RESULT u_L2 3.2379e-03 omega_h -3.6529e-02 omega_e +4.0477e-04 mean_p_offset -7.1957e-03 solve_s 13.95
+CONVERGENCE converged True rnorm 1.269e-11 rnorm0 5.810e+00 ksp_reason 4 ksp_its [1] nonlinear_its 1
+SEPARATED_GAUGE ['residual_A': 7.11101829070427e-05, 'residual_B2': 1.1903114472213024e-08, 'iterations': 12, 'B2_minus_A': 9.993765256455234e-07, 'velocity_fraction': 0.999999127461776, 'seconds': 0.11545168492011726]

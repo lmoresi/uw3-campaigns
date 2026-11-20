@@ -1,0 +1,233 @@
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 7220f392..69a5b0ee 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -1175,7 +1175,9 @@ def _finalize_rotated_solution(solver, U, Q, normal_rows, remove_rotation_gauge)
+             solver._rotated_declared_tested_walls = _given_normal_walls(solver)
+         declared_dofs = _declared_mode_given_dofs(solver)
+         given_rejected = []
+-        for tg, declared in zip(_rigid_rotation_modes(solver), flags):
++        separated = (getattr(solver, "_separated_gauge", None)
++                     if getattr(solver, "_rotated_separated_gauge", False) else None)
++        for k_mode, (tg, declared) in enumerate(zip(_rigid_rotation_modes(solver), flags)):
+             gauge["offered"] += 1
+             if _mode_satisfies_constraints(solver, Q, normal_rows, tg,
+                                            report=gauge["modes"], declared=declared,
+@@ -1183,7 +1185,8 @@ def _finalize_rotated_solution(solver, U, Q, normal_rows, remove_rotation_gauge)
+                 if declared:
+                     # the constraint-compatible mode: v_n = 0 stays exact when
+                     # it is projected out of U (#906)
+-                    tr = _rotated_compatible(Q, tg, normal_rows)
++                    tr = (separated[k_mode].copy() if separated    # EXPERIMENT (#1168)
++                          else _rotated_compatible(Q, tg, normal_rows))
+                     m = tg.duplicate()
+                     Q.multTranspose(tr, m)
+                     tr.destroy()
+@@ -1930,6 +1933,11 @@ def solve_rotated_freeslip(solver, boundaries, remove_rotation_gauge=True,
+             Aop = Atot
+         else:
+             Aop = Ahat
++        if getattr(solver, "_rotated_separated_gauge", False) and iters == 0:
++            if solver._rotated_separated_gauge == "saddle":
++                _separated_gauge_modes_saddle(solver, Aop, Q, normal_rows)   # EXPERIMENT
++            else:
++                _separated_gauge_modes(solver, Aop, Q, normal_rows)    # EXPERIMENT (#1168)
+         if not use_lu:
+             if ctx is None:
+                 Mp = _pressure_mass_schur_pmat(solver) if has_pressure else None
+@@ -3341,6 +3349,97 @@ def _rotated_compatible(Q, g, normal_rows):
+     return t
+ 
+ 
++def _separated_gauge_modes(solver, Aop, Q, normal_rows, n_iter=12):
++    """EXPERIMENT (#1168, separated fix, candidate B; private switch
++    ``solver._rotated_separated_gauge``): the gauge vector for each rigid rotation
++    is the constrained velocity operator's own near-null mode, found by inverse
++    iteration (MUMPS LU) from the constraint-compatible rotation (candidate A,
++    development's mode). Where A is already an exact null vector of the
++    constrained operator (equal chords, a radial normal) it is kept as is: the
++    operator is then singular on it and there is nothing to iterate. Stores the
++    rotated-frame full vectors on ``solver._separated_gauge`` and a report on
++    ``solver._separated_gauge_report``. Serial experiment; collective calls only."""
++    import time
++    t0 = time.perf_counter()
++    dm = solver.dm
++    vel_is = solver._subdict["velocity"][0]
++    Avv = Aop.createSubMatrix(vel_is, vel_is)
++    diag = Avv.getDiagonal()
++    dscale = float(diag.norm(PETSc.NormType.INFINITY))
++    # The constrained normal rows/columns of the rotated operator are eliminated;
++    # restrict the iteration to the free unknowns: those rows get a unit-scale
++    # diagonal in this copy (they decouple) and are re-zeroed in every iterate,
++    # so the inverse iteration cannot settle on them.
++    vis = np.asarray(vel_is.getIndices())
++    rstart = Avv.getOwnershipRange()[0]
++    pos = np.searchsorted(vis, np.asarray(normal_rows, dtype=vis.dtype))
++    pos = pos[(pos < vis.size) & (vis[np.minimum(pos, vis.size - 1)] == np.asarray(normal_rows))]
++    sub_rows = (rstart + pos).astype(PETSc.IntType)
++    Avv.zeroRowsColumns(sub_rows, diag=dscale)
++
++    def _zero_constrained(vec):
++        if sub_rows.size:
++            vec.setValues(sub_rows, np.zeros(sub_rows.size))
++            vec.assemble()
++    modes, report = [], []
++    ksp = None
++    for tg in _rigid_rotation_modes(solver):
++        t = _rotated_compatible(Q, tg, normal_rows)
++        dm.restoreGlobalVec(tg)
++        sub = t.getSubVector(vel_is)
++        x = sub.copy()
++        t.restoreSubVector(vel_is, sub)
++        _zero_constrained(x)
++        x.normalize()
++        Ax = x.duplicate()
++        Avv.mult(x, Ax)
++        res_a = float(Ax.norm()) / dscale
++        entry = {"residual_A": res_a, "iterations": 0, "kept_A": True}
++        if res_a > 1.0e-12:
++            if ksp is None:
++                ksp = PETSc.KSP().create(comm=dm.comm)
++                ksp.setOperators(Avv)
++                ksp.setType("preonly")
++                pc = ksp.getPC()
++                pc.setType("lu")
++                pc.setFactorSolverType("mumps")
++                ksp.setUp()
++            y = x.duplicate()
++            x0 = x.copy()
++            for k in range(n_iter):
++                ksp.solve(x, y)
++                _zero_constrained(y)
++                y.normalize()
++                x, y = y, x
++            Avv.mult(x, Ax)
++            res_b = float(Ax.norm()) / dscale
++            entry.update({"residual_B": res_b, "iterations": n_iter, "kept_A": False,
++                          "B_minus_A": float(abs(abs(x.dot(x0)) - 1.0))})
++            y.destroy()
++            x0.destroy()
++        full = t.duplicate()
++        full.set(0.0)
++        fsub = full.getSubVector(vel_is)
++        x.copy(fsub)
++        full.restoreSubVector(vel_is, fsub)
++        _zero_rows_local(full, normal_rows)
++        full.normalize()
++        modes.append(full)
++        t.destroy()
++        x.destroy()
++        Ax.destroy()
++        report.append(entry)
++    if ksp is not None:
++        ksp.destroy()
++    Avv.destroy()
++    diag.destroy()
++    for old in getattr(solver, "_separated_gauge", None) or []:
++        old.destroy()
++    solver._separated_gauge = modes
++    report.append({"seconds": time.perf_counter() - t0})
++    solver._separated_gauge_report = report
++
++
+ def _rotated_rigid_body_modes(solver, Q, normal_rows, vel_is):
+     """Copies of the velocity parts of the rigid-body modes in the rotated
+     frame, the constrained normal rows zeroed: the near-null space of a GAMG
+@@ -3378,6 +3477,76 @@ def _velocity_null_modes(nsp, vel_is=None):
+     return out
+ 
+ 
++def _separated_gauge_modes_saddle(solver, Aop, Q, normal_rows, n_iter=12):
++    """EXPERIMENT (#1168, candidate B2): as ``_separated_gauge_modes``, but the near-null
++    mode of the whole constrained saddle-point operator (velocity and pressure), by
++    inverse iteration (MUMPS LU) from the constraint-compatible rotation with zero
++    pressure. The constrained normal rows get a unit-scale diagonal in a copy and are
++    re-zeroed in every iterate; the constant pressure mode is removed by pinning one
++    pressure unknown (as the direct-LU route does). The mode keeps its pressure part.
++    Serial experiment."""
++    import time
++    t0 = time.perf_counter()
++    dm = solver.dm
++    A = Aop.copy()
++    diag = A.getDiagonal()
++    dscale = float(diag.norm(PETSc.NormType.INFINITY))
++    rows = np.asarray(normal_rows, dtype=PETSc.IntType)
++    pres = np.asarray(solver._subdict["pressure"][0].getIndices(), dtype=PETSc.IntType)
++    pin = pres[:1]
++    fixed = np.concatenate([rows, pin]).astype(PETSc.IntType)
++    A.zeroRowsColumns(fixed, diag=dscale)
++
++    def _zero_fixed(vec):
++        vec.setValues(fixed, np.zeros(fixed.size))
++        vec.assemble()
++
++    ksp = PETSc.KSP().create(comm=dm.comm)
++    ksp.setOperators(A)
++    ksp.setType("preonly")
++    pc = ksp.getPC()
++    pc.setType("lu")
++    pc.setFactorSolverType("mumps")
++    ksp.setUp()
++    modes, report = [], []
++    for tg in _rigid_rotation_modes(solver):
++        x = _rotated_compatible(Q, tg, normal_rows)
++        dm.restoreGlobalVec(tg)
++        _zero_fixed(x)
++        x.normalize()
++        x0 = x.copy()
++        Ax = x.duplicate()
++        A.mult(x, Ax)
++        res_a = float(Ax.norm()) / dscale
++        y = x.duplicate()
++        for k in range(n_iter):
++            ksp.solve(x, y)
++            _zero_fixed(y)
++            y.normalize()
++            x, y = y, x
++        A.mult(x, Ax)
++        res_b = float(Ax.norm()) / dscale
++        vel = solver._subdict["velocity"][0]
++        sub = x.getSubVector(vel)
++        vel_frac = float(sub.norm())
++        x.restoreSubVector(vel, sub)
++        report.append({"residual_A": res_a, "residual_B2": res_b, "iterations": n_iter,
++                       "B2_minus_A": float(abs(abs(x.dot(x0)) - 1.0)),
++                       "velocity_fraction": vel_frac})
++        modes.append(x)
++        y.destroy()
++        x0.destroy()
++        Ax.destroy()
++    ksp.destroy()
++    A.destroy()
++    diag.destroy()
++    for old in getattr(solver, "_separated_gauge", None) or []:
++        old.destroy()
++    solver._separated_gauge = modes
++    report.append({"seconds": time.perf_counter() - t0})
++    solver._separated_gauge_report = report
++
++
+ def _rotated_nullspace(solver, Q, normal_rows):
+     """Coupled Stokes null space in the rotated frame: constant pressure, plus every
+     rigid rotation Q·mode that is a genuine null space of the constraints — one
+@@ -3413,12 +3582,17 @@ def _rotated_nullspace(solver, Q, normal_rows):
+     flags, note = _declared_mode_flags(solver)
+     declared_dofs = _declared_mode_given_dofs(solver)
+     given_rejected = []
+-    for tg, declared in zip(_rigid_rotation_modes(solver), flags):
++    separated = (getattr(solver, "_separated_gauge", None)
++                 if getattr(solver, "_rotated_separated_gauge", False) else None)
++    for k_mode, (tg, declared) in enumerate(zip(_rigid_rotation_modes(solver), flags)):
+         report = []
+         if _mode_satisfies_constraints(solver, Q, normal_rows, tg, report=report,
+                                        declared=declared, declared_dofs=declared_dofs):
+-            tr = tg.duplicate()                    # tr persists in the NullSpace
+-            Q.mult(tg, tr)
++            if separated:                          # EXPERIMENT (#1168)
++                tr = separated[k_mode].copy()
++            else:
++                tr = tg.duplicate()                # tr persists in the NullSpace
++                Q.mult(tg, tr)
+             vecs.append(tr)
+             n_rot += 1
+             viol = report[-1]["viol"]

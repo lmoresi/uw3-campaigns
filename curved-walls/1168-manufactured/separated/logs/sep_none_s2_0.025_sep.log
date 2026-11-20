@@ -1,0 +1,6 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+[rotated_bc] WARNING: nonlinear rotated free-slip did NOT converge in 3 iterations (rel |F̂| = 1.06e-09 of the reference residual); the fields hold the last (unconverged) iterate.
+mesh none kind s2 cell 0.025 method sep cells 8904
+RESULT u_L2 3.8163e-04 omega_h +3.1226e-03 omega_e +1.4543e-12 mean_p_offset +1.0175e-03 solve_s 21.36
+CONVERGENCE converged False rnorm 3.031e-09 rnorm0 2.869e+00 ksp_reason 4 ksp_its [1, 1, 1] nonlinear_its 3
+SEPARATED_GAUGE ['residual_A': 1.0060149379090076e-12, 'iterations': 12, 'kept_A': False, 'residual_B': 1.601867746089883e-16, 'B_minus_A': 0.0, 'seconds': 0.41114797885529697]

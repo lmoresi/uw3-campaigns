@@ -1,0 +1,4 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+mesh trench kind c3 cell 0.025 method default cells 8904
+RESULT u_L2 5.5139e-04 omega_h -1.2664e-03 omega_e +7.5782e-08 mean_p_offset -9.5659e-04 solve_s 18.22
+CONVERGENCE converged True rnorm 2.640e-13 rnorm0 3.001e+00 ksp_reason 4 ksp_its [1] nonlinear_its 1
