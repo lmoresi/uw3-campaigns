@@ -42,5 +42,6 @@ C1's attempt to file an issue on 2026-11-16 was refused by its permission check.
 | 36 | An annulus datum solve (rotated route) fails at PC setup at np 3 with an empty rank or a random partition; pre-existing on development. | H7, rotated batch review (2026-11-21) | owner: W1, after the batch |
 | 37 | normal= given a field (a P2 vector MeshVariable's .sym) fails in lambdify with "SyntaxError: invalid syntax" before any solve: an unhelpful message. | H6, #1168 round 2 (2026-11-21) | owner: W1: refuse with a message (normal= takes an expression of coordinates) |
 | 38 | Louis's signed 2026-11-15 ruling (Stokes family on simplices refuses a P1 velocity) is implemented only where one field is passed; when both velocityField and pressureField are passed nothing checks degree or cell type (SolNL's P1/P0 on UnstructuredSimplexBox was accepted and diverged). | W1, #944 SolNL (2026-11-21) | owner: W1, after PR A: refuse wherever both fields are known; count affected tests/examples first |
+| 39 | BDF order-2 viscoelastic NavierStokesSLCN is unstable: v error passes 1 by step 10 (development) / 15 (#1256); Stokes and NS agree to 5e-9. Pre-existing. | H1, review of #1256 (2026-11-21) | owner: H7, after #1256 |
 
 Underworld development team with AI support from Claude Code
