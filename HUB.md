@@ -4569,3 +4569,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   equivalent distributed shear strain; then no separate D_c (full weakening after ~strain_crit sigma sqrt(2 pi) of
   slip), one physical length. Alternative: peak strain_crit/D_c (keeps D_c, total grows with sigma). sigma must exceed
   ~one base cell (17 km near the surface); suggested pair sigma 20 and 40 km.
+- 2026-11-20: K1 Gaussian slip-damage source, pushed: kaiju/slab-workbench 9c16389 -> 073a1ee (on 285af6e; base64 mbox sha256
+  5426a165... verified, blobs slab_workbench.py 6082474 / earth_units.py f46f442 verified, compiles).
+  -uw_slip_damage_sigma_km sigma (default 0): unit-integral Gaussian across the fault, plastic strain rate = slip rate
+  exp(-d^2/2 sigma^2)/(sigma sqrt(2 pi)), both sides, to the surface, cut at 3 sigma; d to a dense source line (1/8
+  rung, slip rate interpolated); integrates to 0.997 across a straight fault; uw_slip_damage_km unused when sigma > 0
+  (full weakening after ~25 km of slip at sigma 20, ~50 km at 40). Base cells ~17 km near the surface, larger at depth.
+  Runs Yg20, Yg40 on Y5o's set-up (40 km zone, ocrust fit, tangent top, jump limit 1) PLUS -uw_yield_damage 0.5, from
+  Y4 step 200 after a 2-step check. Hub: yield_damage 0.5 is a second change relative to Y5o (damage from the zone's
+  own yielding, carried outside 40 km, can also yield, as in Y7), so a control Y5o + yield_damage 0.5 without the
+  Gaussian is needed to attribute any gain; asked K1.
