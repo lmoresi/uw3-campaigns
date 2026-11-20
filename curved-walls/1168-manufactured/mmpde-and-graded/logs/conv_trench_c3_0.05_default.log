@@ -1,0 +1,6 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+after the move (trench, n_outer 20): Upper: vertex off circle 2.2e-16 of R, chords 126, max/min 1.230; Lower: vertex off circle 2.2e-16 of R, chords 64, max/min 1.018; sum |r| 4.829e-04, correlation C with the c3 slip -0.0534
+detorque False forcing torque T -1.103e-05 metric trench kind c3 cell 0.05 cells 2306 pressure nullspace True omega_e -1.5373e-07
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+[rotated, default normal] rotated solve: converged True, lu True, rnorm 7.483e-14 (rnorm0 5.812e+00), last ksp_reason 4, ksp_its [1], vel_its_last [None]
+rotated, default normal 2 3.320e-03 8.777e-03 +6.289e-03 -6.042e-04

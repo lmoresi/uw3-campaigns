@@ -32,13 +32,14 @@ import underworld3 as uw
 import manufactured_annulus as ma
 import slide
 
-params = uw.Params(uw_cell_size=0.05, uw_kind="s2", uw_pressure_nullspace=True, uw_only="", uw_slide="none", uw_detorque=False, uw_declare_rotation=True)
+params = uw.Params(uw_cell_size=0.05, uw_kind="s2", uw_pressure_nullspace=True, uw_only="", uw_slide="none", uw_detorque=False, uw_lu_default=False, uw_declare_rotation=True)
 CELL = float(params.uw_cell_size)
 KIND = str(params.uw_kind)
 NULLSPACE = bool(params.uw_pressure_nullspace)
 ONLY = str(params.uw_only)
 SLIDE = str(params.uw_slide)
 DETORQUE = bool(params.uw_detorque)
+LU_DEFAULT = bool(params.uw_lu_default)
 DECLARE = bool(params.uw_declare_rotation)
 
 mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=CELL, qdegree=4)
@@ -86,10 +87,22 @@ def solve(method):
             stokes.add_essential_bc(u_e, wall)
         elif method == "rotated, default normal":
             stokes.add_rotated_freeslip_bc(0, wall)
+            # direct MUMPS LU per increment (one pressure pin instead of the null
+            # space); with the default normal the summed continuity row is already
+            # implied by the wall constraint, so dropping one row changes nothing
+            stokes._rotated_use_lu = LU_DEFAULT
         elif method == "rotated, normal=X/|X|":
             stokes.add_rotated_freeslip_bc(0, wall, normal=radial)
     stokes.solve(zero_init_guess=True)
+    info = getattr(stokes, "_rotated_freeslip_info", None) or {}
     reason = stokes.snes.getConvergedReason()
+    if info:
+        uw.pprint(f"  [{method}] rotated solve: converged {info.get('converged')}, "
+                  f"lu {bool(getattr(stokes, '_rotated_use_lu', False))}, "
+                  f"rnorm {info.get('rnorm', float('nan')):.3e} (rnorm0 "
+                  f"{info.get('rnorm0', float('nan')):.3e}), last ksp_reason "
+                  f"{info.get('ksp_reason')}, ksp_its {info.get('ksp_its')}, "
+                  f"vel_its_last {info.get('vel_its_last')}")
     mean_p = uw.maths.Integral(mesh, p.sym[0]).evaluate() / area
     omega_h = uw.maths.Integral(mesh, v.sym.dot(rot)).evaluate() / I_rr
     du = (v.sym - omega_h * rot) - ue_mod

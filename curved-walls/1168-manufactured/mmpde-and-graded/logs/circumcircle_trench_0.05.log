@@ -1,0 +1,2 @@
+mesh trench cell 0.05 Upper: 126 vertices, chords max/min 1.230; angle to X/|X|: vertices 8.54e-07 deg, midpoints mean-rule 1.21e-06 deg, cc3-rule 1.21e-06 deg; rigid rotation |n.(-y,x)|/R max 2.13e-14; sum |r_i| circumcircle 3.9879e-04, X/|X| 3.9879e-04
+mesh trench cell 0.05 Lower: 64 vertices, chords max/min 1.018; angle to X/|X|: vertices 0.00e+00 deg, midpoints mean-rule 1.21e-06 deg, cc3-rule 1.21e-06 deg; rigid rotation |n.(-y,x)|/R max 4.03e-15; sum |r_i| circumcircle 8.4091e-05, X/|X| 8.4091e-05

@@ -1,0 +1,5 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+declare rotation True detorque False forcing torque T +1.036e-11 slide graded kind s2 cell 0.025 cells 8904 pressure nullspace True omega_e +1.6351e-12
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+[rotated, default normal] rotated solve: converged True, lu True, rnorm 1.658e-13 (rnorm0 2.932e+00), last ksp_reason 4, ksp_its [1], vel_its_last [None]
+rotated, default normal 2 4.187e-04 4.067e-03 +3.452e-03 +4.932e-04

@@ -82,3 +82,89 @@ iterations, |r| 0.30); the 0.025 default-normal entry rests on that solve.
 
 Not run: np 2; the driver itself (`annulus_faults.py`) with its fault ladder and ZG95 geometry;
 the shell after a move; the second-order default normals above.
+
+## Round 2 (2026-11-21, the hub's follow-up): converged reruns and the circumcircle normal
+
+### Which earlier entries were not converged
+
+The "reason" column in the tables above (and in `../circles/`) is a stale SNES reason: the
+rotated path does not run the SNES. The rotated solve's own record (`_rotated_freeslip_info`:
+converged, final residual, KSP reason) is now printed for every solve. Five earlier cell-0.025
+entries had a velocity sub-solve fall back to GAMG and stop unconverged, all with the default
+normal: graded sin 2θ, graded cos 3θ, graded2 sin 2θ, graded3c cos 3θ (`../circles/` and the
+diagnosis above), and the MMPDE trench sin 2θ.
+
+### Converged reruns (`run_converged.sh`; `logs/conv_*`)
+
+Default normal: direct MUMPS LU on the rotated system (`solver._rotated_use_lu`; one pressure
+pin instead of the null space; with the default normal the summed continuity row is already
+implied by the wall constraint, so dropping one row changes nothing). `X/|X|`: the iterative
+route unchanged (the LU route's pin would drop the very row that carries #1168's extra
+constraint, and hide it). Every solve below reports converged True with a final residual of
+1e-11 to 1e-13 against an initial 3 to 6, except the as-built default LU at s2 0.05 / 0.025 and
+c3 0.05, which stop at 7.5e-10, 3.0e-9 and 4.6e-8 (relative 1e-10 to 1e-8) and give the
+`X/|X|` error to four figures.
+
+Velocity error ||u - u_e|| / ||u_e|| modulo rotation (rate between 0.05 and 0.025), mean
+pressure offset in brackets where it is large:
+
+| mesh, slip | default | `X/|X|` = circumcircle |
+|---|---|---|
+| as built, sin 2θ | 2.48e-3, 3.82e-4 (2.70) | 2.48e-3, 3.82e-4 (2.70) |
+| as built, cos 3θ | 3.00e-3, 5.20e-4 (2.53) | 3.00e-3, 5.20e-4 (2.53) |
+| graded, sin 2θ | 2.58e-3, 4.19e-4 (2.62) | 2.60e-3, 4.26e-4 (2.61) |
+| graded, cos 3θ | **8.82e-2, 4.39e-2 (1.01)** | 3.20e-3, 5.82e-4 (2.46) |
+| MMPDE trench, sin 2θ | 2.65e-3, 3.99e-4 (2.73) | **1.43e-2, 7.20e-3 (0.99)** (p -3.6e3, -1.4e4) |
+| MMPDE trench, cos 3θ | 3.32e-3, 5.51e-4 (2.59) | **5.49e-2, 2.75e-2 (1.00)** (p +1.3e4, +5.0e4) |
+| graded2, sin 2θ, 0.025 only | 3.93e-4 | (0.342, `../circles/`) |
+| graded3c, cos 3θ, 0.025 only | 5.85e-4 | (0.332, `../circles/`) |
+
+What moved: of the five unconverged entries, four are unchanged with a converged solver
+(graded sin 2θ 4.19e-4, graded3c 5.85e-4, trench sin 2θ 3.99e-4) or unchanged in kind; graded2
+sin 2θ moves from 5.31e-4 to 3.93e-4. The graded cos 3θ default stays first order with a
+converged LU solve, at about twice the iterative route's values (8.8e-2 and 4.4e-2 against
+2.0e-2 and 1.0e-2): the answer depends on how the near-null rotation is gauged, which is the
+diagnosis of (b), now with converged solves.
+
+### H6-fix-1, the circumcircle normal (`circumcircle.py`; `logs/circumcircle.log`)
+
+At each wall vertex, the unit normal of the circle through it and its two wall neighbours
+(found from the wall facets, not by angle). At each P2 edge midpoint, the normalised mean of
+the edge's two vertex normals ("mean"), or the normal at the midpoint of the circle through
+the edge's two vertices and the nearer other neighbour ("cc3").
+
+On every mesh measured (as built, graded, MMPDE trench; 0.05 and 0.025) every wall vertex lies
+on its circle (to 2.2e-16 of R), so the circumcircle of three wall vertices is the wall circle
+itself. Measured at every wall node: the angle between the circumcircle normal and `X/|X|` is
+at most 8.5e-7° at vertices and 1.2e-6° at midpoints, under either midpoint rule: that is
+arccos's resolution near 1, i.e. identical to round-off. A rigid rotation's normal component
+`|n . (-y, x)| / R` is at most 1.3e-13: the rotation is an exact null mode, as the hub asked.
+And #1168's weights `sum |r_i|` (r_i = W_i . t) are identical for the two normals, e.g. graded
+0.05 outer wall 1.4858e-3 both, MMPDE trench 0.025 outer wall 8.9944e-5 both: the extra
+constraint does not vanish.
+
+So on a circular wall whose vertices lie on the circle (every mesh here, and any mesh a
+slip-restoring mover leaves) H6-fix-1 is `X/|X|`, node for node: the "`X/|X|` = circumcircle"
+column above is both, and the circumcircle normal does **not** converge at second order
+everywhere: it is first order after the MMPDE move, exactly as `X/|X|`. The two differ only
+on a wall whose vertices are off the circle (a non-circular wall, or a released one).
+
+Why no single normal does both: the rotation is an exact null mode only if n is radial at
+every wall node (n . (-y, x) = 0 there); #1168's extra constraint vanishes only if n is
+parallel to the measure-weighted facet normal W_i at every node (r_i = W_i . t = 0). On unequal
+chords W_i is not radial at the vertices (its angle is 0.25° at graded 0.05), so one normal
+cannot satisfy both. A fix has to separate the two roles: constrain along W_i (no extra
+constraint), and treat the rotation by gauging the constrained operator's actual near-null
+mode rather than the declared rotation with its normal rows zeroed (not measured).
+
+### `normal=` does not accept a field
+
+A P2 vector MeshVariable passed as `normal=V.sym` fails inside the lambdify step with
+`SyntaxError: invalid syntax. Perhaps you forgot a comma?` (`<lambdifygenerated-1>`), before
+any solve: a field normal is not supported, and the error says nothing about why. (The #1277
+gap list assumed such a normal is accepted but not seen as varying.) Measuring the
+circumcircle normal through `normal=` therefore needs an expression; on these meshes it is
+`X/|X|` to round-off, so the `X/|X|` solves are its solves.
+
+Not run (round 2): np 2; a mesh whose wall vertices are off the circle, where the circumcircle
+normal would differ from `X/|X|`; the separated fix.

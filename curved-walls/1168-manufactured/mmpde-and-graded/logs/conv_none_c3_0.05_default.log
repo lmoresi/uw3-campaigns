@@ -1,0 +1,6 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+declare rotation True detorque False forcing torque T +5.335e-09 slide none kind c3 cell 0.05 cells 2306 pressure nullspace True omega_e +6.5219e-13
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+[rotated_bc] WARNING: nonlinear rotated free-slip did NOT converge in 3 iterations (rel |F̂| = 8.05e-09 of the reference residual); the fields hold the last (unconverged) iterate.
+[rotated, default normal] rotated solve: converged False, lu True, rnorm 4.610e-08 (rnorm0 5.729e+00), last ksp_reason 4, ksp_its [1, 1, 1], vel_its_last [None, None, None]
+rotated, default normal -6 3.001e-03 8.735e-03 +6.350e-03 -3.052e-03

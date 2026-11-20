@@ -23,7 +23,7 @@ import underworld3 as uw
 import manufactured_annulus as ma
 from underworld3.meshing.smoothing.graph import _pinned_mask
 
-params = uw.Params(uw_cell_size=0.05, uw_kind="s2", uw_pressure_nullspace=True, uw_only="", uw_metric="trench", uw_n_outer=20, uw_detorque=False)
+params = uw.Params(uw_cell_size=0.05, uw_kind="s2", uw_pressure_nullspace=True, uw_only="", uw_metric="trench", uw_n_outer=20, uw_detorque=False, uw_lu_default=False)
 CELL = float(params.uw_cell_size)
 KIND = str(params.uw_kind)
 NULLSPACE = bool(params.uw_pressure_nullspace)
@@ -31,6 +31,7 @@ ONLY = str(params.uw_only)
 METRIC = str(params.uw_metric)
 N_OUTER = int(params.uw_n_outer)
 DETORQUE = bool(params.uw_detorque)
+LU_DEFAULT = bool(params.uw_lu_default)
 
 mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=CELL, qdegree=4)
 _xs, _ys = mesh.X
@@ -127,10 +128,22 @@ def solve(method):
             stokes.add_essential_bc(u_e, wall)
         elif method == "rotated, default normal":
             stokes.add_rotated_freeslip_bc(0, wall)
+            # direct MUMPS LU per increment (one pressure pin instead of the null
+            # space); with the default normal the summed continuity row is already
+            # implied by the wall constraint, so dropping one row changes nothing
+            stokes._rotated_use_lu = LU_DEFAULT
         elif method == "rotated, normal=X/|X|":
             stokes.add_rotated_freeslip_bc(0, wall, normal=radial)
     stokes.solve(zero_init_guess=True)
+    info = getattr(stokes, "_rotated_freeslip_info", None) or {}
     reason = stokes.snes.getConvergedReason()
+    if info:
+        uw.pprint(f"  [{method}] rotated solve: converged {info.get('converged')}, "
+                  f"lu {bool(getattr(stokes, '_rotated_use_lu', False))}, "
+                  f"rnorm {info.get('rnorm', float('nan')):.3e} (rnorm0 "
+                  f"{info.get('rnorm0', float('nan')):.3e}), last ksp_reason "
+                  f"{info.get('ksp_reason')}, ksp_its {info.get('ksp_its')}, "
+                  f"vel_its_last {info.get('vel_its_last')}")
     mean_p = uw.maths.Integral(mesh, p.sym[0]).evaluate() / area
     omega_h = uw.maths.Integral(mesh, v.sym.dot(rot)).evaluate() / I_rr
     du = (v.sym - omega_h * rot) - ue_mod
