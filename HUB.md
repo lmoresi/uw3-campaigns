@@ -4596,3 +4596,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   fault. The damage zone in the melange-wedge is not really active and would heal if we had that switched on." K1:
   healing acts only above 1750 C (uw_heal_T_c) on 533 Myr, so the saturated cold wedge damage never heals; no new runs.
   Recorded in DECISIONS (zg95-annulus-for-kaiju). Open: whether to add healing of inactive cold damage (a new rule).
+- 2026-11-22: Louis: "Yes, add healing, let's see." K1 job 4944: Yh50 and Yh100 = Yg20 (Y5o set-up + Gaussian sigma
+  20 km + uw_yield_damage 0.5, slab_workbench 9c16389 = 073a1ee) with healing everywhere (-uw_heal_T_c 0,
+  -uw_heal_time_myr 50 / 100; the recipe's own healing options dropped), from Y4 step 200 after a 2-step check; no
+  driver change; compared with Yg20 at equal time. Hub note: with uniform healing the steady damage is source x heal
+  time, so fault-fed damage (source ~ slip rate / (sigma sqrt(2 pi))) stays far above strain_crit while inactive wedge
+  damage decays as exp(-t/tau); in effect activity-selective, as wanted. Near-surface damage is advection-limited
+  (rock in transit for a few Myr), so 50-100 Myr healing should barely touch it.
