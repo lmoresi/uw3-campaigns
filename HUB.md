@@ -4628,3 +4628,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   damage held at ~4-5 (renewed), slip within 1-2% of Yg20.
   Hub note: in Y5o the wedge mostly meets the yield criterion but slowly (median 3e-17 /s, ~30x below the mean), so
   "pervasive" is fully true for Yg20, weaker for Y5o.
+- 2026-11-23: Louis (via K1): "Is the zone still important when the fault generates its own damage as well as the
+  damage from the stress on the plate and yielding ?" and "The recipe should be descriptive so that we do not lose the
+  understanding. I am not thinking of a specific implementation." K1 job 4947: Yz20, Yz40 = Yg20/Yg40 with
+  -uw_yield_zone_km 0 (only damaged rock yields; damage from the Gaussian slip source and from yielding), 9c16389 =
+  073a1ee, from Y4 step 200 after a 2-step check; compared with Yg20/Yg40, Y5o, Ys10s. Descriptive recipe document to
+  follow the zone answer. Hub asked K1: restart strain (Y4's carried or reset: decides the seed); whether
+  yield_damage gates yielding on existing damage (if so plate-stress failure cannot start in fresh rock, so Yz tests a
+  narrower question); suggested arm Yw20 = Y4's yield-everywhere law + Gaussian sigma 20, to separate the zone from
+  the fault's damage (Y4 / Yw20 / Yg20 / Yz20).
