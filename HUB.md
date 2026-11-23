@@ -4643,3 +4643,6 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (job 4948) before Louis's go: Y4's yield law everywhere (-uw_yield_zone_side none) + Gaussian sigma 20, fault as
   Yg20, same restart, 9c16389 = 073a1ee. Report set Y4 / Yw20 / Yg20 / Yz20 (+Yz40), Y5o. Hub: Y4 vs Yw20 also
   differs by the strain reset; asked K1 whether a Y4-law reset run exists, else a Y4r control is for Louis to approve.
+- 2026-11-23: K1: no Y4-law reset run exists; Y4 itself ran on from its step 139 with no strain reset and with the
+  melange fit, so Y4 vs Yw20 differs in three ways (reset, fault fit/top, Gaussian). A matching control Y4r = Y4's law,
+  -uw_reset_strain 1, no slip damage, Yw20's fault (ocrust fit, tangent top, jump limit 1). Put to Louis; K1 waits.
