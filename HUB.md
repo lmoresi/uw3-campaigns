@@ -4646,3 +4646,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - 2026-11-23: K1: no Y4-law reset run exists; Y4 itself ran on from its step 139 with no strain reset and with the
   melange fit, so Y4 vs Yw20 differs in three ways (reset, fault fit/top, Gaussian). A matching control Y4r = Y4's law,
   -uw_reset_strain 1, no slip damage, Yw20's fault (ocrust fit, tangent top, jump limit 1). Put to Louis; K1 waits.
+- 2026-11-23: K1 (notice), zone test renders at 290 Myr: Yw20 (Y4 law everywhere + Gaussian sigma 20) looks like
+  Yg20 (yielding localised to the wedge, shallow fault, outer-rise patches); Y4 yields across the whole overriding
+  plate; Yz20/Yz40 (damage-gated, no zone) barely slip, slab necks below the trench by 265-290 Myr. Louis agreed the
+  reading (zone not needed when plate stress can start failure and the fault makes its own damage): "Agreed - let's
+  move on those": (1) Y4r control started, job 4951 (Y4 law, -uw_reset_strain 1, no slip damage, Yw20's fault,
+  9c16389 = 073a1ee, from Y4 step 200); (2) check Yw20's thin damaged layer along the incoming plate's top far seaward.
+  Recorded in DECISIONS as PROVISIONAL (renders only; pending Y4r and windowed slip with spreads). Asked K1 for the
+  numbers.
