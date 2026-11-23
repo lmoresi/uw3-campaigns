@@ -4637,3 +4637,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   yield_damage gates yielding on existing damage (if so plate-stress failure cannot start in fresh rock, so Yz tests a
   narrower question); suggested arm Yw20 = Y4's yield-everywhere law + Gaussian sigma 20, to separate the zone from
   the fault's damage (Y4 / Yw20 / Yg20 / Yz20).
+- 2026-11-23: K1: Yz runs reset strain (-uw_reset_strain 1), so the only seed is the fault's Gaussian; with no zone
+  the rule is a gate, Z = min(gamma/0.5, 1), yield stress = zone_tau0 + (1 - Z) 1e4 tau0, so undamaged rock cannot
+  yield and only nearly fully damaged rock does: Yz tests "the fault's damage plus its own spreading". Yw20 started
+  (job 4948) before Louis's go: Y4's yield law everywhere (-uw_yield_zone_side none) + Gaussian sigma 20, fault as
+  Yg20, same restart, 9c16389 = 073a1ee. Report set Y4 / Yw20 / Yg20 / Yz20 (+Yz40), Y5o. Hub: Y4 vs Yw20 also
+  differs by the strain reset; asked K1 whether a Y4-law reset run exists, else a Y4r control is for Louis to approve.
