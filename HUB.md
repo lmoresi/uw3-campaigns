@@ -4603,3 +4603,12 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   time, so fault-fed damage (source ~ slip rate / (sigma sqrt(2 pi))) stays far above strain_crit while inactive wedge
   damage decays as exp(-t/tau); in effect activity-selective, as wanted. Near-surface damage is advection-limited
   (rock in transit for a few Myr), so 50-100 Myr healing should barely touch it.
+- 2026-11-23: Louis: the lack of active yielding in the wedge "(something I took away from discussions, looking at the
+  lack of deformation of the green materials in the models after their initial few steps, and based on the contours
+  of failure) were all mostly misunderstandings of the plotting choices. K1 confirmed pervasive active yielding in the
+  cold part of the wedge." Correction appended to the 22 Nov DECISIONS entry (zg95-annulus-for-kaiju). Consequences:
+  the healing-everywhere runs (Yh50/Yh100) no longer test "heal the inactive wedge"; with active yielding the wedge
+  damage is renewed and should stay saturated, so Yh is expected to track Yg20 there. The hub repeated the
+  "inactive wedge" premise in its 22 Nov healing advice. Asked K1: which plotting choices misled (markers, contours,
+  colour scales), fix the render defaults and annotate the affected pages; quantify wedge yielding; check whether any
+  recorded finding (e.g. "the melange does not subduct", melange-reset motivation) rested on those plots.
