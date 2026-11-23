@@ -4612,3 +4612,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   "inactive wedge" premise in its 22 Nov healing advice. Asked K1: which plotting choices misled (markers, contours,
   colour scales), fix the render defaults and annotate the affected pages; quantify wedge yielding; check whether any
   recorded finding (e.g. "the melange does not subduct", melange-reset motivation) rested on those plots.
+- 2026-11-23: K1 on the wedge-yielding items. (1) What misled, display only (fields right): the yielding outline is a
+  base-mesh yield_ratio = eta_eff/eta_T contour at 0.5; the wedge yields from the fault to the surface, so no line
+  crosses its interior (the visible line was its lower edge); melange markers drawn over both panels hid the wedge;
+  damage scale saturated at 1 (wedge 5-10 looked like a fault zone at 0.6); passive markers barely change shape under
+  slow distributed yielding (~1e-15 /s, ~3%/Myr). Base vs solver mesh not the issue. (2) Render defaults fixed in
+  launch/prep/run_yield_maps.py: yielding region hatched + outlined, no markers on the damage panel, damage on a log
+  scale 0.1-10 with the full-weakening line, a third panel with plastic strain rate (fixed scale). Ladder-page notes on
+  #zones-renders, #failure-frame, #bounded-renders wait for K1's artifact tool. (3) Cold wedge (hanging wall, < 60 km
+  deep, within 100 km of the fault, T < 0.5) at 300 Myr: Y5o 74% yielding (ratio < 1), 57% below 0.5, plastic strain
+  rate median 3.1e-17 /s, mean 8.3e-16; Yg20 100% yielding, 99% below 0.5, median 5.2e-16, mean 1.2e-15. (4) Checked:
+  "the melange does not subduct" came from melange_speed.py velocities and positions, stands (the wedge yields in
+  place); fu35 fine; the 17 Nov failure shares came from the yield_ratio field, stand (with base-mesh 17 km smearing);
+  Louis's 22 Nov "wedge not really active" was the only plot-based reading, corrected. Yh50/Yh100 at 295 Myr: wedge
+  damage held at ~4-5 (renewed), slip within 1-2% of Yg20.
+  Hub note: in Y5o the wedge mostly meets the yield criterion but slowly (median 3e-17 /s, ~30x below the mean), so
+  "pervasive" is fully true for Yg20, weaker for Y5o.
