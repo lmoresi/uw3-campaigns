@@ -792,3 +792,13 @@ Measured here, not inherited.
   History DOIs in #89, which also corrects the August notes' 1.0.0 entries from .v1 (the
   2026-08-09 first cut) to .v2. JOSS note: no Figshare record, site only. **2027:** allocation not
   yet known; a scheduled check-in on 2026-12-15 (trig_013QcGYpAHga5J4mkeDUdsUN) asks Louis.
+- 2026-11-23: **Contributed note: Stuart Clark (UNSW), "From prompts to mantle flow"** (GPT-6 building a UW3
+  annulus convection model; github.com/StuartRClark/Underworld3_withChatGPT, run on v3.2.0). Louis: a contribution
+  to underworldcode.org, published by us with editorial feedback (Claude Docs doc
+  https://claude.ai/artifact/EN94x5jXA6mZDRte4iMgy6; last section is team-only). We comment, we do not change the
+  GPT's notebook; prompt changes are Stuart's call. Findings: Navier-Stokes used for creeping flow (from the prompt;
+  NavierStokes docstring has no "use Stokes for creeping flow" line, same on development); sector-junction velocity
+  singularity (32.6 cm/yr peak); SVD coarse solve copied from our v3.2.0 tutorials (45 files; 1 README left on
+  development); `__version__` 0.0.0 on the v3.2.0 checkout (dev-hub item). Licence: site text is CC BY 4.0, repo is
+  GPL-3, needs Stuart's agreement. Type: commentary by default. Louis has asked Stuart to rerun on development; a
+  dedicated session if it becomes a real iteration with him.
