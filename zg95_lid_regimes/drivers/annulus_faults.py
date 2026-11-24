@@ -229,6 +229,8 @@ params = uw.Params(
     uw_asth_top=0.3,
     uw_asth_bottom=0.7,
     uw_asth_ramp=0.05,
+    uw_asth_T=0.0,              # >0: the channel only in rock hotter than this (model temperature; a 0.02-wide tanh),
+                                # so a cold slab keeps its viscosity. 0: by depth alone, as before
     # the first fault, when starting from an annulus run
     uw_theta_trench=0.0,
     uw_dip=45.0,
@@ -1814,6 +1816,8 @@ class FaultedMesh:
                                          window=marker_rheo_window(mesh))
         asth = ((params.uw_asth, params.uw_asth_top, params.uw_asth_bottom, params.uw_asth_ramp)
                 if params.uw_asth < 1 else None)
+        if asth is not None and float(params.uw_asth_T) > 0:   # only in hot rock: the slab keeps its viscosity
+            asth = asth + ((1 + sympy.tanh((self.T.sym[0] - float(params.uw_asth_T)) / 0.02)) / 2,)
         self.eta_T = set_viscoplastic(s, self.T.sym[0], deta, tau0, tau1, params.uw_yield_softness,
                                       r_o, weak, yield_factor, asthenosphere=asth,
                                       lower_mantle=((params.uw_lm_eta, params.uw_lm_depth, params.uw_lm_ramp)
@@ -2970,7 +2974,8 @@ _ra, _tau0, _tau1, _H = ((derived["Ra_solver"], derived["tau0"], derived["tau1"]
                          else (params.uw_ra, params.uw_tau0, params.uw_tau1, params.uw_heating))
 uw.pprint(f"annulus r_o {r_o:.4f} r_i {r_i:.4f}, Ra {_ra:.4g}, tau1/Ra "
           f"{_tau1 / _ra:.3g}, tau0 {_tau0:.4g}, H {_H:.4g}, "
-          f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}; "
+          f"asthenosphere {params.uw_asth:g} in {params.uw_asth_top:g}-{params.uw_asth_bottom:g}"
+          + (f" above T {float(params.uw_asth_T):g}" if float(params.uw_asth_T) > 0 else "") + "; "
           f"{len(faults)} fault(s); "
           + (f"ridge x{params.uw_ridge_weak:g} at {', '.join(f'{np.degrees(a):.1f}' for a in ridges)} deg "
              f"(width {params.uw_ridge_width:g}, to {params.uw_ridge_depth:g}); " if ridges else "")
