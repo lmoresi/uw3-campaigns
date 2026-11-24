@@ -4664,3 +4664,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (launch/kaiju_tools/baseline/prepare.sh EARTH; launch/slab_kaiju/common.sh), so the Earth-recipe campaign,
   possibly earth_recipe_movie (job 4417, ANUMAS figures/movie), and the 26 Oct slab controls likely share it. Asked K1
   to port the option to annulus_faults.py in the resend and list which recorded runs had uw_asth < 1.
+- 2026-11-24: K1: resend of the asthenosphere fix as 2 commits in 6 base64 pieces: 4a641a1 (slab_workbench +
+  annulus_model + earth_units, 5657 B, sha 547899...), c137344 (annulus_faults uw_asth_T, model temperature, default 0
+  unchanged, 0.02-wide tanh; 3105 B, sha ef547daf...); blobs slab_workbench.py 2d57a0a, earth_units.py feaf8a4,
+  annulus_model.py d6f76ae, annulus_faults.py c547b69. Y4r is job 4950 (n2, step 317), not 4951; wb_asth Rfix/Rold
+  is job 4951 (n3), both converging at step 0; Rfix's first dt 3.4x shorter, "the channel is now at 80-300 km" (hub
+  asked whether the depth also changed: a second change needing its own control).
+  Runs with uw_asth < 1 (560 run dirs scanned, none with a T switch except Rfix): every workbench run (wb_yield 60
+  dirs incl. Y1..Yz40, Y4r; wb_ladder, wb_mmpde, wb_plane_tests, wb_weak_plane, wb_fault_network, wb_focus_run,
+  wb_mg_levels, wb_ranks, wb_repeat, wb_same_bits, wb_earth_units, late wb_cut/top/floor/fnet) at 348-670 km; the
+  Earth recipe on annulus_faults, 103 dirs at 0.12-0.231, incl. earth_recipe_movie (ANUMAS and UWTN 2026-022
+  figures), earth_young80(_arr), earth_top/thin/spline/sb/lag3/iso/ref_dmg, crust_earth_* (27), earthW_*,
+  bench_cap*, slab_earth_run2*, h2_small_ref4*, h2_graded_kaiju/g2000_np26, sock2e_*_earth2c, wsw_earth_*,
+  arr_tol_test; 0.18-0.231: bench_asth18_cap15/20, crust_earth_a18c15/c20; campaigns/zg95: slab_earth_run1,
+  slab_earth_smoke3/4; slab_control_layered_mantle (26 Oct) at 0.3-0.7 (870-2030 km). No channel: crust_TAf_*,
+  bench_noasth_*, TA/TB thermal runs, dev-restart-runs.
