@@ -4654,3 +4654,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   9c16389 = 073a1ee, from Y4 step 200); (2) check Yw20's thin damaged layer along the incoming plate's top far seaward.
   Recorded in DECISIONS as PROVISIONAL (renders only; pending Y4r and windowed slip with spreads). Asked K1 for the
   numbers.
+- 2026-11-24: Louis: "I did not realise that the asthenosphere weakens the slab. That is probably the biggest problem
+  in the current setup." "I don't think I can trust any of the existing work until we make this important bug fix."
+  The channel (uw_asth 0.1 at 348-670 km, ARGS_earth) multiplied viscosity by depth alone, cold slab included. K1 fix
+  4a641a1 on 9c16389: -uw_asth_T_c weights the channel by a 50 C tanh switch on T (only hot rock weakened);
+  annulus_model.asthenosphere_factor gains hot=1. Base64 mbox did NOT verify (decoded 5679 bytes, sha 41e14409...,
+  expected 5657 / 547899...; tail duplicated): not applied, resend requested in per-file pieces. Hub scan: the same
+  depth-only channel is in annulus_faults.py (~line 1815) and the Earth recipe passes -uw_asth 0.1 0.12-0.231
+  (launch/kaiju_tools/baseline/prepare.sh EARTH; launch/slab_kaiju/common.sh), so the Earth-recipe campaign,
+  possibly earth_recipe_movie (job 4417, ANUMAS figures/movie), and the 26 Oct slab controls likely share it. Asked K1
+  to port the option to annulus_faults.py in the resend and list which recorded runs had uw_asth < 1.
