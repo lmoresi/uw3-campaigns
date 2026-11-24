@@ -4693,3 +4693,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   justifiable numbers"; no depth ruled, published-numbers table to come); Rold = 348 / 669.9 / 58 km, asth_T_c 0.
   Control Rsw (job 4952) = Rold's depth + asth_T_c 1175, 400 steps: Rsw vs Rold isolates the switch, Rfix vs Rsw the
   depth. The 3.4x dt difference is unattributed until Rsw reports.
+- 2026-11-24: K1 checked 0eb969c (zg95-annulus-for-kaiju): fine to run (hunks match c137344, log line correct,
+  hot=1 from c6923ba, tuple unpacked by set_viscoplastic, compiles). Aside: the hub's own commits (hand ports, HUB,
+  DECISIONS) carry the container's git identity, Claude <noreply@anthropic.com>; K1's mbox commits carry Louis as
+  author. Not rewritten (pushed history on shared branches); Louis to say if future hub commits should differ.
