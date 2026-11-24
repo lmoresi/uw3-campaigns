@@ -4679,3 +4679,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   arr_tol_test; 0.18-0.231: bench_asth18_cap15/20, crust_earth_a18c15/c20; campaigns/zg95: slab_earth_run1,
   slab_earth_smoke3/4; slab_control_layered_mantle (26 Oct) at 0.3-0.7 (870-2030 km). No channel: crust_TAf_*,
   bench_noasth_*, TA/TB thermal runs, dev-restart-runs.
+- 2026-11-24: Asthenosphere fix pushed. Pieces: a1_00-02 and both a2 pieces verified as sent; a1_03 arrived with
+  transit damage (one CHOICE_KNOBS context line lost '"uw_yield_zone_km", ' and three context lines lost their
+  leading space); restored against the source, then a1_03 sha f04114f9..., commit-1 mbox 5657 B sha 547899...,
+  commit-2 3105 B sha ef547daf..., total 8762 B sha 6c922a53... all matched. kaiju/slab-workbench: 4a641a1 -> 7e4089c,
+  c137344 -> 2665a70 (on 073a1ee; blobs slab_workbench.py 2d57a0a, earth_units.py feaf8a4, annulus_model.py d6f76ae
+  verified; annulus_faults.py 7acc9a1 here vs K1's c547b69 because this branch carries the stub port 8d0cea9).
+  zg95-annulus-for-kaiju (canonical): annulus_model.py hunk as c6923ba (subject line reads slab_workbench; the
+  commit holds only annulus_model.py) and a hand port of uw_asth_T to its older annulus_faults.py as 0eb969c. Other
+  live branches not ported: the option is opt-in (default unchanged), so they only need it if they are run again.
+  wb_asth: Rfix = top 80 / bottom 300 / ramp 20 km, asth_T_c 1175 (K1's dial pick, not a ruling: Louis 24 Nov "Our
+  asthenosphere is very deep compared to most models. We should set everything like that up based on published /
+  justifiable numbers"; no depth ruled, published-numbers table to come); Rold = 348 / 669.9 / 58 km, asth_T_c 0.
+  Control Rsw (job 4952) = Rold's depth + asth_T_c 1175, 400 steps: Rsw vs Rold isolates the switch, Rfix vs Rsw the
+  depth. The 3.4x dt difference is unattributed until Rsw reports.
