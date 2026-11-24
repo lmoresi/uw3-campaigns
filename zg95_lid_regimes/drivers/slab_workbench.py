@@ -258,6 +258,11 @@ params = uw.Params(
     uw_asth_top_km=348.0,
     uw_asth_bottom_km=670.0,
     uw_asth_ramp_km=58.0,
+    uw_asth_T_c=0.0,            # > 0 (Louis, 2026-11-24: "I did not realise that the asthenosphere weakens the slab. That is
+                                #   probably the biggest problem in the current setup"): the channel applies only above this
+                                #   temperature (a tanh switch 50 C wide), so a slab passing through it keeps its viscosity;
+                                #   the lithosphere-asthenosphere boundary is near 1175 +- 50 C (Richards et al. 2018).
+                                #   0: by depth alone, cold rock included (every run to 2026-11-24)
     # the trench (its angle in the model's frame, radians) and the dip (degrees) of the slab state
     uw_theta_trench=0.0,
     uw_dip=45.0,
@@ -1281,6 +1286,8 @@ class FaultedMesh:
                                          window=marker_rheo_window(mesh))
         asth = ((params.uw_asth, model.asth_top, model.asth_bottom, model.asth_ramp)
                 if params.uw_asth < 1 else None)
+        if asth is not None and float(model.asth_T) > 0:   # only in hot rock (uw_asth_T_c): the slab keeps its viscosity
+            asth = asth + ((1 + sympy.tanh((self.T.sym[0] - float(model.asth_T)) / 0.02)) / 2,)
         y0, y1 = tau0, tau1
         if YIELD_ZONE:
             # in the zone the zone's yield law; elsewhere a yield stress no stress here reaches (10^4 x the surface's
@@ -2426,7 +2433,7 @@ CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
-                "uw_slip_damage_sigma_km", "uw_zone_tau0_mpa",
+                "uw_slip_damage_sigma_km", "uw_asth_T_c", "uw_zone_tau0_mpa",
                 "uw_zone_tau1_mpa_km", "uw_reset_strain", "uw_reset_melange",
                 "uw_fault_precedence", "uw_fault_seams", "uw_split_inset", "uw_split_inset_along", "uw_eta_w",
                 "uw_resample_restored", "uw_wall_normal", "uw_wall_check", "uw_crust_ppc", "uw_ocrust_depth_km",

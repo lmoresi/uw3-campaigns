@@ -151,14 +151,16 @@ def radius_of(mesh):
     return sympy.sqrt(x ** 2 + y ** 2)
 
 
-def asthenosphere_factor(depth, factor, top, bottom, ramp):
+def asthenosphere_factor(depth, factor, top, bottom, ramp, hot=1):
     """A viscosity factor below 1 in a channel between the depths ``top`` and
     ``bottom`` (layer depths), with tanh ramps of width ``ramp`` at both edges; 1
-    elsewhere. ``factor`` 1 is no channel."""
+    elsewhere. ``factor`` 1 is no channel. ``hot`` (1 by default) weights the channel
+    further, e.g. by temperature so that cold rock (a slab) passing through it keeps its
+    viscosity."""
     if factor >= 1:
         return 1
     window = (1 + sympy.tanh((depth - top) / ramp)) * (1 - sympy.tanh((depth - bottom) / ramp)) / 4
-    return 1 - (1 - factor) * window
+    return 1 - (1 - factor) * window * hot
 
 
 def ridge_factor(mesh, r_o, thetas, half_width, depth_cut, factor, ramp=0.02):

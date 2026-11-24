@@ -30,6 +30,7 @@ YEAR_S = 365.25 * 86400.0
 SCALED = [
     ("uw_T_potential_c", "T_interior", "c"),
     ("uw_heal_T_c", "heal_T", "c"),
+    ("uw_asth_T_c", "asth_T", "c"),
     ("uw_age_sub_myr", "age_sub", "myr"),
     ("uw_age_over_myr", "age_over", "myr"),
     ("uw_age_thin_myr", "age_thin", "myr"),
