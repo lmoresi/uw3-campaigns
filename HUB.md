@@ -4742,3 +4742,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   step 6 (66 Myr): plates near the IC; 1175 C at 60-110 km (3.5-6.5 cells) in both; 0.9 Ti at 110-200 km (6-12
   cells); mean q 43 vs 40, incoming plate 53 vs 49 mW/m2; recheck ~150 Myr. Un viscosity 200-550 km 1.0-1.3e21, 670+
   km 3.0e22. Hub asked K1 whether Rsw's memory rose steadily (a leak would also stop 400-step Un/Un24).
+- 2026-11-24: K1: Rsw's OOM is a steady leak, ~5 MB/rank/step (no RSS in records; measured live with srun --overlap
+  ps): Un24 step ~1 0.75 GB/rank, Un step ~75 1.1, Rold step ~272 2.0 (51 GB), Rfix step ~270 2.3 (59 GB); predicts
+  Rsw's OOM near step 330 (died 328) against the 60 GB srun step limit. Rfix will OOM within ~20-30 steps (left to
+  end, past Rsw's range); Rold reaches ~260 Myr; Un/Un24 would OOM near step 300-330, but restart from checkpoints for
+  the 24 h limit anyway (restarts at 80 GB/run). JIT modules served from cache. Suspect: per-step faulted-mesh/solver
+  rebuild keeping old objects, as in #948 (coarse_log_hook); own wrappers checked first; a library reproduction
+  waits for Louis's priority call. Hub: checkpoint restarts (every ~250 steps) contain it meanwhile.
