@@ -802,3 +802,13 @@ Measured here, not inherited.
   development); `__version__` 0.0.0 on the v3.2.0 checkout (dev-hub item). Licence: site text is CC BY 4.0, repo is
   GPL-3, needs Stuart's agreement. Type: commentary by default. Louis has asked Stuart to rerun on development; a
   dedicated session if it becomes a real iteration with him.
+- 2026-11-24: **UWTN 2026-022 (faults on an add-on mesh) handed to the wombat session "Faults article
+  release"** (Louis). Hub work on `note/faults-on-an-add-on-mesh`, pushed at 27e6f35: main merged
+  (classification.yml: keep both entries); simple-shear box defined once, CeTZ sketch, table column = mean of
+  the 17 velocity solves (the old numbers divided by 22), solve times from the sweep records; steps 2-141 cost
+  figure replaces the 800-step one (the held-fault stretches were a fitting-code bug, fixed; Louis removed that
+  text locally, not yet pushed); AuScope and NCI acknowledgements; drafting history moved to figures/src (it
+  failed two tests at article level). Open for release: software_version (25d62812 matches no run), dates and
+  status, PR and deposit on Louis's word. Build bug found and fixed on the way: #91 (PDF build put the web
+  banner and comments block back into notes with a movie; the deposited MMPDE 1.1.0 and 1.2.0 PDFs carry
+  both; 1.3.0 in #90 will be clean). Open to Louis: AuScope sentence on the other method notes.
