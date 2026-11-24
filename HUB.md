@@ -4731,3 +4731,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (job 4950) finished, numbers to follow. Hub notes: Uc differs from Rsw in three settings (eta_ref, lm_eta,
   eta_reg), not one; Uc vs Un is the one-change pair. At Ra 4.7e8 the top boundary layer is ~35-40 km against ~17 km
   base cells near the surface (2 cells): asked K1 to report cells across the boundary layer and the time step.
+- 2026-11-24: K1 wb_um update. Cost: mesh as Rsw (120,204 fine cells, 17 km surface cells, same MG levels); Un's
+  first steps 19-24 Newton vs Rsw 5-14 (line-search cutbacks), ~2x time per iteration, pressure its 8-10 vs 6-8, Uc
+  27 with spikes to 148; likely the cap/floor contrast grown 4e3 -> 8e4; dt ~10x shorter (physics); by step 70 Un at 7
+  Newton, 2.4 min/step. JIT compiles once per step, not per Newton iteration (~15 s/step outside the solve). Uc
+  cancelled (Louis's go); Un continues (4955.3). Louis: "Let's try the corner-cutting with different parameters":
+  Un24 = Un with -uw_eta_max_pas 1e24 (Agrusta 2017; Holt & Becker 2017 use 1.4e23 for plates), job 4957
+  (workbench_um24.sh, n2), from step 0; Un24 vs Un is the cap alone. Rsw (4952) died OOM at step 328 (362 Myr), one
+  rank over the 60 GB step allowance; enough for Rsw vs Rold at equal time. Resolution at Un step 70 (65 Myr) vs Rsw
+  step 6 (66 Myr): plates near the IC; 1175 C at 60-110 km (3.5-6.5 cells) in both; 0.9 Ti at 110-200 km (6-12
+  cells); mean q 43 vs 40, incoming plate 53 vs 49 mW/m2; recheck ~150 Myr. Un viscosity 200-550 km 1.0-1.3e21, 670+
+  km 3.0e22. Hub asked K1 whether Rsw's memory rose steadily (a leak would also stop 400-step Un/Un24).
