@@ -817,3 +817,9 @@ Measured here, not inherited.
   peak slip 0.15951, LU on the patch) cite that commit plus one sentence that the figures came from earlier
   builds recorded in figures/src; on a mismatch, stop and report. Instruction given to Louis to paste (the hub
   cannot message the wombat session).
+- 2026-11-24: release session (session_01HxWvn6feuTGm6LcdQTGTxB, wombat): simple-shear LU arms reproduce on
+  development a673cd52 exactly (66/17, 65/17, 67/17; peak slip to 1e-15); records in
+  figures/src/tail_sweep/records_dev_a673cd52/; software_version = a673cd52; branch at bafff9c (Louis's edits
+  merged, his wording kept on overlaps). Hub asked it to deal with the ILU(0) row: on a673cd52 the default
+  patch is LU (#912), so that row needs a rerun forced to ILU(0) or a clause naming 799ef021. Hub is off the
+  branch. Messages to that session go through send_message (the bridge returned 401).
