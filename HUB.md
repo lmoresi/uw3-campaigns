@@ -4719,3 +4719,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (velocity ~Ra^2/3), so lid/slab resolution must tighten ~3x: this is where MMPDE's ~4x concentration matters.
   Interior 1875 C (no adiabat?) makes a fixed 1175 C "LAB" a model-dependent marker; 0.9 Ti is the consistent one.
   Rsw at step 10 is too early to see the bug (slab not yet in the 348-670 km channel).
+- 2026-11-24: Louis: "your viscosity / Ra choices are fine and as expected". K1 job 4955 (workbench_um.sh, n4), driver
+  4a641a1 (= 7e4089c), from step 0, Rsw's recipe with -uw_eta_ref_pas 1e21 (was 1.97e22; floor 1.26e20, Ra 4.7e8),
+  -uw_lm_eta 30 (was 1), -uw_eta_reg_pas 1.26e21 (was 2.48e22; yielding floor stays 10x the unit). Uc = Rsw's channel
+  (x0.1 at 348-670 km, hot rock only); Un = no channel. 2-step smoke, then 400 steps each. Louis: internal heating
+  waits until the starting geotherm can be set near equilibrium; the young-slab drips he meant were whole-mantle runs
+  with no viscosity jump or phase boundary, before the slab weakening was found. Published table (research agent):
+  upper mantle 3-4e20 (Lambeck 1998, Mitrovica & Forte 2004); lower mantle x30 (Garel 2014, Coltice 2019); LAB 1175
+  +- 50 C (Richards, Hoggard, Cowton & White 2018); 660 km Clapeyron -1.3 to -2.5 MPa/K (Fei 2004, Ye 2014); 47 TW
+  (Davies & Davies 2010); mantle heating ~12 nW/m3; Agrusta 2017: young slabs penetrate the 660, old stagnate. Y4r
+  (job 4950) finished, numbers to follow. Hub notes: Uc differs from Rsw in three settings (eta_ref, lm_eta,
+  eta_reg), not one; Uc vs Un is the one-change pair. At Ra 4.7e8 the top boundary layer is ~35-40 km against ~17 km
+  base cells near the surface (2 cells): asked K1 to report cells across the boundary layer and the time step.
