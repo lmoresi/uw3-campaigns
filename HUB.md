@@ -4705,3 +4705,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   "The x30 lower mantle slows the whole circulation ~7x", and Louis ruled the same day "weaken the upper mantle
   (asthenosphere channel, lithosphere anchored) instead of stiffening the lower mantle". The ruling said
   "lithosphere anchored", so the depth-only channel that weakened the cold slab was never the intent. Sent to K1.
+- 2026-11-24: Louis (via K1): "we need to increase the overall heat flow and thin the lithosphere. If we pair that
+  with increasing the LM viscosity, then we may find the problem is tractable"; "Yes, let's keep pushing this".
+  K1 heatflow_lith.py (jobs 4953, 4954; q = k dT/dz over 0.5-8.5 km, k 3.138 W/m/K; incoming 80 Myr plate reads 85
+  Myr at step 0): Yg20 at 307 Myr mean q 33 mW/m2, old plates 28-33 (half-space ages 300-450 Myr), 1175 C isotherm
+  130-150 km, 0.9 Ti 250-275 km, incoming plate at the trench 56 mW/m2. earth_recipe_movie mean q 32/31/24 at
+  231/457/1103 Myr, 1175 C isotherm median 133/173/246 km: still cooling. Viscosity 1.5-6e22 Pa s at 200-400 km;
+  400-670 km channel at the floor 2.6e21; below 670 km 2e22 (no step); interior 1875 C. Rold (step 78) and Rsw (step
+  10) at ~120 Myr same heat flow 35-37. K1 reading: whole mantle at about lower-mantle viscosity, heat flow ~1/3 of
+  Earth's, plates thicken without limit. Proposed to Louis: upper mantle ~1e21 (~x27 Ra, ~3x heat flow), lower
+  floor, lower mantle ~2-3e22; published-numbers table in progress.
+  Hub notes: x27 Ra thins boundary layers ~3x (Ra^-1/3) and shortens the time step roughly an order of magnitude
+  (velocity ~Ra^2/3), so lid/slab resolution must tighten ~3x: this is where MMPDE's ~4x concentration matters.
+  Interior 1875 C (no adiabat?) makes a fixed 1175 C "LAB" a model-dependent marker; 0.9 Ti is the consistent one.
+  Rsw at step 10 is too early to see the bug (slab not yet in the 348-670 km channel).
