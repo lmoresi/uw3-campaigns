@@ -812,3 +812,8 @@ Measured here, not inherited.
   status, PR and deposit on Louis's word. Build bug found and fixed on the way: #91 (PDF build put the web
   banner and comments block back into notes with a movie; the deposited MMPDE 1.1.0 and 1.2.0 PDFs carry
   both; 1.3.0 in #90 will be clean). Open to Louis: AuScope sentence on the other method notes.
+- 2026-11-24: UWTN 2026-022 software_version: Louis approved the release session running the simple-shear
+  sweep (A_r80_H0_faclu, optionally 160/320) on current development; on a match (66 its / 17 applications,
+  peak slip 0.15951, LU on the patch) cite that commit plus one sentence that the figures came from earlier
+  builds recorded in figures/src; on a mismatch, stop and report. Instruction given to Louis to paste (the hub
+  cannot message the wombat session).
