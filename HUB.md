@@ -4697,3 +4697,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   hot=1 from c6923ba, tuple unpacked by set_viscoplastic, compiles). Aside: the hub's own commits (hand ports, HUB,
   DECISIONS) carry the container's git identity, Claude <noreply@anthropic.com>; K1's mbox commits carry Louis as
   author. Not rewritten (pushed history on shared branches); Louis to say if future hub commits should differ.
+- 2026-11-24: K1: no stiffer lower mantle since 29 Oct: only slab_earth_smoke/smoke2 had -uw_lm_eta 30; every later
+  run has lm_eta 1 (Earth recipe, ARGS_earth, earth_recipe_movie, every workbench run, Rfix/Rold/Rsw). Louis 24 Nov:
+  "It's odd, that is the driver for rollback, and the excuse for de-resolving the lower mantle. Anyway, that will
+  need to be next, after we resolve the asthenosphere." Order: asthenosphere fix first (Rsw vs Rold), then the
+  lower-mantle step from the published-numbers table. Hub found the reason in this log (29 Oct): earth_smoke/smoke2
+  "The x30 lower mantle slows the whole circulation ~7x", and Louis ruled the same day "weaken the upper mantle
+  (asthenosphere channel, lithosphere anchored) instead of stiffening the lower mantle". The ruling said
+  "lithosphere anchored", so the depth-only channel that weakened the cold slab was never the intent. Sent to K1.
