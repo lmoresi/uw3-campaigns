@@ -4764,3 +4764,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   everywhere, no zone/damage yielding/slip damage, from step 0, 400 steps: S0 (-uw_weak_min 1, no strain weakening),
   S0w (default weakening and healing). Also tests the leak (no fault, no per-step rebuild). DECISIONS: new entry; the
   workbench rulings (fault top, ocrust fit, damage, Gaussian, zone) marked SUSPENDED pending re-test.
+- 2026-11-25: Louis: "The asthenosphere should not be weakening the slab, so take care not to reintroduce that." K1
+  edf87b1 pushed as fca4ca3 on kaiju/slab-workbench (on 2665a70; 2 base64 pieces and the 2970 B mbox sha 48d96e14...
+  verified; blob a098467; compiles): -uw_asth < 1 without -uw_asth_T_c > 0 raises ValueError. ARGS_earth.txt still
+  carries -uw_asth 0.1 by depth. S0/S0w (job 4961) run on 4a641a1 with -uw_asth 1 (logs say "asthenosphere 1").
+  Hub asked K1 for the same guard in annulus_faults.py (to carry to zg95-annulus-for-kaiju) and to fix
+  ARGS_earth.txt / the recipe scripts (-uw_asth 1 as the safe default until Louis rules on a channel).
