@@ -284,6 +284,22 @@ params = uw.Params(
                                 #   above the cut"): the shear viscosity along the plane, as a factor of the
                                 #   viscoplastic viscosity there. It has no floor and no yield stress of its own;
                                 #   the host's yield stress there bounds the stress the plane leaves (see `felt`)
+    # the split only down the slab, a weak bridge to the surface (Louis, 2026-11-26: "the fault tends to flatten and become
+    # the surface. Could we try fitting it to the surface but following it as a fault only to the enforced cutoff
+    # (numerical) with a damage zone bridge to the surface but that it all"; his picks: the cut-off where the curve
+    # flattens, the bridge straight to the trench, x0.1 over ~20 km)
+    uw_split_min_dip_deg=0.0,   # > 0: the split stops where the fitted curve, followed up from its deep end, first dips
+                                #   less than this; the flat part above (in S2f/Un it ran along the overriding plate's top
+                                #   for 1000-2400 km) stays a tracked line only. 0: the split to uw_split_inset
+    uw_bridge="plane",          # what carries the fault from the split's top to the surface. "plane" (every run to
+                                #   2026-11-26): the TI weak plane along the fitted curve (uw_eta_w). "zone": an isotropic
+                                #   weak zone along the straight line from the split's top to the trench, the surface
+                                #   point of strongest convergence (the surface velocity's steepest decrease toward
+                                #   +theta within 0.25 rad of the split's top; the fitted curve's surface point before
+                                #   there is a flow), viscosity and yield stress times uw_bridge_weak; no weak plane
+    uw_bridge_weak=0.1,
+    uw_bridge_km=20.0,          #   the bridge's width: cells whose centre lies within half of it (at least 0.75 of a
+                                #   base cell, so the band has no gaps) of the line
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -562,6 +578,9 @@ if str(params.uw_fault_follow) not in ("melange", "ocrust"):
     raise ValueError(f"-uw_fault_follow must be melange or ocrust, not {params.uw_fault_follow!r}")
 if FOLLOW_OCRUST and not ocrust_on:
     raise ValueError("-uw_fault_follow ocrust needs the oceanic-crust line (uw_ocrust_depth_km > 0)")
+BRIDGE = str(params.uw_bridge)
+if BRIDGE not in ("plane", "zone"):
+    raise ValueError(f"-uw_bridge must be plane or zone, not {BRIDGE!r}")
 FAULT_TOP = str(params.uw_fault_top)
 if FAULT_TOP not in ("tangent", "plate", "bounded"):
     raise ValueError(f"-uw_fault_top must be tangent, plate or bounded, not {FAULT_TOP!r}")
@@ -722,13 +741,44 @@ def cut_of(spine):
     are cut as before."""
     r = np.hypot(spine[:, 0], spine[:, 1])
     if not params.uw_split_inset_along or r[0] <= r_o:
-        return spine[r <= r_o - trace_inset() * S]
+        return steep_part(spine[r <= r_o - trace_inset() * S])
     k = int(np.argmax(r < r_o))                     # the first point inside the wall (the spine starts above it)
     f = (r[k - 1] - r_o) / (r[k - 1] - r[k])        # the crossing on segment k-1 -> k
     cross = spine[k - 1] + f * (spine[k] - spine[k - 1])
     along = np.r_[np.zeros(k), np.linalg.norm(spine[k] - cross)
                   + np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(spine[k:], axis=0), axis=1))]]
-    return spine[(np.arange(len(spine)) >= k) & (along >= trace_inset() * S - 1e-12) & (r <= r_o - 0.5 * S)]
+    return steep_part(spine[(np.arange(len(spine)) >= k) & (along >= trace_inset() * S - 1e-12) & (r <= r_o - 0.5 * S)])
+
+
+def steep_part(cut):
+    """With uw_split_min_dip_deg > 0, the part of a cut (ordered from the surface down) below the shallowest segment,
+    counted up from the deep end, that dips less than that: the split stops where the fitted curve flattens (at least
+    four points are kept)."""
+    if float(params.uw_split_min_dip_deg) <= 0 or len(cut) < 5:
+        return cut
+    v = np.diff(cut, axis=0)
+    mid = 0.5 * (cut[1:] + cut[:-1])
+    er = mid / np.hypot(mid[:, 0], mid[:, 1])[:, None]
+    down = -np.sum(v * er, axis=1)
+    along = np.linalg.norm(v - (v * er).sum(axis=1)[:, None] * er, axis=1)
+    flat = np.flatnonzero(np.degrees(np.arctan2(down, along)) < float(params.uw_split_min_dip_deg))
+    k = int(flat[-1]) + 1 if len(flat) else 0
+    return cut[min(k, len(cut) - 4):]
+
+
+def trench_point(theta_hint, fallback):
+    """The trench: the surface angle within 0.25 rad of ``theta_hint`` where the tangential surface velocity falls
+    fastest toward +theta (the plates' strongest convergence), on 201 points just inside the wall, smoothed over 5;
+    ``fallback`` when there is no flow yet. Collective."""
+    th = theta_hint + np.linspace(-0.25, 0.25, 201)
+    pts = np.c_[(r_o - 0.01) * np.cos(th), (r_o - 0.01) * np.sin(th)]
+    v = np.asarray(uw.function.global_evaluate(V_b.sym, onto(pts))).reshape(-1, 2)
+    v_t = -v[:, 0] * np.sin(th) + v[:, 1] * np.cos(th)
+    if not np.all(np.isfinite(v_t)) or np.ptp(v_t) < 1.0e-6:
+        return fallback
+    g = np.gradient(np.convolve(v_t, np.ones(5) / 5, mode="same"), th)
+    g[:3] = g[-3:] = np.inf
+    return float(th[int(np.argmin(g))])
 
 
 def trace_inset():
@@ -1237,7 +1287,7 @@ class FaultedMesh:
         # the network's own footprint is keyed to the cut.
         self.plane = self.director = None
         plane_cells = 0
-        if self.faults:
+        if self.faults and BRIDGE == "plane":
             self.plane = uw.discretisation.MeshVariable(f"plane_{tag}", mesh, 1, degree=0, continuous=False)
             self.director = uw.discretisation.MeshVariable(f"director_{tag}", mesh, mesh.dim, degree=0,
                                                            continuous=False)
@@ -1253,6 +1303,28 @@ class FaultedMesh:
             self.plane.array[:, 0, 0] = on.astype(float)
             self.director.array[:, 0, :] = normals
             plane_cells = int(uw.utilities.gather_data(int(on.sum()), bcast=True).sum())
+        # the bridge (uw_bridge zone): from each split's top straight to the trench, an isotropic weak zone
+        self.bridge = None
+        bridge_cells, self.trench = 0, {}
+        if self.faults and BRIDGE == "zone":
+            self.bridge = uw.discretisation.MeshVariable(f"bridge_{tag}", mesh, 1, degree=0, continuous=False)
+            centroids = np.asarray(model_xy(self.bridge))
+            inb = np.zeros(len(centroids), dtype=bool)
+            for name, (spine, trace) in self.pieces.items():
+                top = trace[0]
+                th_t = trench_point(float(np.arctan2(top[1], top[0])), float(line_inside(spine)[1]))
+                self.trench[name] = th_t
+                seg = np.array([[r_o * np.cos(th_t), r_o * np.sin(th_t)], top])
+                dist, _ = segment_side(centroids, seg)
+                inb |= dist < max(0.5 * float(model.bridge), 0.75 * H_B)
+            self.bridge.array[:, 0, 0] = inb.astype(float)
+            bridge_cells = int(uw.utilities.gather_data(int(inb.sum()), bcast=True).sum())
+        bridge_note = ""
+        if self.bridge is not None:
+            km = MODEL_UNIT["km"]
+            bridge_note = (", bridge %d cells to the trench at %s deg, split from %s km" % (
+                bridge_cells, ", ".join("%.2f" % np.degrees(a) for a in self.trench.values()),
+                ", ".join("%.0f" % ((r_o - np.hypot(*tr[0])) * km) for sp, tr in self.pieces.values())))
         # the damage zone (uw_yield_zone_side): the cells within uw_yield_zone_km of the fault's line, on the overriding
         # side ("upper": the side of the trench's +theta for a dip below 90 degrees, as the slab state) or both
         self.yzone = None
@@ -1284,6 +1356,8 @@ class FaultedMesh:
         M = self.band_mask.sym[0] if self.band_mask is not None else 0
         if crust_on:
             weak = weak * crust_factor_on(mesh, self.crust.sym[0], mask=M)
+        if self.bridge is not None:              # viscosity and yield stress alike (as the melange's factor)
+            weak = weak * (1 - (1 - float(params.uw_bridge_weak)) * self.bridge.sym[0])
         yield_factor = params.uw_yield_boost * (1 - (1 - params.uw_weak_min) * sympy.Min(
             self.gamma.sym[0] / params.uw_strain_crit, 1))
         # A yield stress bounds the stress, and shear along the weak plane raises only uw_eta_w of the stress it
@@ -1380,6 +1454,8 @@ class FaultedMesh:
                             "band_cells_per_rank": band_per_rank,
                             "band_ranks": sum(1 for c in band_per_rank if c),
                             "weak_plane_cells": plane_cells, "yield_zone_cells": zone_cells,
+                            "bridge_cells": bridge_cells, "bridge_trench": dict(self.trench),
+                            "split_top_depth": {n: float(r_o - np.hypot(*tr[0])) for n, (sp, tr) in self.pieces.items()},
                             # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
                             # fault points and we can see if that is sufficient"): rungs, rung length, band width
                             "division": {name: division_record(spine, self.width)
@@ -1387,7 +1463,7 @@ class FaultedMesh:
         described = ", ".join(f"{f['name']} {np.degrees(f['theta']):.2f} deg / dip {f['dip']:.1f} / "
                               f"depth {f['depth']:.3f}" for f in self.faults) or "no fault"
         uw.pprint(f"faulted mesh {tag}: {described}; levels (cells) {level_cells}, weak plane above the cut "
-                  f"{plane_cells} cells" + (f", yield zone ({params.uw_yield_zone_side}) {zone_cells} cells" if YIELD_ZONE
+                  f"{plane_cells} cells" + bridge_note + (f", yield zone ({params.uw_yield_zone_side}) {zone_cells} cells" if YIELD_ZONE
                                             else "")
                   + (f" and rock with plastic strain >= {YIELD_DAMAGE:g}" if YIELD_DAMAGE > 0 else "")
                   + f", built in {self.t_build:.1f} s; band on "
@@ -2450,7 +2526,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_bridge", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
