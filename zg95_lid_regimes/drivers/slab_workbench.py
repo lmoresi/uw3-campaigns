@@ -291,7 +291,7 @@ params = uw.Params(
     uw_split_min_dip_deg=0.0,   # > 0: the split stops where the fitted curve, followed up from its deep end, first dips
                                 #   less than this; the flat part above (in S2f/Un it ran along the overriding plate's top
                                 #   for 1000-2400 km) stays a tracked line only. 0: the split to uw_split_inset
-    uw_bridge="plane",          # what carries the fault from the split's top to the surface. "plane" (every run to
+    uw_bridge_kind="plane",     # what carries the fault from the split's top to the surface. "plane" (every run to
                                 #   2026-11-26): the TI weak plane along the fitted curve (uw_eta_w). "zone": an isotropic
                                 #   weak zone along the straight line from the split's top to the trench, the surface
                                 #   point of strongest convergence (the surface velocity's steepest decrease toward
@@ -578,9 +578,9 @@ if str(params.uw_fault_follow) not in ("melange", "ocrust"):
     raise ValueError(f"-uw_fault_follow must be melange or ocrust, not {params.uw_fault_follow!r}")
 if FOLLOW_OCRUST and not ocrust_on:
     raise ValueError("-uw_fault_follow ocrust needs the oceanic-crust line (uw_ocrust_depth_km > 0)")
-BRIDGE = str(params.uw_bridge)
+BRIDGE = str(params.uw_bridge_kind)    # not "uw_bridge": with uw_bridge_km that reads as a retired model-unit name
 if BRIDGE not in ("plane", "zone"):
-    raise ValueError(f"-uw_bridge must be plane or zone, not {BRIDGE!r}")
+    raise ValueError(f"-uw_bridge_kind must be plane or zone, not {BRIDGE!r}")
 FAULT_TOP = str(params.uw_fault_top)
 if FAULT_TOP not in ("tangent", "plate", "bounded"):
     raise ValueError(f"-uw_fault_top must be tangent, plate or bounded, not {FAULT_TOP!r}")
@@ -1303,7 +1303,7 @@ class FaultedMesh:
             self.plane.array[:, 0, 0] = on.astype(float)
             self.director.array[:, 0, :] = normals
             plane_cells = int(uw.utilities.gather_data(int(on.sum()), bcast=True).sum())
-        # the bridge (uw_bridge zone): from each split's top straight to the trench, an isotropic weak zone
+        # the bridge (uw_bridge_kind zone): from each split's top straight to the trench, an isotropic weak zone
         self.bridge = None
         bridge_cells, self.trench = 0, {}
         if self.faults and BRIDGE == "zone":
@@ -2526,7 +2526,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_bridge", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
