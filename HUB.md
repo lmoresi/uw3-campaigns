@@ -4749,3 +4749,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   the 24 h limit anyway (restarts at 80 GB/run). JIT modules served from cache. Suspect: per-step faulted-mesh/solver
   rebuild keeping old objects, as in #948 (coarse_log_hook); own wrappers checked first; a library reproduction
   waits for Louis's priority call. Hub: checkpoint restarts (every ~250 steps) contain it meanwhile.
+- 2026-11-25: Louis: "The very flat fault is interesting ... we can try revisiting the various properties (do we even
+  need a melange layer) now that we have the slab behaving itself. The problem: the information / intuition we
+  currently have is ALL flawed, so we should go back to the simplest recipe, see how it works, see what needs to go
+  back in. We may need to stop modelling the fault as a fault when it gets that flat, and just track where it lies."
+  K1 results (strip kaiju movies/out/asth_um_strip.png, job 4958, records at equal time): Rold slab near the CMB as a
+  thin stream by 130 Myr, subducting plate 1.9 cm/yr; Rsw slab hangs at 300-400 km, plates 0.07-0.17 cm/yr until ~200
+  Myr; at 260 Myr both 2.1 cm/yr, rollback Rold 1380 km (dip 11) vs Rsw 270 km (dip 16); Rfix close to Rsw. Un/Un24:
+  plates ~4 cm/yr by 65 Myr, slab sinks steeply into the x30 lower mantle (kinks at 670, folds deeper); from ~55 Myr
+  (Un) / 30 Myr (Un24) the melange and ocrust markers ride the overriding plate's top and the fault fit follows at
+  ~2.3 cm/yr, 1800-2700 km from the slab by 130 Myr: fault-based numbers after that invalid. Every recipe run's
+  melange had -uw_crust_weak 0.999 (tracer only). Cancelled (Louis agreed): Un 4955, Un24 4957, resumes 4959/4960.
+  Started job 4961 (workbench_s0.sh, runs/wb_s0): Un24's weak mantle, no fault (-uw_detect_start 100000), Y4's law
+  everywhere, no zone/damage yielding/slip damage, from step 0, 400 steps: S0 (-uw_weak_min 1, no strain weakening),
+  S0w (default weakening and healing). Also tests the leak (no fault, no per-step rebuild). DECISIONS: new entry; the
+  workbench rulings (fault top, ocrust fit, damage, Gaussian, zone) marked SUSPENDED pending re-test.
