@@ -4808,3 +4808,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   zone or damage. 0.01 and the fault set-up are K1 dial picks, not rulings. Hub: S2f's fault set-up is the one that
   in Un/Un24 followed markers riding the overriding plate to 1800-2700 km off the slab; asked K1 to monitor
   fault-to-slab distance each detection and flag (or stop) if it exceeds a few cells.
+- 2026-11-25: K1 fault_on_slab.py (kaiju launch/prep, offline from checkpoints): finds the slab from T alone (coldest
+  node at 150 and 300 km); reports fault-to-slab gap beyond the slab half-width at 150/300 km (FLAG > 50 km) and the
+  fault's surface point vs the slab centre at 150 km (FLAG > 350 km). On Un: at depth the fault stays on the slab
+  throughout (gap -25 to -103 km); the runaway is entirely in the top: 252/277 km at 1/55 Myr, flagged at 68 Myr (478
+  km), 1854 km at 135 Myr. Run on S2f with each render; S2f read only to its first flag; not wired into the driver.
+  Hub note: the top measure starts near 250 km by geometry, so a flag on the change from its starting value (e.g.
+  +100 km) would catch drift earlier than the absolute 350 km.
