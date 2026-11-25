@@ -94,6 +94,8 @@ GitHub, or in session transcripts. If it dies:
 
 ## Standing rules (team)
 
+- **GitHub usage limits (Louis, 2026-11-25, after GitHub staff disabled access to underworldcode/underworld3 for a ToS violation; appeal sent).** Container images build on release tags or by hand only; superseded CI runs are cancelled (#1311). The hub no longer updates a PR branch whenever development touches the same file: an overlapping PR merges after one update at most, batched, and desks do not push trivial follow-ups that restart the 6-shard suite. Automated merging, labelling and commenting are self-limited (no bursts; one consolidated comment instead of several). Nov 20 for reference: 413 workflow runs (202 full test matrix, ~800 runner-hours; 69 container builds), 57 merges, 178 comments.
+
 - **Coarse multigrid levels move with the fine mesh, by injection** (Louis, 2026-11-19, on W1's coarse-levels note): "They should move, really, even if, in the FMG, we don't know their coordinates. If we extract a coarse level as a submesh, I think it should be an injection of the fine-level coordinates." Nested levels take the moved fine coordinates through the refinement point map; add-on and split fault levels carry the fine displacement side by side (W1 to propose the exact form).
 
 - **The code plays a straight bat; AI is the helper** (Louis, 2026-11-19, ruling bare coordinates in a units model refused, #1197): "I would prefer refusal. What might be helpful for a human (let me hold your hand) is an anti-pattern for AI helping out. So let's assume that AI is the helper and the code is playing with a straight bat all the time." Ambiguous input is refused with a message that shows the fix; the library does not guess on the user's behalf.
