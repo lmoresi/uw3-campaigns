@@ -1,0 +1,44 @@
+From dcbbb12202f9c43038b93ae5f3ea0b330ff8a02a Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 01:29:20 +1100
+Subject: [PATCH] Testing guide: bound iteration counts, never assert them
+ exactly
+
+An iteration count is reproducible only to round-off, from run to run on one
+build and in serial too. PETSc's VecMDot takes the BLAS gemv path when the
+vectors happen to be adjacent in memory, and its own loops otherwise
+(-vec_mdot_use_gemv, on by default), and allocation placement picks the path.
+On test_1157's low-viscosity case the last velocity sub-solve took 78
+iterations or ran to its cap of 200 with the solution the same to 16 digits.
+With -vec_mdot_use_gemv 0 the runs were bit-identical (UNFILED 64).
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/TESTING-RELIABILITY-SYSTEM.md | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/docs/developer/TESTING-RELIABILITY-SYSTEM.md b/docs/developer/TESTING-RELIABILITY-SYSTEM.md
+index a6d6f5ee..53276010 100644
+--- a/docs/developer/TESTING-RELIABILITY-SYSTEM.md
++++ b/docs/developer/TESTING-RELIABILITY-SYSTEM.md
+@@ -300,6 +300,17 @@ pytest -m "not tier_c"
+ 3. **Use xfail Appropriately**: If testing unimplemented feature, mark with xfail
+ 4. **Don't Break CI**: Tier C tests with xfail won't break automated testing
+ 5. **Promote Deliberately**: Tier B → A is the review step described above
++6. **Bound iteration counts; never assert them exactly**: an iteration count,
++   outer or sub-solve, is reproducible only to round-off, from run to run on one
++   build and in serial too. PETSc computes the multiple dot products in GMRES and
++   FGMRES orthogonalisation through BLAS `gemv` when the vectors happen to be
++   adjacent in memory, and through its own loops otherwise (`-vec_mdot_use_gemv`,
++   on by default), and allocation placement picks the path. A sub-solve that
++   stagnates near its target turns the last-bit difference into a different count.
++   On `test_1157`'s low-viscosity case the last velocity sub-solve took 78
++   iterations or ran to its cap of 200, while the solution agreed to 16 digits
++   (UNFILED 64). Assert an upper bound tight enough to catch a regression, and
++   assert the answer against its baseline.
+ 
+ ### When a Test Fails
+ 
+-- 
+2.39.5 (Apple Git-154)
+

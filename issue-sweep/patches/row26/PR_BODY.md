@@ -41,9 +41,11 @@ would remain (#424).
 
 Test: `tests/test_0894_serial_custom_fmg_drops_orphans.py` (level_2, tier_b, 25 s). The graded
 fixture asserts at most 4 velocity iterations (13 on development) and |v| = 787.24535978 to
-rtol 1e-7. A no-orphan guard asserts counts 1/3/9 and |v| = 816.99052405 to rtol 1e-7.
+rtol 1e-7. A no-orphan guard bounds its counts (outer <= 2, velocity <= 4, pressure <= 10; 1/3/9 measured),
+because counts are reproducible only to round-off (UNFILED 64). It also asserts |v| = 816.99052405 to
+rtol 1e-7.
 
-Tolerances: solver 1e-8; the norm baselines rtol 1e-7; the iteration cap 4.
+Tolerances: solver 1e-8; the norm baselines rtol 1e-7; the iteration bounds as above.
 
 Depends on the bounded orphan-repair query (UNFILED 62), which this branch carries as its first
 two commits.

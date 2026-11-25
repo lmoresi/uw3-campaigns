@@ -1,7 +1,7 @@
 From c5a4748592b6d5e7ca39b1efb330df88bd9d1b5e Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 01:26:56 +1100
-Subject: [PATCH 3/4] test_0893 checks the repair's claims against a greedy
+Subject: [PATCH 3/5] test_0893 checks the repair's claims against a greedy
  reference
 
 The hard-coded counts (1770 orphans, nnz 7260, 877 empty columns) came from

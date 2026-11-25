@@ -1,7 +1,7 @@
 From a5b1b623a6b43592216e993d472e20626e06f9d9 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 00:07:22 +1100
-Subject: [PATCH 4/4] Serial custom-FMG: drop orphan coarse DOFs, do not repair
+Subject: [PATCH 4/5] Serial custom-FMG: drop orphan coarse DOFs, do not repair
  them
 
 Since #890 the parallel custom-FMG route builds its node transfers without
