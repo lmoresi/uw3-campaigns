@@ -1,0 +1,220 @@
+From d37db66e63a39c089e5bb36ea7eae995ac13454b Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 04:21:25 +1100
+Subject: [PATCH] add_fault refuses a cut with no facet, or one that misses
+ part of the trace
+
+The cut labels an edge only when both its ends and its midpoint lie on the
+trace. A trace sampled finer than the mesh can leave a sample without a
+vertex, and the chord between its neighbours is then unlabelled. add_fault
+returned such faults, with no facet or with a chain stopping short of the
+trace's end, and said nothing (UNFILED 68). On an irregular 1/12 box, 8 of
+40 smooth traces sampled 0.3 cells apart came back with no facet, and 4
+stopped short.
+
+After each segment's cut, _refuse_an_empty_or_partial_cut raises when the
+cut labelled no facet, or when some point of the trace (ten per segment) is
+more than half a cell from the labelled chain. The cell is the mean edge
+length within the trace's bounding box, grown by a tenth of its diagonal.
+The message gives the trace's median sample spacing against that cell size,
+and the fix: resample to about one cell apart. Counts and distances are
+reduced over the ranks, so every rank reaches the same verdict.
+
+The label-only path (cut=False) is unchanged: there an empty label is
+legitimate (a fault wholly inside the seam ligament).
+
+test_0897:
+- an empty and a short chain from traces sampled 0.3 cells apart on the
+  regular box, which fail on development;
+- a trace sampled a cell apart, which is still added;
+- the check itself on chains labelled by hand along y = 0.5, which does not
+  depend on how any mesher places a cut.
+The fault suite (38 files) is unchanged: 417 passed, 1 skipped.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/fault_split.py      | 59 ++++++++++++
+ ...d_fault_refuses_an_empty_or_partial_cut.py | 94 +++++++++++++++++++
+ 2 files changed, 153 insertions(+)
+ create mode 100644 tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 4cbd4dec..69bfe90d 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1611,6 +1611,63 @@ def _label_embedded_edges(dm, segments, values, exclude=None, verbose=False,
+     return new
+ 
+ 
++def _refuse_an_empty_or_partial_cut(dm, name, value, poly):
++    """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
++
++    The cut labels an edge only when both its ends and its midpoint lie on the
++    trace, so a sample left without a vertex (a trace sampled finer than the
++    mesh) leaves the chord between its neighbours unlabelled: the fault came
++    back with no facet, or stopping short of the trace's end, and nothing said
++    so. The chain must come within half a cell of every point of the trace
++    (the trace is sampled at ten points per segment); the cell is the mean edge
++    length within the trace's bounding box, grown by a tenth of its diagonal.
++    COLLECTIVE: the counts and distances are reduced, so every rank decides
++    alike."""
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
++
++    comm = uw.mpi.comm
++    X = _coords(dm)
++    eS, _eE = dm.getDepthStratum(1)
++    ends = _edge_vertices(dm)
++    lab = dm.getLabel(name)
++    marked = (np.asarray(lab.getStratumIS(int(value)).getIndices(), dtype=np.int64) - eS
++              if lab is not None and lab.getStratumSize(int(value)) else
++              np.zeros(0, dtype=np.int64))
++    n_facets = int(comm.allreduce(int(marked.size), op=MPI.SUM))
++
++    lo, hi = poly.min(axis=0), poly.max(axis=0)
++    grow = 0.1 * float(np.linalg.norm(hi - lo))
++    mid = 0.5 * (X[ends[:, 0]] + X[ends[:, 1]])
++    near = np.all((mid >= lo - grow) & (mid <= hi + grow), axis=1)
++    lengths = np.linalg.norm(X[ends[near, 0]] - X[ends[near, 1]], axis=1)
++    tot = comm.allreduce(np.array([lengths.sum(), lengths.size], dtype=float), op=MPI.SUM)
++    h = float(tot[0] / tot[1]) if tot[1] else float("nan")
++    seg = np.linalg.norm(np.diff(poly, axis=0), axis=1)
++    spacing = float(np.median(seg)) if seg.size else float("nan")
++    advice = (f"The trace's samples are {spacing:.3g} apart (median), against cells "
++              f"of about {h:.3g} here; resample the trace to about one cell "
++              f"({h:.3g}) apart and add the fault again.")
++    if n_facets == 0:
++        raise ValueError(f"add_fault: the cut along {name!r} labelled no facet, so "
++                         f"there would be no fault. {advice}")
++
++    t = np.linspace(0.0, 1.0, 11)
++    dense = np.vstack([poly[:-1] + x * (poly[1:] - poly[:-1]) for x in t])
++    d = np.full(len(dense), np.inf)
++    for a, b in zip(X[ends[marked, 0]], X[ends[marked, 1]]):
++        e = b - a
++        L = float(e @ e)
++        u = np.clip(((dense - a) @ e) / L, 0.0, 1.0) if L > 0 else np.zeros(len(dense))
++        d = np.minimum(d, np.linalg.norm(dense - (a + u[:, None] * e), axis=1))
++    d = comm.allreduce(d, op=MPI.MIN)
++    worst = int(np.argmax(d))
++    if d[worst] > 0.5 * h:
++        where = tuple(float(x) for x in dense[worst])
++        raise ValueError(f"add_fault: the cut along {name!r} misses part of the trace: "
++                         f"the labelled chain is {d[worst]:.3g} from the trace at {where}, "
++                         f"more than half a cell ({0.5 * h:.3g}). {advice}")
++
++
+ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+               blind=1, across_seams=False, partition=True, on_shared="warn",
+               **place_kwargs):
+@@ -1785,6 +1842,8 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+             n_shared += line_cut_module.last_shared_targets["count"]
+             dm, info = cut_along_lines(dm, [poly], label=name,
+                                        label_value=values[name], **snap)
++            _refuse_an_empty_or_partial_cut(dm, name, values[name],
++                                            np.asarray(poly, dtype=float))
+             if verbose:
+                 uw.pprint(f"[add_fault {name!r}] {info['n_cut_edges']} "
+                           f"facets, min angle {info['min_angle']:.2f} deg")
+diff --git a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+new file mode 100644
+index 00000000..e865dfa8
+--- /dev/null
++++ b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+@@ -0,0 +1,94 @@
++"""add_fault refuses a cut that labels no facet, or a chain that misses part of the trace (UNFILED 68).
++
++The cut labels an edge only when both its ends and its midpoint lie on the trace. A trace
++sampled finer than the mesh can leave a sample without a vertex, and the edge joining its
++neighbours is then a chord, not on the trace, and unlabelled. add_fault used to return such
++a fault with no facet at all, or with a chain that stopped short of the trace's end, and say
++nothing. On an irregular 1/12 box, 8 of 40 smooth traces sampled 0.3 cells apart came back
++with no facet.
++
++The traces here are on the regular 1/12 box: six cells long, sampled 0.3 cells apart, from
++the measurement's generator. One comes back empty, one stops 0.6 cells short of its end, and
++one sampled a cell apart is whole and must still be added.
++"""
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++H = 1 / 12
++
++
++def _trace(k, ds):
++    rng = np.random.default_rng(22)
++    for i in range(k + 1):
++        ang = rng.uniform(0, np.pi)
++        turn = rng.uniform(-1, 1) if i % 2 else 0.0
++        c = 0.5 + rng.uniform(-0.05, 0.05, 2)
++    L = 6 * H
++    s = np.linspace(-L / 2, L / 2, max(2, int(round(6 / ds))) + 1)
++    th = ang + turn * s / L
++    d = np.column_stack([np.cos(th), np.sin(th)])
++    return c + np.cumsum(np.vstack([[0, 0], d[1:] * np.diff(s)[:, None]]), axis=0) - L / 2 * d[0]
++
++
++@pytest.fixture(scope="module")
++def box():
++    return uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                             cellSize=H, regular=True)
++
++
++def test_a_cut_with_no_facet_is_refused(box):
++    with pytest.raises(ValueError, match="labelled no facet") as err:
++        box.add_fault(("F", _trace(3, 0.3)))
++    assert "resample the trace" in str(err.value)
++
++
++def test_a_chain_that_stops_short_is_refused(box):
++    with pytest.raises(ValueError, match="misses part of the trace") as err:
++        box.add_fault(("F", _trace(4, 0.3)))
++    assert "resample the trace" in str(err.value)
++
++
++def test_a_whole_cut_is_added(box):
++    m2 = box.add_fault(("F", _trace(0, 1.0)))
++    b = [bb for bb in m2.boundaries if bb.name == "F"][0]
++    assert m2.dm.getLabel("F").getStratumSize(b.value) > 0
++
++
++def _label_edges_on_y(dm, name, y, x0, x1):
++    """Label the mesh edges lying on the line y = const between x0 and x1."""
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
++    X = _coords(dm)
++    eS, _ = dm.getDepthStratum(1)
++    ends = _edge_vertices(dm)
++    tol = 1e-9
++    on = ((np.abs(X[ends[:, 0], 1] - y) < tol) & (np.abs(X[ends[:, 1], 1] - y) < tol)
++          & (np.minimum(X[ends[:, 0], 0], X[ends[:, 1], 0]) >= x0 - tol)
++          & (np.maximum(X[ends[:, 0], 0], X[ends[:, 1], 0]) <= x1 + tol))
++    dm.createLabel(name)
++    lab = dm.getLabel(name)
++    for e in np.flatnonzero(on) + eS:
++        lab.setValue(int(e), 7)
++    return int(on.sum())
++
++
++def test_the_check_on_chains_labelled_by_hand(box):
++    """The check itself, on a straight trace along the box's row of edges at y = 0.5,
++    independent of how any mesher places a cut."""
++    from underworld3.utilities.fault_split import _refuse_an_empty_or_partial_cut
++    poly = np.array([[0.25, 0.5], [0.75, 0.5]])
++    dm = box.dm.clone()
++    dm.createLabel("E")
++    with pytest.raises(ValueError, match="labelled no facet"):
++        _refuse_an_empty_or_partial_cut(dm, "E", 7, poly)
++    dm = box.dm.clone()
++    assert _label_edges_on_y(dm, "Half", 0.5, 0.25, 0.5) > 0
++    with pytest.raises(ValueError, match="misses part of the trace"):
++        _refuse_an_empty_or_partial_cut(dm, "Half", 7, poly)
++    dm = box.dm.clone()
++    assert _label_edges_on_y(dm, "Whole", 0.5, 0.25, 0.75) > 0
++    _refuse_an_empty_or_partial_cut(dm, "Whole", 7, poly)
+-- 
+2.39.5 (Apple Git-154)
+
