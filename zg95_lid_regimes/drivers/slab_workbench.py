@@ -334,6 +334,11 @@ params = uw.Params(
                                 #   so that the largest move is the limit. The search for the slab is centred on the fault
                                 #   in use at depth (its median angle below half the cap), not on its surface point.
                                 #   0 (every run to 2026-11-18): no limit, and the search centred on the surface point
+    uw_fault_jump_after_myr=0.0,  # > 0 (Louis, 2026-11-25, on S2f: "The fault does not seem to fit the actual position very
+                                #   well. I think this is all an adjustment phase from the start up"; "Yes, continue"):
+                                #   uw_fault_jump_rungs applies only from this model time on; before it the fit moves
+                                #   freely (and the search is centred on the surface point), so the fault can follow the
+                                #   prescribed slab while it steepens. 0: the limit from the start
     uw_spline_length_km=58.0,   # the smoothing length L: lam = L^4 / 0.005 in model lengths (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
@@ -561,6 +566,11 @@ FAULT_TOP = str(params.uw_fault_top)
 if FAULT_TOP not in ("tangent", "plate", "bounded"):
     raise ValueError(f"-uw_fault_top must be tangent, plate or bounded, not {FAULT_TOP!r}")
 JUMP_RUNGS = float(params.uw_fault_jump_rungs)
+
+
+def jump_rungs():
+    """the jump limit (rungs) in force now: none before uw_fault_jump_after_myr of model time"""
+    return JUMP_RUNGS if t >= float(model.fault_jump_after) else 0.0
 FIT_NAME = "ocrust fault" if FOLLOW_OCRUST else "melange fault"     # the fit's log lines
 # the markers: name -> (swarm variable, its P1 picture on the base mesh, the geometry
 # of the slab state as a function of particle coordinates)
@@ -964,7 +974,7 @@ def crust_spline_points(faults):
         hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
     X0 = r_o * hint
     Xd = X0                                          # where the slab is looked for at depth
-    if faults and JUMP_RUNGS > 0:                    # the fault in use below half the cap
+    if faults and jump_rungs() > 0:                    # the fault in use below half the cap
         old = np.asarray(faults[0]["points"], dtype=float)
         at = (r_o - np.hypot(old[:, 0], old[:, 1]) > 0.5 * cap)
         if at.any():
@@ -1132,7 +1142,7 @@ def crust_spline_points(faults):
         extra.update({"spline_tangent_dip": top_dip, "spline_reach": float(inc * (wall[0] - leave[0]))})
         top_dip = float(np.degrees(np.arctan2(-d[1], abs(d[0]))))
     pol = np.vstack([wall - (0.02 / max(-d[1], 1e-6)) * d, wall, seg])   # (X, Y = -depth)
-    if faults and JUMP_RUNGS > 0:
+    if faults and jump_rungs() > 0:
         # the fault in use and this fit, each from where it crosses the surface down, paired by fraction of length;
         # moves measured and made in the plane
         def from_surface(m):
@@ -1148,7 +1158,7 @@ def crust_spline_points(faults):
         B = from_surface(np.c_[r_o * (hint + wrap(np.arctan2(old[:, 1], old[:, 0]) - hint)),
                                np.hypot(old[:, 0], old[:, 1]) - r_o])
         gap = float(np.linalg.norm(A - B, axis=1).max())
-        frac = min(1.0, JUMP_RUNGS * S / gap) if gap > 0 else 1.0
+        frac = min(1.0, jump_rungs() * S / gap) if gap > 0 else 1.0
         extra.update({"spline_jump": gap, "spline_jump_frac": frac})
         if frac < 1.0:
             L = B + frac * (A - B)
@@ -2440,7 +2450,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
