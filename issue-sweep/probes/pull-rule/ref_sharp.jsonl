@@ -1,0 +1,16 @@
+{"mode": "new_light_sharp", "trace": 0, "N": 12, "turn": 0.0, "slip_max": 0.1415360941337785, "min_angle_deg": 11.34337272952705, "outer": [1], "vel": [36], "pres": [20], "converged": true}
+{"mode": "new_light_sharp", "trace": 0, "N": 24, "turn": 0.0, "slip_max": 0.1412072636783433, "min_angle_deg": 5.746694132667345, "outer": [1], "vel": [64], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 0, "N": 48, "turn": 0.0, "slip_max": 0.13995525009907642, "min_angle_deg": 5.271448663572586, "outer": [1], "vel": [108], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 0, "N": 96, "turn": 0.0, "slip_max": 0.14005155382036263, "min_angle_deg": 5.663459522007805, "outer": [1], "vel": [160], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 1, "N": 12, "turn": -0.08132591051210647, "slip_max": 0.12138969411585893, "min_angle_deg": 22.72066782513959, "outer": [1], "vel": [33], "pres": [21], "converged": true}
+{"mode": "new_light_sharp", "trace": 1, "N": 24, "turn": -0.08132591051210647, "slip_max": 0.12110504825004025, "min_angle_deg": 5.422944952365965, "outer": [1], "vel": [66], "pres": [21], "converged": true}
+{"mode": "new_light_sharp", "trace": 1, "N": 48, "turn": -0.08132591051210647, "slip_max": 0.12035947897315705, "min_angle_deg": 6.153606583941035, "outer": [1], "vel": [93], "pres": [21], "converged": true}
+{"mode": "new_light_sharp", "trace": 1, "N": 96, "turn": -0.08132591051210647, "slip_max": 0.12033491371362756, "min_angle_deg": 4.1156956882510505, "outer": [1], "vel": [158], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 2, "N": 12, "turn": 0.0, "slip_max": 0.11094576627476924, "min_angle_deg": 5.861654737987383, "outer": [1], "vel": [34], "pres": [19], "converged": true}
+{"mode": "new_light_sharp", "trace": 2, "N": 24, "turn": 0.0, "slip_max": 0.11000048819815295, "min_angle_deg": 7.284628878578431, "outer": [1], "vel": [61], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 2, "N": 48, "turn": 0.0, "slip_max": 0.10999138281965806, "min_angle_deg": 7.231672034890595, "outer": [1], "vel": [89], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 2, "N": 96, "turn": 0.0, "slip_max": 0.10932331794646644, "min_angle_deg": 6.037615554470713, "outer": [1], "vel": [148], "pres": [22], "converged": true}
+{"mode": "new_light_sharp", "trace": 3, "N": 12, "turn": -0.8997174098538341, "slip_max": 0.16486762559636683, "min_angle_deg": 6.59399015616415, "outer": [1], "vel": [42], "pres": [20], "converged": true}
+{"mode": "new_light_sharp", "trace": 3, "N": 24, "turn": -0.8997174098538341, "slip_max": 0.1670953050469096, "min_angle_deg": 5.18087763320714, "outer": [1], "vel": [64], "pres": [21], "converged": true}
+{"mode": "new_light_sharp", "trace": 3, "N": 48, "turn": -0.8997174098538341, "error": "the cut did not converge in 12 passes; every pass must split at least one edge and remove "}
+{"mode": "new_light_sharp", "trace": 3, "N": 96, "turn": -0.8997174098538341, "slip_max": 0.165630693499419, "min_angle_deg": 5.4082911956760125, "outer": [1], "vel": [191], "pres": [22], "converged": true}

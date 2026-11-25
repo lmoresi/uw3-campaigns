@@ -60,3 +60,56 @@ on the regular box (one case 25 -> 46). They are bounded and converged.
 - It changes the mesh, and the slip by up to ~8 %, for traces that place today.
 - Open before Louis decides: a refinement reference for the slip, and the 5 sharp-turn
   regressions.
+
+## Row 29 follow-up (2026-11-26): refinement reference, guard check, cost
+
+### (1) Refinement: max slip, sheared box, frictionless fault, trace sampled at one cell
+The four traces have fixed geometry (6/12 long), on irregular boxes of 12, 24, 48 and 96 cells a
+side (`refine29.py`, `ref_dev.jsonl` and `ref_sharp.jsonl`).
+
+| trace | N | development | light + sharp |
+|---|---|---|---|
+| 0 (line) | 12 / 24 / 48 / 96 | 0.142238 / 0.141118 / 0.140109 / 0.140014 | 0.141536 / 0.141207 / 0.139955 / 0.140052 |
+| 1 (arc) | 12 / 24 / 48 / 96 | 0.121347 / 0.121105 / **0.074992** / 0.120290 | 0.121390 / 0.121105 / 0.120359 / 0.120335 |
+| 2 (line) | 12 / 24 / 48 / 96 | 0.111159 / 0.109895 / 0.109820 / 0.109328 | 0.110946 / 0.110000 / 0.109991 / 0.109323 |
+| 3 (arc) | 12 / 24 / 48 / 96 | 0.167323 / 0.167023 / 0.165926 / 0.165642 | 0.164868 / 0.167095 / refused / 0.165631 |
+
+- **Same limit.** At N = 96 the two rules agree to about 1e-4 relative on all four traces.
+- **Accuracy at the working resolution (N = 12):** both are within 0.5-1.7 % of the N = 96 value.
+  The light rule is closer on three of the four traces, and on trace 3 it is 0.5 % low against
+  development's 1.0 % high.
+- **Development gave a wrong answer silently:** trace 1 at N = 48 has slip 0.0750 against about
+  0.120 (38 % low), with no error. That is a silent partial fault, the defect UNFILED 68 refuses
+  and the labelling fix removes.
+- **One new refusal under the light rule:** trace 3 at N = 48, "the cut did not converge in 12
+  passes". It is refused, not wrong.
+
+### (2) The 5 sharp-turn regressions are refused, with a message
+All five are `add_fault: the cut along 'F' misses part of the trace: ...` (four at 150 degrees,
+one at 120). None comes back silently. A scan of every labelling-build record found 22 results
+that came back from add_fault while my probe's check called them partial: their trace-to-chain
+distance is 0.500-0.568 of the NOMINAL cell (1/12). The guard's own tolerance is half the mean
+edge length near the trace, which includes the diagonals and comes to about 0.59 nominal cells
+here, so they pass it as specified. This is not a gap, but the guard's "half a cell" is looser
+than the nominal cell; tightening it (the median, or the shortest side) is a question for the
+row.
+
+### (3) Cost: the iteration rise is the mesh quality
+- **Smallest angle in the faulted mesh** (`min_angles`): development 12-39 degrees; light + sharp
+  4-7 degrees. Without a vertex on every sample, the cut's crossing points sit close to existing
+  vertices and leave slivers.
+- **Velocity iterations at N = 12 / 96:** development 26-29 / 78-82; light + sharp 33-42 /
+  148-191.
+- **A remedy, measured** (`ref_snap.jsonl`, traces 0 and 2, N = 12-48): the cut's own snap,
+  `snap_frac`, raised from 0.1 to 0.3, restores the angles to 15-24 degrees and the iterations to
+  29-63 (development 26-50). The slip moves by under 0.3 %.
+
+| snap_frac | min angle (deg) | velocity its N = 12 / 24 / 48 |
+|---|---|---|
+| 0.1 | 5.3-11.3 | 34-36 / 61-64 / 89-108 |
+| 0.2 | 8.1-24.2 | 28-36 / 52-55 / 74-83 |
+| 0.3 | 15.7-24.2 | 28-29 / 36-38 / 46-63 |
+
+The row's candidate is therefore the light + sharp pull WITH snap_frac 0.3 for add_fault. The
+effect of snap_frac 0.3 on development's rule, on add_conforming_surface, and on the 360 kink
+and 120 line traces is not yet measured.
