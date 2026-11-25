@@ -4876,3 +4876,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - fault_checks every step (record "fault_check"): fit vs fault in use > 35 km; fault vs slab thermal top at 100/200/300 km > 50 km beyond half-width; surface point vs trench_point > 150 km; slip/convergence > 1.5. -uw_check_stop_steps N stops after N flagged steps in a row (exit 3, checkpointed); 0 records only.
   - -uw_warm_shift 1: old solution read at new DOFs moved by the fault's displacement (full within max displacement + 1 rung, fading over 3). Default 0 unchanged.
 - Hub review: the slab check is unsigned (|offset from cold core| − half-width), so it catches a fault on the overriding side but not one inside or under the slab; only the first fault is checked; exit 3 must stop workbench_seg.sh's chain, since a restart resets the in-a-row count. Item (1) is not addressed by this commit.
+
+### 2026-11-26 — slab check signed (K1 01fd202 → 208b056); seg script stops on exit 3; job 4974
+- 01fd202 (on 139af40, blob d294e32), verified (.gz and mbox sha match) and pushed to kaiju/slab-workbench as 208b056: the slab check is now the signed distance from the slab's top edge (half-T contour, overriding side by uw_dip as overriding_side uses): > 0 into the wedge, < 0 into or under the slab; |gap| > uw_check_slab_km flags.
+- Hub note: the half-T edge sits inside the slab's thermal boundary layer, so a fault correctly on the interface reads a few tens of km positive. Compare against that baseline, not 0.
+- workbench_seg.sh (kaiju-local): it used to restart after an exit 3 that left a checkpoint; it now reads the exit code, prints STOPPED and ends the chain.
+- Test of Louis's item (1): job 4974 restarts S3n from step 30 on 139af40 (no jump limit, ocrust fit). S3n_ws runs with -uw_warm_shift 1 and S3n_ns with 0, 30 steps each, default check limits, record only (uw_check_stop_steps 0). The slab check in this job is still the unsigned one.
