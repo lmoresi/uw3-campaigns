@@ -4857,3 +4857,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   +theta, 29 km deep, 0.25 rad window). Defaults 0 / plane: unchanged. Hub review note: trench_point assumes the
   convergence sign of the current polarity (subducting plate at smaller theta, dip < 90); a reversed polarity would
   need the sign flipped (as overriding_side does). Fine for the current runs.
+- 2026-11-26: K1: trench_point needs no polarity change: convergence makes v_t fall across the trench whichever plate
+  subducts (plate at smaller theta moves +theta, larger theta moves -theta), so the most negative dv_t/dtheta is the
+  convergent boundary for either polarity; a ridge is the most positive. Hub's 9fd7791 review note withdrawn (wrong).
+  S2f (4968) cancelled at step ~320 (120 Myr); its top was off the slab from ~20 Myr. Job 4971: S4f / S4n on 9fd7791
+  (= 8e3ae8c), -uw_split_min_dip_deg 20 (K1 dial) -uw_bridge zone -uw_bridge_weak 0.1 -uw_bridge_km 20; S4f = S3f
+  (jump limit after 15 Myr) + these, S4n = S3n (no jump limit) + these; from step 0 to 600 steps in segments. (S3f/S3n
+  were not reported to the hub before this notice.) K1 uses gzip -U1 pieces from now on.
