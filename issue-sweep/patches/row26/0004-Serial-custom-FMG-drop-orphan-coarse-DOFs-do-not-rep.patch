@@ -1,7 +1,7 @@
-From aa3d092cdf3b2412fe7c7fcb638a1ddb6396200c Mon Sep 17 00:00:00 2001
+From a5b1b623a6b43592216e993d472e20626e06f9d9 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 00:07:22 +1100
-Subject: [PATCH 3/3] Serial custom-FMG: drop orphan coarse DOFs, do not repair
+Subject: [PATCH 4/4] Serial custom-FMG: drop orphan coarse DOFs, do not repair
  them
 
 Since #890 the parallel custom-FMG route builds its node transfers without
@@ -36,10 +36,10 @@ Underworld development team with AI support from Claude Code
  create mode 100644 tests/test_0894_serial_custom_fmg_drops_orphans.py
 
 diff --git a/src/underworld3/utilities/custom_mg.py b/src/underworld3/utilities/custom_mg.py
-index 75a3e922..ab0f9cf3 100644
+index de473cbb..4f4c1989 100644
 --- a/src/underworld3/utilities/custom_mg.py
 +++ b/src/underworld3/utilities/custom_mg.py
-@@ -481,8 +481,16 @@ def _reduced_from_node_transfer(Pn, r2f_c, r2f_f, ncomp):
+@@ -488,8 +488,16 @@ def _reduced_from_node_transfer(Pn, r2f_c, r2f_f, ncomp):
  
  def _reduced_transfer(coarse_coords, fine_coords, r2f_c, r2f_f, ncomp, builder):
      """Build one prolongation reduced(coarse) -> reduced(fine):

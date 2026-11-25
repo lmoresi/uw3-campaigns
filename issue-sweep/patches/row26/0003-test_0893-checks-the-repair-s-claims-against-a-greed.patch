@@ -1,0 +1,180 @@
+From c5a4748592b6d5e7ca39b1efb330df88bd9d1b5e Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 01:26:56 +1100
+Subject: [PATCH 3/4] test_0893 checks the repair's claims against a greedy
+ reference
+
+The hard-coded counts (1770 orphans, nnz 7260, 877 empty columns) came from
+the Delaunay of a regular grid, which is not unique: another platform splits
+the ties differently (1768 / 7264 / 871 on a Linux server). The test now uses
+a seeded random cloud (no ties, a unique greedy result). It compares the
+fine rows the repair rewrote with a brute-force greedy reference, the orphans
+taken from the build without the repair. It keeps the 20 MB memory cap.
+
+The reference is the only check on the widening: a query held at 9
+neighbours passes every custom-MG test, and fails this one. Development's
+builder makes the reference's claims too (1,876 orphans), and fails the
+memory cap (59 MB). A second case has a single fine DOF: development raised
+(IndexError), and the bounded query gives it to the first orphan.
+
+The build statistics gain orphans_claimed, the fine rows given to orphans;
+orphans_repaired keeps its meaning, the orphans found. The comment notes
+the per-orphan loop is Python and that per-rank callers pass False.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/custom_mg.py        | 15 +++-
+ ...est_0893_custom_mg_orphan_repair_memory.py | 81 +++++++++++++++----
+ 2 files changed, 76 insertions(+), 20 deletions(-)
+
+diff --git a/src/underworld3/utilities/custom_mg.py b/src/underworld3/utilities/custom_mg.py
+index 75a3e922..de473cbb 100644
+--- a/src/underworld3/utilities/custom_mg.py
++++ b/src/underworld3/utilities/custom_mg.py
+@@ -60,14 +60,17 @@ def _record(stats, outside, orphans_repaired=0):
+     """Fill a caller's ``stats`` dict, if it passed one, with what a build saw:
+     ``outside_hull``, the number of fine nodes outside the coarse hull (snapped to
+     the nearest coarse node: a wrong row, not an empty one), ``outside``, their
+-    indices, and ``orphans_repaired``, the orphan columns repaired. The statistics
+-    belong to the call; a module-level record was read after an RBF build that
+-    never wrote it (#885)."""
++    indices, ``orphans_repaired``, the orphan columns the repair found (the name
++    is older than the count), and ``orphans_claimed``, the fine rows it gave
++    them, which is fewer when the orphans outnumber the free fine DOFs. The
++    statistics belong to the call; a module-level record was read after an RBF
++    build that never wrote it (#885)."""
+     if stats is not None:
+         outside = np.asarray(outside, dtype=np.int64)
+         stats["outside_hull"] = int(outside.size)
+         stats["outside"] = outside
+         stats["orphans_repaired"] = int(orphans_repaired)
++        stats["orphans_claimed"] = 0
+ 
+ 
+ def barycentric_prolongation(coarse_coords, fine_coords, repair_orphans=True,
+@@ -167,7 +170,9 @@ def barycentric_prolongation(coarse_coords, fine_coords, repair_orphans=True,
+         # and doubles, for that orphan only, while every candidate is claimed or
+         # the first free one ties with the last neighbour found (a tie can run
+         # past it). One query of orphans + 8 neighbours for every orphan held an
+-        # (orphans x orphans) array: 8.6 GB per rank on #893's hierarchy.
++        # (orphans x orphans) array: 8.6 GB per rank on #893's hierarchy. The
++        # loop is Python, one small query per orphan (21,929 orphans: 11.7 s,
++        # 7.8 MB); per-rank callers pass repair_orphans=False and never run it.
+         ftree = cKDTree(fine_coords)
+ 
+         def ranked(c, k):
+@@ -193,6 +198,8 @@ def barycentric_prolongation(coarse_coords, fine_coords, repair_orphans=True,
+             f = int(row[a])
+             taken[f] = True
+             fixes[f] = int(c)
++        if stats is not None:
++            stats["orphans_claimed"] = len(fixes)
+         if fixes:
+             keep = ~np.isin(np.asarray(rows), list(fixes))
+             rows = list(np.asarray(rows)[keep]) + list(fixes.keys())
+diff --git a/tests/test_0893_custom_mg_orphan_repair_memory.py b/tests/test_0893_custom_mg_orphan_repair_memory.py
+index c1ffad80..53ce9c64 100644
+--- a/tests/test_0893_custom_mg_orphan_repair_memory.py
++++ b/tests/test_0893_custom_mg_orphan_repair_memory.py
+@@ -1,10 +1,16 @@
+-"""The barycentric builder's orphan repair runs in memory linear in the orphans.
++"""The barycentric builder's orphan repair: the greedy claims, in memory linear in the orphans.
+ 
+-The repair gives each orphan coarse DOF (a column with no fine image) its nearest
+-unclaimed fine DOF. It used to query orphans + 8 neighbours for every orphan at
+-once, an (orphans x orphans) array: 8.6 GB per rank on #893's hierarchy. The
+-fixture forces 1,770 orphans by putting the fine cloud in the left half of the
+-coarse one; that query held 55 MB here, the bounded one 4 MB.
++The repair gives each orphan coarse DOF (a column with no fine image), in column order, its
++nearest fine DOF not yet claimed, equal distances going to the lower fine index. It used to
++query orphans + 8 neighbours for every orphan at once, an (orphans x orphans) array: 8.6 GB
++per rank on #893's hierarchy. The query is now bounded and widened per orphan only while its
++candidates are taken.
++
++The claims are checked against a brute-force greedy reference, with the orphans taken from
++the build without the repair, so the check does not depend on how the platform's Delaunay
++splits a tie. The cloud is random, so there are no ties: the greedy result is unique. The
++fine cloud fills the left half of the coarse one, which forces orphans whose nearest fine DOFs
++are all claimed and so exercises the widening (a query held at 9 neighbours fails here).
+ """
+ 
+ import tracemalloc
+@@ -17,10 +23,43 @@ from underworld3.utilities import custom_mg
+ pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
+ 
+ 
+-def test_orphan_repair_memory_is_bounded():
+-    g = np.linspace(0.0, 1.0, 60)
+-    coarse = np.array([(x, y) for x in g for y in g])
+-    fine = np.random.default_rng(0).random((3600, 2)) * [0.5, 1.0]
++def _clouds(n=3600):
++    rng = np.random.default_rng(893)
++    coarse = rng.random((n, 2))
++    fine = rng.random((n, 2)) * [0.5, 1.0]
++    return coarse, fine
++
++
++def _greedy_reference(coarse, fine, orphans):
++    taken = np.zeros(len(fine), dtype=bool)
++    claims = {}
++    for c in orphans:
++        if taken.all():
++            break
++        d = np.linalg.norm(fine - coarse[c], axis=1)
++        d[taken] = np.inf
++        f = int(np.lexsort((np.arange(len(fine)), d))[0])
++        taken[f] = True
++        claims[f] = int(c)
++    return claims
++
++
++def _claims(P, P0):
++    """The fine rows the repair rewrote, as {row: orphan column}."""
++    changed = np.flatnonzero(np.asarray((P != P0).sum(axis=1)).ravel())
++    out = {}
++    for r in changed:
++        row = P.getrow(r)
++        assert row.nnz == 1 and row.data[0] == 1.0, (r, row)
++        out[int(r)] = int(row.indices[0])
++    return out
++
++
++def test_the_repair_makes_the_greedy_claims_in_bounded_memory():
++    coarse, fine = _clouds()
++    P0 = custom_mg.barycentric_prolongation(coarse, fine, repair_orphans=False)
++    orphans = np.flatnonzero(np.asarray((P0 != 0).sum(axis=0)).ravel() == 0)
++    assert len(orphans) > 1000
+ 
+     stats = {}
+     tracemalloc.start()
+@@ -29,11 +68,21 @@ def test_orphan_repair_memory_is_bounded():
+         peak = tracemalloc.get_traced_memory()[1]
+     finally:
+         tracemalloc.stop()
+-
+     assert peak < 20.0e6, f"orphan repair peaked at {peak / 1e6:.1f} MB"
+-    # the claims themselves are unchanged (hard baseline, development's builder)
+-    assert stats["orphans_repaired"] == 1770
+-    assert P.nnz == 7260
+-    empty = np.asarray((P != 0).sum(axis=0)).ravel() == 0
+-    assert int(empty.sum()) == 877
++
++    reference = _greedy_reference(coarse, fine, orphans)
++    assert _claims(P, P0) == reference
++    assert stats["orphans_repaired"] == len(orphans)
++    assert stats["orphans_claimed"] == len(reference)
+     np.testing.assert_allclose(np.asarray(P.sum(axis=1)).ravel(), 1.0, rtol=0, atol=1e-14)
++
++
++def test_a_single_fine_dof_takes_the_first_orphan():
++    coarse, _fine = _clouds(40)
++    fine = np.array([[0.25, 0.5]])
++    stats = {}
++    P = custom_mg.barycentric_prolongation(coarse, fine, stats=stats)
++    P0 = custom_mg.barycentric_prolongation(coarse, fine, repair_orphans=False)
++    orphans = np.flatnonzero(np.asarray((P0 != 0).sum(axis=0)).ravel() == 0)
++    assert _claims(P, P0) == {0: int(orphans[0])}
++    assert stats["orphans_claimed"] == 1
+-- 
+2.39.5 (Apple Git-154)
+

@@ -1,7 +1,7 @@
 From e2aa7be68dcd13e1c664c644248add39acacb52a Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Wed, 25 Nov 2026 23:36:48 +1100
-Subject: [PATCH 2/3] Break orphan-repair ties by fine index; number the test
+Subject: [PATCH 2/4] Break orphan-repair ties by fine index; number the test
  after #893
 
 Equal distances go to the lower fine index, and a query widens while the first

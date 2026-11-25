@@ -1,8 +1,14 @@
 # Register row 26 (proposed): serial custom-FMG without the orphan repair
 
-Base: underworld3 development fbef72fa. Three commits, as `git format-patch` files:
-- 0001 and 0002 are UNFILED 62 (the bounded query, then the tie-break and test_0893);
-- 0003 (aa3d092c) is row 26.
+Base: underworld3 development fbef72fa. Four commits, as `git format-patch` files:
+- 0001-0003 are UNFILED 62 (the bounded query, the tie-break, and round 2's reference test,
+  c5a47485);
+- 0004 (a5b1b623) is row 26, restacked from aa3d092c onto the fixed 62 with no conflicts. The
+  change is the same.
+
+After the restack, test_0893, test_0894, test_1015 and test_1016 pass (14 passed). The
+before/after tables were measured on aa3d092c, whose row-26 change is identical. 62's round 2
+changes only its test, the build statistics and a comment.
 
 Apply them with `git am 000*.patch` on fbef72fa. Not pushed. Merging is Louis's call.
 
