@@ -17,7 +17,7 @@ gives fieldsplit velocity/pressure:
 
 | fixture | orphans | empty after the repair | its before | its after | rel. diff of v |
 |---|---|---|---|---|---|
-| graded finest annulus, 0.006 to 0.06, under a uniform tail | 3,245 | 8,631 | 1/13/9 | 1/3/9 | 3.2e-10 |
+| graded finest annulus, 0.006 to 0.06, under a uniform tail | 3,245 | 8,631 | 1/13/9 | 1/3/9 (macOS), 1/4/9 (Linux server, matching its np 2-4) | 3.2e-10 |
 | graded finest annulus, 0.01 to 0.04 | 185 | 338 | 1/3/9 | 1/3/9 | 1.5e-12 |
 | #893 placed-ladder hierarchy, refinement 4, chain 2, unsplit | 10, 38 | 1, 34 | 1/4/9 | 1/4/9 | 2.4e-9 |
 | the same, split ladder | 0 (split levels use the cell-located transfer) | 0 | 1/25/17 | 1/25/17 | 0 |
@@ -48,6 +48,7 @@ rtol 1e-7.
 Tolerances: solver 1e-8; the norm baselines rtol 1e-7; the iteration bounds as above.
 
 Depends on the bounded orphan-repair query (UNFILED 62), which this branch carries as its first
-two commits.
+three commits. UNFILED 62 is in turn stacked on UNFILED 65 (the uw ckdtree stale-buffer fix),
+which must merge first.
 
 Underworld development team with AI support from Claude Code

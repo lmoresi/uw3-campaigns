@@ -1,11 +1,12 @@
 # Register row 26 (proposed): serial custom-FMG without the orphan repair
 
-Base: underworld3 development fbef72fa. Five commits, as `git format-patch` files:
+Base: underworld3 development fbef72fa. Six commits, as `git format-patch` files:
 - 0001-0003 are UNFILED 62 (the bounded query, the tie-break, and round 2's reference test,
   c5a47485);
-- 0004 (a5b1b623) is row 26, restacked from aa3d092c onto the fixed 62 with no conflicts. The
+- 0004 (a2624c5b, message reworded without codenames; was a5b1b623) is row 26, restacked from aa3d092c onto the fixed 62 with no conflicts. The
   change is the same;
-- 0005 (c0ef3729) bounds test_0894's guard counts instead of matching them (UNFILED 64).
+- 0005 (17aaf6c0, was c0ef3729) bounds test_0894's guard counts instead of matching them (UNFILED 64);
+- 0006 (d34ac500) compares test_0894's answers with a direct solve on the same mesh, and bounds the graded count at 6 (review round 2).
 
 After the restack, test_0893, test_0894, test_1015 and test_1016 pass (14 passed). The
 before/after tables were measured on aa3d092c, whose row-26 change is identical. 62's round 2

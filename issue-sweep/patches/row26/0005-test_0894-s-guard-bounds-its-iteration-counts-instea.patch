@@ -1,7 +1,7 @@
-From c0ef3729a2886953abdf7154975efba1ac90ecae Mon Sep 17 00:00:00 2001
+From 17aaf6c01d540c3323b9a874f666ec682807aa38 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 01:29:49 +1100
-Subject: [PATCH 5/5] test_0894's guard bounds its iteration counts instead of
+Subject: [PATCH 5/6] test_0894's guard bounds its iteration counts instead of
  matching them
 
 Iteration counts are reproducible only to round-off (UNFILED 64, the

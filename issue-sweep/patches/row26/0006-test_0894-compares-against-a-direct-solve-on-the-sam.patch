@@ -1,0 +1,99 @@
+From d34ac500e5d3c7da6fb34ce4a3e348e697b53147 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 04:23:08 +1100
+Subject: [PATCH 6/6] test_0894 compares against a direct solve on the same
+ mesh; bounds with headroom
+
+The answers were absolute norms (816.99052405 at rtol 1e-7), which the
+Linux server's gmsh misses by 2.6e-5; the graded case passed there by 9.3e-8.
+Both cases now compare the custom-FMG solve with a direct LU solve on the
+same mesh in the same run (relative 1e-6 at solve tolerance 1e-8). The
+graded case's velocity bound is 6 (3 on macOS, 4 on Linux; 13 on
+development); the guard's bounds are 2 / 6 / 12 (1 / 3 / 9 measured).
+
+Underworld development team with AI support from Claude Code
+---
+ ...st_0894_serial_custom_fmg_drops_orphans.py | 42 +++++++++++++------
+ 1 file changed, 29 insertions(+), 13 deletions(-)
+
+diff --git a/tests/test_0894_serial_custom_fmg_drops_orphans.py b/tests/test_0894_serial_custom_fmg_drops_orphans.py
+index cb6d872e..f7c1a39c 100644
+--- a/tests/test_0894_serial_custom_fmg_drops_orphans.py
++++ b/tests/test_0894_serial_custom_fmg_drops_orphans.py
+@@ -5,7 +5,9 @@ serial route also ran the barycentric builder's repair first. The repair gives e
+ its nearest fine DOF by overwriting that fine row, which can take away the only fine image
+ of the row's old coarse DOFs. Under the graded finest level here, the top coarse level has
+ 3,245 orphans. After the repair 8,631 columns were empty, and the velocity solve took 13
+-iterations against 3 without it (UNFILED 63). The parallel route has run without the repair
++iterations against 3 or 4 without it (UNFILED 63). The answers are checked against a direct
++solve on the same mesh: an absolute norm depends on the mesher and differs between
++platforms. The parallel route has run without the repair
+ since #890, so the serial and parallel transfers also differed. The guard has no orphans,
+ and its counts stay within their bounds.
+ """
+@@ -20,8 +22,9 @@ from underworld3.utilities.custom_mg import set_custom_fmg
+ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
+ 
+ 
+-def _solve(fine, tail):
+-    """Stokes P2/P1, rotated free-slip on both walls of the annulus (radii 0.5, 1)."""
++def _solve(fine, tail, lu=False):
++    """Stokes P2/P1, rotated free-slip on both walls of the annulus (radii 0.5, 1);
++    custom FMG on ``tail``, or a direct LU solve on the same mesh for reference."""
+     x, y = fine.X
+     r = sympy.sqrt(x ** 2 + y ** 2)
+     v = uw.discretisation.MeshVariable("V", fine, 2, degree=2)
+@@ -34,12 +37,20 @@ def _solve(fine, tail):
+     s.add_rotated_freeslip_bc(0, "Upper", normal=fine.CoordinateSystem.unit_e_0)
+     s.add_rotated_freeslip_bc(0, "Lower", normal=fine.CoordinateSystem.unit_e_0)
+     s.petsc_use_pressure_nullspace = True
+-    s.tolerance = 1.0e-8
+-    set_custom_fmg(s, tail, field_id=0)
++    if lu:
++        s._rotated_use_lu = True
++        s.tolerance = 1.0e-11
++    else:
++        s.tolerance = 1.0e-8
++        set_custom_fmg(s, tail, field_id=0)
+     s.solve(zero_init_guess=True)
+     info = s._rotated_freeslip_info
+     assert info["converged"]
+-    return info, float(np.linalg.norm(np.asarray(v.array)))
++    return info, np.asarray(v.array).ravel().copy()
++
++
++def _rel(a, b):
++    return float(np.linalg.norm(a - b) / np.linalg.norm(b))
+ 
+ 
+ def _uniform_tail():
+@@ -51,14 +62,19 @@ def _uniform_tail():
+ def test_orphans_on_a_graded_finest_level_are_dropped_not_repaired():
+     fine = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.06,
+                               cellSizeInner=0.006, cellSizeOuter=0.06, qdegree=3)
+-    info, vnorm = _solve(fine, _uniform_tail())
+-    assert info["vel_its_last"][-1] <= 4, info["vel_its_last"]
+-    np.testing.assert_allclose(vnorm, 787.24535978, rtol=1e-7)
++    info, v = _solve(fine, _uniform_tail())
++    # 3 on macOS gmsh, 4 on Linux gmsh; 13 on development (the repair's empty columns)
++    assert info["vel_its_last"][-1] <= 6, info["vel_its_last"]
++    # the answer against a direct solve on the SAME mesh (no absolute, mesher-bound norm)
++    _info, v_lu = _solve(fine, None, lu=True)
++    assert _rel(v, v_lu) < 1.0e-6
+ 
+ 
+ def test_no_orphans_no_change():
+     fine = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.02, qdegree=3)
+-    info, vnorm = _solve(fine, _uniform_tail())
+-    # counts are reproducible only to round-off (UNFILED 64): bounds, not values; 1 / 3 / 9 here
+-    assert info["ksp_its"][-1] <= 2 and info["vel_its_last"][-1] <= 4 and info["pres_its_last"][-1] <= 10, info
+-    np.testing.assert_allclose(vnorm, 816.99052405, rtol=1e-7)
++    info, v = _solve(fine, _uniform_tail())
++    # counts are reproducible only to round-off (UNFILED 64): bounds with headroom over
++    # both platforms, not values; 1 / 3 / 9 measured
++    assert info["ksp_its"][-1] <= 2 and info["vel_its_last"][-1] <= 6 and info["pres_its_last"][-1] <= 12, info
++    _info, v_lu = _solve(fine, None, lu=True)
++    assert _rel(v, v_lu) < 1.0e-6
+-- 
+2.39.5 (Apple Git-154)
+

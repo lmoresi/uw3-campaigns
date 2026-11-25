@@ -1,7 +1,7 @@
-From a5b1b623a6b43592216e993d472e20626e06f9d9 Mon Sep 17 00:00:00 2001
+From a2624c5bf38d8d7920cbbffdf7ba889b7181398e Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 00:07:22 +1100
-Subject: [PATCH 4/5] Serial custom-FMG: drop orphan coarse DOFs, do not repair
+Subject: [PATCH 4/6] Serial custom-FMG: drop orphan coarse DOFs, do not repair
  them
 
 Since #890 the parallel custom-FMG route builds its node transfers without
@@ -25,7 +25,7 @@ no-orphan guard (counts 1/3/9 unchanged). Before and after, over 51 custom-MG
 and placed-ribbon test files (229 tests with solves): 227 have identical
 counts, with solutions within 1e-14. One is test_0894. One, test_1157's
 first warm solve, takes 78 or 200 velocity iterations from run to run on the
-same build. 3-D box, split ladder and K1 #893 fixtures: identical counts,
+same build. 3-D box, split ladder and the #893 placed-ladder fixtures: identical counts,
 solutions within 5e-11.
 
 Underworld development team with AI support from Claude Code
