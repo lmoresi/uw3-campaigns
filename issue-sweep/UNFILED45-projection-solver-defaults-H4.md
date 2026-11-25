@@ -5,6 +5,12 @@ H4, 2026-11-25, for C1. Measured locally under the GitHub pause.
 - **Machine:** hyperion, a 96-thread Linux workstation (Xeon Gold 6240R, MPICH).
 - **Method:** every projection was overridden by H4's audit hook (env `PROJ_TOL`, `PROJ_KSP`, `PROJ_PC`), so library code was unchanged. Logs and scripts are in hyperion `runs/2026-11-10-h4/projaudit/` (`four.sh`, `four_*.jsonl`, `ve/ve_box.py`, `illcond*.py`).
 
+**Status (2026-11-25, after UNFILED 52 passed round 2 at 83dbc69a):** current, nothing to re-measure.
+- **Prerequisite 3 is met:** projections now refuse a qdegree below their degree, so CG never sees a singular mass matrix.
+- **The measured configurations are unaffected:** the 36 files run every projection at qdegree at least its degree, and the 52 review found no refusal in 212 serial and 91 parallel files.
+- **The P3/P4 at qdegree 2 rows below** are now refused rather than solved, which is the point of 52.
+- **The numbers were taken with #1298's increment rule in force.** #1298 is reviewed but held for the pause.
+
 ## The four configurations
 
 Today's default is GMRES+GAMG at each projection's own tolerance (1e-3 for the history projections, 1e-4 or 1e-6 elsewhere).
