@@ -113,3 +113,53 @@ row.
 The row's candidate is therefore the light + sharp pull WITH snap_frac 0.3 for add_fault. The
 effect of snap_frac 0.3 on development's rule, on add_conforming_surface, and on the 360 kink
 and 120 line traces is not yet measured.
+
+## Row 29, the snap_frac measurements (2026-11-26)
+
+### (2) add_conforming_surface
+It has its own `snap_frac` argument with its own default (0.10). A change to add_fault's default does
+not touch it, so that path is unchanged by the row.
+
+### (1) and (3) The hunt: 120 lines+arcs and 360 kinks, both meshes, spacings 1.0 / 0.5 / 0.3 cell
+"refused" counts add_fault raising; "returned partial/empty" counts a result that came back from
+add_fault but misses part of the trace by the probe's nominal-cell check (on development there is no
+guard).
+
+| family | dev (snap 0.1) | dev + snap 0.3 | light+sharp (snap 0.1) | light+sharp + snap 0.3 |
+|---|---|---|---|---|
+| lines+arcs | 51 complete / 50 refused / 19 returned partial or empty | 51 / 50 / 19 | 120 / 0 / 0 | 120 / 0 / 0 |
+| kinks | 181 / 95 / 84 | 179 / 96 / 85 | 305 / 52 / 3 | 304 / 53 / 3 |
+
+The 3 "returned" under light+sharp are the guard-tolerance borderline cases (0.50-0.57 nominal
+cells).
+
+- Kinks complete by turn, of 60: at 10-90 degrees, dev 25-37 and light+sharp 60, with or without
+  snap. At 120, 28 / 27 / 45 / 44. At 150, 21 / 20 / 20 / 20.
+- Traces that place on development (232), still complete: dev + snap 0.3 230; light+sharp 227;
+  light+sharp + snap 0.3 226.
+- **So snap 0.3 alone changes little in the hunt; the pull rule is what changes the outcomes.**
+
+### Refinement at snap 0.3 (four traces, N = 12-96): max slip, velocity iterations, smallest angle
+- **dev + snap 0.3 is identical to dev at snap 0.1** on traces 0, 1 and 3 up to N = 48 (the snap
+  never fires there). Small changes elsewhere (trace 2 N = 24: 0.109876 against 0.109895). It still
+  gives the silent 0.0750 at trace 1, N = 48.
+- **light+sharp + snap 0.3:**
+  - iterations at N = 12 / 96 are 27-33 / 73-112, against development's 26-29 / 69-82 and
+    light+sharp at snap 0.1's 33-42 / 148-191;
+  - smallest angles in the solved meshes are 14-37 degrees;
+  - slips agree with the other modes' limit to about 1e-4 at N = 96;
+  - trace 3 at N = 48, refused at snap 0.1, places at snap 0.3 (0.166138).
+
+### A blocker found: the light+sharp rule leaves ZERO-AREA cells at sharp turns
+In the kink hunt, 5 results that add_fault returned as complete hold a cell of area 1e-17 to 3e-16
+cell^2, with a smallest angle of 0 degrees. All are at 90- and 120-degree turns, and they are the
+same 5 at snap 0.1 and at 0.3 (`flat.jsonl`). Development's every-sample rule produces none at
+either snap setting (0 of about 330 results, `flat_dev.jsonl`). The cut refuses an INVERTED cell
+but not a flat one, so these come back silently. A flat cell gives the finite-element map a zero
+Jacobian, so a solve on such a mesh cannot be trusted. None of the refinement study's solved meshes
+has one; the smallest angle there is 4 degrees or more.
+
+So, as measured, the row is not ready. Either the cut refuses a degenerate cell (area below a
+stated fraction of h^2, alongside its inverted-cell check), which would turn these 5 into
+refusals, or the sharp-turn keep is changed so that it does not produce them. The first is a
+guard the cut needs anyway: any pull rule could reach it.

@@ -76,9 +76,10 @@ def solve(m2, name):
                 pres=info.get("pres_its_last"), converged=bool(info.get("converged")))
 
 for n, (tag, Q) in enumerate(traces()):
-    rec = dict(mode=MODE, mesh=mesh_kind, ds=DS, trace=tag)
+    rec = dict(mode=MODE + ("+snap" + os.environ["SNAP_FRAC"] if os.environ.get("SNAP_FRAC") else ""), mesh=mesh_kind, ds=DS, trace=tag)
     try:
-        m2 = mesh.add_fault(("F", Q))
+        snap = {"snap_frac": float(os.environ["SNAP_FRAC"])} if os.environ.get("SNAP_FRAC") else {}
+        m2 = mesh.add_fault(("F", Q), **snap)
     except Exception as e:
         msg = str(e)
         rec["outcome"] = ("empty" if "no facet" in msg else "partial" if "misses part" in msg else "raised")
@@ -99,7 +100,8 @@ for n, (tag, Q) in enumerate(traces()):
                trace_to_chain_mean=float(a.mean() / h), chain_to_trace_max=float(c.max() / h), cells=int(dm.getHeightStratum(0)[1]))
     # the base mesh's own vertices that a pull or a snap moved (the split adds vertices after them)
     n0 = min(len(X0), len(X)); mv = np.linalg.norm(X[:n0] - X0[:n0], axis=1)
-    rec.update(moved=int((mv > 1e-12).sum()), moved_max=float(mv.max() / h))
+    rec.update(moved=int((mv > 1e-12).sum()), moved_max=float(mv.max() / h),
+               min_angle_deg=float(np.min(lc.min_angles(dm))), min_area=float(np.min(lc.cell_areas(dm))) / h ** 2)
     if n < SOLVE and rec["outcome"] == "complete":
         try:
             rec.update(solve(m2, "F"))

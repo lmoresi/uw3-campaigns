@@ -1,0 +1,16 @@
+{"mode": "dev", "trace": 0, "N": 12, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.1422384446770364, "min_angle_deg": 31.7360458203886, "outer": [1], "vel": [26], "pres": [19], "converged": true}
+{"mode": "dev", "trace": 0, "N": 24, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.14111759313388386, "min_angle_deg": 16.624562454553807, "outer": [1], "vel": [34], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 0, "N": 48, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.1401094304881563, "min_angle_deg": 22.320174275433114, "outer": [1], "vel": [50], "pres": [22], "converged": true}
+{"mode": "dev", "trace": 0, "N": 96, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.1400139777484391, "min_angle_deg": 16.264944075446852, "outer": [1], "vel": [81], "pres": [22], "converged": true}
+{"mode": "dev", "trace": 1, "N": 12, "turn": -0.08132591051210647, "snap_frac": "0.3", "slip_max": 0.1213473521397747, "min_angle_deg": 29.02666924081567, "outer": [1], "vel": [29], "pres": [18], "converged": true}
+{"mode": "dev", "trace": 1, "N": 24, "turn": -0.08132591051210647, "snap_frac": "0.3", "slip_max": 0.12110477945687702, "min_angle_deg": 39.18323583505963, "outer": [1], "vel": [29], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 1, "N": 48, "turn": -0.08132591051210647, "snap_frac": "0.3", "slip_max": 0.07499163767584258, "min_angle_deg": 29.25194706012651, "outer": [1], "vel": [44], "pres": [22], "converged": true}
+{"mode": "dev", "trace": 1, "N": 96, "turn": -0.08132591051210647, "snap_frac": "0.3", "slip_max": 0.12028955787875162, "min_angle_deg": 12.014607327308159, "outer": [1], "vel": [79], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 2, "N": 12, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.11115901920447867, "min_angle_deg": 25.481838949929795, "outer": [1], "vel": [26], "pres": [18], "converged": true}
+{"mode": "dev", "trace": 2, "N": 24, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.10987575114992568, "min_angle_deg": 21.194619400060343, "outer": [1], "vel": [35], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 2, "N": 48, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.10981999789318317, "min_angle_deg": 19.003458006754737, "outer": [1], "vel": [50], "pres": [22], "converged": true}
+{"mode": "dev", "trace": 2, "N": 96, "turn": 0.0, "snap_frac": "0.3", "slip_max": 0.10932757444956226, "min_angle_deg": 21.918350142082446, "outer": [1], "vel": [69], "pres": [22], "converged": true}
+{"mode": "dev", "trace": 3, "N": 12, "turn": -0.8997174098538341, "snap_frac": "0.3", "slip_max": 0.16732263601952166, "min_angle_deg": 29.534286217289697, "outer": [1], "vel": [26], "pres": [18], "converged": true}
+{"mode": "dev", "trace": 3, "N": 24, "turn": -0.8997174098538341, "snap_frac": "0.3", "slip_max": 0.16702326989588584, "min_angle_deg": 23.992783932366535, "outer": [1], "vel": [31], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 3, "N": 48, "turn": -0.8997174098538341, "snap_frac": "0.3", "slip_max": 0.16592602298034742, "min_angle_deg": 22.284581400967962, "outer": [1], "vel": [49], "pres": [21], "converged": true}
+{"mode": "dev", "trace": 3, "N": 96, "turn": -0.8997174098538341, "snap_frac": "0.3", "slip_max": 0.16562699132779507, "min_angle_deg": 18.738788539164418, "outer": [1], "vel": [74], "pres": [22], "converged": true}
