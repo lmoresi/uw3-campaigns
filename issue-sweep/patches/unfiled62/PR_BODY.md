@@ -45,6 +45,8 @@ the only check on the widening. A second case is the single fine DOF.
 Tolerances: a peak memory cap of 20 MB (tracemalloc); row sums equal to 1 within 1e-14. The
 claims are compared exactly.
 
+**Stacked on UNFILED 65** (the uw ckdtree stale-buffer fix), which must merge first: test_0885 depends on it.
+
 Leaves open UNFILED 63: the repair empties columns too. Register row 26, stacked on this branch,
 turns the repair off on the serial custom-FMG route.
 
