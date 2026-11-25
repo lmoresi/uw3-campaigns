@@ -45,3 +45,35 @@ and 1097 all pass (63 passed, 1 skipped).
 ## Tolerances
 None beyond the printed rounding: the baselines are the message's own 3-significant-figure
 numbers, compared exactly.
+
+## Second commit, 22fb2614: place_sheet (C1: "yes to place_sheet next")
+place_sheet is 3-D only; 2-D add_fault goes through line_cut. "Leave the 3-D placement" was read
+as the 3-D thin volume (place_surface.py ~5363), which this commit leaves unchanged.
+
+- `_closed_shell_3d` (shared by the sheet and the 3-D thin volume) keeps its message text. At the
+  wall refusal it attaches `wall_face`, `drop` (the cavity's cells) and `rounds` to the
+  exception. The 3-D thin volume is otherwise untouched (test_0855 passes).
+- The sheet carve catches it and raises `_sheet_wall_refusal`. The original text leads, so
+  fault_split's `"wall" in str(err)` and the tests' "domain wall" matches still hold. No campaign
+  driver matches on sheet errors (grep of uw3-campaigns: the only retry lists are the 2-D
+  ribbon's).
+- Numbers: the cavity's reach is the largest exact sheet distance of any vertex of a dropped
+  cell. The nearest wall vertex is taken over non-outcrop wall vertices, with a bounded exact
+  distance (cutoff 2 x reach; the touched vertex is always inside it). The carve terms are
+  clearance x h at the touched vertex and 0.6 x the largest diameter of the dropped cells
+  around it. The lever is clearance if clearance x h >= 0.6 x diameter, otherwise cell size.
+- Probe (p_sheet_wall.py): flat 0.4 x 0.4 sheet in a unit box, cells 0.11. It is refused at
+  z = 0.98-0.80 and places at 0.76. At 0.95 / 0.87 / 0.80 the message gives a reach of
+  0.245 / 0.227 / 0.261 against a wall at 0.05 / 0.13 / 0.20, and asks for 0.195 / 0.097 /
+  0.061 more. 0.80 - 0.061 = 0.74 agrees with 0.76 placing. Growth rounds were 0 in all three:
+  the reach is the carve (0.111) plus the dropped cells' outer vertices, about one cell.
+- Test: tests/test_0868_place_sheet_wall_refusal_numbers.py (level_1, tier_b, 3 s), the z = 0.87
+  fixture. Baselines are reach 0.227, wall 0.13 and the lever "refine the mesh near it".
+- Both new tests were run against development's place_surface.py (swapped in, rebuilt): both
+  fail with the old text. Restored and rebuilt: both pass. Placement and sheet tests 0853, 0854,
+  0855, 0865, 0867, 0868, 1090, 1091 and 1174: 98 passed, 1 skipped.
+- Not changed: the sheet's "strand a domain-wall vertex" refusal (~1962). No fixture reaches it
+  here, and changing it without a failing test is against the rule.
+- For H1 at np 2 (C1's check): the message is formatted only on the surgery rank and then
+  all-gathered as a string, so every rank should raise identical text. To confirm, run test_0865
+  and test_0868's fixtures under mpirun -n 2 and compare str(err) across ranks.

@@ -1,0 +1,165 @@
+From 22fb2614075397f2925cc549dbde90479e961704 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Wed, 25 Nov 2026 23:55:21 +1100
+Subject: [PATCH 2/2] Give the sheet's wall refusal its numbers
+
+place_sheet's "the sheet's cavity reached the domain wall away from the
+outcrop; the sheet must clear the other walls" did not say how far the sheet
+was from the wall or what set the cavity's size. On a unit box with cells of
+0.11, a flat sheet 0.13 below the top wall is refused, though it is more than
+a cell away.
+
+_closed_shell_3d now attaches what it reached to the exception (the wall face,
+the cavity's cells, the growth rounds), with its text unchanged; the 3-D thin
+volume, its other caller, raises the same message as before. The sheet carve
+catches it and raises _sheet_wall_refusal. The new message keeps the original
+text first, then gives:
+- the wall vertex touched;
+- the cavity's reach from the sheet;
+- the nearest wall vertex's distance from the sheet;
+- the carve's two reaches there (clearance x h, and 0.6 x the cell diameter
+  for the centroid rule);
+- any growth rounds the shell took;
+- the move that would clear the wall, and the lever: clearance when it
+  governs, otherwise the mesh's cell size.
+
+test_0868 is that fixture: reach 0.227, nearest wall vertex 0.13, and the
+cells, not clearance, set the carve.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 52 +++++++++++++++++--
+ ...t_0868_place_sheet_wall_refusal_numbers.py | 42 +++++++++++++++
+ 2 files changed, 90 insertions(+), 4 deletions(-)
+ create mode 100644 tests/test_0868_place_sheet_wall_refusal_numbers.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 3c8b9bf6..16faacda 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -1843,6 +1843,41 @@ def _gather_regions(dm, vertex_region_chart, verbose=False, layers=1):
+     return work, n_region, n_moved, owner, canon
+ 
+ 
++def _sheet_wall_refusal(err, X, cells, sheet_pts, sheet_tris, on_wall, on_open,
++                        h_vertex, h_cell, clearance):
++    """The sheet's wall refusal from :func:`_closed_shell_3d` (``err``, which
++    carries the wall face it reached, the cavity's cells then and the growth
++    rounds), with the numbers that decide it: how far the cavity reaches from
++    the sheet, how far the nearest wall vertex is from it, the carve's two
++    reaches at the wall vertex the cavity touched, and how much of the reach
++    the shell's growth to a closed manifold added. The text of ``err`` leads,
++    unchanged, for callers that match on it."""
++    face = np.asarray(err.wall_face, dtype=np.int64)
++    cav = np.unique(cells[err.drop].ravel())
++    d_cav = _sheet_distance(X[cav], sheet_pts, sheet_tris)
++    reach = float(d_cav.max())
++    d_face = _sheet_distance(X[face], sheet_pts, sheet_tris)
++    w = int(face[np.argmin(d_face)])
++    walls = np.flatnonzero(on_wall & ~on_open)
++    wall = float(_sheet_distance_within(X[walls], sheet_pts, sheet_tris,
++                                        2.0 * reach).min())
++    by_h = float(clearance * h_vertex[w])
++    star = (cells == w).any(axis=1) & err.drop
++    by_c = float(0.6 * h_cell[star].max()) if star.any() else 0.0
++    lever = ("reduce clearance or the cell size near it" if by_h >= by_c
++             else "refine the mesh near it, whose cells set the carve here")
++    grown = (f" The shell grew {err.rounds} round(s) to close, taking the "
++             f"cavity past the carve." if err.rounds else "")
++    return RuntimeError(
++        f"{err}. It touched the wall at ({X[w, 0]:.4g}, {X[w, 1]:.4g}, "
++        f"{X[w, 2]:.4g}): the cavity reaches {reach:.3g} from the sheet and the "
++        f"nearest wall vertex is {wall:.3g} from it. The carve takes the "
++        f"vertices within clearance x h = {by_h:.3g} of the sheet, every cell "
++        f"the sheet crosses, and every cell whose centre is within 0.6 x its "
++        f"diameter = {by_c:.3g} of it.{grown} Move the sheet about "
++        f"{reach - wall:.3g} further from the wall, or {lever}")
++
++
+ def _carve_cavity_3d(dm, X, cells, sheet_pts, sheet_tris, clearance,
+                      held_cells, h_vertex, on_wall, shared_chart,
+                      open_deletable=None, open_near=None, extra_victims=None):
+@@ -1939,9 +1974,15 @@ def _carve_cavity_3d(dm, X, cells, sheet_pts, sheet_tris, clearance,
+     if not drop.any():
+         raise ValueError("the sheet meets no cell of this mesh")
+ 
+-    shell, cap_faces, drop = _closed_shell_3d(
+-        dm, X, cells, drop, victim, held_cells, shared_chart, "sheet",
+-        open_vertex=open_near)
++    try:
++        shell, cap_faces, drop = _closed_shell_3d(
++            dm, X, cells, drop, victim, held_cells, shared_chart, "sheet",
++            open_vertex=open_near)
++    except RuntimeError as err:
++        if not hasattr(err, "wall_face"):
++            raise
++        raise _sheet_wall_refusal(err, X, cells, sheet_pts, sheet_tris, on_wall,
++                                  on_open, h_vertex, h_cell, clearance) from None
+ 
+     # The straddle rule — or the shell growth — can drop the whole star of
+     # a vertex that is NOT a victim; such a vertex is on no shell face and
+@@ -2580,9 +2621,12 @@ def _closed_shell_3d(dm, X, cells, drop, victim, held_cells, shared_chart,
+                         open_vertex[v] for v in verts):
+                     cap_faces.append((f, verts))
+                     continue
+-                raise RuntimeError(
++                err = RuntimeError(
+                     f"the {noun}'s cavity reached the domain wall away from "
+                     f"the outcrop; the {noun} must clear the other walls")
++                # for a caller that reports the numbers (_sheet_wall_refusal)
++                err.wall_face, err.drop, err.rounds = list(verts), drop.copy(), _round
++                raise err
+             if n_in == 1:
+                 shell.append((f, face_verts[f]))
+         edge_count = Counter()
+diff --git a/tests/test_0868_place_sheet_wall_refusal_numbers.py b/tests/test_0868_place_sheet_wall_refusal_numbers.py
+new file mode 100644
+index 00000000..4f7e7288
+--- /dev/null
++++ b/tests/test_0868_place_sheet_wall_refusal_numbers.py
+@@ -0,0 +1,42 @@
++"""The sheet's wall refusal says how far the cavity reaches and how far the wall is.
++
++A flat sheet 0.13 below the top wall of a unit box with cells of 0.11 is refused: its
++cavity reaches the wall. The message used to say only "the sheet must clear the other
++walls", which gave no hint that the sheet was more than a cell from the wall, or that
++the cells' own size, not clearance, set the carve.
++"""
++
++import re
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import place_sheet
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++
++def test_sheet_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
++    mesh = uw.meshing.UnstructuredSimplexBox(
++        minCoords=(0.0, 0.0, 0.0), maxCoords=(1.0, 1.0, 1.0), cellSize=0.11,
++        regular=False, qdegree=2)
++    s = np.linspace(-0.2, 0.2, 5)
++    pts = np.array([(0.5 + a, 0.5 + b, 0.87) for a in s for b in s])
++    tris = []
++    for i in range(4):
++        for j in range(4):
++            a, b, c, d = 5 * i + j, 5 * i + j + 1, 5 * (i + 1) + j, 5 * (i + 1) + j + 1
++            tris += [(a, b, d), (a, d, c)]
++
++    with pytest.raises(RuntimeError, match="reached the domain wall") as err:
++        place_sheet(mesh.dm, pts, np.array(tris, dtype=np.int64), label="Fault")
++
++    msg = str(err.value)
++    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the sheet and the "
++                  r"nearest wall vertex is ([0-9.e+-]+) from it", msg)
++    assert m, msg
++    reach, wall = float(m.group(1)), float(m.group(2))
++    assert reach > wall
++    assert (reach, wall) == (0.227, 0.13)
++    assert "refine the mesh near it" in msg
+-- 
+2.39.5 (Apple Git-154)
+
