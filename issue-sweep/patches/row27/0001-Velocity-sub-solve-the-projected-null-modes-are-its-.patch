@@ -1,0 +1,154 @@
+From 89b36128e561b3ac569d02a566b82274f07d345d Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 01:37:19 +1100
+Subject: [PATCH] Velocity sub-solve: the projected null modes are its
+ transpose null space
+
+On a rotated free-slip annulus or shell with an exact normal, the rotations
+the outer solve admits are null modes of the velocity block, and
+_NullModeProjectedPC projects them out of what the preconditioner is given
+and what it returns (#963). The velocity sub-solve's right-hand side kept
+its component along them, and its residual cannot fall below that
+component: on test_1157's low-viscosity annulus one sub-solve plateaued at
+9e-6 against its target of 3.3e-8 (0.033 x tol) and ran to its
+200-iteration cap (UNFILED 64, register row 27).
+
+The admitted modes are now also the velocity block's transpose null space,
+so KSPSolve removes them from every velocity sub-solve's right-hand side.
+It is the same mode set the shell holds. Where no mode is admitted (a
+no-slip wall, the mesh normal on a shell), nothing is attached and the solve
+is development's, bit for bit. PETSc's mechanism gives what a hand
+projection of the right-hand side gave (57 velocity iterations, error
+1.52e-10 against LU), so no projection code is added.
+
+Measured, serial, before and after:
+- test_1157's case at cell 0.1: 305 velocity iterations and 5.5 s become
+  57 and 2.5 s.
+- A warm 8-step loop: every development step capped one or two velocity
+  sub-solves, at about 6.7 s per step; now none, at 1.85 s.
+- TI annulus: one cap removed, 7.3 s to 6.3 s.
+- 3-D shell with an exact normal (3 modes), and the fault ladder split and
+  unsplit: counts unchanged.
+- The answer moves at most 5.6e-13 relative in these fixtures. In the 39
+  rotated free-slip test files (236 tests with solves), 234 have identical
+  counts; it moves at most 2.8e-9 (tolerance 1e-6). test_1157's cold solve
+  goes from 200 to 4.
+
+test_0895 is the low-viscosity annulus: no capped velocity sub-solve (1 on
+development) and the answer within 1e-9 of LU. Its guard has a no-slip
+inner wall, where no mode is admitted.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/rotated_bc.py       |  8 ++
+ ...rotated_velocity_subsolve_null_mode_rhs.py | 79 +++++++++++++++++++
+ 2 files changed, 87 insertions(+)
+ create mode 100644 tests/test_0895_rotated_velocity_subsolve_null_mode_rhs.py
+
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 5872290b..604e5090 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -2990,6 +2990,14 @@ def _project_exact_null_modes(vel_ksp, nsp, vel_is, comm, tol):
+                                                threshold=_projection_threshold(tol))
+     if not modes:
+         return 0, ratios
++    # The same modes are the block's transpose null space, so KSPSolve removes them
++    # from every velocity sub-solve's right-hand side, as the shell below removes
++    # them from what the preconditioner is given. A right-hand side left with a
++    # component along a mode cannot have its residual fall below that component: at
++    # mu 1e-4 on test_1157's annulus one sub-solve plateaued at 9e-6 against a target
++    # of 3.3e-8 and ran to its 200-iteration cap, and a cold solve took 305 velocity
++    # iterations where 57 do, to the same answer (UNFILED 64, register row 27).
++    A_vv.setTransposeNullSpace(PETSc.NullSpace().create(vectors=modes, comm=comm))
+     shell = PETSc.PC().createPython(_NullModeProjectedPC(inner, modes), comm=comm)
+     shell.setOperators(A_vv, P_vv)
+     vel_ksp.setPC(shell)
+diff --git a/tests/test_0895_rotated_velocity_subsolve_null_mode_rhs.py b/tests/test_0895_rotated_velocity_subsolve_null_mode_rhs.py
+new file mode 100644
+index 00000000..79d378cb
+--- /dev/null
++++ b/tests/test_0895_rotated_velocity_subsolve_null_mode_rhs.py
+@@ -0,0 +1,79 @@
++"""A velocity sub-solve does not chase the null mode its preconditioner projects out (row 27).
++
++On an annulus with rotated free-slip on both walls, a rotation is a null mode of the velocity
++block, and the preconditioner projects it out of what it is given and what it returns
++(#963). The velocity sub-solve's right-hand side kept its component along the mode, and the
++residual cannot fall below that component. At mu 1e-4 one sub-solve's right-hand side is
++6e-5 along the mode: it plateaus at 9e-6 and runs to its 200-iteration cap against a target
++of 3.3e-8, and the cold solve takes 305 velocity iterations where 57 do (UNFILED 64). The
++admitted modes are now the velocity block's transpose null space, so the sub-solve's
++right-hand side is projected as the preconditioner's input is.
++
++The guard puts no-slip on the inner wall: no rotation is a null mode, nothing is admitted,
++and the solve is the one development makes.
++"""
++
++import numpy as np
++import pytest
++import sympy
++
++import underworld3 as uw
++from underworld3.utilities import custom_mg
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++
++def _annulus(tag, lower="freeslip", lu=False, mu=1.0e-4):
++    mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.1,
++                              refinement=2, qdegree=3)
++    v = uw.discretisation.MeshVariable(f"V0895{tag}", mesh, 2, degree=2)
++    p = uw.discretisation.MeshVariable(f"P0895{tag}", mesh, 1, degree=1)
++    stokes = uw.systems.Stokes(mesh, velocityField=v, pressureField=p)
++    stokes.constitutive_model = uw.constitutive_models.ViscousFlowModel
++    stokes.constitutive_model.Parameters.shear_viscosity_0 = mu
++    X = mesh.X
++    r = sympy.sqrt(X[0] ** 2 + X[1] ** 2)
++    th = sympy.atan2(X[1], X[0])
++    stokes.bodyforce = (1.0e3 * sympy.cos(4 * th) * sympy.sin(sympy.pi * (r - 0.5) / 0.5)
++                        * sympy.Matrix([X[0] / r, X[1] / r]))
++    if lower == "freeslip":
++        stokes.add_rotated_freeslip_bc(0, "Lower")
++    else:
++        stokes.add_dirichlet_bc((0.0, 0.0), "Lower")
++    stokes.add_rotated_freeslip_bc(0, "Upper")
++    stokes.petsc_use_pressure_nullspace = True
++    if lu:
++        stokes._rotated_use_lu = True
++        stokes.tolerance = 1.0e-11
++    else:
++        stokes.tolerance = 1.0e-6
++        custom_mg.set_custom_fmg(stokes, mesh._coarse_level_meshes()[:-1], field_id=0)
++    return v, stokes
++
++
++def _rel(a, b):
++    a, b = np.asarray(a).ravel(), np.asarray(b).ravel()
++    return float(np.linalg.norm(a - b) / np.linalg.norm(b))
++
++
++def test_the_velocity_subsolve_stops_at_its_target_not_its_cap():
++    v, stokes = _annulus("fs")
++    stokes.solve(zero_init_guess=True)
++    info = stokes._rotated_freeslip_info
++    assert info["converged"]
++    assert stokes._rotated_linear_cache["ctx"]["projected_null_modes"] == 1
++    assert info["sub_capped"]["velocity"] == 0, info["sub_capped"]
++    v_lu, direct = _annulus("fslu", lu=True)
++    direct.solve(zero_init_guess=True)
++    assert _rel(v.array, v_lu.array) < 1.0e-9
++
++
++def test_no_null_mode_no_change():
++    v, stokes = _annulus("ns", lower="noslip")
++    stokes.solve(zero_init_guess=True)
++    info = stokes._rotated_freeslip_info
++    assert info["converged"]
++    assert stokes._rotated_linear_cache["ctx"]["projected_null_modes"] == 0
++    v_lu, direct = _annulus("nslu", lower="noslip", lu=True)
++    direct.solve(zero_init_guess=True)
++    assert _rel(v.array, v_lu.array) < 1.0e-7
+-- 
+2.39.5 (Apple Git-154)
+
