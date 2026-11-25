@@ -1,0 +1,86 @@
+From e2aa7be68dcd13e1c664c644248add39acacb52a Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Wed, 25 Nov 2026 23:36:48 +1100
+Subject: [PATCH 2/3] Break orphan-repair ties by fine index; number the test
+ after #893
+
+Equal distances go to the lower fine index, and a query widens while the first
+free candidate ties with the last neighbour found, so the claims no longer
+depend on how many neighbours were asked for. Development's claims on exact
+ties depended on its k = orphans + 8: on half-cell-offset grids the bounded
+query without this tie-break already differed from development (104 to 1,472
+entries), and no bounded query can reproduce that order.
+
+Still bit-identical to development on every call in the custom-MG and
+placed-ribbon tests (98), on K1's #893 fixture at refinement 4 (orphans 10 and
+38) and on 40 random 2-D and 3-D clouds.
+
+The memory test moves to test_0893 (test_1015 is taken twice already).
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/custom_mg.py        | 35 ++++++++++++-------
+ ...st_0893_custom_mg_orphan_repair_memory.py} |  0
+ 2 files changed, 22 insertions(+), 13 deletions(-)
+ rename tests/{test_1015_custom_mg_orphan_repair_memory.py => test_0893_custom_mg_orphan_repair_memory.py} (100%)
+
+diff --git a/src/underworld3/utilities/custom_mg.py b/src/underworld3/utilities/custom_mg.py
+index 57cc9d97..75a3e922 100644
+--- a/src/underworld3/utilities/custom_mg.py
++++ b/src/underworld3/utilities/custom_mg.py
+@@ -162,26 +162,35 @@ def barycentric_prolongation(coarse_coords, fine_coords, repair_orphans=True,
+     _record(stats, np.nonzero(simp < 0)[0], orphans.size)
+     n_fine = fine_coords.shape[0]
+     if orphans.size and n_fine:
+-        # Each orphan, in order, claims its nearest unclaimed fine DOF. The
+-        # query starts at 9 neighbours and doubles, for that orphan only, while
+-        # every candidate is already claimed. One query of orphans + 8
+-        # neighbours for every orphan gave the same claims but held an
++        # Each orphan, in order, claims its nearest unclaimed fine DOF, equal
++        # distances going to the lower index. The query starts at 9 neighbours
++        # and doubles, for that orphan only, while every candidate is claimed or
++        # the first free one ties with the last neighbour found (a tie can run
++        # past it). One query of orphans + 8 neighbours for every orphan held an
+         # (orphans x orphans) array: 8.6 GB per rank on #893's hierarchy.
+         ftree = cKDTree(fine_coords)
+-        k0 = min(9, n_fine)
+-        cand = ftree.query(coarse_coords[orphans], k=k0)[1].reshape(orphans.size, k0)
++
++        def ranked(c, k):
++            d, j = ftree.query(coarse_coords[c], k=k)
++            d, j = np.atleast_1d(d), np.atleast_1d(j)
++            order = np.lexsort((j, d))
++            return d[order], j[order]
++
+         taken = np.zeros(n_fine, dtype=bool)
+         fixes = {}
+-        for i, c in enumerate(orphans):
++        for c in orphans:
+             if len(fixes) == n_fine:
+                 break
+-            row, k = cand[i], k0
+-            free = ~taken[row]
+-            while not free.any():
+-                k = min(2 * k, n_fine)
+-                row = np.atleast_1d(ftree.query(coarse_coords[c], k=k)[1])
++            k = min(9, n_fine)
++            d, row = ranked(c, k)
++            while True:
+                 free = ~taken[row]
+-            f = int(row[np.argmax(free)])
++                a = int(np.argmax(free))
++                if k == n_fine or (free[a] and d[a] < d[-1]):
++                    break
++                k = min(2 * k, n_fine)
++                d, row = ranked(c, k)
++            f = int(row[a])
+             taken[f] = True
+             fixes[f] = int(c)
+         if fixes:
+diff --git a/tests/test_1015_custom_mg_orphan_repair_memory.py b/tests/test_0893_custom_mg_orphan_repair_memory.py
+similarity index 100%
+rename from tests/test_1015_custom_mg_orphan_repair_memory.py
+rename to tests/test_0893_custom_mg_orphan_repair_memory.py
+-- 
+2.39.5 (Apple Git-154)
+
