@@ -141,7 +141,11 @@ params = uw.Params(
                                 #   is heated by the mantle below it; < 0: the overriding plate's thickness at
                                 #   the trench, 2 sqrt(kappa uw_age_over_myr) (zero without an overriding plate)
     uw_slab_wedge_age_myr=167.0,  # the slab's top is cold (T = 0 on the plane): the wedge is cooled beside the slab over
-                                #   2 sqrt(kappa this) (145 km), continuous across the plane, no mask
+                                #   2 sqrt(kappa this) (145 km), continuous across the plane, no mask. < 0 (Louis,
+                                #   2026-11-25: "Not sure why the upper halo does not match the lower plate age"; "At the
+                                #   moment it looks like an extra sinker / weight on the lithosphere"): the slab's own age
+                                #   down-dip (the plate's age continued), so the slab starts as the plate bent down. The
+                                #   167 Myr was a fixed 0.05-depth halo from 25 Oct (878b9c2), when the plates were ~900 Myr
     uw_restart=-1,
     uw_cell=0.5,
     uw_refinement=4,
@@ -1841,7 +1845,8 @@ def slab_temperature(xy):
     age_end = float(model.age_sub) + tau
     overshoot = np.maximum(s_raw - model.slab_length, 0.0) + np.maximum(-s_raw, 0.0)
     end_factor = erfc(overshoot / (2.0 * np.sqrt(age_end)))
-    scale = np.where(n_into >= 0, 2.0 * np.sqrt(age_end), 2.0 * np.sqrt(float(model.slab_wedge_age)))
+    wedge_age = age_end if float(model.slab_wedge_age) < 0 else float(model.slab_wedge_age)   # < 0: the slab's own age
+    scale = np.where(n_into >= 0, 2.0 * np.sqrt(age_end), 2.0 * np.sqrt(wedge_age))
     T_slab = T_i - T_i * end_factor * erfc(np.abs(n_into) / scale)
     return np.minimum(T_plate, T_slab)
 
