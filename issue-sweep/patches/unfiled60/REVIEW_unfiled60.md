@@ -65,7 +65,8 @@ as the 3-D thin volume (place_surface.py ~5363), which this commit leaves unchan
 - Probe (p_sheet_wall.py): flat 0.4 x 0.4 sheet in a unit box, cells 0.11. It is refused at
   z = 0.98-0.80 and places at 0.76. At 0.95 / 0.87 / 0.80 the message gives a reach of
   0.245 / 0.227 / 0.261 against a wall at 0.05 / 0.13 / 0.20, and asks for 0.195 / 0.097 /
-  0.061 more. 0.80 - 0.061 = 0.74 agrees with 0.76 placing. Growth rounds were 0 in all three:
+  0.061 more. 0.80 - 0.061 = 0.74, but 0.76 already places, so the advice
+  over-asks by about 0.02 here. It errs on the safe side, as a guide should. Growth rounds were 0 in all three:
   the reach is the carve (0.111) plus the dropped cells' outer vertices, about one cell.
 - Test: tests/test_0868_place_sheet_wall_refusal_numbers.py (level_1, tier_b, 3 s), the z = 0.87
   fixture. Baselines are reach 0.227, wall 0.13 and the lever "refine the mesh near it".
