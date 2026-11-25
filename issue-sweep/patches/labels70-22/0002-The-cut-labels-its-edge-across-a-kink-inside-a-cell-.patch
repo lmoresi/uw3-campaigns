@@ -1,0 +1,341 @@
+From 44aa8c53c29c35927280fabcfc65555849357f70 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 04:44:32 +1100
+Subject: [PATCH 2/2] The cut labels its edge across a kink inside a cell;
+ refuse partial surfaces
+
+_label_cut_edges labelled an edge as the cut's only when both its ends AND
+its midpoint lay on the trace. The midpoint test was there to keep out an
+edge joining two points of the trace across a turn, but it also dropped
+the cut's own edge across a kink of the trace inside a cell, where a sample
+has no vertex. add_conforming_surface (which puts no vertex on the samples)
+returned every curved surface partial, even sampled a cell apart: an arc of
+turn 0.08 rad labelled 5 of 17 edges. At 0.3 cells some came back with no
+facet. add_fault hid most of it by pulling a vertex onto every sample, and
+paid with snap failures and empty faults (UNFILED 70, UNFILED 22).
+
+The rule now: an edge is the line's when both ends lie on it, they are
+consecutive along it (no vertex on the line between their arc-length
+parameters), and the edge's chord is at least half the line's length
+between them (_CHORD_TO_ARC = 0.5, which admits a kink of up to 120
+degrees inside a cell and refuses a hairpin, or two stretches that pass
+close). Distances and parameters are measured as the cut measures them:
+along chords in the plane, along great-circle arcs on a sphere (a
+polyline given with three coordinates on a SphericalManifold).
+
+Measured, old rule against new on one build (10 lines and 10 arcs, both
+directions, irregular and regular 1/12 boxes):
+- add_conforming_surface: complete 20-22/40 -> 40/40 at 1, 0.5 and 0.3
+  cell; empty 0-6 -> 0.
+- add_fault: empty 1-8 -> 0; complete up in most rows.
+- Hairpins (arms half a cell apart) and a self-approach: no spurious edge
+  under either rule.
+- add_fault with only its tips and 45-degree turns pulled: 240/240
+  complete under the new rule. That pull rule is not changed here.
+
+UNFILED 68's refusal now guards add_conforming_surface too, counting only
+the trace's points inside the mesh (points_in_domain, reduced over the
+ranks). Its message names the calling method.
+
+test_0898: an arc crossing the box is labelled along its whole length
+(fails under the midpoint rule: 0.682 from the trace); no edge joins the
+arms of a hairpin. test_0897's empty fixture is now partial, and still
+refused. The fault, conforming-surface and line-cut suites (40 files):
+428 passed, 1 skipped.
+
+Underworld development team with AI support from Claude Code
+---
+ .../discretisation/discretisation_mesh.py     |  7 ++
+ src/underworld3/utilities/fault_split.py      | 20 +++--
+ src/underworld3/utilities/line_cut.py         | 71 +++++++++++++--
+ ...d_fault_refuses_an_empty_or_partial_cut.py |  5 +-
+ ...0898_cut_labels_the_chord_across_a_kink.py | 89 +++++++++++++++++++
+ 5 files changed, 177 insertions(+), 15 deletions(-)
+ create mode 100644 tests/test_0898_cut_labels_the_chord_across_a_kink.py
+
+diff --git a/src/underworld3/discretisation/discretisation_mesh.py b/src/underworld3/discretisation/discretisation_mesh.py
+index a890883d..7dcb094d 100644
+--- a/src/underworld3/discretisation/discretisation_mesh.py
++++ b/src/underworld3/discretisation/discretisation_mesh.py
+@@ -10244,6 +10244,13 @@ class Mesh(Stateful, uw_object):
+         if repair:
+             cut_dm, info = self._repair_cut(cut_dm, lines, info, repair_reach,
+                                             verbose)
++        # a cut that labelled nothing, or only part of the surface, is refused
++        # rather than handed on (UNFILED 68 / 70)
++        from underworld3.utilities.fault_split import _refuse_an_empty_or_partial_cut
++        for line in lines:
++            _refuse_an_empty_or_partial_cut(cut_dm, name, value, line,
++                                            caller="add_conforming_surface",
++                                            domain=self)
+         earlier = (None if tracked is None
+                    else _carried_fault_records(cut_dm, tracked, [name]))
+         if verbose:
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 69bfe90d..bf51588f 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1551,8 +1551,9 @@ def _label_embedded_edges(dm, segments, values, exclude=None, verbose=False,
+     """Label the mesh edges already lying on each polyline; return a CLONE.
+ 
+     The label-only form of the cut (``add_fault(cut=False)``): an edge is
+-    the fault's when both its ends and its midpoint lie on the line (the
+-    chord rule of :func:`line_cut._label_cut_edges`). Edges with a support
++    the fault's when both its ends lie on the line, consecutive along it,
++    with its chord at least half the line's length between them (the rule of
++    :func:`line_cut._label_cut_edges`). Edges with a support
+     cell in the ``exclude`` label are left out — the seam ligament's base
+     cells, where the band was clipped and the fault is deliberately uncut.
+     A chain end that is not an end of the trace is a CLIPPED end, at the
+@@ -1611,7 +1612,8 @@ def _label_embedded_edges(dm, segments, values, exclude=None, verbose=False,
+     return new
+ 
+ 
+-def _refuse_an_empty_or_partial_cut(dm, name, value, poly):
++def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
++                                    domain=None):
+     """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
+ 
+     The cut labels an edge only when both its ends and its midpoint lie on the
+@@ -1621,6 +1623,8 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly):
+     so. The chain must come within half a cell of every point of the trace
+     (the trace is sampled at ten points per segment); the cell is the mean edge
+     length within the trace's bounding box, grown by a tenth of its diagonal.
++    ``domain``, a Mesh, restricts the coverage test to the trace's points inside
++    it, for a surface that runs past the walls (add_conforming_surface).
+     COLLECTIVE: the counts and distances are reduced, so every rank decides
+     alike."""
+     from underworld3.utilities.line_cut import _coords, _edge_vertices
+@@ -1648,8 +1652,8 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly):
+               f"of about {h:.3g} here; resample the trace to about one cell "
+               f"({h:.3g}) apart and add the fault again.")
+     if n_facets == 0:
+-        raise ValueError(f"add_fault: the cut along {name!r} labelled no facet, so "
+-                         f"there would be no fault. {advice}")
++        raise ValueError(f"{caller}: the cut along {name!r} labelled no facet, so "
++                         f"there would be no surface. {advice}")
+ 
+     t = np.linspace(0.0, 1.0, 11)
+     dense = np.vstack([poly[:-1] + x * (poly[1:] - poly[:-1]) for x in t])
+@@ -1660,10 +1664,14 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly):
+         u = np.clip(((dense - a) @ e) / L, 0.0, 1.0) if L > 0 else np.zeros(len(dense))
+         d = np.minimum(d, np.linalg.norm(dense - (a + u[:, None] * e), axis=1))
+     d = comm.allreduce(d, op=MPI.MIN)
++    if domain is not None:
++        inside = np.asarray(domain.points_in_domain(dense), dtype=np.int64).ravel()
++        inside = comm.allreduce(inside, op=MPI.MAX).astype(bool)
++        d = np.where(inside, d, 0.0)
+     worst = int(np.argmax(d))
+     if d[worst] > 0.5 * h:
+         where = tuple(float(x) for x in dense[worst])
+-        raise ValueError(f"add_fault: the cut along {name!r} misses part of the trace: "
++        raise ValueError(f"{caller}: the cut along {name!r} misses part of the trace: "
+                          f"the labelled chain is {d[worst]:.3g} from the trace at {where}, "
+                          f"more than half a cell ({0.5 * h:.3g}). {advice}")
+ 
+diff --git a/src/underworld3/utilities/line_cut.py b/src/underworld3/utilities/line_cut.py
+index 6ba6be56..7d8a74cb 100644
+--- a/src/underworld3/utilities/line_cut.py
++++ b/src/underworld3/utilities/line_cut.py
+@@ -752,24 +752,79 @@ def _set_coordinates(dm, indices, values):
+     dm.setCoordinatesLocal(new)
+ 
+ 
++# An edge between two points of a line is the line's when its chord is at least
++# this fraction of the line's length between them. A chord across one kink of
++# turn theta keeps cos(theta / 2) of the arc at worst, so 0.5 admits a kink of
++# up to 120 degrees inside a cell; a hairpin, or two stretches of the line that
++# pass close to each other, give a short chord over a long arc and are refused.
++_CHORD_TO_ARC = 0.5
++
++
++def _segment_length_to(seg, F):
++    """Length along ``seg`` from its start to the points ``F`` on it: along the
++    chord of a planar segment, along the great circle of a spherical one."""
++    if isinstance(seg, _GreatCircleArc):
++        r = np.linalg.norm(seg.A)
++        return r * np.arctan2(np.linalg.norm(np.cross(seg.A, F), axis=1), F @ seg.A)
++    return np.linalg.norm(F - seg.A, axis=1)
++
++
++def _line_parameters(X, line):
++    """Distance of each point to the polyline (as the cut measures it: chords in
++    the plane, great-circle arcs on a sphere), and its arc-length parameter there."""
++    best = np.full(len(X), np.inf)
++    t = np.full(len(X), np.nan)
++    start = 0.0
++    for seg in _segments([line]):
++        F = seg.foot(X)
++        d = np.linalg.norm(X - F, axis=1)
++        closer = d < best
++        best = np.where(closer, d, best)
++        t = np.where(closer, start + _segment_length_to(seg, F), t)
++        start += float(_segment_length_to(seg, seg.B[None, :])[0])
++    return best, t
++
++
+ def _label_cut_edges(dm, lines, tol, name, value):
+     """Mark the edges lying along the cut; return the edge points marked.
+ 
+-    An edge is on the cut when both its endpoints and its midpoint lie on a line.
+-    The midpoint test is what distinguishes the cut from a chord: where a polyline
+-    turns, two vertices on different segments can be joined by an edge that is not
+-    part of the line at all.
++    An edge is on the cut when, for some line, both its endpoints lie on that
++    line, they are CONSECUTIVE along it (no other vertex on the line lies
++    between their arc-length parameters), and the edge's chord is at least
++    ``_CHORD_TO_ARC`` of the line's length between them. The chord rule is what
++    keeps out an edge that is not part of the line: two vertices of a hairpin, or
++    of two stretches that pass close to each other, are near in space and far
++    along the line. A first rule asked for the edge's MIDPOINT on the line, which
++    also dropped the cut's edge across a kink inside a cell (a sample of the
++    trace with no vertex on it), so a curved surface came back partial or empty
++    (UNFILED 70; UNFILED 22).
+ 
+     The points are returned rather than counted here because a shared edge is held
+     by every rank on the seam: counting locally and summing would report it once
+-    per sharer. The caller counts the OWNED ones.
++    per sharer. The caller counts the OWNED ones. Consecutiveness is judged among
++    the vertices this rank holds; a vertex between two ends along the line lies
++    in a cell the line passes through between them, which the edge's rank holds.
+     """
+     X = _coords(dm)
+-    on = _distance_to_lines(X, lines) < tol
+     eS, _eE = dm.getDepthStratum(1)
+     ends = _edge_vertices(dm)
+-    mid_on = _distance_to_lines(0.5 * (X[ends[:, 0]] + X[ends[:, 1]]), lines) < tol
+-    keep = on[ends[:, 0]] & on[ends[:, 1]] & mid_on
++    keep = np.zeros(len(ends), dtype=bool)
++    for line in lines:
++        d, t = _line_parameters(X, line)
++        on = d < tol
++        both = on[ends[:, 0]] & on[ends[:, 1]] & ~keep
++        if not both.any():
++            continue
++        cand = np.flatnonzero(both)
++        ta, tb = t[ends[cand, 0]], t[ends[cand, 1]]
++        lo, hi = np.minimum(ta, tb), np.maximum(ta, tb)
++        arc = hi - lo
++        chord = np.linalg.norm(X[ends[cand, 0]] - X[ends[cand, 1]], axis=1)
++        ts = np.sort(t[on])
++        between = (np.searchsorted(ts, hi - tol, side="left")
++                   - np.searchsorted(ts, lo + tol, side="right"))
++        ok = (between <= 0) & (chord >= _CHORD_TO_ARC * arc - tol)
++        keep[cand[ok]] = True
+ 
+     if not dm.hasLabel(name):
+         dm.createLabel(name)
+diff --git a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+index e865dfa8..c0f93aeb 100644
+--- a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
++++ b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+@@ -42,7 +42,10 @@ def box():
+ 
+ 
+ def test_a_cut_with_no_facet_is_refused(box):
+-    with pytest.raises(ValueError, match="labelled no facet") as err:
++    # empty under the midpoint labelling rule; since the cut labels its edges across
++    # in-cell kinks (UNFILED 70) the chain is partial instead. Either way it is refused;
++    # the empty-label refusal itself is checked on a hand-labelled chain below
++    with pytest.raises(ValueError, match="labelled no facet|misses part of the trace") as err:
+         box.add_fault(("F", _trace(3, 0.3)))
+     assert "resample the trace" in str(err.value)
+ 
+diff --git a/tests/test_0898_cut_labels_the_chord_across_a_kink.py b/tests/test_0898_cut_labels_the_chord_across_a_kink.py
+new file mode 100644
+index 00000000..f9f8dfee
+--- /dev/null
++++ b/tests/test_0898_cut_labels_the_chord_across_a_kink.py
+@@ -0,0 +1,89 @@
++"""The cut labels its edge across a kink of the trace inside a cell (UNFILED 70, UNFILED 22).
++
++The cut labels an edge as the surface's when both its ends lie on the trace. It used to
++ask for the edge's midpoint on the trace as well, to keep out an edge joining two points of
++the trace across a turn. That also dropped the cut's own edge across a kink of the trace
++inside a cell, where a sample has no vertex: a curved surface added with
++add_conforming_surface came back partial (an arc of turn 0.08 rad: 5 of 17 edges labelled)
++or with no facet at all, and said nothing. The rule now asks for the two ends to be
++consecutive along the trace, with the edge's chord at least half the trace's length between
++them, which still keeps out the two arms of a hairpin.
++
++The assertions are relations on the result (the chain covers the trace; no labelled edge
++spans more than twice its length of trace), not counts from one mesher.
++"""
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities import line_cut
++from underworld3.utilities.fault_split import _refuse_an_empty_or_partial_cut
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++H = 1 / 12
++
++
++@pytest.fixture(scope="module")
++def box():
++    return uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                             cellSize=H, regular=True)
++
++
++def _chain(child, name):
++    b = [bb for bb in child.boundaries if bb.name == name][0]
++    dm = child.dm
++    vS, _ = dm.getDepthStratum(0)
++    X = np.asarray(dm.getCoordinatesLocal().array).reshape(-1, 2)
++    lab = dm.getLabel(name)
++    ends = np.array([dm.getCone(int(e)) for e in lab.getStratumIS(b.value).getIndices()]) - vS
++    return b.value, X, ends
++
++
++def _spans(X, ends, trace):
++    """Length of trace between each labelled edge's ends, over the edge's length."""
++    _d, t = line_cut._line_parameters(X, trace)
++    chord = np.linalg.norm(X[ends[:, 0]] - X[ends[:, 1]], axis=1)
++    return np.abs(t[ends[:, 0]] - t[ends[:, 1]]) / chord
++
++
++def _arc():
++    """A gentle arc (turn -0.08 rad) crossing the box, sampled a cell apart: every
++    sample inside a cell is a kink with no vertex on it."""
++    rng = np.random.default_rng(22)
++    for k in range(2):
++        ang = rng.uniform(0, np.pi)
++        turn = rng.uniform(-1, 1) if k % 2 else 0.0
++        c = 0.5 + rng.uniform(-0.05, 0.05, 2)
++    L = 1.6
++    s = np.linspace(-L / 2, L / 2, int(round(L / H)) + 1)
++    th = ang + turn * s / L
++    d = np.column_stack([np.cos(th), np.sin(th)])
++    return c + np.cumsum(np.vstack([[0, 0], d[1:] * np.diff(s)[:, None]]), axis=0) - L / 2 * d[0]
++
++
++def test_a_curved_surface_is_labelled_along_its_whole_length(box):
++    trace = _arc()
++    child = box.add_conforming_surface(uw.meshing.Surface("Arc", box, trace))
++    value, X, ends = _chain(child, "Arc")
++    inside = np.all((trace >= 0) & (trace <= 1), axis=1)
++    # within half a cell of every point of the trace inside the box (the check UNFILED 68
++    # added to add_fault); the midpoint rule left the last 8 cells unlabelled
++    _refuse_an_empty_or_partial_cut(child.dm, "Arc", value, trace[inside])
++    assert (_spans(X, ends, trace) <= 2.0).all()
++
++
++def test_no_edge_joins_the_arms_of_a_hairpin(box):
++    gap = 0.5 * H
++    a = np.linspace(0.0, 0.7, 60)
++    psi = np.linspace(np.pi / 2, -np.pi / 2, 30)[1:-1]
++    trace = np.vstack([np.column_stack([0.52 - a[::-1], np.full(60, 0.5 + gap / 2)]),
++                       np.column_stack([0.52 + gap / 2 * np.cos(psi), 0.5 + gap / 2 * np.sin(psi)]),
++                       np.column_stack([0.52 - a, np.full(60, 0.5 - gap / 2)])])
++    try:
++        child = box.add_conforming_surface(uw.meshing.Surface("Pin", box, trace))
++    except (ValueError, RuntimeError):
++        return                      # refused is acceptable; a spurious edge is not
++    _value, X, ends = _chain(child, "Pin")
++    assert (_spans(X, ends, trace) <= 2.0).all()
+-- 
+2.39.5 (Apple Git-154)
+
