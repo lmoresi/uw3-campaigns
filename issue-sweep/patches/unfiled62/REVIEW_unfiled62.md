@@ -48,3 +48,21 @@ Row-sum check atol 1e-14. Memory cap 20 MB (new 4.4 MB, old 54.7 MB). Matrix equ
 The repair can create new orphans: overwriting a fine row with a weight-one injection
 removes that row's old columns. On the forced fixture, 1,770 columns are empty before the
 repair and 877 after it. Development does the same; install drops them.
+
+## Round 2 (H1 review: changes requested), commit c5a47485
+1. test_0893 no longer hard-codes counts from a regular grid's non-unique Delaunay. It uses a
+   seeded random cloud and compares the claims with an inline greedy reference, with the
+   orphans from the repair-off build. The 20 MB cap stays.
+2. It fails on a k-held-at-9 mutant (`mutant_k9.py`, `mutant_plugin.py`; the claims differ) and
+   on development (59.2 MB; and IndexError with a single fine DOF). Development's claims equal
+   the reference on this cloud (`dev_vs_ref.py`: 1,876 orphans), so the reference encodes the
+   existing rule.
+3. The PR body no longer says "tie order". It describes the cascade, with the server's counts
+   next to the laptop's.
+4. Lows:
+   - `orphans_claimed` added, and `orphans_repaired` documented as the orphans found;
+   - the n_fine = 1 fix is in the test and the body;
+   - the Python loop and the per-rank False are noted in the code and the body.
+
+Custom-MG tests 1015, 1016 and 1017: 15 passed. test_0885 is blocked by UNFILED 65, not by this
+branch.
