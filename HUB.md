@@ -4798,3 +4798,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   tip sinks 2.7-3.2 cm/yr through 670 into the x30 lower mantle; no visible difference with or without strain
   weakening (Louis agrees). Hub: suggested a cheap leak bisect to K1 (vary checkpoint cadence / skip the swarm or
   advection on S0 for ~20 steps) since the leak is now in the plain solve loop, likely library-side.
+- 2026-11-25: K1: S0/S1/S1o at 0/15/30/59 Myr (movies/out/s1_strip.png, job 4967): S1's halo fix thins the slab but
+  behaviour is the same in all three: slab vertical by ~15 Myr, sinks ~3 cm/yr past 2000 km by 59 Myr, trench fixed;
+  subducting plate ~3, overriding ~1.5 cm/yr, both toward the trench; S1o at 59 Myr draws cold lithosphere down from
+  both sides. Louis: "Agreed, this is two sided subduction right now. Let's add things back". Job 4968
+  (workbench_seg.sh, driver 6b6ac2f = ca9afb8, from step 0, to 600 steps), one add-back each on S1o: S2c weak melange
+  -uw_crust_weak 0.01 (viscosity and yield x0.01 in the 11 km layer, fading below 348 km), no fault; S2f fitted fault
+  (-uw_fault_follow ocrust -uw_fault_top tangent -uw_fault_jump_rungs 1, detection from step 0), melange 0.999, no
+  zone or damage. 0.01 and the fault set-up are K1 dial picks, not rulings. Hub: S2f's fault set-up is the one that
+  in Un/Un24 followed markers riding the overriding plate to 1800-2700 km off the slab; asked K1 to monitor
+  fault-to-slab distance each detection and flag (or stop) if it exceeds a few cells.
