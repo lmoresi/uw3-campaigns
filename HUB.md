@@ -4864,3 +4864,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   (= 8e3ae8c), -uw_split_min_dip_deg 20 (K1 dial) -uw_bridge zone -uw_bridge_weak 0.1 -uw_bridge_km 20; S4f = S3f
   (jump limit after 15 Myr) + these, S4n = S3n (no jump limit) + these; from step 0 to 600 steps in segments. (S3f/S3n
   were not reported to the hub before this notice.) K1 uses gzip -U1 pieces from now on.
+
+### 2026-11-26 — S4f/S4n refused at start-up; uw_bridge renamed uw_bridge_kind; S3f/S3n recorded
+- Job 4971 (S4f/S4n) refused at start-up: earth_units.RETIRED reads "uw_" + each scaled option's model name as a retired model-unit option, and uw_bridge_km's model name is "bridge", so -uw_bridge was refused. K1's ad4eb54 renames the kind option to -uw_bridge_kind; nothing else changes. Verified (.gz and mbox sha match, blob c337af7) and pushed to kaiju/slab-workbench as 0266b33. S4f/S4n relaunch on it with -uw_bridge_kind zone.
+- S3f/S3n for the record: job 4970, driver 60c2659, both S2f's set-up (S1o + fitted fault, ocrust, tangent top). S3f: -uw_fault_jump_rungs 1 -uw_fault_jump_after_myr 15. S3n: -uw_fault_jump_rungs 0. Both passed the smoke check and match S2f at step 1 (slip ~1 cm/yr). fault_on_slab and plate_budget due at ~20-30 Myr.
