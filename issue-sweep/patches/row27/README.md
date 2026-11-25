@@ -13,6 +13,6 @@ Files:
 The fault fixture is `run_k1.py` (issue-sweep/patches/row26) with arguments `<tag> 3 2 1e-6
 <split>`.
 
-For the server at np 2-4: test_0895, test_1157 and the fixtures. The velocity sub-block's
-transpose null space is set per rank on the distributed sub-matrix, from the same modes the shell
-holds.
+For the server at np 2-4: test_0895, test_1157 and the fixtures. The null space is created collectively on the solve's communicator,
+from the distributed mode vectors the shell holds, and attached to the distributed velocity
+sub-matrix.
