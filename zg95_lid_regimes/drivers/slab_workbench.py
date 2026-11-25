@@ -262,7 +262,7 @@ params = uw.Params(
                                 #   probably the biggest problem in the current setup"): the channel applies only above this
                                 #   temperature (a tanh switch 50 C wide), so a slab passing through it keeps its viscosity;
                                 #   the lithosphere-asthenosphere boundary is near 1175 +- 50 C (Richards et al. 2018).
-                                #   0: by depth alone, cold rock included (every run to 2026-11-24)
+                                #   0: by depth alone, cold rock included (every run to 2026-11-24); refused from 2026-11-25 when uw_asth < 1
     # the trench (its angle in the model's frame, radians) and the dip (degrees) of the slab state
     uw_theta_trench=0.0,
     uw_dip=45.0,
@@ -530,6 +530,12 @@ slip_src_b = uw.discretisation.MeshVariable("slip_damage_rate", base, 1, degree=
 # The melange layer: particles over the whole base mesh carrying a 0/1 marker "crust"; its proxy is
 # the per-cell linear fit through the cell's particles (sharp at cell edges, no value in a
 # cell the layer has left); crust_b (P1) is the checkpointed picture for the renders.
+if params.uw_asth < 1 and float(params.uw_asth_T_c) <= 0:
+    # Louis, 2026-11-25: "The asthenosphere should not be weakening the slab, so take care not to reintroduce that." A
+    # channel by depth alone weakens the cold slab as much as the mantle around it (every run to 2026-11-24, e.g. the
+    # -uw_asth 0.1 of ARGS_earth.txt); runs before 4a641a1's fix are reproduced on their own commits
+    raise ValueError("-uw_asth < 1 needs -uw_asth_T_c > 0 (the channel only in hot rock): by depth alone it weakens "
+                     "the slab")
 crust_on = params.uw_crust_weak < 1
 RIDGE_CRUST = bool(int(params.uw_ridge_crust))
 if RIDGE_CRUST and (not crust_on or params.uw_crust_ppc <= 0 or params.uw_crust_refill_every <= 0):
