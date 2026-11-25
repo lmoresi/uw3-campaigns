@@ -1,0 +1,209 @@
+From 0105339684538d81a7f9b7b27095879097fcb53b Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 07:15:29 +1100
+Subject: [PATCH] WIP: add_fault pulls tips and turns, snap_frac 0.3 (register
+ row 29)
+
+---
+ src/underworld3/utilities/fault_split.py      | 82 +++++++++++++++----
+ ..._add_fault_slip_independent_of_sampling.py | 67 +++++++++++++++
+ 2 files changed, 135 insertions(+), 14 deletions(-)
+ create mode 100644 tests/test_0900_add_fault_slip_independent_of_sampling.py
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index bf51588f..477328b3 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1612,6 +1612,64 @@ def _label_embedded_edges(dm, segments, values, exclude=None, verbose=False,
+     return new
+ 
+ 
++def _cell_size_near(dm, poly):
++    """Mean edge length of the mesh within the trace's bounding box, grown by a
++    tenth of its diagonal. COLLECTIVE: summed over the ranks, so every rank gets
++    the same number."""
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
++
++    X = _coords(dm)
++    ends = _edge_vertices(dm)
++    lo, hi = poly.min(axis=0), poly.max(axis=0)
++    grow = 0.1 * float(np.linalg.norm(hi - lo))
++    mid = 0.5 * (X[ends[:, 0]] + X[ends[:, 1]])
++    near = np.all((mid >= lo - grow) & (mid <= hi + grow), axis=1)
++    lengths = np.linalg.norm(X[ends[near, 0]] - X[ends[near, 1]], axis=1)
++    tot = uw.mpi.comm.allreduce(np.array([lengths.sum(), lengths.size], dtype=float),
++                                op=MPI.SUM)
++    return float(tot[0] / tot[1]) if tot[1] else float("nan")
++
++
++# add_fault pulls a vertex onto the trace's tips, onto its turns of more than
++# _PULL_TURN_DEG, and onto every sample within _SHARP_REACH cells of a turn of
++# more than _SHARP_TURN_DEG; the cut follows the whole trace between them.
++_PULL_TURN_DEG = 45.0
++_SHARP_TURN_DEG = 90.0
++_SHARP_REACH = 1.5
++# add_fault's default snap fraction (cut_along_lines' own default is 0.1): with
++# fewer pulled vertices the cut's crossing points sit closer to existing ones,
++# and a larger snap keeps the cells sound (smallest angle 15-24 degrees against
++# 4-7 at 0.1, measured; register row 29).
++_ADD_FAULT_SNAP_FRAC = 0.3
++
++
++def _pulled_samples(dm, poly):
++    """The samples of ``poly`` that add_fault puts a mesh vertex on (row 29).
++
++    Pulling every sample of a trace sampled finer than the mesh distorted the
++    cells until the cut's snap inverted them, or let two samples share a vertex
++    and break the chain; and the answer followed the sampling (a fault's slip
++    moved up to 8 % between samplings of one trace). A tip, and a turn, still
++    need a vertex of their own: without one a sharp turn crosses a cell edge
++    twice. COLLECTIVE (the cell size near the trace is reduced)."""
++    P = np.asarray(poly, dtype=float)
++    if len(P) <= 2:
++        return P
++    a = P[1:-1] - P[:-2]
++    b = P[2:] - P[1:-1]
++    cos = np.einsum("ij,ij->i", a, b) / (np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1))
++    turn = np.degrees(np.arccos(np.clip(cos, -1.0, 1.0)))
++    keep = np.zeros(len(P), dtype=bool)
++    keep[[0, -1]] = True
++    keep[1:-1] |= turn > _PULL_TURN_DEG
++    sharp = 1 + np.flatnonzero(turn > _SHARP_TURN_DEG)
++    if sharp.size:
++        reach = _SHARP_REACH * _cell_size_near(dm, P)
++        for i in sharp:
++            keep |= np.linalg.norm(P - P[i], axis=1) <= reach
++    return P[keep]
++
++
+ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+                                     domain=None):
+     """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
+@@ -1639,13 +1697,7 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+               np.zeros(0, dtype=np.int64))
+     n_facets = int(comm.allreduce(int(marked.size), op=MPI.SUM))
+ 
+-    lo, hi = poly.min(axis=0), poly.max(axis=0)
+-    grow = 0.1 * float(np.linalg.norm(hi - lo))
+-    mid = 0.5 * (X[ends[:, 0]] + X[ends[:, 1]])
+-    near = np.all((mid >= lo - grow) & (mid <= hi + grow), axis=1)
+-    lengths = np.linalg.norm(X[ends[near, 0]] - X[ends[near, 1]], axis=1)
+-    tot = comm.allreduce(np.array([lengths.sum(), lengths.size], dtype=float), op=MPI.SUM)
+-    h = float(tot[0] / tot[1]) if tot[1] else float("nan")
++    h = _cell_size_near(dm, poly)
+     seg = np.linalg.norm(np.diff(poly, axis=0), axis=1)
+     spacing = float(np.median(seg)) if seg.size else float("nan")
+     advice = (f"The trace's samples are {spacing:.3g} apart (median), against cells "
+@@ -1747,8 +1799,10 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+         of about 0.9 (the default 0.6 leaves a cavity the fill cannot close
+         on it; the placement's volume guard refuses). 2-D: the cut's snapping
+         options of :func:`line_cut.cut_along_lines` (``snap_frac``,
+-        ``snap_quality``, ``snap_dist``), passed on only when given, so a call
+-        without them makes the same cut as before (#595).
++        ``snap_quality``, ``snap_dist``), passed on when given. ``snap_frac``
++        defaults to 0.3 here (the cut's own default is 0.1): add_fault puts a
++        vertex on the trace's tips and turns only, and the larger snap keeps
++        the cells near the cut sound.
+ 
+     Returns
+     -------
+@@ -1777,6 +1831,7 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+         raise TypeError(f"add_fault: {other} apply to 3-D sheets only; in 2-D "
+                         f"only {sorted(snap_keys)} are accepted")
+     snap = {k: place_kwargs[k] for k in snap_keys if k in place_kwargs}
++    snap.setdefault("snap_frac", _ADD_FAULT_SNAP_FRAC)
+ 
+     segments = []
+     for entry in faults:
+@@ -1841,11 +1896,10 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+             dm = dm.clone()
+         _mark_host_cells(dm)
+         for name, poly in segments:
+-            # EVERY control point gets a vertex, not just the tips: an
+-            # interior kink is the same problem as a tip — a distinguished
+-            # point of the geometry that must coincide with a mesh vertex,
+-            # or the cut leaves the chain fragmented at the turn.
+-            dm = pull_vertex_onto(dm, np.asarray(poly, dtype=float),
++            # the tips and the turns get a vertex (a distinguished point of
++            # the geometry, or the cut leaves the chain fragmented there), not
++            # every sample: see _pulled_samples
++            dm = pull_vertex_onto(dm, _pulled_samples(dm, np.asarray(poly, dtype=float)),
+                                   on_shared=on_shared)
+             n_shared += line_cut_module.last_shared_targets["count"]
+             dm, info = cut_along_lines(dm, [poly], label=name,
+diff --git a/tests/test_0900_add_fault_slip_independent_of_sampling.py b/tests/test_0900_add_fault_slip_independent_of_sampling.py
+new file mode 100644
+index 00000000..2d26b7a7
+--- /dev/null
++++ b/tests/test_0900_add_fault_slip_independent_of_sampling.py
+@@ -0,0 +1,67 @@
++"""add_fault places a finely sampled trace, and the answer does not depend on the sampling (row 29).
++
++add_fault pulled a mesh vertex onto every sample of the trace. A trace sampled finer than
++the mesh then distorted the cells until the cut's snap inverted them, or two samples shared
++a vertex and the chain broke: this arc, sampled a third or half of a cell apart, was refused
++("snapping inverted 3 cell(s)", "the chain has a single facet") and sampled a cell apart came
++back partial. The fault's slip in a sheared box also depended on the sampling: pulling a vertex
++onto every sample makes the mesh follow it (up to 8 % in the measurement). add_fault now pulls
++the trace's two tips, its turns of more than 45 degrees, and its samples within one and a half
++cells of a turn of more than 90 degrees; the cut follows the whole trace between them.
++
++The assertions are relations on one mesh: every sampling places the fault, and the slips agree.
++"""
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++H = 1 / 12
++
++
++def _arc(ds):
++    """A gentle arc (the measurement's trace la1), six cells long, sampled ds cells apart."""
++    rng = np.random.default_rng(22)
++    for k in range(2):
++        ang = rng.uniform(0, np.pi)
++        turn = rng.uniform(-1, 1) if k % 2 else 0.0
++        c = 0.5 + rng.uniform(-0.05, 0.05, 2)
++    L = 6 * H
++    s = np.linspace(-L / 2, L / 2, 400)
++    th = ang + turn * s / L
++    d = np.column_stack([np.cos(th), np.sin(th)])
++    P = c + np.cumsum(np.vstack([[0, 0], d[1:] * np.diff(s)[:, None]]), axis=0) - L / 2 * d[0]
++    seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
++    cum = np.concatenate([[0], np.cumsum(seg)])
++    q = np.linspace(0, cum[-1], int(round(cum[-1] / (ds * H))) + 1)
++    return np.column_stack([np.interp(q, cum, P[:, 0]), np.interp(q, cum, P[:, 1])])
++
++
++def _slip(mesh):
++    x, y = mesh.X
++    st = uw.systems.Stokes(mesh)
++    st.constitutive_model = uw.constitutive_models.ViscousFlowModel
++    st.constitutive_model.Parameters.shear_viscosity_0 = 1
++    st.tolerance = 1.0e-8
++    st.petsc_use_pressure_nullspace = True
++    for side in ("Top", "Bottom", "Left", "Right"):
++        st.add_dirichlet_bc((y - 0.5, 0.0), side)
++    st.add_fault_bc(0, "F")
++    st.solve()
++    info = st._rotated_freeslip_info
++    assert info["converged"]
++    from underworld3.utilities.fault_contact import fault_slip
++    _s, V, _leak = fault_slip(st, "F", info)
++    return float(np.abs(V).max())
++
++
++def test_a_finely_sampled_arc_places_with_the_same_slip():
++    box = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                            cellSize=H, regular=True)
++    slips = [_slip(box.add_fault(("F", _arc(ds)))) for ds in (1.0, 0.5, 0.3)]
++    spread = (max(slips) - min(slips)) / max(slips)
++    # 7.3e-5 measured; development's every-sample pull spread up to 8e-2 on such traces
++    assert spread < 1.0e-3, slips
+-- 
+2.39.5 (Apple Git-154)
+

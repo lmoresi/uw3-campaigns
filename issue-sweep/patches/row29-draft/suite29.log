@@ -1,0 +1,835 @@
+..............FF..F..................................................... [ 16%]
+........................................................................ [ 33%]
+.....................................s.................................. [ 49%]
+..............FF......................................F................. [ 66%]
+......FFF............................................................... [ 83%]
+...........F...F.FF.......FF........F...........FF...................... [ 99%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points[forward] _
+
+direction = 'forward'
+
+    @pytest.mark.parametrize("direction", ["forward", "reversed"])
+    def test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points(direction):
+        """The prescribed-normal sheet's fault (test_1092): nine control points over
+        0.6 radians on a sphere of cell size 0.15, two pairs of which share a vertex.
+        The later of each pair keeps it, so which point goes without follows the
+        trace's direction (measured: phi -0.15 and 0.075 forward, their mirror images
+        reversed). The cut and the split succeed either way, and the two are counted
+        on the mesh returned."""
+        from underworld3.utilities import line_cut
+    
+        # the sphere of test_1092
+        sphere = uw.meshing.SphericalManifold(radius=1.0, cellSize=0.15, degree=1, qdegree=5)
+        phi = np.linspace(-0.3, 0.3, 9)
+        trace = np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])
+        if direction == "reversed":
+            trace = trace[::-1]
+        with pytest.warns(UserWarning, match="left without a vertex"):
+>           split = sphere.add_fault(("Flt", trace))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_0559_coarse_replay_notes_shared_control_points.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:10448: in add_fault
+    child = add_fault(self, faults, verbose=verbose, cut=cut,
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_split.py:1939: in add_fault
+    cut = Mesh(dm, simplex=mesh.dm.isSimplex(),
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:1315: in __init__
+    self.nuke_coords_and_rebuild(verbose)
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:3690: in nuke_coords_and_rebuild
+    self._cell_radii, self._centroids = self._get_cell_radii()
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:8965: in _get_cell_radii
+    radii, _fvm_centroids = petsc_discretisation.petsc_fvm_get_local_cell_sizes(self)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/underworld3/cython/petsc_discretisation.pyx:71: in underworld3.cython.petsc_discretisation.petsc_fvm_get_local_cell_sizes
+    _compute_geometry_fvm(mesh, cellgeom, facegeom)
+src/underworld3/cython/petsc_discretisation.pyx:34: in underworld3.cython.petsc_discretisation._compute_geometry_fvm
+    _check_error_code_collectively(ierr, "DMPlexComputeGeometryFVM")
+src/underworld3/cython/petsc_discretisation.pyx:23: in underworld3.cython.petsc_discretisation._check_error_code_collectively
+    _collective_raise(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+problem = 'DMPlexComputeGeometryFVM failed on rank 0 with error code 77'
+error = <class 'RuntimeError'>, error_kwargs = {}
+first = ('DMPlexComputeGeometryFVM failed on rank 0 with error code 77', <class 'RuntimeError'>, {}, 'fault_contact._collective_raise')
+exc = RuntimeError('DMPlexComputeGeometryFVM failed on rank 0 with error code 77')
+
+    def _collective_raise(problem, error=RuntimeError, **error_kwargs):
+        """One synchronisation point for rank-local failures in collective paths.
+    
+        ``problem`` is ``None`` or an error message string. The verdicts are
+        allgathered and, if any rank failed, the SAME error is raised on EVERY
+        rank — the same contract as fault_split's refusals. Without this, a
+        rank-local raise inside the rotation build or the interface assembler
+        leaves the other ranks blocked in the next collective (Q assembly, the
+        trace-mass exchange, the Newton loop) instead of aborting: a deadlock
+        where an error was meant. COLLECTIVE — every rank must reach it.
+    
+        ``error`` (with ``error_kwargs``) is the class raised: a hierarchy build
+        passes ``custom_mg.CollectiveBuildError`` so the ranks retry or degrade
+        together, as its other checks do.
+    
+        Every rank raises the class of the FIRST failing rank's call, with that
+        rank's message: two calls that pair can pass different classes (an
+        ``agreed_build`` exit and a guard inside the build), and the ranks must
+        still raise one class, or a caller that catches one of them parts the
+        ranks (#874, W1's review of #1218).
+    
+        The exchange is a one-integer flag first, and the messages are gathered
+        only when some rank failed, so a healthy path costs one small allreduce.
+        World-collective: the verdict communicator is a duplicate of the world.
+        """
+        # on the verdict communicator (mpi.first_verdict): a rank still inside a
+        # collective of the path cannot be paired with this exchange
+        first = mpi.first_verdict(problem, site="fault_contact._collective_raise",
+                                  error=error, kwargs=error_kwargs)
+        if first is None:
+            return
+        problem, error, error_kwargs = first.message, first.error, first.kwargs
+        if problem is not None:
+            exc = error(problem, **error_kwargs)
+            # every rank raises this one together: an agreed_build context passes
+            # it through rather than agreeing a second time (#874)
+            exc.agreed = True
+>           raise exc
+E           RuntimeError: DMPlexComputeGeometryFVM failed on rank 0 with error code 77
+
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_contact.py:98: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+direction = 'forward'
+
+    @pytest.mark.parametrize("direction", ["forward", "reversed"])
+    def test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points(direction):
+        """The prescribed-normal sheet's fault (test_1092): nine control points over
+        0.6 radians on a sphere of cell size 0.15, two pairs of which share a vertex.
+        The later of each pair keeps it, so which point goes without follows the
+        trace's direction (measured: phi -0.15 and 0.075 forward, their mirror images
+        reversed). The cut and the split succeed either way, and the two are counted
+        on the mesh returned."""
+        from underworld3.utilities import line_cut
+    
+        # the sphere of test_1092
+        sphere = uw.meshing.SphericalManifold(radius=1.0, cellSize=0.15, degree=1, qdegree=5)
+        phi = np.linspace(-0.3, 0.3, 9)
+        trace = np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])
+        if direction == "reversed":
+            trace = trace[::-1]
+>       with pytest.warns(UserWarning, match="left without a vertex"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted.
+E        Emitted warnings: [].
+
+tests/test_0559_coarse_replay_notes_shared_control_points.py:64: Failed
+----------------------------- Captured stderr call -----------------------------
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: PETSc has generated inconsistent data
+[0]PETSC ERROR: Direction for face 2096 could not be fixed, normal (-0.129315,-0.00560025) v (0.,0.)
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-p value: no:cacheprovider source: command line
+[0]PETSC ERROR:   Option left: name:-q (no value) source: command line
+[0]PETSC ERROR:   Option left: name:-rf value: tests/test_0077_model_registry_does_not_pin.py source: command line
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/pytest/__main__.py with 1 MPI process(es) and PETSC_ARCH  on Wombat-4.local by lmoresi Thu Nov 26 07:15:33 2026
+[0]PETSC ERROR: Configure options: AR=arm64-apple-darwin20.0.0-ar CPP=arm64-apple-darwin20.0.0-clang-cpp RANLIB=arm64-apple-darwin20.0.0-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-D_FORTIFY_SOURCE=2 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -mmacosx-version-min=11.0 -mmacosx-version-min=11.0" LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib -L/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib" --COPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=armv8.3-a -ftree-vectorize -fPIC -fno-stack-protector -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.dylib --with-lapack-lib=liblapack.dylib --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime --with-x=0 --with-scalar-type=real   --with-cuda=0 --with-batch --prefix=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime
+[0]PETSC ERROR: #1 DMPlexComputeGeometryFVM() at /Users/runner/miniforge3/conda-bld/bld/rattler-build_petsc_1782806021/work/src/dm/impls/plex/plexgeometry.c:3055
+_ test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points[reversed] _
+
+direction = 'reversed'
+
+    @pytest.mark.parametrize("direction", ["forward", "reversed"])
+    def test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points(direction):
+        """The prescribed-normal sheet's fault (test_1092): nine control points over
+        0.6 radians on a sphere of cell size 0.15, two pairs of which share a vertex.
+        The later of each pair keeps it, so which point goes without follows the
+        trace's direction (measured: phi -0.15 and 0.075 forward, their mirror images
+        reversed). The cut and the split succeed either way, and the two are counted
+        on the mesh returned."""
+        from underworld3.utilities import line_cut
+    
+        # the sphere of test_1092
+        sphere = uw.meshing.SphericalManifold(radius=1.0, cellSize=0.15, degree=1, qdegree=5)
+        phi = np.linspace(-0.3, 0.3, 9)
+        trace = np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])
+        if direction == "reversed":
+            trace = trace[::-1]
+        with pytest.warns(UserWarning, match="left without a vertex"):
+>           split = sphere.add_fault(("Flt", trace))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_0559_coarse_replay_notes_shared_control_points.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:10448: in add_fault
+    child = add_fault(self, faults, verbose=verbose, cut=cut,
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_split.py:1939: in add_fault
+    cut = Mesh(dm, simplex=mesh.dm.isSimplex(),
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:1315: in __init__
+    self.nuke_coords_and_rebuild(verbose)
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:3690: in nuke_coords_and_rebuild
+    self._cell_radii, self._centroids = self._get_cell_radii()
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:8965: in _get_cell_radii
+    radii, _fvm_centroids = petsc_discretisation.petsc_fvm_get_local_cell_sizes(self)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/underworld3/cython/petsc_discretisation.pyx:71: in underworld3.cython.petsc_discretisation.petsc_fvm_get_local_cell_sizes
+    _compute_geometry_fvm(mesh, cellgeom, facegeom)
+src/underworld3/cython/petsc_discretisation.pyx:34: in underworld3.cython.petsc_discretisation._compute_geometry_fvm
+    _check_error_code_collectively(ierr, "DMPlexComputeGeometryFVM")
+src/underworld3/cython/petsc_discretisation.pyx:23: in underworld3.cython.petsc_discretisation._check_error_code_collectively
+    _collective_raise(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+problem = 'DMPlexComputeGeometryFVM failed on rank 0 with error code 77'
+error = <class 'RuntimeError'>, error_kwargs = {}
+first = ('DMPlexComputeGeometryFVM failed on rank 0 with error code 77', <class 'RuntimeError'>, {}, 'fault_contact._collective_raise')
+exc = RuntimeError('DMPlexComputeGeometryFVM failed on rank 0 with error code 77')
+
+    def _collective_raise(problem, error=RuntimeError, **error_kwargs):
+        """One synchronisation point for rank-local failures in collective paths.
+    
+        ``problem`` is ``None`` or an error message string. The verdicts are
+        allgathered and, if any rank failed, the SAME error is raised on EVERY
+        rank — the same contract as fault_split's refusals. Without this, a
+        rank-local raise inside the rotation build or the interface assembler
+        leaves the other ranks blocked in the next collective (Q assembly, the
+        trace-mass exchange, the Newton loop) instead of aborting: a deadlock
+        where an error was meant. COLLECTIVE — every rank must reach it.
+    
+        ``error`` (with ``error_kwargs``) is the class raised: a hierarchy build
+        passes ``custom_mg.CollectiveBuildError`` so the ranks retry or degrade
+        together, as its other checks do.
+    
+        Every rank raises the class of the FIRST failing rank's call, with that
+        rank's message: two calls that pair can pass different classes (an
+        ``agreed_build`` exit and a guard inside the build), and the ranks must
+        still raise one class, or a caller that catches one of them parts the
+        ranks (#874, W1's review of #1218).
+    
+        The exchange is a one-integer flag first, and the messages are gathered
+        only when some rank failed, so a healthy path costs one small allreduce.
+        World-collective: the verdict communicator is a duplicate of the world.
+        """
+        # on the verdict communicator (mpi.first_verdict): a rank still inside a
+        # collective of the path cannot be paired with this exchange
+        first = mpi.first_verdict(problem, site="fault_contact._collective_raise",
+                                  error=error, kwargs=error_kwargs)
+        if first is None:
+            return
+        problem, error, error_kwargs = first.message, first.error, first.kwargs
+        if problem is not None:
+            exc = error(problem, **error_kwargs)
+            # every rank raises this one together: an agreed_build context passes
+            # it through rather than agreeing a second time (#874)
+            exc.agreed = True
+>           raise exc
+E           RuntimeError: DMPlexComputeGeometryFVM failed on rank 0 with error code 77
+
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_contact.py:98: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+direction = 'reversed'
+
+    @pytest.mark.parametrize("direction", ["forward", "reversed"])
+    def test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points(direction):
+        """The prescribed-normal sheet's fault (test_1092): nine control points over
+        0.6 radians on a sphere of cell size 0.15, two pairs of which share a vertex.
+        The later of each pair keeps it, so which point goes without follows the
+        trace's direction (measured: phi -0.15 and 0.075 forward, their mirror images
+        reversed). The cut and the split succeed either way, and the two are counted
+        on the mesh returned."""
+        from underworld3.utilities import line_cut
+    
+        # the sphere of test_1092
+        sphere = uw.meshing.SphericalManifold(radius=1.0, cellSize=0.15, degree=1, qdegree=5)
+        phi = np.linspace(-0.3, 0.3, 9)
+        trace = np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])
+        if direction == "reversed":
+            trace = trace[::-1]
+>       with pytest.warns(UserWarning, match="left without a vertex"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted.
+E        Emitted warnings: [].
+
+tests/test_0559_coarse_replay_notes_shared_control_points.py:64: Failed
+----------------------------- Captured stderr call -----------------------------
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR:   It appears a new error in the code was triggered after a previous error, possibly because:
+[0]PETSC ERROR:   -  The first error was not properly handled via (for example) the use of
+[0]PETSC ERROR:      PetscCall(TheFunctionThatErrors()); or
+[0]PETSC ERROR:   -  The second error was triggered while handling the first error.
+[0]PETSC ERROR:   Above is the traceback for the previous unhandled error, below the traceback for the next error
+[0]PETSC ERROR:   ALL ERRORS in the PETSc libraries are fatal, you should add the appropriate error checking to the code
+[0]PETSC ERROR: PETSc has generated inconsistent data
+[0]PETSC ERROR: Direction for face 2096 could not be fixed, normal (-0.129315,-0.00560025) v (0.,0.)
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-dm_plex_hash_location (no value) source: code
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-p value: no:cacheprovider source: command line
+[0]PETSC ERROR:   Option left: name:-q (no value) source: command line
+[0]PETSC ERROR:   Option left: name:-rf value: tests/test_0077_model_registry_does_not_pin.py source: command line
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/pytest/__main__.py with 1 MPI process(es) and PETSC_ARCH  on Wombat-4.local by lmoresi Thu Nov 26 07:15:33 2026
+[0]PETSC ERROR: Configure options: AR=arm64-apple-darwin20.0.0-ar CPP=arm64-apple-darwin20.0.0-clang-cpp RANLIB=arm64-apple-darwin20.0.0-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-D_FORTIFY_SOURCE=2 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -mmacosx-version-min=11.0 -mmacosx-version-min=11.0" LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib -L/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib" --COPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=armv8.3-a -ftree-vectorize -fPIC -fno-stack-protector -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.dylib --with-lapack-lib=liblapack.dylib --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime --with-x=0 --with-scalar-type=real   --with-cuda=0 --with-batch --prefix=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime
+[0]PETSC ERROR: #1 DMPlexComputeGeometryFVM() at /Users/runner/miniforge3/conda-bld/bld/rattler-build_petsc_1782806021/work/src/dm/impls/plex/plexgeometry.c:3055
+____________ test_add_fault_without_snap_options_makes_the_same_cut ____________
+
+    def test_add_fault_without_snap_options_makes_the_same_cut():
+        def faulted(**snap):
+            box = uw.meshing.UnstructuredSimplexBox(minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0),
+                                                    cellSize=0.08, regular=False)
+            return box.add_fault([("F595", np.array([[0.25, 0.3], [0.75, 0.62]]))], **snap)
+    
+        plain = _vertices(faulted())
+>       assert plain == _vertices(faulted(snap_frac=0.10, snap_quality=0.15, snap_dist=0.0))
+E       assert 244 == 260
+E        +  where 260 = _vertices(<underworld3.discretisation.discretisation_mesh.Mesh object at 0x137bfeba0>)
+E        +    where <underworld3.discretisation.discretisation_mesh.Mesh object at 0x137bfeba0> = <function test_add_fault_without_snap_options_makes_the_same_cut.<locals>.faulted at 0x137807c40>(snap_frac=0.1, snap_quality=0.15, snap_dist=0.0)
+
+tests/test_0595_cut_spares_internal_boundaries.py:65: AssertionError
+_____________________ test_a_cut_with_no_facet_is_refused ______________________
+
+box = <underworld3.discretisation.discretisation_mesh.Mesh object at 0x14616b590>
+
+    def test_a_cut_with_no_facet_is_refused(box):
+        # empty under the midpoint labelling rule; since the cut labels its edges across
+        # in-cell kinks (UNFILED 70) the chain is partial instead. Either way it is refused;
+        # the empty-label refusal itself is checked on a hand-labelled chain below
+>       with pytest.raises(ValueError, match="labelled no facet|misses part of the trace") as err:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py:48: Failed
+___________________ test_a_chain_that_stops_short_is_refused ___________________
+
+box = <underworld3.discretisation.discretisation_mesh.Mesh object at 0x14616b590>
+
+    def test_a_chain_that_stops_short_is_refused(box):
+>       with pytest.raises(ValueError, match="misses part of the trace") as err:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py:54: Failed
+________________ test_fault_reaction_is_the_membrane_resultant _________________
+
+    def test_fault_reaction_is_the_membrane_resultant():
+        """A split fault in the breathing sheet carries the membrane stress across
+        it: the no-opening reaction, de-smeared by the trace mass, is the resultant
+        L * 6 eta W on every pair (the trace mass once took the triangle's weights
+        on a surface mesh and read 5 to 8 times that)."""
+        from underworld3.utilities.fault_contact import fault_normal_traction
+        W, eta, L = 0.1, 1.0, 0.08
+        sphere = _sphere(0.15)
+        phi = np.linspace(-0.3, 0.3, 9)
+>       split = sphere.add_fault(("Flt", np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_1092_thin_sheet_prescribed_normal.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:10448: in add_fault
+    child = add_fault(self, faults, verbose=verbose, cut=cut,
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_split.py:1939: in add_fault
+    cut = Mesh(dm, simplex=mesh.dm.isSimplex(),
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: in timed
+    result = routine(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:1315: in __init__
+    self.nuke_coords_and_rebuild(verbose)
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:3690: in nuke_coords_and_rebuild
+    self._cell_radii, self._centroids = self._get_cell_radii()
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/discretisation/discretisation_mesh.py:8965: in _get_cell_radii
+    radii, _fvm_centroids = petsc_discretisation.petsc_fvm_get_local_cell_sizes(self)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/underworld3/cython/petsc_discretisation.pyx:71: in underworld3.cython.petsc_discretisation.petsc_fvm_get_local_cell_sizes
+    _compute_geometry_fvm(mesh, cellgeom, facegeom)
+src/underworld3/cython/petsc_discretisation.pyx:34: in underworld3.cython.petsc_discretisation._compute_geometry_fvm
+    _check_error_code_collectively(ierr, "DMPlexComputeGeometryFVM")
+src/underworld3/cython/petsc_discretisation.pyx:23: in underworld3.cython.petsc_discretisation._check_error_code_collectively
+    _collective_raise(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+problem = 'DMPlexComputeGeometryFVM failed on rank 0 with error code 77'
+error = <class 'RuntimeError'>, error_kwargs = {}
+first = ('DMPlexComputeGeometryFVM failed on rank 0 with error code 77', <class 'RuntimeError'>, {}, 'fault_contact._collective_raise')
+exc = RuntimeError('DMPlexComputeGeometryFVM failed on rank 0 with error code 77')
+
+    def _collective_raise(problem, error=RuntimeError, **error_kwargs):
+        """One synchronisation point for rank-local failures in collective paths.
+    
+        ``problem`` is ``None`` or an error message string. The verdicts are
+        allgathered and, if any rank failed, the SAME error is raised on EVERY
+        rank — the same contract as fault_split's refusals. Without this, a
+        rank-local raise inside the rotation build or the interface assembler
+        leaves the other ranks blocked in the next collective (Q assembly, the
+        trace-mass exchange, the Newton loop) instead of aborting: a deadlock
+        where an error was meant. COLLECTIVE — every rank must reach it.
+    
+        ``error`` (with ``error_kwargs``) is the class raised: a hierarchy build
+        passes ``custom_mg.CollectiveBuildError`` so the ranks retry or degrade
+        together, as its other checks do.
+    
+        Every rank raises the class of the FIRST failing rank's call, with that
+        rank's message: two calls that pair can pass different classes (an
+        ``agreed_build`` exit and a guard inside the build), and the ranks must
+        still raise one class, or a caller that catches one of them parts the
+        ranks (#874, W1's review of #1218).
+    
+        The exchange is a one-integer flag first, and the messages are gathered
+        only when some rank failed, so a healthy path costs one small allreduce.
+        World-collective: the verdict communicator is a duplicate of the world.
+        """
+        # on the verdict communicator (mpi.first_verdict): a rank still inside a
+        # collective of the path cannot be paired with this exchange
+        first = mpi.first_verdict(problem, site="fault_contact._collective_raise",
+                                  error=error, kwargs=error_kwargs)
+        if first is None:
+            return
+        problem, error, error_kwargs = first.message, first.error, first.kwargs
+        if problem is not None:
+            exc = error(problem, **error_kwargs)
+            # every rank raises this one together: an agreed_build context passes
+            # it through rather than agreeing a second time (#874)
+            exc.agreed = True
+>           raise exc
+E           RuntimeError: DMPlexComputeGeometryFVM failed on rank 0 with error code 77
+
+.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_contact.py:98: RuntimeError
+----------------------------- Captured stderr call -----------------------------
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR:   It appears a new error in the code was triggered after a previous error, possibly because:
+[0]PETSC ERROR:   -  The first error was not properly handled via (for example) the use of
+[0]PETSC ERROR:      PetscCall(TheFunctionThatErrors()); or
+[0]PETSC ERROR:   -  The second error was triggered while handling the first error.
+[0]PETSC ERROR:   Above is the traceback for the previous unhandled error, below the traceback for the next error
+[0]PETSC ERROR:   ALL ERRORS in the PETSc libraries are fatal, you should add the appropriate error checking to the code
+[0]PETSC ERROR: PETSc has generated inconsistent data
+[0]PETSC ERROR: Direction for face 2096 could not be fixed, normal (-0.129315,-0.00560025) v (0.,0.)
+[0]PETSC ERROR: WARNING! There are unused option(s) set! Could be the program crashed before usage or a spelling mistake, etc!
+[0]PETSC ERROR:   Option left: name:-options_left value: 0 source: code
+[0]PETSC ERROR:   Option left: name:-p value: no:cacheprovider source: command line
+[0]PETSC ERROR:   Option left: name:-q (no value) source: command line
+[0]PETSC ERROR:   Option left: name:-rf value: tests/test_0077_model_registry_does_not_pin.py source: command line
+[0]PETSC ERROR:   Option left: name:-viewer_hdf5_collective value: false source: code
+[0]PETSC ERROR:   Option left: name:-viewer_hdf5_sp_output value: true source: code
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: PETSc Release Version 3.25.3, Jun 29, 2026
+[0]PETSC ERROR: /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/pytest/__main__.py with 1 MPI process(es) and PETSC_ARCH  on Wombat-4.local by lmoresi Thu Nov 26 07:15:33 2026
+[0]PETSC ERROR: Configure options: AR=arm64-apple-darwin20.0.0-ar CPP=arm64-apple-darwin20.0.0-clang-cpp RANLIB=arm64-apple-darwin20.0.0-ranlib CC=mpicc CXX=mpicxx FC=mpifort CPPFLAGS="-D_FORTIFY_SOURCE=2 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -mmacosx-version-min=11.0 -mmacosx-version-min=11.0" LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib -L/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib" --COPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CXXOPTFLAGS="-ftree-vectorize -fPIC -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --FOPTFLAGS="-march=armv8.3-a -ftree-vectorize -fPIC -fno-stack-protector -O2 -pipe -isystem /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda/petsc-3.25.3 -fdebug-prefix-map=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime=/usr/local/src/conda-prefix -O3" --CUDAOPTFLAGS=-O3 --with-clib-autodetect=0 --with-cxxlib-autodetect=0 --with-fortranlib-autodetect=0 --with-debugging=0 --with-blas-lib=libblas.dylib --with-lapack-lib=liblapack.dylib --with-yaml=1 --with-hdf5=1 --with-fftw=1 --with-hwloc=1 --with-openmp=1 --with-hypre=1 --with-metis=1 --with-mpi=1 --with-mumps=1 --with-parmetis=1 --with-pthread=1 --with-ptscotch=1 --with-shared-libraries --with-ssl=0 --with-scalapack=1 --with-superlu=1 --with-superlu_dist=1 --with-superlu_dist-include=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-suitesparse=1 --with-suitesparse-dir=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime --with-x=0 --with-scalar-type=real   --with-cuda=0 --with-batch --prefix=/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime
+[0]PETSC ERROR: #1 DMPlexComputeGeometryFVM() at /Users/runner/miniforge3/conda-bld/bld/rattler-build_petsc_1782806021/work/src/dm/impls/plex/plexgeometry.c:3055
+________ test_the_weak_copy_threshold_sits_in_the_measured_gap[at-rest] ________
+
+amp = 0.0, flagged_max = 0.0, kept_min = 0.255
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x146503dd0>
+
+    @pytest.mark.skipif(uw.mpi.size > 1, reason="serial")
+    @pytest.mark.parametrize("amp, flagged_max, kept_min", [
+        (0.0, 0.0, 0.255), (0.002, 0.0, 0.221), (0.015, 0.069, 0.379)],
+        ids=["at-rest", "moved-0.002", "moved-0.015"])
+    def test_the_weak_copy_threshold_sits_in_the_measured_gap(amp, flagged_max, kept_min,
+                                                              monkeypatch):
+        """``fault_mg._WEAK_COPY`` must lie between the weakest copy the located rule
+        needs repaired and the weakest it does not, in every case: a value moved
+        past either edge of the gap fails here. The edges are measured live from the
+        located rule alone (the repair switched off), and checked against the values
+        recorded when the threshold was set."""
+        child = _child()
+        if amp:
+            _move_every_addon_level(child, amp)
+        mesh = child.add_fault([("Flt", TRACE)])
+        threshold = fault_mg._WEAK_COPY
+        monkeypatch.setattr(fault_mg, "_WEAK_COPY", 0.0)      # the located rule alone
+        norms = _copy_column_norms(mesh)
+        ratios = np.sort(norms / np.median(norms))
+        needs = ratios[ratios < 0.5 * kept_min]              # the copies to repair
+        sound = ratios[ratios >= 0.5 * kept_min]
+        assert needs.size and needs.max() == pytest.approx(flagged_max, abs=0.005)
+>       assert sound.min() == pytest.approx(kept_min, abs=0.005)
+E       assert np.float64(0....9539338943752) == 0.255 ± 0.005
+E         
+E         comparison failed
+E         Obtained: 0.14039539338943752
+E         Expected: 0.255 ± 0.005
+
+tests/test_1120_split_transfer_fault_copies.py:140: AssertionError
+______ test_the_weak_copy_threshold_sits_in_the_measured_gap[moved-0.002] ______
+
+amp = 0.002, flagged_max = 0.0, kept_min = 0.221
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x145d19280>
+
+    @pytest.mark.skipif(uw.mpi.size > 1, reason="serial")
+    @pytest.mark.parametrize("amp, flagged_max, kept_min", [
+        (0.0, 0.0, 0.255), (0.002, 0.0, 0.221), (0.015, 0.069, 0.379)],
+        ids=["at-rest", "moved-0.002", "moved-0.015"])
+    def test_the_weak_copy_threshold_sits_in_the_measured_gap(amp, flagged_max, kept_min,
+                                                              monkeypatch):
+        """``fault_mg._WEAK_COPY`` must lie between the weakest copy the located rule
+        needs repaired and the weakest it does not, in every case: a value moved
+        past either edge of the gap fails here. The edges are measured live from the
+        located rule alone (the repair switched off), and checked against the values
+        recorded when the threshold was set."""
+        child = _child()
+        if amp:
+            _move_every_addon_level(child, amp)
+        mesh = child.add_fault([("Flt", TRACE)])
+        threshold = fault_mg._WEAK_COPY
+        monkeypatch.setattr(fault_mg, "_WEAK_COPY", 0.0)      # the located rule alone
+        norms = _copy_column_norms(mesh)
+        ratios = np.sort(norms / np.median(norms))
+        needs = ratios[ratios < 0.5 * kept_min]              # the copies to repair
+        sound = ratios[ratios >= 0.5 * kept_min]
+        assert needs.size and needs.max() == pytest.approx(flagged_max, abs=0.005)
+>       assert sound.min() == pytest.approx(kept_min, abs=0.005)
+E       assert np.float64(0.343120862821605) == 0.221 ± 0.005
+E         
+E         comparison failed
+E         Obtained: 0.343120862821605
+E         Expected: 0.221 ± 0.005
+
+tests/test_1120_split_transfer_fault_copies.py:140: AssertionError
+______ test_the_weak_copy_threshold_sits_in_the_measured_gap[moved-0.015] ______
+
+amp = 0.015, flagged_max = 0.069, kept_min = 0.379
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x145ad2f90>
+
+    @pytest.mark.skipif(uw.mpi.size > 1, reason="serial")
+    @pytest.mark.parametrize("amp, flagged_max, kept_min", [
+        (0.0, 0.0, 0.255), (0.002, 0.0, 0.221), (0.015, 0.069, 0.379)],
+        ids=["at-rest", "moved-0.002", "moved-0.015"])
+    def test_the_weak_copy_threshold_sits_in_the_measured_gap(amp, flagged_max, kept_min,
+                                                              monkeypatch):
+        """``fault_mg._WEAK_COPY`` must lie between the weakest copy the located rule
+        needs repaired and the weakest it does not, in every case: a value moved
+        past either edge of the gap fails here. The edges are measured live from the
+        located rule alone (the repair switched off), and checked against the values
+        recorded when the threshold was set."""
+        child = _child()
+        if amp:
+            _move_every_addon_level(child, amp)
+        mesh = child.add_fault([("Flt", TRACE)])
+        threshold = fault_mg._WEAK_COPY
+        monkeypatch.setattr(fault_mg, "_WEAK_COPY", 0.0)      # the located rule alone
+        norms = _copy_column_norms(mesh)
+        ratios = np.sort(norms / np.median(norms))
+        needs = ratios[ratios < 0.5 * kept_min]              # the copies to repair
+        sound = ratios[ratios >= 0.5 * kept_min]
+>       assert needs.size and needs.max() == pytest.approx(flagged_max, abs=0.005)
+E       assert (0)
+E        +  where 0 = array([], dtype=float64).size
+
+tests/test_1120_split_transfer_fault_copies.py:139: AssertionError
+______ test_a_cut_made_on_a_moved_mesh_reaches_the_level_below_through_it ______
+
+    def test_a_cut_made_on_a_moved_mesh_reaches_the_level_below_through_it():
+        """The cut and the split inherit the record from the mesh they were made on.
+        Their cells have no refinement relation to the level below: a node reaches
+        its parent through the cell of the moved mesh it lies in. Where a node of
+        the split mesh is a node of the moved mesh, the transfer has to give it the
+        position that node was built at."""
+        mesh = _box()
+        below = mesh._coarse_level_meshes()[-2]
+        _record(mesh, below, ap._parent_cells_local(below, mesh))
+        X0 = _move(mesh)
+        child = mesh.add_fault([("Flt", TRACE)])
+        assert fault_mg.provenance_source(below, child) is child
+        P, Xc, Xf = _transfer(below, child, 1)
+        distance, node = cKDTree(np.asarray(mesh.X.coords)).query(Xf)
+        shared = distance < 1e-12
+        # the cut adds a few nodes on the trace; the rest are the moved mesh's
+>       assert shared.sum() >= len(X0) - 5
+E       assert np.int64(760) >= (769 - 5)
+E        +  where np.int64(760) = <built-in method sum of numpy.ndarray object at 0x16f7de2b0>()
+E        +    where <built-in method sum of numpy.ndarray object at 0x16f7de2b0> = array([ True,  True,  True,  True,  True,  True,  True,  True,  True,\n        True,  True,  True,  True,  True,  True,...False, False, False, False, False,\n       False, False, False, False, False, False, False, False, False,\n       False]).sum
+E        +  and   769 = len(array([[0.        , 0.        ],\n       [1.        , 0.        ],\n       [0.        , 1.        ],\n       ...,\n       [0.15263007, 0.1272502 ],\n       [0.85601682, 0.22728279],\n       [0.87066663, 0.15709991]], shape=(769, 2)))
+
+tests/test_1173_addon_record_after_a_move.py:206: AssertionError
+_____ test_a_split_level_takes_over_the_reference_of_the_level_it_replaces _____
+
+    def test_a_split_level_takes_over_the_reference_of_the_level_it_replaces():
+        """``Mesh.add_fault`` replaces each add-on level under an adapt child by
+        its split copy. The child's reference was taken against the level
+        replaced and has to serve against the copy, or the next fault's partition
+        reads the child's parents where its cells have moved to."""
+        base = uw.meshing.UnstructuredSimplexBox(
+            minCoords=(0, 0), maxCoords=(1, 1), cellSize=1 / 6, regular=True,
+            refinement=1, qdegree=2)
+        metric = uw.discretisation.MeshVariable("M", base, 1, degree=1)
+        near = np.abs(np.asarray(metric.coords)[:, 1] - 0.5) < 0.2
+        metric.array[:, 0, 0] = np.where(near, 48.0, 12.0) ** 2
+        host = base.adapt(metric, max_levels=2, engine="nvb")
+        level = host._custom_mg_coarse_meshes[-1]
+        assert not getattr(level, "_mg_static", False)
+        parent_of_host = ap._parent_cells_local(level, host)
+        X = np.asarray(host.X.coords).copy()
+        host.deform(X + 0.5 * _shift(X))
+        child = host.add_fault([("Flt", TRACE)])
+        below = ap._levels_of(child)[2][-1]
+        assert below is not level and child._addon_reference[0] is below
+        # the parents on the split copy, named by the cell of the unsplit level
+        # under each. 8 of the 2,506 are cut cells that straddle two parents; read
+        # where the cells stand, 1,411 differ.
+        parents = _located(below, level)[ap._parent_cells_local(below, child)]
+        wrong = (parents != parent_of_host[_located(child, host)]).sum()
+>       assert len(parents) > 2000 and wrong <= 16
+E       assert (2470 > 2000 and np.int64(20) <= 16)
+E        +  where 2470 = len(array([  0,   1,   2, ..., 306, 593, 593], shape=(2470,)))
+
+tests/test_1173_addon_record_after_a_move.py:299: AssertionError
+____________________ test_two_calls_solve_as_one_call_does _____________________
+
+    def test_two_calls_solve_as_one_call_does():
+        _first, second = _two_calls()
+        stokes = _sheared(second, ["Flt", "F2"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")      # every fault has its law: silent
+            stokes.solve()
+        for name in ("Flt", "F2"):
+            _s, slip, _l = fault_slip(stokes, name, stokes._rotated_freeslip_info)
+>           assert abs(np.abs(slip).max() - SLIP_ONE_CALL[name]) < 2e-5, name
+E           AssertionError: Flt
+E           assert np.float64(2.344504877857534e-05) < 2e-05
+E            +  where np.float64(2.344504877857534e-05) = abs((np.float64(0.15215155495122143) - 0.152175))
+E            +    where np.float64(0.15215155495122143) = <built-in method max of numpy.ndarray object at 0x1464a9fb0>()
+E            +      where <built-in method max of numpy.ndarray object at 0x1464a9fb0> = array([0.0548087 , 0.07710242, 0.08417393, 0.09384289, 0.10665986,\n       0.11671535, 0.12458437, 0.13149368, 0.135701...72, 0.13802025, 0.13397851, 0.12720145, 0.11937314,\n       0.10915181, 0.09602968, 0.08606805, 0.07872814, 0.05585173]).max
+E            +        where array([0.0548087 , 0.07710242, 0.08417393, 0.09384289, 0.10665986,\n       0.11671535, 0.12458437, 0.13149368, 0.135701...72, 0.13802025, 0.13397851, 0.12720145, 0.11937314,\n       0.10915181, 0.09602968, 0.08606805, 0.07872814, 0.05585173]) = <ufunc 'absolute'>(array([0.0548087 , 0.07710242, 0.08417393, 0.09384289, 0.10665986,\n       0.11671535, 0.12458437, 0.13149368, 0.135701...72, 0.13802025, 0.13397851, 0.12720145, 0.11937314,\n       0.10915181, 0.09602968, 0.08606805, 0.07872814, 0.05585173]))
+E            +          where <ufunc 'absolute'> = np.abs
+
+tests/test_1174_a_second_add_fault_keeps_the_first.py:140: AssertionError
+_______________ test_a_split_fault_with_no_law_is_named_at_solve _______________
+
+    def test_a_split_fault_with_no_law_is_named_at_solve():
+        _first, second = _two_calls()
+        stokes = _sheared(second, ["F2"])
+        with pytest.warns(UserWarning, match="'Flt'") as caught:
+            stokes.solve()
+        message = "".join(str(w.message) for w in caught if "'Flt'" in str(w.message))
+        assert "add_fault_bc" in message
+        assert "'FltPlus', 'FltMinus'" in message
+        assert "'F2'" not in message             # F2 has its law
+        assert caught[0].filename == __file__    # reported at the caller's line
+        # what the warning is about: the crack opens
+        _n, _tangential, normal = _jump(stokes, FLT)
+>       assert abs(normal - OPENING_WITH_NO_LAW) < 1e-4
+E       assert np.float64(0.0003594491480732494) < 0.0001
+E        +  where np.float64(0.0003594491480732494) = abs((np.float64(0.016550550851926752) - 0.01691))
+
+tests/test_1174_a_second_add_fault_keeps_the_first.py:159: AssertionError
+_____________ test_one_call_puts_every_fault_on_the_add_on_levels ______________
+
+    def test_one_call_puts_every_fault_on_the_add_on_levels():
+        """Two faults given in one call: the split level of the tail lists both,
+        and the base levels beneath stay welded. Two calls leave the same."""
+        both = _adapt_child().add_fault([("Flt", FLT), ("F2", F2)])
+>       assert _faults_on_the_tail(both) == TAIL
+E       AssertionError: assert [{}, {}, {'F2...5, 'Flt': 23}] == [{}, {}, {'F2...3, 'Flt': 31}]
+E         
+E         At index 2 diff: {'Flt': 23, 'F2': 25} != {'Flt': 31, 'F2': 33}
+E         Use -v to get more diff
+
+tests/test_1174_a_second_add_fault_keeps_the_first.py:282: AssertionError
+_________________ test_the_add_on_levels_keep_the_first_fault __________________
+
+    def test_the_add_on_levels_keep_the_first_fault():
+        """Under an adapt child the add-on levels of the tail are split too; a level
+        that carried the first fault carries both after the second call, with the
+        first's pairing as it was, and the solve is the one-call solve."""
+        host = _adapt_child()
+        first = host.add_fault([("Flt", FLT)])
+        held = [k for k, level in enumerate(first._custom_mg_coarse_meshes)
+                if "Flt" in (getattr(level, "_fault_point_pairs", None) or {})]
+        assert held
+        second = first.add_fault([("F2", F2)])
+        assert sorted(second._fault_point_pairs) == ["F2", "Flt"]
+        _assert_pairing_kept(second, first, "Flt", FLT)
+        for k in held:
+            level = second._custom_mg_coarse_meshes[k]
+            assert sorted(level._fault_point_pairs) == ["F2", "Flt"]
+            _assert_pairing_kept(level, first._custom_mg_coarse_meshes[k], "Flt", FLT)
+    
+        stokes = _sheared(second, ["Flt", "F2"])
+        stokes.solve()
+        for name in ("Flt", "F2"):
+            _s, slip, _l = fault_slip(stokes, name, stokes._rotated_freeslip_info)
+            assert abs(np.abs(slip).max() - SLIP_ONE_CALL_ADAPT[name]) < 2e-5, name
+            n_pairs, _tangential, normal = _jump(stokes, TRACES[name])
+>           assert n_pairs == NODE_PAIRS_ADAPT[name]
+E           assert 47 == 63
+
+tests/test_1174_a_second_add_fault_keeps_the_first.py:310: AssertionError
+_______________ test_a_conforming_surface_keeps_the_split_fault ________________
+
+    def test_a_conforming_surface_keeps_the_split_fault():
+        """A surface cut into a split mesh keeps the fault's record (it was
+        dropped, with the fault left split), and a cut that would refine the
+        fault's own edges is refused."""
+        first = _box().add_fault([("Flt", FLT)])
+        surface = uw.meshing.Surface("S", first, np.array([[-0.1, 0.80], [1.1, 0.84]]))
+        child = first.add_conforming_surface(surface)
+        assert sorted(child._fault_point_pairs) == ["Flt"]
+        _assert_pairing_kept(child, first, "Flt", FLT)
+        stokes = _sheared(child, ["Flt"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            stokes.solve()
+        _s, slip, _l = fault_slip(stokes, "Flt", stokes._rotated_freeslip_info)
+>       assert abs(np.abs(slip).max() - SLIP_FLT_ALONE) < 2e-5
+E       AssertionError: assert np.float64(3.194613424423176e-05) < 2e-05
+E        +  where np.float64(3.194613424423176e-05) = abs((np.float64(0.16035505386575577) - 0.160387))
+E        +    where np.float64(0.16035505386575577) = <built-in method max of numpy.ndarray object at 0x140e9a5b0>()
+E        +      where <built-in method max of numpy.ndarray object at 0x140e9a5b0> = array([0.06069009, 0.08516311, 0.09269338, 0.10302655, 0.11654884,\n       0.12692248, 0.1347981 , 0.14157443, 0.145638...81, 0.14563811, 0.14157442, 0.1347981 , 0.12692248,\n       0.11654885, 0.10302655, 0.09269339, 0.0851631 , 0.06069008]).max
+E        +        where array([0.06069009, 0.08516311, 0.09269338, 0.10302655, 0.11654884,\n       0.12692248, 0.1347981 , 0.14157443, 0.145638...81, 0.14563811, 0.14157442, 0.1347981 , 0.12692248,\n       0.11654885, 0.10302655, 0.09269339, 0.0851631 , 0.06069008]) = <ufunc 'absolute'>(array([0.06069009, 0.08516311, 0.09269338, 0.10302655, 0.11654884,\n       0.12692248, 0.1347981 , 0.14157443, 0.145638...81, 0.14563811, 0.14157442, 0.1347981 , 0.12692248,\n       0.11654885, 0.10302655, 0.09269339, 0.0851631 , 0.06069008]))
+E        +          where <ufunc 'absolute'> = np.abs
+
+tests/test_1174_a_second_add_fault_keeps_the_first.py:416: AssertionError
+__________ test_a_split_level_solve_after_a_move_keeps_its_iterations __________
+
+    def test_a_split_level_solve_after_a_move_keeps_its_iterations():
+        """6 velocity iterations at rest and after each of three moves, which is
+        what a solver built on the moved mesh takes. With the transfer rebuilt from
+        the moved coordinates each move takes 13. The fixture carries no FAC
+        patch.
+    
+        The count is the last velocity application's. At rest it was 5 before the
+        split-level transfer gave every coarse fault copy a fine image (#1120): the
+        total over the solve's 17 velocity applications is unchanged (116), and the
+        last one now goes on to 4e-9 where it stopped at 1.2e-8."""
+        s, mesh = _split_level_stokes()
+        s.solve()
+        counts = [max(s._rotated_freeslip_info["vel_its_last"])]
+        for _ in range(3):
+            _deform(mesh)
+            s.solve()
+            assert s.snes.getConvergedReason() > 0
+            counts.append(max(s._rotated_freeslip_info["vel_its_last"]))
+>       assert counts == [6, 6, 6, 6]
+E       assert [5, 5, 5, 5] == [6, 6, 6, 6]
+E         
+E         At index 0 diff: 5 != 6
+E         Use -v to get more diff
+
+tests/test_1176_custom_mg_transfer_after_a_move.py:189: AssertionError
+____________ test_a_fault_cut_into_a_moved_mesh_is_read_where_it_is ____________
+
+    def test_a_fault_cut_into_a_moved_mesh_is_read_where_it_is():
+        """The child moved before the fault was cut into it, so the fault lies on
+        its trace in the moved geometry on the new mesh and on the split level
+        under it. The new mesh has not moved since it was made and is read on its
+        own coordinates: 6 velocity iterations, as with the child at rest."""
+        s, mesh = _split_level_stokes(move_the_host=_deform_across_the_fault)
+        s.solve()
+        assert s.snes.getConvergedReason() > 0
+>       assert max(s._rotated_freeslip_info["vel_its_last"]) == 6
+E       assert 5 == 6
+E        +  where 5 = max([5])
+
+tests/test_1176_custom_mg_transfer_after_a_move.py:204: AssertionError
+=============================== warnings summary ===============================
+test_0494_two_lines_complete_chains.py::test_one_call_keeps_both_chains_complete[0.7]
+test_0494_two_lines_complete_chains.py::test_one_call_keeps_both_chains_complete[0.7]
+test_0494_two_lines_complete_chains.py::test_one_call_keeps_both_chains_complete[0.9]
+test_0494_two_lines_complete_chains.py::test_one_call_keeps_both_chains_complete[0.9]
+test_0494_two_lines_complete_chains.py::test_sequential_cuts_keep_both_chains_complete[0.7]
+test_0494_two_lines_complete_chains.py::test_sequential_cuts_keep_both_chains_complete[0.7]
+test_0494_two_lines_complete_chains.py::test_sequential_cuts_keep_both_chains_complete[0.9]
+test_0494_two_lines_complete_chains.py::test_sequential_cuts_keep_both_chains_complete[0.9]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_0494_two_lines_complete_chains.py:25: DeprecationWarning: Arrays of 2-dimensional vectors are deprecated. Use arrays of 3-dimensional vectors instead. (deprecated in NumPy 2.0)
+    d = np.cross(line[1] - line[0], X - line[0])
+
+test_0844_line_cut.py::test_a_cut_mesh_carries_a_step_viscosity_without_leaking_stress
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_0844_line_cut.py:491: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    stokes.solve()
+
+test_0866_fault_pair_sign_at_a_junction.py::test_every_strand_slips_the_way_the_rock_says
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:2378: UserWarning: fault_mg: 9 of 26 weak coarse fault copies in a split-level transfer have no recorded-parent row to repair them, so they keep a (nearly) empty column and the coarse level may have null directions (#1120). This happens when the coarse levels do not follow a move of the finest; the count is in solve_report.config['multigrid_hierarchy']['unrepaired_fault_copies'].
+    Pn = fault_mg.cell_located_prolongation(
+
+test_0866_fault_pair_sign_at_a_junction.py::test_every_strand_slips_the_way_the_rock_says
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/rotated_bc.py:2669: UserWarning: custom_mg: coarse level 2 and the level above it are not nested, and 5 coarse unknown(s) on level 2 were combinations of others with the same fine images; each was merged into them, which keeps the coarse space (#1101). Only coarse unknowns with at most 4 fine images are checked; dependent ones with wider support can remain.
+    Pl = rotated_split_transfers(solver, h, Ps, Q, normal_rows)
+
+test_0940_essential_condition_on_a_fault_with_a_law.py::test_conditions_on_both_sides_without_a_law_still_solve
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_0940_essential_condition_on_a_fault_with_a_law.py:63: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    s.solve()
+
+test_1083_thin_thick_alignment.py::test_dragged_shell_thin_and_thick_agree_on_the_sphere
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1083_thin_thick_alignment.py:186: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    shell.solve()
+
+test_1131_rotated_nullspace_from_mesh.py::test_a_units_model_shell_solves_with_its_declared_modes[plain_velocity]
+test_1131_rotated_nullspace_from_mesh.py::test_a_units_model_shell_solves_with_its_declared_modes[unit_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1131_rotated_nullspace_from_mesh.py:573: RuntimeWarning: SNES_Stokes: the rotated free-slip velocity sub-solve stopped at its iteration cap without converging, in 3 application(s), so the solve's convergence does not mean that block solved. Counts in _rotated_freeslip_info['sub_capped'] (#625).
+    stokes.solve()
+
+test_1146_custom_mg_after_deform.py::test_the_hierarchy_is_installed_once_and_again_after_a_deform[poisson]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1146_custom_mg_after_deform.py:91: UserWarning: custom_mg: the mesh of solver 'Solver_4839_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()                       # PETSc error 73 here before the fix
+
+test_1146_custom_mg_after_deform.py::test_the_hierarchy_is_installed_once_and_again_after_a_deform[stokes_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1146_custom_mg_after_deform.py:91: UserWarning: custom_mg: the mesh of solver 'Solver_4879_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()                       # PETSc error 73 here before the fix
+
+test_1149_custom_mg_hierarchy_lifecycle.py::test_gamg_after_a_fac_install_on_an_adapt_child[stokes_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1149_custom_mg_hierarchy_lifecycle.py:91: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+    s.solve()
+
+test_1149_custom_mg_hierarchy_lifecycle.py::test_a_rebuilt_stokes_snes_lets_its_ksps_go[gauge]
+test_1149_custom_mg_hierarchy_lifecycle.py::test_a_rebuilt_stokes_snes_lets_its_ksps_go[guard_armed]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1149_custom_mg_hierarchy_lifecycle.py:292: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_the_transfers_after_a_move_are_those_before_it[placed-deform]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:159: UserWarning: custom_mg: the mesh of solver 'Solver_6584_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_the_transfers_after_a_move_are_those_before_it[placed-mover]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:159: UserWarning: custom_mg: the mesh of solver 'Solver_6622_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_relaxed_adapt_child_is_read_where_the_relax_left_it
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:299: UserWarning: custom_mg: the mesh of solver 'Solver_7056_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_relax_in_a_call_of_its_own_is_part_of_making_the_mesh
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:315: UserWarning: custom_mg: the mesh of solver 'Solver_7097_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_reloaded_mesh_is_read_on_its_rebuilt_refinement
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: FutureWarning: write_checkpoint() is deprecated and retained for compatibility. Use write_timestep(..., petsc_reload=True) for PETSc reload output; set create_xdmf=True when visualization/remap payloads are also needed.
+    result = routine(*args, **kwargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_0559_coarse_replay_notes_shared_control_points.py::test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points[forward]
+FAILED tests/test_0559_coarse_replay_notes_shared_control_points.py::test_a_sphere_fault_cuts_in_either_direction_and_counts_its_shared_points[reversed]
+FAILED tests/test_0595_cut_spares_internal_boundaries.py::test_add_fault_without_snap_options_makes_the_same_cut
+FAILED tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_cut_with_no_facet_is_refused
+FAILED tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_chain_that_stops_short_is_refused
+FAILED tests/test_1092_thin_sheet_prescribed_normal.py::test_fault_reaction_is_the_membrane_resultant
+FAILED tests/test_1120_split_transfer_fault_copies.py::test_the_weak_copy_threshold_sits_in_the_measured_gap[at-rest]
+FAILED tests/test_1120_split_transfer_fault_copies.py::test_the_weak_copy_threshold_sits_in_the_measured_gap[moved-0.002]
+FAILED tests/test_1120_split_transfer_fault_copies.py::test_the_weak_copy_threshold_sits_in_the_measured_gap[moved-0.015]
+FAILED tests/test_1173_addon_record_after_a_move.py::test_a_cut_made_on_a_moved_mesh_reaches_the_level_below_through_it
+FAILED tests/test_1173_addon_record_after_a_move.py::test_a_split_level_takes_over_the_reference_of_the_level_it_replaces
+FAILED tests/test_1174_a_second_add_fault_keeps_the_first.py::test_two_calls_solve_as_one_call_does
+FAILED tests/test_1174_a_second_add_fault_keeps_the_first.py::test_a_split_fault_with_no_law_is_named_at_solve
+FAILED tests/test_1174_a_second_add_fault_keeps_the_first.py::test_one_call_puts_every_fault_on_the_add_on_levels
+FAILED tests/test_1174_a_second_add_fault_keeps_the_first.py::test_the_add_on_levels_keep_the_first_fault
+FAILED tests/test_1174_a_second_add_fault_keeps_the_first.py::test_a_conforming_surface_keeps_the_split_fault
+FAILED tests/test_1176_custom_mg_transfer_after_a_move.py::test_a_split_level_solve_after_a_move_keeps_its_iterations
+FAILED tests/test_1176_custom_mg_transfer_after_a_move.py::test_a_fault_cut_into_a_moved_mesh_is_read_where_it_is
+18 failed, 414 passed, 1 skipped, 25 warnings in 1748.34s (0:29:08)
+underworld3: transcript -> /private/var/folders/bt/jsh174p911lcyp7hslpkzktc0000gn/T/pytest-of-lmoresi/pytest-920/test_a_solver_that_solved_in_a0/transcripts/2026-11-26T07-15-37-__main__
