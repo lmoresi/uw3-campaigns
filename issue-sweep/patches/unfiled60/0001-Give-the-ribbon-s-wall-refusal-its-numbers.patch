@@ -1,0 +1,134 @@
+From 7fe58f8f6c4a7431ecb3af13591079d4adc678c2 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Wed, 25 Nov 2026 23:45:39 +1100
+Subject: [PATCH] Give the ribbon's wall refusal its numbers
+
+"The ribbon's cavity reached the domain wall; the volume must be interior,
+with clearance to spare" did not say how much clearance was missing. The two
+ribbon sites in _place_thin_volume_2d now raise _wall_refusal_2d, which gives:
+the wall vertex the cavity touched, how far the cavity reaches from the band's
+skin, how far the nearest wall vertex is from it, and the two terms of the
+carve's reach there (clearance x h and 0.6 x width). It names the move that
+would clear the wall, and the lever, chosen by whichever term governs. The
+check itself (#549, #670) is unchanged, and "reached the domain wall" stays,
+because the campaign drivers retry on it.
+
+test_0865 places an interior ribbon 0.1 from the outer wall of an annulus with
+cells of 0.05. It fails on the old message; on this one it reads
+reach 0.112 and nearest wall vertex 0.0335.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 38 +++++++++++++++----
+ ..._0865_place_ribbon_wall_refusal_numbers.py | 36 ++++++++++++++++++
+ 2 files changed, 66 insertions(+), 8 deletions(-)
+ create mode 100644 tests/test_0865_place_ribbon_wall_refusal_numbers.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 267730fe..3c8b9bf6 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7500,6 +7500,32 @@ def _gathered_vertices_2d(h_vertex, d_skin, reach_v):
+     return d_skin < reach_v + 1.0 * h_vertex
+ 
+ 
++def _wall_refusal_2d(ring, X, on_wall, d_skin, h_vertex, clearance, width):
++    """The refusal for a 2-D cavity whose boundary ``ring`` reached the domain
++    wall, with the numbers that decide it: how far the cavity reaches from the
++    band's skin, how far the nearest wall vertex is from it, and the two terms
++    of the carve's reach at the wall vertex the ring touches. The phrase
++    "reached the domain wall" is what callers match to retry with other
++    margins; it stays."""
++    ring = np.asarray([v for v in ring if v < len(X)], dtype=np.int64)
++    hit = ring[on_wall[ring]]
++    w = int(hit[np.argmin(d_skin[hit])])
++    reach = float(d_skin[ring].max())
++    wall = float(d_skin[on_wall].min())
++    by_h, by_w = float(clearance * h_vertex[w]), 0.6 * float(width)
++    lever = ("reduce clearance or the cell size near the wall" if by_h >= by_w
++             else "narrow the band, whose width sets the carve here")
++    return RuntimeError(
++        f"the ribbon's cavity reached the domain wall at "
++        f"({X[w, 0]:.4g}, {X[w, 1]:.4g}): the cavity reaches {reach:.3g} from "
++        f"the band's skin and the nearest wall vertex is {wall:.3g} from it. "
++        f"The carve takes the cells within max(clearance x h = {by_h:.3g}, "
++        f"0.6 x width = {by_w:.3g}) of the skin there, and the cavity's "
++        f"boundary is the ring of vertices around them. The volume must be "
++        f"interior, with clearance to spare: move it about {reach - wall:.3g} "
++        f"further from the wall, or {lever}")
++
++
+ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                           clearance, size, assembly, verbose, mesher=None,
+                           seams="gather", ligament=None, grading=0.35):
+@@ -7805,10 +7831,8 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         raise RuntimeError(
+                             "a deleted vertex is on the cavity boundary")
+                     if len(old_ring) and on_wall[old_ring].any():
+-                        raise RuntimeError(
+-                            "the ribbon's cavity reached the domain wall; "
+-                            "the volume must be interior, with clearance "
+-                            "to spare")
++                        raise _wall_refusal_2d(old_ring, X, on_wall, d_skin,
++                                               h_vertex, clearance, width)
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+                 comps = []                  # handled
+             for ring, comp in comps:
+@@ -7867,10 +7891,8 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                 if chain_k is None:
+                     if on_wall[np.asarray([v for v in ring
+                                            if v < len(X)])].any():
+-                        raise RuntimeError(
+-                            "the ribbon's cavity reached the domain wall; "
+-                            "the volume must be interior, with clearance "
+-                            "to spare")
++                        raise _wall_refusal_2d(ring, X, on_wall, d_skin,
++                                               h_vertex, clearance, width)
+                 else:
+                     chain_ids = [len(X) + int(v) for v in chain_k]
+                     chain_ends = (asm_pts[chain_k[0]], asm_pts[chain_k[-1]])
+diff --git a/tests/test_0865_place_ribbon_wall_refusal_numbers.py b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+new file mode 100644
+index 00000000..9d49b934
+--- /dev/null
++++ b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+@@ -0,0 +1,36 @@
++"""The ribbon's wall refusal says how far the cavity reaches and how far the wall is.
++
++The fixture is an interior ribbon 0.1 from the outer wall of an annulus with cells of
++0.05: the cavity around it reaches the wall, and the placement refuses it (the check
++dates from #549 and #670). The message used to say only "with clearance to spare".
++"""
++
++import re
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++
++def test_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
++    mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.1,
++                              refinement=1, qdegree=2)
++    th, dip = np.radians(80.0), np.radians(35.0)
++    top = 0.9 * np.array([np.cos(th), np.sin(th)])
++    inward = -np.array([np.cos(th - dip), np.sin(th - dip)])
++    trace = top + (0.05 * np.arange(7))[:, None] * inward
++
++    with pytest.raises(RuntimeError, match="reached the domain wall") as err:
++        place_fault_ribbon_2d(mesh, [("Fault", trace)], 0.1, margin_rings=1,
++                              clearance=0.7, split=False, mesher="ladder")
++
++    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the band's skin and "
++                  r"the nearest wall vertex is ([0-9.e+-]+) from it", str(err.value))
++    assert m, str(err.value)
++    reach, wall = float(m.group(1)), float(m.group(2))
++    assert reach > wall
++    assert (reach, wall) == (0.112, 0.0335)
+-- 
+2.39.5 (Apple Git-154)
+
