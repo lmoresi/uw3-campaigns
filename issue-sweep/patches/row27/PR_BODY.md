@@ -20,6 +20,23 @@ against LU, both ways. No projection code is added. The modes are only near-null
 block (they are admitted below a threshold), and that is enough here: the removal is a projection
 of the right-hand side and does not require exact nullity.
 
+**Who else sees the null space** (`check27.py`):
+- The Schur complement's inner solve is the velocity sub-KSP, by PCFieldSplit's construction, so
+  the removal acts there too. That is where the largest component (6e-5) arose.
+- The finest multigrid level's smoother (GMRES with SOR) has `A_vv` as its operator, so its
+  solves remove the mode from their right-hand side as well. That right-hand side is the
+  preconditioner's input, which the shell has already projected, so the removal changes nothing
+  beyond round-off. A projection on the velocity sub-KSP alone (a pre-solve hook, without the
+  Mat null space) gave the same 57 iterations and the same error against LU.
+- The coarser levels have their own Galerkin operators. The Schur round-off test reads a separate
+  submatrix of `Ahat`.
+
+**No stale null space.** The modes are admitted, and the null space attached, only when a new
+rotated KSP is built. A reused context keeps the KSP, the shell and `A_vv` together, with the same
+modes. A BC change (no-slip added on the inner wall) rebuilds the setup: the new `A_vv` admits no
+mode and carries no null space. A non-rigid mesh move gives a new `A_vv`, whose null space is the
+newly admitted mode. Which modes are admitted is decided by the existing #963 rule, unchanged.
+
 Serial, before and after. Rotated counts are outer/velocity/pressure, last application; "capped"
 counts velocity sub-solves that hit their cap.
 
