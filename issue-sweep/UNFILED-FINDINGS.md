@@ -54,5 +54,6 @@ C1's attempt to file an issue on 2026-11-16 was refused by its permission check.
 | 48 | read_checkpoint(file, data_name="T") into a second variable on the writing mesh gives the WRONG field at np 3, silently: int (T_read - T)^2 = 0.248 (empty rank) / 0.198 (all ranks with cells) vs int T^2 = 0.203; exact at np 1, 2; read_timestep exact everywhere. | H1, review of #1297 (2026-11-21) | CAUSE + FIX in #1310 (H5): the topology SF maps from the mesh's load source, not the checkpoint's point order (wrong from np 2); read_checkpoint now checks the saved point order (writer: exact via its own layout; rebuilt mesh: exact; else refused on every rank); load_from_h5_plex_vector mirror fault fixed. Science hub told (DEV-HUB) |
 | 49 | read_timestep on a file written with create_xdmf=False, petsc_reload=True into a differently named variable: rank 0 alone raises KeyError (no fields group), the others wait in a bcast: hangs at np 2 and 3. | H1, review of #1297 | FIX in #1310 (H5) |
 | 50 | evaluate_gradient with points on a rank holding no cells raises on that rank only (rank-local exception). | H1, review of #1297 | owner: H6, after #1295 |
+| 51 | Beginner tutorial 12 stops at (temperature/velocity[0]).units: a field Matrix has no .units. | H1, review of #1304 (2026-11-25) | owner: H3 |
 
 Underworld development team with AI support from Claude Code
