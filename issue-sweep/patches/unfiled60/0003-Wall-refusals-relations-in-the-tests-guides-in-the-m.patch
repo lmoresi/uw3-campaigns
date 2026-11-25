@@ -1,7 +1,7 @@
-From 0a9d08fcbe34cb82c84eea57ad5d680a63970c4f Mon Sep 17 00:00:00 2001
+From 8e7d79075c080717fa939df61d52d76f113eb49e Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 03:37:56 +1100
-Subject: [PATCH 3/3] Wall refusals: relations in the tests, guides in the
+Subject: [PATCH 3/4] Wall refusals: relations in the tests, guides in the
  messages
 
 Review round 2 (Linux server). test_0865 failed there: gmsh 4.15.2 on Linux
@@ -17,9 +17,11 @@ are not pinned.
 
 The messages:
 - "move it at least about X (a guide: the cavity is re-cut at the new
-  position)". Following them converges in two or three steps: the ribbon
-  0.9 -> 0.821 -> 0.743, or narrowed to 0.058 and then moved to 0.864; the
-  sheet 0.87 -> 0.773 -> 0.748.
+  position)". Followed step by step, the sheet places in two moves (0.87
+  -> 0.773 -> 0.748). The ribbon at width 0.1 does not: moving away from the
+  named wall swings between the two walls; it places when narrowed first
+  (to 0.058) and then moved (to 0.864), which the next commit makes the
+  message say.
 - The ribbon's narrowing lever names the width below which clearance x h
   sets the carve. Predicted targets for width and cell size were tried and
   were wrong (a ribbon of width 0.025 and a sheet with cells of 0.08 were

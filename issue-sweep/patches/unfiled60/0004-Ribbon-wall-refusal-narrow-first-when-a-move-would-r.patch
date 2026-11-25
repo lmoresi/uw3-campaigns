@@ -1,0 +1,71 @@
+From d1aa0e1e56a8056fea81a05f64f6085f67afc5e9 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 04:27:08 +1100
+Subject: [PATCH 4/4] Ribbon wall refusal: narrow first when a move would reach
+ the other wall
+
+At width 0.1 on the annulus fixture, moving the band away from the wall
+the message names carries the cavity onto the wall across the band: 0.9 ->
+0.821 is refused at the inner wall, and moving back out is refused at the
+outer one again. When a wall vertex far from the touched one (more than 4 x
+the reach away) lies within reach + the suggested move of the skin, the
+message now says that the move would bring the cavity onto that wall, and
+to narrow the band first, then move if it is still refused. Followed as
+told, the fixture places in two steps: narrow to 0.058, then move 0.036
+away from the outer wall (top 0.864); 0.0572 on the Linux server, from its
+clearance x h of 0.0343. test_0865 accepts either form of guidance.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py        | 15 ++++++++++++---
+ ...test_0865_place_ribbon_wall_refusal_numbers.py |  4 +++-
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 55b62836..2545d1a9 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7574,6 +7574,17 @@ def _wall_refusal_2d(ring, X, on_wall, d_skin, h_vertex, clearance, width):
+     else:
+         lever = (f"narrow the band: its width sets the carve down to a width of "
+                  f"about {by_h / 0.6:.3g}, where clearance x h takes over")
++    # a wall elsewhere (the other side of the band) that the cavity would reach
++    # after the suggested move: moving away from one wall moves it onto the other
++    far = (on_wall & (d_skin < reach + (reach - wall))
++           & (np.linalg.norm(X - X[w], axis=1) > 4.0 * reach))
++    move = (f"move it at least about {reach - wall:.3g} further from the wall (a "
++            f"guide: the cavity is re-cut at the new position), or {lever}")
++    if far.any():
++        o = int(np.flatnonzero(far)[np.argmin(d_skin[far])])
++        move = (f"moving it about {reach - wall:.3g} away from this wall would bring "
++                f"the cavity onto the wall at ({X[o, 0]:.4g}, {X[o, 1]:.4g}): first "
++                f"{lever}, then move it if it is still refused")
+     return RuntimeError(
+         f"the ribbon's cavity reached the domain wall, touching it at "
+         f"({X[w, 0]:.4g}, {X[w, 1]:.4g}). In mesh units: the cavity reaches "
+@@ -7582,9 +7593,7 @@ def _wall_refusal_2d(ring, X, on_wall, d_skin, h_vertex, clearance, width):
+         f"cells within max(clearance x h = {by_h:.3g}, 0.6 x width = "
+         f"{by_w:.3g}) of the skin, and the cavity's boundary is the ring of "
+         f"vertices around them. The volume must be interior, with clearance to "
+-        f"spare: move it at least about {reach - wall:.3g} further from the "
+-        f"wall (a guide: the cavity is re-cut at the new position), or "
+-        f"{lever}")
++        f"spare: {move}")
+ 
+ 
+ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+diff --git a/tests/test_0865_place_ribbon_wall_refusal_numbers.py b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+index d756cda1..9736c6ab 100644
+--- a/tests/test_0865_place_ribbon_wall_refusal_numbers.py
++++ b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+@@ -43,4 +43,6 @@ def test_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
+     assert 0.02 < wall < 0.05, msg
+     assert reach >= max(terms) >= 0.6 * 0.1 - 1e-12, msg
+     assert "narrow the band" in msg and "mesh units" in msg, msg
+-    assert "at least about" in msg and "a guide" in msg, msg
++    # either a move (a guide), or, where the move would carry the cavity onto the
++    # wall across the band, "first narrow the band" (this fixture's case on macOS)
++    assert ("at least about" in msg and "a guide" in msg) or "first narrow the band" in msg, msg
+-- 
+2.39.5 (Apple Git-154)
+

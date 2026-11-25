@@ -9,19 +9,24 @@ def ribbon(top_r, wdt):
     top = top_r * np.array([np.cos(th), np.sin(th)])
     place_fault_ribbon_2d(m, [("Fault", top + (0.05 * np.arange(7))[:, None] * inward)], wdt,
                           margin_rings=1, clearance=0.7, split=False, mesher="ladder")
-for plan in ("move", "narrow-then-move"):
+for plan in ("as-told", "move", "narrow-then-move"):
     r, wdt = 0.9, 0.1
     for step in range(5):
         try:
             ribbon(r, wdt); print(f"FOLLOW ribbon {plan} step {step}: top {r:.4f} width {wdt:.4f} placed"); break
         except RuntimeError as e:
             msg = str(e)
-            mv = float(re.search(r"at least about ([0-9.e-]+) further", msg).group(1))
+            mm = re.search(r"at least about ([0-9.e-]+) further", msg) or re.search(r"moving it about ([0-9.e-]+) away", msg)
+            mv = float(mm.group(1))
+            first_narrow = "first narrow the band" in msg
             nw = re.search(r"down to a width of about ([0-9.e-]+)", msg)
-            if plan == "narrow-then-move" and nw and step == 0:
+            wx, wy = (float(x) for x in re.search(r"touching it at \(([-0-9.e]+), ([-0-9.e]+)\)", msg).groups())
+            outer = np.hypot(wx, wy) > 0.75            # which wall the message names
+            if (plan == "narrow-then-move" and nw and step == 0) or (plan == "as-told" and first_narrow and nw):
                 wdt = float(nw.group(1)); act = f"narrow to {wdt:.4f}"
             else:
-                r -= mv; act = f"move {mv:.4f} (top {r:.4f})"
+                r += -mv if outer else mv              # away from the named wall
+                act = f"move {mv:.4f} away from the {'outer' if outer else 'inner'} wall (top {r:.4f})"
             print(f"FOLLOW ribbon {plan} step {step}: refused -> {act}; reach/wall " + " ".join(re.findall(r"(?:reaches|is) ([0-9.]+) from", msg)))
 s = np.linspace(-0.2, 0.2, 5)
 tris = np.array([t for i in range(4) for j in range(4) for t in ((5*i+j, 5*i+j+1, 5*(i+1)+j+1), (5*i+j, 5*(i+1)+j+1, 5*(i+1)+j))], dtype=np.int64)

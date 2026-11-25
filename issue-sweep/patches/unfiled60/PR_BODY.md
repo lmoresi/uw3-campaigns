@@ -18,13 +18,20 @@ the message is identical on every rank (Linux server review): it is formatted on
 and all-gathered.
 
 The suggested move is a guide, not a guarantee: the cavity is re-cut at the new position, and its
-reach changes. Following the messages step by step converges in two or three steps on the test
-fixtures:
-- the ribbon from 0.9 to 0.821 to 0.743;
-- or narrowed to 0.058 first, then moved to 0.864;
-- the sheet from 0.87 to 0.773 to 0.748.
-No predicted target is given for the width or the cell size. Predictions were tried, and a ribbon
-narrowed to the predicted 0.025-0.03, or a sheet with cells of 0.08, were still refused.
+reach changes. Followed step by step (`follow.py`, moving away from the wall each message names):
+- the sheet places in two moves, 0.87 to 0.773 to 0.748 (on the Linux server 0.773 is refused
+  too, and the second message places it);
+- the ribbon at width 0.1 does not place by moving alone. Moving away from one wall carries the
+  cavity onto the wall across the band (0.9 to 0.821 is refused at the inner wall). When a wall
+  far from the touched one lies within the cavity's reach plus the suggested move, the message
+  says so and says to narrow the band first, to the width where clearance x h takes over the
+  carve (0.058 here, 0.0572 on the Linux server, whose clearance x h is 0.0343 against 0.0348).
+  Followed as told, it places in two steps: narrow to 0.058, then move 0.036 away from the outer
+  wall (top 0.864).
+
+No predicted target is given for the width or the cell size: predictions were tried and missed
+(a ribbon narrowed to 0.025-0.03, and a sheet with cells of 0.08, were still refused). The
+numbers above are examples from the test fixtures.
 
 Tests:
 - `tests/test_0865_place_ribbon_wall_refusal_numbers.py`: an interior ribbon about 0.03 from the

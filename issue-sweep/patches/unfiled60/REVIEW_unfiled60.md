@@ -96,3 +96,17 @@ as the 3-D thin volume (place_surface.py ~5363), which this commit leaves unchan
    - nothing partition-dependent is asserted.
 
 Placement and sheet tests 0853, 0854, 0855, 0865, 0868, 1090, 1091: 67 passed, 1 skipped.
+
+## Round 3 (Linux server: text only), commits 8e7d7907 (0003 reworded) and d1aa0e1e
+- follow.py now moves away from the wall each message names. At width 0.1 the ribbon swings
+  between the walls (0.9 -> 0.821, refused at the inner wall -> 0.899, refused at the outer, and
+  so on), as the review found.
+- Message: when a wall far from the touched one (more than 4 x the reach) lies within reach + the
+  suggested move, the message says that the move would bring the cavity onto that wall, and to
+  narrow the band first. It is a few lines in _wall_refusal_2d. Followed as told: narrow to
+  0.058, then move 0.036 (top 0.864), placed. test_0865 accepts either guidance form (the
+  narrow-first form depends on the mesh's inner wall distance).
+- The ribbon example in the body and in 0003's message is now the narrow-then-move path. 0.0572
+  is the Linux server's figure, 0.058 macOS's (clearance x h 0.0343 against 0.0348). The numbers
+  are examples.
+- Placement tests 0853, 0855, 0865, 0868, 1090, 1091: 59 passed, 1 skipped.
