@@ -1,0 +1,1224 @@
+From 9d1482d4e677b50eadfb4cc85825f1a0252c1db6 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 26 Nov 2026 10:05:49 +1100
+Subject: [PATCH] Tests: describe the review or the machine, not session codes
+ or host names
+
+Comments and docstrings in 62 test files named the review sessions that
+measured something (by their codes) or the machines a measurement was made
+on (by their host names). Each now says what the reader needs: the review
+it came from ("the #1225 review", "review round 3"), or the kind of machine
+where it matters ("a 96-thread Linux workstation", "a Linux cluster", "a
+workstation"). Where neither matters the attribution is dropped.
+
+Text only: with docstrings dropped and every string constant replaced by a
+placeholder, each file's AST is identical before and after. One string
+constant changes, a dictionary key in test_1134 whose values alone are read.
+The six files the docstring branch for UNFILED 57 edits are left to it.
+
+Underworld development team with AI support from Claude Code
+---
+ tests/parallel/fault_fixtures.py                   |  2 +-
+ tests/parallel/ptest_1094_thin_sheet_parallel.py   |  2 +-
+ .../test_0001_sphere_refinement_folds_parallel.py  |  6 +++---
+ ...est_0020_snapshot_disk_swarm_values_parallel.py |  2 +-
+ ...est_0078_rebuild_memory_rotated_fmg_parallel.py |  4 ++--
+ .../test_0682_clamp_by_containing_cell_parallel.py |  2 +-
+ ...0785_evaluated_values_reach_storage_parallel.py |  2 +-
+ tests/parallel/test_0874_agreed_build_parallel.py  | 10 +++++-----
+ .../test_0874_nested_transfer_verdict_parallel.py  |  2 +-
+ ..._normal_summed_on_pinned_components_parallel.py |  6 +++---
+ .../test_1064_rotated_freeslip_parallel.py         |  2 +-
+ tests/parallel/test_1066_rotated_datum_parallel.py |  2 +-
+ ...t_1069_boundary_label_on_some_ranks_parallel.py |  2 +-
+ tests/parallel/test_1085_submesh_boundary_names.py |  2 +-
+ ...st_1101_custom_mg_dependent_columns_parallel.py |  2 +-
+ .../test_1103_custom_mg_empty_rank_parallel.py     |  2 +-
+ ...7_interpolation_rank_owning_nothing_parallel.py |  2 +-
+ ...ustom_mg_builder_failure_collective_parallel.py |  2 +-
+ ...1111_custom_mg_cut_of_a_moved_child_parallel.py | 10 +++++-----
+ .../parallel/test_1114_mg_coarse_gamg_parallel.py  |  4 ++--
+ ...st_1131_rotated_nullspace_from_mesh_parallel.py |  6 +++---
+ .../test_1133_fac_patch_summary_parallel.py        |  2 +-
+ .../test_1138_serial_reference_child_env.py        |  2 +-
+ ...1139_fac_zone_blocks_any_rank_count_parallel.py |  2 +-
+ ...142_rotated_exact_mode_projected_pc_parallel.py |  2 +-
+ .../test_1144_rotated_rebuild_memory_parallel.py   |  4 ++--
+ ...147_fac_structural_blocks_per_fault_parallel.py |  2 +-
+ ...test_1149_custom_mg_reinstall_frees_parallel.py |  2 +-
+ ...test_1152_fac_zone_survives_a_mover_parallel.py |  6 +++---
+ ...napshot_refusal_agrees_across_ranks_parallel.py |  2 +-
+ ...test_1173_addon_record_after_a_move_parallel.py |  2 +-
+ .../test_1183_contained_points_owned_parallel.py   |  2 +-
+ ...9_global_evaluate_non_finite_points_parallel.py |  2 +-
+ tests/test_0028_convergence_reference.py           |  4 ++--
+ tests/test_0052_collective_guard_scan.py           | 14 +++++++-------
+ tests/test_0077_model_registry_does_not_pin.py     |  2 +-
+ tests/test_0745_two_models_in_one_process.py       |  2 +-
+ tests/test_0760_evaluate_units_contract.py         |  2 +-
+ ...949_refinement_says_which_walls_are_left_off.py |  2 +-
+ ...st_1064_constrained_spherical_shell_response.py |  2 +-
+ tests/test_1066_rotated_meets_essential.py         |  4 ++--
+ tests/test_1070_free_surface_in_a_units_model.py   |  4 ++--
+ tests/test_1086_mmpde_seam_matches_serial.py       |  4 ++--
+ tests/test_1103_facet_slip_matches_serial.py       |  2 +-
+ tests/test_1120_split_transfer_fault_copies.py     |  2 +-
+ tests/test_1123_exact_locator_simplex.py           |  2 +-
+ tests/test_1131_rotated_nullspace_from_mesh.py     |  6 +++---
+ tests/test_1134_fac_cover_gate_structure.py        |  4 ++--
+ tests/test_1142_rotated_exact_mode_projected_pc.py | 12 ++++++------
+ tests/test_1145_stokes_adjoint_keeps_custom_mg.py  |  4 ++--
+ tests/test_1146_custom_mg_after_deform.py          |  2 +-
+ tests/test_1149_custom_mg_hierarchy_lifecycle.py   |  6 +++---
+ tests/test_1151_first_solve_after_a_mesh_move.py   |  2 +-
+ .../test_1157_rotated_warm_resolve_at_roundoff.py  |  4 ++--
+ tests/test_1159_thin_sheet_solve_takes_picard.py   |  6 +++---
+ tests/test_1176_facet_restore_whole_boundary.py    |  2 +-
+ .../test_1282_generators_take_their_refinement.py  |  2 +-
+ tests/test_1284_centre_point_label.py              |  2 +-
+ tests/test_1284_semi_lagrangian_column_velocity.py |  2 +-
+ tests/test_1285_swarm_petsc_save_checkpoint.py     |  2 +-
+ tests/test_1290_rotated_normal_refuses_a_field.py  |  2 +-
+ tests/test_1295_rotated_datum_net_flux_refused.py  |  2 +-
+ 62 files changed, 105 insertions(+), 105 deletions(-)
+
+diff --git a/tests/parallel/fault_fixtures.py b/tests/parallel/fault_fixtures.py
+index 6888d461..e946d735 100644
+--- a/tests/parallel/fault_fixtures.py
++++ b/tests/parallel/fault_fixtures.py
+@@ -116,7 +116,7 @@ def parents_contain_centroids(below, lev, centroids=None, as_built=False):
+     par = np.asarray(lev._addon_parent).reshape(-1, 2)
+     vxy_b, cv_b = _cell_vertex_table(below, as_built=as_built)
+     # explicit widths, from the mesh and not the arrays: a rank with no cell
+-    # has empty arrays, and reshape(0, -1) cannot infer a width (H5: test_1173
++    # has empty arrays, and reshape(0, -1) cannot infer a width (in review, test_1173
+     # raised on the empty rank at np 3 while the others waited)
+     nv, cdim = below.dm.getDimension() + 1, below.cdim
+     nb = cv_b.shape[0] if cv_b.ndim == 2 else 0
+diff --git a/tests/parallel/ptest_1094_thin_sheet_parallel.py b/tests/parallel/ptest_1094_thin_sheet_parallel.py
+index 0da5bd4d..0fb12e0e 100644
+--- a/tests/parallel/ptest_1094_thin_sheet_parallel.py
++++ b/tests/parallel/ptest_1094_thin_sheet_parallel.py
+@@ -38,7 +38,7 @@ def _gmax(value):
+ def _on_every_rank(local):
+     """Run the rank-local ``local()`` and agree on the outcome before any
+     collective: a raise on one rank alone left the others waiting in the next
+-    reduction (H1's review saw a mutant hang this way). Every rank raises if
++    reduction (a mutant hung this way in review). Every rank raises if
+     any did, naming the ranks; otherwise each gets its own result."""
+     try:
+         value, error = local(), None
+diff --git a/tests/parallel/test_0001_sphere_refinement_folds_parallel.py b/tests/parallel/test_0001_sphere_refinement_folds_parallel.py
+index e51bb03f..35e566cd 100644
+--- a/tests/parallel/test_0001_sphere_refinement_folds_parallel.py
++++ b/tests/parallel/test_0001_sphere_refinement_folds_parallel.py
+@@ -24,10 +24,10 @@ of leaving the others waiting. Contracts, on every rank:
+   partition interface can invert cells on one side only; the vertex is held on every
+   rank that holds it, so the mesh does not depend on the partition. Copies agreeing
+   is not enough to show this: when only one side held the vertex, the copies still
+-  agreed at np 8, but 31 vertices were held instead of 24 (hyperion, 2026-11-06).
++  agreed at np 8, but 31 vertices were held instead of 24 (2026-11-06).
+ 
+-On development eddab707 (no guard) at np 2 on Linux (hyperion, 2026-11-06), the folding
+-callback leaves 2 inverted cells and the shell 5, with no warning, and those tests fail.
++On development eddab707 (no guard) at np 2 on a 96-thread Linux workstation (2026-11-06), the
++folding callback leaves 2 inverted cells and the shell 5, with no warning, and those tests fail.
+ 
+     mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0001_sphere_refinement_folds_parallel.py
+ """
+diff --git a/tests/parallel/test_0020_snapshot_disk_swarm_values_parallel.py b/tests/parallel/test_0020_snapshot_disk_swarm_values_parallel.py
+index 9f795050..74d35ee8 100644
+--- a/tests/parallel/test_0020_snapshot_disk_swarm_values_parallel.py
++++ b/tests/parallel/test_0020_snapshot_disk_swarm_values_parallel.py
+@@ -9,7 +9,7 @@ sidecar is read per rank, so here, on every rank:
+ 
+ On development eddab707 a Lagrangian-stress restart at np 2 gave 0.43553 against
+ 0.68137 for the uninterrupted run; with the fix they agree to about 1e-16 at np 1, 2 and
+-4 (hyperion).
++4.
+ 
+     mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0020_snapshot_disk_swarm_values_parallel.py
+ """
+diff --git a/tests/parallel/test_0078_rebuild_memory_rotated_fmg_parallel.py b/tests/parallel/test_0078_rebuild_memory_rotated_fmg_parallel.py
+index 4714bf82..485ca183 100644
+--- a/tests/parallel/test_0078_rebuild_memory_rotated_fmg_parallel.py
++++ b/tests/parallel/test_0078_rebuild_memory_rotated_fmg_parallel.py
+@@ -10,7 +10,7 @@ custom FMG on the child's coarse levels with the FAC patch keyed on the fault's
+ Written for #948. Those runs grew about 190 MB per rank at every fault rebuild, but the
+ cause was outside the library: a monitoring hook kept every rebuild's solver in a
+ module-level list. On this path the library keeps no mesh or solver per rebuild, at any rank
+-count measured: in CI's environment on kaiju (2026-11-06), 1.0 MB per rebuild at np 2
++count measured: in CI's environment on a Linux cluster (2026-11-06), 1.0 MB per rebuild at np 2
+ and 0.7 MB at np 4, on a two-level fixture.
+ The test guards against a library leak appearing here.
+ 
+@@ -20,7 +20,7 @@ Two checks share one run of rebuilds:
+ - the resident set grows by less than 10 MB per rebuild on the worst rank, Linux only
+   (macOS keeps freed memory in it). This sees a PETSc-side leak too, where petsc4py
+   defers destruction in parallel.
+-Measured at np 2 in CI's environment on hyperion (2026-11-06): 2.61 MB per rebuild
++Measured at np 2 in CI's environment on a 96-thread workstation (2026-11-06): 2.61 MB per rebuild
+ and no object alive; with every Stokes solver held in a module-level list, as the
+ hook did, 49.4 MB per rebuild and 20 objects alive, and both tests fail.
+ Before each reading of the resident set a mesh is built, which empties petsc4py's
+diff --git a/tests/parallel/test_0682_clamp_by_containing_cell_parallel.py b/tests/parallel/test_0682_clamp_by_containing_cell_parallel.py
+index 8a1728e7..6b614f3e 100644
+--- a/tests/parallel/test_0682_clamp_by_containing_cell_parallel.py
++++ b/tests/parallel/test_0682_clamp_by_containing_cell_parallel.py
+@@ -82,7 +82,7 @@ def _allreduce_max(x):
+ 
+ 
+ def test_a_linear_p1_field_is_left_exact():
+-    """H6's probe: P1 scalar and vector linear in x and y, 400 interior points.
++    """The review's probe: P1 scalar and vector linear in x and y, 400 interior points.
+ 
+     The interpolant is a convex combination of its cell's nodes, so the cell
+     bound never acts. Development clipped 5 of 400 in serial and 48 to 74 at np 2.
+diff --git a/tests/parallel/test_0785_evaluated_values_reach_storage_parallel.py b/tests/parallel/test_0785_evaluated_values_reach_storage_parallel.py
+index 705d19a1..8fa26e4b 100644
+--- a/tests/parallel/test_0785_evaluated_values_reach_storage_parallel.py
++++ b/tests/parallel/test_0785_evaluated_values_reach_storage_parallel.py
+@@ -152,7 +152,7 @@ def test_deform_keeps_every_tensor_shape_in_its_components():
+ def test_deform_with_units_keeps_a_constant_field(reference_scales):
+     """A constant T of raw 0.5 K reads raw 0.5 after a deform in a units model, with
+     no limiter. With the transferred values reduced by the temperature scale it came
+-    out at 0.0005 (review round 3, H1).
++    out at 0.0005 (review round 3).
+ 
+     The target is 0.99 of ``mesh.X.coords`` with its units, so the move stays in the
+     model frame (#979, fixed in #1003) and every new node lies inside the old mesh.
+diff --git a/tests/parallel/test_0874_agreed_build_parallel.py b/tests/parallel/test_0874_agreed_build_parallel.py
+index 8252d663..7602b669 100644
+--- a/tests/parallel/test_0874_agreed_build_parallel.py
++++ b/tests/parallel/test_0874_agreed_build_parallel.py
+@@ -131,7 +131,7 @@ class _CountingVerdicts:
+ 
+ class _CheckedComm:
+     """The build's mpi4py communicator, checking at run time that every
+-    collective made inside an active agreed_build follows an agreement (W1's
++    collective made inside an active agreed_build follows an agreement (a
+     review: the static rule cannot see a collective inside a helper)."""
+ 
+     def __init__(self, comm, verdicts):
+@@ -280,7 +280,7 @@ def test_a_failure_on_a_rank_with_no_cells_is_raised_on_every_rank(monkeypatch):
+ 
+ 
+ # --------------------------------------------------------------------------- #
+-#  H1's round 2: the retry, the swallows, the envelope
++#  Review round 2: the retry, the swallows, the envelope
+ # --------------------------------------------------------------------------- #
+ def test_a_failure_inside_the_build_takes_the_rbf_retry(monkeypatch):
+     """A failure in the FAC split, on one rank and once, is a builder failure:
+@@ -299,7 +299,7 @@ def test_a_failure_inside_the_build_takes_the_rbf_retry(monkeypatch):
+     monkeypatch.setattr(custom_mg, "_patch_links", failing_once)
+     # the mesh-owned hierarchy (no set_custom_fmg): an explicit registration
+     # surfaces a build error by design, the automatic pickup retries
+-    # a body force, so the retried hierarchy has work to do (H1, round 3: the
++    # a body force, so the retried hierarchy has work to do (review round 3: the
+     # walls' shear alone converged at the first iteration)
+     with pytest.warns(UserWarning, match="retrying with the 'rbf' builder"):
+         stokes = _ribbon_solve(explicit=False, bodyforce=(0.0, -1.0))
+@@ -311,7 +311,7 @@ def test_a_failure_inside_the_build_takes_the_rbf_retry(monkeypatch):
+     assert record is not None and "Once in the build" in record["detail"], record
+     # and the retry really installed the RBF hierarchy: a broken RBF build
+     # would degrade to the default preconditioner and still converge
+-    # (H1, round 4)
++    # (review round 4)
+     assert "custom_mg.build" not in stokes.pc_fallbacks, stokes.pc_fallbacks
+     installed = getattr(stokes, "_custom_mg", None)
+     assert isinstance(installed, dict) and \
+@@ -397,7 +397,7 @@ def test_an_all_rank_check_keeps_its_own_builder_failure():
+     """A CollectiveBuildError every rank raises from a check on agreed counts
+     (not through an agreement point) keeps builder_failure=False through the
+     context's exit: a check another builder cannot change must not trigger an
+-    RBF rebuild (H1, round 3)."""
++    RBF rebuild (review round 3)."""
+     from underworld3.utilities.agreed_build import agreed_build
+     caught = None
+     try:
+diff --git a/tests/parallel/test_0874_nested_transfer_verdict_parallel.py b/tests/parallel/test_0874_nested_transfer_verdict_parallel.py
+index b0367609..cb73b811 100644
+--- a/tests/parallel/test_0874_nested_transfer_verdict_parallel.py
++++ b/tests/parallel/test_0874_nested_transfer_verdict_parallel.py
+@@ -57,7 +57,7 @@ def test_a_transfer_spoiled_on_one_rank_gives_no_map_on_any():
+ 
+ def test_a_rank_that_owns_nothing_does_not_veto_the_transfer():
+     # a box of two triangles: from np 2 some rank owns no cell (cells per rank [0, 2] at
+-    # np 2, hyperion). On development that rank left its peers waiting in the fine
++    # np 2). On development that rank left its peers waiting in the fine
+     # coordinates' first read, which is collective, and the job hung
+     base = uw.meshing.UnstructuredSimplexBox(minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0),
+                                              cellSize=1.0, regular=True, qdegree=2)
+diff --git a/tests/parallel/test_0941_rotated_normal_summed_on_pinned_components_parallel.py b/tests/parallel/test_0941_rotated_normal_summed_on_pinned_components_parallel.py
+index f4ed59f6..498c01a5 100644
+--- a/tests/parallel/test_0941_rotated_normal_summed_on_pinned_components_parallel.py
++++ b/tests/parallel/test_0941_rotated_normal_summed_on_pinned_components_parallel.py
+@@ -6,7 +6,7 @@ field's local-to-global scatter, which carries no DOF an essential condition
+ constrains: at a node where a rotated wall meets a wall pinning one component,
+ that component kept each rank's own share, zero on a rank holding none of the
+ node's facets. The normal there depended on the partition, and so did the
+-traction read at the node (H1 measured 0.5 % at a stranded corner) and the
++traction read at the node (0.5 % at a stranded corner, measured in review) and the
+ value the corner's reduced constraint takes from the pinned part of the normal
+ (#939). The sum now rides the DM's point star forest, every component.
+ 
+@@ -22,8 +22,8 @@ at any rank count: the top-left square is split along the diagonal from the
+ corner, and its lower triangle, which holds the corner and a Left facet but no
+ Top facet, goes to rank 1 with the column below it; rank 0 holds the triangle
+ with the corner's Top facet. (The default partitions did not strand it: at np 2
+-the old fixture shared no Top node, and at np 3 it passed on development, H7's
+-review of #1265. H1's shell partitions c941a/b, which strand it, failed on
++the old fixture shared no Top node, and at np 3 it passed on development, the
++#1265 review. The review's shell partitions c941a/b, which strand it, failed on
+ development and passed on the branch.) If the distributed mesh does not
+ strand the corner, the tests skip.
+ 
+diff --git a/tests/parallel/test_1064_rotated_freeslip_parallel.py b/tests/parallel/test_1064_rotated_freeslip_parallel.py
+index 61ea896a..20265f95 100644
+--- a/tests/parallel/test_1064_rotated_freeslip_parallel.py
++++ b/tests/parallel/test_1064_rotated_freeslip_parallel.py
+@@ -83,7 +83,7 @@ _MESH_ANNULUS = [600, 2.356187202481425]       # Annulus(0.5, 1.0, cellSize=0.1)
+ _MESH_ANNULUS_FMG = [2304, 2.356078287527854]  # cellSize=0.2, refined twice
+ _MESH_SHELL = [1417, 3.4521585981151097]       # SphericalShell(0.55, 1.0, cs=0.25)
+ _MESH_SHELL_INT = [2016, 3.4521585981151106]   # SphericalShellInternalBoundary
+-# The same meshes as Linux's gmsh builds them, recorded on hyperion at np 2 with the
++# The same meshes as Linux's gmsh builds them, recorded on a 96-thread workstation at np 2 with the
+ # conda-forge stack CI uses (2026-11-06). The two shells are as development builds
+ # them; flipping their walls to the convex hull (#946, PR #952) changes them, and a
+ # skip then prints the fingerprint and values to add here.
+diff --git a/tests/parallel/test_1066_rotated_datum_parallel.py b/tests/parallel/test_1066_rotated_datum_parallel.py
+index a69583ab..6bdd5c0a 100644
+--- a/tests/parallel/test_1066_rotated_datum_parallel.py
++++ b/tests/parallel/test_1066_rotated_datum_parallel.py
+@@ -30,7 +30,7 @@ from serial_reference import (
+ # Annulus(0.5, 1.0, cellSize=0.1). rtol 1e-2, i.e. "is this still the same answer".
+ ANCHOR_DATUM = [{"fingerprint": [600, 2.356187202481425],
+                  "values": (6.6559607579,)},
+-                # Linux's gmsh annulus, recorded on hyperion at np 2 (2026-11-06)
++                # Linux's gmsh annulus, recorded on a 96-thread workstation at np 2 (2026-11-06)
+                 {"fingerprint": [612, 2.3561872024814274],
+                  "values": (6.656023361562388,)}]
+ 
+diff --git a/tests/parallel/test_1069_boundary_label_on_some_ranks_parallel.py b/tests/parallel/test_1069_boundary_label_on_some_ranks_parallel.py
+index bf6264ef..351fcf9d 100644
+--- a/tests/parallel/test_1069_boundary_label_on_some_ranks_parallel.py
++++ b/tests/parallel/test_1069_boundary_label_on_some_ranks_parallel.py
+@@ -2,7 +2,7 @@
+ 
+ A label made after distribution exists only on the ranks that hold its points.
+ ``PetscDSAddBoundary_UW`` then passed a null label to ``DMAddBoundary`` on the
+-others, and the solve ended in a segmentation fault (exit 59, measured by H1
++others, and the solve ended in a segmentation fault (exit 59, measured in review
+ at np 2 and 3 for Poisson and Stokes). The ranks now agree that the label
+ exists, and a rank without it gets it empty.
+ 
+diff --git a/tests/parallel/test_1085_submesh_boundary_names.py b/tests/parallel/test_1085_submesh_boundary_names.py
+index 27d24999..5686c997 100644
+--- a/tests/parallel/test_1085_submesh_boundary_names.py
++++ b/tests/parallel/test_1085_submesh_boundary_names.py
+@@ -25,7 +25,7 @@ import underworld3 as uw
+ 
+ pytestmark = [pytest.mark.level_2, pytest.mark.mpi(min_size=2), pytest.mark.timeout(120)]
+ 
+-# The boundary enum of the extracted outer slab (measured; H1's review of #856).
++# The boundary enum of the extracted outer slab (measured in the #856 review).
+ OUTER_SLAB_BOUNDARIES = [("Top", 12), ("Right", 13), ("Left", 14), ("Internal", 15),
+                          ("Outer", 102), ("All_Boundaries", 1001)]
+ 
+diff --git a/tests/parallel/test_1101_custom_mg_dependent_columns_parallel.py b/tests/parallel/test_1101_custom_mg_dependent_columns_parallel.py
+index 9813d623..c533b03c 100644
+--- a/tests/parallel/test_1101_custom_mg_dependent_columns_parallel.py
++++ b/tests/parallel/test_1101_custom_mg_dependent_columns_parallel.py
+@@ -236,7 +236,7 @@ def test_no_dependent_pair_leaves_the_transfer_untouched():
+ 
+ 
+ def test_more_columns_than_shared_rows_are_reduced_exactly():
+-    """Three columns on the same two fine rows span two dimensions (W1's case
++    """Three columns on the same two fine rows span two dimensions (a review case
+     on a cut of a moved child: a rotated transfer mixes a node's components).
+     The smallest is dropped as a combination of the other two, the level below
+     folded with the same coefficients: the composite transfer is unchanged,
+diff --git a/tests/parallel/test_1103_custom_mg_empty_rank_parallel.py b/tests/parallel/test_1103_custom_mg_empty_rank_parallel.py
+index 5b131dbb..adc12ec9 100644
+--- a/tests/parallel/test_1103_custom_mg_empty_rank_parallel.py
++++ b/tests/parallel/test_1103_custom_mg_empty_rank_parallel.py
+@@ -2,7 +2,7 @@
+ 
+ A coarse level is small by construction, so on a large run most ranks own none
+ of its cells, and the fine mesh of a placed fault is gathered onto one rank, so
+-most ranks own none of the finest cells either. Found on kaiju at np 104 (a
++most ranks own none of the finest cells either. Found on a Linux cluster at np 104 (a
+ 124-cell coarsest level, the faulted annulus): ``_colocate_level`` shaped its
+ centroid arrays from the cells it found, an empty rank raised IndexError, and
+ the ranks that had cells waited in the next all-gather for ever.
+diff --git a/tests/parallel/test_1107_interpolation_rank_owning_nothing_parallel.py b/tests/parallel/test_1107_interpolation_rank_owning_nothing_parallel.py
+index 0ed35749..33fee18c 100644
+--- a/tests/parallel/test_1107_interpolation_rank_owning_nothing_parallel.py
++++ b/tests/parallel/test_1107_interpolation_rank_owning_nothing_parallel.py
+@@ -9,7 +9,7 @@ shared point belongs to the highest rank that holds it, so a rank whose cells
+ sit wholly inside higher ranks' regions owns nothing. Its entries then reach
+ owners that never preallocated them: the owner raises "New nonzero caused a
+ malloc" inside ``MatAssemblyEnd``, and the rank that did not raise waits in the
+-assembly's own collective for ever. Found on kaiju at np 32 and 52 on the
++assembly's own collective for ever. Found on a Linux cluster at np 32 and 52 on the
+ 124-cell coarsest level of the faulted annulus, where custom-P multigrid reads
+ each level's node coordinates (#902), and on a 3-D notch mesh at np 16.
+ 
+diff --git a/tests/parallel/test_1108_custom_mg_builder_failure_collective_parallel.py b/tests/parallel/test_1108_custom_mg_builder_failure_collective_parallel.py
+index 7930a39e..e2dc3b8c 100644
+--- a/tests/parallel/test_1108_custom_mg_builder_failure_collective_parallel.py
++++ b/tests/parallel/test_1108_custom_mg_builder_failure_collective_parallel.py
+@@ -4,7 +4,7 @@
+ degrades to the solver's default preconditioner when that fails too. The verdict
+ was each rank's own: a rank whose builder raised retried alone while the others
+ went on into the transfer's assembly, and the ranks met in different collectives
+-(on kaiju at np 32 and 52, after #902's assembly failure, the run hung).
++(on a Linux cluster at np 32 and 52, after #902's assembly failure, the run hung).
+ 
+ The barycentric builder is rank-local work, so its verdict can be agreed right
+ after it: a failure on any rank is raised on every rank, and the retry is taken
+diff --git a/tests/parallel/test_1111_custom_mg_cut_of_a_moved_child_parallel.py b/tests/parallel/test_1111_custom_mg_cut_of_a_moved_child_parallel.py
+index 6f40df71..5f715ca1 100644
+--- a/tests/parallel/test_1111_custom_mg_cut_of_a_moved_child_parallel.py
++++ b/tests/parallel/test_1111_custom_mg_cut_of_a_moved_child_parallel.py
+@@ -6,7 +6,7 @@ columns: in the rotated transfer, three columns on one fine node's two
+ component rows. #1104's guard handled only columns on one shared row and
+ refused these ("share fewer fine images than there are of them"), so a solve
+ that had converged in 6 velocity iterations before the guard stopped. They are
+-now reduced exactly to as many columns as they span. W1's fixture (test_1176's
++now reduced exactly to as many columns as they span. The review's fixture (test_1176's
+ ``_split_level_stokes``): the child moved by ``amp sin(pi x) sin(pi y)`` along
+ x or y (across the fault) before ``add_fault``. Every case must solve; the
+ 0.002 case across the fault, which the guard never touched, stays at 6.
+@@ -23,13 +23,13 @@ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b, pytest.mark.timeout(300)]
+ 
+ TRACE = np.array([[0.3, 0.45], [0.7, 0.55]])
+ 
+-# (axis, amplitude): the amplitudes W1 measured; 0.005 and up were refused
++# (axis, amplitude): the amplitudes measured in review; 0.005 and up were refused
+ CASES = [(1, 0.002), (0, 0.005), (1, 0.005), (0, 0.01), (1, 0.01), (0, 0.015), (1, 0.015)]
+ 
+ # The coarse fault copies left with no fine image, measured serially (development,
+-# W1, 2026-11-21). In parallel the add-on partition's copy of the moved child now
++# 2026-11-21). In parallel the add-on partition's copy of the moved child now
+ # keeps the child's as-built record (#1276), so it is nested where the child was
+-# made, as on one rank, and the count is the same: H5 measured 7, 8 and 11 at
++# made, as on one rank, and the count is the same: review measured 7, 8 and 11 at
+ # np 2 and 3 for the first three, where development gave 1, 8 and 4.
+ UNREPAIRED = {(0, 0.005): 7, (1, 0.005): 8, (0, 0.01): 11, (1, 0.01): 14,
+               (0, 0.015): 13, (1, 0.015): 28}
+@@ -89,5 +89,5 @@ def test_a_cut_of_a_moved_child_solves(axis, amplitude):
+         # it says the same at every rank count (#1276, case 2a)
+         assert unrepaired == UNREPAIRED[(axis, amplitude)], note
+         # Still open: the merged count is not yet the same at every rank count
+-        # (H5: 2 at np 2 against 4 serially at (0, 0.005); 17 at np 3 against
++        # (review: 2 at np 2 against 4 serially at (0, 0.005); 17 at np 3 against
+         # 19 at (0, 0.01)), so it is not asserted here.
+diff --git a/tests/parallel/test_1114_mg_coarse_gamg_parallel.py b/tests/parallel/test_1114_mg_coarse_gamg_parallel.py
+index 0652225d..73d322cc 100644
+--- a/tests/parallel/test_1114_mg_coarse_gamg_parallel.py
++++ b/tests/parallel/test_1114_mg_coarse_gamg_parallel.py
+@@ -13,8 +13,8 @@ counts move with the partition).
+ 
+ The recorded answer is a baseline, held to 1e-7. At solver tolerance 1e-6 the
+ answer itself moves with the partition and the host: the standard box's gathered
+-LU is 7.9e-9 from it at np 1 (wombat) and 1.2e-8 and 1.5e-8 at np 2 and 4 (CI's
+-environment on kaiju), where GAMG and LU in one run agree to 4.5e-11 or better.
++LU is 7.9e-9 from it at np 1 (a developer workstation) and 1.2e-8 and 1.5e-8 at np 2 and 4 (CI's
++environment on a Linux cluster), where GAMG and LU in one run agree to 4.5e-11 or better.
+ That agreement is the two solves stopping well past the tolerance, not a
+ guarantee: a Schur solve that stops one iteration earlier (tolerance 3e-6 on
+ the rotated route) moves them 2.4e-9 apart. The same-run bound is 1e-8; a
+diff --git a/tests/parallel/test_1131_rotated_nullspace_from_mesh_parallel.py b/tests/parallel/test_1131_rotated_nullspace_from_mesh_parallel.py
+index 1ae1ea78..1d1d2f02 100644
+--- a/tests/parallel/test_1131_rotated_nullspace_from_mesh_parallel.py
++++ b/tests/parallel/test_1131_rotated_nullspace_from_mesh_parallel.py
+@@ -14,9 +14,9 @@ wall; a rank-local verdict would keep the mode there and drop it elsewhere.
+ - An add_fault child keeps the declaration and the exemption on every rank. At np > 1
+   the add-on partition can move the level the fault is cut on into a new mesh, which
+   must inherit the declaration too: without that, a conforming sheet on a shell gave
+-  v_rms 1.79e-3 at np 1 and 3.45e-3 at np 4 (hyperion, on b7030602).
++  v_rms 1.79e-3 at np 1 and 3.45e-3 at np 4 (on b7030602).
+ - The fixture has its power: at each rank count it was measured at, some rank holds no
+-  deformed wall vertex. Measured on Linux (hyperion, 2026-11-06), the ranks untouched
++  deformed wall vertex. Measured on a 96-thread Linux workstation (2026-11-06), the ranks untouched
+   were 1, 2, 2, 3, 4, 6 at np 2, 3, 4, 5, 6, 8. With the reduction made rank-local, the
+   ranks disagree and the solve hangs into the supervisor at np 2, 3, 4 and 8. If a
+   partitioner change makes the power assert fail, the fixture has lost its power, not
+@@ -118,7 +118,7 @@ def test_a_wall_deformed_on_some_ranks_drops_the_mode_on_every_rank():
+ 
+ 
+ # the rank counts at which the add-on partition was measured to move the level the
+-# fault is cut on (hyperion, 2026-11-06: not at np 2 or 6)
++# fault is cut on (2026-11-06: not at np 2 or 6)
+ MOVES_AT = (3, 4, 5, 8)
+ 
+ 
+diff --git a/tests/parallel/test_1133_fac_patch_summary_parallel.py b/tests/parallel/test_1133_fac_patch_summary_parallel.py
+index 80363268..69a73846 100644
+--- a/tests/parallel/test_1133_fac_patch_summary_parallel.py
++++ b/tests/parallel/test_1133_fac_patch_summary_parallel.py
+@@ -4,7 +4,7 @@
+ between ranks: a level is None, one ``(owned, subdomain)`` pair, or a list of
+ pairs, and a rank holding no part of a fault zone carries an empty pair. The
+ add-on matrix's row 5 driver looped one allreduce over its own rank's blocks.
+-At np 4 on kaiju the ranks made different numbers of calls, and the run hung
++At np 4 on a Linux cluster the ranks made different numbers of calls, and the run hung
+ after its solve had finished.
+ 
+ ``hierarchy.patch_summary`` is now made once, where the patch is installed, with
+diff --git a/tests/parallel/test_1138_serial_reference_child_env.py b/tests/parallel/test_1138_serial_reference_child_env.py
+index 25fcaf5c..a62d4fa6 100644
+--- a/tests/parallel/test_1138_serial_reference_child_env.py
++++ b/tests/parallel/test_1138_serial_reference_child_env.py
+@@ -4,7 +4,7 @@
+ scrubs the launcher's variables from the child's environment so that the child
+ runs as a singleton instead of trying to join the parent's job. The scrub dropped
+ every ``OMPI_*`` variable, which also dropped the user's own Open MPI component
+-selections. On kaiju, jobs set ``OMPI_MCA_io=^ompio`` to keep HDF5 off OMPIO, and
++selections. On a Linux cluster, jobs set ``OMPI_MCA_io=^ompio`` to keep HDF5 off OMPIO, and
+ under load every HDF5 error 76 was in a spawned reference run that never saw it.
+ 
+ The child now keeps the user's selections and parameters for io (and its
+diff --git a/tests/parallel/test_1139_fac_zone_blocks_any_rank_count_parallel.py b/tests/parallel/test_1139_fac_zone_blocks_any_rank_count_parallel.py
+index ac925ced..2a0f5fa8 100644
+--- a/tests/parallel/test_1139_fac_zone_blocks_any_rank_count_parallel.py
++++ b/tests/parallel/test_1139_fac_zone_blocks_any_rank_count_parallel.py
+@@ -203,7 +203,7 @@ def test_the_structural_patch_alone_takes_the_serial_iterations(structural_alone
+     info = stokes._rotated_freeslip_info
+     assert info["converged"]
+     its = max(info["vel_its_last"])
+-    # 3 measured at np 1, 2 and 4 (kaiju) and np 1 (macOS); one block per rank
++    # 3 measured at np 1, 2 and 4 (a Linux cluster) and np 1 (macOS); one block per rank
+     # took 4 at np 2 and 6 at np 4
+     assert its <= 3, f"np {uw.mpi.size}: the velocity solve took {its} iterations (#925)"
+ 
+diff --git a/tests/parallel/test_1142_rotated_exact_mode_projected_pc_parallel.py b/tests/parallel/test_1142_rotated_exact_mode_projected_pc_parallel.py
+index 35c1c49d..3c532224 100644
+--- a/tests/parallel/test_1142_rotated_exact_mode_projected_pc_parallel.py
++++ b/tests/parallel/test_1142_rotated_exact_mode_projected_pc_parallel.py
+@@ -10,7 +10,7 @@ check). Here, on every rank:
+ - destroying the solve's workspace destroys the multigrid the projection wraps. In
+   parallel petsc4py defers the destruction of a dropped reference, and before the fix
+   the whole hierarchy outlived every solve: 533 to 1106 MB over 31 adjoint solves at
+-  np 2, against 535 to 551 MB without the projection (hyperion, on 108f9dee).
++  np 2, against 535 to 551 MB without the projection (on 108f9dee).
+ 
+     mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_1142_rotated_exact_mode_projected_pc_parallel.py
+ """
+diff --git a/tests/parallel/test_1144_rotated_rebuild_memory_parallel.py b/tests/parallel/test_1144_rotated_rebuild_memory_parallel.py
+index 9b6a254d..cc31cd92 100644
+--- a/tests/parallel/test_1144_rotated_rebuild_memory_parallel.py
++++ b/tests/parallel/test_1144_rotated_rebuild_memory_parallel.py
+@@ -13,7 +13,7 @@ the deferred list at its end.
+ The test counts that list's entries itself, through ``PETSc.garbage_view``, rather
+ than reading the resident set: a test that runs earlier in the same process can free
+ enough heap to absorb the leak before the resident set moves (about 33 MB after
+-test_1139 or test_1097, hyperion 2026-11-08), which made a resident-set test pass or
++test_1139 or test_1097, measured 2026-11-08), which made a resident-set test pass or
+ fail by where CI's batches of six files fell. The deferred list is this process's own
+ and does not depend on what ran before: on development it fails alone, in its CI
+ batch and after either of those, and with the fix it passes in all four.
+@@ -102,7 +102,7 @@ def test_a_rebuild_leaves_no_deferred_destroys_behind():
+         entries.append(_deferred_entries(stokes.dm.comm))
+     # every rebuild's drops are freed at the end of its solve, so the list does not grow;
+     # unfreed, it grows by the old workspace's objects at every rebuild (on development
+-    # 06c574e8 at np 2, rank 0's summary grew by 5412 bytes a rebuild, hyperion)
++    # 06c574e8 at np 2, rank 0's summary grew by 5412 bytes a rebuild)
+     growth = comm.allreduce(entries[-1] - entries[0], op=MPI.MAX)
+     assert growth <= 0, (f"the deferred-destroy list grew by {growth} entries over "
+                          f"{MEASURED - 1} rebuilds: {entries}")
+diff --git a/tests/parallel/test_1147_fac_structural_blocks_per_fault_parallel.py b/tests/parallel/test_1147_fac_structural_blocks_per_fault_parallel.py
+index 3a59e7a6..3341b63c 100644
+--- a/tests/parallel/test_1147_fac_structural_blocks_per_fault_parallel.py
++++ b/tests/parallel/test_1147_fac_structural_blocks_per_fault_parallel.py
+@@ -5,7 +5,7 @@ split faults' bands, their duplicates and a halo. The parallel branch gathers it
+ from every rank so that no partition boundary cuts it (#925), and it was one block
+ for all faults, factorised on the rank owning most of its rows. The add-on partition
+ gives each fault to the rank owning most of it, so two faults apart sat on two ranks
+-and both were factorised on one: on #895's stage 1 (kaiju, h_b/S 48, np 4 to 16)
++and both were factorised on one: on #895's stage 1 (a Linux cluster, h_b/S 48, np 4 to 16)
+ that rank's factorisation and triangular solves did twice the work of one fault's,
+ and the solve took 19 to 28 % longer than with a block per fault. The slip agreed to
+ 5e-14 in the same iterations.
+diff --git a/tests/parallel/test_1149_custom_mg_reinstall_frees_parallel.py b/tests/parallel/test_1149_custom_mg_reinstall_frees_parallel.py
+index 19f8647c..a72c29cd 100644
+--- a/tests/parallel/test_1149_custom_mg_reinstall_frees_parallel.py
++++ b/tests/parallel/test_1149_custom_mg_reinstall_frees_parallel.py
+@@ -5,7 +5,7 @@ the destroy is collective, so the object goes on a deferred list that only a col
+ ``PETSc.garbage_cleanup`` empties, and nothing on the standard solve paths ran one. Every
+ reinstall of a custom-P hierarchy kept its predecessor's transfers and level objects:
+ on this fixture at np 2, +6 entries per reinstall on Poisson and +28 on the Stokes
+-velocity block (hyperion, development a6eebb61). The solve that installed now empties
++velocity block (development a6eebb61). The solve that installed now empties
+ the list at its end, as the rotated path does (#1007).
+ 
+ Run with at least two ranks.
+diff --git a/tests/parallel/test_1152_fac_zone_survives_a_mover_parallel.py b/tests/parallel/test_1152_fac_zone_survives_a_mover_parallel.py
+index cec37347..0af0668c 100644
+--- a/tests/parallel/test_1152_fac_zone_survives_a_mover_parallel.py
++++ b/tests/parallel/test_1152_fac_zone_survives_a_mover_parallel.py
+@@ -93,7 +93,7 @@ def _stokes(mesh, zone, split, tag):
+         s.add_fault_bc(0, boundary="Fault")
+     s.petsc_use_pressure_nullspace = True
+     # well inside the comparison's bounds: at 1e-6, kept and fresh differ by the
+-    # convergence noise itself, 1.5e-6 in velocity at np 2 (hyperion, round 3)
++    # convergence noise itself, 1.5e-6 in velocity at np 2 (review round 3)
+     s.tolerance = TOLERANCE
+     return s, v, p
+ 
+@@ -280,7 +280,7 @@ def test_a_kept_zone_patch_matches_a_fresh_registration(split, capsys):
+                for which, solver in others.items()}
+         told["velocity_its"] = {"kept": its_k, "fresh": its_f, **its}
+         # one line per move, past pytest's capture: on a loaded host a move takes over a
+-        # minute at np 2 (hyperion at load 60: 157 s and 254 s for the two cases, 3-4
++        # minute at np 2 (a 96-thread workstation at load 60: 157 s and 254 s for the two cases, 3-4
+         # times CI), and the MPI supervisor kills a job silent for 300 s. It carries the
+         # counts, so a green run records them for its host too.
+         with capsys.disabled():
+@@ -334,7 +334,7 @@ def test_a_kept_zone_patch_matches_a_fresh_registration(split, capsys):
+             # no zone and a moved mesh: nothing is installed on the finest level
+             none_rows = others["none"]._custom_mg["hierarchy"].level_patch_rows[-1]
+             assert none_rows is None, (k, none_rows)
+-        # to the solver tolerance: at 1e-8 kept and fresh agree to ~4e-9 (hyperion,
++        # to the solver tolerance: at 1e-8 kept and fresh agree to ~4e-9 (measured at
+         # np 1, 2 and 4); a patch only preconditions, and the outer solve converges
+         # on the true residual, so a stale one costs iterations and not accuracy
+         assert errors["velocity"] < 100 * TOLERANCE, (k, errors, told)
+diff --git a/tests/parallel/test_1155_snapshot_refusal_agrees_across_ranks_parallel.py b/tests/parallel/test_1155_snapshot_refusal_agrees_across_ranks_parallel.py
+index d7a02704..3910f93b 100644
+--- a/tests/parallel/test_1155_snapshot_refusal_agrees_across_ranks_parallel.py
++++ b/tests/parallel/test_1155_snapshot_refusal_agrees_across_ranks_parallel.py
+@@ -4,7 +4,7 @@ The mesh's solver register holds its solvers weakly, so a solver the user drops
+ collected, with its history manager. A snapshot that captured that history cannot be
+ restored, and says so. When a reference to the dropped solver survives on only some
+ ranks, those ranks found the history and restored it while the others raised, and the
+-job hung in the next collective (hyperion, np 2 and 4, PR #1050 review round 2). The
++job hung in the next collective (np 2 and 4, PR #1050 review round 2). The
+ verdict is now agreed before anything is written: every rank raises, and the model is
+ left as it was.
+ 
+diff --git a/tests/parallel/test_1173_addon_record_after_a_move_parallel.py b/tests/parallel/test_1173_addon_record_after_a_move_parallel.py
+index a2b2db82..44a9388a 100644
+--- a/tests/parallel/test_1173_addon_record_after_a_move_parallel.py
++++ b/tests/parallel/test_1173_addon_record_after_a_move_parallel.py
+@@ -70,7 +70,7 @@ def _smooth(mesh):
+ # bound half of each for the two movers, whose grid at another rank count has
+ # not been measured; and 19, 19 and 15 pressure iterations at 3 velocity
+ # iterations an application. After mesh.deform the count is 19 in serial and
+-# at np 2 and 20 at np 3, 4 and 5 (hyperion), and the slip the same at every
++# at np 2 and 20 at np 3, 4 and 5, and the slip the same at every
+ # rank count.
+ MOVERS = [pytest.param(_deform, True, 0.03, 19, 0.159472, id="deform"),
+           pytest.param(_redistribute, True, 0.023, 19, 0.159522,
+diff --git a/tests/parallel/test_1183_contained_points_owned_parallel.py b/tests/parallel/test_1183_contained_points_owned_parallel.py
+index 1c473bd5..2102c5b8 100644
+--- a/tests/parallel/test_1183_contained_points_owned_parallel.py
++++ b/tests/parallel/test_1183_contained_points_owned_parallel.py
+@@ -2,7 +2,7 @@
+ 
+ The face-crossing walk, its restarts from the nearest centroids and the
+ face-tolerance search could all miss a contained point on a strongly sheared mesh:
+-2 per million at np 2 on the old gmsh fixture (H1's probe on #1175). The exact
++2 per million at np 2 on the old gmsh fixture (the #1175 review's probe). The exact
+ fallback tests every local cell whose bounding box holds a point the walk did not
+ place, so none is missed.
+ 
+diff --git a/tests/parallel/test_1249_global_evaluate_non_finite_points_parallel.py b/tests/parallel/test_1249_global_evaluate_non_finite_points_parallel.py
+index d7612d19..a31e9352 100644
+--- a/tests/parallel/test_1249_global_evaluate_non_finite_points_parallel.py
++++ b/tests/parallel/test_1249_global_evaluate_non_finite_points_parallel.py
+@@ -30,7 +30,7 @@ def _field():
+     return T
+ 
+ 
+-# The sample line of the parallel plotting helpers' check (H1's probe on #1246).
++# The sample line of the parallel plotting helpers' check (the #1246 review's probe).
+ POINTS = np.column_stack((np.linspace(0.1, 0.9, 41), np.linspace(0.2, 0.3, 41)))
+ 
+ 
+diff --git a/tests/test_0028_convergence_reference.py b/tests/test_0028_convergence_reference.py
+index f2de4177..19b826cf 100644
+--- a/tests/test_0028_convergence_reference.py
++++ b/tests/test_0028_convergence_reference.py
+@@ -171,7 +171,7 @@ def test_the_rotated_loop_s_last_increment_stops_at_the_floor():
+     # takes: a transversely isotropic power law in an annulus, rotated free slip on
+     # the outer wall, tolerance 1e-11. The last increment's linear solve was asked for
+     # 1e-11 of an already small residual, below round-off, and ran into its cap of
+-    # 300. Each increment now stops at max(0.1 T, the round-off floor): on wombat its
++    # 300. Each increment now stops at max(0.1 T, the round-off floor): on a workstation its
+     # linear iterations are [1, 2, 1, 1, 1, 1].
+     mesh = uw.meshing.Annulus(radiusInner=0.5, radiusOuter=1.0, cellSize=0.15, qdegree=3)
+     x, y = mesh.X
+@@ -250,7 +250,7 @@ def test_a_datum_that_starts_at_zero_counts_from_the_start():
+     # Read by its value, a lid ramped up from zero, or a Robin ambient set later, was
+     # cached as "no datum" and kept the stationary rule: the ramped lid's warm
+     # re-solves were 6.4e-3 and 2.7e-3 off, against 1.1e-6 for the same lid built at
+-    # speed 1 (hyperion's review of the branch, M1).
++    # speed 1 (review of the branch, M1).
+     lid = uw.expression(r"U_{0028z}", 0.0, "lid speed, ramped from zero")
+     stokes = _weak_lid(lid)
+     assert stokes._weak_datum()
+diff --git a/tests/test_0052_collective_guard_scan.py b/tests/test_0052_collective_guard_scan.py
+index 93e8858a..11941472 100644
+--- a/tests/test_0052_collective_guard_scan.py
++++ b/tests/test_0052_collective_guard_scan.py
+@@ -124,7 +124,7 @@ def is_collective(call, aliases=frozenset()):
+ UNIFORM_TOKENS = (
+     # the communicator's SIZE is the same on every rank; its RANK is the one
+     # quantity guaranteed not to be (a collective under `if comm.rank == 0:`
+-    # is the classic hang), so it is not here (#874, C1 on #1225)
++    # is the classic hang), so it is not here (#874, and the #1225 review)
+     "mpi.size", "comm.size",
+     ".dim", ".cdim", "dimension", ".degree", ".simplex", ".order",
+     "isinstance", "hasattr", "__debug__",
+@@ -238,7 +238,7 @@ def classify(test, params, reduced=frozenset()):
+ 
+     # before the uniform tokens (``hasattr``, ``mpi.size``) and before the
+     # argument rule: a guard that reads the rank is rank-local whatever else it
+-    # says and wherever the communicator came from (H1's review of #1225)
++    # says and wherever the communicator came from (the #1225 review)
+     if any(token in squashed for token in RANK_TOKENS) or "rank" in {
+             n.id for n in ast.walk(test) if isinstance(n, ast.Name)}:
+         return "rank"
+@@ -563,8 +563,8 @@ def test_accepted_list_has_no_stale_entries():
+ 
+ def test_a_guard_keyed_entry_flags_any_other_guard_in_the_function():
+     """A planted rank-local guard around an agreement point in _build_body is
+-    flagged, while the accepted ``pre is not None`` guard there is not (H1's
+-    review of #1225: keyed on the function alone, the entry waved any guard
++    flagged, while the accepted ``pre is not None`` guard there is not (the #1225
++    review: keyed on the function alone, the entry waved any guard
+     in the function through). The planted guard is one the scan classes as
+     rank-local, a local array's size."""
+     planted = (
+@@ -595,7 +595,7 @@ def test_a_guard_keyed_entry_flags_any_other_guard_in_the_function():
+ # ``agree()`` on one branch only or inside a broad ``except``. Those are left
+ # to the run-time check in tests/parallel/test_0874_agreed_build_parallel.py,
+ # which wraps the build's communicator and asserts that every collective made
+-# inside an active context follows an agreement (W1's and H1's reviews of
++# inside an active context follows an agreement (the reviews of
+ # #1218).
+ AGREE_CALLS = {"agree", "agreed_allreduce", "agreed_allgather", "agreed_bcast"}
+ 
+@@ -697,7 +697,7 @@ def test_every_collective_in_an_agreed_build_has_an_agreement_point():
+     assert not findings, "collectives with no agreement point in front:\n" + "\n".join(findings)
+ 
+ 
+-#: H1's plants (review of #1225): guards that read the rank, each reported
++#: The review's plants (#1225): guards that read the rank, each reported
+ #: under an agreement point.
+ RANK_PLANTS = [
+     "comm.rank == 1", "comm.rank", "uw.mpi.rank == last", "mpi.rank < 2",
+@@ -712,7 +712,7 @@ def test_a_rank_guard_is_never_taken_for_uniform(guard):
+     """The rank is the one quantity guaranteed to differ between ranks: an
+     agreement point (or a collective) under a guard that reads it is reported,
+     whatever else the guard says, and also when the communicator is a
+-    parameter (#874, H1 and C1 on #1225)."""
++    parameter (#874, and the #1225 review)."""
+     planted = (
+         "def f(comm, last):\n"
+         "    rank = comm.rank\n"
+diff --git a/tests/test_0077_model_registry_does_not_pin.py b/tests/test_0077_model_registry_does_not_pin.py
+index 01ce18a7..a9b5985d 100644
+--- a/tests/test_0077_model_registry_does_not_pin.py
++++ b/tests/test_0077_model_registry_does_not_pin.py
+@@ -7,7 +7,7 @@ lived for the rest of the process. A driver that rebuilds a faulted mesh
+ each time a fault moves therefore kept every mesh it ever built: measured on
+ a box whose straight fault moves at each rebuild, 9 meshes, 21 DMs,
+ 12 matrices, one KSP and one SNES more after each rebuild, 53 MB per rebuild
+-at k = 3 in serial, and about 0.4 GB per rank per rebuild in the kaiju
++at k = 3 in serial, and about 0.4 GB per rank per rebuild in the Linux-cluster
+ production runs (an out-of-memory kill after 24 rebuilds). The swarms and
+ state-bearers were already held weakly; the meshes, variables and solvers
+ now are too.
+diff --git a/tests/test_0745_two_models_in_one_process.py b/tests/test_0745_two_models_in_one_process.py
+index 1b24d016..cc3a6f8b 100644
+--- a/tests/test_0745_two_models_in_one_process.py
++++ b/tests/test_0745_two_models_in_one_process.py
+@@ -33,7 +33,7 @@ def _first_model():
+ 
+ 
+ def _free_surface_built_but_not_solved():
+-    """A first model that only builds a FreeSurface (H1's case): its derived
++    """A first model that only builds a FreeSurface (the review's case): its derived
+     solves copy a coordinate-dependent viscosity through unwrap."""
+     _free_surface_on_a_new_mesh(solve=False)
+ 
+diff --git a/tests/test_0760_evaluate_units_contract.py b/tests/test_0760_evaluate_units_contract.py
+index 4a9c5fb4..56f8026b 100644
+--- a/tests/test_0760_evaluate_units_contract.py
++++ b/tests/test_0760_evaluate_units_contract.py
+@@ -377,7 +377,7 @@ def _T_and_constants(mesh):
+ @pytest.mark.tier_b
+ def test_a_viscosity_contrast_beside_a_unitless_field_is_a_pure_number(units_model):
+     """``T * eta1/eta0``: the dimensional leaves reduce to a pure number, so this
+-    is not a mix (H1, review of #1182). 2.0 * 1e-3."""
++    is not a mix (the #1182 review). 2.0 * 1e-3."""
+     T, e1, e0 = _T_and_constants(_box())
+     r = uw.function.evaluate(T.sym[0] * e1 / e0, _PTS)
+     assert float(np.asarray(r).ravel()[0]) == pytest.approx(2.0e-3)
+diff --git a/tests/test_0949_refinement_says_which_walls_are_left_off.py b/tests/test_0949_refinement_says_which_walls_are_left_off.py
+index 2a29049d..e78b30c6 100644
+--- a/tests/test_0949_refinement_says_which_walls_are_left_off.py
++++ b/tests/test_0949_refinement_says_which_walls_are_left_off.py
+@@ -37,7 +37,7 @@ def test_a_crease_that_holds_vertices_back_names_the_walls_and_the_remedy():
+             assert len(messages) == 1, messages
+             # the count, and which walls hold the crease vertices, are the
+             # platform's gmsh mesh's: on macOS all on Lower, on a Linux build
+-            # not (H5, 2026-11-22); so any non-empty list of the shell's walls
++            # not (measured 2026-11-22); so any non-empty list of the shell's walls
+             held = re.search(r"(\d+) vertices it moved", messages[0])
+             assert held and int(held.group(1)) > 0, messages[0]
+             walls = re.search(r"off the walls (\[[^\]]*\])", messages[0])
+diff --git a/tests/test_1064_constrained_spherical_shell_response.py b/tests/test_1064_constrained_spherical_shell_response.py
+index 5c8e1278..0835c1f8 100644
+--- a/tests/test_1064_constrained_spherical_shell_response.py
++++ b/tests/test_1064_constrained_spherical_shell_response.py
+@@ -227,7 +227,7 @@ def test_direct_lu_diagnostic_constrained_matches_direct_lu_diagnostic_nitsche()
+ def test_lu_subsolve_fieldsplit_constrained_matches_default_nitsche_response():
+     # This was a strict xfail ("LU sub-solves in the velocity | [p,h] preconditioner
+     # still do not reproduce the validated Nitsche/default velocity response"). It
+-    # passes on Linux (hyperion, both builds) and on macOS arm64 at development
++    # passes on a 96-thread Linux workstation (both builds) and on macOS arm64 at development
+     # eddab707, so the agreement within 1 % is now asserted.
+     nitsche_surface, nitsche_cmb, nitsche_reason = solve_response(
+         "nitsche",
+diff --git a/tests/test_1066_rotated_meets_essential.py b/tests/test_1066_rotated_meets_essential.py
+index a89cc22f..81f16bbd 100644
+--- a/tests/test_1066_rotated_meets_essential.py
++++ b/tests/test_1066_rotated_meets_essential.py
+@@ -14,7 +14,7 @@ sides. Issue #616; the corner reaction of #608 is the same node.
+ 
+ Serial only. The corner tests read the velocity at the lid's ends with a
+ rank-local ``evaluate``, so under ``mpirun`` a rank that does not hold an end
+-fails them (H7's review of #1263); the serial batch is where they run.
++fails them (the #1263 review); the serial batch is where they run.
+ 
+ Run: pixi run python -m pytest tests/test_1066_rotated_meets_essential.py -v
+ """
+@@ -224,7 +224,7 @@ def test_a_fixed_pinned_value_keeps_the_cached_rotation(capsys):
+     """u_z = 1/20 on Left, a number, solved three times on one solver: the second
+     and third solves reuse the cached rotation, and the corner keeps the pin
+     (u_x = -1/15) in each. The rotation was rebuilt at every solve for any nonzero
+-    pin, 0.04 to 0.11 s a solve (H7's review of #1263); only a pin that can change
++    pin, 0.04 to 0.11 s a solve (the #1263 review); only a pin that can change
+     between solves (the clock, a named expression, a field) needs that."""
+     reused = []
+     warnings, at_each = _lid_against_a_pinned_wall((None, 0.05), capsys,
+diff --git a/tests/test_1070_free_surface_in_a_units_model.py b/tests/test_1070_free_surface_in_a_units_model.py
+index 39a37ba3..eef8e1b8 100644
+--- a/tests/test_1070_free_surface_in_a_units_model.py
++++ b/tests/test_1070_free_surface_in_a_units_model.py
+@@ -115,7 +115,7 @@ def test_a_reassigned_viscosity_is_refused_as_drift_in_a_units_model():
+     """The derived solves were configured at construction. Re-assigning the free
+     solve's viscosity afterwards must be caught as drift, with units as without:
+     it called .subs on a plain number, and a bare except hid it, so the solve ran
+-    on the stale viscosity (9.85e-4 off; H1's review of #1205)."""
++    on the stale viscosity (9.85e-4 off; the #1205 review)."""
+     _units_model()
+     try:
+         fs, mesh = _build(viscosity=_radial_viscosity)
+@@ -129,7 +129,7 @@ def test_a_reassigned_viscosity_is_refused_as_drift_in_a_units_model():
+ def test_the_consistent_solve_is_warm_started_with_the_stored_velocity():
+     """The warm start copies the free solve's stored values. Through .array a
+     velocity with units went into a field without them, 100 times too large for
+-    cm/yr (H1's review of #1205)."""
++    cm/yr (the #1205 review)."""
+     _units_model()
+     try:
+         fs, mesh = _build(viscosity=_radial_viscosity)
+diff --git a/tests/test_1086_mmpde_seam_matches_serial.py b/tests/test_1086_mmpde_seam_matches_serial.py
+index 7122110b..e4490966 100644
+--- a/tests/test_1086_mmpde_seam_matches_serial.py
++++ b/tests/test_1086_mmpde_seam_matches_serial.py
+@@ -13,7 +13,7 @@ redistribution path were read from those cells alone:
+   off the domain (by up to 0.37 with ``slip_surfaces=True``).
+ 
+ Both are now combined over every rank holding the vertex. The cases are
+-boxes in 2D and 3D, pinned and slipping, and H1's cavity annulus (a
++boxes in 2D and 3D, pinned and slipping, and the review's cavity annulus (a
+ refinement-2 annulus moved towards a fault trace at metric amplitude 20) at
+ np 2, 3, 4 and 5. Each case runs
+ ``Mesh.redistribute_nodes`` serially and in parallel, in subprocesses
+@@ -77,7 +77,7 @@ def _scatter_cells(dmod, seed=1086):
+ 
+ 
+ def _move_annulus(out, slip=False):
+-    """H1's cavity case (#1086): a refinement-2 annulus moved by node
++    """The review's cavity case (#1086): a refinement-2 annulus moved by node
+     redistribution towards a dipping fault trace, metric amplitude 20. The
+     metric is read exactly (``metric_eval="sympy"``): the default frozen read
+     goes through ``global_evaluate``, which is partition-dependent at seams
+diff --git a/tests/test_1103_facet_slip_matches_serial.py b/tests/test_1103_facet_slip_matches_serial.py
+index 56448932..7d87917e 100644
+--- a/tests/test_1103_facet_slip_matches_serial.py
++++ b/tests/test_1103_facet_slip_matches_serial.py
+@@ -41,7 +41,7 @@ CASES = {
+     "facet_2d_scattered": (2, 0.25, (3,), True),
+     "facet_3d": (3, 0.35, (2, 3), False),
+     # an internal surface: no boundary facets in serial, so its vertices are
+-    # pinned; a partition seam along it must not give it any (H1, #1109)
++    # pinned; a partition seam along it must not give it any (the #1109 review)
+     "internal_2d": (2, None, (2, 3), False),
+     "internal_2d_scattered": (2, None, (3,), True),
+     # the 3-D seam test: a tet facet's point is its vertices' FULL join
+diff --git a/tests/test_1120_split_transfer_fault_copies.py b/tests/test_1120_split_transfer_fault_copies.py
+index 766c340d..908f8e10 100644
+--- a/tests/test_1120_split_transfer_fault_copies.py
++++ b/tests/test_1120_split_transfer_fault_copies.py
+@@ -160,7 +160,7 @@ def test_copies_left_weak_are_reported_not_passed_in_silence(monkeypatch):
+         fault_mg.cell_located_prolongation(coarse, mesh, DEGREE, True)
+     record = fault_mg.last_parent_rows
+     assert record["weak_copies"] > 0 and record["remaining"] > 0, record
+-    # no cell of the pair touches both copies of the fault (H5's guard, defensive)
++    # no cell of the pair touches both copies of the fault (a defensive guard)
+     assert record["side_conflicts"] == 0, record
+ 
+ 
+diff --git a/tests/test_1123_exact_locator_simplex.py b/tests/test_1123_exact_locator_simplex.py
+index c2039d55..dc041e81 100644
+--- a/tests/test_1123_exact_locator_simplex.py
++++ b/tests/test_1123_exact_locator_simplex.py
+@@ -126,7 +126,7 @@ def test_the_walk_from_boundary_cells_and_its_recovery(sheared_box):
+     """From a random boundary cell, the walk has to get round the wavy wall. Where
+     a cell's most violated face is a boundary face the walk crosses the most
+     violated face that has a neighbour instead; a walk that left through the
+-    boundary there lost 1189 of 2e5 (H1's measurement on #1214). What the walk
++    boundary there lost 1189 of 2e5 (measured in the #1214 review). What the walk
+     guarantees, and what the locator adds:
+     - every cell the walk returns contains its point;
+     - a point it loses has left through the boundary (no cycling, no step limit),
+diff --git a/tests/test_1131_rotated_nullspace_from_mesh.py b/tests/test_1131_rotated_nullspace_from_mesh.py
+index fd5ff702..752ec238 100644
+--- a/tests/test_1131_rotated_nullspace_from_mesh.py
++++ b/tests/test_1131_rotated_nullspace_from_mesh.py
+@@ -548,7 +548,7 @@ def test_a_units_model_shell_solves_with_its_declared_modes(velocity_units):
+     # units model, on which np.zeros_like raised TypeError in 3-D (rotated_bc.py:3023 on
+     # development eddab707); they are built from coords_nd now. With a velocity that
+     # carries units they were then written through its .array, which refuses a plain
+-    # array ("Cannot assign plain array", hyperion on d992064d)
++    # array ("Cannot assign plain array", on d992064d)
+     uw.reset_default_model()
+     uw.get_default_model().set_reference_quantities(
+         length=uw.quantity(1000, "km"), viscosity=uw.quantity(1e21, "Pa*s"),
+@@ -583,7 +583,7 @@ def test_a_units_model_shell_solves_with_its_declared_modes(velocity_units):
+ def test_a_given_normal_is_tested_not_exempt():
+     # a circular wall with a given normal that is not radial: the rotation is not
+     # tangent to it, so it must take the constraint test and fail it. Exempted, the
+-    # solve diverged to a v_rms of 2e7 (hyperion, on c6c2668a)
++    # solve diverged to a v_rms of 2e7 (on c6c2668a)
+     mesh, v, stokes = _annulus_stokes("1131n")
+     x, y = mesh.X
+     r = sympy.sqrt(x ** 2 + y ** 2)
+@@ -672,7 +672,7 @@ def test_the_declaration_is_part_of_the_cached_geometry_and_the_adjoint_record()
+ 
+ def test_a_wall_is_read_from_its_facets_not_every_point_its_label_holds():
+     # a label can hold points off the wall: Linux's gmsh labels interior vertices
+-    # SegmentedSphericalShell's "Upper" directly (r down to 0.62; hyperion), while the
++    # SegmentedSphericalShell's "Upper" directly (r down to 0.62), while the
+     # labelled facets lie on the sphere. Label an interior vertex by hand, so the case
+     # is the same on every host
+     mesh, v, stokes = _annulus_stokes("1131l")
+diff --git a/tests/test_1134_fac_cover_gate_structure.py b/tests/test_1134_fac_cover_gate_structure.py
+index bb8ecadf..bf27d42a 100644
+--- a/tests/test_1134_fac_cover_gate_structure.py
++++ b/tests/test_1134_fac_cover_gate_structure.py
+@@ -12,7 +12,7 @@ level, an LU over nearly all of it. Each verdict is recorded on
+ 
+ The fixture is test_1017's NVB band hierarchy (Poisson) with the band widened to
+ half-width 0.3. The band level has 417 rows, and its patch and halo hold 355 of
+-them on macOS arm64 and 356 on kaiju's Linux x86_64 (85 %), over the gate, so it
++them on macOS arm64 and 356 on a Linux x86_64 cluster (85 %), over the gate, so it
+ declines. The uniform level below it has 225 rows (the interior P2 nodes of the
+ 8 x 8 grid), all in its subdomain. A new host records its subdomain count here.
+ """
+@@ -29,7 +29,7 @@ BAND = 0.3
+ BAND_ROWS = 417
+ # the band level's patch+halo rows, per host
+ BAND_SUBDOMAIN = {"macOS arm64, custom PETSc 3.25.0": 355,
+-                  "Linux x86_64 (kaiju), PETSc 3.25.0": 356}
++                  "Linux x86_64 cluster, PETSc 3.25.0": 356}
+ UNIFORM_ROWS = 225
+ 
+ 
+diff --git a/tests/test_1142_rotated_exact_mode_projected_pc.py b/tests/test_1142_rotated_exact_mode_projected_pc.py
+index dc65179c..6220af30 100644
+--- a/tests/test_1142_rotated_exact_mode_projected_pc.py
++++ b/tests/test_1142_rotated_exact_mode_projected_pc.py
+@@ -8,7 +8,7 @@ the right-hand side and the solution, not from those directions, so the inner FG
+ floored near 1e-7 against its 3.3e-11 and the outer FGMRES restarted it until the CI
+ supervisor killed the job (test_1064's annulus_fmg case, every CI run from eddab707).
+ Whether rounding put the floor above the tolerance depended on the OpenBLAS kernel
+-(hyperion, Linux): SkylakeX finished, Zen and Haswell stalled at np 2, Nehalem and
++(a 96-thread Linux workstation): SkylakeX finished, Zen and Haswell stalled at np 2, Nehalem and
+ Sandybridge at np 1, Core2 and Prescott at both.
+ 
+ The velocity preconditioner is now ``z = P M (P r)`` with ``P`` projecting out the exact
+@@ -17,7 +17,7 @@ modes, and the answer is unchanged to 13 digits.
+ - The analytic-normal annulus projects one mode, its inner velocity solve converges in
+   a few cycles, and it gives the recorded answer. Without the projection the inner solve
+   ran to its cap of 200 on macOS arm64, where the outer solve happened to converge anyway,
+-  and on most x86 kernels; under SkylakeX it took 4 (hyperion). So this bound catches a
++  and on most x86 kernels; under SkylakeX it took 4 (Linux x86_64). So this bound catches a
+   regression on arm64 and those kernels, and the forced-kernel child below catches it on
+   any x86 host.
+ - These wrapped meshes declare no rotation, so under the default (facet-averaged)
+@@ -57,7 +57,7 @@ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
+ 
+ RI, RO = 0.5, 1.0
+ # the velocity L2 of the analytic-normal solve: 0.0190696175990617 on macOS arm64 and
+-# 0.01906961745108 on Linux (hyperion, every kernel), whose gmsh builds a slightly
++# 0.01906961745108 on a 96-thread Linux workstation (every kernel), whose gmsh builds a slightly
+ # different annulus; the band is centred between them
+ L2_ANALYTIC = 0.019069617525
+ 
+@@ -126,7 +126,7 @@ def test_an_undeclared_rotation_under_the_default_normal_is_neither_admitted_nor
+ def test_the_projection_releases_the_multigrid_it_wraps():
+     # the sub-KSP gives up the multigrid when the projection takes its place, so the
+     # projection must destroy it: at np 2, where petsc4py defers destruction, the whole
+-    # hierarchy outlived every solve, 19 MB an adjoint solve (hyperion)
++    # hierarchy outlived every solve, 19 MB an adjoint solve (a 96-thread Linux workstation)
+     _info, _L2, s = _annulus_fmg("1142r", radial=True)
+     ctx = s._rotated_linear_cache["ctx"]
+     inner = ctx["pc"].getFieldSplitSubKSP()[0].getPC().getPythonContext().inner
+@@ -204,7 +204,7 @@ def test_the_threshold_follows_the_tolerance():
+     assert threshold(1.0e-14) == 1.0e-10        # floored: a mode exact to rounding (4e-11)
+ 
+ 
+-# slid 1e-5 and 3e-5 rad: 6.2e-8 and 1.8e-7 (macOS arm64 and hyperion agree to 3 digits)
++# slid 1e-5 and 3e-5 rad: 6.2e-8 and 1.8e-7 (macOS arm64 and Linux x86_64 agree to 3 digits)
+ @pytest.mark.parametrize("slide, projected, band", [(1.0e-5, 1, (3.0e-8, 1.0e-7)),
+                                                     (3.0e-5, 0, (1.0e-7, 4.0e-7))],
+                          ids=["slide1e-05", "slide3e-05"])
+@@ -239,7 +239,7 @@ def test_a_converged_re_solve_at_a_new_tolerance_keeps_the_geometry():
+     # warm and already inside the looser tolerance, the re-solve builds no KSP. The
+     # rotation, the operator and the prolongation stay for the next solve: dropping
+     # them and rebuilding the prolongation grew RSS by about 10 MB a re-solve at np 2
+-    # (hyperion, round 5)
++    # (review round 5)
+     s = _slid_annulus_fmg("1142k", 3.0e-5, 1.0, tolerance=1.0e-9, solve=False)
+     s.solve()
+     Q = s._rotated_linear_cache["Q"]
+diff --git a/tests/test_1145_stokes_adjoint_keeps_custom_mg.py b/tests/test_1145_stokes_adjoint_keeps_custom_mg.py
+index 47faaf6c..2b2bf575 100644
+--- a/tests/test_1145_stokes_adjoint_keeps_custom_mg.py
++++ b/tests/test_1145_stokes_adjoint_keeps_custom_mg.py
+@@ -6,14 +6,14 @@ solves with the same KSP, and the switch resets the preconditioner: the fieldspl
+ rebuilt the velocity block as a one-level multigrid, with no coarse correction and no
+ FAC smoother. On a split fault box the adjoint took 23 velocity iterations at np 1 and
+ 29 at np 2, against the forward's 4; a forward solve after it took 4 again, so only
+-the adjoint lost the hierarchy (hyperion, development ba3fc23e). The adjoint still
++the adjoint lost the hierarchy (development ba3fc23e). The adjoint still
+ converged, so the cost is iterations, and they grow with the resolution where the
+ FAC patch matters.
+ 
+ The injection goes in before the adjoint assembles its tangent at the forward state.
+ The install assembles at a zero vector to reach the fieldsplit; done after the state's
+ assembly, it left a nonlinear adjoint solving with the tangent at u = 0, wrong by 12
+-to 75 % in the velocity and reported converged (hyperion's review of the first fix).
++to 75 % in the velocity and reported converged (review of the first fix).
+ The nonlinear cases below check the multiplier against a dense solve of K^T mu = b
+ with K the consistent tangent at the forward state.
+ """
+diff --git a/tests/test_1146_custom_mg_after_deform.py b/tests/test_1146_custom_mg_after_deform.py
+index 33eef641..83ab7cd8 100644
+--- a/tests/test_1146_custom_mg_after_deform.py
++++ b/tests/test_1146_custom_mg_after_deform.py
+@@ -99,7 +99,7 @@ def test_the_hierarchy_is_installed_once_and_again_after_a_deform(build, monkeyp
+ 
+ def test_a_user_smoother_key_survives_an_install():
+     # The FAC keys of a level without a patch are dropped; a smoother the user chose
+-    # for that level is not (hyperion's review, M1: jacobi on level 1 became SOR).
++    # for that level is not (review, M1: jacobi on level 1 became SOR).
+     s, _mesh, managed_pc = _poisson()
+     s.petsc_options["mg_levels_1_pc_type"] = "jacobi"
+     s.solve()
+diff --git a/tests/test_1149_custom_mg_hierarchy_lifecycle.py b/tests/test_1149_custom_mg_hierarchy_lifecycle.py
+index e5443e3a..22d6ed1a 100644
+--- a/tests/test_1149_custom_mg_hierarchy_lifecycle.py
++++ b/tests/test_1149_custom_mg_hierarchy_lifecycle.py
+@@ -167,7 +167,7 @@ def _killed_and_said_so(s):
+ def test_a_deform_kills_the_patch_on_the_rotated_fault_route():
+     # add_fault_bc configures the velocity block in utilities.rotated_bc, not through
+     # install(); the route recorded no geometry, and a deform there declined the moved
+-    # patch silently at the cover gate (H1's review of bundle A, M1)
++    # patch silently at the cover gate (review of bundle A, M1)
+     s, mesh, _managed_pc = _stokes()
+     s.add_fault_bc(0, "Flt")
+     s.solve()
+@@ -187,7 +187,7 @@ def test_a_deform_kills_the_patch_on_the_rotated_fault_route():
+ def test_a_mover_kills_the_patch_too():
+     # A mover commits through remesh_with_field_transfer as mesh.deform does, and
+     # the patch was keyed on _mesh_version, which only mesh.deform moves: a smoothed
+-    # mesh kept its patch version and the moved patch was declined silently (H1's
++    # mesh kept its patch version and the moved patch was declined silently (the
+     # review, M2)
+     s, mesh, managed_pc = _poisson()
+     s.solve()
+@@ -273,7 +273,7 @@ def _live_ksps():
+ @pytest.mark.parametrize("guarded", [False, True], ids=["gauge", "guard_armed"])
+ def test_a_rebuilt_stokes_snes_lets_its_ksps_go(guarded):
+     # Reassigning bodyforce rebuilds the SNES on every solve. The old outer KSP and
+-    # its two fieldsplit blocks stayed alive: +3 KSPs per solve before the fix (H1,
++    # its two fieldsplit blocks stayed alive: +3 KSPs per solve before the fix (review of
+     # #1012). With the guard armed the deadline test held the entry too.
+     mesh = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
+                                              cellSize=0.25, qdegree=2)
+diff --git a/tests/test_1151_first_solve_after_a_mesh_move.py b/tests/test_1151_first_solve_after_a_mesh_move.py
+index a461d42a..f89755df 100644
+--- a/tests/test_1151_first_solve_after_a_mesh_move.py
++++ b/tests/test_1151_first_solve_after_a_mesh_move.py
+@@ -20,7 +20,7 @@ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
+ def _fixture():
+     mesh = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
+                                              cellSize=1 / 12, regular=False, qdegree=2)
+-    # varying in x, so that an x move changes every interior value (hyperion's
++    # varying in x, so that an x move changes every interior value (the
+     # review: a DG0 band whose centroids do not cross it, or a field an x move does
+     # not change, passes whatever the assembly reads)
+     weak = uw.discretisation.MeshVariable("weak1151", mesh, 1, degree=1)
+diff --git a/tests/test_1157_rotated_warm_resolve_at_roundoff.py b/tests/test_1157_rotated_warm_resolve_at_roundoff.py
+index 1002f6ed..c9b71a85 100644
+--- a/tests/test_1157_rotated_warm_resolve_at_roundoff.py
++++ b/tests/test_1157_rotated_warm_resolve_at_roundoff.py
+@@ -18,7 +18,7 @@ Which of the two happened depended on the rounding, so the failure looked random
+   Schur solve's own terms, not in the outer residual's units. A first fix scaled
+   it by the convergence reference, and on this annulus at forcing 1e8 it cut
+   genuine sub-solves short, 9.3e-7 off the direct solve where development is
+-  1.7e-8 (hyperion's review).
++  1.7e-8 (measured in review, on a 96-thread Linux workstation).
+ """
+ import numpy as np
+ import pytest
+@@ -103,6 +103,6 @@ def test_a_cold_solve_at_a_large_forcing_is_untouched():
+     a, b = np.asarray(v.array).ravel(), np.asarray(v_lu.array).ravel()
+     err = np.sqrt(uw.mpi.comm.allreduce(float(((a - b) ** 2).sum()))
+                   / uw.mpi.comm.allreduce(float((b ** 2).sum())))
+-    # the reference-scaled floor: 9.3e-7; development and this test: 1.2e-8 (wombat)
++    # the reference-scaled floor: 9.3e-7; development and this test: 1.2e-8 (a workstation)
+     assert err < 5.0e-8, err
+     assert stokes._rotated_linear_cache["ctx"]["schur_roundoff"].fired == 0
+diff --git a/tests/test_1159_thin_sheet_solve_takes_picard.py b/tests/test_1159_thin_sheet_solve_takes_picard.py
+index d41df1ac..38774d6a 100644
+--- a/tests/test_1159_thin_sheet_solve_takes_picard.py
++++ b/tests/test_1159_thin_sheet_solve_takes_picard.py
+@@ -173,7 +173,7 @@ def _fault_sheet():
+ 
+ def test_picard_stages_on_a_fault_contact_sheet():
+     # a fault contact runs the rotated loop too; picard=2 raised NotImplementedError
+-    # there because solve() did not compile the blended Jacobian for it (hyperion's
++    # there because solve() did not compile the blended Jacobian for it (the
+     # review of #876, F4)
+     plain = _fault_sheet()
+     plain.solve()
+@@ -187,7 +187,7 @@ def test_picard_stages_on_a_fault_contact_sheet():
+     assert info["continuation_switched"], "no Picard phase on the fault-contact loop"
+     assert info["converged"]
+     u_staged = np.asarray(staged.u.array)
+-    # both stop at tolerance 1e-8 of the residual: 1.5e-8 apart (wombat)
++    # both stop at tolerance 1e-8 of the residual: 1.5e-8 apart (a developer workstation)
+     assert np.linalg.norm(u_staged - u_plain) < 1.0e-7 * np.linalg.norm(u_plain)
+ 
+ 
+@@ -216,5 +216,5 @@ def test_picard_stages_on_a_fault_contact_stokes_solve():
+     staged.solve(picard=2)
+     info = staged._rotated_freeslip_info
+     assert info["continuation_switched"] and info["converged"], info
+-    # 1.4e-10 apart (wombat)
++    # 1.4e-10 apart (a developer workstation)
+     assert np.linalg.norm(np.asarray(staged.u.array) - u_plain) < 1.0e-7 * np.linalg.norm(u_plain)
+diff --git a/tests/test_1176_facet_restore_whole_boundary.py b/tests/test_1176_facet_restore_whole_boundary.py
+index bdf37a7a..310aaa70 100644
+--- a/tests/test_1176_facet_restore_whole_boundary.py
++++ b/tests/test_1176_facet_restore_whole_boundary.py
+@@ -7,7 +7,7 @@ facet radius are tested. That bound is exact, so the nearest point it gives is t
+ one the search over every facet gives, bit for bit and with the same facet on a
+ tie. Checked here on a 2-D and a 3-D boundary against the search over every facet.
+ 
+-And H1's fixture from #1176 on one rank: an annulus moved by deform, walls at 0.45
++And the review's fixture from #1176 on one rank: an annulus moved by deform, walls at 0.45
+ and 0.90. A point inside is returned unchanged; a point beyond the outer wall lands
+ on it.
+ """
+diff --git a/tests/test_1282_generators_take_their_refinement.py b/tests/test_1282_generators_take_their_refinement.py
+index eea45ea8..490a9acb 100644
+--- a/tests/test_1282_generators_take_their_refinement.py
++++ b/tests/test_1282_generators_take_their_refinement.py
+@@ -1,7 +1,7 @@
+ """Mesh generators take the refinement they are given (UNFILED 28's class).
+ 
+ A sweep of every generator in uw.meshing, each called with its defaults and
+-with refinement=1 (W1, 2026-11-21), found two that did not:
++with refinement=1 (2026-11-21), found two that did not:
+ 
+ * DiscInternalBoundaries passed refinement=refinement, with a refinement
+   callback, to Mesh, but had no refinement parameter: every call raised
+diff --git a/tests/test_1284_centre_point_label.py b/tests/test_1284_centre_point_label.py
+index c37f6634..d54b4fa1 100644
+--- a/tests/test_1284_centre_point_label.py
++++ b/tests/test_1284_centre_point_label.py
+@@ -4,7 +4,7 @@
+ label, so a Dirichlet condition on ``"Centre"`` pins the field at r = 0.
+ AnnulusWithSpokes accepted ``centre`` and ignored it: the gmsh model had no
+ physical group for the centre point, and a condition on Centre was refused
+-(the example sweep for #944, W1 2026-11-21). QuarterAnnulus
++(the example sweep for #944, 2026-11-21). QuarterAnnulus
+ marks the centre always. SegmentedSphericalBall's docstring promised a
+ Centre point that it never labelled (its tag was taken by the north pole).
+ """
+diff --git a/tests/test_1284_semi_lagrangian_column_velocity.py b/tests/test_1284_semi_lagrangian_column_velocity.py
+index 1e54d968..e39f4cb9 100644
+--- a/tests/test_1284_semi_lagrangian_column_velocity.py
++++ b/tests/test_1284_semi_lagrangian_column_velocity.py
+@@ -5,7 +5,7 @@ Mesh vectors are (1, dim) rows. ``V_fn=sympy.Matrix([vx, vy])`` is a (dim, 1)
+ column, and the trace read only its first row (``v[:, 0, :]`` of a
+ (N, dim, 1) evaluation): the x component alone, then a reshape failure
+ (docs/examples/convection/advanced/Ex_AdvectionDiffusion_1dBlock.py, the
+-example sweep for #944, W1 2026-11-21). The column is now transposed to the
++example sweep for #944, 2026-11-21). The column is now transposed to the
+ row, as EulerianSUPG already does, and the solve matches the row form.
+ """
+ import numpy as np
+diff --git a/tests/test_1285_swarm_petsc_save_checkpoint.py b/tests/test_1285_swarm_petsc_save_checkpoint.py
+index 84f273f9..58e3596a 100644
+--- a/tests/test_1285_swarm_petsc_save_checkpoint.py
++++ b/tests/test_1285_swarm_petsc_save_checkpoint.py
+@@ -4,7 +4,7 @@ It called DMSwarm.viewXDMF, which PETSc 3.25 refuses for a swarm with no
+ active cell DM ("Swarm has no active cell DM"). Underworld's swarms are
+ DMSWARM_BASIC and have none, so every call failed
+ (docs/examples/solid_mechanics/advanced/Ex_VP-CM_slabSubduction.py, the
+-example sweep for #944, W1 2026-11-21). It now writes through write_timestep:
++example sweep for #944, 2026-11-21). It now writes through write_timestep:
+ h5 data and an XDMF file at the same name, which read_timestep restores.
+ """
+ import os
+diff --git a/tests/test_1290_rotated_normal_refuses_a_field.py b/tests/test_1290_rotated_normal_refuses_a_field.py
+index a069fb92..a391ab26 100644
+--- a/tests/test_1290_rotated_normal_refuses_a_field.py
++++ b/tests/test_1290_rotated_normal_refuses_a_field.py
+@@ -3,7 +3,7 @@
+ ``normal=`` takes an expression of the mesh coordinates (or a constant), which
+ the rotation evaluates at each wall node. A mesh variable's ``.sym`` passed the
+ check for stray symbols, since a field is a function of the coordinates, and
+-then failed inside ``lambdify`` with "SyntaxError: invalid syntax" (H6, UNFILED
++then failed inside ``lambdify`` with "SyntaxError: invalid syntax" (UNFILED
+ 37). It is now refused where the condition is added, with a message saying what
+ ``normal=`` takes.
+ """
+diff --git a/tests/test_1295_rotated_datum_net_flux_refused.py b/tests/test_1295_rotated_datum_net_flux_refused.py
+index bc9a7c06..d86e47f2 100644
+--- a/tests/test_1295_rotated_datum_net_flux_refused.py
++++ b/tests/test_1295_rotated_datum_net_flux_refused.py
+@@ -128,7 +128,7 @@ def test_a_dimensional_datum_is_judged_on_the_same_footing(off, refused, capsys)
+     """In a units model, u.n = 1 cm/yr cos 2θ: F and S are taken from the datum
+     unwrapped once to its non-dimensional form. Integrated as given and under
+     Abs they came back at two scales (F/S 6.9e-5 for the far case at 4.8e-2,
+-    H7's review), so the far case was not refused and the near one not warned."""
++    measured in review), so the far case was not refused and the near one not warned."""
+     uw.reset_default_model()
+     uw.get_default_model().set_reference_quantities(
+         length=uw.quantity(1000, "km"), viscosity=uw.quantity(1e21, "Pa*s"),
+-- 
+2.53.0
+
