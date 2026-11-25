@@ -50,6 +50,7 @@ params = uw.Params(
     uw_trace_inset=0.5,         # uw_ti_trace_inset
     uw_split=0,                 # 0: the TI realisation (split=False); 1: the split control
     uw_solve=1,                 # 0: build the hierarchy only
+    uw_tol=1.0e-4,              # solver tolerance
 )
 
 RATIO = 0.55
@@ -151,7 +152,7 @@ if int(params.uw_solve):
     s.add_rotated_freeslip_bc(0, "Upper", normal=unit_r)
     s.add_rotated_freeslip_bc(0, "Lower", normal=unit_r)
     s.petsc_use_pressure_nullspace = True
-    s.tolerance = 1.0e-4
+    s.tolerance = float(params.uw_tol)
     set_custom_fmg(s, tail, field_id=0)
     t1 = time.time()
     s.solve(zero_init_guess=True)
