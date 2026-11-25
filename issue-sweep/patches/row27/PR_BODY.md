@@ -43,7 +43,7 @@ counts velocity sub-solves that hit their cap.
 | fixture | modes | before | capped | wall | after | capped | wall | rel. change of v |
 |---|---|---|---|---|---|---|---|---|
 | warm 8-step loop, annulus, mu 1e-4 (each step) | 1 | 2/200/7 typical | 1-2 | ~6.7 s | 2/3/7 | 0 | 1.85 s | <= 5.6e-13 |
-| TI annulus (radial director, eta_1 = 0.01 eta_0), mu 1e-4 | 1 | 2/11/11 | 1 | 7.30 s | 2/11/11 | 0 | 6.28 s | 5.9e-14 |
+| TI annulus (radial director, eta_1 = 0.01 eta_0), mu 1e-4 | 1 | 2/11/11 (macOS), 2/10/11 (Linux server) | 1 | 7.30 s | same | 0 | 6.28 s | 5.9e-14 |
 | TI annulus, mu 1 | 1 | 1/10/9 | 0 | 3.37 s | 1/10/9 | 0 | 3.63 s | 6.5e-14 |
 | 3-D shell, exact normal, mu 1e-4 / 1 | 3 | 2/5/18, 1/6/18 | 0 | 14.4, 12.3 s | unchanged | 0 | 14.2, 12.3 s | 1.8e-15, 1.3e-12 |
 | 3-D shell, mesh normal (no mode admitted) | 0 | 2/12/11, 1/12/10 | 0 | | unchanged | 0 | | 0 (bit-identical) |
@@ -64,8 +64,13 @@ at mu 1e-4, cell 0.1, asserts no capped velocity sub-solve (1 on development) an
 1e-9 of LU (1.52e-10 measured). The guard has a no-slip inner wall: no mode is admitted, and the
 answer is within 1e-7 of LU.
 
-Tolerances: the solve tolerance is 1e-6; the answer against LU 1e-9 (1e-7 for the guard). No
+Tolerances: the solve tolerance is 1e-6; the answer against LU 1e-9 (1e-7 for the guard). The LU
+references solve to 1e-10, the tightest that route reaches on this annulus (its floor is about 7e-11,
+#1058, which this change does not touch: the direct route never projects modes), and each must
+converge. No
 iteration count is asserted exactly.
+
+The transpose null space is held by the projected-PC shell and destroyed with its modes (#1007).
 
 Not measured: parallel (np 2-4 is the review's), and the pressure sub-solve's own creep on
 fault-network layouts (a different floor).
