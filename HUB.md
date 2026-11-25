@@ -4783,3 +4783,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   Earth-recipe scripts (baseline/prepare.sh EARTH, slab_kaiju/common.sh) left alone: line not in use, launch refused
   by dbf7f10, moving it would need its model-unit Ra and deta reworked. Job 4961: S0 and S0w passed the smoke (3-4
   Newton/step, no fault, "asthenosphere 1"), on their 400 steps.
+- 2026-11-25: Louis: "Not sure why the upper halo does not match the lower plate age." "Yep, make those changes to
+  the initial slab. At the moment it looks like an extra sinker / weight on the lithosphere." "But let's continue
+  sweeping so we can see what is going on. Is the memory leak still going to cause us problems ?" "The slab SHOULD be
+  stiffer that the lower mantle ... the viscosity jump there is likely the phase change which we don't have ... We'll
+  just leave it." K1 6b6ac2f pushed as ca9afb8 on kaiju/slab-workbench (on 95bf2da; 3 base64 pieces and 3012 B mbox
+  sha 580e6d8e... verified; blob d9d51ff; compiles): -uw_slab_wedge_age_myr < 0 puts the slab's upper halo at the
+  slab's own age (default 167 unchanged; the 167 was a fixed 0.05-depth halo from 878b9c2, 25 Oct, plates ~900 Myr).
+  Job 4964 already used it before the notice. Memory: S0 (no fault) grows 7.6 MB/rank/step (1.25 GB step 87, 2.38
+  step 235), so the leak is NOT the fault rebuild; S0/S0w (4961) hit 60 GB near step 240 (~85 Myr). Workaround
+  workbench_seg.sh: segments of <= 150 steps, each a fresh process from the last checkpoint (exact restarts). Job
+  4964 (n3): S1 = S0 + halo at own age; S1o = S1 + overriding plate at 80 Myr (was 933); 600 steps in segments. Job
+  4965 (queued): S0/S0w to 600 steps on 4a641a1. First look (movies/out/s0_strip.png): slab steepens to vertical,
+  tip sinks 2.7-3.2 cm/yr through 670 into the x30 lower mantle; no visible difference with or without strain
+  weakening (Louis agrees). Hub: suggested a cheap leak bisect to K1 (vary checkpoint cadence / skip the swarm or
+  advection on S0 for ~20 steps) since the leak is now in the plain solve loop, likely library-side.
