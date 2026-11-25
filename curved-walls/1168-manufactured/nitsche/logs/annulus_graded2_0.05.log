@@ -1,0 +1,17 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/nitsche/annulus_nitsche.py:93: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+  stokes.solve(zero_init_guess=True)
+/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/nitsche/annulus_nitsche.py:93: RuntimeWarning: SNES_Stokes: the solve diverged (DIVERGED_MAX_IT) and its fields hold the last iterate. solver.solve_report records the solve (#1059).
+  stokes.solve(zero_init_guess=True)
+/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/nitsche/annulus_nitsche.py:93: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+  stokes.solve(zero_init_guess=True)
+slide graded2 kind s2 cell 0.05 cells 2306 pressure nullspace True omega_e +5.8232e-12
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+essential (control) 4 2.285e-03 2.285e-03 +5.351e-09 +1.209e-06
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+[rotated_bc] WARNING: converged in the pressure-gauge QUOTIENT space, but the projected-out gauge component (|F̂_p·1|/√N = 2.69e-08) dominates the converged residual (1.31e-11). The wall-normal datum carries a net boundary flux this enclosed incompressible domain cannot absorb — the velocity field violates mass conservation at that level. Check the datum's surface integral (solver._rotated_pressure_gauge_residual holds this number).
+rotated, default normal 2 2.465e-03 2.465e-03 -8.013e-09 +7.398e-07
+nitsche, default normal 4 4.785e-01 4.785e-01 +9.622e-05 +2.160e+04
+nitsche, normal=X/|X| 4 5.538e-01 5.538e-01 -5.122e-05 -4.994e+04
+SNES solve diverged after 50 iterations: DIVERGED_MAX_IT The solution vector may not have been updated. Use <solver>.petsc_options.setValue('snes_converged_reason', None) and <solver>.petsc_options.setValue('snes_monitor', None) to investigate.
+nitsche, normal=Gamma -5 7.861e-03 7.867e-03 -2.523e-04 -5.145e-05

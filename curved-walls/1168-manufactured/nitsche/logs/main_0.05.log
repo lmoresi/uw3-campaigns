@@ -1,0 +1,15 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+/mnt/nvme0n1p4/home/lmorese/hyperion-work/uw3-campaigns-h6/curved-walls/1168-manufactured/nitsche/diag.py:109: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+  stokes.solve(zero_init_guess=True)
+variant both-xy cell 0.05 gamma 12.5 nullspace(closed) True cells 6590
+case X outer ess inner ess snes 4 ksp 3 u L2 4.339e-04 <p>-<p_e> +9.085e-05
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+case R outer rot inner rot snes 2 ksp 0 u L2 1.252e-03 <p>-<p_e> +1.014e-04
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 5.809e-01 <p>-<p_e> +3.228e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 1.045e-02 <p>-<p_e> +1.654e-04
+case C outer nit:ex inner nit:ex snes 2 ksp 3 u L2 5.598e-01 <p>-<p_e> -9.326e+04
+case D1 outer nit:bn inner ess snes 2 ksp 3 u L2 5.632e-01 <p>-<p_e> +3.454e+04
+case D2 outer ess inner nit:bn snes 4 ksp 3 u L2 4.348e-04 <p>-<p_e> +5.136e-02
+case E0- outer ess inner nat- snes 2 ksp 3 u L2 4.339e-04 <p>-<p_e> +1.898e-05
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.634e-03 <p>-<p_e> +1.620e-03
+case F- outer nit:fa inner nat- snes 2 ksp 3 u L2 1.313e-02 <p>-<p_e> -4.865e-02

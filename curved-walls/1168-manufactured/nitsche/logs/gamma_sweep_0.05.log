@@ -1,0 +1,24 @@
+variant both-xy cell 0.05 gamma 1.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 7.311e-01 <p>-<p_e> +4.058e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 1.701e-02 <p>-<p_e> -6.632e-06
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.843e-03 <p>-<p_e> +1.621e-03
+variant both-xy cell 0.05 gamma 10.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 5.303e-01 <p>-<p_e> +2.946e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 8.347e-03 <p>-<p_e> +1.492e-04
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.634e-03 <p>-<p_e> +1.620e-03
+variant both-xy cell 0.05 gamma 100.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 6.696e-01 <p>-<p_e> +3.722e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 7.568e-02 <p>-<p_e> +7.376e-04
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.636e-03 <p>-<p_e> +1.621e-03
+variant both-xy cell 0.05 gamma 1000.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 6.794e-01 <p>-<p_e> +3.776e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 3.616e-01 <p>-<p_e> +3.791e-03
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.636e-03 <p>-<p_e> +1.620e-03
+variant both-xy cell 0.05 gamma 10000.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 6.821e-01 <p>-<p_e> +3.791e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 6.282e-01 <p>-<p_e> +7.746e-03
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 1.637e-03 <p>-<p_e> +1.617e-03
+variant both-xy cell 0.05 gamma 100000.0 nullspace(closed) True cells 6590
+case A outer nit:bn inner nit:bn snes 2 ksp 2 u L2 6.859e-01 <p>-<p_e> +3.813e+04
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 6.914e-01 <p>-<p_e> +8.836e-03
+case E- outer nit:bn inner nat- snes 2 ksp 2 u L2 1.641e-03 <p>-<p_e> +1.607e-03

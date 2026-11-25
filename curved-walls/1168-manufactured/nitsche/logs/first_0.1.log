@@ -1,0 +1,7 @@
+variant both-xy cell 0.1 gamma 12.5 nullspace(closed) True cells 1680
+case X outer ess inner ess snes 4 ksp 3 u L2 3.121e-03 <p>-<p_e> -2.285e-05
+case R outer rot inner rot snes 2 ksp 0 u L2 5.701e-03 <p>-<p_e> +1.637e-05
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 5.073e-01 <p>-<p_e> +7.029e+03
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 2.293e-02 <p>-<p_e> +1.218e-04
+case C outer nit:ex inner nit:ex snes 2 ksp 3 u L2 4.702e-01 <p>-<p_e> -1.949e+04
+case E0 outer ess inner nat snes 2 ksp 3 u L2 5.510e-02 <p>-<p_e> -3.333e-01

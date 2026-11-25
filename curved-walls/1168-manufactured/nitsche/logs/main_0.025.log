@@ -1,0 +1,13 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+variant both-xy cell 0.025 gamma 12.5 nullspace(closed) True cells 25674
+case X outer ess inner ess snes 2 ksp 3 u L2 5.635e-05 <p>-<p_e> +6.551e-05
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+case R outer rot inner rot snes 2 ksp 0 u L2 2.973e-04 <p>-<p_e> +6.541e-05
+case A outer nit:bn inner nit:bn snes 2 ksp 3 u L2 6.282e-01 <p>-<p_e> +1.396e+05
+case B outer nit:fa inner nit:fa snes 2 ksp 3 u L2 4.971e-03 <p>-<p_e> +6.401e-05
+case C outer nit:ex inner nit:ex snes 4 ksp 3 u L2 6.169e-01 <p>-<p_e> -4.114e+05
+case D1 outer nit:bn inner ess snes 2 ksp 3 u L2 6.050e-01 <p>-<p_e> +1.484e+05
+case D2 outer ess inner nit:bn snes 2 ksp 3 u L2 5.680e-05 <p>-<p_e> +6.554e-05
+case E0- outer ess inner nat- snes 2 ksp 3 u L2 5.636e-05 <p>-<p_e> +4.548e-06
+case E- outer nit:bn inner nat- snes 2 ksp 3 u L2 3.970e-04 <p>-<p_e> +4.084e-04
+case F- outer nit:fa inner nat- snes 2 ksp 3 u L2 6.223e-03 <p>-<p_e> -2.331e-02

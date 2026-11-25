@@ -1,0 +1,9 @@
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+slide none kind s2 cell 0.05 cells 2306 pressure nullspace True omega_e +5.5226e-12
+method reason u L2 u L2 raw omega_h <p>-<p_e>
+essential (control) 2 2.295e-03 2.295e-03 +5.715e-08 -3.560e-05
+[rotated_bc] WARNING: no multigrid hierarchy is registered for this solver (no set_custom_fmg registration, no adapt tail); the velocity block falls back to GAMG. Build the mesh with refinement levels or through adapt() so a coarse tail rides through, and register it with custom_mg.set_custom_fmg(solver, levels, field_id=0).
+rotated, default normal 2 2.445e-03 2.445e-03 +6.831e-08 -3.645e-05
+nitsche, default normal 2 2.444e-03 2.444e-03 +6.434e-08 -1.148e-01
+nitsche, normal=X/|X| 2 2.444e-03 2.444e-03 +6.373e-08 +2.753e-01
+nitsche, normal=Gamma 2 7.560e-03 7.567e-03 -2.745e-04 -7.411e-05
