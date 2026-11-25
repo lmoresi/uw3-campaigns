@@ -39,13 +39,18 @@ Not changed: the public `barycentric_prolongation(..., repair_orphans=True)` def
 `set_custom_mg`. Their callers have no install-time drop, so without the repair a zero column
 would remain (#424).
 
-Test: `tests/test_0894_serial_custom_fmg_drops_orphans.py` (level_2, tier_b, 25 s). The graded
-fixture asserts at most 4 velocity iterations (13 on development) and |v| = 787.24535978 to
-rtol 1e-7. A no-orphan guard bounds its counts (outer <= 2, velocity <= 4, pressure <= 10; 1/3/9 measured),
-because counts are reproducible only to round-off (UNFILED 64). It also asserts |v| = 816.99052405 to
-rtol 1e-7.
+Test: `tests/test_0894_serial_custom_fmg_drops_orphans.py` (level_2, tier_b).
+- The graded fixture asserts at most 6 velocity iterations. It takes 13 on development, 3 here on
+  macOS and 4 on the Linux server.
+- A no-orphan guard bounds its counts (outer <= 2, velocity <= 6, pressure <= 12; 1/3/9
+  measured).
+- Both compare the custom-FMG answer with a direct LU solve on the same mesh in the same run, to
+  1e-6 relative at solve tolerance 1e-8. Absolute norms are not asserted: they depend on the
+  mesher, and the Linux server's gmsh gives a norm 2.6e-5 away from macOS's.
+- Iteration counts are reproducible only to round-off (UNFILED 64), so they are bounded, not
+  matched.
 
-Tolerances: solver 1e-8; the norm baselines rtol 1e-7; the iteration bounds as above.
+Tolerances: solve 1e-8; the answer against LU 1e-6; the bounds above.
 
 Depends on the bounded orphan-repair query (UNFILED 62), which this branch carries as its first
 three commits. UNFILED 62 is in turn stacked on UNFILED 65 (the uw ckdtree stale-buffer fix),
