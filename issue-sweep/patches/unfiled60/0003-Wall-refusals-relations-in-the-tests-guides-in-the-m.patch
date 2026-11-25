@@ -1,0 +1,230 @@
+From 0a9d08fcbe34cb82c84eea57ad5d680a63970c4f Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 03:37:56 +1100
+Subject: [PATCH 3/3] Wall refusals: relations in the tests, guides in the
+ messages
+
+Review round 2 (Linux server). test_0865 failed there: gmsh 4.15.2 on Linux
+puts the annulus's wall vertices about 1.5 % differently, and the reach
+read 0.107 against 0.112. Both tests now assert what the fixture means:
+- the reach exceeds the wall distance;
+- the wall distance lies within a band (0.13 exactly for the sheet, whose
+  wall vertices are at z = 1 on any mesh);
+- the reach is at least the largest carve term;
+- the lever's text.
+The touched vertex and the carve terms, which differ between rank counts,
+are not pinned.
+
+The messages:
+- "move it at least about X (a guide: the cavity is re-cut at the new
+  position)". Following them converges in two or three steps: the ribbon
+  0.9 -> 0.821 -> 0.743, or narrowed to 0.058 and then moved to 0.864; the
+  sheet 0.87 -> 0.773 -> 0.748.
+- The ribbon's narrowing lever names the width below which clearance x h
+  sets the carve. Predicted targets for width and cell size were tried and
+  were wrong (a ribbon of width 0.025 and a sheet with cells of 0.08 were
+  still refused), so none is given.
+- The units are named (mesh units).
+- The nearest wall vertex is reported as such, not as the touched one.
+- An empty set of wall vertices off the outcrop, or none within the bounded
+  distance, is reported in words, so the "domain wall" phrase survives.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 81 +++++++++++--------
+ ..._0865_place_ribbon_wall_refusal_numbers.py | 20 +++--
+ ...t_0868_place_sheet_wall_refusal_numbers.py | 18 +++--
+ 3 files changed, 76 insertions(+), 43 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 16faacda..55b62836 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -1847,35 +1847,45 @@ def _sheet_wall_refusal(err, X, cells, sheet_pts, sheet_tris, on_wall, on_open,
+                         h_vertex, h_cell, clearance):
+     """The sheet's wall refusal from :func:`_closed_shell_3d` (``err``, which
+     carries the wall face it reached, the cavity's cells then and the growth
+-    rounds), with the numbers that decide it: how far the cavity reaches from
+-    the sheet, how far the nearest wall vertex is from it, the carve's two
+-    reaches at the wall vertex the cavity touched, and how much of the reach
+-    the shell's growth to a closed manifold added. The text of ``err`` leads,
+-    unchanged, for callers that match on it."""
++    rounds), with the numbers that decide it, in mesh units: how far the cavity
++    reaches from the sheet, how far the nearest wall vertex off the outcrop is
++    from it, the carve's two reaches at the wall vertex the cavity touched, and
++    the growth rounds. The suggestions are guides: the cavity is re-cut wherever
++    the sheet is moved. The text of ``err`` leads, unchanged, for callers that
++    match on it."""
+     face = np.asarray(err.wall_face, dtype=np.int64)
+     cav = np.unique(cells[err.drop].ravel())
+-    d_cav = _sheet_distance(X[cav], sheet_pts, sheet_tris)
+-    reach = float(d_cav.max())
+-    d_face = _sheet_distance(X[face], sheet_pts, sheet_tris)
+-    w = int(face[np.argmin(d_face)])
++    reach = float(_sheet_distance(X[cav], sheet_pts, sheet_tris).max())
++    w = int(face[np.argmin(_sheet_distance(X[face], sheet_pts, sheet_tris))])
+     walls = np.flatnonzero(on_wall & ~on_open)
+-    wall = float(_sheet_distance_within(X[walls], sheet_pts, sheet_tris,
+-                                        2.0 * reach).min())
++    if walls.size:
++        # exact below 2 x reach; a vertex beyond it reads as the sentinel
++        d_wall = float(_sheet_distance_within(X[walls], sheet_pts, sheet_tris,
++                                              2.0 * reach).min())
++        wall_text = (f"the nearest wall vertex off the outcrop is {d_wall:.3g} "
++                     f"from it" if d_wall < 2.0 * reach else
++                     f"no wall vertex off the outcrop is within {2.0 * reach:.3g} "
++                     f"of it")
++    else:
++        d_wall, wall_text = float("nan"), "the mesh has no wall vertex off the outcrop"
+     by_h = float(clearance * h_vertex[w])
+     star = (cells == w).any(axis=1) & err.drop
+-    by_c = float(0.6 * h_cell[star].max()) if star.any() else 0.0
++    d_cell = float(h_cell[star].max()) if star.any() else float(h_vertex[w])
++    by_c = 0.6 * d_cell
++    move = (f"move the sheet at least about {reach - d_wall:.3g} further from "
++            f"the wall (a guide: the cavity is re-cut at the new position), or "
++            if np.isfinite(d_wall) and d_wall < reach else "")
+     lever = ("reduce clearance or the cell size near it" if by_h >= by_c
+              else "refine the mesh near it, whose cells set the carve here")
+     grown = (f" The shell grew {err.rounds} round(s) to close, taking the "
+              f"cavity past the carve." if err.rounds else "")
+     return RuntimeError(
+         f"{err}. It touched the wall at ({X[w, 0]:.4g}, {X[w, 1]:.4g}, "
+-        f"{X[w, 2]:.4g}): the cavity reaches {reach:.3g} from the sheet and the "
+-        f"nearest wall vertex is {wall:.3g} from it. The carve takes the "
++        f"{X[w, 2]:.4g}). In mesh units: the cavity reaches {reach:.3g} from the "
++        f"sheet, and {wall_text}. At the touched vertex the carve takes the "
+         f"vertices within clearance x h = {by_h:.3g} of the sheet, every cell "
+         f"the sheet crosses, and every cell whose centre is within 0.6 x its "
+-        f"diameter = {by_c:.3g} of it.{grown} Move the sheet about "
+-        f"{reach - wall:.3g} further from the wall, or {lever}")
++        f"diameter = {by_c:.3g} of it.{grown} To clear it, {move}{lever}")
+ 
+ 
+ def _carve_cavity_3d(dm, X, cells, sheet_pts, sheet_tris, clearance,
+@@ -7546,28 +7556,35 @@ def _gathered_vertices_2d(h_vertex, d_skin, reach_v):
+ 
+ def _wall_refusal_2d(ring, X, on_wall, d_skin, h_vertex, clearance, width):
+     """The refusal for a 2-D cavity whose boundary ``ring`` reached the domain
+-    wall, with the numbers that decide it: how far the cavity reaches from the
+-    band's skin, how far the nearest wall vertex is from it, and the two terms
+-    of the carve's reach at the wall vertex the ring touches. The phrase
+-    "reached the domain wall" is what callers match to retry with other
+-    margins; it stays."""
++    wall, with the numbers that decide it, in mesh units: how far the cavity
++    reaches from the band's skin, how far the nearest wall vertex is from the
++    skin, and the two terms of the carve's reach at the wall vertex the ring
++    touched. The suggestions are guides: the cavity is re-cut wherever the band
++    is moved, so its reach changes too. The phrase "reached the domain wall"
++    leads, because callers match it to retry with other margins."""
+     ring = np.asarray([v for v in ring if v < len(X)], dtype=np.int64)
+     hit = ring[on_wall[ring]]
+     w = int(hit[np.argmin(d_skin[hit])])
+     reach = float(d_skin[ring].max())
+-    wall = float(d_skin[on_wall].min())
++    walls = d_skin[on_wall]
++    wall = float(walls.min()) if walls.size else float("nan")
+     by_h, by_w = float(clearance * h_vertex[w]), 0.6 * float(width)
+-    lever = ("reduce clearance or the cell size near the wall" if by_h >= by_w
+-             else "narrow the band, whose width sets the carve here")
++    if by_h >= by_w:
++        lever = "reduce clearance or the cell size near the wall"
++    else:
++        lever = (f"narrow the band: its width sets the carve down to a width of "
++                 f"about {by_h / 0.6:.3g}, where clearance x h takes over")
+     return RuntimeError(
+-        f"the ribbon's cavity reached the domain wall at "
+-        f"({X[w, 0]:.4g}, {X[w, 1]:.4g}): the cavity reaches {reach:.3g} from "
+-        f"the band's skin and the nearest wall vertex is {wall:.3g} from it. "
+-        f"The carve takes the cells within max(clearance x h = {by_h:.3g}, "
+-        f"0.6 x width = {by_w:.3g}) of the skin there, and the cavity's "
+-        f"boundary is the ring of vertices around them. The volume must be "
+-        f"interior, with clearance to spare: move it about {reach - wall:.3g} "
+-        f"further from the wall, or {lever}")
++        f"the ribbon's cavity reached the domain wall, touching it at "
++        f"({X[w, 0]:.4g}, {X[w, 1]:.4g}). In mesh units: the cavity reaches "
++        f"{reach:.3g} from the band's skin, and the nearest wall vertex is "
++        f"{wall:.3g} from the skin. At the touched vertex the carve takes the "
++        f"cells within max(clearance x h = {by_h:.3g}, 0.6 x width = "
++        f"{by_w:.3g}) of the skin, and the cavity's boundary is the ring of "
++        f"vertices around them. The volume must be interior, with clearance to "
++        f"spare: move it at least about {reach - wall:.3g} further from the "
++        f"wall (a guide: the cavity is re-cut at the new position), or "
++        f"{lever}")
+ 
+ 
+ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+diff --git a/tests/test_0865_place_ribbon_wall_refusal_numbers.py b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+index 9d49b934..d756cda1 100644
+--- a/tests/test_0865_place_ribbon_wall_refusal_numbers.py
++++ b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+@@ -3,6 +3,8 @@
+ The fixture is an interior ribbon 0.1 from the outer wall of an annulus with cells of
+ 0.05: the cavity around it reaches the wall, and the placement refuses it (the check
+ dates from #549 and #670). The message used to say only "with clearance to spare".
++The assertions are relations, not one mesher's numbers: gmsh on Linux puts the wall
++vertices about 1.5 % differently, and the reach moves with them (0.107 against 0.112).
+ """
+ 
+ import re
+@@ -28,9 +30,17 @@ def test_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
+         place_fault_ribbon_2d(mesh, [("Fault", trace)], 0.1, margin_rings=1,
+                               clearance=0.7, split=False, mesher="ladder")
+ 
+-    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the band's skin and "
+-                  r"the nearest wall vertex is ([0-9.e+-]+) from it", str(err.value))
+-    assert m, str(err.value)
++    msg = str(err.value)
++    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the band's skin, and the "
++                  r"nearest wall vertex is ([0-9.e+-]+) from the skin", msg)
++    assert m, msg
+     reach, wall = float(m.group(1)), float(m.group(2))
+-    assert reach > wall
+-    assert (reach, wall) == (0.112, 0.0335)
++    terms = [float(x) for x in re.findall(r"= ([0-9.e+-]+)", msg)]
++    # what the fixture means, not one mesher's numbers: the skin is about 0.03
++    # from the wall (0.0335 on macOS, the same on Linux), the cavity reaches past
++    # it and past the carve, and the band's width sets the carve here
++    assert reach > wall, msg
++    assert 0.02 < wall < 0.05, msg
++    assert reach >= max(terms) >= 0.6 * 0.1 - 1e-12, msg
++    assert "narrow the band" in msg and "mesh units" in msg, msg
++    assert "at least about" in msg and "a guide" in msg, msg
+diff --git a/tests/test_0868_place_sheet_wall_refusal_numbers.py b/tests/test_0868_place_sheet_wall_refusal_numbers.py
+index 4f7e7288..89707728 100644
+--- a/tests/test_0868_place_sheet_wall_refusal_numbers.py
++++ b/tests/test_0868_place_sheet_wall_refusal_numbers.py
+@@ -3,7 +3,8 @@
+ A flat sheet 0.13 below the top wall of a unit box with cells of 0.11 is refused: its
+ cavity reaches the wall. The message used to say only "the sheet must clear the other
+ walls", which gave no hint that the sheet was more than a cell from the wall, or that
+-the cells' own size, not clearance, set the carve.
++the cells' own size, not clearance, set the carve. The assertions are relations, not
++one mesher's numbers.
+ """
+ 
+ import re
+@@ -33,10 +34,15 @@ def test_sheet_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
+         place_sheet(mesh.dm, pts, np.array(tris, dtype=np.int64), label="Fault")
+ 
+     msg = str(err.value)
+-    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the sheet and the "
+-                  r"nearest wall vertex is ([0-9.e+-]+) from it", msg)
++    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the sheet, and the nearest "
++                  r"wall vertex off the outcrop is ([0-9.e+-]+) from it", msg)
+     assert m, msg
+     reach, wall = float(m.group(1)), float(m.group(2))
+-    assert reach > wall
+-    assert (reach, wall) == (0.227, 0.13)
+-    assert "refine the mesh near it" in msg
++    terms = [float(x) for x in re.findall(r"= ([0-9.e+-]+)", msg)]
++    # the top wall's vertices are at z = 1 on any mesh, so the wall is 0.13 away;
++    # the cavity reaches past it and past the carve, and the cells set the carve
++    assert reach > wall, msg
++    assert abs(wall - 0.13) < 1e-3, msg
++    assert reach >= max(terms), msg
++    assert "refine the mesh near it" in msg and "mesh units" in msg, msg
++    assert "at least about" in msg and "a guide" in msg, msg
+-- 
+2.39.5 (Apple Git-154)
+

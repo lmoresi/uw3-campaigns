@@ -78,3 +78,21 @@ as the 3-D thin volume (place_surface.py ~5363), which this commit leaves unchan
 - For H1 at np 2 (C1's check): the message is formatted only on the surgery rank and then
   all-gathered as a string, so every rank should raise identical text. To confirm, run test_0865
   and test_0868's fixtures under mpirun -n 2 and compare str(err) across ranks.
+
+## Round 2 (Linux server review: changes requested), commit 0a9d08fc
+1. High: test_0865 failed on Linux (0.107 against 0.112). Both tests now assert relations: reach >
+   wall, the wall in a band, reach >= the largest carve term, and the lever text. No
+   partition-dependent term is pinned.
+2. Medium: "conservative" was wrong and is gone. The move is "at least about X (a guide: the
+   cavity is re-cut at the new position)". `follow.py` follows the messages to placement in two or
+   three steps (numbers in the PR body). Predicted width and cell-size targets were tried
+   (`check_targets.py`) and failed (a ribbon of width 0.025-0.03 and a sheet with cells of
+   0.08-0.11 were still refused at the same position), so the message names the width where
+   clearance x h takes over instead of predicting a target.
+3. Lows:
+   - empty or out-of-range wall sets are reported in words, so the phrase survives;
+   - the nearest wall vertex is named as such;
+   - the units are mesh units;
+   - nothing partition-dependent is asserted.
+
+Placement and sheet tests 0853, 0854, 0855, 0865, 0868, 1090, 1091: 67 passed, 1 skipped.
