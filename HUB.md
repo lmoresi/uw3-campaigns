@@ -4832,3 +4832,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   kaiju/slab-workbench (on ca9afb8): -uw_fault_jump_after_myr, the jump limit only from that model time (default 0
   unchanged); 5 base64 pieces, j_04 arrived with '"uw_yield_damage", ' dropped from a context line, restored, then
   the 6404 B mbox sha 24d1714d... matched; blobs slab_workbench.py 690ae46, earth_units.py 70ce9e7; compiles.
+- 2026-11-26: K1, S2f step cost (records.json steps 2-320, all warm): 233 steps (73%) rebuild the faulted mesh,
+  median 6 Newton, 2 line-search cutbacks, 106 s Stokes; 86 steps on the same mesh: median 1.5 Newton, 0 cutbacks,
+  20 s (S1o's cost). The cost is the first solve on a rebuilt mesh, not the fault/yield coupling. Detection every
+  step (-uw_detect_every 1), the fit moves enough to rebuild 3 steps in 4; a larger rebuild threshold or detection
+  every few steps would cut most of it, worth doing only once the fault stays on the slab. S2f's top runs off from
+  ~20 Myr (970 km at 37 Myr, 2390 km at 106-120 Myr) while the fault at 150/300 km stays on the slab; convergence falls
+  to 0.4-1.7 cm/yr while fault slip stays 3-4 cm/yr.
+  Hub reading: the same top runaway as Un/Un24 (markers ride the overriding plate; the tangent top follows them).
+  Slip > convergence means the run-off top is slipping inside the overriding plate. The jump-after option (b534ba9)
+  does not address it. Candidate remedies for Louis: fit the top to the slab found from temperature (as
+  fault_on_slab.py does reliably) instead of markers; and/or his 25 Nov idea, stop splitting where the fault is flat
+  and only track it.
