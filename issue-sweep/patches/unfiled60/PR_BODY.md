@@ -35,6 +35,10 @@ development. It asserts the printed reach (0.227) and wall distance (0.13) exact
 to 3 significant figures. The shared shell builder keeps its text, so the 3-D thin volume's
 refusal is unchanged.
 
+The suggested move is a rough guide that errs on the safe side, and the message says "about".
+With the sheet at z = 0.80 it asks for 0.061 more clearance, which puts the sheet at z = 0.74; a
+sheet at z = 0.76 already places.
+
 Not changed: the 3-D thin volume, the removal, and the stranded-wall-vertex refusals.
 
 Underworld development team with AI support from Claude Code
