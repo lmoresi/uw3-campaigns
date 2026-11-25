@@ -21,8 +21,8 @@ on 60 fixtures.
 **Behaviour change on exact-distance ties.** With an exact tie, development's choice depended on
 the size of its one large query and on the platform. The bounded query takes the lower index.
 One different claim takes a fine DOF a later orphan would have had, so a tie early on cascades:
-- on the server's fixtures, 17-208 orphans took a farther node on development and 32-384 with
-  this change;
+- on the server's fixtures, 17-208 orphans took a farther node with this change and 32-384 on
+  development;
 - on half-cell-offset integer grids, where four-way ties are exact, 168-1,720 entries differed
   for n = 16-48 on that server, and 184-788 for n = 16-32 on a 12-core Apple M4 laptop.
 
