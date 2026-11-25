@@ -1,9 +1,10 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Two commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Three commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
+- 0003 (911a7b16) is UNFILED 72: the cut refuses a flat cell (see the last section).
 
 ## Cause
 `line_cut._label_cut_edges` labelled an edge only when both its ends AND its midpoint lay on the
@@ -69,3 +70,34 @@ the lighter pull. That is a register row for Louis, measured after this PR's rev
 - test_0897: its "empty" fixture is partial under the new labelling, and still refused. The
   empty-label refusal is checked on a hand-labelled chain.
 - The fault, conforming-surface and line-cut suites (40 files): 428 passed, 1 skipped.
+
+## UNFILED 72: the cut refuses a flat cell (0003)
+With the labelling fixed, add_fault places traces that development refused for other reasons, and
+some came back with a flat cell: area 1e-17 to 6e-19 of the cell's own size, a 0-degree angle. They
+sit at 90- and 120-degree turns where several samples lose their vertex to a later one. It happens
+under the every-sample pull, not only a lighter one; `dev72.py` reproduces it, and add_fault
+returned that mesh. The cut refused inverted cells but not flat ones.
+
+The guard: a cell whose area is below 1e-9 of its own longest edge squared is refused. Every mesh
+add_fault returned in the hunt was measured with the guard off (`pull22r.py`, `ratio_*.jsonl`;
+about 1060 meshes). Minimum area / longest edge^2, per returned mesh:
+
+| bin | development (329) | labelling, every sample (304) | labelling, light+sharp (428) |
+|---|---|---|---|
+| < 1e-14 | 0 | 17 | 5 |
+| 1e-14 to 5.7e-5 | 0 | 0 | 0 |
+| 5.7e-5 to 1e-2 | 3 (5.7e-5, 3.7e-3, 9.9e-3) | 0 | 0 |
+| 1e-2 to 0.1 | 124 | 102 | 326 |
+| > 0.1 | 202 | 185 | 97 |
+
+The gap runs from 1e-14 to 5.7e-5. The threshold, 1e-9, is its log-middle, with a margin of about
+5e4 on each side. It is a flatness guard, not a quality guard: development returns a poor but not
+flat mesh at 5.7e-5, and it passes.
+
+Every refusal by the guard in the guarded hunt (22 under the every-sample pull, 7 under light+sharp,
+at either snap setting) is a trace that development also refuses (it raised on all 29). So the guard
+never refuses a trace development places.
+
+test_0899: the measured trace is refused under both pull rules; a trace that places normally is not;
+the refusals fail with the guard disabled. Suites: 431 passed, 1 skipped (run at a threshold of 1e-6;
+1e-9 refuses strictly less).

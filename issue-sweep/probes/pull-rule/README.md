@@ -163,3 +163,17 @@ So, as measured, the row is not ready. Either the cut refuses a degenerate cell 
 stated fraction of h^2, alongside its inverted-cell check), which would turn these 5 into
 refusals, or the sharp-turn keep is changed so that it does not produce them. The first is a
 guard the cut needs anyway: any pull rule could reach it.
+
+## Row 29 remeasured with UNFILED 72's guard (2026-11-26)
+The guard (a flat cell is refused) is in the labelling branch (0003). Guarded hunt, `pull_guard72.jsonl`
+(480 results per mode):
+- every sample pulled, snap 0.1 / 0.3: 268 / 266 complete, 22 refused as flat;
+- light+sharp, snap 0.1 / 0.3: 420 / 419 complete, 7 refused as flat.
+
+The 7 light+sharp flat refusals (90-, 120- and 150-degree kinks) are all traces development also
+refuses, so (b), a change to the sharp-turn keep, is not needed for parity: development places none
+of them. With the guard, no mesh with a flat cell comes back under any rule.
+
+Remaining for the row: unchanged from the follow-up. light+sharp with snap_frac 0.3 places 226 of the
+232 traces development places. It fixes finely sampled traces, makes the slip independent of the
+sampling, converges to the same limit, and restores mesh quality and iterations.

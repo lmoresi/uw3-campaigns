@@ -1,0 +1,194 @@
+From 911a7b16971d533e7b712d4bc6c2537c6a4ef6ed Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 06:33:53 +1100
+Subject: [PATCH 3/3] The cut refuses a flat cell
+
+cut_along_lines refused an inverted cell but not a flat one. With the
+edge labelling now complete across in-cell kinks, add_fault placed
+traces it used to refuse for other reasons, and some came back with a
+cell of area 1e-17 to 6e-19 of their own size (a 0-degree angle), at
+90- and 120-degree turns where several samples lost their vertex to a
+later one (UNFILED 72). That holds both for the every-sample pull and
+for a lighter one. A flat cell gives the finite-element map a zero
+Jacobian.
+
+The cut now raises when a cell's area is below 1e-9 of its own longest
+edge squared (0.433 for an equilateral cell). Over every mesh add_fault
+returned in the measurement (about 1060, three pull rules), the flat
+ones sit below 1e-14 and the sound ones at 5.7e-5 and above
+(development's worst; nearly all at 1e-2 and above), with nothing
+between. The threshold is the log-middle of that gap. Being relative to
+each cell's size, it reads alike on a graded mesh. It is a flatness
+guard, not a quality guard: development returns a poor but not flat
+cell at 5.7e-5, and it passes.
+
+The message names the worst cell, the trace's nearest sample, and the
+sharpest turn within three cells, and says how to fix it: a vertex at a
+sharp turn, a smaller angle, or samples about a cell apart. The count is
+reduced by SUM and the worst cell by a MIN over (ratio, size, position),
+so every rank raises the same message.
+
+test_0899: the measured trace is refused when its samples are pulled
+sparsely and when every sample is pulled; a trace that places normally
+is not. With the guard disabled the two refusals fail. The fault,
+conforming-surface and line-cut suites: 431 passed, 1 skipped.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/line_cut.py         | 64 +++++++++++++++++++
+ ...test_0899_cut_refuses_a_degenerate_cell.py | 61 ++++++++++++++++++
+ 2 files changed, 125 insertions(+)
+ create mode 100644 tests/test_0899_cut_refuses_a_degenerate_cell.py
+
+diff --git a/src/underworld3/utilities/line_cut.py b/src/underworld3/utilities/line_cut.py
+index 7d8a74cb..e601c005 100644
+--- a/src/underworld3/utilities/line_cut.py
++++ b/src/underworld3/utilities/line_cut.py
+@@ -860,6 +860,68 @@ def cell_areas(dm, global_vote=False):
+     return 0.5 * _signed_twice_areas(P, _global_flip(P, dm.getComm()) if global_vote else None)
+ 
+ 
++# A cut cell is FLAT when its area is below this fraction of its own longest
++# edge squared (0.433 for an equilateral cell). It is a flatness guard, not a
++# quality guard: a flat cell gives the finite-element map a zero Jacobian, and
++# the inverted-cell check above misses it. Measured over every mesh add_fault
++# returned in UNFILED 72's hunt (about 1060 meshes, three pull rules), the flat
++# ones sit below 1e-14 (round-off) and the sound ones at 5.7e-5 and above
++# (development's worst; nearly all at 1e-2 and above), with nothing between. The
++# threshold is the log-middle of that gap. Being relative to the cell's own
++# size, it reads alike on a graded mesh. A poor but not flat cell (development
++# returns one at 5.7e-5) passes; a quality limit would be a separate decision.
++_DEGENERATE_AREA_FRACTION = 1.0e-9
++
++
++def _refuse_degenerate_cells(dm, areas, lines):
++    """Raise on every rank when the cut leaves a degenerate cell, naming the worst
++    cell and the turn of the trace nearest it. COLLECTIVE."""
++    X = _coords(dm)
++    vS, vE = dm.getDepthStratum(0)
++    cS, cE = dm.getHeightStratum(0)
++    worst = (np.inf, np.inf, *([np.inf] * X.shape[1]))
++    n_bad = 0
++    for c in range(cS, cE):
++        v = [int(p) - vS for p in dm.getTransitiveClosure(c)[0] if vS <= p < vE]
++        P = X[v]
++        longest = max(np.linalg.norm(P[i] - P[j]) for i, j in ((0, 1), (1, 2), (2, 0)))
++        ratio = abs(float(areas[c - cS])) / (longest * longest) if longest > 0 else 0.0
++        if ratio < _DEGENERATE_AREA_FRACTION:
++            n_bad += 1
++            if ratio < worst[0]:
++                worst = (ratio, float(longest), *P.mean(axis=0))
++    n_bad = uw.mpi.comm.allreduce(n_bad, op=MPI.SUM)
++    if not n_bad:
++        return
++    ratio, size, *where = uw.mpi.comm.allreduce(worst, op=MPI.MIN)
++    where = np.array(where)
++    # the trace's nearest sample, and its sharpest turn within three of the
++    # worst cell's longest edge (the same on every rank: lines are replicated)
++    near_d, near_p, sharp = np.inf, None, (0.0, None)
++    for line in lines:
++        L = np.asarray(line, dtype=float)
++        for i in range(len(L)):
++            d = float(np.linalg.norm(L[i] - where))
++            if d < near_d:
++                near_d, near_p = d, L[i]
++            if 0 < i < len(L) - 1 and d <= 3.0 * size:
++                a, b = L[i] - L[i - 1], L[i + 1] - L[i]
++                cos = float(a @ b) / (np.linalg.norm(a) * np.linalg.norm(b))
++                turn = float(np.degrees(np.arccos(np.clip(cos, -1.0, 1.0))))
++                if turn > sharp[0]:
++                    sharp = (turn, L[i])
++    fmt = lambda q: tuple(round(float(x), 6) for x in q)
++    turn_text = (f"; the trace turns {sharp[0]:.0f} degrees at {fmt(sharp[1])}, "
++                 f"within three cells of it" if sharp[1] is not None and sharp[0] > 10.0
++                 else "; the trace runs straight there")
++    raise RuntimeError(
++        f"the cut leaves {n_bad} flat cell(s) (area below "
++        f"{_DEGENERATE_AREA_FRACTION:g} of the cell's longest edge squared), the "
++        f"worst at {fmt(where)}, beside the trace's sample at {fmt(near_p)}"
++        f"{turn_text}. Give a sharp turn a vertex of its own (sample the trace at "
++        f"it), reduce its angle, or resample the trace near it about a cell apart.")
++
++
+ def min_angles(dm):
+     """Smallest interior angle of every triangle, in degrees.
+ 
+@@ -1143,6 +1205,8 @@ def cut_along_lines(dm, lines, snap_frac=0.10, label=CUT_LABEL, label_value=1,
+             f"snapping inverted {n_inverted} cell(s); snap_frac={snap_frac} is "
+             "too large for this mesh.")
+ 
++    _refuse_degenerate_cells(cut, areas, lines)
++
+     marked = _label_cut_edges(cut, lines, 1e-9 * scale, label, label_value)
+ 
+     # Every reported number is GLOBAL. They are printed together as one summary,
+diff --git a/tests/test_0899_cut_refuses_a_degenerate_cell.py b/tests/test_0899_cut_refuses_a_degenerate_cell.py
+new file mode 100644
+index 00000000..0a412995
+--- /dev/null
++++ b/tests/test_0899_cut_refuses_a_degenerate_cell.py
+@@ -0,0 +1,61 @@
++"""The cut refuses to leave a degenerate (flat) cell (UNFILED 72).
++
++The cut refused an INVERTED cell, but not a flat one: with few samples of a trace pulled
++onto vertices, a 90-degree turn on the regular 1/12 box left two cells of area 1e-16 of
++their own size, and the cut returned them as if complete. A flat cell gives the
++finite-element map a zero Jacobian. The cut now refuses a cell whose area is below 1e-9 of
++its longest edge squared, naming where it is and the turn of the trace near it. The flat
++cells measured sit below 1e-14 and every sound mesh at 5.7e-5 or above; the threshold is in
++that gap.
++
++The trace and the samples pulled onto vertices are the measured case (spacing half a cell,
++a 90-degree turn). Pulling every sample, as add_fault does, leaves the same kind of cell:
++there add_fault returned a mesh with a 0-degree angle.
++"""
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities import line_cut
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++TRACE = np.array([
++    [0.6090432512341917, 0.6609578307168709], [0.5728503003912726, 0.6403136688207525],
++    [0.5366573495483534, 0.619669506924634], [0.5004643987054342, 0.5990253450285156],
++    [0.4642714478625152, 0.5783811831323971], [0.428078497019596, 0.5577370212362787],
++    [0.44872265891571445, 0.5215440703933595], [0.4693668208118329, 0.48535111955044036],
++    [0.49001098270795135, 0.44915816870752123], [0.5106551446040698, 0.41296521786460205],
++    [0.5312993065001882, 0.3767722670216829]])
++PULLED = TRACE[[0, 2, 3, 4, 5, 6, 7, 8, 10]]
++
++
++@pytest.fixture(scope="module")
++def box():
++    return uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                             cellSize=1 / 12, regular=True)
++
++
++def test_a_flat_cell_is_refused_and_located(box):
++    dm = line_cut.pull_vertex_onto(box.dm, PULLED, on_shared="note")
++    with pytest.raises(RuntimeError, match="flat cell") as err:
++        line_cut.cut_along_lines(dm, [TRACE])
++    msg = str(err.value)
++    assert "the trace turns 90 degrees" in msg and "sample the trace" in msg, msg
++
++
++def test_every_sample_pulled_is_refused_too(box):
++    # the flat cells come from the cut, not from which samples are pulled: with every
++    # sample pulled, as add_fault does, five samples lose their vertex to a later one
++    # and the cut leaves the same kind of cell (add_fault returned it, a 0-degree angle)
++    dm = line_cut.pull_vertex_onto(box.dm, TRACE, on_shared="note")
++    with pytest.raises(RuntimeError, match="flat cell"):
++        line_cut.cut_along_lines(dm, [TRACE])
++
++
++def test_a_trace_that_places_is_not_refused(box):
++    line = np.array([[0.2 + 0.1 * k, 0.43 + 0.02 * k] for k in range(7)])
++    dm = line_cut.pull_vertex_onto(box.dm, line, on_shared="note")
++    _cut, info = line_cut.cut_along_lines(dm, [line])
++    assert info["min_angle"] > 1.0
+-- 
+2.39.5 (Apple Git-154)
+

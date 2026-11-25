@@ -1,4 +1,4 @@
-From d1aa0e1e56a8056fea81a05f64f6085f67afc5e9 Mon Sep 17 00:00:00 2001
+From 25eabf9a4042c68ef355cbc7ff71acfcedb0ede0 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 04:27:08 +1100
 Subject: [PATCH 4/4] Ribbon wall refusal: narrow first when a move would reach
@@ -10,10 +10,14 @@ the message names carries the cavity onto the wall across the band: 0.9 ->
 outer one again. When a wall vertex far from the touched one (more than 4 x
 the reach away) lies within reach + the suggested move of the skin, the
 message now says that the move would bring the cavity onto that wall, and
-to narrow the band first, then move if it is still refused. Followed as
-told, the fixture places in two steps: narrow to 0.058, then move 0.036
-away from the outer wall (top 0.864); 0.0572 on the Linux server, from its
-clearance x h of 0.0343. test_0865 accepts either form of guidance.
+to narrow the band first, then move if it is still refused. Narrowed once
+(to 0.058; 0.0572 on the Linux server, from its clearance x h of 0.0343)
+and then moved 0.036 away from the outer wall (top 0.864), the fixture
+places. Followed literally, the second message asks to narrow again (to
+0.0507 on the Linux server), because h at the new touched vertex is
+smaller; that step does not shrink the reach, and the move after it
+places it, so literally it takes three steps. test_0865 accepts either
+form of guidance.
 
 Underworld development team with AI support from Claude Code
 ---

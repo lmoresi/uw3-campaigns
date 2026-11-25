@@ -26,8 +26,10 @@ reach changes. Followed step by step (`follow.py`, moving away from the wall eac
   far from the touched one lies within the cavity's reach plus the suggested move, the message
   says so and says to narrow the band first, to the width where clearance x h takes over the
   carve (0.058 here, 0.0572 on the Linux server, whose clearance x h is 0.0343 against 0.0348).
-  Followed as told, it places in two steps: narrow to 0.058, then move 0.036 away from the outer
-  wall (top 0.864).
+  Narrowed once and then moved 0.036 away from the outer wall (top 0.864), it places. Followed
+  literally, the second message asks to narrow again (to 0.0507 on the Linux server), because the
+  cell size at the new touched vertex is smaller. That step does not shrink the reach, and the
+  move after it places the band, so the literal path takes three steps.
 
 No predicted target is given for the width or the cell size: predictions were tried and missed
 (a ribbon narrowed to 0.025-0.03, and a sheet with cells of 0.08, were still refused). The
