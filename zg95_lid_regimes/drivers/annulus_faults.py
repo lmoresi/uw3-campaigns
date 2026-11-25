@@ -254,7 +254,7 @@ params = uw.Params(
     uw_asth_bottom=0.7,
     uw_asth_ramp=0.05,
     uw_asth_T=0.0,              # >0: the channel only in rock hotter than this (model temperature; a 0.02-wide tanh),
-                                # so a cold slab keeps its viscosity. 0: by depth alone, as before
+                                # so a cold slab keeps its viscosity. 0 with uw_asth < 1 (by depth alone): refused from 2026-11-25
     # the first fault, when starting from an annulus run
     uw_theta_trench=0.0,
     uw_dip=45.0,
@@ -524,6 +524,11 @@ FIRST_SOLVE = True             # the run's first solve: an unconverged cold one 
 REBUILD = float(params.uw_rebuild_cells) * H_B                  # the rebuild threshold, a distance (needs_rebuild)
 if str(params.uw_fault_seams) not in ("gather", "conform"):
     raise ValueError(f"-uw_fault_seams must be gather or conform, not {params.uw_fault_seams!r}")
+if params.uw_asth < 1 and float(params.uw_asth_T) <= 0:
+    # Louis, 2026-11-25: "The asthenosphere should not be weakening the slab, so take care not to reintroduce that." A
+    # channel by depth alone weakens the cold slab as much as the mantle around it (the Earth recipe to 2026-11-24, e.g.
+    # earth_recipe_movie); runs before c137344 are reproduced on their own commits
+    raise ValueError("-uw_asth < 1 needs -uw_asth_T > 0 (the channel only in hot rock): by depth alone it weakens the slab")
 try:                                   # which mechanism puts a gathered fault on one rank (the record says)
     import underworld3.utilities.addon_partition  # noqa: F401  (development: the add-on is partitioned first)
     _addon_partition = True
