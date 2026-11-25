@@ -4770,3 +4770,9 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   carries -uw_asth 0.1 by depth. S0/S0w (job 4961) run on 4a641a1 with -uw_asth 1 (logs say "asthenosphere 1").
   Hub asked K1 for the same guard in annulus_faults.py (to carry to zg95-annulus-for-kaiju) and to fix
   ARGS_earth.txt / the recipe scripts (-uw_asth 1 as the safe default until Louis rules on a channel).
+- 2026-11-25: K1 dbf7f10 (annulus_faults.py: -uw_asth < 1 without -uw_asth_T > 0 raises ValueError; 2 base64 pieces
+  and the 2719 B mbox sha 4889444f... verified) pushed: kaiju/slab-workbench 95bf2da (on fca4ca3; blob 6d31420 here vs
+  K1's c34d21d, this branch's annulus_faults.py carries the stub port) and zg95-annulus-for-kaiju 2d52f6f (on 2eea0ae,
+  git am -3 clean, compiles). ARGS_earth.txt and the recipe scripts unchanged (K1: -uw_asth 1 or a temperature value
+  changes the recipe's physics, so it goes to Louis; ARGS_earth.txt is also read when job 4961's 400-step runs start).
+  With both guards a default Earth-recipe launch now fails at startup instead of weakening the slab.
