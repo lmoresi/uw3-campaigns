@@ -4815,3 +4815,20 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   km), 1854 km at 135 Myr. Run on S2f with each render; S2f read only to its first flag; not wired into the driver.
   Hub note: the top measure starts near 250 km by geometry, so a flag on the change from its starting value (e.g.
   +100 km) would catch drift earlier than the absolute 350 km.
+- 2026-11-26: Louis (25 Nov): "I don't want any models that have no fault. That would be pointless in this effort to
+  model faults. We know weak zones can be a bit like faults. My main concern is why the fault did nothing much in the
+  most recent set." Later: "the only models that look like they have a fault (sharp velocity discontinuity near the
+  surface) are the ones that do not have a fault. The models with a fault have distributed deformation near the
+  surface. The fault does not seem to fit the actual position very well. I think this is all an adjustment phase
+  from the start up but it does seem that the runs are going incredibly slowly now." "Yes, continue - let's
+  characterise the system". Cancelled: S0/S0w (4961), continuation 4965, S1/S1o (4964), S2c (4968.0 in its smoke).
+  S2f continues (4968). DECISIONS entry added. K1: plate_budget.py first 30 Myr: Un24 fault slip 70-110% of
+  convergence but convergence only 0.9-1.2 cm/yr for 15 Myr; Un barely moves; S0w 4-6 cm/yr. Un/Un24 confined
+  yielding to the 40 km zone (x1e4 elsewhere): plates rigid. S2f vs S1o (s2f_strip.png): same convergence 3.8-5.0
+  cm/yr, slab tip ~1100 km at 22 Myr; fault takes 70-98% and turns the vertical two-sided drip into a one-sided slab
+  dipping 45-60 deg, trench fixed; fault lags the steepening slab (one rung per fit); fault_on_slab flags top drift
+  from 19.4 Myr (+117 km). Cost: dt ~0.3-0.45 Myr in S1o/S2f/Rsw (Courant at real speeds); S2f 12.5 Newton/step with
+  ~10 line-search cutbacks, 16 s each, vs S1o 2 at 9 s: ~10x per step. K1 60c2659 pushed as b534ba9 on
+  kaiju/slab-workbench (on ca9afb8): -uw_fault_jump_after_myr, the jump limit only from that model time (default 0
+  unchanged); 5 base64 pieces, j_04 arrived with '"uw_yield_damage", ' dropped from a context line, restored, then
+  the 6404 B mbox sha 24d1714d... matched; blobs slab_workbench.py 690ae46, earth_units.py 70ce9e7; compiles.
