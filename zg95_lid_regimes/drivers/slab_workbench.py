@@ -305,8 +305,9 @@ params = uw.Params(
     # forcing the physics, we should also look carefully at the fault in the wrong place models"). Every step records
     # them (record "fault_check"); a step is flagged when one passes its limit
     uw_check_fit_km=35.0,       # the fault in use against the fresh fit (paired by fraction of length below the surface)
-    uw_check_slab_km=50.0,      # the fault in use against the slab's thermal top at 100, 200, 300 km (beyond the slab's
-                                #   half-width, from the coldest point on that depth within 640 km of arc)
+    uw_check_slab_km=50.0,      # the fault in use against the slab's thermal top at 100, 200, 300 km: the signed distance
+                                #   from the slab's top edge (where T is halfway from the coldest point on that depth, within
+                                #   640 km of arc, back to the median; > 0 into the wedge, < 0 into the slab), either way
     uw_check_top_km=150.0,      # the fault's surface point against the trench (trench_point: the strongest convergence)
     uw_check_slip_ratio=1.5,    # the fault's largest slip rate over the plates' convergence across the trench (300-1000
                                 #   km each side): slip well above convergence is the fault slipping out of place
@@ -882,10 +883,14 @@ def fault_checks(used, fit, slip_max):
             a -= 1
         while b < len(T) - 1 and T[b + 1] < half:
             b += 1
-        gap = (abs(th_f - th[i]) - 0.5 * (th[b] - th[a])) * r * km
+        # signed from the slab's top edge (its overriding side, +theta for a dip below 90 degrees): > 0 into the wedge
+        # (a fault behind the hinge), < 0 into the slab (a fault cutting through it or lying under it)
+        over = 1.0 if params.uw_dip < 90 else -1.0
+        edge = th[b] if over > 0 else th[a]
+        gap = over * (th_f - edge) * r * km
         slab[f"{z_km:.0f}"] = round(float(gap), 1)
     rec["slab_km"] = slab
-    if slab and max(slab.values()) > float(params.uw_check_slab_km):
+    if slab and max(abs(g) for g in slab.values()) > float(params.uw_check_slab_km):
         flags.append("slab")
     th_100 = depth_crossing(line, 100.0 / km)
     th_tr = trench_point(th_100 if th_100 is not None else th_top, th_top)
