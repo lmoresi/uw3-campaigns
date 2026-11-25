@@ -22,12 +22,12 @@ rng = np.random.default_rng(seed)
 
 def trace():
     if mesh_kind.startswith("box"):
-        p0 = rng.uniform(0.25, 0.75, 2)
+        p0 = rng.uniform(0.3, 0.45, 2)
     else:
         r0, t0 = rng.uniform(0.65, 0.85), rng.uniform(0, 2 * np.pi)
         p0 = r0 * np.array([np.cos(t0), np.sin(t0)])
-    ang = rng.uniform(0, 2 * np.pi); curv = rng.uniform(-3, 3)
-    L = rng.uniform(2, 4) * h; ds = rng.uniform(0.3, 0.7) * h
+    ang = rng.uniform(0, 2 * np.pi); curv = rng.uniform(-float(__import__('os').environ.get('CURV', 3)), float(__import__('os').environ.get('CURV', 3)))
+    L = rng.uniform(float(__import__('os').environ.get('LMIN', 2)), float(__import__('os').environ.get('LMAX', 4))) * h; ds = rng.uniform(0.3, 0.7) * h
     n = max(3, int(L / ds) + 1)
     s = np.linspace(0, L, n)
     th = ang + curv * s

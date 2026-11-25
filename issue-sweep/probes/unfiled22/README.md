@@ -60,3 +60,36 @@ traces). It is not the owner of a shared vertex. Candidate rule: pull the tips, 
 threshold, and samples at least about a cell apart. Acceptance: the hunt, the kink table, and the
 sphere-sheet set. test_0559 needs its premise restated (the warning is for samples that share a
 vertex, which a thinning rule removes).
+
+## CORRECTION (2026-11-26, later): the first hunt measured the wrong thing
+The tables above count cuts that did not raise. A cut that does not raise can still label almost
+nothing: `_label_cut_edges` marks an edge only when both ends AND its midpoint lie on the polyline,
+so a chord between two pulled vertices is not marked. End to end with `add_fault`, a fault can come
+back with ZERO facets and no error. The "0 of 360" for the thinned rules is withdrawn.
+
+End to end (`hunt3.py`): 20 smooth traces (lines and gentle arcs, 6 cells long, centred in a 1/12
+irregular box), forward and reversed, so 40 add_fault calls per row. "complete" means the fault
+chain lies within half a cell of every point of the trace; "partial" means it does not; "empty"
+means add_fault returned a fault with no facet.
+
+| sample spacing | development | thin (tips, turns > 45 deg, >= 1 cell) | tips + turns > 45 deg |
+|---|---|---|---|
+| 1.0 cell | 40 complete | 40 complete | 24 complete, 12 partial, 4 raised |
+| 0.5 cell | 16 complete, 5 partial, 1 empty, 18 raised | 20 complete, 6 empty, 14 raised | 20 complete, 2 empty, 18 raised |
+| 0.3 cell | 6 complete, 4 partial, 8 empty, 22 raised | 20 complete, 20 empty | 20 complete, 12 empty, 8 raised |
+
+Straight-line control (`straight.py`): development is complete at spacings of 2 and 1 cell at both
+angles tried, and refuses some orientations at 0.7, 0.5 and 0.3 cell (inverted snap, a
+self-meeting label).
+
+What this says:
+1. A DEFECT on development, whatever rule is chosen: add_fault can return a fault with no facet
+   and no error (1/40 at 0.5 cell, 8/40 at 0.3). It should refuse.
+2. Sampling finer than about a cell degrades add_fault on development: 40, 16 and 6 of 40
+   complete at 1.0, 0.5 and 0.3 cell.
+3. No pull rule measured here fixes it. Thinning turns refusals into silent empty faults, and the
+   exact 20s suggest the outcome depends on the trace's direction (the thinning measures spacing
+   from the first sample). The cause of the empty and partial chains is in the cut's labelling of
+   chords and in the snap, not in which samples are pulled.
+The hairpin and before/after-solve measurements C1 asked for are moot until the rule question is
+settled.
