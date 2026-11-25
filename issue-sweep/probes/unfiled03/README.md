@@ -65,6 +65,7 @@ for np in 1 2 3 4; do
 done
 grep -h "^EFF" u3_np*.log
 ```
-Compare across rank counts: the counts (outer/vel/pres), capped, and |v|. Save v (the probe saves
-it per rank's local array), or compare |v| to 1e-6 and 1e-9 relative. Informational if the counts
-stay within one iteration and |v| agrees to the tolerance at both tolerances.
+Compare across rank counts: the counts (outer/vel/pres), capped, and |v|. The probe prints |v| as
+the L2 norm by integration, which is independent of the partition (np 1, tol 1e-6: 62.23669508874).
+Informational if the counts stay within one iteration and |v| agrees to the tolerance at both
+tolerances. (The serial table above compared full nodal vectors.)

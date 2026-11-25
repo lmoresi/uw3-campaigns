@@ -22,7 +22,11 @@ sys.argv = ["p_893_k1.py", "-uw_refinement", ref, "-uw_chain", "2", "-uw_split",
 g = runpy.run_path(os.path.expanduser("~/+Simulations/uw3-campaigns-w1/issue-sweep/probes/p_893_k1.py"), run_name="__main__")
 s, v = g["s"], g["v"]
 i = s._rotated_freeslip_info
+import underworld3 as uw
 V = np.asarray(v.array).ravel()
-np.save(f"veff_{mode.replace(':', '')}_{ref}_{tol}.npy", V)
-print(f"EFF {mode} ref {ref} tol {tol}: outer {i['ksp_its']} vel {i['vel_its_last']} pres {i['pres_its_last']} "
-      f"capped {i.get('sub_capped')} converged {i['converged']} |v| {np.linalg.norm(V):.12e}", flush=True)
+if uw.mpi.size == 1:
+    np.save(f"veff_{mode.replace(':', '')}_{ref}_{tol}.npy", V)
+# the L2 norm by integration: independent of the partition (v.array holds ghost rows too)
+vnorm = float(np.sqrt(uw.maths.Integral(g["fine"], v.sym.dot(v.sym)).evaluate()))
+uw.pprint(f"EFF np {uw.mpi.size} {mode} ref {ref} tol {tol}: outer {i['ksp_its']} vel {i['vel_its_last']} pres {i['pres_its_last']} "
+      f"capped {i.get('sub_capped')} converged {i['converged']} |v| {vnorm:.12e}")
