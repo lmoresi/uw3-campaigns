@@ -4776,3 +4776,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   git am -3 clean, compiles). ARGS_earth.txt and the recipe scripts unchanged (K1: -uw_asth 1 or a temperature value
   changes the recipe's physics, so it goes to Louis; ARGS_earth.txt is also read when job 4961's 400-step runs start).
   With both guards a default Earth-recipe launch now fails at startup instead of weakening the slab.
+- 2026-11-25: Louis: "Agreed - let's keep it simple at the moment. LM higher viscosity but not other add ons". K1:
+  runs/wb_ladder/ARGS_earth.txt (kaiju-local) is now the S0 mantle: -uw_asth 1 (asth_top/bottom/ramp removed),
+  -uw_lm_eta 30, -uw_eta_ref_pas 1e21, -uw_eta_reg_pas 1.26e21, -uw_eta_max_pas 1e24, header quoting Louis; old file
+  kept as ARGS_earth_to20261124.txt; changed only after job 4961's 400-step runs had read it. The annulus_faults
+  Earth-recipe scripts (baseline/prepare.sh EARTH, slab_kaiju/common.sh) left alone: line not in use, launch refused
+  by dbf7f10, moving it would need its model-unit Ra and deta reworked. Job 4961: S0 and S0w passed the smoke (3-4
+  Newton/step, no fault, "asthenosphere 1"), on their 400 steps.
