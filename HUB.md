@@ -4844,3 +4844,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   does not address it. Candidate remedies for Louis: fit the top to the slab found from temperature (as
   fault_on_slab.py does reliably) instead of markers; and/or his 25 Nov idea, stop splitting where the fault is flat
   and only track it.
+- 2026-11-26: Louis: "I agree that we should take on the knowledge that we have gained - the fault tends to flatten
+  and become the surface. Could we try fitting it to the surface but following it as a fault only to the enforced
+  cutoff (numerical) with a damage zone bridge to the surface but that it all." His picks: cut-off where the curve
+  flattens; bridge straight to the trench; x0.1 over ~20 km. K1 9fd7791 pushed as 8e3ae8c on kaiju/slab-workbench (on
+  b534ba9): sent as format-patch -U1, gzip -9 -n, base64 in 4 pieces; every piece, the .gz (3815 B, 5a36511d...) and
+  the mbox (10754 B, ee6d1681...) matched first time; blobs slab_workbench.py 6cde9a0, earth_units.py 0127651;
+  compiles. -uw_split_min_dip_deg: steep_part, the split stops where the curve, followed up from its deep end, first
+  dips less than this (keeps >= 4 points). -uw_bridge zone: no TI plane; isotropic zone (viscosity and yield x
+  -uw_bridge_weak) on cells within half of -uw_bridge_km (>= 0.75 base cell) of the straight line from the split's
+  top to the trench; trench_point = strongest surface convergence (tangential velocity falling fastest toward
+  +theta, 29 km deep, 0.25 rad window). Defaults 0 / plane: unchanged. Hub review note: trench_point assumes the
+  convergence sign of the current polarity (subducting plate at smaller theta, dip < 90); a reversed polarity would
+  need the sign flipped (as overriding_side does). Fine for the current runs.
