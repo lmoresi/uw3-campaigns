@@ -300,6 +300,25 @@ params = uw.Params(
     uw_bridge_weak=0.1,
     uw_bridge_km=20.0,          #   the bridge's width: cells whose centre lies within half of it (at least 0.75 of a
                                 #   base cell, so the band has no gaps) of the line
+    # checks that the fault in use sits where the physics puts the plate boundary (Louis, 2026-11-26: "we need to flag
+    # situations where the fault fitting is driving the physics and penalise that - we dropped the very-flat fault for
+    # forcing the physics, we should also look carefully at the fault in the wrong place models"). Every step records
+    # them (record "fault_check"); a step is flagged when one passes its limit
+    uw_check_fit_km=35.0,       # the fault in use against the fresh fit (paired by fraction of length below the surface)
+    uw_check_slab_km=50.0,      # the fault in use against the slab's thermal top at 100, 200, 300 km (beyond the slab's
+                                #   half-width, from the coldest point on that depth within 640 km of arc)
+    uw_check_top_km=150.0,      # the fault's surface point against the trench (trench_point: the strongest convergence)
+    uw_check_slip_ratio=1.5,    # the fault's largest slip rate over the plates' convergence across the trench (300-1000
+                                #   km each side): slip well above convergence is the fault slipping out of place
+    uw_check_stop_steps=0,      # > 0: the run stops (exit 3, last step checkpointed) after this many flagged steps in a
+                                #   row; 0: flags are recorded only
+    uw_warm_shift=0,            # 1 (Louis, 2026-11-26: "we need to make the warm start work when we remesh the fault ...
+                                #   it is worse if it receives the old jump but in the wrong place"): after a rebuild the
+                                #   old solution is read at each new DOF moved by the fault's own displacement (old minus
+                                #   new, paired by fraction of length below the surface), in full out to the largest
+                                #   displacement plus a rung from the new fault and fading to none over three rungs more,
+                                #   so the old jump arrives on the new fault, each side from its own side. 0 (every run to
+                                #   2026-11-26): the old solution read in place
     uw_rebuild_cells=1.0,       # rebuild the faulted mesh when a fault moved more than this many BASE CELLS
                                 #   (uw_cell / 2**uw_refinement, independent of the rung spacing): the fault polyline's
                                 #   gap to the built one. Replaces uw_rebuild_rungs (retired 2026-11-04): counted in rungs
@@ -779,6 +798,114 @@ def trench_point(theta_hint, fallback):
     g = np.gradient(np.convolve(v_t, np.ones(5) / 5, mode="same"), th)
     g[:3] = g[-3:] = np.inf
     return float(th[int(np.argmin(g))])
+
+
+def nearest_on(points, poly):
+    """For each point: the distance to the polyline and the fractional index of its nearest point on it."""
+    dist, where = np.full(len(points), np.inf), np.zeros(len(points))
+    for j, (p, q) in enumerate(zip(poly[:-1], poly[1:])):
+        d = q - p
+        s = np.clip(((points - p) @ d) / max(d @ d, 1e-30), 0.0, 1.0)
+        r = np.linalg.norm(points - (p + s[:, None] * d), axis=1)
+        m = r < dist
+        dist[m], where[m] = r[m], j + s[m]
+    return dist, where
+
+
+def shift_by_fault(points, new_faults, old_faults, n=201):
+    """Points moved by their fault's displacement (uw_warm_shift): for each fault in both sets, the old and new lines
+    below the surface paired by fraction of length; a point takes the displacement (old minus new) at its nearest point
+    on the new line, in full within the largest displacement plus a rung of it, fading to none three rungs further."""
+    out = np.array(points, dtype=float)
+    old = {f["name"]: f for f in old_faults}
+    for f in new_faults:
+        if f["name"] not in old:
+            continue
+        a = by_fraction(line_inside(np.asarray(f["points"], dtype=float))[0], n)
+        b = by_fraction(line_inside(np.asarray(old[f["name"]]["points"], dtype=float))[0], n)
+        disp = b - a
+        d0 = float(np.linalg.norm(disp, axis=1).max()) + S
+        dist, where = nearest_on(points, a)
+        w = np.clip(1.0 - (dist - d0) / (3.0 * S), 0.0, 1.0)
+        k = np.clip(where, 0, n - 1)
+        lo = np.floor(k).astype(int)
+        hi = np.minimum(lo + 1, n - 1)
+        frac = (k - lo)[:, None]
+        out += w[:, None] * ((1 - frac) * disp[lo] + frac * disp[hi])
+    return out
+
+
+def by_fraction(line, n=101):
+    """A polyline resampled at n points evenly in fraction of its length."""
+    seg = np.linalg.norm(np.diff(line, axis=0), axis=1)
+    s = np.r_[0.0, np.cumsum(seg)]
+    f = np.linspace(0.0, s[-1], n)
+    return np.c_[np.interp(f, s, line[:, 0]), np.interp(f, s, line[:, 1])]
+
+
+def depth_crossing(line, z):
+    """The angle where a polyline (ordered from the surface down) first reaches depth z (model units); None if not."""
+    d = r_o - np.hypot(line[:, 0], line[:, 1])
+    th = np.unwrap(np.arctan2(line[:, 1], line[:, 0]))
+    for i in range(len(line) - 1):
+        if (d[i] - z) * (d[i + 1] - z) <= 0 and d[i] != d[i + 1]:
+            return float(th[i] + (z - d[i]) / (d[i + 1] - d[i]) * (th[i + 1] - th[i]))
+    return None
+
+
+def fault_checks(used, fit, slip_max):
+    """Where the fault in use (``used``, the faults the solve ran on) sits against the physics: the fresh fit, the
+    slab's thermal top, the trench and the plates' convergence (uw_check_*). Returns (record, flags). Collective."""
+    if not used:
+        return {}, []
+    km, cm = MODEL_UNIT["km"], MODEL_UNIT["cm_yr"]
+    line, th_top = line_inside(np.asarray(used[0]["points"], dtype=float))
+    rec, flags = {}, []
+    if fit:
+        new, _ = line_inside(np.asarray(fit[0]["points"], dtype=float))
+        rec["fit_km"] = float(np.linalg.norm(by_fraction(line) - by_fraction(new), axis=1).max() * km)
+        if rec["fit_km"] > float(params.uw_check_fit_km):
+            flags.append("fit")
+    slab = {}
+    for z_km in (100.0, 200.0, 300.0):
+        z = z_km / km
+        th_f = depth_crossing(line, z)
+        if th_f is None:
+            continue
+        th = th_f + np.linspace(-0.1, 0.1, 241)
+        r = r_o - z
+        T = np.asarray(uw.function.global_evaluate(T_b.sym, onto(np.c_[r * np.cos(th), r * np.sin(th)]))).ravel()
+        i = int(np.argmin(T))
+        half = 0.5 * (T[i] + float(np.median(T)))
+        a, b = i, i
+        while a > 0 and T[a - 1] < half:
+            a -= 1
+        while b < len(T) - 1 and T[b + 1] < half:
+            b += 1
+        gap = (abs(th_f - th[i]) - 0.5 * (th[b] - th[a])) * r * km
+        slab[f"{z_km:.0f}"] = round(float(gap), 1)
+    rec["slab_km"] = slab
+    if slab and max(slab.values()) > float(params.uw_check_slab_km):
+        flags.append("slab")
+    th_100 = depth_crossing(line, 100.0 / km)
+    th_tr = trench_point(th_100 if th_100 is not None else th_top, th_top)
+    rec["top_km"] = float(abs(wrap(th_top - th_tr)) * r_o * km)
+    if rec["top_km"] > float(params.uw_check_top_km):
+        flags.append("top")
+    off = np.r_[np.linspace(-1000.0, -300.0, 8), np.linspace(300.0, 1000.0, 8)] / (r_o * km)
+    th = th_tr + off
+    pts = np.c_[(r_o - 0.01) * np.cos(th), (r_o - 0.01) * np.sin(th)]
+    v = np.asarray(uw.function.global_evaluate(V_b.sym, onto(pts))).reshape(-1, 2)
+    v_t = -v[:, 0] * np.sin(th) + v[:, 1] * np.cos(th)
+    conv = float(v_t[:8].mean() - v_t[8:].mean())
+    rec["convergence_cm_yr"] = conv * cm
+    rec["slip_cm_yr"] = float(slip_max) * cm if np.isfinite(slip_max) else float("nan")
+    if conv * cm > 0.05 and np.isfinite(slip_max):
+        rec["slip_ratio"] = float(slip_max / conv)
+        if rec["slip_ratio"] > float(params.uw_check_slip_ratio):
+            flags.append("slip")
+    rec["flags"] = flags
+    return rec, flags
 
 
 def trace_inset():
@@ -1490,15 +1617,19 @@ class FaultedMesh:
                         nudge[sec.getOffset(q) // width] = sign * 0.1 * S * np.asarray(n_hat)
         return nudge
 
-    def warm_start(self, V, P=None):
+    def warm_start(self, V, P=None, old_faults=None):
         """Initial guess from velocity (and pressure) on another mesh, the split copies
-        evaluated a hair inside their own side."""
+        evaluated a hair inside their own side; with uw_warm_shift and the source mesh's faults
+        (``old_faults``), read where the fault's own move puts each point (shift_by_fault)."""
         split_source = getattr(V.mesh, "_fault_point_pairs", None)
+        shift = bool(int(params.uw_warm_shift)) and old_faults and self.faults
 
         def at(var, source, coords):
             points = np.asarray(coords, dtype=float)
             if split_source:
                 points = points + self.split_nudges(var)
+            if shift:
+                points = shift_by_fault(points, self.faults, old_faults)
             return np.asarray(uw.function.global_evaluate(source.sym, onto(points)))
 
         self.v.array[:, 0, :] = at(self.v, V, model_xy(self.v)).reshape(-1, 2)
@@ -2526,7 +2657,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
@@ -2646,6 +2777,7 @@ def needs_rebuild(faults, built):
 if str(params.uw_placement_refused) not in ("stop", "keep"):
     raise ValueError(f"-uw_placement_refused {params.uw_placement_refused}: stop or keep")
 stopped = None                              # why the run ended early (uw_placement_refused stop)
+flagged_run = 0                             # fault-check flags in a row (uw_check_stop_steps)
 last_ckpt = int(params.uw_restart)          # the last step with a checkpoint on disk (-1: none)
 base_moved = False                          # the base has moved since the faulted mesh was built (uw_mmpde_every)
 for k in range(k0, k0 + params.uw_steps):
@@ -2695,7 +2827,7 @@ for k in range(k0, k0 + params.uw_steps):
             # failed to converge (measured on forming a second fault). solve() retries cold
             # if the warm start does not converge.
             t_warm = time.perf_counter()
-            faulted.warm_start(previous.v, previous.p)
+            faulted.warm_start(previous.v, previous.p, previous.faults)
             t_warm = time.perf_counter() - t_warm
             faulted.stokes.newton_switch_rtol = params.uw_rebuild_newton_switch
             mesh_rec = faulted.mesh_record
@@ -2810,6 +2942,13 @@ for k in range(k0, k0 + params.uw_steps):
                  "step": record["t_step"]}})
     if move:
         record["mmpde"] = move
+    check, check_flags = fault_checks(faulted.faults, faults, float(rec.get("slip_max", float("nan"))))
+    record["fault_check"] = check
+    flagged_run = flagged_run + 1 if check_flags else 0
+    if check_flags:
+        uw.pprint(f"  FAULT CHECK flagged ({', '.join(check_flags)}; {flagged_run} in a row): fit "
+                  f"{check.get('fit_km', float('nan')):.0f} km, slab {check.get('slab_km')}, top "
+                  f"{check.get('top_km', float('nan')):.0f} km, slip/convergence {check.get('slip_ratio', float('nan')):.2f}")
     records.append(record)
     described = " ".join(f"{f['name']}@{np.degrees(f['theta']):.1f}/{f['dip']:.0f}/{f['depth']:.2f}"
                          f"(slip {rec['slip'].get(f['name'], float('nan')):.0f})" for f in faults) or "none"
@@ -2827,6 +2966,15 @@ for k in range(k0, k0 + params.uw_steps):
         solver["wall"]["checkpoint"] = round(time.perf_counter() - t_phase, 3)
         if k == k0 + params.uw_steps - 1:
             write_records(records)
+    if int(params.uw_check_stop_steps) > 0 and flagged_run >= int(params.uw_check_stop_steps):
+        stopped = f"the fault check flagged {flagged_run} steps in a row to step {step} ({', '.join(check_flags)})"
+        if last_ckpt < step:
+            checkpoint(step, t, records, faulted, faults, next_id,
+                       {"k": k + 1, "n_built": n_built, "refused": refused, "last_damage": last_damage})
+            last_ckpt = step
+        write_records(records)
+        stopped += f"; step {last_ckpt} checkpointed"
+        break
     step += 1
 
 if stopped:
