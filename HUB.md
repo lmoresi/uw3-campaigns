@@ -4947,3 +4947,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Why R6 also failed: the march runs on the ocrust particles with a fixed step ds = 0.005 (14.5 km), keeping particles within 1.5 x crust_thick of its path. With crust_thick 7 the band was 10.5 km, and the line left it at the hinge, whatever the cell size.
   - So the fit's scales (14.5 km march, 58 km spline smoothing) are the same in R6c and R17c. The box refines the mesh and the fault's rungs (6 km), not the fit. The fit gains nothing from the box.
 - Correction (K1): the 11.3 km tracer layer is not weak (-uw_crust_weak 0.999). R6c/R17c have no weak crust at all; the 7 km crust exists only as fit geometry (crust line at 7 km, fault 3 km above it).
+
+### 2026-11-27 — R6c/R17c (4978) invalid, fault frozen; fit-fail guard (K1 907369c → a250e8f); R6d/R17d
+- The fit failed on most steps ("the march along the melange layer stopped at depth 0.006-0.029"; "the fault keeps its place").
+  - R17c: 227 of ~236 fits failed, the first at step 5.
+  - R6c: 111 failures against 22 successes, the first at step 18.
+  - The fault stayed at an early fit while the slab moved away: the apparent detachment in closeup_r6c_r17c.png. The checks flagged it (R17c top 267 → 525 km, slip/convergence 0.27-0.29), but recorded only.
+  - Cause (K1): the 7 km fitting line lies above the split's top (one rung: 17 km in R17c, about 6 km in R6c), so at the trench it is dragged through the welded layer and the march cannot follow it round the hinge. The recipe's 17.4 km line worked (S3/S4).
+  - Everything after step 5 (R17c) and step 18 (R6c) is invalid. K1 cancelled the job.
+- 907369c (on 430b0ed, blob e41f56b), verified (.gz and mbox sha match). A failed fit while the run has a fault counts, and a good fit resets the count. -uw_fit_fail_stop (default 10) failures in a row stop the run (exit 3, checkpointed).
+- Next: R6d/R17d, as R6c/R17c but with the recipe's fitting line (-uw_ocrust_depth_km 17.4 -uw_fault_above_ocrust_km 7, fault ~10 km down), fit-fail guard on. A 7 km crust goes into the mechanics later, as its own step.
+- Hub review:
+  - Two launches (4977, 4978) were lost because each changed the set-up, the crust and the resolution at once. R6d/R17d now change only set-up and resolution against S3n; keep it that way.
+  - The top check caught the frozen fault from early on, but recorded only. For a new set-up, run with uw_check_stop_steps > 0 (for example 20), so a misplaced fault ends the run instead of costing a job.
