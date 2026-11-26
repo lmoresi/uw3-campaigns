@@ -4960,3 +4960,21 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Hub review:
   - Two launches (4977, 4978) were lost because each changed the set-up, the crust and the resolution at once. R6d/R17d now change only set-up and resolution against S3n; keep it that way.
   - The top check caught the frozen fault from early on, but recorded only. For a new set-up, run with uw_check_stop_steps > 0 (for example 20), so a misplaced fault ends the run instead of costing a job.
+
+### 2026-11-27 — Louis: regroup on the best recipe; Q10/Q17 (job 4982); WORKBENCH_LESSONS.md
+- Louis: "Let's hold for a moment and re-group. Boundary layers are largely self-similar ... go back to our best-working recipe and first make sure it still works with the new asthenosphere parameters ... a small amount of mesh-refinement ... lock in any gains in understanding. THEN we can start to thin the plate / turn up the heat / rescale."
+  - His picks: no channel; 10 km cells near the trench at about the same cost; the old overriding side (strip + continent).
+- Invalid and superseded: R6c/R17c, and R6d (4981, cancelled) and R17d (stopped itself at step 14: fit failed 10 in a row, a 17.4 km line against a 17 km rung under an 80 Myr overriding plate).
+- Rsw, "the best recipe with the fix": 282 good fits and 47 failed (first at step 8). Convergence 1.1 cm/yr at 220 Myr, 2.5-3.7 afterwards. Slip/convergence 1.21-1.33. The top drifts +137 km at 256 Myr and +460 km at 359 Myr.
+- Job 4982 (driver 907369c = kaiju/slab-workbench a250e8f, from step 0):
+  - Q10: Yg20's recipe (Y4 law, 40 km zone both sides, damage yielding 0.5, strain weakening and healing, slip-damage sigma 20, ocrust 17.4 km line, tangent top) on the base-file mantle (no channel, 1e21, x30 below 670) with the old overriding side. Kept: halo -1, no jump limit. Box: 10 km, ±600 km, centred -150 km, to 300 km, growth 0.3, -uw_cell_inner 0.6897, giving 112,768 fine cells against 114,176 today.
+  - Q17: the same on today's mesh.
+- WORKBENCH_LESSONS.md (K1, 14 rules and findings with their runs, plus the checks for every run): verified (.gz and mbox sha match, blob 77c96db). Pushed to zg95-annulus-for-kaiju as e8fb7bc, linked from a new DECISIONS entry (ebdd6fd).
+- Hub review:
+  - Q10 against Q17 differs by mesh only, at matched cost. Good.
+  - Rsw's 47 failed fits make the fit-fail stop (10 in a row) a real risk on the recipe's own line; report fit counts early.
+  - Rsw's top drift (+460 km by 359 Myr) is the Un/S2f failure arriving late. The "best recipe" holds to about 250 Myr, not throughout.
+  - Lessons file, to tighten in its next revision:
+    - Rule 9 needs the caveat that the split's own jump biases the shear peak toward the fault.
+    - Rule 5 cites R6d as holding, though R6d was cancelled; state how far it ran.
+    - Rule 11 cites S2f as a fault that stays on the slab, though S2f's top ran off from ~20 Myr; that holds only at depth.
