@@ -33,3 +33,18 @@ that. Why 1.1:
 
 The cell size here is the mean edge length in the trace's bounding box, grown by a tenth of its
 diagonal, SUM-reduced over the ranks with an in-place Allreduce. Every rank gets the same number.
+
+## test_1120, done in the row 29 WIP (hub's ruling)
+- **What moved it:** the snap (0.1 to 0.3), not the pull. The trace has two points, and pulling
+  every sample gives bit-identical ratios. An explicit snap_frac=0.1 does not restore the recorded
+  edges either: the add-on levels' cuts take the snap too (`w1120.py`).
+- **The moved-0.015 case** now uses the trace shifted down by 0.01, chosen from a scan of eight
+  offsets (`scan1120.py`). It makes 3 weak copies (all 0), with the weakest sound copy at 0.743.
+- **The relation,** in every case: the copies below the median are split at their largest
+  multiplicative jump, and `needs.max() < _WEAK_COPY < sound.min()` must hold. A case that makes
+  no weak copy FAILS, so a platform that meshes one away shows.
+- **Measured margin at rest:** 0.140 against `_WEAK_COPY` = 0.1. The constant is not moved.
+- **No mesh fixture reaches a non-zero weak copy with margin under row 29's snap.** The nearest is
+  dy -0.015, at 0.090 against 0.1. So `test_the_weak_copy_comparison` tests the comparison itself
+  on hand-made norms: copies at 0.5, 0.9, 1.0 and 1.5 times the threshold, strict at the
+  threshold, and invariant under scaling.
