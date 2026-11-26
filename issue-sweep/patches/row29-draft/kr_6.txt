@@ -1,0 +1,3 @@
+box_reg KREF kink90_7  cells/side 12: slip 0.08629
+box_reg KREF kink90_7  cells/side 24: slip 0.08075
+box_reg KREF kink90_7  cells/side 48: slip 0.08081

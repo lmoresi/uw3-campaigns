@@ -81,3 +81,29 @@ diagonal, SUM-reduced over the ranks with an in-place Allreduce. Every rank gets
 
   Development's trace 1 at 48 is the silent 38 % low fault. Smallest cell angle under the final
   rule: 15.7 to 36.9 degrees.
+
+## Row 29 restacked on labels70-22 0007 (head a2a8b544)
+Row 29 chooses which samples to pull, and 0007's `_in_pull_order` (judged on the full trace)
+orders them. Row 29's turn threshold is now 0007's `_TURN_DEG`.
+- **Suite:** 12 failed, 425 passed, 1 skipped. The 12 are the moved baselines above, less test_1120
+  (converted, passing).
+- **Grid** (`c29s7_box_*.jsonl`):
+  - 412 added; 9 bad against the one-cell reference; median error 0.20 %;
+  - every added fault within 0.146 cells of its trace;
+  - no turn off the chain.
+- **The 9 "bad" faults against refinement** (12/24/48 cells per side, `kref.py`, `kr_*.txt`):
+
+| Fault | Row 29 at 12 | Converged (48) | Row 29 error | One-cell reference error |
+|---|---|---|---|---|
+| box_irr kink150_3 | 0.1390 | 0.0865 | +61 % | −12 % |
+| box_reg kink150_3 | 0.1341 | 0.0856 | +57 % | −10 % |
+| box_irr kink90_4 | 0.0501 | 0.0333 | +51 % | +75 % |
+| box_reg kink90_0 | 0.0430 | 0.0393 | +9.4 % | +35 % |
+| box_reg kink90_7 | 0.0863 | 0.0808 | +6.8 % | −3.7 % |
+| box_irr kink90_9 | 0.0487 | 0.0456 | +6.7 % | +26 % |
+
+- **The hairpins** (kink150_3) are UNFILED 84.
+- **kink90_4:** the 1/12 mesh is far from converged for this 90-degree kink, whatever the rule. Its
+  one-cell reference is 75 % off.
+- **The other three** are 7-9 % above the converged slip. The one-cell reference misjudges these
+  six faults by −12 % to +75 %.
