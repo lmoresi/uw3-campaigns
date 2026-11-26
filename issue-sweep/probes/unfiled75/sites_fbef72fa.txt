@@ -1,0 +1,89 @@
+adjoint.py:963 | MAX | local
+constitutive_models.py:2927 | MAX | local
+constitutive_models.py:2971 | MIN | local_min
+constitutive_models.py:2972 | MAX | local_max
+cython/petsc_generic_snes_solvers.pyx:2104 | MAX | local_nonzero
+cython/petsc_generic_snes_solvers.pyx:2575 | MAX | int(values.size != b.getLocalSize())
+cython/petsc_generic_snes_solvers.pyx:2661 | MAX | int(out.size != n_solver)
+cython/petsc_generic_snes_solvers.pyx:4554 | MAX | failed
+cython/petsc_generic_snes_solvers.pyx:4558 | MIN | int(pressure is not None)
+cython/petsc_generic_snes_solvers.pyx:10011 | MAX | int(bool(self.mesh.isSimplex) and u_degree == 1)
+cython/petsc_generic_snes_solvers.pyx:12690 | MAX | int(any(interior_pts.values()))
+cython/petsc_generic_snes_solvers.pyx:13488 | MAX | int(values.size != b.getLocalSize())
+cython/petsc_generic_snes_solvers.pyx:13600 | MAX | int(n != velocity_dual.size)
+cython/petsc_generic_snes_solvers.pyx:14166 | MAX | max_magvel
+discretisation/discretisation_mesh.py:270 | MAX | int(h5plex.getCoordinatesLocal().getBlockSize())
+discretisation/discretisation_mesh.py:2275 | getattr | val
+discretisation/discretisation_mesh.py:2367 | <positional> | [_angle_deg(edge_a
+discretisation/discretisation_mesh.py:2371 | <positional> | [edge_a
+discretisation/discretisation_mesh.py:4449 | MAX | local
+discretisation/discretisation_mesh.py:9096 | MIN | local_min
+discretisation/discretisation_mesh.py:9118 | MAX | local_max
+level_set.py:511 | MIN | local
+level_set.py:518 | MAX | float(coords[:
+level_set.py:520 | MIN | float(coords[:
+level_set.py:550 | op | float(local_extreme)
+materials.py:1033 | <positional> | [_condition_mask(a
+materials.py:1036 | <positional> | [_condition_mask(a
+meshing/smoothing/graph.py:26 | MIN | float(value)
+meshing/smoothing/graph.py:33 | MAX | float(value)
+meshing/smoothing/metrics.py:495 | <positional> | np.array([pEnd - pStart
+mpi.py:108 | MAX | int(message is not None)
+swarm.py:3679 | MAX | global_count
+swarm.py:3708 | MAX | int(needs_migration)
+swarm.py:3728 | MAX | int(stale)
+swarm.py:6133 | MAX | max_magvel
+systems/advection_diffusion_eulerian.py:661 | MIN | float(values.min()) if values.size else np.inf
+systems/advection_diffusion_eulerian.py:662 | MAX | float(values.max()) if values.size else -np.inf
+systems/advection_diffusion_eulerian.py:699 | MAX | local
+systems/advection_diffusion_eulerian.py:746 | MAX | local
+systems/ddt.py:1196 | MAX | moved
+systems/free_surface.py:27 | MAX | float(np.abs(a).max()) if np.size(a) else 0.0
+systems/free_surface.py:1526 | MAX | local_max
+systems/navier_stokes_eulerian.py:562 | MAX | float(speed.max()) if speed.size else 0.0
+systems/navier_stokes_eulerian.py:650 | MAX | float(change)
+systems/navier_stokes_eulerian.py:651 | MAX | float(scale)
+systems/navier_stokes_eulerian.py:661 | MAX | local
+systems/solvers.py:351 | MAX | local_max
+systems/solvers.py:454 | MIN | loc
+systems/solvers.py:735 | MAX | int(split)
+systems/solvers.py:2318 | MAX | moved
+systems/solvers.py:2319 | MAX | scale
+systems/solvers.py:3026 | MIN | min_dt_local
+systems/solvers.py:6166 | MAX | max_magvel
+systems/yield_continuation.py:346 | MAX | int(np.isnan(ratio).any())
+systems/yield_continuation.py:349 | MAX | local
+utilities/_cylindrical_dirichlet.py:495 | MAX | float(np.max(np.abs(stokes.u.array - previous)
+utilities/_cylindrical_pressure.py:229 | MAX | moment_error
+utilities/_cylindrical_wall.py:309 | MAX | float(np.max(np.abs(stokes.u.array-previous)
+utilities/_pressure_split.py:286 | MAX | residual
+utilities/agreed_build.py:114 | <positional> | value
+utilities/boundary_flux.py:241 | MAX | max((m for _q
+utilities/boundary_flux.py:619 | MAX | max((lsec.getFieldDof(e
+utilities/custom_mg.py:2800 | MAX | local
+utilities/edge_split.py:137 | MIN | local[0] if local.size else np.inf
+utilities/edge_split.py:138 | MAX | local[-1] if local.size else -np.inf
+utilities/fault_mg.py:884 | MIN | int(_split_record(fine) is not None and _split_record(coarse) is not None)
+utilities/fault_mg.py:1192 | <positional> | int((uniq[:
+utilities/fault_mg.py:1593 | MAX | float(n2.max()) if n2.size else 0.0
+utilities/fault_split.py:2124 | MAX | int(ids.max()) if ids.size else 0
+utilities/fault_split.py:2664 | MAX | len(comps)
+utilities/line_cut.py:511 | MAX | int(fresh.any())
+utilities/line_cut.py:517 | MIN | int(np.array_equal(proposed
+utilities/line_cut.py:1298 | MAX | int(shared[cS - pStart:cE - pStart].any())
+utilities/line_cut.py:1395 | MIN | local
+utilities/line_cut.py:1455 | MIN | float(after[ruined].min()) if ruined.any() else np.inf
+utilities/nd_array_callback.py:1163 | MAX | float(local_max)
+utilities/nd_array_callback.py:1170 | MAX | float(local_arr[i])
+utilities/nd_array_callback.py:1234 | MIN | float(local_min)
+utilities/nd_array_callback.py:1241 | MIN | float(local_arr[i])
+utilities/place_surface.py:999 | MIN | end_wall
+utilities/place_surface.py:1705 | MAX | int(ids_in.max()) if ids_in.size else 0
+utilities/place_surface.py:1796 | MAX | int(ids_in.max()) if ids_in.size else 0
+utilities/place_surface.py:6949 | MAX | len(soup_segs)
+utilities/place_surface.py:7197 | MAX | len(soup_tris)
+utilities/rotated_bc.py:1221 | MAX | int(constrained)
+utilities/rotated_bc.py:1224 | MIN | none if lowest is None else int(lowest)
+utilities/rotated_bc.py:4110 | MIN | float(d.min()) if d.size else np.inf
+utilities/rotated_bc.py:4111 | MAX | float(d.max()) if d.size else -np.inf
+88 sites
