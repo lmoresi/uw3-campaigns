@@ -5001,3 +5001,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - step 38 (frozen): -90 (24 km) / -51 (51 km) | -3 km
   - step 42 (recovered): -86 (24 km) / -43 (52 km) | -3 km
 - Verdict: valid. The decisive evidence is that the recovered fit at step 42 matches the stale fault at step 38 within a few km at both depths. The fault's being "inside the cold region" is not evidence either way (lessons rule 9). The slab shifted 20-45 km relative to the fault over the interval.
+
+### 2026-11-27 — Q17 guard stop; Q10 cancelled; fit_gap patch (54d9b3b) not received intact; Q10b/Q17b
+- Q17 was stopped by the fit-fail guard at step 22 (15.9 Myr; failures at steps 12-21). K1 cancelled Q10 at step ~44 (16 Myr), after 31 good and 10 failed fits in runs of 4-5.
+  - The marches stopped at 0.05-0.09 (145-260 km), not at the hinge.
+  - line_spacing.py: the ocrust line is evenly 4.2 km apart except where it tears. At 100-150 km the count fell from 15 particles to 4 by step 12; at 200-300 km it was 2-3 particles, 11-25 km apart, by step 22.
+  - Renders (closeup_q.png, visc_edot_Q17.png): the upper slab steepens to vertical in ~10 Myr while the prescribed 45 deg tip, cold and strong, sits on the 670 step. This makes an S-kink at 300-400 km with the highest strain rate, and the line tears on the kink's outer arc.
+  - Verdict on the stop: the frozen interval is not valid (no recovered fit).
+- Louis: "The necking in the upper plate is probably because we seed the slab with a solution that has way too much cold material above the fault ... The fact that the particles are stretched apart means there are not enough of them ... we should be able to find particles to link up."
+- 54d9b3b (-uw_fit_gap_km: where the march finds < 3 particles it looks ahead up to that distance in the same band and links to the nearest; default 0): NOT verified. The base64 has a block of the earlier lessons piece l_00 spliced into it, so it fails to decode (gzip CRC error, sha 96e8464... against the stated cac62ad...). Also stated as "on 8ac2588", which is the lessons commit, not the workbench head (a250e8f). Resend requested.
+- Next (K1): Q10b/Q17b, as Q10/Q17 with -uw_crust_line_spacing_km 1 (4x denser) and -uw_fit_gap_km 60, driver 54d9b3b, from step 0.
+- Hub review:
+  - Louis's question ("first make sure it still works with the new asthenosphere parameters") has an answer: as it stands, it does not. On the weak mantle the recipe's fit fails within ~16 Myr in both meshes.
+  - The tear sits on the S-kink that the prescribed 45 deg tip makes against the 670 step, so the initial slab geometry is a cause, not only particle density. Denser particles and gap-linking treat the fit; the seed (Louis's "too much cold material") is the other lever.
+  - A 60 km look-ahead is four march steps. Check that the link never lands on another limb of the S-kink.
