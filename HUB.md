@@ -4994,3 +4994,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - after: 42, 223: 1.16|632|-15; 70, 250: 1.88|879|-66
 - The hang (41-146 Myr, 0.05-0.2 cm/yr) comes before the frozen interval. Convergence rises smoothly through it and carries on the same trend after step 42, with no jump at either end. The trench moved 15 km. K1 verdict: valid; Rsw stands as the comparison. Guard stops in Q10/Q17 get the same check and a recorded verdict.
 - Hub: accepted. The trench drift is a surface measure, while the slab tip went down 77 km during the interval. fault_on_slab at 150/300 km at step 38 would close the depth side.
+
+### 2026-11-27 — Rsw frozen interval, depth side: closed, valid
+- fault_on_slab.py (now takes a step list) on Rsw, fault against the slab's cold core at 150 / 300 km (|offset| minus half-width; offset) and top drift:
+  - step 12: -147 (4 km) / -121 (6 km) | -22 km
+  - step 38 (frozen): -90 (24 km) / -51 (51 km) | -3 km
+  - step 42 (recovered): -86 (24 km) / -43 (52 km) | -3 km
+- Verdict: valid. The decisive evidence is that the recovered fit at step 42 matches the stale fault at step 38 within a few km at both depths. The fault's being "inside the cold region" is not evidence either way (lessons rule 9). The slab shifted 20-45 km relative to the fault over the interval.
