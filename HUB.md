@@ -5035,3 +5035,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Hub review:
   - Where the line has torn, re-seeding fills the gap with particles placed by the last fault, and the next fit goes through them. There the fit tracks its own previous answer, advected one step. ref_km is the only independent check, so it should flag (for example past uw_check_fit_km), not only record.
   - With re-seeding on, the chain refill is off for the whole line, including the incoming plate and ridge end it used to cover. Asked K1 to confirm the incoming plate's line is still maintained.
+
+### 2026-11-27 — K1 answers on 0bf494f
+- Incoming plate's line: ridge_crust still refills every 5 steps, independent of uw_line_reseed. It lays the melange lattice and the ocrust line's surface points inside ridge_crust_window wherever none lie within 0.75 spacings. Between the window and the trench the plate is rigid, so spacing holds; inside the trench the re-seeding covers it. The bend just seaward of the trench has no active feed, so line_spacing.py will be run there at each report.
+- ref_km stays record-only for Q10b/Q17b and goes in every segment report, along with good/failed fits, gap links (count, max length, max lateral) and re-seeded particles per fit. If it behaves sensibly, it becomes a flag in the next driver commit, at uw_check_fit_km unless the numbers say otherwise. Hub: accepted.
