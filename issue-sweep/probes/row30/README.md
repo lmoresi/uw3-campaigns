@@ -86,3 +86,35 @@ Largest slip at 12 / 24 / 48 / 96 cells per side, base against pinned:
   0.041, 0.073 against 0.069, 0.040, 0.063). In the one 90-degree case where the default normal is
   also 45/45, the two give the same nonzero jump (0.018).
 - **Why it gives zero at some 90-degree apexes is not established.**
+
+## 3-D: a creased sheet (`crease.py`, add_fault's 3-D path with a triangulated sheet)
+**Set-up:** two planar facets 0.25 wide meeting along a crease parallel to x (half-length 0.25),
+turned by 60, 90 or 120 degrees. The sheet is triangulated at 0.03, with each quad's diagonal
+chosen to leave no all-rim triangle. The box is sheared in y-z, so the slip crosses the crease;
+the fault is frictionless.
+
+**The probe patch:** at each crease pair the pair block is rewritten in the frame (averaged
+normal, w = averaged normal × crease direction, crease direction), and the jump along w is
+constrained too. That holds the jump along both sheets' normals and leaves slip free along the
+crease.
+
+| Turn | Cell size (cells) | Opening at the crease, default / pinned | Largest slip, default / pinned | Slip along the crease, default / pinned | Velocity its, default / pinned |
+|---|---|---|---|---|---|
+| 60 | 0.06 (24k) | 0.0246 / 0 | 0.1203 / 0.1145 | 0.049 / 0.009 | 81 / 77 |
+| 60 | 0.045 (56k) | 0.0252 / 0 | 0.1212 / 0.1151 | 0.051 / 0.014 | 76 / 74 |
+| 60 | 0.034 (123k) | 0.0255 / 0 | 0.1219 / 0.1158 | 0.051 / 0.017 | 75 / 74 |
+| 90 | 0.06 / 0.045 / 0.034 | 0.0053 / 0.0039 / 0.0030 against 0 | 0.1056 / 0.1064 / 0.1070, the same pinned to 0.03 % | 0.015-0.024, the same | 82 / 76, 78 / 75, 72 / 68 |
+| 120 | 0.06 / 0.045 / 0.034 | 0.012 / 0.010 / 0.010 against 0 | 0.1188 / 0.1192 / 0.1200, the same pinned to 0.05 % | 0.017-0.025, the same | 82 / 81, 80 / 80, 75 / 74 |
+
+- **The crease opens under the default constraint, as the 2-D apex does.** At a 60-degree turn it
+  opens by 0.025 at every level (about 21 % of the slip), and the opening feeds a false slip along
+  the crease (0.05 against 0.01-0.02 pinned). At 90 degrees it decays; at 120 it does not.
+- **The largest slip** is unaffected at 90 and 120 degrees. At 60 the default is 5 % above the
+  pinned value at every level.
+- **The limit of this measurement:** the crease has 33 pairs at every level. The placement
+  conforms the mesh to the sheet's own triangulation (0.03), so refining the box does not refine
+  the fault surface, and the constant 5 % gap at 60 degrees cannot be resolved into a common limit
+  or two different ones. That needs the sheet refined with the box; at 123k cells a solve takes
+  about 10 minutes on the laptop. Not run.
+- **The two-dimensional conclusions carry over:** opening at the turn, no iteration cost, and the
+  pinned frame is consistent. Convergence in 3-D is unshown.
