@@ -14,8 +14,8 @@ ops (LAND, LOR, BOR, LXOR, BAND), and lists the rest with the first argument (`s
 `bool(...)`, a conditional scalar) was traced back to its definition.
 
 ## Verdict: no site reduces an array under MIN, MAX or a custom op; nothing to convert
-- 51 sites wrap the argument as a scalar at the call.
-- The 37 others, traced:
+- Most sites wrap the argument as a scalar at the call.
+- Every other site, traced:
   - **Python floats:** adjoint 963; constitutive_models 2927, 2971, 2972; mesh 9096, 9118;
     level_set 511; the advection-diffusion, navier-stokes, ddt, free-surface and solvers sites;
     yield_continuation 349; _cylindrical_pressure 229; _pressure_split 286; place_surface 999;
