@@ -4978,3 +4978,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
     - Rule 9 needs the caveat that the split's own jump biases the shear peak toward the fault.
     - Rule 5 cites R6d as holding, though R6d was cancelled; state how far it ran.
     - Rule 11 cites S2f as a fault that stays on the slab, though S2f's top ran off from ~20 Myr; that holds only at depth.
+
+### 2026-11-27 — lessons rev 1 (K1 8ac2588 → bdc2e26); Rsw's fit failures; hub correction withdrawn
+- Withdrawn: the hub's follow-up message to K1 said S2f's 1800-2700 km run-off was Un/Un24 only. That was wrong. fault_on_slab.py on S2f: top drift +117 km at 19.4 Myr, +744 at 36.5, +1333 at 52.9, +1887 at 68.1, +2150 at 86.0, +2164 at 106.3 Myr. The fault stayed on the slab at 150 and 300 km. The ca9726e HUB entry ("S2f's top ran off from ~20 Myr") stands.
+- Rsw's 47 failed fits: 8 singles, plus runs of 4 (from step 8), 28 (steps 14-41, while the slab hung; marches stopping at about 0.015-0.016) and 7 (from step 103). The 10-in-a-row guard would have stopped Rsw at about step 23.
+  - Hub: so the "best recipe" ran 28 steps on a frozen fault in its own reference run. Rsw's early period is suspect on the same grounds as R6c/R17c.
+  - K1's policy: a guard stop is resumed from its checkpoint with a higher -uw_fit_fail_stop and inspected, not discarded. Hub: acceptable, provided the inspection decides whether the frozen interval is valid, not only whether the run recovers.
+- Rsw is a comparison for Q10/Q17, not a control: it has the old stiff mantle with the T-switched channel.
+- Rev 1 of WORKBENCH_LESSONS.md, verified (.gz and mbox sha match) and pushed to zg95-annulus-for-kaiju as bdc2e26. Rule 5: R6d held its first 7 fits; Rsw's failure pattern; guard stop means resume and inspect. Rule 9: the split-bias caveat and the slip/velocity-difference test. Rule 11: "at depth", with S2f before its top ran off.
