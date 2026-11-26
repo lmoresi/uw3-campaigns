@@ -378,6 +378,12 @@ params = uw.Params(
                                 #   uw_fault_jump_rungs applies only from this model time on; before it the fit moves
                                 #   freely (and the search is centred on the surface point), so the fault can follow the
                                 #   prescribed slab while it steepens. 0: the limit from the start
+    uw_fit_gap_km=0.0,          # > 0 (Louis, 2026-11-27: "The fact that the particles are stretched apart means there are not
+                                #   enough of them ... Either way, we should be able to find particles to link up"): where the
+                                #   march along the line finds too few particles in its window, it looks ahead along its
+                                #   direction up to this far, within the same band, and links to the nearest particle there
+                                #   instead of counting a miss (Q10/Q17: the line torn round a kink at 200-300 km, 2-3
+                                #   particles 11-25 km apart). 0: no look-ahead (every run to 2026-11-27)
     uw_spline_length_km=58.0,   # the smoothing length L: lam = L^4 / 0.005 in model lengths (offline on 12 stored
                                 #   checkpoints, 2026-11-12: radius of curvature 0.04-0.13; 0.012 kinked at the wedge)
     uw_wall_normal="analytic",  # the free-slip walls' normal: "analytic" (radial unit_r, every run to 2026-11-01) or
@@ -1186,6 +1192,17 @@ def crust_spline_points(faults):
             m = (np.abs(a) < ds) & (np.abs(n) < band)
             if m.sum() >= 3:
                 q, miss = q + np.median(n[m]) * left(t), -1
+        if miss >= 0 and float(model.fit_gap) > 0:     # too few here: link to the nearest particle ahead (uw_fit_gap_km)
+            gap = float(model.fit_gap)
+            base_pt = pts[-1]
+            near = tree.query_ball_point(base_pt + 0.5 * gap * t, 0.5 * gap + band)
+            if near:
+                rel = M[near] - base_pt
+                a, n = rel @ t, rel @ left(t)
+                ahead = (a > 0.25 * ds) & (a <= gap) & (np.abs(n) < band)
+                if ahead.any():
+                    k = np.flatnonzero(ahead)[np.argmin(a[ahead])]
+                    q, miss = base_pt + a[k] * t + n[k] * left(t), -1
         miss += 1
         if miss > 6:
             break
@@ -2665,7 +2682,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_fit_gap_km", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
