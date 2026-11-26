@@ -1,22 +1,24 @@
-From 3e603a9694f90cfc479a21e6164acdc7ae01bfb8 Mon Sep 17 00:00:00 2001
+From 3fca66677ccfcfe371d57bf9f8e07f14e1314a32 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Thu, 26 Nov 2026 17:09:21 +1100
 Subject: [PATCH] docs: a developer's home-directory paths become placeholders
 
 Examples, design notes and review records under docs/ carried absolute paths
 in two developers' home directories: checkpoint directories, simulation
-output, worktrees and a downloaded reference. Each is now a placeholder,
-~/path/to/..., keeping the part that names what the path is (the simulation
-or the worktree). 44 lines in 17 files.
+output, worktrees and a downloaded reference. Each is now a placeholder that
+keeps the part naming what the path is (the simulation or the worktree):
+~/path/to/... in prose and shell comments, and path/to/... inside Python
+strings, where a ~ is never expanded. 44 lines in 17 files.
 
-An example's checkpoint_dir or a script's FIG now reads as a placeholder to
-set, as the original path did on any other machine.
+No code change; seven example path values (a checkpoint_dir, outdir or FIG)
+become placeholders to set, as the original paths were on any other machine.
 
 Left as they are: the saved PETSc traceback in the stderr output of cell 11
 of the Richards wetting-front tutorial notebook (quoted output), and a path
 inside a binary spreadsheet in a WIP example.
 
 Text only: in the Python files only comments and string constants change.
+Two commented-out lines that joined two paths by mistake keep the second.
 
 Underworld development team with AI support from Claude Code
 ---
@@ -105,7 +107,7 @@ index 7b49ccf9..58669887 100644
  
  The two-Stokes investigation is the bridge between the ETD work and a production-quality VEP+yield solver.
 diff --git a/docs/developer/design/fault_hierarchy_render.py b/docs/developer/design/fault_hierarchy_render.py
-index 432706b8..f19794dc 100644
+index 432706b8..da94b7d2 100644
 --- a/docs/developer/design/fault_hierarchy_render.py
 +++ b/docs/developer/design/fault_hierarchy_render.py
 @@ -12,7 +12,7 @@ import pyvista as pv
@@ -113,7 +115,7 @@ index 432706b8..f19794dc 100644
  pv.OFF_SCREEN = True
  
 -FIG = "/Users/lmoresi/+Simulations/fault_network_3d_parallel/figures"
-+FIG = "~/path/to/simulations/fault_network_3d_parallel/figures"
++FIG = "path/to/simulations/fault_network_3d_parallel/figures"
  H, W = 0.08, 0.04
  def patch(x0, x1, y, z0=0.4, z1=0.6):
      return np.array([[x0, y, z0], [x1, y, z0], [x1, y, z1], [x0, y, z1]])
@@ -131,7 +133,7 @@ index cbef13f3..21c0c04a 100644
  
  **Do not move this directory.** PETSc hardcodes paths at configure time, so
 diff --git a/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py b/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
-index 40f079d9..3766b4e0 100644
+index 40f079d9..8d54be7c 100644
 --- a/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
 +++ b/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
 @@ -57,7 +57,7 @@ Pdeg = Vdeg - 1
@@ -139,12 +141,12 @@ index 40f079d9..3766b4e0 100644
  
  # %%
 -outdir      = "/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Couette/Couette-res16-order1-Pirr-np8"
-+outdir      = "~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Couette/Couette-res16-order1-Pirr-np8"
++outdir      = "path/to/uw3-dev/Navier-Stokes-benchmark/output-Couette/Couette-res16-order1-Pirr-np8"
  expt_name   = "Couette-res16-order1-Pirr_run0"
  idx = 50
  
 diff --git a/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py b/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
-index 2848c534..7fcdcd69 100644
+index 2848c534..9db08c09 100644
 --- a/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
 +++ b/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
 @@ -100,8 +100,8 @@ idx = idx - 1
@@ -153,13 +155,13 @@ index 2848c534..7fcdcd69 100644
  # %%
 -#outdir = f"/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
 -outdir = f"/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}-dt{dt_ns}-tstep10/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
-+#outdir = f"~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
-+outdir = f"~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}-dt{dt_ns}-tstep10/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
++#outdir = f"path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
++outdir = f"path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}-dt{dt_ns}-tstep10/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
  expt_name = f"Pois-res{resolution}-order{order}-{mesh_type}-case{case_num}_run{idx}"
  
  # %%
 diff --git a/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py b/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
-index a74ed845..0e1216d2 100644
+index a74ed845..652e0b35 100644
 --- a/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
 +++ b/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
 @@ -67,15 +67,15 @@ pv.global_theme.camera["position"] = [0.0, 0.0, 20.0]
@@ -167,13 +169,13 @@ index a74ed845..0e1216d2 100644
  step = 1 #50
  
 -# basename = "/Users/lmoresi/+Simulations/ShearTest/ShearTestHP_InclusionMu05/shear_band_sw_nonp_0.5"
-+# basename = "~/path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/shear_band_sw_nonp_0.5"
++# basename = "path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/shear_band_sw_nonp_0.5"
  basename = "output/shear_band_sw_nonp_0.5"
  
  
  # + language="sh"
 -# ls -trl "/Users/lmoresi/+Simulations/ShearTest/ShearTestHP_InclusionMu05/" | tail
-+# ls -trl "~/path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/" | tail
++# ls -trl ~/path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/ | tail
  
  # +
 -# # ls /Users/lmoresi/+Simulations/ShearTest/ShearMu05_res0.01
@@ -182,7 +184,7 @@ index a74ed845..0e1216d2 100644
  # +
  # Simplified (not periodic) mesh that covers the 
 diff --git a/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py b/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
-index c0ab8510..cdf3d798 100644
+index c0ab8510..13d54247 100644
 --- a/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
 +++ b/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
 @@ -97,14 +97,14 @@ import os
@@ -198,12 +200,12 @@ index c0ab8510..cdf3d798 100644
  step = 95
  
 -checkpoint_dir = "/Users/lmoresi/+Simulations/PorousFlow/viscousFingering_example_7"
-+checkpoint_dir = "~/path/to/simulations/PorousFlow/viscousFingering_example_7"
++checkpoint_dir = "path/to/simulations/PorousFlow/viscousFingering_example_7"
  checkpoint_base = "simpson_ViscousFinger"
  base_filename = os.path.join(checkpoint_dir, checkpoint_base)
  
 diff --git a/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py b/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
-index 88a5355e..91baed34 100644
+index 88a5355e..db387edf 100644
 --- a/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
 +++ b/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
 @@ -37,10 +37,10 @@ import sympy
@@ -215,12 +217,12 @@ index 88a5355e..91baed34 100644
  
  ###### checkpoint_dir = "../Examples-Convection/output"
 -checkpoint_dir = "/Users/lmoresi/+Simulations/InnerCore/ConvectionDisk"
-+checkpoint_dir = "~/path/to/simulations/InnerCore/ConvectionDisk"
++checkpoint_dir = "path/to/simulations/InnerCore/ConvectionDisk"
  checkpoint_base = f"Disc_Ra1e7_H1_deleta_1000.0"
  meshfile = os.path.join(checkpoint_dir, checkpoint_base) + ".mesh.05100.h5"
  
 diff --git a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
-index d11de1c3..65a82fec 100644
+index d11de1c3..a09fa22c 100644
 --- a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
 +++ b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
 @@ -53,21 +53,21 @@ import sympy
@@ -245,8 +247,8 @@ index d11de1c3..65a82fec 100644
  
 -checkpoint_dir = "/Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/Rho3e3/"
 -# checkpoint_dir = "/Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes//Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_DvDt_std"
-+checkpoint_dir = "~/path/to/simulations/NS_benchmarks/NS_Disc/Rho3e3/"
-+# checkpoint_dir = "~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/~/path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
++checkpoint_dir = "path/to/simulations/NS_benchmarks/NS_Disc/Rho3e3/"
++# checkpoint_dir = "path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
  
  checkpoint_base = "Cylinder_NS_rho_3000.0_30_dt0.1"
  base_filename = os.path.join(checkpoint_dir, checkpoint_base)
@@ -262,7 +264,7 @@ index d11de1c3..65a82fec 100644
  
  # -
 diff --git a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
-index 89af0315..a91a3bc2 100644
+index 89af0315..6cb60b72 100644
 --- a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
 +++ b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
 @@ -68,21 +68,21 @@ import sympy
@@ -287,8 +289,8 @@ index 89af0315..a91a3bc2 100644
  
 -checkpoint_dir = "/Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0"
 -# checkpoint_dir = "/Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes//Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_DvDt_std"
-+checkpoint_dir = "~/path/to/simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0"
-+# checkpoint_dir = "~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/~/path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
++checkpoint_dir = "path/to/simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0"
++# checkpoint_dir = "path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
  
  checkpoint_base = "NS_test_Re_1000_SLCN_60"
  base_filename = os.path.join(checkpoint_dir, checkpoint_base)
