@@ -311,6 +311,9 @@ params = uw.Params(
     uw_check_top_km=150.0,      # the fault's surface point against the trench (trench_point: the strongest convergence)
     uw_check_slip_ratio=1.5,    # the fault's largest slip rate over the plates' convergence across the trench (300-1000
                                 #   km each side): slip well above convergence is the fault slipping out of place
+    uw_fit_fail_stop=10,        # > 0: the run stops (exit 3) after this many failed fits in a row while it has a fault (the
+                                #   fault "keeps its place"): R6c/R17c, 2026-11-27, ran 85-95 % of steps on a fault frozen at
+                                #   an old fit while the slab moved away. 0: never
     uw_check_stop_steps=0,      # > 0: the run stops (exit 3, last step checkpointed) after this many flagged steps in a
                                 #   row; 0: flags are recorded only
     uw_warm_shift=0,            # 1 (Louis, 2026-11-26: "we need to make the warm start work when we remesh the fault ...
@@ -2662,7 +2665,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
@@ -2783,6 +2786,7 @@ if str(params.uw_placement_refused) not in ("stop", "keep"):
     raise ValueError(f"-uw_placement_refused {params.uw_placement_refused}: stop or keep")
 stopped = None                              # why the run ended early (uw_placement_refused stop)
 flagged_run = 0                             # fault-check flags in a row (uw_check_stop_steps)
+fit_fails = 0                               # failed fits in a row (uw_fit_fail_stop)
 last_ckpt = int(params.uw_restart)          # the last step with a checkpoint on disk (-1: none)
 base_moved = False                          # the base has moved since the faulted mesh was built (uw_mmpde_every)
 for k in range(k0, k0 + params.uw_steps):
@@ -2893,6 +2897,10 @@ for k in range(k0, k0 + params.uw_steps):
         found = crust_spline_points(faults)
         if found is None:
             uw.pprint(f"  {FIT_NAME}: no slab top reaching the cap from the surface; the fault keeps its place")
+            fit_fails += 1
+            if faults and int(params.uw_fit_fail_stop) > 0 and fit_fails >= int(params.uw_fit_fail_stop) and not stopped:
+                stopped = (f"the fit failed {fit_fails} times in a row to step {step}: the fault was left where an old "
+                           f"fit put it; see the fit's message above")
             if not faults and not stopped:
                 # Louis, 2026-11-25: "I don't want any models that have no fault" (hub DECISIONS: every model has a
                 # fault). A run whose first fit forms none stops (exit 3) rather than going on fault-free; the fit's
@@ -2900,6 +2908,7 @@ for k in range(k0, k0 + params.uw_steps):
                 stopped = (f"no fault formed at the first fit (step {step}): {FIT_NAME} found no slab top reaching the "
                            f"cap; see the fit's message above")
         else:
+            fit_fails = 0
             poly, theta_t, dip, depth, info = found
             if faults:
                 f = faults[0]
@@ -2977,7 +2986,11 @@ for k in range(k0, k0 + params.uw_steps):
         solver["wall"]["checkpoint"] = round(time.perf_counter() - t_phase, 3)
         if k == k0 + params.uw_steps - 1:
             write_records(records)
-    if stopped and not faults:                  # no fault formed (above): end the run, nothing to checkpoint
+    if stopped and (not faults or fit_fails):   # no fault formed, or the fit failing (above): end the run
+        if faults and last_ckpt < step:
+            checkpoint(step, t, records, faulted, faults, next_id,
+                       {"k": k + 1, "n_built": n_built, "refused": refused, "last_damage": last_damage})
+            last_ckpt = step
         write_records(records)
         break
     if int(params.uw_check_stop_steps) > 0 and flagged_run >= int(params.uw_check_stop_steps):
