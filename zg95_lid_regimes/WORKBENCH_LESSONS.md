@@ -22,7 +22,9 @@ Rules marked *ruled* are Louis's decisions; the rest are findings.
 5. **The fit follows a marker line, and that line must lie below the split's top** (where the frictionless part begins,
    about one rung below the surface). A line above it is dragged across the trench in the welded layer and the march loses it
    at the hinge: R6c/R17c (7 km line) froze the fault on 85-95 % of steps; R17d (17.4 km line, 17 km rung) failed from step 5
-   under an 80 Myr overriding plate; S3n/S4f (17.4 km line under the weak strip) and R6d (6 km rung) held. Louis, 27 Nov:
+   under an 80 Myr overriding plate; S3n/S4f (17.4 km line under the weak strip) held for 60-100 Myr, and R6d (6 km rung)
+   held its first 7 fits before it was cancelled. Rsw (the recipe line) failed 47 of 329 fits, once 28 in a row (steps 14-41,
+   while the slab hung): a run stopped by the guard is resumed with a higher limit and inspected, not discarded. Louis, 27 Nov:
    the marker is easier to fit than a smooth field.
 6. **No jump limit at start-up.** The one-rung limit made the fault cut across the steepening slab for ~10 Myr (S2f: the
    free fit up to ~140 km away, the fault moved 12-33 % per fit). Without it (S3n) the fault follows the slab; S3f (limit after
@@ -34,7 +36,9 @@ Rules marked *ruled* are Louis's decisions; the rest are findings.
    against 0.4-1.7 convergence). `fault_on_slab.py` flags the top's drift from its start (> +100 km).
 9. **Where the slab decouples is read kinematically, not thermally.** The peak along-dip shear across the slab top sits
    at the fault (+-12 km at 100-300 km, S3n_ns); the half-T edge reads 60-100 km off because cold overriding lithosphere is
-   dragged down on top (`kin_check.py`, `check_4974.py`).
+   dragged down on top (`kin_check.py`, `check_4974.py`). Caveat: the split's own velocity jump biases the peak toward the
+   fault, so compare the fault's slip rate at depth with the slab-to-wedge velocity difference over +-50 km as well; a
+   ratio well below 1 means the fault is there but not doing the work (S3n_ns step 58 at 200-300 km).
 
 ## The set-up
 
@@ -43,7 +47,7 @@ Rules marked *ruled* are Louis's decisions; the rest are findings.
     the slab; it yields over 150-350 km (plastic strain rate ~1e-14 /s at 150-250 km from the fault's top) and takes about
     half the convergence (S3n, S4f).
 11. **Without a fault the slab sinks two-sided** (S0, S1, S1o: vertical, trench fixed, both plates drawn in). With a fault
-    that stays on the slab it is one-sided at the same rate (S2f/S3n vs S1o): the slab's sinking sets the rate, the fault the
+    that stays on the slab at depth it is one-sided at the same rate (S3n; S2f before its top ran off, vs S1o): the slab's sinking sets the rate, the fault the
     geometry.
 12. **In the upper mantle the slab is at its yield stress** (~1e23 Pa s straining at 1e-15 to 1e-14.5 /s, S4f): the yield
     law sets its strength there. Below 670 km it is rigid (the x30 multiplies after the cap; Louis, 25 Nov: leave it).
