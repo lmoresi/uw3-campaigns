@@ -1,6 +1,6 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Seven commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Eight commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
@@ -312,3 +312,6 @@ the same trace; `kref.py`, `k909ref.py`). Cells were compared under both orders 
   there is no verdict.
 - **None is a defect.** "Worse against the one-cell reference" is an unreliable verdict wherever
   that reference cuts or rounds a corner itself.
+
+## 0008: docstring caveat (text only)
+add_fault's Notes say the slip reported at a sharp turn's apex can be spurious (one constraint normal there; UNFILED 84 mechanism, register row 30 proposed), and to read slip more than about a cell from a sharp turn.

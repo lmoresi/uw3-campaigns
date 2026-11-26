@@ -1,7 +1,7 @@
 From a00f18d24a93c3001ec3f4970982e30491a2bf0f Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 13:51:06 +1100
-Subject: [PATCH 5/7] Review round 2: base-mesh cell size, pieces by vertex
+Subject: [PATCH 5/8] Review round 2: base-mesh cell size, pieces by vertex
  number, parallel test
 
 - The coverage test's cell size is the median length of the 6 base-mesh
