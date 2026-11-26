@@ -1,0 +1,157 @@
+From d8d843d28214645a8ccba098b5a2b301d69ed27e Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 13:08:52 +1100
+Subject: [PATCH] A surface mesh in 3-D measures its cells one at a time
+
+A mesh's cell sizes, each cell's volume**(1/dim), came from
+DMPlexComputeGeometryFVM, which also orients every face. On a 2-D mesh in
+3-D it takes an edge's normal as (-dy, dx, 0), in the xy plane, which need
+not lie in the surface. A sphere cut along its equator, with the cut's own
+point on a meridian edge, has cells whose cell-to-face vector runs along
+the slit edge in xy: the dot product is 2.4e-18, PETSc raises "Direction
+for face ... could not be fixed" (error 77), and the mesh cannot be built.
+
+When the coordinate dimension exceeds the mesh dimension, the sizes now
+come from DMPlexComputeCellGeometryFVM per cell, in a C loop. That is the
+call the full routine makes for each cell, without the face orientation.
+Full-dimensional meshes keep the full routine.
+
+test_0901 (tier B) builds the equator cut and checks every radius against
+the square root of the triangle's area at 1e-12; it fails on development
+with error 77. The manifold tests (19 files): 158 passed.
+
+Underworld development team with AI support from Claude Code
+---
+ .../cython/petsc_discretisation.pyx           | 39 +++++++++++++++
+ src/underworld3/cython/petsc_extras.pxi       |  1 +
+ ...esh_cell_sizes_need_no_face_orientation.py | 50 +++++++++++++++++++
+ 3 files changed, 90 insertions(+)
+ create mode 100644 tests/test_0901_surface_mesh_cell_sizes_need_no_face_orientation.py
+
+diff --git a/src/underworld3/cython/petsc_discretisation.pyx b/src/underworld3/cython/petsc_discretisation.pyx
+index 2524d738..39d3075c 100644
+--- a/src/underworld3/cython/petsc_discretisation.pyx
++++ b/src/underworld3/cython/petsc_discretisation.pyx
+@@ -56,12 +56,51 @@ def petsc_fvm_get_min_radius(mesh) -> float:
+ 
+         return min_radius
+ 
++cdef _cell_geometry_by_cell(mesh):
++    """Each local cell's centroid and volume as ``(n, 4)`` rows, one call of
++    ``DMPlexComputeCellGeometryFVM`` per cell: the cell part of
++    ``DMPlexComputeGeometryFVM``, without its face orientation. Checked on every
++    rank."""
++    cdef DM dm = mesh.dm
++    cdef PetscInt c, k, cStart, cEnd
++    cdef PetscReal vol
++    cdef PetscReal centroid[3]
++    cdef PetscErrorCode ierr = 0
++    cStart, cEnd = mesh.dm.getHeightStratum(0)
++    out = np.zeros((cEnd - cStart, 4))
++    cdef double[:, ::1] o = out
++    cdef PetscInt cdim = mesh.dm.getCoordinateDim()
++    for c in range(cStart, cEnd):
++        centroid[0] = centroid[1] = centroid[2] = 0.0
++        ierr = DMPlexComputeCellGeometryFVM(dm.dm, c, &vol, centroid, NULL)
++        if ierr != 0:
++            break
++        for k in range(cdim):
++            o[c - cStart, k] = centroid[k]
++        o[c - cStart, 3] = vol
++    _check_error_code_collectively(ierr, "DMPlexComputeCellGeometryFVM")
++    return out
++
++
+ def petsc_fvm_get_local_cell_sizes(mesh) -> np.array:
+         """
+         Each local cell's ``volume**(1/dim)`` and its centroid, from
+         ``DMPlexComputeGeometryFVM``. Degree 1 only.
++
++        On a surface in 3-D (coordinate dimension above the mesh dimension) the
++        cells are measured one at a time instead. ``DMPlexComputeGeometryFVM``
++        also orients every face, from an edge normal ``(-dy, dx, 0)`` in the xy
++        plane; on a surface that normal need not lie in the surface, and an edge
++        whose cell-to-face vector is perpendicular to it (a sphere cut along its
++        equator, measured) raises, and the mesh cannot be built. The volumes are
++        the same: that routine measures each cell with the same call.
+         """
+ 
++        if mesh.dm.getCoordinateDim() > mesh.dm.getDimension():
++            cell_sizes = _cell_geometry_by_cell(mesh)
++            return (np.power(cell_sizes[:, -1], 1 / mesh.dim),
++                    cell_sizes[:, 0:mesh.dim])
++
+         ## Note: The petsc4py version of DMPlexComputeGeometryFVM does not compute all cells and
+         ## does not obtain the minimum radius for the mesh.
+ 
+diff --git a/src/underworld3/cython/petsc_extras.pxi b/src/underworld3/cython/petsc_extras.pxi
+index 6b4b88a3..a32da5e6 100644
+--- a/src/underworld3/cython/petsc_extras.pxi
++++ b/src/underworld3/cython/petsc_extras.pxi
+@@ -97,6 +97,7 @@ cdef extern from "petsc.h" nogil:
+     # PetscErrorCode DMPlexSetSNESLocalFEM( PetscDM, void *, void *, void *)
+     # PetscErrorCode DMPlexSetSNESLocalFEM( PetscDM, PetscBool, void *)
+     PetscErrorCode DMPlexComputeGeometryFVM( PetscDM dm, PetscVec *cellgeom, PetscVec *facegeom)
++    PetscErrorCode DMPlexComputeCellGeometryFVM( PetscDM dm, PetscInt cell, PetscReal *vol, PetscReal centroid[], PetscReal normal[])
+     PetscErrorCode DMPlexSetRegularRefinement( PetscDM dm, PetscBool regular)
+     PetscErrorCode MatInterpolate(PetscMat A, PetscVec x, PetscVec y)
+     PetscErrorCode DMSetLocalSection(PetscDM, PetscSection)
+diff --git a/tests/test_0901_surface_mesh_cell_sizes_need_no_face_orientation.py b/tests/test_0901_surface_mesh_cell_sizes_need_no_face_orientation.py
+new file mode 100644
+index 00000000..30e0fa48
+--- /dev/null
++++ b/tests/test_0901_surface_mesh_cell_sizes_need_no_face_orientation.py
+@@ -0,0 +1,50 @@
++"""A surface mesh in 3-D is built whatever the direction of its edges.
++
++A mesh's cell sizes are each cell's ``volume**(1/dim)``. They came from
++``DMPlexComputeGeometryFVM``, which also orients every face: it takes an edge's
++normal as ``(-dy, dx, 0)``, in the xy plane, and turns it towards the cell. On a
++surface in 3-D that normal need not lie in the surface. Cut along the equator of a
++sphere, an edge in the plane z = 0 whose cells have their third vertex directly
++above or below one of its ends has a cell-to-face vector along the edge in xy, so
++the dot product is zero (2.4e-18, measured) and PETSc raises "Direction for face
++... could not be fixed": the mesh could not be built. The sizes need only the cells.
++"""
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++
++def _equator_cut():
++    from underworld3.utilities import line_cut as lc
++
++    sphere = uw.meshing.SphericalManifold(radius=1.0, cellSize=0.15, degree=1, qdegree=5)
++    phi = np.linspace(-0.3, 0.3, 9)
++    Q = np.column_stack([np.cos(phi), np.sin(phi), np.zeros_like(phi)])
++    # only the tips hold a vertex, so the cut inserts its own points where the
++    # equator crosses the meridian edges
++    dm = lc.pull_vertex_onto(sphere.dm, Q[[0, -1]], on_shared="note")
++    cut, _info = lc.cut_along_lines(dm, [Q], label="F", label_value=7)
++    return sphere, cut
++
++
++def test_a_sphere_cut_along_the_equator_is_built():
++    from underworld3.utilities._plex_topology import closure_points
++    from underworld3.utilities.line_cut import _coords
++
++    sphere, cut = _equator_cut()
++    mesh = uw.discretisation.Mesh(cut, simplex=True,
++                                  coordinate_system_type=sphere.CoordinateSystem.coordinate_type,
++                                  qdegree=sphere.qdegree, verbose=False)
++    radii, _centroids = mesh._get_cell_radii()
++
++    dm = mesh.dm
++    cS, cE = dm.getHeightStratum(0)
++    vS, _ = dm.getDepthStratum(0)
++    P = _coords(dm)[closure_points(dm, np.arange(cS, cE), 0) - vS]
++    area = 0.5 * np.linalg.norm(np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0]), axis=1)
++    assert len(radii) == cE - cS
++    assert np.allclose(radii, np.sqrt(area), rtol=1e-12, atol=0)
+-- 
+2.39.5 (Apple Git-154)
+
