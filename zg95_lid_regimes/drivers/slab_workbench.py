@@ -127,6 +127,13 @@ params = uw.Params(
                                 #   reactions", "I'd trace the oceanic crust as a near-line. We don't need to know its
                                 #   thickness, just its location"). 0: none
     uw_crust_line_spacing_km=0.0,  # the particle spacing along the oceanic-crust line; 0: a quarter of the rung spacing S
+    uw_line_reseed=0,           # 1 (Louis, 2026-11-27: "you have 3 or four in an element, why not just add 25 or 50 ... You could
+                                #   also re-populate along the fault. Add particles there, let them move, fit them when you
+                                #   update the fault next time"): after each good fit, the oceanic-crust line is re-seeded along
+                                #   the fault moved uw_fault_above_ocrust_km to the subducting side, every line spacing from
+                                #   below the surface to the cap, where no line particle lies within 0.75 spacings (it replaces
+                                #   the line's chain refill, which stopped at the trench's bunching and never reached a tear
+                                #   down the slab). 0: the chain refill every uw_crust_refill_every steps (every run to 2026-11-27)
     uw_buoy_T=1.0,              # scales the thermal buoyancy
     # the compositional overriding plate (stage 3): a layer uw_over_comp_thick_km thick from
     # uw_over_gap_km behind the trench to its ridge, viscosity x uw_over_eta, density uw_over_drho_kg_m3 above the
@@ -628,6 +635,9 @@ if swarm_on:
     # populated by the initial state: fresh particles for the slab state, the saved ones on a restart
 for name, on, geometry in (("crust", crust_on, lambda xy: layer_marker(xy, crust_thick)),
                            ("ocrust", ocrust_on, lambda xy: np.zeros(len(xy))),   # 1 on its line's particles only
+                           # with uw_line_reseed: the original line, never re-seeded (hub, 2026-11-27: "Keep a passive copy
+                           # of the original line ... so fit_km and the slab checks still have something the fit didn't make")
+                           ("oref", ocrust_on and bool(int(params.uw_line_reseed)), lambda xy: np.zeros(len(xy))),
                            ("over", over_on, lambda xy: over_marker(xy, float(model.over_comp_thick)))):
     if on:
         markers[name] = (uw.swarm.SwarmVariable(name, crust_swarm, 1, proxy_location="cells", proxy_degree=1),
@@ -901,6 +911,23 @@ def fault_checks(used, fit, slip_max):
     rec["slab_km"] = slab
     if slab and max(abs(g) for g in slab.values()) > float(params.uw_check_slab_km):
         flags.append("slab")
+    if "oref" in markers:     # the fault against the passive (never re-seeded) line, less the fault's offset above it
+        xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+        mine = xy[np.asarray(markers["oref"][0].array[:, 0, 0]).ravel() > 0.5]
+        Q = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
+        dq, tq = r_o - np.hypot(Q[:, 0], Q[:, 1]), np.arctan2(Q[:, 1], Q[:, 0])
+        ref = {}
+        for z_km in (100.0, 200.0, 300.0):
+            z = z_km / km
+            th_f = depth_crossing(line, z)
+            m = (np.abs(dq - z) < 8.0 / km) if len(Q) else np.zeros(0, dtype=bool)
+            if th_f is None or not m.any():
+                continue
+            m &= np.abs(wrap(tq - th_f)) < 0.1
+            if m.any():
+                d = abs(float(np.median(wrap(tq[m] - th_f)))) * (r_o - z) * km
+                ref[f"{z_km:.0f}"] = round(d - float(model.fault_above_ocrust) * km, 1)
+        rec["ref_km"] = ref
     th_100 = depth_crossing(line, 100.0 / km)
     th_tr = trench_point(th_100 if th_100 is not None else th_top, th_top)
     rec["top_km"] = float(abs(wrap(th_top - th_tr)) * r_o * km)
@@ -1183,6 +1210,7 @@ def crust_spline_points(faults):
     left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
     tree = cKDTree(M)
     pts, t, miss = [np.array([X0 + inc * 0.35, -(L0 if FOLLOW_OCRUST else 0.5 * ct)])], np.array([-inc, 0.0]), 0
+    links, KM_PER = [], MODEL_UNIT["km"]               # uw_fit_gap_km's links: [length, lateral offset] in km
     for _ in range(600):                             # the march along the layer's centre
         q = pts[-1] + ds * t
         idx = tree.query_ball_point(q, 0.02)
@@ -1202,7 +1230,11 @@ def crust_spline_points(faults):
                 ahead = (a > 0.25 * ds) & (a <= gap) & (np.abs(n) < band)
                 if ahead.any():
                     k = np.flatnonzero(ahead)[np.argmin(a[ahead])]
-                    q, miss = base_pt + a[k] * t + n[k] * left(t), -1
+                    land = base_pt + a[k] * t + n[k] * left(t)
+                    # at least two particles within a march step of the landing point (hub review: not one stray)
+                    if len(tree.query_ball_point(land, ds)) >= 2:
+                        links.append([round(float(a[k]) * KM_PER, 1), round(float(n[k]) * KM_PER, 1)])
+                        q, miss = land, -1
         miss += 1
         if miss > 6:
             break
@@ -1388,7 +1420,7 @@ def crust_spline_points(faults):
     t_hat = np.array([-r_hat[1], r_hat[0]])
     down = (below - at_wall) / max(np.linalg.norm(below - at_wall), 1e-12)
     dip = float(np.degrees(np.arctan2(-down @ r_hat, down @ t_hat)))
-    info = {"locator": "spline", "spline_follow": str(params.uw_fault_follow),
+    info = {"locator": "spline", "spline_follow": str(params.uw_fault_follow), "gap_links": links,
             "spline_trench_depth": float(-leave[1]), "spline_flat_depth": z_flat,
             "spline_run_to_wall": float(to_wall), "spline_top_dip": top_dip, "spline_end": end_at, "spline_end_depth": float(-seg[-1, 1]), "raw": np.c_[pol[:, 0] / r_o, -pol[:, 1]][::4].round(6).tolist(),
             **extra}
@@ -2186,6 +2218,8 @@ def refill_crust():
                 var.array[-added:, 0, 0] = 1.0
             elif name == "ocrust":
                 var.array[-added:, 0, 0] = 0.0
+            elif name == "oref":                   # the passive reference line only loses particles
+                var.array[-added:, 0, 0] = 0.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
     for var, _, _ in markers.values():
@@ -2236,12 +2270,60 @@ def ridge_crust(faults):
                     var.array[-added:, 0, 0] = 1.0
                 elif name in ("crust", "ocrust"):
                     var.array[-added:, 0, 0] = 0.0
+                elif name == "oref":                   # the passive reference line only loses particles
+                    var.array[-added:, 0, 0] = 0.0
                 elif nearest is not None:
                     var.array[-added:, 0, 0] = old[name][nearest]
         for var, _, _ in markers.values():
             var._update()
         total += int(added)
     return total
+
+
+def reseed_line_along_fault(fault):
+    """uw_line_reseed: line particles where the oceanic-crust line should be by the fault just fitted (the fault moved
+    uw_fault_above_ocrust_km to its subducting side), every line_spacing() from the surface's line depth to the cap, where
+    no line particle lies within 0.75 spacings. Markers as refill_line. Collective. Returns the particles added on this rank."""
+    from scipy.spatial import cKDTree
+    sp = line_spacing()
+    line, th = line_inside(np.asarray(fault["points"], dtype=float))
+    seg = np.linalg.norm(np.diff(line, axis=0), axis=1)
+    n_pts = max(int(seg.sum() / sp) + 1, 2)
+    res = by_fraction(line, n_pts)
+    tang = np.gradient(res, axis=0)
+    tang /= np.maximum(np.linalg.norm(tang, axis=1), 1e-30)[:, None]
+    nrm = np.c_[-tang[:, 1], tang[:, 0]]
+    mid = len(res) // 2
+    _, side = segment_side((res[mid] + 1.0e-3 * nrm[mid])[None, :], line)
+    if side[0] == overriding_side(line, th):          # the normal must point into the subducting side
+        nrm = -nrm
+    pts = res + float(model.fault_above_ocrust) * nrm
+    depth = r_o - np.hypot(pts[:, 0], pts[:, 1])
+    pts = pts[(depth > 0.5 * float(model.ocrust_depth)) & (depth < fault_depth_cap())]
+    xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)
+    old = {name: np.array(var.array[:, 0, 0]) for name, (var, _, _) in markers.items()}
+    mine = xy[old["ocrust"] > 0.5]
+    P = np.c_[uw.utilities.gather_data(mine[:, 0], bcast=True), uw.utilities.gather_data(mine[:, 1], bcast=True)]
+    cand = pts
+    if len(P) and len(pts):
+        cand = pts[cKDTree(P).query(pts)[0] > 0.75 * sp]
+    cand = onto(cand) if len(cand) else np.zeros((0, 2))
+    added = crust_swarm.add_particles_with_coordinates(np.ascontiguousarray(cand)) if len(cand) else 0
+    if added:
+        new_xy = np.asarray(swarm_xy(), dtype=float).reshape(-1, 2)[-added:]
+        nearest = cKDTree(xy).query(new_xy)[1] if len(xy) else None
+        for name, (var, _, _) in markers.items():
+            if name == "ocrust":
+                var.array[-added:, 0, 0] = 1.0
+            elif name == "crust":
+                var.array[-added:, 0, 0] = 0.0
+            elif name == "oref":                   # the passive reference line only loses particles
+                var.array[-added:, 0, 0] = 0.0
+            elif nearest is not None:
+                var.array[-added:, 0, 0] = old[name][nearest]
+    for var, _, _ in markers.values():
+        var._update()
+    return int(added)
 
 
 def line_spacing():
@@ -2333,6 +2415,8 @@ def refill_line(faults, target, line_d):
                 var.array[-added:, 0, 0] = 1.0
             elif name in ("crust", "ocrust"):
                 var.array[-added:, 0, 0] = 0.0
+            elif name == "oref":                   # the passive reference line only loses particles
+                var.array[-added:, 0, 0] = 0.0
             elif nearest is not None:
                 var.array[-added:, 0, 0] = old[name][nearest]
     for var, _, _ in markers.values():
@@ -2368,7 +2452,7 @@ def seed_swarm():
             if ocrust_on else 0)
     for name, (var, _, geometry) in markers.items():
         var.array[:, 0, 0] = geometry(swarm_xy())
-        if name == "ocrust" and n_oc:
+        if name in ("ocrust", "oref") and n_oc:
             var.array[-n_oc:, 0, 0] = 1.0
         var._update()
 
@@ -2420,6 +2504,8 @@ def reset_melange(faults):
             if name == "crust":
                 v.array[-added:, 0, 0] = 1.0
             elif name == "ocrust":
+                v.array[-added:, 0, 0] = 0.0
+            elif name == "oref":                   # the passive reference line only loses particles
                 v.array[-added:, 0, 0] = 0.0
             elif nearest is not None:
                 v.array[-added:, 0, 0] = old[name][nearest]
@@ -2682,7 +2768,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_fit_gap_km", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_fit_gap_km", "uw_line_reseed", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
@@ -2886,7 +2972,7 @@ for k in range(k0, k0 + params.uw_steps):
         if (crust_on and params.uw_crust_ppc > 0 and params.uw_crust_refill_every > 0
                 and (k + 1) % int(params.uw_crust_refill_every) == 0):
             n_refill = int(uw.utilities.gather_data(refill_crust(), bcast=True).sum())
-            if ocrust_on:
+            if ocrust_on and not int(params.uw_line_reseed):
                 n_refill += int(uw.utilities.gather_data(refill_line(faults, "ocrust", model.ocrust_depth),
                                                          bcast=True).sum())
             if n_refill:
@@ -2941,6 +3027,10 @@ for k in range(k0, k0 + params.uw_steps):
                 layer = "oceanic-crust line" if FOLLOW_OCRUST else "melange layer"
                 events.append(f"formed {faults[0]['name']} on the {layer} at {np.degrees(theta_t):.1f} deg, "
                               f"dip {dip:.1f}, depth {depth:.3f}, {len(poly)} points")
+    if detect_now and found is not None and faults and ocrust_on and int(params.uw_line_reseed):
+        n_seed = int(uw.utilities.gather_data(reseed_line_along_fault(faults[0]), bcast=True).sum())
+        if n_seed:
+            events.append(f"line re-seeded along the fault: {n_seed} particles")
     if damage:
         last_damage = dict(damage)
     for e in events:
