@@ -55,13 +55,17 @@ diagonal, SUM-reduced over the ranks with an in-place Allreduce. Every rank gets
   are complete on every mesh: 60/60 on each box, 30/30 on the sphere and on the annulus. The
   kinks:
 
-  | Mesh | Complete | Partial | Raised | Empty |
+  | Mesh | Added | Refused (misses part) | Refused (other) | Refused (no facet) |
   |---|---|---|---|---|
   | irregular box | 144 | 28 | 8 | – |
-  | regular box | 139 | 22 | 18 | 1 |
+  | regular box | 139 + 1 short (below) | 21 | 18 | 1 |
   | sphere | 32 | 26 | 2 | – |
 
-  "Partial" and "raised" are both refusals; the probe sorts them by message. Against the round-1
+  Every row in the refused columns is a refusal; the probe sorts them by message. One fault is
+  ADDED short: box_reg, sampling 0.5, kink120_2. Its chain is 0.5000 nominal cells from the trace
+  at the corner. The library measures in base k=6 cells, larger on the regular box, so it passes;
+  its slip is 33 % low (cover29). This is the half-cell corner case the coverage fraction leaves
+  open, with no gap to move it into. It is the one known wrong fault the guards add on this grid. Against the round-1
   base, 9 move from partial to raised: 0006's end check fires before the distance test, so the
   message changes but the fault is still refused. 3 complete faults are now refused, by round 2's
   base-mesh cell size, and 1 refused fault is now added.
