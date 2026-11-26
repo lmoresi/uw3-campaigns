@@ -1,0 +1,501 @@
+From c379ad4ce180e84ccbe2cd95c19a139a831be90f Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 16:51:47 +1100
+Subject: [PATCH 7/7] add_fault keeps a vertex on each turn; round-3 review:
+ seam edges counted once
+
+Turns. A sample where the trace turns by more than 45 degrees is pulled
+after the plain samples (the tips still last), so it keeps the vertex it
+shares with a neighbour, and that vertex is labelled as the tips' are; the
+chain must pass through it. Before, a turn that lost its vertex to the
+next sample left the cut across the corner: kink120_2 on the regular box,
+sampled half a cell apart, was 0.5 cells off at the corner and its slip
+33 % low (now 0 and 3 %). On the 480-trace box grid: faults more than
+10 % off among those added 22 -> 13, and the coverage distance now has a
+gap, every one-piece fault within 0.172 cells of its trace or at 1.25 or
+more (150-degree hairpins that lose an arm), so half a cell no longer
+decides anything at round-off. Development-placed faults whose mesh
+changes: 13 of 232, one vertex each.
+
+Review round 3 (Linux workstation):
+- the chain's edges are gathered and counted ONCE: an edge on a partition
+  seam is held by both its ranks, and counted twice its ends looked
+  interior, so a stray end on a seam was accepted on 8 of 9 layouts;
+  pieces, ends and turns all use the one deduplicated set;
+- an earlier slit is recognised by the exact side labels of the faults
+  already split into the mesh, not any label ending in Plus or Minus;
+- a chain that fails a check beside such a slit is no longer passed: the
+  refusal is handed back and raised after the record check and the split,
+  whose own messages come first;
+- the tip and turn labels are removed after use;
+- the parallel test runs add_fault distributed as well, catches every
+  exception before its gather, and refuses a stray end on a seam.
+
+test_0897: a turn keeps its vertex (fails before: 0.5 cells), a turn
+vertex off the chain is refused, a label named like a slit is not one.
+Suites: 433 passed, 1 skipped. The parallel test is not run here.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/fault_split.py      | 211 ++++++++++++------
+ ...lt_refusal_agrees_across_ranks_parallel.py |  49 +++-
+ ...d_fault_refuses_an_empty_or_partial_cut.py |  60 +++++
+ 3 files changed, 252 insertions(+), 68 deletions(-)
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 32d01fa7..6239f2cc 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1671,7 +1671,7 @@ def _base_cell_size(base_dm, points, k=_CELL_SIZE_EDGES):
+ 
+ 
+ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+-                                    domain=None, base_dm=None):
++                                    domain=None, base_dm=None, split_faults=()):
+     """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
+ 
+     A sample left without a vertex (a trace sampled finer than the mesh) could
+@@ -1680,7 +1680,11 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+     (``_COVERAGE_FRACTION``) of the base mesh's local edge length
+     (:func:`_base_cell_size` on ``base_dm``, the mesh before the pull and the
+     cut; ``dm`` when not given) of every point of the trace, ten points per
+-    segment. For add_fault the chain must also end on the tips' vertices.
++    segment. For add_fault the chain must also end on the tips' vertices and
++    pass through the turns'; beside the slit of a fault in ``split_faults`` (the
++    faults already split into the mesh) that refusal is RETURNED, for add_fault
++    to raise once the checks after the cut have had their say, and None
++    otherwise.
+     ``domain``, a Mesh, restricts the test to the trace's points inside
+     it, for a surface that runs past the walls (add_conforming_surface).
+     COLLECTIVE: every count and distance is reduced, so every rank decides
+@@ -1716,20 +1720,23 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+         raise ValueError(f"{caller}: the cut along {name!r} labelled no facet, so "
+                          f"there would be no surface. {advice(float(np.nanmedian(h)))}")
+ 
++    pending = None
+     if caller == "add_fault":
+-        # one polyline cuts to ONE connected chain. Counted GLOBALLY: every
+-        # rank's labelled edges are gathered (they are few) and joined at their
+-        # end points, keyed by GLOBAL vertex number, so a chain crossing a
+-        # partition seam (across_seams, or partition=False) counts as one, and
+-        # the coincident vertices of an earlier fault's slit stay apart.
+-        # Measured: a chain in two pieces with a 0.58-cell gap can pass the
+-        # distance test below when the trace runs within half a cell of the
+-        # other piece; the split then split one piece and left the other, and
+-        # add_fault returned it.
++        # one polyline cuts to ONE connected chain, which ENDS on the vertices
++        # the tips were pulled onto and passes THROUGH those the turns were:
++        # exact, by mesh point, with no tolerance. Every rank's labelled edges
++        # are gathered (they are few) and keyed by GLOBAL vertex number, each
++        # edge ONCE (an edge on a partition seam is held by both its ranks), so
++        # a chain crossing a seam counts as one and its ends are seen there too.
++        # Measured: a chain in pieces can pass the distance test below when the
++        # trace runs within half a cell of another piece (the split then split
++        # one piece and left the other); a tip or a turn that lost its vertex
++        # left the fault a sample spacing short, or cutting its corner.
+         vS, _vE = dm.getDepthStratum(0)
+         vnum = np.asarray(dm.getVertexNumbering().getIndices(), dtype=np.int64)
+         vnum = np.where(vnum >= 0, vnum, -vnum - 1)
+         local = [(int(vnum[a]), int(vnum[b])) for a, b in ends[marked]]
++        chain = {tuple(sorted(e)) for edges in comm.allgather(local) for e in edges}
+         parent = {}
+ 
+         def root(v):
+@@ -1737,52 +1744,66 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+                 v = parent[v]
+             return v
+ 
+-        for edges in comm.allgather(local):
+-            for a, b in edges:
+-                ra, rb = root(a), root(b)
+-                parent.setdefault(ra, ra)
+-                parent.setdefault(rb, rb)
+-                if ra != rb:
+-                    parent[ra] = rb
++        degree = {}
++        for a, b in chain:
++            degree[a] = degree.get(a, 0) + 1
++            degree[b] = degree.get(b, 0) + 1
++            ra, rb = root(a), root(b)
++            parent.setdefault(ra, ra)
++            parent.setdefault(rb, rb)
++            if ra != rb:
++                parent[ra] = rb
+         pieces = len({root(v) for v in parent})
+-        # a chain cut in two by an already-split fault's slit is the split's
+-        # to refuse, with its own message (a touching junction): defer to it
+-        slit_labels = [dm.getLabelName(i) for i in range(dm.getNumLabels())
+-                       if dm.getLabelName(i).endswith(("Plus", "Minus"))]
+-        # the slit labels sit on edges: look at the star of every chain vertex
+-        chain_vertices = {int(v) for v in ends[marked].ravel()}
+-        on_slit = bool(slit_labels) and any(
+-            dm.getLabelValue(lname, int(p)) >= 0
+-            for v in chain_vertices
+-            for p in dm.getTransitiveClosure(int(v) + vS, useCone=False)[0]
+-            for lname in slit_labels)
+-        on_slit = bool(comm.allreduce(int(on_slit), op=MPI.MAX))
+-        if pieces > 1 and not on_slit:
+-            raise ValueError(f"{caller}: the cut along {name!r} is in {pieces} pieces, "
+-                             f"not one chain: it misses part of the trace. "
+-                             f"{advice(float(np.nanmedian(h)))}")
+-        # the chain must END on the vertices the tips were pulled onto: exact,
+-        # by mesh point, with no tolerance (a tip that went without its vertex
+-        # left the fault a sample spacing short)
+-        if not on_slit and dm.hasLabel(_TIP_LABEL):
+-            tip_label = dm.getLabel(_TIP_LABEL)
+-            mine = {int(vnum[v]): tip_label.getValue(int(v) + vS) == 1
+-                    for v in {int(x) for x in ends[marked].ravel()}}
+-            degree = {}
+-            for edges in comm.allgather(local):
+-                for a, b in edges:
+-                    degree[a] = degree.get(a, 0) + 1
+-                    degree[b] = degree.get(b, 0) + 1
+-            is_tip = {}
+-            for flags in comm.allgather(mine):
+-                for g, f in flags.items():
+-                    is_tip[g] = is_tip.get(g, False) or f
+-            stray = sorted(g for g, k in degree.items() if k == 1 and not is_tip.get(g, False))
++
++        def marked_vertices(label_name):
++            if not dm.hasLabel(label_name):
++                return None
++            lab = dm.getLabel(label_name)
++            mine = ([int(vnum[int(v) - vS]) for v in lab.getStratumIS(1).getIndices()]
++                    if lab.getStratumSize(1) else [])
++            return {g for ids in comm.allgather(mine) for g in ids}
++
++        problems = []
++        if pieces > 1:
++            problems.append(f"is in {pieces} pieces, not one chain: it misses part of "
++                            f"the trace")
++        tips = marked_vertices(_TIP_LABEL)
++        if tips is not None:
++            stray = sorted(g for g, k in degree.items() if k == 1 and g not in tips)
+             if stray:
+-                raise ValueError(f"{caller}: the cut along {name!r} does not end at the "
+-                                 f"trace's tips: {len(stray)} end(s) of the chain are not "
+-                                 f"the vertices the tips were put on. "
++                problems.append(f"does not end at the trace's tips: {len(stray)} end(s) "
++                                f"of the chain are not the vertices the tips were put on")
++        turns = marked_vertices(_TURN_LABEL)
++        if turns is not None:
++            missed = sorted(turns - set(degree))
++            if missed:
++                problems.append(f"does not pass through the trace's turns: "
++                                f"{len(missed)} vertex(es) a turn of more than "
++                                f"{_TURN_DEG:g} degrees was put on are not on the chain")
++        if problems:
++            # beside the slit of a fault already split into this mesh the chain
++            # is cut there: a touching or crossing junction. The checks that
++            # follow the cut (the fault records, the split) name what they
++            # find; this refusal is handed back, and raised if they pass
++            slits = {f"{n}{side}" for names in comm.allgather(sorted(split_faults or ()))
++                     for n in names for side in ("Plus", "Minus")}
++            slit_labels = [lname for lname in sorted(slits) if dm.hasLabel(lname)]
++            chain_vertices = {int(v) for v in ends[marked].ravel()}
++            on_slit = bool(slit_labels) and any(
++                dm.getLabelValue(lname, int(p)) >= 0
++                for v in chain_vertices
++                for p in dm.getTransitiveClosure(int(v) + vS, useCone=False)[0]
++                for lname in slit_labels)
++            on_slit = bool(comm.allreduce(int(on_slit), op=MPI.MAX))
++            if not on_slit:
++                raise ValueError(f"{caller}: the cut along {name!r} {problems[0]}. "
+                                  f"{advice(float(np.nanmedian(h)))}")
++            pending = (f"{caller}: the cut along {name!r} meets an already-split "
++                       f"fault's slit and {problems[0]} (a touching or crossing "
++                       f"junction). A shared point would clamp every arm's slip to "
++                       f"zero there, stiffer than a true junction. Use the offset "
++                       f"form (uw.meshing.prepare_fault_network), which brackets the "
++                       f"true branch.")
+ 
+     d = np.full(len(dense), np.inf)
+     for a, b in zip(X[ends[marked, 0]], X[ends[marked, 1]]):
+@@ -1799,11 +1820,13 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+     worst = int(np.argmax(excess))
+     if excess[worst] > _COVERAGE_FRACTION:
+         where = tuple(float(x) for x in dense[worst])
++        fraction = "half" if _COVERAGE_FRACTION == 0.5 else f"{_COVERAGE_FRACTION:g} of"
+         raise ValueError(f"{caller}: the cut along {name!r} misses part of the trace: "
+                          f"the labelled chain is {d[worst]:.3g} from the trace at {where}, "
+-                         f"more than {_COVERAGE_FRACTION:g} of the local cell side "
++                         f"more than {fraction} the local cell side "
+                          f"({_COVERAGE_FRACTION * h[worst]:.3g}). "
+                          f"{advice(float(h[worst]))}")
++    return pending
+ 
+ 
+ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+@@ -1889,7 +1912,8 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+     ------
+     ValueError
+         When a cut labels no facet, is in more than one piece, does not end on
+-        the vertices the tips were put on, or leaves a point of the trace
++        the vertices the tips were put on or pass through those the turns (more
++        than 45 degrees) were put on, or leaves a point of the trace
+         farther from its chain than half the local cell side (the base mesh's,
+         before the cut). A chain that cuts across a corner by less than half a
+         cell is added.
+@@ -1968,6 +1992,7 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+     dm, tracked = _track_fault_records(mesh)
+     hosts_marked = bool(cut)
+     n_shared = 0
++    junctions = []
+     from underworld3.utilities import line_cut as line_cut_module
+     if cut:
+         # each cell of the mesh being cut carries its own index through the cut
+@@ -1985,19 +2010,26 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+             # interior kink is the same problem as a tip — a distinguished
+             # point of the geometry that must coincide with a mesh vertex,
+             # or the cut leaves the chain fragmented at the turn.
+-            # the tips are pulled LAST: two targets choosing one vertex leave
+-            # it to the later, and a tip that lost it to the next sample left
+-            # the fault short of its tip by one sample spacing
++            # the turns are pulled after the other samples and the tips last:
++            # two targets choosing one vertex leave it to the later, and a tip
++            # or a turn that lost it to the next sample left the fault a
++            # sample spacing short of its tip, or cutting its corner
+             P = np.asarray(poly, dtype=float)
+-            targets = P if len(P) <= 2 else np.vstack([P[1:-1], P[[0, -1]]])
+-            dm = pull_vertex_onto(dm, targets, on_shared=on_shared)
++            dm = pull_vertex_onto(dm, _in_pull_order(P), on_shared=on_shared)
+             _mark_tip_vertices(dm, P[[0, -1]])
++            _mark_turn_vertices(dm, P)
+             n_shared += line_cut_module.last_shared_targets["count"]
+             dm, info = cut_along_lines(dm, [poly], label=name,
+                                        label_value=values[name], **snap)
+-            _refuse_an_empty_or_partial_cut(dm, name, values[name],
+-                                            np.asarray(poly, dtype=float),
+-                                            base_dm=base_dm)
++            pending = _refuse_an_empty_or_partial_cut(
++                dm, name, values[name], np.asarray(poly, dtype=float),
++                base_dm=base_dm,
++                split_faults=(getattr(mesh, "_fault_point_pairs", None) or {}).keys())
++            if pending is not None:
++                junctions.append(pending)
++            for label_name in (_TIP_LABEL, _TURN_LABEL):
++                if dm.hasLabel(label_name):
++                    dm.removeLabel(label_name)
+             if verbose:
+                 uw.pprint(f"[add_fault {name!r}] {info['n_cut_edges']} "
+                           f"facets, min angle {info['min_angle']:.2f} deg")
+@@ -2066,6 +2098,9 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+     for name, poly in segments:
+         out = split_fault(out, name, orientation=poly[-1] - poly[0],
+                           verbose=verbose, across_seams=across_seams)
++    # a junction the checks after the cut let through is refused here
++    if junctions:
++        raise ValueError(junctions[0])
+     # the traces themselves, for trace-smoothed fault normals
+     # (add_fault_bc(..., normal="trace")) and for rendering overlays;
+     # Surface OBJECTS ride along too, so normal="surface" spells the
+@@ -2118,6 +2153,54 @@ def _mark_tip_vertices(dm, tips):
+             label.setValue(int(v) + vS, 1)
+ 
+ 
++# a sample of the trace whose direction changes by more than this is a TURN:
++# it is pulled after the plain samples, and the chain must pass through it
++_TURN_DEG = 45.0
++_TURN_LABEL = "UW_FaultTurn"
++
++
++def _turns(P):
++    """Mask of the samples of ``P`` that are turns (never the tips)."""
++    P = np.asarray(P, dtype=float)
++    out = np.zeros(len(P), dtype=bool)
++    if len(P) > 2:
++        a = P[1:-1] - P[:-2]
++        b = P[2:] - P[1:-1]
++        cos = np.einsum("ij,ij->i", a, b) / (np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1))
++        out[1:-1] = np.degrees(np.arccos(np.clip(cos, -1.0, 1.0))) > _TURN_DEG
++    return out
++
++
++def _in_pull_order(P):
++    """The samples of ``P`` in the order add_fault pulls them: the plain samples,
++    then the turns, then the two tips, so a tip or a turn keeps the vertex it
++    shares with a neighbour (the later target keeps it)."""
++    P = np.asarray(P, dtype=float)
++    if len(P) <= 2:
++        return P
++    turn = _turns(P)
++    inner = np.arange(1, len(P) - 1)
++    return np.vstack([P[inner[~turn[inner]]], P[inner[turn[inner]]], P[[0, -1]]])
++
++
++def _mark_turn_vertices(dm, P):
++    """Label the vertices the trace's turns were just pulled onto, matched exactly
++    as the tips are (:func:`_mark_tip_vertices`). A turn that went without its
++    vertex (one shared with a tip) is not labelled."""
++    from underworld3.utilities.line_cut import _coords
++
++    if dm.hasLabel(_TURN_LABEL):
++        dm.removeLabel(_TURN_LABEL)
++    dm.createLabel(_TURN_LABEL)
++    label = dm.getLabel(_TURN_LABEL)
++    X = _coords(dm)
++    vS, _vE = dm.getDepthStratum(0)
++    P = np.asarray(P, dtype=float)
++    for q in P[_turns(P)]:
++        for v in np.flatnonzero(np.all(X == q, axis=1)):
++            label.setValue(int(v) + vS, 1)
++
++
+ def _mark_host_cells(dm):
+     """Label each cell of ``dm`` with its own local index. The cut (a DMPlex
+     transform) and the split hand a cell's label value to every cell made from
+diff --git a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+index 547c10f2..f5abee2d 100644
+--- a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
++++ b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+@@ -49,11 +49,12 @@ def box():
+ 
+ 
+ def _outcome(fn):
++    # any exception, so every rank still reaches the gather below
+     try:
+         fn()
+         return "passed"
+-    except ValueError as e:
+-        return str(e)
++    except Exception as e:      # noqa: BLE001 - compared across the ranks
++        return f"{type(e).__name__}: {e}"
+ 
+ 
+ def _same_everywhere(outcome):
+@@ -62,11 +63,30 @@ def _same_everywhere(outcome):
+     return every[0]
+ 
+ 
++# the add-on partition gathers a fault's neighbourhood onto one rank; without it,
++# and cut across the seams, the chain is distributed
++LAYOUTS = {"addon": {}, "distributed": {"partition": False, "across_seams": True}}
++
++
++@pytest.mark.parametrize("layout", sorted(LAYOUTS))
+ @pytest.mark.parametrize("k, ds", [(3, 0.3), (4, 0.3), (4, 0.5), (0, 1.0)],
+                          ids=["was_empty", "was_short", "tip_shared", "whole"])
+-def test_a_cut_is_added_alike_on_every_rank(box, k, ds):
++def test_a_cut_is_added_alike_on_every_rank(box, k, ds, layout):
+     # the first three once lost a tip's vertex to the next sample (see test_0897)
+-    assert _same_everywhere(_outcome(lambda: box.add_fault(("F", _trace(k, ds))))) == "passed"
++    out = _same_everywhere(_outcome(lambda: box.add_fault(("F", _trace(k, ds)), **LAYOUTS[layout])))
++    assert out == "passed"
++
++
++@pytest.mark.parametrize("layout", sorted(LAYOUTS))
++def test_a_kink_is_added_alike_on_every_rank(box, layout):
++    # its turn once lost its vertex to the next sample (see test_0897)
++    import importlib.util
++    import pathlib
++    path = pathlib.Path(__file__).parents[1] / "test_0897_add_fault_refuses_an_empty_or_partial_cut.py"
++    spec = importlib.util.spec_from_file_location("t0897", path)
++    t0897 = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(t0897)
++    assert _same_everywhere(_outcome(lambda: box.add_fault(("F", t0897.KINK120), **LAYOUTS[layout]))) == "passed"
+ 
+ 
+ def _label_on_y(dm, name, y, spans):
+@@ -96,3 +116,24 @@ def test_a_chain_across_the_seams_is_one_piece(box):
+     _label_on_y(dm, "Gap", 0.5, [(1 / 12, 6 / 12), (7 / 12, 11 / 12)])
+     out = _same_everywhere(_outcome(lambda: _refuse_an_empty_or_partial_cut(dm, "Gap", 7, poly)))
+     assert "is in 2 pieces" in out
++
++
++def test_a_stray_end_on_a_seam_is_refused(box):
++    # a chain across the distributed box whose far end is not a tip's vertex: an
++    # edge on a seam is held by two ranks, and counted twice its ends looked
++    # interior, so the stray end was accepted on most layouts (Linux workstation
++    # review). The edges are counted once now.
++    from underworld3.utilities.fault_split import _TIP_LABEL, _refuse_an_empty_or_partial_cut
++    from underworld3.utilities.line_cut import _coords
++    poly = np.array([[1 / 12, 0.5], [11 / 12, 0.5]])
++    dm = box.dm.clone()
++    _label_on_y(dm, "Stray", 0.5, [(1 / 12, 11 / 12)])
++    X = _coords(dm)
++    vS, _ = dm.getDepthStratum(0)
++    dm.createLabel(_TIP_LABEL)
++    for x in (1 / 12, 6 / 12):          # the far tip is NOT at the chain's end
++        hit = np.flatnonzero(np.all(np.abs(X - [x, 0.5]) < 1e-9, axis=1))
++        for v in hit:
++            dm.getLabel(_TIP_LABEL).setValue(int(v) + vS, 1)
++    out = _same_everywhere(_outcome(lambda: _refuse_an_empty_or_partial_cut(dm, "Stray", 7, poly)))
++    assert "does not end at the trace's tips" in out
+diff --git a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+index a18cb699..43e0c290 100644
+--- a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
++++ b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+@@ -92,6 +92,35 @@ def test_a_tip_keeps_its_vertex(box):
+         assert np.linalg.norm(V - tip, axis=1).min() < 1e-12
+ 
+ 
++# a 120-degree kink, two arms of 2.5 cells sampled half a cell apart, from the
++# measurement's kink generator (box_reg, kink120_2)
++KINK120 = np.array([
++    [0.35894532226677367, 0.5335026620957273], [0.39229729161262283, 0.5085275294261167],
++    [0.425649260958472, 0.4835523967565061], [0.45900123030432116, 0.45857726408689553],
++    [0.4923531996501703, 0.43360213141728493], [0.5257051689960195, 0.4086269987476744],
++    [0.5306582836778643, 0.44999821780222493], [0.5356113983597092, 0.4913694368567754],
++    [0.540564513041554, 0.5327406559113259], [0.5455176277233988, 0.5741118749658765],
++    [0.5504707424052436, 0.615483094020427]])
++
++
++def test_a_turn_keeps_its_vertex(box):
++    # the turn (sample 5) and the next sample chose the same vertex, and the later
++    # target kept it: the chain cut the corner by half a cell and the fault's slip
++    # was 33 % low. The turns are now pulled after the other samples.
++    X, E = _plus_chain(box.add_fault(("F", KINK120)))
++    V = X[np.unique(E.ravel())]
++    for p in (KINK120[0], KINK120[5], KINK120[-1]):
++        assert np.linalg.norm(V - p, axis=1).min() < 1e-12
++    Q = KINK120
++    dense = np.vstack([Q[:-1] + x * (Q[1:] - Q[:-1]) for x in np.linspace(0, 1, 11)])
++    d = np.full(len(dense), np.inf)
++    for a, c in zip(X[E[:, 0]], X[E[:, 1]]):
++        e = c - a
++        u = np.clip(((dense - a) @ e) / (e @ e), 0, 1)
++        d = np.minimum(d, np.linalg.norm(dense - (a + u[:, None] * e), axis=1))
++    assert d.max() < 0.25 * H
++
++
+ def _label_edges_on_y(dm, name, y, x0, x1):
+     """Label the mesh edges lying on the line y = const between x0 and x1."""
+     from underworld3.utilities.line_cut import _coords, _edge_vertices
+@@ -154,3 +183,34 @@ def test_the_check_on_chains_labelled_by_hand(box):
+         dm.getLabel(_TIP_LABEL).setValue(v + vS, 1)
+     with pytest.raises(ValueError, match="does not end at the trace's tips"):
+         _refuse_an_empty_or_partial_cut(dm, "Ends", 7, poly)
++
++    # a turn's vertex off the chain: the turns' label marks a vertex a row above
++    from underworld3.utilities.fault_split import _TURN_LABEL
++    dm = box.dm.clone()
++    _label_edges_on_y(dm, "Turn", 0.5, 0.25, 0.75)
++    X = _coords(dm)
++    vS, _ = dm.getDepthStratum(0)
++    dm.createLabel(_TURN_LABEL)
++    v = int(np.argmin(np.linalg.norm(X - [0.5, 0.5 + 1 / 12], axis=1)))
++    dm.getLabel(_TURN_LABEL).setValue(v + vS, 1)
++    with pytest.raises(ValueError, match="does not pass through the trace's turns"):
++        _refuse_an_empty_or_partial_cut(dm, "Turn", 7, poly)
++
++
++def test_a_label_named_like_a_slit_is_not_one(box):
++    """Only the sides of a fault already split into the mesh are slits: a user's
++    label that merely ends in 'Plus' once switched the chain checks off."""
++    from underworld3.utilities.fault_split import _TIP_LABEL, _refuse_an_empty_or_partial_cut
++    from underworld3.utilities.line_cut import _coords
++    poly = np.array([[0.25, 0.5], [0.75, 0.5]])
++    dm = box.dm.clone()
++    _label_edges_on_y(dm, "Ends", 0.5, 0.25, 0.75)
++    _label_edges_on_y(dm, "UserPlus", 0.5, 0.25, 0.75)
++    X = _coords(dm)
++    vS, _ = dm.getDepthStratum(0)
++    dm.createLabel(_TIP_LABEL)
++    for x in (0.25, 2 / 3):
++        v = int(np.argmin(np.linalg.norm(X - [x, 0.5], axis=1)))
++        dm.getLabel(_TIP_LABEL).setValue(v + vS, 1)
++    with pytest.raises(ValueError, match="does not end at the trace's tips"):
++        _refuse_an_empty_or_partial_cut(dm, "Ends", 7, poly)
+-- 
+2.39.5 (Apple Git-154)
+

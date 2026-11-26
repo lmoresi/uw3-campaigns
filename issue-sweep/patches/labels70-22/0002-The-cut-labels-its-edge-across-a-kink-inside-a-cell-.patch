@@ -1,7 +1,7 @@
 From 44aa8c53c29c35927280fabcfc65555849357f70 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 04:44:32 +1100
-Subject: [PATCH 2/6] The cut labels its edge across a kink inside a cell;
+Subject: [PATCH 2/7] The cut labels its edge across a kink inside a cell;
  refuse partial surfaces
 
 _label_cut_edges labelled an edge as the cut's only when both its ends AND

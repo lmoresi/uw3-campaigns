@@ -1,7 +1,7 @@
 From 911a7b16971d533e7b712d4bc6c2537c6a4ef6ed Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 06:33:53 +1100
-Subject: [PATCH 3/6] The cut refuses a flat cell
+Subject: [PATCH 3/7] The cut refuses a flat cell
 
 cut_along_lines refused an inverted cell but not a flat one. With the
 edge labelling now complete across in-cell kinks, add_fault placed

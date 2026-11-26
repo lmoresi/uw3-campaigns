@@ -1,6 +1,6 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Six commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Seven commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
@@ -8,6 +8,7 @@ Base: development fbef72fa. Six commits, as `git format-patch` files. Not pushed
 - 0004 is review round 1 (see its section).
 - 0005 is review round 2 (see its section).
 - 0006 keeps a vertex on each tip and requires the chain to end on them (see its section).
+- 0007 keeps a vertex on each turn and requires the chain to pass through it, with review round 3 (see its section).
 
 ## Cause
 `line_cut._label_cut_edges` labelled an edge only when both its ends AND its midpoint lay on the
@@ -228,3 +229,61 @@ is done. So a mesh changes exactly when the two target orders pull a different v
     than 10 %: 12 to 3. Better in 16, worse in 9.
   - Worse by more than 2 points: six faults. Five are kink30s, which move from 0.2-5 % to 3-9 %
     error. The sixth is kink150_3 at sampling 0.3, off already (68 % to 75 %).
+
+## 0007: the turns keep their vertices; review round 3
+**The corner gap was 0006's defect one level up** (`turns-last-measurement/k1202.py`). kink120_2's
+turn sample lost its vertex to its later neighbour, so the chain cut the corner by up to half a
+cell and the slip was 33 % low. A check that the chain passes through every pulled vertex could
+not see this, because the turn was never marked (`thru*_box_*.jsonl`: it refused nothing on
+either rule).
+
+**The fix:**
+- add_fault pulls plain samples first, then turns over `_TURN_DEG` = 45 degrees, then the tips;
+- the turns' vertices are labelled `UW_FaultTurn` by exact identity;
+- the chain must pass through them (global, by vertex number).
+
+**Measured** (`ord6_*`, `ord29_*`, `order7_*` in `turns-last-measurement/`):
+
+| | today's rule (0006 → 0007) | row 29 (current → turns last) |
+|---|---|---|
+| kink120_2 | 0.5 → 0 cells, slip −33 % → −3.2 % | the same |
+| bad faults among those added | 22 → 13 | 21 → 9 |
+| median slip error | 1.69 % → 1.50 % | 0.23 % → 0.20 % |
+| outcomes changing class | none | 4 now refused: 3 wrong before, caught by the cell guards; the 4th unusable before too, now refused for a single facet |
+| added faults with a turn off the chain | 30 → 0 | 20 → 0 |
+
+- **The coverage distance now has a gap.** Every one-piece fault lies within 0.172 cells of its
+  trace, or at 1.25 cells or more (150-degree hairpins that lose an arm). Half a cell sits in the
+  gap: 2.9 times above the largest added, 2.5 times below the smallest refused. The two verdicts
+  that were round-off (kink120_2 and kink120_3 at 0.4999999999997) are both gone.
+- **Development-placed faults whose mesh changes:** 13 of 232, each by one vertex (all kinks;
+  sampling 0.5: 5, 0.3: 8). All 13 are still added.
+  - Slip change: median +10 %, 90 % within 44 %.
+  - The largest change is box_reg kink150_6 at 0.5. On development it is a half-split fault (two
+    pieces, slip 0.0036 against a reference of 0.101). 0006 refuses it; 0007 splits it whole at
+    0.0999.
+  - Against the one-cell reference (9 with one), the median error falls from 14 % to 3.8 %, and
+    faults off by more than 10 % from 5 to 2.
+  - Worse by more than 2 points: box_irr kink90_1 at 0.5 (2.7 → 5.0 %), box_irr kink90_9 at 0.3
+    (2.2 → 17.8 %), box_reg kink60_2 at 0.3 (1.2 → 4.0 %).
+- **Caveat (UNFILED 84, not this patch):** 150-degree hairpins at sampling 0.3 give wrong slip
+  whatever the order (box_reg kink150_3: +74 % under both). On the irregular box 0007 adds one
+  that 0006 refused by distance (+83 %).
+
+**Review round 3 (Linux workstation, changes requested):**
+1. The end check was partition-dependent. The edges are now gathered and counted ONCE
+   (`{tuple(sorted(e)) ...}`), for the pieces, the ends and the turns. The parallel test adds a
+   stray end on a seam; it fails at np 2 without the fix (the reviewer's run).
+2. Round-off at 0.5: removed by the turn fix, as measured above.
+3. Lows:
+   - the tip and turn labels are removed after use;
+   - slits are matched to the exact side labels of the faults already split into the mesh
+     (`_fault_point_pairs`), and a test shows a 'UserPlus' label no longer disables the checks;
+   - a failing check beside a slit is returned and raised after the record check and the split,
+     so a 3-piece chain across a slit is refused, with test_1174's junction messages kept;
+   - the parallel test also runs add_fault distributed (`partition=False, across_seams=True`) and
+     catches every exception before its gather;
+   - "half" replaces "0.5 of".
+
+Suites: 433 passed, 1 skipped. On one rank, all 12 cases of the parallel test pass, called
+directly; np 2-4 is for the reviewer.
