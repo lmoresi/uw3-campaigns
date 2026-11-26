@@ -4940,3 +4940,10 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - A run that forms no fault ran on silently. Under the ruling that every model has a fault (25 Nov), the driver should stop when no fault forms in the first steps rather than continue fault-free.
   - It failed in R6 too, with 6 km cells, where a 7 km layer is about one cell. So either the march does not run at the box's resolution, or the layer is sampled on the unrefined base. To answer.
   - Mechanically the weak tracer layer is still 11.3 km; only the crust line used for the fit is 7 km. Louis's "7-8 km crust" is in the geometry of the fit, not in the weak material.
+
+### 2026-11-26 — guard: no fault at the first fit stops the run (K1 430b0ed → 2dbb16b); fit scales; no crust in the mechanics
+- 430b0ed (on 01fd202, blob c2f2e73), verified (.gz and mbox sha match) and pushed to kaiju/slab-workbench as 2dbb16b. A detection that finds no slab top while the run has no fault stops the run: exit 3, "STOPPED: no fault formed at the first fit (step N)". workbench_seg.sh ends the chain on exit 3.
+  - Hub caveat: this assumes a slab top exists from the start, which holds for the imposed-slab workbench. A run where subduction must initiate would stop wrongly; it would need a grace period.
+- Why R6 also failed: the march runs on the ocrust particles with a fixed step ds = 0.005 (14.5 km), keeping particles within 1.5 x crust_thick of its path. With crust_thick 7 the band was 10.5 km, and the line left it at the hinge, whatever the cell size.
+  - So the fit's scales (14.5 km march, 58 km spline smoothing) are the same in R6c and R17c. The box refines the mesh and the fault's rungs (6 km), not the fit. The fit gains nothing from the box.
+- Correction (K1): the 11.3 km tracer layer is not weak (-uw_crust_weak 0.999). R6c/R17c have no weak crust at all; the 7 km crust exists only as fit geometry (crust line at 7 km, fault 3 km above it).
