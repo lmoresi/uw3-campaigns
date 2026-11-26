@@ -5015,3 +5015,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - Louis's question ("first make sure it still works with the new asthenosphere parameters") has an answer: as it stands, it does not. On the weak mantle the recipe's fit fails within ~16 Myr in both meshes.
   - The tear sits on the S-kink that the prescribed 45 deg tip makes against the 670 step, so the initial slab geometry is a cause, not only particle density. Denser particles and gap-linking treat the fit; the seed (Louis's "too much cold material") is the other lever.
   - A 60 km look-ahead is four march steps. Check that the link never lands on another limb of the S-kink.
+
+### 2026-11-27 — fit_gap patch received intact (K1 54d9b3b → pushed)
+- The resend decoded: .gz cac62ad and mbox 622675c match, on a250e8f (= 907369c; K1's "8ac2588" was a slip). Blobs: slab_workbench.py ab56dd2, earth_units.py a0f93c0. Pushed to kaiju/slab-workbench as 9428958. The corrupt first send had a second half pasted from another patch.
+- Hub review of the code:
+  - The link takes a single particle (the nearest ahead within gap and band), with no median, so one stray particle defines the line across the gap.
+  - The band is 3 x crust_thick laterally, wide enough at 60 km ahead to reach another limb of the S-kink.
+  - Nothing records the links. Asked K1 to record each link's length and lateral offset.
+- Louis (via K1) has since asked for many more line particles (25-50 per element) and for re-populating the line along the fault after each fit; that is the next commit.
