@@ -4889,3 +4889,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Checks (ws/ns): fit_km is 0-10 km except single steps at 19 and 41. The unsigned slab values are -3 to -70 km (within the cold region; ambiguous without the sign). top_km is 78-207 km, flagged at steps 31, 32 and 37. slip/convergence is 0.41-0.61.
   - Hub: the fault tracks its own fit without the jump limit (item 1 is partly met). But top_km of 80-200 km together with slip/convergence of about 0.5 says the fault carries only about half the convergence, and the strongest convergence lies 100-200 km from the fault's surface point, in the 26 km thin strip (over_gap 2175 km). K1 reads this as the set-up. Hub reading: it is the physics putting the plate boundary away from the fault, which is what the check is meant to catch. K1 has asked Louis again whether the overriding plate should touch the trench.
 - Next: run the signed slab check (208b056) offline on 4974's checkpoints, with the ocrust line against the half-T edge as the baseline.
+
+### 2026-11-26 — job 4974 follow-up (K1 check_4974.py): the strip, not the fault, is the plate boundary
+- K1 now agrees the top flag is live.
+- Signed distance from the half-T edge (ns; ws within a few km), fault | ocrust line:
+  - step 32: -102|-104 at 100 km, -60|-68 at 200 km, -21|-25 at 300 km
+  - step 46: -59|-67, -72|-107, -48|-59
+  - step 58: -78|-66, -100|-65, -99|-62
+  - The fault follows the ocrust line within about 10 km (35-40 km at 300 km late on). Both lie 60-100 km inside the edge, because cold strip lithosphere is dragged down on top of the slab.
+- Step 58, top 30 km, by distance from the fault's surface point: plastic strain rate about 2e-16/s at 0-50 km, 5e-15 at 100-150, about 1e-14 at 150-250, and below 1e-21 outside. Surface v_t falls from 3.4 to -1.6 cm/yr across 150-250 km. The strip yields there and takes most of the convergence; the fault takes 0.3-0.5.
+- Line-search cutbacks line up with rebuilds: 6-19 on rebuild steps, 0-7 on steps 52-60 (where only the top flag fires).
+- K1 proposes checking against the ocrust line or melange base instead of the thermal edge. Hub disagrees:
+  - The fault is fitted to the ocrust line, so that check is circular: it repeats fit_km.
+  - The thermal check is reporting a real condition: cold hanging-wall lithosphere going down with the slab means the decoupling surface is above the fault, in the strip. That agrees with the strain rates.
+  - Keep the thermal check. Add an independent kinematic check: where the along-slab velocity changes from slab to wedge (peak shear strain rate across the slab top) against the fault.
+- Set-up question for Louis, asked by K1: an ocean-ocean set-up with the overriding plate at the trench, instead of the 26 km thin strip (over_gap 2175 km).
