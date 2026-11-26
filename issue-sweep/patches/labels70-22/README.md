@@ -1,12 +1,13 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Five commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Six commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
 - 0003 (911a7b16) is UNFILED 72: the cut refuses a flat cell (see the 72 section).
 - 0004 is review round 1 (see its section).
 - 0005 is review round 2 (see its section).
+- 0006 keeps a vertex on each tip and requires the chain to end on them (see its section).
 
 ## Cause
 `line_cut._label_cut_edges` labelled an edge only when both its ends AND its midpoint lay on the
@@ -175,9 +176,41 @@ curve sampled one cell apart (the reference counts only when it is one piece wit
   - Slip does not split at it either: the 0.45-0.60 band holds 26 faults within 10 % and 15
     outside.
 - **Choice (hub's rule when no gap exists):** keep 0.5, keep the piece check for the split chains,
-  and state the residual risk. At 0.5, 252 of the 321 one-piece faults are added. Of those, 36
+  and state the residual risk. (Superseded by 0006, which removes the tip shortfalls; the numbers
+  below are 0005's.) At 0.5, 252 of the 321 one-piece faults are added. Of those, 36
   stop short of a tip, by at most 0.50 cells:
   - shortfalls up to 0.4 cells: slip error median 10 %, 12 of 21 above 10 %;
   - shortfalls of 0.4-0.5 cells: slip error median 5 %, 1 of 13 above 10 %;
   - no shortfall: median 1.4 %, 13 of 77 above 10 % (the distortion).
   This is stated in add_fault's docstring (Raises) and in the PR body.
+
+## 0006: the tips keep their vertices (hub, after round 2's geometry)
+Every one of the 36 tip-short faults was short at the START of the trace, by one sample spacing.
+`tip_dbg.py` on box_reg, sampling 0.5, la3 shows the mechanism:
+- sample 0 (the tip) and sample 1 chose the same vertex, and `pull_vertex_onto` gives it to the
+  later target;
+- the tip ended 0.5 cells from any vertex, and the cut's first segment began at sample 1.
+At the end of a trace the tip is the later target of its pair, so it always won there.
+test_0897's "empty" and "short" traces of UNFILED 68 were this defect too.
+
+The fix, in add_fault:
+- the tips are pulled after the other samples;
+- their vertices are labelled `UW_FaultTip` (the pull writes the tip's own coordinates, matched
+  exactly; the cut carries the label);
+- the chain's ends, joined globally by vertex number, must be those vertices, or the cut is refused.
+  This is exact, by mesh point, with no tolerance.
+
+On the grid (`cover6_box_*.jsonl`):
+
+| | 0005 | 0006 |
+|---|---|---|
+| one-piece faults refused by distance | 69 | 20 |
+| median slip error (judged) | 5.0 % | 2.0 % |
+| sound faults' worst distance (99 % / max) | 0.645 / 0.94 cells | 0.447 / 0.52 cells |
+| added faults short of a tip | 36 | 0 |
+
+- The 12 faults still short of a tip are 150-degree hairpins that lose a whole arm (2-4 cells).
+  The distance (1.25-1.56 cells) and the end check refuse them.
+- The distance keeps 0.5 for the corners. Bad faults still start at 0 there, from the pull's cell
+  distortion (row 29).
+- Suites: 432 passed, 1 skipped.
