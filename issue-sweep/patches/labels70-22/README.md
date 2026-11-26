@@ -214,3 +214,17 @@ On the grid (`cover6_box_*.jsonl`):
 - The distance keeps 0.5 for the corners. Bad faults still start at 0 there, from the pull's cell
   distortion (row 29).
 - Suites: 432 passed, 1 skipped.
+
+### The size of 0006's change on faults development places today (`order0006.py`)
+The pull is the same function on development and 0006, and the cut is deterministic once the pull
+is done. So a mesh changes exactly when the two target orders pull a different vertex set.
+- **Whole grid:** 167 of 480 meshes change (sampling 0.3: 101, 0.5: 64, 1.0: 2). Each differs by
+  ONE vertex: the tip's vertex in place of the neighbouring sample's.
+- **Development-placed faults** (complete on development, `pull_dev.jsonl`): 29 of 232 change
+  (24 kinks, 5 lines/arcs; sampling 0.5: 16, 0.3: 13). All 29 are still added.
+- **Slip, 0005 to 0006** (same labelling; only the order differs):
+  - median change +5.5 %; 90 % of changes within 17 %; the largest 26 %; 20 up, 9 down;
+  - against the one-cell reference (25 with one): |error| median 9.5 % to 2.3 %; faults off by more
+    than 10 %: 12 to 3. Better in 16, worse in 9.
+  - Worse by more than 2 points: six faults. Five are kink30s, which move from 0.2-5 % to 3-9 %
+    error. The sixth is kink150_3 at sampling 0.3, off already (68 % to 75 %).
