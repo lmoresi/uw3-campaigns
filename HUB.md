@@ -4914,3 +4914,21 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Checks: the thermal check stays recorded. The kinematic check is the one to trust for "fault in the wrong place" at depth.
   - Hub caveat: the split's own jump biases the peak toward the fault. The step-58 move-off shows the check can still see misplacement, but a deep slip rate against the slab-wedge velocity difference over ±50 km would make it firmer.
 - No set-up variants until Louis rules on ocean-ocean with the overriding plate at the trench.
+
+### 2026-11-26 — Louis: resolve the lithosphere and slab locally; ocean-ocean set-up R6/R17 (job 4977)
+- Louis: "the fault does follow the right line, but the damage zone is huge compared to the plate thickness ... Resolve the lithosphere and not everywhere; resolve the slab and not everywhere. Occam's razor as much as possible but not if it hurts us." His picks: the overriding side an 80 Myr ocean plate at the trench; 6 km cells; a 7-8 km crust.
+- Job 4977 (driver 01fd202 = kaiju/slab-workbench 208b056; from step 0; checks recorded only, default limits).
+  - Both arms:
+    - ocean-ocean: -uw_age_over_myr 80 -uw_over_gap_km 0 -uw_cont_age_myr 0 -uw_cont_extent_km 0 -uw_over_drho_kg_m3 0
+    - 7 km crust: -uw_ocrust_depth_km 7 -uw_fault_above_ocrust_km 3 -uw_crust_thick_km 7
+    - S3n's fault: ocrust fit, tangent top, -uw_fault_jump_rungs 0
+    - weak_min 1; halo at the slab's own age; the S0 mantle
+  - R6: focus box with -uw_focus_cell_km 6 -uw_focus_arc_km 600 -uw_focus_centre_km 0 -uw_focus_depth_km 300 -uw_focus_growth 0.3; 88 GB per step.
+  - R17: the same with no box (17 km surface cells), as the control.
+  - The S3/S4 runs (4970, 4972) continue on the old set-up.
+- K1 on the broad damage: the split starts about one 17 km rung below the surface, and the old 26 km strip lay almost entirely above it, welded to the slab across that layer. That explains the yielding 150-350 km into the overriding side.
+- Hub review:
+  - Design: R17 against S3n tests the set-up change; R6 against R17 tests resolution. Good.
+  - The box is fixed: 600 km of arc and 300 km deep at the initial trench. It resolves the trench and the top of the slab, not the slab below 300 km, and it does not follow the trench if it migrates. This is a first step toward "resolve the slab", not the whole of it; MMPDE remains the moving option.
+  - The 3 km fault-above-ocrust offset is sub-cell in both arms, and the 7 km crust is sub-cell in R17.
+  - Report memory per segment for R6, given the leak.
