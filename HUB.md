@@ -4904,3 +4904,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - The thermal check is reporting a real condition: cold hanging-wall lithosphere going down with the slab means the decoupling surface is above the fault, in the strip. That agrees with the strain rates.
   - Keep the thermal check. Add an independent kinematic check: where the along-slab velocity changes from slab to wedge (peak shear strain rate across the slab top) against the fault.
 - Set-up question for Louis, asked by K1: an ocean-ocean set-up with the overriding plate at the trench, instead of the 26 km thin strip (over_gap 2175 km).
+
+### 2026-11-26 — kinematic check on 4974 (K1 kin_check.py): at depth the fault is the interface; hub reading withdrawn
+- S3n_ns: peak along-dip shear across the slab top, relative to the fault crossing (> 0 toward the overriding side).
+  - Through step 52, the peak is within about one cell of the fault at 100, 200 and 300 km (offsets -12 to +8 km; peaks 0.02-0.21 cm/yr per km). The ocrust line is within about 20 km.
+  - At step 58, the peaks at 200 and 300 km move off (+172 and -158 km) and are 3-10x weaker: the deep fault is nearly inactive. To watch.
+- So the cold strip lithosphere over the fault moves with the wedge side; it is not a decoupling above the fault. The hub reading of 4c4699e ("decoupling surface above the fault") is withdrawn for depth.
+- What stands: the plate boundary is misplaced at the surface, where the strip yields 150-250 km from the fault top (top flag live; the fault takes 0.3-0.5 of convergence).
+- Checks: the thermal check stays recorded. The kinematic check is the one to trust for "fault in the wrong place" at depth.
+  - Hub caveat: the split's own jump biases the peak toward the fault. The step-58 move-off shows the check can still see misplacement, but a deep slip rate against the slab-wedge velocity difference over ±50 km would make it firmer.
+- No set-up variants until Louis rules on ocean-ocean with the overriding plate at the trench.
