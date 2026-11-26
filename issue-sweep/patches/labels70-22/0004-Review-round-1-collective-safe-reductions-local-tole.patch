@@ -1,7 +1,7 @@
 From 23f0f0b4f0e1840c70aa68fc2566e15646f19257 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 11:18:02 +1100
-Subject: [PATCH 4/4] Review round 1: collective-safe reductions, local
+Subject: [PATCH 4/5] Review round 1: collective-safe reductions, local
  tolerance, one connected chain
 
 - The per-point reductions in the empty-or-partial check (distances under

@@ -1,0 +1,361 @@
+From a00f18d24a93c3001ec3f4970982e30491a2bf0f Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Thu, 26 Nov 2026 13:51:06 +1100
+Subject: [PATCH 5/5] Review round 2: base-mesh cell size, pieces by vertex
+ number, parallel test
+
+- The coverage test's cell size is the median length of the 6 base-mesh
+  edges nearest each trace point, measured before the pull and the cut. A
+  radius that grew with the distance to the nearest edge let half a cell
+  reach 0.56-0.75 cells at a tip or a corner, and the cut's own short
+  edges shrank it to 0.06-0.08 cells beside them. Each rank offers its 6
+  nearest owned edges and every rank takes the same 6, ties by global
+  point number.
+- The fraction stays at half a cell, now a named constant. On a 480-trace
+  box grid no distribution has a gap to put it in: sound faults (slip
+  within 10 % of the trace sampled a cell apart) reach 0.94 cells and
+  wrong ones start at 0, the pull's distortion mixing the two; the tip
+  shortfalls fall at whole sample spacings. A single chain stopping up to
+  half a cell short of a tip is therefore added; add_fault's docstring
+  says so, with the measured slip error.
+- The chain's pieces are joined at global vertex numbers, not coordinates,
+  so the coincident vertices of an earlier fault's slit stay apart.
+- A parallel test: the refusals and acceptances agree on every rank with
+  one message, and a hand-labelled chain across the partition is one
+  piece, with one edge out two.
+
+Suites: 431 passed, 1 skipped; the parallel test is not run here.
+
+Underworld development team with AI support from Claude Code
+---
+ .../discretisation/discretisation_mesh.py     |   2 +-
+ src/underworld3/utilities/fault_split.py      | 126 ++++++++++++------
+ ...lt_refusal_agrees_across_ranks_parallel.py | 101 ++++++++++++++
+ 3 files changed, 188 insertions(+), 41 deletions(-)
+ create mode 100644 tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+
+diff --git a/src/underworld3/discretisation/discretisation_mesh.py b/src/underworld3/discretisation/discretisation_mesh.py
+index 7dcb094d..5f1d9c03 100644
+--- a/src/underworld3/discretisation/discretisation_mesh.py
++++ b/src/underworld3/discretisation/discretisation_mesh.py
+@@ -10250,7 +10250,7 @@ class Mesh(Stateful, uw_object):
+         for line in lines:
+             _refuse_an_empty_or_partial_cut(cut_dm, name, value, line,
+                                             caller="add_conforming_surface",
+-                                            domain=self)
++                                            domain=self, base_dm=dm)
+         earlier = (None if tracked is None
+                    else _carried_fault_records(cut_dm, tracked, [name]))
+         if verbose:
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 8fe8768e..9912bb89 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1612,46 +1612,76 @@ def _label_embedded_edges(dm, segments, values, exclude=None, verbose=False,
+     return new
+ 
+ 
+-def _local_cell_size(X, ends, points):
+-    """The mesh's edge length near each of ``points``: the MEDIAN length of the
+-    edges whose midpoints lie within three times the distance from the point to
+-    the nearest edge midpoint, so it follows a graded mesh (a mean counts the
+-    diagonals and the cut's own short edges; on a regular box the median is the
+-    cell side). COLLECTIVE: the nearest distance is MIN-reduced into a buffer
+-    (mpi4py's pickling allreduce compares whole arrays under MIN), and each
+-    rank's nearby lengths are gathered, so every rank takes the same median."""
++# the largest distance from the trace to its chain, as a fraction of the local
++# cell size, that a cut may leave. No measured distribution has a gap to put it
++# in (on the 480-trace box grid sound faults reach 0.94 cells and wrong ones
++# start at 0, the pull's distortion mixing the two), so it stays at half a cell;
++# the piece count refuses the split chains a distance cannot see
++_COVERAGE_FRACTION = 0.5
++
++# the cell size at a trace point: the median length of this many base-mesh edges
++# nearest it (by midpoint); see _base_cell_size
++_CELL_SIZE_EDGES = 6
++
++
++def _base_cell_size(base_dm, points, k=_CELL_SIZE_EDGES):
++    """The BASE mesh's edge length at each of ``points``: the median length of
++    the ``k`` edges whose midpoints are nearest the point.
++
++    Measured on the mesh before the pull and the cut, so neither the cut's own
++    short edges nor the gap being judged can move it (a radius that grew with the
++    distance to the nearest edge let half a cell reach 0.56-0.75 cells at a tip or
++    a corner). COLLECTIVE: each rank offers its k nearest OWNED edges, the offers
++    are gathered, and every rank takes the same k nearest (ties by global point
++    number), so the answer does not move with the partition."""
+     from scipy.spatial import cKDTree
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
+ 
+     comm = uw.mpi.comm
+     n = len(points)
+-    mid = 0.5 * (X[ends[:, 0]] + X[ends[:, 1]])
+-    L = np.linalg.norm(X[ends[:, 0]] - X[ends[:, 1]], axis=1)
+-    near = np.full(n, np.inf)
+-    tree = cKDTree(mid) if len(mid) else None
+-    if tree is not None and n:
+-        near = np.asarray(tree.query(points)[0], dtype=float)
+-    comm.Allreduce(MPI.IN_PLACE, near, op=MPI.MIN)
+-    mine = [np.zeros(0)] * n
+-    if tree is not None and n:
+-        mine = [L[idx] for idx in tree.query_ball_point(points, r=3.0 * near + 1e-300)]
+-    gathered = comm.allgather(mine)
++    X = _coords(base_dm)
++    ends = _edge_vertices(base_dm)
++    eS, eE = base_dm.getDepthStratum(1)
++    pS, _pE = base_dm.getChart()
++    gnum = np.asarray(base_dm.createPointNumbering().getIndices(), dtype=np.int64)
++    gid = gnum[np.arange(eS, eE) - pS]
++    owned = gid >= 0
++    mid = 0.5 * (X[ends[owned, 0]] + X[ends[owned, 1]])
++    L = np.linalg.norm(X[ends[owned, 0]] - X[ends[owned, 1]], axis=1)
++    gid = gid[owned]
++    kk = min(k, len(mid))
++    if kk and n:
++        dist, idx = cKDTree(mid).query(points, k=kk)
++        dist = np.asarray(dist, dtype=float).reshape(n, kk)
++        idx = np.asarray(idx).reshape(n, kk)
++        mine = (dist, L[idx], gid[idx].astype(float))
++    else:
++        mine = (np.zeros((n, 0)), np.zeros((n, 0)), np.zeros((n, 0)))
++    offers = comm.allgather(mine)
++    dist = np.hstack([o[0] for o in offers])
++    lens = np.hstack([o[1] for o in offers])
++    ids = np.hstack([o[2] for o in offers])
+     out = np.full(n, np.nan)
+-    for k in range(n):
+-        lens = np.concatenate([g[k] for g in gathered])
+-        if lens.size:
+-            out[k] = float(np.median(lens))
++    for j in range(n):
++        if dist.shape[1]:
++            order = np.lexsort((ids[j], dist[j]))[:k]
++            out[j] = float(np.median(lens[j, order]))
+     return out
+ 
+ 
+ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+-                                    domain=None):
++                                    domain=None, base_dm=None):
+     """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
+ 
+     A sample left without a vertex (a trace sampled finer than the mesh) could
+     leave the fault with no facet, or stopping short of the trace's end, and
+-    nothing said so. The chain must come within half the LOCAL median edge
+-    length (:func:`_local_cell_size`) of every point of the trace, ten points
+-    per segment. ``domain``, a Mesh, restricts the test to the trace's points inside
++    nothing said so. The chain must come within a fraction
++    (``_COVERAGE_FRACTION``) of the base mesh's local edge length
++    (:func:`_base_cell_size` on ``base_dm``, the mesh before the pull and the
++    cut; ``dm`` when not given) of every point of the trace, ten points per
++    segment. Half a cell is not a gap in any measured distribution: a single
++    chain stopping up to half a cell short of a tip passes (see add_fault).
++    ``domain``, a Mesh, restricts the test to the trace's points inside
+     it, for a surface that runs past the walls (add_conforming_surface).
+     COLLECTIVE: every count and distance is reduced, so every rank decides
+     alike."""
+@@ -1669,7 +1699,7 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+ 
+     t = np.linspace(0.0, 1.0, 11)
+     dense = np.vstack([poly[:-1] + x * (poly[1:] - poly[:-1]) for x in t])
+-    h = _local_cell_size(X, ends, dense)
++    h = _base_cell_size(dm if base_dm is None else base_dm, dense)
+     seg = np.linalg.norm(np.diff(poly, axis=0), axis=1)
+     spacing = float(np.median(seg)) if seg.size else float("nan")
+ 
+@@ -1689,14 +1719,17 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+     if caller == "add_fault":
+         # one polyline cuts to ONE connected chain. Counted GLOBALLY: every
+         # rank's labelled edges are gathered (they are few) and joined at their
+-        # end points, keyed by coordinates. A vertex shared by two ranks has
+-        # bit-identical coordinates on both, so this is identity, not a
+-        # tolerance, and a chain crossing a partition seam (across_seams, or
+-        # partition=False) counts as one. Measured: a chain in two pieces with a
+-        # 0.58-cell gap can pass the distance test below when the trace runs
+-        # within half a cell of the other piece; the split then split one piece
+-        # and left the other, and add_fault returned it.
+-        local = [(tuple(map(float, X[a])), tuple(map(float, X[b]))) for a, b in ends[marked]]
++        # end points, keyed by GLOBAL vertex number, so a chain crossing a
++        # partition seam (across_seams, or partition=False) counts as one, and
++        # the coincident vertices of an earlier fault's slit stay apart.
++        # Measured: a chain in two pieces with a 0.58-cell gap can pass the
++        # distance test below when the trace runs within half a cell of the
++        # other piece; the split then split one piece and left the other, and
++        # add_fault returned it.
++        vS, _vE = dm.getDepthStratum(0)
++        vnum = np.asarray(dm.getVertexNumbering().getIndices(), dtype=np.int64)
++        vnum = np.where(vnum >= 0, vnum, -vnum - 1)
++        local = [(int(vnum[a]), int(vnum[b])) for a, b in ends[marked]]
+         parent = {}
+ 
+         def root(v):
+@@ -1714,7 +1747,6 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+         pieces = len({root(v) for v in parent})
+         # a chain cut in two by an already-split fault's slit is the split's
+         # to refuse, with its own message (a touching junction): defer to it
+-        vS, _vE = dm.getDepthStratum(0)
+         slit_labels = [dm.getLabelName(i) for i in range(dm.getNumLabels())
+                        if dm.getLabelName(i).endswith(("Plus", "Minus"))]
+         # the slit labels sit on edges: look at the star of every chain vertex
+@@ -1743,11 +1775,12 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+         d = np.where(inside.astype(bool), d, 0.0)
+     excess = d / np.where(np.isfinite(h) & (h > 0), h, np.inf)
+     worst = int(np.argmax(excess))
+-    if excess[worst] > 0.5:
++    if excess[worst] > _COVERAGE_FRACTION:
+         where = tuple(float(x) for x in dense[worst])
+         raise ValueError(f"{caller}: the cut along {name!r} misses part of the trace: "
+                          f"the labelled chain is {d[worst]:.3g} from the trace at {where}, "
+-                         f"more than half the local cell side ({0.5 * h[worst]:.3g}). "
++                         f"more than {_COVERAGE_FRACTION:g} of the local cell side "
++                         f"({_COVERAGE_FRACTION * h[worst]:.3g}). "
+                          f"{advice(float(h[worst]))}")
+ 
+ 
+@@ -1829,6 +1862,17 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+     -------
+     Mesh
+         The split mesh, carrying every fault's side boundaries and pairing.
++
++    Raises
++    ------
++    ValueError
++        When a cut labels no facet, is in more than one piece, or leaves a point
++        of the trace farther from its chain than half the local cell side (the
++        base mesh's, before the cut). A chain in one piece may still stop up to
++        half a cell short of a tip and be added: on a 1/12 box grid of 480
++        traces, 36 of the 252 faults added stopped short, by at most 0.50 cells,
++        and their slip was 5-10 % (median) off the same trace sampled a cell
++        apart. Sampling a trace about a cell apart leaves no shortfall.
+     """
+     from enum import Enum
+ 
+@@ -1915,6 +1959,7 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+         if dm is mesh.dm:
+             dm = dm.clone()
+         _mark_host_cells(dm)
++        base_dm = dm
+         for name, poly in segments:
+             # EVERY control point gets a vertex, not just the tips: an
+             # interior kink is the same problem as a tip — a distinguished
+@@ -1926,7 +1971,8 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+             dm, info = cut_along_lines(dm, [poly], label=name,
+                                        label_value=values[name], **snap)
+             _refuse_an_empty_or_partial_cut(dm, name, values[name],
+-                                            np.asarray(poly, dtype=float))
++                                            np.asarray(poly, dtype=float),
++                                            base_dm=base_dm)
+             if verbose:
+                 uw.pprint(f"[add_fault {name!r}] {info['n_cut_edges']} "
+                           f"facets, min angle {info['min_angle']:.2f} deg")
+diff --git a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+new file mode 100644
+index 00000000..9f0092d0
+--- /dev/null
++++ b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+@@ -0,0 +1,101 @@
++"""add_fault's empty-or-partial refusal in parallel (UNFILED 68).
++
++The refusal is collective: every count and distance is reduced, the cell size is
++taken from the k nearest owned base-mesh edges gathered over the ranks, and the
++chain's pieces are joined at global vertex numbers over the gathered labelled
++edges. So every rank raises the same message or none does, and a chain that
++crosses a partition seam counts as one piece.
++
++What is asserted, at any rank count:
++
++* the two traces of tests/test_0897 that cut short are refused on every rank,
++  with one message, and the whole one is added on every rank;
++* a chain labelled by hand along y = 0.5 across most of the distributed box is
++  one piece and passes; the same chain with one edge left out is refused as two
++  pieces on every rank.
++
++    mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
++    mpirun -n 3 python -m pytest --with-mpi tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.mpi(min_size=2), pytest.mark.level_2, pytest.mark.tier_b,
++              pytest.mark.timeout(900)]
++
++H = 1 / 12
++
++
++def _trace(k, ds):
++    # the generator of tests/test_0897
++    rng = np.random.default_rng(22)
++    for i in range(k + 1):
++        ang = rng.uniform(0, np.pi)
++        turn = rng.uniform(-1, 1) if i % 2 else 0.0
++        c = 0.5 + rng.uniform(-0.05, 0.05, 2)
++    L = 6 * H
++    s = np.linspace(-L / 2, L / 2, max(2, int(round(6 / ds))) + 1)
++    th = ang + turn * s / L
++    d = np.column_stack([np.cos(th), np.sin(th)])
++    return c + np.cumsum(np.vstack([[0, 0], d[1:] * np.diff(s)[:, None]]), axis=0) - L / 2 * d[0]
++
++
++@pytest.fixture(scope="module")
++def box():
++    return uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                             cellSize=H, regular=True)
++
++
++def _outcome(fn):
++    try:
++        fn()
++        return "passed"
++    except ValueError as e:
++        return str(e)
++
++
++def _same_everywhere(outcome):
++    every = uw.mpi.comm.allgather(outcome)
++    assert all(o == every[0] for o in every), every
++    return every[0]
++
++
++@pytest.mark.parametrize("k", [3, 4], ids=["empty", "short"])
++def test_a_short_cut_is_refused_alike_on_every_rank(box, k):
++    out = _same_everywhere(_outcome(lambda: box.add_fault(("F", _trace(k, 0.3)))))
++    assert "misses part of the trace" in out or "labelled no facet" in out
++
++
++def test_a_whole_cut_is_added_on_every_rank(box):
++    assert _same_everywhere(_outcome(lambda: box.add_fault(("F", _trace(0, 1.0))))) == "passed"
++
++
++def _label_on_y(dm, name, y, spans):
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
++    X = _coords(dm)
++    eS, _ = dm.getDepthStratum(1)
++    ends = _edge_vertices(dm)
++    lo = np.minimum(X[ends[:, 0], 0], X[ends[:, 1], 0])
++    hi = np.maximum(X[ends[:, 0], 0], X[ends[:, 1], 0])
++    on = (np.abs(X[ends[:, 0], 1] - y) < 1e-9) & (np.abs(X[ends[:, 1], 1] - y) < 1e-9)
++    keep = np.zeros(len(ends), dtype=bool)
++    for x0, x1 in spans:
++        keep |= on & (lo >= x0 - 1e-9) & (hi <= x1 + 1e-9)
++    dm.createLabel(name)
++    lab = dm.getLabel(name)
++    for e in np.flatnonzero(keep) + eS:
++        lab.setValue(int(e), 7)
++
++
++def test_a_chain_across_the_seams_is_one_piece(box):
++    from underworld3.utilities.fault_split import _refuse_an_empty_or_partial_cut
++    poly = np.array([[1 / 12, 0.5], [11 / 12, 0.5]])
++    dm = box.dm.clone()
++    _label_on_y(dm, "Whole", 0.5, [(1 / 12, 11 / 12)])
++    assert _same_everywhere(_outcome(lambda: _refuse_an_empty_or_partial_cut(dm, "Whole", 7, poly))) == "passed"
++    dm = box.dm.clone()
++    _label_on_y(dm, "Gap", 0.5, [(1 / 12, 6 / 12), (7 / 12, 11 / 12)])
++    out = _same_everywhere(_outcome(lambda: _refuse_an_empty_or_partial_cut(dm, "Gap", 7, poly)))
++    assert "is in 2 pieces" in out
+-- 
+2.39.5 (Apple Git-154)
+

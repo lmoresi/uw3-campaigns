@@ -1,11 +1,12 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Four commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Five commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
 - 0003 (911a7b16) is UNFILED 72: the cut refuses a flat cell (see the 72 section).
 - 0004 is review round 1 (see its section).
+- 0005 is review round 2 (see its section).
 
 ## Cause
 `line_cut._label_cut_edges` labelled an edge only when both its ends AND its midpoint lay on the
@@ -123,6 +124,60 @@ the refusals fail with the guard disabled. Suites: 431 passed, 1 skipped (run at
    - 72's message no longer asks for a sample at an existing one;
    - 72's loop is vectorised;
    - the 120-degree comment is corrected;
-   - test_0897's short case is now caught by the partition-independent piece count, and the test
-     gains a two-pieces hand-labelled case.
+   - test_0897 gains a two-pieces hand-labelled case, which only the piece count refuses.
+     (Corrected in round 2: the trace cases are NOT refused by the piece count. Both are one
+     chain; the distance refuses them, at 0.9 cells (the empty case) and 0.6 cells (the short case).)
 Suites: 431 passed, 1 skipped.
+
+## Review round 2 (Linux server: changes requested), commit 0005
+1. Medium, tolerance:
+   - h is now the median length of the 6 BASE-mesh edges nearest each trace point (by midpoint).
+     The base is the mesh before the pull and the cut, so neither the gap being judged nor the
+     cut's own short edges (low 3) can move it.
+   - Collective: each rank offers its 6 nearest OWNED edges (owned by `createPointNumbering`),
+     and every rank takes the same 6 nearest, ties broken by global point number.
+   - The fraction is the named constant `_COVERAGE_FRACTION`, kept at 0.5. The numbers below say
+     why: no measured distribution has a gap.
+2. The piece join is keyed by global vertex number, not coordinates, so an earlier slit's
+   coincident vertices stay apart.
+3. Low 3 follows from (1).
+4. New parallel test `tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py`:
+   - refused and added traces give one outcome and one message on every rank;
+   - a hand-labelled chain across the distributed box is one piece, and the same chain with one
+     edge out is "2 pieces" on every rank.
+   - Not run here (no MPI on the laptop).
+5. The round 1 text on the short case is corrected above.
+
+### The threshold measurement (`cover.py`, the 480-trace box grid)
+For each fault, the refusal was patched to record instead of raise, keeping: the pieces, the worst
+trace-to-chain distance (in base k=6 cells), and the frictionless-fault max slip against the same
+curve sampled one cell apart (the reference counts only when it is one piece within 0.25 cells).
+
+- **Today's pull rule** (every sample pulled; `cover_box_*.jsonl`): 164 one-piece faults have a
+  reference, 109 of them within 10 % and 55 off by more. There is no gap.
+  - The sound faults' worst distance reaches 0.94 cells (quantiles 50/90/99 %: 0.13/0.52/0.65).
+  - The bad faults' starts at 0.000 (quantiles 50/90 %: 0.50/0.94).
+  - Three bad faults lie exactly on their trace and are still 10-18 % off: the pull's cell
+    distortion moves slip without any coverage fault (register row 29).
+- **Row 29's rule, emulated in the probe** (`ROW29=1`, `cover29_box_*.jsonl`):
+  - sound faults reach at most 0.313 cells (99 %: 0.146);
+  - eight bad faults lie at 0 (kinks of 90 and 150 degrees, off for another reason), and the
+    rest run from 0.271 to 0.624;
+  - 0.35-0.43 would separate them here, but 38 of today's 109 sound faults lie above 0.4. It is
+    not a threshold for today's rule.
+- **Geometry, which depends on no pull rule** (`GEOM=1`, `coverg_box_*.jsonl`): each chain edge's
+  ends are projected onto the trace's arc length, the intervals are joined, and the gaps are
+  measured in base cells.
+  - No fault has an interior gap; every uncovered stretch is at a tip. Corner cuts project as
+    covered and are left to the distance.
+  - The tip shortfalls fall at whole sample spacings: 0.31 and 0.625 cells at sampling 0.3, 0.5
+    at sampling 0.5. So the empty band at 0.40-0.45 belongs to the sampling grid, not to the faults.
+  - Slip does not split at it either: the 0.45-0.60 band holds 26 faults within 10 % and 15
+    outside.
+- **Choice (hub's rule when no gap exists):** keep 0.5, keep the piece check for the split chains,
+  and state the residual risk. At 0.5, 252 of the 321 one-piece faults are added. Of those, 36
+  stop short of a tip, by at most 0.50 cells:
+  - shortfalls up to 0.4 cells: slip error median 10 %, 12 of 21 above 10 %;
+  - shortfalls of 0.4-0.5 cells: slip error median 5 %, 1 of 13 above 10 %;
+  - no shortfall: median 1.4 %, 13 of 77 above 10 % (the distortion).
+  This is stated in add_fault's docstring (Raises) and in the PR body.
