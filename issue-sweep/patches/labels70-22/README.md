@@ -1,10 +1,11 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Three commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Four commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
-- 0003 (911a7b16) is UNFILED 72: the cut refuses a flat cell (see the last section).
+- 0003 (911a7b16) is UNFILED 72: the cut refuses a flat cell (see the 72 section).
+- 0004 is review round 1 (see its section).
 
 ## Cause
 `line_cut._label_cut_edges` labelled an edge only when both its ends AND its midpoint lay on the
@@ -101,3 +102,27 @@ never refuses a trace development places.
 test_0899: the measured trace is refused under both pull rules; a trace that places normally is not;
 the refusals fail with the guard disabled. Suites: 431 passed, 1 skipped (run at a threshold of 1e-6;
 1e-9 refuses strictly less).
+
+## Review round 1 (Linux server: changes requested), commit 0004
+1. HIGH, parallel hang: every array reduction is in-place `comm.Allreduce` (the distances under
+   MIN, the inside mask under MAX, the local-size reductions). The remaining lowercase reductions
+   are on scalars and tuples. Not run in parallel here; np 2-4 is the review's.
+2. Tolerance: half the LOCAL median edge length at each trace point. On the irregular box the local
+   median is about 1.25 nominal cells. kink120_1's worst gap (0.541 nominal = 0.43 local cells)
+   therefore passes the distance test. It is refused by the new topological check: one polyline
+   must cut to ONE connected chain, counted globally (gathered edges joined at coordinate-keyed end
+   points, so a chain across a seam counts once). It defers to the split's touching-junction refusal
+   when an earlier slit cut it.
+   - The defect it exposed on development: the split splits one fragment and leaves the other
+     labelled but unsplit, and add_fault returns no error. In kink120_1 the Plus and Minus chains end
+     2.2 cells short of the trace (`dbg_split2.py`). On development's build, 101 of 265 returned
+     sharp-kink faults were in 2-3 pieces (`dev_pieces.jsonl`). Every trace the check refuses was in
+     pieces on development.
+3. Lows:
+   - add_conforming_surface's refusal gives surface advice;
+   - 72's message no longer asks for a sample at an existing one;
+   - 72's loop is vectorised;
+   - the 120-degree comment is corrected;
+   - test_0897's short case is now caught by the partition-independent piece count, and the test
+     gains a two-pieces hand-labelled case.
+Suites: 431 passed, 1 skipped.
