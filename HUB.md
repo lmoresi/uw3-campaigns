@@ -4986,3 +4986,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - K1's policy: a guard stop is resumed from its checkpoint with a higher -uw_fit_fail_stop and inspected, not discarded. Hub: acceptable, provided the inspection decides whether the frozen interval is valid, not only whether the run recovers.
 - Rsw is a comparison for Q10/Q17, not a control: it has the old stiff mantle with the T-switched channel.
 - Rev 1 of WORKBENCH_LESSONS.md, verified (.gz and mbox sha match) and pushed to zg95-annulus-for-kaiju as bdc2e26. Rule 5: R6d held its first 7 fits; Rsw's failure pattern; guard stop means resume and inspect. Rule 9: the split-bias caveat and the slip/velocity-difference test. Rule 11: "at depth", with S2f before its top ran off.
+
+### 2026-11-27 — Rsw steps 14-41 (frozen fault): K1 verdict valid
+- plate_budget.py on Rsw (step, Myr: convergence cm/yr | slab tip km | trench drift km):
+  - before: 4, 41: 0.05|504|0; 12, 133: 0.17|516|0
+  - frozen: 14, 146: 0.21|516|0; 26, 195: 0.40|531|-15; 38, 218: 1.00|593|-15
+  - after: 42, 223: 1.16|632|-15; 70, 250: 1.88|879|-66
+- The hang (41-146 Myr, 0.05-0.2 cm/yr) comes before the frozen interval. Convergence rises smoothly through it and carries on the same trend after step 42, with no jump at either end. The trench moved 15 km. K1 verdict: valid; Rsw stands as the comparison. Guard stops in Q10/Q17 get the same check and a recorded verdict.
+- Hub: accepted. The trench drift is a surface measure, while the slab tip went down 77 km during the interval. fault_on_slab at 150/300 km at step 38 would close the depth side.
