@@ -118,3 +118,21 @@ crease.
   about 10 minutes on the laptop. Not run.
 - **The two-dimensional conclusions carry over:** opening at the turn, no iteration cost, and the
   pinned frame is consistent. Convergence in 3-D is unshown.
+
+### 3-D at 60 degrees with the sheet refined along with the box (`crease_ref.py`)
+Sheet spacing half the cell size (0.03 / 0.0225 / 0.017):
+
+| Cell size (cells) | Crease pairs | Default largest slip | Pinned | Gap | Default opening | Slip along the crease, default / pinned |
+|---|---|---|---|---|---|---|
+| 0.06 (24k) | 33 | 0.12029 | 0.11446 | 5.1 % | 0.0246 | 0.049 / 0.009 |
+| 0.045 (58k) | 43 | 0.11929 | 0.11463 | 4.1 % | 0.0219 | 0.044 / 0.014 |
+| 0.034 (126k) | 57 | 0.11851 | 0.11497 | 3.1 % | 0.0192 | 0.039 / 0.015 |
+
+- **The gap closes in proportion to the cell size** (0.0058, 0.0047, 0.0035, about 0.1 h) and
+  extrapolates to zero, so default and pinned converge to the SAME limit.
+- **The pinned value is much closer to it at each level:** it moves 0.15-0.3 % per level, against
+  0.65-0.8 % for the default, which comes down towards it.
+- **The opening of the default decays slowly** (0.0246 to 0.0192); the pinned crease does not open.
+- **Iterations:** pinned equal or 3-5 fewer (81/77, 92/87, 113/110).
+- **So row 30's 3-D form has the same evidence as 2-D.** The earlier constant gap came from
+  refining the box without the sheet.
