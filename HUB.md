@@ -5023,3 +5023,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - The band is 3 x crust_thick laterally, wide enough at 60 km ahead to reach another limb of the S-kink.
   - Nothing records the links. Asked K1 to record each link's length and lateral offset.
 - Louis (via K1) has since asked for many more line particles (25-50 per element) and for re-populating the line along the fault after each fit; that is the next commit.
+
+### 2026-11-27 — line re-seeded along the fault, passive reference line, safer gap links (K1 8761b2d → 0bf494f)
+- Correction: Q10b/Q17b had not started when 54d9b3b was in transit; nothing ran on an unpushed driver. 54d9b3b's local parent was the lessons commit, but it touches only driver files, so applying it on a250e8f was right.
+- Louis: "you have 3 or four in an element, why not just add 25 or 50 ... You could also re-populate along the fault. Add particles there, let them move, fit them when you update the fault next time."
+- 8761b2d (on 54d9b3b), verified (.gz d74186e and mbox b15a5e9 match, blob 035f62a) and pushed to kaiju/slab-workbench as 0bf494f:
+  - -uw_line_reseed 1: after each good fit, line particles are laid along the fault shifted fault_above_ocrust to the subducting side, every line spacing from half the line depth to the cap, wherever no line particle lies within 0.75 spacings. This replaces the chain refill, which stalled at the trench's bunching.
+  - Marker "oref": the original line, never re-seeded (set to 0 on every particle any adder creates). fault_checks records ref_km, the fault's distance from oref at 100/200/300 km less the offset. Recorded, not flagged.
+  - Gap links need at least 2 particles within ds of the landing point. Each fit records its links (info "gap_links": [length km, lateral km]).
+- Runs to follow: Q10b/Q17b from step 0 with -uw_crust_line_spacing_km 0.5 (about 20 per 10 km cell, 34 per 17 km) -uw_line_reseed 1 -uw_fit_gap_km 60.
+- Hub review:
+  - Where the line has torn, re-seeding fills the gap with particles placed by the last fault, and the next fit goes through them. There the fit tracks its own previous answer, advected one step. ref_km is the only independent check, so it should flag (for example past uw_check_fit_km), not only record.
+  - With re-seeding on, the chain refill is off for the whole line, including the incoming plate and ridge end it used to cover. Asked K1 to confirm the incoming plate's line is still maintained.
