@@ -4932,3 +4932,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - The box is fixed: 600 km of arc and 300 km deep at the initial trench. It resolves the trench and the top of the slab, not the slab below 300 km, and it does not follow the trench if it migrates. This is a first step toward "resolve the slab", not the whole of it; MMPDE remains the moving option.
   - The 3 km fault-above-ocrust offset is sub-cell in both arms, and the 7 km crust is sub-cell in R17.
   - Report memory per segment for R6, given the leak.
+
+### 2026-11-26 — R6/R17 (4977) cancelled, no fault formed; R6c/R17c (job 4978)
+- R6/R17 ran with "faults none". The fit marches along the tracer (melange) layer, and with -uw_crust_thick_km 7 that layer was under one cell. The march stopped at 0.006-0.007 (17-20 km): "no slab top reaching the cap from the surface". K1 cancelled after the smoke run.
+- R6c/R17c (job 4978) are the same except the tracer layer stays at the recipe's 11.3 km: -uw_ocrust_depth_km 7 -uw_fault_above_ocrust_km 3. The 7 km crust line and the fault lie inside the tracer layer. Same box for R6c. This time the smoke check is read for fault formation.
+- Hub review:
+  - A run that forms no fault ran on silently. Under the ruling that every model has a fault (25 Nov), the driver should stop when no fault forms in the first steps rather than continue fault-free.
+  - It failed in R6 too, with 6 km cells, where a 7 km layer is about one cell. So either the march does not run at the box's resolution, or the layer is sampled on the unrefined base. To answer.
+  - Mechanically the weak tracer layer is still 11.3 km; only the crust line used for the fit is 7 km. Louis's "7-8 km crust" is in the geometry of the fit, not in the weak material.
