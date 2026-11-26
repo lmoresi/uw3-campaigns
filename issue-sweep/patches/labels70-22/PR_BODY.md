@@ -46,7 +46,8 @@ add_fault and add_conforming_surface refuse a cut that does not follow the trace
   cells produced fall between 1e-14 and 1e-9.
 - **Tip vertices.** These are found by exact equality with the coordinates the pull has just
   written (the stored value itself, not a tolerance).
-- **On the trace.** A vertex is on the trace when it lies within the cut's own snapping tolerance.
+- **On the trace.** A vertex is on the trace when it lies within 1e-9 of the mesh's global extent
+  of it. The same 1e-9 also separates arc-length parameters.
 
 ## Measured behaviour change
 On the 480-trace box grid (two 1/12 boxes, regular and irregular; lines, arcs and kinks of 10 to
@@ -75,7 +76,8 @@ On the 480-trace box grid (two 1/12 boxes, regular and irregular; lines, arcs an
 - **tests/parallel/test_0897 (parallel)**: one outcome and one message on every rank; a chain
   across the partition is one piece.
 
-Fault, conforming-surface and line-cut suites: 432 passed, 1 skipped. Parallel runs were done on a
-Linux workstation at 2-4 ranks.
+Fault, conforming-surface and line-cut suites: 432 passed, 1 skipped, serial. The round-1 code ran
+at 2-4 ranks on a Linux workstation (180 runs, identical messages on every rank). The parallel test
+and the later commits are still to be run there.
 
 Underworld development team with AI support from Claude Code
