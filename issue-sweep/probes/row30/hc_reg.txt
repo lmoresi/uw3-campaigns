@@ -1,0 +1,8 @@
+HC box_reg 12 base: refused snapping inverted 1 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 12 pin: refused snapping inverted 1 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 24 base: refused snapping inverted 1 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 24 pin: refused snapping inverted 1 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 48 base: refused snapping inverted 2 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 48 pin: refused snapping inverted 2 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 96 base: refused snapping inverted 8 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_reg 96 pin: refused snapping inverted 8 cell(s); snap_frac=0.1 is too large for this mesh.

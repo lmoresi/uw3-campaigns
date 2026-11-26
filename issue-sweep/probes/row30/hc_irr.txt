@@ -1,0 +1,8 @@
+HC box_irr 12 base: largest 0.13050 apex 0.1305 beyond-1-cell 0.08270 vel 29
+HC box_irr 12 pin: largest 0.07359 apex 0.0000 beyond-1-cell 0.07359 vel 28
+HC box_irr 24 base: largest 0.10993 apex 0.1099 beyond-1-cell 0.09565 vel 37
+HC box_irr 24 pin: largest 0.08428 apex 0.0000 beyond-1-cell 0.08428 vel 38
+HC box_irr 48 base: largest 0.09515 apex 0.0929 beyond-1-cell 0.09490 vel 62
+HC box_irr 48 pin: largest 0.08632 apex 0.0000 beyond-1-cell 0.08632 vel 61
+HC box_irr 96 base: refused snapping inverted 4 cell(s); snap_frac=0.1 is too large for this mesh.
+HC box_irr 96 pin: refused snapping inverted 4 cell(s); snap_frac=0.1 is too large for this mesh.
