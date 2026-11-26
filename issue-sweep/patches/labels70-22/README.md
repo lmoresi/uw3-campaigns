@@ -1,6 +1,6 @@
 # UNFILED 70 and 22: the cut labels its edge across a kink inside a cell (with 68's refusal as the guard)
 
-Base: development fbef72fa. Eight commits, as `git format-patch` files. Not pushed.
+Base: development fbef72fa. Nine commits, as `git format-patch` files. Not pushed.
 - 0001 (d37db66e) is UNFILED 68: add_fault refuses a cut with no facet, or one that misses part
   of the trace. It is reviewed on its own.
 - 0002 (44aa8c53) is the labelling fix, plus 68's refusal on add_conforming_surface.
@@ -315,3 +315,19 @@ the same trace; `kref.py`, `k909ref.py`). Cells were compared under both orders 
 
 ## 0008: docstring caveat (text only)
 add_fault's Notes say the slip reported at a sharp turn's apex can be spurious (one constraint normal there; UNFILED 84 mechanism, register row 30 proposed), and to read slip more than about a cell from a sharp turn.
+
+## 0009: review round 4 (Linux workstation; library clean, the test changed)
+1. The parallel test's distributed cases now accept the split's refusal of a chain running ALONG
+   a seam ("a fault facet lies ON the partition seam"), asserting agreement across the ranks.
+2. The stray end sits on an edge that the ACTUAL partition gives to two ranks (from the point
+   star-forest; the test skips at np 1). The kink case asserts, reduced over the ranks, that the
+   turn is a vertex of the chain. Both are meant to fail on 0006 at np 2; that is the reviewer's
+   run.
+3. `marked_vertices` reduces `hasLabel` over the ranks before its gather (a hang when a label was
+   on one rank only).
+4. A chain cut beside both side labels of a fault the mesh does not record as split (a reloaded
+   mesh) is refused as a crossing of that fault (`test_a_crossing_of_an_unrecorded_fault_is_named`).
+   test_1174's JUNCTION pattern is now the split's own message.
+
+Suites: 435 passed, 1 skipped. On one rank the parallel test's functions pass, called directly
+(the seam case skips).

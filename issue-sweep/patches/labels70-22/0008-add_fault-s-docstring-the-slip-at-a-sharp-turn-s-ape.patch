@@ -1,7 +1,7 @@
 From 435a8aecce6c466b056819b6a587fb0113b3812f Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 17:34:44 +1100
-Subject: [PATCH 8/8] add_fault's docstring: the slip at a sharp turn's apex
+Subject: [PATCH 8/9] add_fault's docstring: the slip at a sharp turn's apex
  can be spurious
 
 The fault's constraint holds the two sides together along one normal at
