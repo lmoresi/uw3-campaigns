@@ -70,8 +70,14 @@ On the 480-trace box grid (two 1/12 boxes, regular and irregular; lines, arcs an
   kink30 traces move from 0.2-5 % to 3-9 % error, and one 150-degree hairpin moves from 68 % to
   75 %.
 - **Faults development places today, from keeping the turns.** 13 of 232 change, each by one
-  vertex. Their median error against the one-cell reference falls from 14 % to 3.8 %. Three get
-  worse by more than 2 points (2.7 → 5.0 %, 2.2 → 17.8 %, 1.2 → 4.0 %).
+  vertex. Their median error against the one-cell reference falls from 14 % to 3.8 %. Three look
+  worse against that reference. Solved on meshes 2 and 4 times finer:
+  - one is in fact much better (29 % to 3.8 % above the converged slip; the reference itself is
+    26 % high);
+  - one is worse, 3.8 % to 12 %. This is the coarse mesh's error at a 90-degree corner, which the
+    old corner cut of 0.35 cells partly cancelled. The cells near the turn are sound (smallest
+    angle 23.9 degrees).
+  - one does not converge cleanly, and both orders lie inside its spread.
 - **Known, not fixed here:** a 150-degree hairpin sampled finer than a third of a cell gives wrong
   slip whatever the pull order (+74 % on the regular box). On the irregular box one is now added
   at +83 % that was refused by distance before. It is tracked separately.

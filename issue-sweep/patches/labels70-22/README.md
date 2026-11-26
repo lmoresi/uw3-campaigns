@@ -287,3 +287,28 @@ either rule).
 
 Suites: 433 passed, 1 skipped. On one rank, all 12 cases of the parallel test pass, called
 directly; np 2-4 is for the reviewer.
+
+### The three faults 0007 made "worse": the yardstick, and discretisation (hub's question)
+The one-cell reference is the same trace sampled a cell apart on the same 1/12 mesh. For these
+faults it is not converged, so each was also solved on finer meshes (12, 24 and 48 cells per side,
+the same trace; `kref.py`, `k909ref.py`). Cells were compared under both orders (`k909.py`,
+`k901.py`).
+
+| Fault | 0006 slip | 0007 slip (0.5 / 0.3) | one-cell ref | converged | Smallest angle near the turn (0006 → 0007) |
+|---|---|---|---|---|---|
+| box_irr kink90_9, 0.3 | 0.0589 (corner cut 0.28 cells) | 0.04748 / 0.04736 | 0.0576 | 0.0456 (12/24/48: 0.04736, 0.04583, 0.04561) | 24.3 → 25.8 deg |
+| box_irr kink90_1, 0.5 | 0.0903 (corner cut 0.35 cells) | 0.0975 / 0.0977 | 0.0928 | about 0.087 (12/24/48: 0.0975, 0.0866, 0.0874) | 28.2 → 23.9 deg |
+| box_reg kink60_2, 0.3 | 0.0987 | 0.0936 | 0.0975 | not converged (0.0936, 0.1028, 0.0958) | — |
+
+- **kink90_9 is not worse; it is much better.** 0006 was 29 % above the converged slip and 0007
+  is 3.8 % above it. The one-cell reference is itself 26 % high, which is what made 0007 look 18
+  points worse.
+- **kink90_1 is worse against the converged slip** (3.8 % to 12 %), but not from distortion:
+  - no cell near the turn is under 15 degrees, and the snap moves nothing more;
+  - under 0007, samplings 0.5 and 0.3 agree to 0.2 %, both exactly on the trace;
+  - the 12 % is the 1/12 mesh's discretisation error at a 90-degree corner. 0006's fault cut the
+    corner by 0.35 cells, which shortens it and partly cancelled that error.
+- **kink60_2** does not converge cleanly over 12/24/48. Both orders lie inside that spread, so
+  there is no verdict.
+- **None is a defect.** "Worse against the one-cell reference" is an unreliable verdict wherever
+  that reference cuts or rounds a corner itself.
