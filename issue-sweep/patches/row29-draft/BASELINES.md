@@ -48,3 +48,32 @@ diagonal, SUM-reduced over the ranks with an in-place Allreduce. Every rank gets
   dy -0.015, at 0.090 against 0.1. So `test_the_weak_copy_comparison` tests the comparison itself
   on hand-made norms: copies at 0.5, 0.9, 1.0 and 1.5 times the threshold, strict at the
   threshold, and invariant under scaling.
+
+## Row 29 on 0006: the grid and the refinement (the evidence for Louis)
+- **Grid** (`g29_r6.jsonl`; the final rule with add_fault's defaults; boxes at h = 1/12, sphere
+  at 0.1, annulus at 0.05; samplings 1.0/0.5/0.3, or 1.5/0.5/0.3 on the sphere). Lines and arcs
+  are complete on every mesh: 60/60 on each box, 30/30 on the sphere and on the annulus. The
+  kinks:
+
+  | Mesh | Complete | Partial | Raised | Empty |
+  |---|---|---|---|---|
+  | irregular box | 144 | 28 | 8 | – |
+  | regular box | 139 | 22 | 18 | 1 |
+  | sphere | 32 | 26 | 2 | – |
+
+  "Partial" and "raised" are both refusals; the probe sorts them by message. Against the round-1
+  base, 9 move from partial to raised: 0006's end check fires before the distance test, so the
+  message changes but the fault is still refused. 3 complete faults are now refused, by round 2's
+  base-mesh cell size, and 1 refused fault is now added.
+- **Refinement** (`ref_final6_*.jsonl`): four traces, each sampled a cell apart, max slip at 12 /
+  24 / 48 cells per side. They are identical to the earlier final-rule runs, and they converge:
+
+  | Trace | Final rule (12 / 24 / 48) | Development (12 / 24 / 48) |
+  |---|---|---|
+  | 0 | 0.14149 / 0.14124 / 0.13997 | 0.14224 / 0.14112 / 0.14011 |
+  | 1 | 0.12139 / 0.12105 / 0.12035 | 0.12135 / 0.12110 / **0.07499** |
+  | 2 | 0.11121 / 0.10971 / 0.10993 | 0.11116 / 0.10989 / 0.10982 |
+  | 3 | 0.16629 / 0.16743 / 0.16614 | 0.16732 / 0.16702 / 0.16593 |
+
+  Development's trace 1 at 48 is the silent 38 % low fault. Smallest cell angle under the final
+  rule: 15.7 to 36.9 degrees.

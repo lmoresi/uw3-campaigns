@@ -1,0 +1,3 @@
+{"mode": "final", "trace": 1, "N": 12, "turn": -0.08132591051210647, "snap_frac": "0.1", "slip_max": 0.12138969411585893, "min_angle_deg": 22.72066782513959, "outer": [1], "vel": [33], "pres": [21], "converged": true}
+{"mode": "final", "trace": 1, "N": 24, "turn": -0.08132591051210647, "snap_frac": "0.1", "slip_max": 0.12105149661442798, "min_angle_deg": 36.897278210834735, "outer": [1], "vel": [27], "pres": [21], "converged": true}
+{"mode": "final", "trace": 1, "N": 48, "turn": -0.08132591051210647, "snap_frac": "0.1", "slip_max": 0.12034829938135964, "min_angle_deg": 15.866368499918194, "outer": [1], "vel": [58], "pres": [21], "converged": true}
