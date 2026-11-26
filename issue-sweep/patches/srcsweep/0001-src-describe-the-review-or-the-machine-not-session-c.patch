@@ -1,0 +1,304 @@
+From a3d1737680183f64242e22a8e48e44be91ba4c61 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 26 Nov 2026 13:31:06 +1100
+Subject: [PATCH] src: describe the review or the machine, not session codes or
+ host names
+
+Comments and docstrings in 11 source files named the review sessions that
+measured something (by their codes) or the machines a measurement was made
+on (by their host names). Each now says what the reader needs: the review
+it came from ("the #1218 review", "review round 3"), or the kind of machine
+where it matters ("a Linux cluster", "a 96-thread Linux workstation"). Where
+neither matters the attribution is dropped. The H0-H3 matrices in the
+adjoint assembly and the A1, B1, C1 and "C1-continuous" names are code and
+mathematics, not codes, and are unchanged.
+
+Text only: for every changed file the token stream with comment and string
+contents blanked is identical before and after, and for the Python files the
+AST with docstrings dropped and strings replaced by a placeholder is too.
+
+Underworld development team with AI support from Claude Code
+---
+ .../cython/petsc_generic_snes_solvers.pyx          |  6 +++---
+ .../discretisation/discretisation_mesh.py          |  2 +-
+ src/underworld3/discretisation/remesh.py           |  2 +-
+ src/underworld3/model.py                           |  2 +-
+ src/underworld3/mpi.py                             |  2 +-
+ src/underworld3/systems/free_surface.py            |  6 +++---
+ src/underworld3/utilities/agreed_build.py          |  6 +++---
+ src/underworld3/utilities/custom_mg.py             | 14 +++++++-------
+ src/underworld3/utilities/fault_contact.py         |  2 +-
+ src/underworld3/utilities/fault_mg.py              |  4 ++--
+ src/underworld3/utilities/rotated_bc.py            |  8 ++++----
+ 11 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/src/underworld3/cython/petsc_generic_snes_solvers.pyx b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+index fc67b3bb..1e48627d 100644
+--- a/src/underworld3/cython/petsc_generic_snes_solvers.pyx
++++ b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+@@ -4690,7 +4690,7 @@ class SolverBaseClass(uw_object):
+         is a number is held as a symbol of its own before the term is unwrapped, so a
+         lid ramped up from zero, or a Robin ambient set later, counts from the start
+         (the value can change without a rebuild; read by value, a datum that was zero
+-        when first read stayed "no datum": hyperion's review, M1). An expression whose
++        when first read stayed "no datum": review, M1). An expression whose
+         value at rest cannot be decided counts too. Read once per set of boundary
+         terms, keyed on the terms' hashes: an expression re-pointed in place between
+         the unknown and a constant (``E.sym = ...``) keeps its hash, so the verdict is
+@@ -4858,7 +4858,7 @@ class SolverBaseClass(uw_object):
+             # A preconditioned norm is scaled by its first ratio to ||b||, which need
+             # not hold as the iteration goes; the true residual decides. Stopping on
+             # the estimate alone left the true residual above the floor and cost
+-            # Newton a step (test_0009, a warm nonlinear Poisson: hyperion's review,
++            # Newton a step (test_0009, a warm nonlinear Poisson: review,
+             # M2). Every rank reaches this test with the same rnorm. COLLECTIVE.
+             r = ksp.buildResidual()
+             true = r.norm()
+@@ -13454,7 +13454,7 @@ class SNES_Stokes_SaddlePt(SolverBaseClass):
+             # the tangent below is assembled at the forward state: the install
+             # assembles at a zero vector to reach the fieldsplit, and after the
+             # state's assembly it left the adjoint solving with the tangent at
+-            # u = 0 (hyperion's review: a power-law adjoint 73 % off in the
++            # u = 0 (review: a power-law adjoint 73 % off in the
+             # velocity, reported converged). The rotated route builds its own.
+             from underworld3.utilities.custom_mg import auto_inject_custom_mg
+             auto_inject_custom_mg(self, field_id=0)
+diff --git a/src/underworld3/discretisation/discretisation_mesh.py b/src/underworld3/discretisation/discretisation_mesh.py
+index a890883d..6d255ef3 100644
+--- a/src/underworld3/discretisation/discretisation_mesh.py
++++ b/src/underworld3/discretisation/discretisation_mesh.py
+@@ -8597,7 +8597,7 @@ class Mesh(Stateful, uw_object):
+     # units) counts as in that cell. It admits points genuinely on a face or
+     # edge, and rejects points well inside a different cell. It does NOT make
+     # ownership unique: a point within the slab of a partition seam is claimed
+-    # by the ranks on both sides (measured by H1 on #1175: 30 to 2,690 points
++    # by the ranks on both sides (measured in the #1175 review: 30 to 2,690 points
+     # per run claimed twice), and the rank that does not contain it evaluates
+     # it in a cell that does not (up to 2.8e-4 off, 1e-5 typical).
+     # global_evaluate therefore hands each point it holds without containing it
+diff --git a/src/underworld3/discretisation/remesh.py b/src/underworld3/discretisation/remesh.py
+index 92940b4a..a0cbebb9 100644
+--- a/src/underworld3/discretisation/remesh.py
++++ b/src/underworld3/discretisation/remesh.py
+@@ -340,7 +340,7 @@ def remesh_with_field_transfer(
+         do_move()
+         return True
+     # A failure list left by an earlier call that never reached its raise must
+-    # not raise on this one (H4's review of #960). Only the outer call clears it:
++    # not raise on this one (the #960 review). Only the outer call clears it:
+     # a nested call returns above and leaves the outer call's list alone.
+     mesh._remesh_failed_transfer = None
+     mesh._in_remesh_transfer = True
+diff --git a/src/underworld3/model.py b/src/underworld3/model.py
+index 04210962..a15f49c2 100644
+--- a/src/underworld3/model.py
++++ b/src/underworld3/model.py
+@@ -432,7 +432,7 @@ class Model(PintNativeModelMixin, BaseModel):
+     # Weak, like the swarms below: a strong registry kept every mesh ever
+     # built, with its DM hierarchy, its variables' vectors and its solvers'
+     # matrices. A driver that rebuilds a faulted mesh at each fault move grew
+-    # by ~0.4 GB per rank per rebuild until it was killed (kaiju, 2026-10).
++    # by ~0.4 GB per rank per rebuild until it was killed (a Linux cluster, 2026-10).
+     _meshes: Any = PrivateAttr(default_factory=weakref.WeakValueDictionary)
+     _primary_mesh_id: Optional[int] = PrivateAttr(default=None)
+     # The primary mesh itself, held weakly: an id alone outlives its mesh and
+diff --git a/src/underworld3/mpi.py b/src/underworld3/mpi.py
+index 3d1778a7..e4591600 100644
+--- a/src/underworld3/mpi.py
++++ b/src/underworld3/mpi.py
+@@ -98,7 +98,7 @@ def first_verdict(message, *, site, error=RuntimeError, kwargs=None):
+     exchange have paired (a rank at one site, another at a different one),
+     every rank raises the same mismatch error naming both, with the first
+     failing rank's message, rather than reading one site's payload as
+-    another's (#874, H1's review of #1218).
++    another's (#874, the #1218 review).
+ 
+     ``error`` must be importable at module level: the envelope is pickled
+     through the allgather, and a class is pickled by reference."""
+diff --git a/src/underworld3/systems/free_surface.py b/src/underworld3/systems/free_surface.py
+index 0b9d6aab..28277e02 100644
+--- a/src/underworld3/systems/free_surface.py
++++ b/src/underworld3/systems/free_surface.py
+@@ -861,7 +861,7 @@ class FreeSurface:
+                     # No swallow: a check that can fail silently is not a check.
+                     # In a units model a constant unwraps to a plain number,
+                     # which has nothing to rebind, so only an expression is
+-                    # rebound (H1's review of #1205).
++                    # rebound (the #1205 review).
+                     expected = _comparable(getattr(free_params, attr), unwrap, rebind)
+                     actual = _comparable(getattr(their_params, attr), unwrap, None)
+                     note(name, f"Parameters.{attr}", expected, actual)
+@@ -1805,8 +1805,8 @@ class FreeSurface:
+         # relative residual (measured, power-law annulus acceptance run).
+         # A raw variable-to-variable copy inside the non-dimensional boundary:
+         # .data on both sides. Through .array a velocity with units (cm/yr) went
+-        # into a field without them and was stored 100 times too large (H1's
+-        # review of #1205); ddt.py copies histories the same way.
++        # into a field without them and was stored 100 times too large (the
++        # #1205 review); ddt.py copies histories the same way.
+         self.consistent.u.data[...] = self.free.u.data
+         self.consistent.p.data[...] = self.free.p.data
+         self.consistent.solve(zero_init_guess=False)
+diff --git a/src/underworld3/utilities/agreed_build.py b/src/underworld3/utilities/agreed_build.py
+index 74931935..f382ab8c 100644
+--- a/src/underworld3/utilities/agreed_build.py
++++ b/src/underworld3/utilities/agreed_build.py
+@@ -55,8 +55,8 @@ def reraise_agreed(err):
+     """Inside a handler that would swallow an exception: re-raise ``err`` if it
+     is an agreed error (one every rank raised together). A broad ``except``
+     around an agreement point would otherwise swallow it on the healthy ranks,
+-    while the failed rank left: those then wait in their next agreement (H1's
+-    review of #1218). Call it first in every sanctioned swallow that can see
++    while the failed rank left: those then wait in their next agreement (the
++    #1218 review). Call it first in every sanctioned swallow that can see
+     an agreement point."""
+     if getattr(err, "agreed", False):
+         raise err
+@@ -91,7 +91,7 @@ class agreed_build:
+         # (a CollectiveBuildError from a check on allreduced counts, raised on
+         # every rank but not through an agreement point) keeps its own verdict:
+         # forcing builder_failure=True onto a check that said False would
+-        # trigger a futile rebuild before degrading (H1, round 3)
++        # trigger a futile rebuild before degrading (review round 3)
+         builder_failure = getattr(err, "builder_failure", self.builder_failure)
+         try:
+             _raise_agreed(f"{self.what}: {kind.__name__}: {err}", builder_failure)
+diff --git a/src/underworld3/utilities/custom_mg.py b/src/underworld3/utilities/custom_mg.py
+index 6c26f0c0..9dcaea76 100644
+--- a/src/underworld3/utilities/custom_mg.py
++++ b/src/underworld3/utilities/custom_mg.py
+@@ -968,7 +968,7 @@ def _gathered_patch_blocks(zones, structural, max_rows, rstart, comm):
+                 # they gain nothing, and faults a coarse cell or two apart are
+                 # coupled in the operator, which separate blocks would drop:
+                 # parallel faults 0.12 apart took 4 velocity iterations against
+-                # 3, and their two pieces always landed on one rank (H1's review).
++                # 3, and their two pieces always landed on one rank (measured in review).
+                 on_rank = {}
+                 for piece in _connected_pieces(sub, *links):
+                     on_rank.setdefault(_majority_rank(piece, starts), []).append(piece)
+@@ -1643,7 +1643,7 @@ def _configure_pcmg(pc, Ps, coarse="redundant", smoother="robust", owned=None,
+     # configuration a previous install left: its pc_type when that is "composite"
+     # with no member list of its own (a composite the user built names its members
+     # in pc_composite_pcs), and that composite's block keys. Any other smoother key
+-    # on the level is the user's, and stays (hyperion's review, M1).
++    # on the level is the user's, and stays (review, M1).
+     for l in range(1, nlev):
+         if patch_rows and l < len(patch_rows) and patch_rows[l] is not None:
+             continue
+@@ -1744,9 +1744,9 @@ def _configure_pcmg(pc, Ps, coarse="redundant", smoother="robust", owned=None,
+             # cuts it 25-58 times and makes it nearly the same at any rank count
+             # (4.1e8 at np 8 and 16); the block's triangular solves, which every
+             # smoother application pays, ran 3.5-6 times faster and the solve
+-            # 2.3-4 times, with the same iterations and slip (kaiju, #895; rcm was
++            # 2.3-4 times, with the same iterations and slip (a Linux cluster, #895; rcm was
+             # worse than nd). On blocks that are not bands it cost nothing: 1.2 to
+-            # 3 times less fill on every block measured (hyperion's review).
++            # 3 times less fill on every block measured (in review).
+             # An ordering already in the database (the user's) is left in place,
+             # and is not one of the keys a caller drops.
+             key = _sub_key.replace("sub_pc_type", "sub_pc_factor_mat_ordering_type")
+@@ -1830,7 +1830,7 @@ def _release_fac_keys(solver, force=False):
+     no members (PETSc error 73). Not collective.
+ 
+     After the drop, a ``setFromOptions`` on the FAC level's own smoother KSP takes it
+-    back to the default smoother: the composite is gone from the database (hyperion
++    back to the default smoother: the composite is gone from the database (review
+     measured 3 to 5 iterations). No library path makes that call."""
+     names = getattr(solver, "_custom_mg_fac_keys", None)
+     if not names:
+@@ -2644,7 +2644,7 @@ class CustomMGHierarchy:
+         accuracy"). Its blocks are the masked cells' rows, which a node move leaves in
+         place: a mover changes coordinates, not the cells, their DOF numbering or the
+         partition, and the patch is only a preconditioner, so a stale one could cost
+-        iterations but not change the solution. Hyperion measured 2-3 velocity
++        iterations but not change the solution. Review measured 2-3 velocity
+         iterations at every one of 6 MMPDE moves at np 1, 2 and 4 with the patch kept,
+         the same as a fresh registration with the zone recomputed, and 14-28 with it
+         killed. What a move still kills on a zone-keyed level is what the coincidence
+@@ -2658,7 +2658,7 @@ class CustomMGHierarchy:
+         ``_move_version``, which every committed move bumps (``mesh.deform`` and every
+         mover) and a trial move inside ``ephemeral_coords`` does not. Nor does a
+         snapshot restore: it puts the coarse levels back with the fine mesh, and the
+-        patch built before the move applies again (hyperion measured 3 iterations kept
++        patch built before the move applies again (review measured 3 iterations kept
+         against 6 killed on the fault fixture, 2 against 15 on a zone patch, with the
+         same solution). Collective: a mover's no-move test is rank-local, so a version
+         could move on some ranks only, and the verdict is taken over all of them."""
+diff --git a/src/underworld3/utilities/fault_contact.py b/src/underworld3/utilities/fault_contact.py
+index c98f9ad2..895536a9 100644
+--- a/src/underworld3/utilities/fault_contact.py
++++ b/src/underworld3/utilities/fault_contact.py
+@@ -77,7 +77,7 @@ def _collective_raise(problem, error=RuntimeError, **error_kwargs):
+     rank's message: two calls that pair can pass different classes (an
+     ``agreed_build`` exit and a guard inside the build), and the ranks must
+     still raise one class, or a caller that catches one of them parts the
+-    ranks (#874, W1's review of #1218).
++    ranks (#874, the #1218 review).
+ 
+     The exchange is a one-integer flag first, and the messages are gathered
+     only when some rank failed, so a healthy path costs one small allreduce.
+diff --git a/src/underworld3/utilities/fault_mg.py b/src/underworld3/utilities/fault_mg.py
+index 6fbe652f..94068ea5 100644
+--- a/src/underworld3/utilities/fault_mg.py
++++ b/src/underworld3/utilities/fault_mg.py
+@@ -459,7 +459,7 @@ def _recorded_parent_cells(coarse, fine, Xf, fn, vxy_c, cv_c, vxy_f, cv_f,
+         cand = pieces(nest[h]) if h >= 0 and nest[h] >= 0 else np.zeros(0, np.int64)
+         cands.append(same_side(k, cand))
+     # a cell whose candidates are all across the fault borrows its face
+-    # neighbours' (W1's rule): the split separates the two sides, so a face
++    # neighbours' (the rule): the split separates the two sides, so a face
+     # neighbour is on the same side
+     dm = fine.dm
+     cS = dm.getHeightStratum(0)[0]
+@@ -576,7 +576,7 @@ def _recorded_rows_where_weak(coarse, fine, degree, continuous, Xf, Xc, cn, fn,
+     rotated pair's mean and jump columns proportional, and the Galerkin level
+     singular. Only those rows change: the parent rule everywhere puts nodes in
+     the thin pieces the coarse cut leaves, which costs smoother work for no
+-    gain (W1's decision on #1120). Serial."""
++    gain (decided on #1120). Serial."""
+     global last_parent_rows
+     last_parent_rows = None
+     copies = _fault_copy_nodes(coarse, degree, continuous)
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 5872290b..744e969c 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -147,7 +147,7 @@ def _datum_net_flux(solver, datum_specs):
+     for boundary, g in (datum_specs or {}).items():
+         # F and S on one footing: the datum unwrapped once to its non-dimensional
+         # form, then integrated as it is and as its modulus. A dimensional datum
+-        # integrated as given and under Abs came back at two scales (H7's review).
++        # integrated as given and under Abs came back at two scales (measured in review).
+         g = sympy.sympify(unwrap_expression(g, mode="nondimensional"))
+         F += float(uw.maths.BdIntegral(solver.mesh, g, boundary).evaluate())
+         S += float(uw.maths.BdIntegral(solver.mesh, sympy.Abs(g), boundary).evaluate())
+@@ -2777,7 +2777,7 @@ def _destroy_rotated_ksp_ctx(ctx):
+ 
+ # A Schur right-hand side within this many machine epsilons of the round-off of its own
+ # terms carries nothing to solve for (#910). Measured as r0 / (eps ||A10| |x_u||) at
+-# pressure iteration 0 (hyperion's review records and wombat, 833 decisions):
++# pressure iteration 0 (review records from two machines, 833 decisions):
+ #   - cold solves: 5.7e9 (test_1018's late Newton increments) to 2e15, about 6.7e14
+ #     on the annulus; never fired (forcing 1e3 to 1e10, mu 1e-8 to 1e2);
+ #   - genuine warm corrections: 1.8e8 at mu 1, down to 1.45e6 (test_1157 at mu 1e-4)
+@@ -2881,7 +2881,7 @@ class _SchurRoundoffTest:
+ # round 3).
+ #
+ # What projecting a near-null mode costs scales with the solve tolerance and grows with
+-# the rank count (#964, round 4, hyperion, walls slid along their circles). At tol 1e-9,
++# the rank count (#964, round 4, a 96-thread workstation, walls slid along their circles). At tol 1e-9,
+ # np 2, projecting paid at 62 tol (19464 GMRES orthogonalisations against 140115 left)
+ # and cost at 180 tol (49014 against 10528); at 620 tol it cost 2x at np 2 and 4.5x at
+ # np 4; at tol 1e-11 a mode at 6.2e-8 projected ran the velocity solve into its cap.
+@@ -3031,7 +3031,7 @@ def _set_absolute_target(ksp, abs_target, bhat, ctx):
+     the fraction. An absolute tolerance on them, in the outer residual's units, was
+     the first form: the pressure solve then stopped at 6 iterations in place of 15
+     on test_1087's single increment, and the fault slip moved 2.2e-4 at tolerance
+-    1e-6 (hyperion's review, H1). Scaled this way an increment whose residual is far
++    1e-6 (measured in review). Scaled this way an increment whose residual is far
+     above the target, a first increment above all, is solved as before, and only the
+     last increments of a tight solve relax (#911).
+ 
+-- 
+2.53.0
+
