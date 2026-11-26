@@ -1,26 +1,87 @@
-docs/developer/hpc_containers/README.md:14
-docs/developer/hpc_containers/README.md:27
-docs/developer/hpc_containers/base.rocky-ompi:2
-docs/developer/subsystems/fault-split-multigrid.md:156
-docs/developer/subsystems/fault-split-multigrid.md:168
-docs/developer/subsystems/fault-split-multigrid.md:496
-docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md:102
-docs/developer/guides/fault-multigrid.md:124
-docs/developer/guides/fault-multigrid.md:131
-docs/developer/guides/fault-multigrid.md:287
-docs/developer/guides/fault-multigrid.md:301
-docs/developer/guides/faults-in-convection.md:73
-docs/developer/guides/faults-in-convection.md:81
-docs/developer/guides/hpc-cluster-setup.md:25
-docs/developer/guides/hpc-cluster-setup.md:55
-docs/developer/guides/hpc-cluster-setup.md:58
-docs/developer/guides/hpc-cluster-setup.md:75
-docs/developer/guides/hpc-cluster-setup.md:79
-docs/developer/guides/hpc-cluster-setup.md:95
-docs/developer/guides/hpc-cluster-setup.md:104
-docs/developer/guides/hpc-cluster-setup.md:107
-docs/developer/guides/hpc-cluster-setup.md:110
-docs/developer/guides/hpc-cluster-setup.md:128
-docs/developer/guides/hpc-cluster-setup.md:134
-docs/developer/guides/hpc-cluster-setup.md:145
-docs/developer/guides/hpc-cluster-setup.md:290
+# Kaiju and Gadi mentions left as they are, pending the maintainer's ruling on naming a cluster as a supported platform.
+# Branch heads: docs/ at docs/docs-no-session-codes, src/ at docs/src-no-session-or-host-names, tests/ at docs/tests-no-session-or-host-names.
+# 83 lines: docs 73 (29 name Kaiju, 49 name Gadi; some both), src 5 and tests 5 (all Gadi). No Kaiju line is left in src/ or tests/: those sweeps reworded them before the interim rule.
+# [CONFIG] marks a line that stays whatever the ruling: a configuration value or a file name.
+docs/developer/hpc_containers/base.rocky-ompi:2:# Platform base for the Rocky Linux + OpenMPI family (NCI Gadi, ANU Kaiju).
+docs/developer/hpc_containers/underworld3.hpc:17:#       --build-arg PETSC_IMAGE=ghcr.io/<owner>/petsc-gadi:3.25.0-ompi \
+docs/developer/hpc_containers/underworld3.hpc:21:#       -t ghcr.io/<owner>/underworld3-gadi:development \
+docs/developer/hpc_containers/underworld3.hpc:25:ARG PETSC_IMAGE="ghcr.io/underworldcode/petsc-gadi:3.25.0-ompi"
+docs/developer/hpc_containers/petsc.hpc:17:#       -t ghcr.io/<owner>/petsc-gadi:3.25.0-ompi \
+docs/developer/hpc_containers/README.md:14:base.rocky-ompi    Rocky 8.10 + system OpenMPI      -> uw3-base-rocky-ompi:{runtime,builder}     Gadi, Kaiju
+docs/developer/hpc_containers/README.md:16:petsc.hpc          PETSc from source, on a base     -> petsc-{gadi,setonix}:<version>-{ompi,mpich}
+docs/developer/hpc_containers/README.md:17:underworld3.hpc    UW3 + Python stack, on PETSc     -> underworld3-{gadi,setonix}:<branch|tag>
+docs/developer/hpc_containers/README.md:26:| Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
+docs/developer/hpc_containers/README.md:27:| Kaiju | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
+docs/developer/hpc_containers/README.md:77:    -t ghcr.io/<user>/petsc-gadi:3.25.0-ompi -f docs/developer/hpc_containers/petsc.hpc
+docs/developer/hpc_containers/README.md:80:    --build-arg PETSC_IMAGE=ghcr.io/<user>/petsc-gadi:3.25.0-ompi \
+docs/developer/hpc_containers/README.md:83:    -t ghcr.io/<user>/underworld3-gadi:development -f docs/developer/hpc_containers/underworld3.hpc
+docs/developer/hpc_containers/README.md:94:singularity pull docker://ghcr.io/underworldcode/underworld3-gadi:latest
+docs/developer/CHANGELOG.md:895:  connectivity for ParaView (#218, #205); Gadi Singularity container build
+docs/developer/subsystems/boundary-stress-and-projection-postprocessing.md:25:OOM-killed mid-sequence on Gadi.
+docs/developer/subsystems/fault-split-multigrid.md:156:  67, #892). Inexact block solves were measured on the add-on matrix's box (kaiju,
+docs/developer/subsystems/fault-split-multigrid.md:168:  and 16. Measured on the add-on matrix's row 5 networks (kaiju, np 4 to 16, 2026-11),
+docs/developer/subsystems/fault-split-multigrid.md:496:On row 5 with no zone at n_rungs 320 (30 048 rows in the block; kaiju, 2026-11), both
+docs/developer/subsystems/solvers.md:332:(spherical Kramer `case1`, free-slip Nitsche, Gadi at np=144, cellsize 1/32):
+docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md:88:| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 de
+docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md:102:- the zg95 rotated drivers (kaiju);
+docs/developer/guides/fault-multigrid.md:124:takes 83 to 166 and 28 to 76. On the production annulus at np 16 (kaiju,
+docs/developer/guides/fault-multigrid.md:131:kaiju at np 16; the drivers' decisions ledger there,
+docs/developer/guides/fault-multigrid.md:287:   annulus at np 16 (`development` 25d62812, kaiju's budget): the finest-level
+docs/developer/guides/fault-multigrid.md:301:   kaiju (2026-11-01) with "the ribbon's cavity reached the domain wall away
+docs/advanced/performance.md:28:compute bound**. In a controlled Gadi campaign on a 2-D power-law Barr–Houseman
+docs/advanced/performance.md:86:**Still open.** A recommended Gadi rank placement for bandwidth-bound solves, whether
+[CONFIG] docs/developer/guides/hpc-cluster-setup.md:21:**PETSc build:** `petsc-custom/build-petsc.sh` auto-detects the cluster from hostname, or can be overridden with `UW_CLUSTER=kaiju|gadi`. Cluster-specific difference
+docs/developer/guides/hpc-cluster-setup.md:25:## Kaiju
+docs/developer/guides/hpc-cluster-setup.md:55:Copy `kaiju_install_user.sh` (per-user) or `kaiju_install_shared.sh` (admin) from [uw3-hpc-baremetal-install-run](https://github.com/jcgraciosa/uw3-hpc-baremetal-install-run)
+docs/developer/guides/hpc-cluster-setup.md:58:source kaiju_install_user.sh install
+docs/developer/guides/hpc-cluster-setup.md:75:source kaiju_install_user.sh
+docs/developer/guides/hpc-cluster-setup.md:79:#### What PETSc builds on Kaiju
+docs/developer/guides/hpc-cluster-setup.md:95:source kaiju_install_user.sh
+docs/developer/guides/hpc-cluster-setup.md:104:Use `kaiju_slurm_job.sh` from [uw3-hpc-baremetal-install-run](https://github.com/jcgraciosa/uw3-hpc-baremetal-install-run). Edit the variables at the top, then:
+docs/developer/guides/hpc-cluster-setup.md:107:sbatch kaiju_slurm_job.sh
+docs/developer/guides/hpc-cluster-setup.md:110:`--mpi=pmix` is **required** on Kaiju (Spack has `pmix@5.0.3`):
+docs/developer/guides/hpc-cluster-setup.md:128:source kaiju_install_shared.sh install
+docs/developer/guides/hpc-cluster-setup.md:134:### Troubleshooting (Kaiju)
+[CONFIG] docs/developer/guides/hpc-cluster-setup.md:138:Source the install script inside the job script (not the login shell) so all paths propagate to compute nodes. The `kaiju_slurm_job.sh` template does this correctly
+docs/developer/guides/hpc-cluster-setup.md:145:source kaiju_install_user.sh
+docs/developer/guides/hpc-cluster-setup.md:165:## Gadi
+docs/developer/guides/hpc-cluster-setup.md:171:| System | NCI Gadi (CentOS, Lustre filesystem) |
+docs/developer/guides/hpc-cluster-setup.md:179:The following Gadi modules must be available:
+docs/developer/guides/hpc-cluster-setup.md:192:> **Inode quota:** Gadi's `/g/data` has strict inode limits. PETSc (which creates many files during build) may need to be built on `/scratch` and symlinked from `/g/data`. T
+docs/developer/guides/hpc-cluster-setup.md:196:Copy `gadi_install_user.sh` (per-user) or `gadi_install_shared.sh` (admin) from [uw3-hpc-baremetal-install-run](https://github.com/jcgraciosa/uw3-hpc-baremetal-install-run) 
+docs/developer/guides/hpc-cluster-setup.md:199:source gadi_install_shared.sh install
+docs/developer/guides/hpc-cluster-setup.md:213:#### What PETSc builds on Gadi
+docs/developer/guides/hpc-cluster-setup.md:218:- **MPI**: Gadi's OpenMPI module (`--with-cc/cxx/fc`)
+docs/developer/guides/hpc-cluster-setup.md:219:- **HDF5**: Gadi's `hdf5/1.12.2p` module (`--with-hdf5-dir`)
+docs/developer/guides/hpc-cluster-setup.md:228:source gadi_install_shared.sh
+docs/developer/guides/hpc-cluster-setup.md:231:This loads Gadi modules, activates the pixi `hpc` environment via `pixi shell-hook`, and sets `PETSC_DIR`, `PETSC_ARCH`, and `PYTHONPATH`. Gadi's HDF5 lib dir is prepended t
+docs/developer/guides/hpc-cluster-setup.md:235:Use `gadi_pbs_job.sh` from [uw3-hpc-baremetal-install-run](https://github.com/jcgraciosa/uw3-hpc-baremetal-install-run). Edit the variables at the top, then:
+docs/developer/guides/hpc-cluster-setup.md:238:qsub gadi_pbs_job.sh
+docs/developer/guides/hpc-cluster-setup.md:253:source gadi_install_shared.sh install
+docs/developer/guides/hpc-cluster-setup.md:259:source /g/data/m18/software/uw3-pixi/gadi_install_shared.sh
+docs/developer/guides/hpc-cluster-setup.md:262:### Troubleshooting (Gadi)
+docs/developer/guides/hpc-cluster-setup.md:266:The pixi `hpc` env ships a serial HDF5 1.14 (transitive conda-forge dependency). If h5py links against it instead of Gadi's parallel HDF5 1.12.2p, this symbol (removed in 1.
+docs/developer/guides/hpc-cluster-setup.md:269:source gadi_install_shared.sh
+docs/developer/guides/hpc-cluster-setup.md:275:The pixi `hpc` env ships a full conda toolchain (`x86_64-conda-linux-gnu-*`) that interferes with Gadi's OpenMPI wrappers. `build-petsc.sh` handles this via `setup_gadi_buil
+docs/developer/guides/hpc-cluster-setup.md:279:Gadi ships compiler-tagged Fortran MPI libraries (`libmpi_usempif08_GNU.so`) rather than the standard untagged names. `build-petsc.sh` creates symlinks in `petsc-custom/mpi-
+docs/developer/guides/hpc-cluster-setup.md:283:Ensure the install script is sourced inside the job script (not just in the login shell). The `gadi_pbs_job.sh` template does this correctly.
+docs/developer/guides/hpc-cluster-setup.md:290:source kaiju_install_user.sh   # or gadi_install_shared.sh
+docs/developer/guides/release-process.md:333:benchmarks on a supported HPC facility (NCI Gadi or Pawsey Setonix) on two
+docs/advanced/troubleshooting.md:73:**Reported thresholds.** On Gadi (PETSc 3.25.4, HDF5 1.12.2p, Open MPI 4.1.7, MPI-enabled
+docs/reviews/2026-07/solver-wall-clock-guard-adversarial-review.md:74:The comment at the destroy site records that this exact retention "at Gadi scale … push[ed]
+docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md:196:allocation on Gadi.
+docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md:203:### Gadi Evidence
+docs/developer/guides/faults-in-convection.md:73:np 16 (kaiju, `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
+docs/developer/guides/faults-in-convection.md:81:`development` (b440b88 in `lmoresi/uw3-campaigns`, accepted on kaiju at np 16). Split coarse levels are not developed further (Louis,
+docs/beginner/quickstart.md:73:Strong parallel-scaling tests run on Australia's peak computing system, [GADI, at the National Computational Infrastructure](https://nci.org.au/our-systems/hpc-systems?ref=underworldcode.or
+docs/docstrings/inventory.json:48128:      "sys.argv automatically on some platforms but NOT others (e.g. Gadi),",
+src/underworld3/utilities/_petsc_tools.py:38:    from `sys.argv` on every platform (Gadi being the case in #111), so
+src/underworld3/utilities/_params.py:161:        # sys.argv automatically on some platforms but NOT others (e.g. Gadi),
+src/underworld3/utilities/_jitextension.py:1990:    # Tags: RTLD_LOCAL, RTLD_Global, Gadi.
+src/underworld3/cython/petsc_generic_snes_solvers.pyx:5344:        # Gadi scale to push past memory limits during stress recovery
+src/underworld3/cython/petsc_generic_snes_solvers.pyx:10124:        # #147 for the spherical-Kramer benchmark on Gadi that drove this change;
+tests/test_1063_constrained_traction.py:34:    # high-contrast augmented system; a single-level GAMG solve stalls on Gadi.
+tests/test_0821_params_cli_override.py:4:On some platforms (e.g. Gadi) petsc4py does NOT auto-populate the PETSc options
+tests/test_0821_params_cli_override.py:29:    DB was not pre-populated (the Gadi failure mode in #111)."""
+tests/test_0821_params_cli_override.py:32:        # Simulate Gadi: CLI arg present, options DB not yet populated.
+tests/test_1181_cylindrical_dirichlet.py:302:    The Gadi MPI16 gate first exposed the real null-handle crash. Never inspect

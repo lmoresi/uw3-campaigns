@@ -1,5 +1,5 @@
       7 docs/advanced/figures/bench_fmg_vs_gamg_velocity_ksp.md
-      4 docs/beginner/tutorials/17-Richards-Transient-Wetting-Front.ipynb
+      5 docs/beginner/tutorials/17-Richards-Transient-Wetting-Front.ipynb
       1 docs/developer/design/fault_hierarchy_render.py
       2 docs/developer/design/VEP_TWO_STOKES_OPERATOR_SPLIT.md
       1 docs/developer/guides/development-setup.md
@@ -16,3 +16,4 @@
       1 docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md
       1 docs/reviews/2025-11/UNWRAPPING-REFACTORING-REVIEW.md
       4 docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md
+  total 49 lines in 18 files

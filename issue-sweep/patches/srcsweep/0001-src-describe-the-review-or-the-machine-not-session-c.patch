@@ -1,4 +1,4 @@
-From a3d1737680183f64242e22a8e48e44be91ba4c61 Mon Sep 17 00:00:00 2001
+From e9fafc23a59094c369639891563d31e3203d1ed2 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Thu, 26 Nov 2026 13:31:06 +1100
 Subject: [PATCH] src: describe the review or the machine, not session codes or
@@ -164,7 +164,7 @@ index 74931935..f382ab8c 100644
          try:
              _raise_agreed(f"{self.what}: {kind.__name__}: {err}", builder_failure)
 diff --git a/src/underworld3/utilities/custom_mg.py b/src/underworld3/utilities/custom_mg.py
-index 6c26f0c0..9dcaea76 100644
+index 6c26f0c0..1a2661c1 100644
 --- a/src/underworld3/utilities/custom_mg.py
 +++ b/src/underworld3/utilities/custom_mg.py
 @@ -968,7 +968,7 @@ def _gathered_patch_blocks(zones, structural, max_rows, rstart, comm):
@@ -202,7 +202,7 @@ index 6c26f0c0..9dcaea76 100644
  
      After the drop, a ``setFromOptions`` on the FAC level's own smoother KSP takes it
 -    back to the default smoother: the composite is gone from the database (hyperion
-+    back to the default smoother: the composite is gone from the database (review
++    back to the default smoother: the composite is gone from the database (the review
      measured 3 to 5 iterations). No library path makes that call."""
      names = getattr(solver, "_custom_mg_fac_keys", None)
      if not names:
@@ -211,7 +211,7 @@ index 6c26f0c0..9dcaea76 100644
          place: a mover changes coordinates, not the cells, their DOF numbering or the
          partition, and the patch is only a preconditioner, so a stale one could cost
 -        iterations but not change the solution. Hyperion measured 2-3 velocity
-+        iterations but not change the solution. Review measured 2-3 velocity
++        iterations but not change the solution. The review measured 2-3 velocity
          iterations at every one of 6 MMPDE moves at np 1, 2 and 4 with the patch kept,
          the same as a fresh registration with the zone recomputed, and 14-28 with it
          killed. What a move still kills on a zone-keyed level is what the coincidence
@@ -220,7 +220,7 @@ index 6c26f0c0..9dcaea76 100644
          mover) and a trial move inside ``ephemeral_coords`` does not. Nor does a
          snapshot restore: it puts the coarse levels back with the fine mesh, and the
 -        patch built before the move applies again (hyperion measured 3 iterations kept
-+        patch built before the move applies again (review measured 3 iterations kept
++        patch built before the move applies again (the review measured 3 iterations kept
          against 6 killed on the fault fixture, 2 against 15 on a zone patch, with the
          same solution). Collective: a mover's no-move test is rank-local, so a version
          could move on some ranks only, and the verdict is taken over all of them."""
@@ -238,7 +238,7 @@ index c98f9ad2..895536a9 100644
      The exchange is a one-integer flag first, and the messages are gathered
      only when some rank failed, so a healthy path costs one small allreduce.
 diff --git a/src/underworld3/utilities/fault_mg.py b/src/underworld3/utilities/fault_mg.py
-index 6fbe652f..94068ea5 100644
+index 6fbe652f..70a209bc 100644
 --- a/src/underworld3/utilities/fault_mg.py
 +++ b/src/underworld3/utilities/fault_mg.py
 @@ -459,7 +459,7 @@ def _recorded_parent_cells(coarse, fine, Xf, fn, vxy_c, cv_c, vxy_f, cv_f,
@@ -246,7 +246,7 @@ index 6fbe652f..94068ea5 100644
          cands.append(same_side(k, cand))
      # a cell whose candidates are all across the fault borrows its face
 -    # neighbours' (W1's rule): the split separates the two sides, so a face
-+    # neighbours' (the rule): the split separates the two sides, so a face
++    # neighbours' (the #1120 rule): the split separates the two sides, so a face
      # neighbour is on the same side
      dm = fine.dm
      cS = dm.getHeightStratum(0)[0]
@@ -260,7 +260,7 @@ index 6fbe652f..94068ea5 100644
      last_parent_rows = None
      copies = _fault_copy_nodes(coarse, degree, continuous)
 diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
-index 5872290b..744e969c 100644
+index 5872290b..7bd2b416 100644
 --- a/src/underworld3/utilities/rotated_bc.py
 +++ b/src/underworld3/utilities/rotated_bc.py
 @@ -147,7 +147,7 @@ def _datum_net_flux(solver, datum_specs):
@@ -295,7 +295,7 @@ index 5872290b..744e969c 100644
      the first form: the pressure solve then stopped at 6 iterations in place of 15
      on test_1087's single increment, and the fault slip moved 2.2e-4 at tolerance
 -    1e-6 (hyperion's review, H1). Scaled this way an increment whose residual is far
-+    1e-6 (measured in review). Scaled this way an increment whose residual is far
++    1e-6 (the #1014 review). Scaled this way an increment whose residual is far
      above the target, a first increment above all, is solved as before, and only the
      last increments of a tight solve relax (#911).
  
