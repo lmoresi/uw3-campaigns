@@ -1,0 +1,420 @@
+From 3e603a9694f90cfc479a21e6164acdc7ae01bfb8 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 26 Nov 2026 17:09:21 +1100
+Subject: [PATCH] docs: a developer's home-directory paths become placeholders
+
+Examples, design notes and review records under docs/ carried absolute paths
+in two developers' home directories: checkpoint directories, simulation
+output, worktrees and a downloaded reference. Each is now a placeholder,
+~/path/to/..., keeping the part that names what the path is (the simulation
+or the worktree). 44 lines in 17 files.
+
+An example's checkpoint_dir or a script's FIG now reads as a placeholder to
+set, as the original path did on any other machine.
+
+Left as they are: the saved PETSc traceback in the stderr output of cell 11
+of the Richards wetting-front tutorial notebook (quoted output), and a path
+inside a binary spreadsheet in a WIP example.
+
+Text only: in the Python files only comments and string constants change.
+
+Underworld development team with AI support from Claude Code
+---
+ .../figures/bench_fmg_vs_gamg_velocity_ksp.md      | 14 +++++++-------
+ .../design/VEP_TWO_STOKES_OPERATOR_SPLIT.md        |  4 ++--
+ docs/developer/design/fault_hierarchy_render.py    |  2 +-
+ docs/developer/guides/development-setup.md         |  2 +-
+ .../advanced/Ex_NS_Couette_PostProc.py             |  2 +-
+ .../intermediate/Ex_NS_PipeFlow_PostProc.py        |  4 ++--
+ .../advanced/Ex_Sheared_Layer_Visualisation.py     |  6 +++---
+ .../advanced/Ex_viscousFingering-Viz.py            |  4 ++--
+ .../intermediate/Ex_DiscStokes_Visualise.py        |  4 ++--
+ .../Ex_Navier_Stokes_Visualise_Disc.py             | 14 +++++++-------
+ .../Ex_Navier_Stokes_Visualise_NS_DFG_2d.py        | 10 +++++-----
+ .../reviews/2025-10/REDUCTION-OPERATIONS-REVIEW.md |  4 ++--
+ .../2025-10/SWARM-INTEGRATION-STATISTICS-REVIEW.md |  4 ++--
+ .../2025-11/TIMING-SYSTEM-REFACTOR-REVIEW.md       |  2 +-
+ docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md  |  2 +-
+ .../2025-11/UNWRAPPING-REFACTORING-REVIEW.md       |  2 +-
+ docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md       |  8 ++++----
+ 17 files changed, 44 insertions(+), 44 deletions(-)
+
+diff --git a/docs/advanced/figures/bench_fmg_vs_gamg_velocity_ksp.md b/docs/advanced/figures/bench_fmg_vs_gamg_velocity_ksp.md
+index 92157e4a..f5dce63d 100644
+--- a/docs/advanced/figures/bench_fmg_vs_gamg_velocity_ksp.md
++++ b/docs/advanced/figures/bench_fmg_vs_gamg_velocity_ksp.md
+@@ -11,16 +11,16 @@ Two assets: a solver-scaling **benchmark figure** (for `docs/advanced/`) and an
+ ## Absolute locations (the worktree may differ — use these)
+ 
+ - **Figure + CSV + this note** — currently *uncommitted* in the feature worktree:
+-  `/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/gmg-geometric-interp/docs/advanced/figures/`
++  `~/path/to/worktrees/gmg-geometric-interp/docs/advanced/figures/`
+   Once PR #228 merges they live in the main checkout at
+-  `/Users/lmoresi/+Underworld/underworld3-pixi/docs/advanced/figures/`
++  `~/path/to/underworld3/docs/advanced/figures/`
+   (repo-relative `docs/advanced/figures/` — stable in any checkout).
+ - **Animation, per-step PNGs, render scripts** — on disk, not in the repo:
+-  `/Users/lmoresi/+Simulations/StagnantLid/anim_full_Ra1e7_dEta1e3_res32_R8_mode1/`
+-  (frames + GIFs) and `/Users/lmoresi/+Simulations/StagnantLid/` (`_render_clean.py`,
++  `~/path/to/simulations/StagnantLid/anim_full_Ra1e7_dEta1e3_res32_R8_mode1/`
++  (frames + GIFs) and `~/path/to/simulations/StagnantLid/` (`_render_clean.py`,
+   `_render_watch.py`).
+ - **Harness** — `scripts/stagnant_lid_adapt_loop.py` in the repo (currently
+-  `/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/gmg-geometric-interp/scripts/stagnant_lid_adapt_loop.py`).
++  `~/path/to/worktrees/gmg-geometric-interp/scripts/stagnant_lid_adapt_loop.py`).
+ 
+ The repo-relative paths used in the docs-reference snippets below are intentional
+ — image references resolve relative to the docs page, not the filesystem.
+@@ -64,7 +64,7 @@ The repo-relative paths used in the docs-reference snippets below are intentiona
+ ## 2. Animation companion — adaptive convection GIF
+ 
+ **File (NOT in the repo — multi-MB — in the simulation directory):**
+-`/Users/lmoresi/+Simulations/StagnantLid/anim_full_Ra1e7_dEta1e3_res32_R8_mode1/`
++`~/path/to/simulations/StagnantLid/anim_full_Ra1e7_dEta1e3_res32_R8_mode1/`
+ - `anim_clean_Ra1e7_dEta1e3_res32_R8_mode1.gif` — **docs/PR size**: 8 MB, 63 frames (every 4th step), 480 px, clean style (T field + adaptive-mesh edges; no scalebar, streamlines, or text).
+ - `anim_clean_…_HQ.gif` — 24 MB, 125 frames, 600 px.
+ - `frame_clean_step0001…0250.png` — all 250 clean PNGs, kept for re-cutting cadence/size.
+@@ -110,7 +110,7 @@ mpirun -np 5 python scripts/stagnant_lid_adapt_loop.py \
+   `--resume` cannot be used for the FMG arm.
+ - **Render:** `_render_clean.py <run_dir>` (clean — no scalebar/streamlines) or
+   `_render_watch.py <run_dir>` (default — with scalebar + streamlines), both in
+-  `/Users/lmoresi/+Simulations/StagnantLid/`. GIF assembled with Pillow (crop white margin →
++  `~/path/to/simulations/StagnantLid/`. GIF assembled with Pillow (crop white margin →
+   resize → sample frames).
+ 
+ ## Status
+diff --git a/docs/developer/design/VEP_TWO_STOKES_OPERATOR_SPLIT.md b/docs/developer/design/VEP_TWO_STOKES_OPERATOR_SPLIT.md
+index 7b49ccf9..58669887 100644
+--- a/docs/developer/design/VEP_TWO_STOKES_OPERATOR_SPLIT.md
++++ b/docs/developer/design/VEP_TWO_STOKES_OPERATOR_SPLIT.md
+@@ -14,7 +14,7 @@ But the in-residual softmin has known imperfections:
+ * **Higher-order ETD-2** beats BDF-2 by 4× on smooth VE but blows up under in-residual yield in tight-yield regimes (lesson #11 — fundamental, not patchable). For *fully-VE problems* ETD-2 is shippable; for *VEP*, only ETD-1 is.
+ * **No clean predictor-corrector path**: the radial-return-after-VE-predictor pattern (Phase F) only worked with ETD-1, and adding it to ETD-2 didn't rescue ETD-2 (lesson: σ-damping in outer Picard isn't sufficient — need to update η_eff between iters too).
+ 
+-The web-advice doc (`/Users/lmoresi/Downloads/vep_stress_update_full_latex.md`) prescribes the architecture that *is* the standard robust pattern in production geodynamics codes:
++The web-advice doc (`~/path/to/vep_stress_update_full_latex.md`) prescribes the architecture that *is* the standard robust pattern in production geodynamics codes:
+ 
+ ```
+ Stokes solve with lagged viscosity → VE exponential predictor → plastic return mapping → damped outer Picard iteration
+@@ -122,6 +122,6 @@ The user's framing closing the ETD investigation: *"the radial return, correctly
+ 
+ * `EXPONENTIAL_VE_INTEGRATOR.md` lesson #13 — first-order dissipation explanation
+ * Phase F results — what radial return alone (without two-Stokes) achieves and where it fails
+-* Web advice `/Users/lmoresi/Downloads/vep_stress_update_full_latex.md` §3, §11, §15 — the canonical predictor-corrector + outer Picard architecture
++* Web advice `~/path/to/vep_stress_update_full_latex.md` §3, §11, §15 — the canonical predictor-corrector + outer Picard architecture
+ 
+ The two-Stokes investigation is the bridge between the ETD work and a production-quality VEP+yield solver.
+diff --git a/docs/developer/design/fault_hierarchy_render.py b/docs/developer/design/fault_hierarchy_render.py
+index 432706b8..f19794dc 100644
+--- a/docs/developer/design/fault_hierarchy_render.py
++++ b/docs/developer/design/fault_hierarchy_render.py
+@@ -12,7 +12,7 @@ import pyvista as pv
+ from mpi4py import MPI
+ pv.OFF_SCREEN = True
+ 
+-FIG = "/Users/lmoresi/+Simulations/fault_network_3d_parallel/figures"
++FIG = "~/path/to/simulations/fault_network_3d_parallel/figures"
+ H, W = 0.08, 0.04
+ def patch(x0, x1, y, z0=0.4, z1=0.6):
+     return np.array([[x0, y, z0], [x1, y, z0], [x1, y, z1], [x0, y, z1]])
+diff --git a/docs/developer/guides/development-setup.md b/docs/developer/guides/development-setup.md
+index cbef13f3..21c0c04a 100644
+--- a/docs/developer/guides/development-setup.md
++++ b/docs/developer/guides/development-setup.md
+@@ -72,7 +72,7 @@ rm -rf build/
+ ## PETSc is not relocatable
+ 
+ ```
+-/Users/lmoresi/+Underworld/underworld-pixi-2/petsc/
++~/path/to/petsc/
+ ```
+ 
+ **Do not move this directory.** PETSc hardcodes paths at configure time, so
+diff --git a/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py b/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
+index 40f079d9..3766b4e0 100644
+--- a/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
++++ b/docs/examples/WIP/needs_update/fluid_mechanics/advanced/Ex_NS_Couette_PostProc.py
+@@ -57,7 +57,7 @@ Pdeg = Vdeg - 1
+ Pcont = False
+ 
+ # %%
+-outdir      = "/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Couette/Couette-res16-order1-Pirr-np8"
++outdir      = "~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Couette/Couette-res16-order1-Pirr-np8"
+ expt_name   = "Couette-res16-order1-Pirr_run0"
+ idx = 50
+ 
+diff --git a/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py b/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
+index 2848c534..7fcdcd69 100644
+--- a/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
++++ b/docs/examples/WIP/needs_update/fluid_mechanics/intermediate/Ex_NS_PipeFlow_PostProc.py
+@@ -100,8 +100,8 @@ idx = idx - 1
+ p_text = "P" if Pcont else "dP"
+ 
+ # %%
+-#outdir = f"/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
+-outdir = f"/Users/jgra0019/Documents/codes/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}-dt{dt_ns}-tstep10/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
++#outdir = f"~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
++outdir = f"~/path/to/uw3-dev/Navier-Stokes-benchmark/output-Pois/higher-order-elem-{mesh_type}-P{Vdeg}{p_text}{Pdeg}-dt{dt_ns}-tstep10/Pois-HR-{mesh_type}-res{resolution}-order{order}-dt{dt_ns}/"
+ expt_name = f"Pois-res{resolution}-order{order}-{mesh_type}-case{case_num}_run{idx}"
+ 
+ # %%
+diff --git a/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py b/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
+index a74ed845..0e1216d2 100644
+--- a/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
++++ b/docs/examples/WIP/needs_update/solid_mechanics/advanced/Ex_Sheared_Layer_Visualisation.py
+@@ -67,15 +67,15 @@ pv.global_theme.camera["position"] = [0.0, 0.0, 20.0]
+ # +
+ step = 1 #50
+ 
+-# basename = "/Users/lmoresi/+Simulations/ShearTest/ShearTestHP_InclusionMu05/shear_band_sw_nonp_0.5"
++# basename = "~/path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/shear_band_sw_nonp_0.5"
+ basename = "output/shear_band_sw_nonp_0.5"
+ 
+ 
+ # + language="sh"
+-# ls -trl "/Users/lmoresi/+Simulations/ShearTest/ShearTestHP_InclusionMu05/" | tail
++# ls -trl "~/path/to/simulations/ShearTest/ShearTestHP_InclusionMu05/" | tail
+ 
+ # +
+-# # ls /Users/lmoresi/+Simulations/ShearTest/ShearMu05_res0.01
++# # ls ~/path/to/simulations/ShearTest/ShearMu05_res0.01
+ 
+ # +
+ # Simplified (not periodic) mesh that covers the 
+diff --git a/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py b/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
+index c0ab8510..cdf3d798 100644
+--- a/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
++++ b/docs/examples/porous_flow/advanced/Ex_viscousFingering-Viz.py
+@@ -97,14 +97,14 @@ import os
+ 
+ # + language="sh"
+ #
+-# ls -trl /Users/lmoresi/+Simulations/PorousFlow/viscousFingering_example_8/* | tail -10
++# ls -trl ~/path/to/simulations/PorousFlow/viscousFingering_example_8/* | tail -10
+ 
+ # +
+ ## Reading the checkpoints back in ... 
+ 
+ step = 95
+ 
+-checkpoint_dir = "/Users/lmoresi/+Simulations/PorousFlow/viscousFingering_example_7"
++checkpoint_dir = "~/path/to/simulations/PorousFlow/viscousFingering_example_7"
+ checkpoint_base = "simpson_ViscousFinger"
+ base_filename = os.path.join(checkpoint_dir, checkpoint_base)
+ 
+diff --git a/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py b/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
+index 88a5355e..91baed34 100644
+--- a/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
++++ b/docs/examples/utilities/intermediate/Ex_DiscStokes_Visualise.py
+@@ -37,10 +37,10 @@ import sympy
+ 
+ # ls -trl ../Examples-Convection/output/Disc_Ra1e7_H1_deleta_1000.0*T* | tail
+ 
+-# ls -trl /Users/lmoresi/+Simulations/InnerCore/ConvectionDisk | tail
++# ls -trl ~/path/to/simulations/InnerCore/ConvectionDisk | tail
+ 
+ ###### checkpoint_dir = "../Examples-Convection/output"
+-checkpoint_dir = "/Users/lmoresi/+Simulations/InnerCore/ConvectionDisk"
++checkpoint_dir = "~/path/to/simulations/InnerCore/ConvectionDisk"
+ checkpoint_base = f"Disc_Ra1e7_H1_deleta_1000.0"
+ meshfile = os.path.join(checkpoint_dir, checkpoint_base) + ".mesh.05100.h5"
+ 
+diff --git a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
+index d11de1c3..65a82fec 100644
+--- a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
++++ b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_Disc.py
+@@ -53,21 +53,21 @@ import sympy
+ 
+ # + language="sh"
+ #
+-# ls -tr /Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc | tail -5
+-# #ls -tr /Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/output_res_033/*mesh*h5 | tail -10
++# ls -tr ~/path/to/simulations/NS_benchmarks/NS_Disc | tail -5
++# #ls -tr ~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/output_res_033/*mesh*h5 | tail -10
+ #
+ # -
+ 
+ 
+-# ls -tr /Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/Rho3e3 | tail -5
++# ls -tr ~/path/to/simulations/NS_benchmarks/NS_Disc/Rho3e3 | tail -5
+ 
+ # +
+ ## Reading the checkpoints back in ... 
+ 
+ step = 135
+ 
+-checkpoint_dir = "/Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/Rho3e3/"
+-# checkpoint_dir = "/Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes//Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_DvDt_std"
++checkpoint_dir = "~/path/to/simulations/NS_benchmarks/NS_Disc/Rho3e3/"
++# checkpoint_dir = "~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/~/path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
+ 
+ checkpoint_base = "Cylinder_NS_rho_3000.0_30_dt0.1"
+ base_filename = os.path.join(checkpoint_dir, checkpoint_base)
+@@ -278,8 +278,8 @@ for step in steps:
+     
+     pl.clear()
+ # +
+-# # ! mkdir /Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1_images
+-# # ! cp /Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1*png /Users/lmoresi/+Simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1_images
++# # ! mkdir ~/path/to/simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1_images
++# # ! cp ~/path/to/simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1*png ~/path/to/simulations/NS_benchmarks/NS_Disc/rho1e4/Cylinder_NS_rho_10000.0_50_dt0.1_images
+ 
+ 
+ # -
+diff --git a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
+index 89af0315..a91a3bc2 100644
+--- a/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
++++ b/docs/examples/utilities/intermediate/Ex_Navier_Stokes_Visualise_NS_DFG_2d.py
+@@ -68,21 +68,21 @@ import sympy
+ 
+ # + language="sh"
+ #
+-# ls -tr /Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_Re1000
+-# #ls -tr /Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/output_res_033/*mesh*h5 | tail -10
++# ls -tr ~/path/to/simulations/NS_benchmarks/NS_BMK_Re1000
++# #ls -tr ~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/output_res_033/*mesh*h5 | tail -10
+ #
+ # -
+ 
+ 
+-# ls -tr /Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0/NS_test_Re_1000_SLCN_60*mesh* | tail
++# ls -tr ~/path/to/simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0/NS_test_Re_1000_SLCN_60*mesh* | tail
+ 
+ # +
+ ## Reading the checkpoints back in ... 
+ 
+ step = 190
+ 
+-checkpoint_dir = "/Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0"
+-# checkpoint_dir = "/Users/lmoresi/+Underworld/underworld3/JupyterBook/Notebooks/Examples-NavierStokes//Users/lmoresi/+Simulations/NS_benchmarks/NS_BMK_DvDt_std"
++checkpoint_dir = "~/path/to/simulations/NS_benchmarks/NS_BMK_Re1000/output_res_60_3.0"
++# checkpoint_dir = "~/path/to/underworld3/JupyterBook/Notebooks/Examples-NavierStokes/~/path/to/simulations/NS_benchmarks/NS_BMK_DvDt_std"
+ 
+ checkpoint_base = "NS_test_Re_1000_SLCN_60"
+ base_filename = os.path.join(checkpoint_dir, checkpoint_base)
+diff --git a/docs/reviews/2025-10/REDUCTION-OPERATIONS-REVIEW.md b/docs/reviews/2025-10/REDUCTION-OPERATIONS-REVIEW.md
+index 34c4797d..40f0db13 100644
+--- a/docs/reviews/2025-10/REDUCTION-OPERATIONS-REVIEW.md
++++ b/docs/reviews/2025-10/REDUCTION-OPERATIONS-REVIEW.md
+@@ -142,7 +142,7 @@ def std(self):
+ ### Test Execution
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ pixi run -e default pytest tests/test_0850_comprehensive_reduction_operations.py -v
+ pixi run -e default pytest tests/test_0851_std_reduction_method.py -v
+ ```
+@@ -307,7 +307,7 @@ This implementation is ready for approval with the following conditions:
+ 
+ ```bash
+ # Run the specific reduction tests
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ pixi run -e default pytest tests/test_0850_comprehensive_reduction_operations.py tests/test_0851_std_reduction_method.py -v
+ 
+ # Verify no regressions (takes ~5-10 minutes)
+diff --git a/docs/reviews/2025-10/SWARM-INTEGRATION-STATISTICS-REVIEW.md b/docs/reviews/2025-10/SWARM-INTEGRATION-STATISTICS-REVIEW.md
+index ec962ef6..3f99a94d 100644
+--- a/docs/reviews/2025-10/SWARM-INTEGRATION-STATISTICS-REVIEW.md
++++ b/docs/reviews/2025-10/SWARM-INTEGRATION-STATISTICS-REVIEW.md
+@@ -149,7 +149,7 @@ std_f = np.sqrt(max(variance, 0.0))
+ ### Test Execution
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ pixi run -e default pytest tests/test_0852_swarm_integration_statistics.py -v
+ ```
+ 
+@@ -373,7 +373,7 @@ This documentation and testing package is ready for approval with the following
+ 
+ ```bash
+ # Run integration tests
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ pixi run -e default pytest tests/test_0852_swarm_integration_statistics.py -v
+ 
+ # Verify all test assertions pass
+diff --git a/docs/reviews/2025-11/TIMING-SYSTEM-REFACTOR-REVIEW.md b/docs/reviews/2025-11/TIMING-SYSTEM-REFACTOR-REVIEW.md
+index 9f1d2847..fb6fcc82 100644
+--- a/docs/reviews/2025-11/TIMING-SYSTEM-REFACTOR-REVIEW.md
++++ b/docs/reviews/2025-11/TIMING-SYSTEM-REFACTOR-REVIEW.md
+@@ -125,7 +125,7 @@ Refactored the timing system from 625→509 lines by eliminating ~400 lines of m
+ ### Run Timing Tests
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ 
+ # Rebuild if needed
+ pixi run underworld-build
+diff --git a/docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md b/docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md
+index e1cbf7ac..0ecccfe5 100644
+--- a/docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md
++++ b/docs/reviews/2025-11/UNITS-SYSTEM-FIXES-REVIEW.md
+@@ -104,7 +104,7 @@ Fixed critical bug in non-dimensionalization where different input units (km/yr
+ ### Run Units Tests
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ 
+ # Rebuild
+ pixi run underworld-build
+diff --git a/docs/reviews/2025-11/UNWRAPPING-REFACTORING-REVIEW.md b/docs/reviews/2025-11/UNWRAPPING-REFACTORING-REVIEW.md
+index 6385d2f8..a45322ea 100644
+--- a/docs/reviews/2025-11/UNWRAPPING-REFACTORING-REVIEW.md
++++ b/docs/reviews/2025-11/UNWRAPPING-REFACTORING-REVIEW.md
+@@ -100,7 +100,7 @@ Refactored the expression unwrapping system to consolidate logic and prepare for
+ ### Run Critical Tests
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld-pixi-2/underworld3
++cd ~/path/to/underworld3
+ 
+ # Rebuild after changes
+ pixi run underworld-build
+diff --git a/docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md b/docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md
+index 01988282..f1ebdd82 100644
+--- a/docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md
++++ b/docs/reviews/2026-07/BRANCH-TRIAGE-LEDGER.md
+@@ -443,7 +443,7 @@ quality-audit branch/worktree (`feature/quality-audit-2026-07`) are also KEEP_AC
+   petsc_generic_snes_solvers.pyx, both test files) is EMPTY, and merge-base `ae647025` is the
+   commit directly before the squash. Development has since moved further on these files
+   (#298 rotated-SNES). Worktree
+-  `/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/custom-mg-prolongation` is
++  `~/path/to/worktrees/custom-mg-prolongation` is
+   CLEAN (empty `status --porcelain`). Worktree name is a leftover from the #290 custom-MG
+   work; the directory was reused for this branch.
+ - **`feature/dminterp-bypass-element-check`** — 2 commits ahead of merge-base `44c2f472`:
+@@ -628,7 +628,7 @@ quality-audit branch/worktree (`feature/quality-audit-2026-07`) are also KEEP_AC
+   commit (CHANGES entry, current API names, toctree wiring) on top of the snapshot-disk
+   feature (PR #198). It is 0 commits ahead of development and was merged via PR #199 (merge
+   commit `44c2f472` on development). Worktree
+-  `/Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/in-memory-checkpoint` is
++  `~/path/to/worktrees/in-memory-checkpoint` is
+   dirty only with 2 untracked demo render PNGs (snapshot_backstepping_demo.png,
+   snapshot_backstepping_spatial.png, dated 2026-05-12/13) plus a few gitignored vep_*.png
+   renders — no code or doc changes. Nothing exists only here except throwaway figures.
+@@ -786,7 +786,7 @@ Before executing the batch, the same two checks (`merge-base --is-ancestor` + cl
+ This is an audit document; there is no code to test. To re-verify any row:
+ 
+ ```bash
+-cd /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/quality-audit-2026-07
++cd ~/path/to/worktrees/quality-audit-2026-07
+ 
+ # merged-by-ancestry?
+ git merge-base --is-ancestor <branch> development && echo merged
+@@ -801,7 +801,7 @@ git log --oneline development..<branch>
+ git log --oneline origin/<branch>..<branch>   # (or: git branch -r --contains <tip>)
+ 
+ # worktree dirty?
+-git -C /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/<worktree> status --porcelain
++git -C ~/path/to/worktrees/<worktree> status --porcelain
+ ```
+ 
+ The bulk-list spot checks recorded above were run on 2026-07-03 against development tip
+-- 
+2.53.0
+
