@@ -2893,6 +2893,12 @@ for k in range(k0, k0 + params.uw_steps):
         found = crust_spline_points(faults)
         if found is None:
             uw.pprint(f"  {FIT_NAME}: no slab top reaching the cap from the surface; the fault keeps its place")
+            if not faults and not stopped:
+                # Louis, 2026-11-25: "I don't want any models that have no fault" (hub DECISIONS: every model has a
+                # fault). A run whose first fit forms none stops (exit 3) rather than going on fault-free; the fit's
+                # reason is the line above (R6/R17, 2026-11-26: the march stopped under a 7 km tracer layer)
+                stopped = (f"no fault formed at the first fit (step {step}): {FIT_NAME} found no slab top reaching the "
+                           f"cap; see the fit's message above")
         else:
             poly, theta_t, dip, depth, info = found
             if faults:
@@ -2971,6 +2977,9 @@ for k in range(k0, k0 + params.uw_steps):
         solver["wall"]["checkpoint"] = round(time.perf_counter() - t_phase, 3)
         if k == k0 + params.uw_steps - 1:
             write_records(records)
+    if stopped and not faults:                  # no fault formed (above): end the run, nothing to checkpoint
+        write_records(records)
+        break
     if int(params.uw_check_stop_steps) > 0 and flagged_run >= int(params.uw_check_stop_steps):
         stopped = f"the fault check flagged {flagged_run} steps in a row to step {step} ({', '.join(check_flags)})"
         if last_ckpt < step:
