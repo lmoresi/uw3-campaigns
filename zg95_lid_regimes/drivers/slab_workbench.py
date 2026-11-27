@@ -1192,13 +1192,14 @@ def crust_spline_points(faults):
         hint = float(theta[sub][piece][np.argmin(depth[sub][piece])])
     X0 = r_o * hint
     Xd = X0                                          # where the slab is looked for at depth
-    if faults and jump_rungs() > 0:                    # the fault in use below half the cap
+    if faults:                                       # near the fault in use below half the cap (from 28 Nov always: a
+                                                     # slab lying at ~25 deg took its deep part > 0.3 from the top, Q17c)
         old = np.asarray(faults[0]["points"], dtype=float)
         at = (r_o - np.hypot(old[:, 0], old[:, 1]) > 0.5 * cap)
         if at.any():
             Xd = r_o * (hint + float(np.median(wrap(np.arctan2(old[at, 1], old[at, 0]) - hint))))
     M = np.c_[r_o * (hint + wrap(theta - hint)), -depth]
-    M = M[(np.abs(M[:, 0] - X0) < r_o * 0.4) & (depth < cap + 0.11)]
+    M = M[(np.abs(M[:, 0] - X0) < r_o * 0.8) & (depth < cap + 0.11)]   # 0.8 (was 0.4): room for a slab lying flat
     dep = -M[:, 1]
     sh = np.abs(dep - L0) < 0.5 * ct if FOLLOW_OCRUST else dep < 0.5 * ct
     deep = (dep > 0.5 * cap) & (dep < cap + 2 * ct) & (np.abs(M[:, 0] - Xd) < 0.3)
