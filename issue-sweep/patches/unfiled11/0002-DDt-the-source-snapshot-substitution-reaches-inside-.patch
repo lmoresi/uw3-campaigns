@@ -1,6 +1,6 @@
-From 7028d491e32ee99af07baa8611f0b7e33c56465f Mon Sep 17 00:00:00 2001
+From 40779a93f638b5445f4422a192c35bc5ee5dc1b0 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
-Date: Fri, 27 Nov 2026 23:04:12 +1100
+Date: Sat, 28 Nov 2026 01:12:48 +1100
 Subject: [PATCH 2/2] DDt: the source snapshot substitution reaches inside
  named expressions
 
@@ -23,14 +23,14 @@ refreshes the snapshot before it projects.
 
 Underworld development team with AI support from Claude Code
 ---
- src/underworld3/systems/ddt.py | 59 ++++++++++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 10 deletions(-)
+ src/underworld3/systems/ddt.py | 60 ++++++++++++++++++++++++++++------
+ 1 file changed, 50 insertions(+), 10 deletions(-)
 
 diff --git a/src/underworld3/systems/ddt.py b/src/underworld3/systems/ddt.py
-index 945a30c4..02fc677b 100644
+index 945a30c4..307733b7 100644
 --- a/src/underworld3/systems/ddt.py
 +++ b/src/underworld3/systems/ddt.py
-@@ -630,6 +630,45 @@ def _build_weighted_sum(coeffs, psi_fn, psi_star_syms):
+@@ -630,6 +630,46 @@ def _build_weighted_sum(coeffs, psi_fn, psi_star_syms):
      return result
  
  
@@ -47,8 +47,9 @@ index 945a30c4..02fc677b 100644
 +    An expanded expression is copied as it is when the source is built: a later
 +    direct ``.sym`` assignment to it is seen once ``psi_fn`` is set again, which
 +    the constitutive models' parameter setters do. Contents that are a number, a
-+    quantity or a Matrix are not descended into (a Matrix, as before). Each named
-+    expression is walked once per call, so shared sub-expressions cost no more.
++    quantity or a Matrix are not descended into (a Matrix, as on development).
++    Each named expression is walked once per call, so shared sub-expressions
++    cost no more.
 +    """
 +    from underworld3.function.expressions import UWexpression
 +
@@ -76,7 +77,7 @@ index 945a30c4..02fc677b 100644
  class _DDtBase(uw_object):
      r"""Shared machinery for the DDt history-manager flavors.
  
-@@ -1094,11 +1133,11 @@ class _DDtBase(uw_object):
+@@ -1094,11 +1134,11 @@ class _DDtBase(uw_object):
              indep = self._psi_star_indep_indices
              row = sympy.Matrix([[source_fn[i, j] for (i, j) in indep]])
              if self._psi_snapshot_enabled and self._psi_snapshot is not None:
@@ -93,7 +94,7 @@ index 945a30c4..02fc677b 100644
                  ps0 = self.psi_star[0]
                  psi_snapshot = self._psi_snapshot
                  substitutions = {
-@@ -1106,7 +1145,7 @@ class _DDtBase(uw_object):
+@@ -1106,7 +1146,7 @@ class _DDtBase(uw_object):
                      for i in range(self.mesh.dim)
                      for j in range(self.mesh.dim)
                  }
@@ -102,7 +103,7 @@ index 945a30c4..02fc677b 100644
              return row
          else:
              # Scalar / vector path: psi_star[0] is a scalar/vector field. If
-@@ -1184,10 +1223,10 @@ class _DDtBase(uw_object):
+@@ -1184,10 +1224,10 @@ class _DDtBase(uw_object):
      def _check_snapshot_is_level_0(self):
          """The commit's frozen source must be ``psi_star[0]`` as it is now.
  

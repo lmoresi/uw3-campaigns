@@ -20,7 +20,7 @@ UNFILED 11's part (b), the record-projection fallback reading a snapshot refresh
 | the projection reads the snapshot through a named expression (the copy and the history set 1 apart; projection solved directly, at tolerance 1e-10) | fails: the diagonal is 1.0 off | passes | passes |
 | no `psi_star[0]` symbol is left in the compiled source | fails | passes | passes |
 | a named quantity with units (2 Pa s) is left as an atom | passes | fails: SympifyError | passes |
-| a diamond of shared named expressions 16 deep builds in under 2 s | passes | fails: 37 s (the version without the memo, too) | passes, 0.4 s |
+| a diamond of shared named expressions 16 deep builds in under 2 s, and (unwrapped) no psi_star[0] is left at its bottom | fails: left | fails: 37 s (the version without the memo, too) | passes, 0.4 s |
 
 **What was run** (serial, on a 96-thread Linux workstation, Intel Xeon Gold 6240R):
 
