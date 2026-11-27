@@ -5039,3 +5039,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 ### 2026-11-27 — K1 answers on 0bf494f
 - Incoming plate's line: ridge_crust still refills every 5 steps, independent of uw_line_reseed. It lays the melange lattice and the ocrust line's surface points inside ridge_crust_window wherever none lie within 0.75 spacings. Between the window and the trench the plate is rigid, so spacing holds; inside the trench the re-seeding covers it. The bend just seaward of the trench has no active feed, so line_spacing.py will be run there at each report.
 - ref_km stays record-only for Q10b/Q17b and goes in every segment report, along with good/failed fits, gap links (count, max length, max lateral) and re-seeded particles per fit. If it behaves sensibly, it becomes a flag in the next driver commit, at uw_check_fit_km unless the numbers say otherwise. Hub: accepted.
+
+### 2026-11-27 — Q10b/Q17b: fits held, re-seeding bloats the line; Louis drops re-seeding; Q10c/Q17c (job 4985)
+- Q10b/Q17b at 15-22 Myr:
+  - All fits good (32/32, 30/30), no gap links used, ref_km within about ±14 km at 100-300 km.
+  - About 750 particles were re-seeded per fit. line_particles.py (movies/out/line_particles_qb.png) shows the re-seeded line as a band 20-40 km wide, fanning to 20-60 km near the trench. Q10b went from 9k to 32.7k line particles by 20 Myr.
+  - The passive line's near-trench part was dragged back to about 17 km depth, 150-220 km behind the fault top (the overriding-strip drag, lessons rule 10). The fault did not follow it.
+- Louis: "Not keen on the re-seeding idea any more ! Option 3 looks better to me." (Option 3: the dense line and gap links, no re-seeding.)
+- Job 4984 cancelled. Job 4985: Q10c/Q17c = Q10b/Q17b with -uw_line_reseed 0 (chain refill back on), -uw_crust_line_spacing_km 0.5, -uw_fit_gap_km 60; driver 8761b2d (= kaiju/slab-workbench 0bf494f); from step 0. With no oref marker, ref_km is not recorded; the ocrust line itself is passive and independent of the fit again.
+- Hub:
+  - One change against Q10b/Q17b; good.
+  - Q10b/Q17b are a useful control for Q10c/Q17c up to 15-22 Myr (fit counts, fault position). Keep their checkpoints.
+  - The strip drag at the trench persists in the old overriding side. That is a set-up property (rule 10), not a fitting problem; note it when reading Q10c/Q17c convergence.
