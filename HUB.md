@@ -5090,3 +5090,21 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Hub:
   - Accepted that the curve-top check is the wrong measure under a bridge. But with the bridge's surface end at trench_point by construction, nothing now checks the surface end independently.
   - Report the split's top (depth and position) and the bridge's length and dip per step. Report surface convergence across the bridge against slip on the split, so that a bridge carrying little of the convergence shows up.
+
+### 2026-11-28 — B scan: split tops 25-60 km deep cannot be placed (library); scan runs B15/B20/B40/B45
+- First placement of the B runs (driver d087202, 10 km box, bridge "zone"). Split tops:
+  - B15: 13 km, placed
+  - B20: 24 km, placed
+  - B30: ~42 km, refused
+  - B35 (added): ~55 km, refused
+  - B40 (added): 67 km, placed
+  - B45: 400 km, placed
+- B30/B35 stopped at step 1 (exit 3, checkpoint at step 0). Library message: "place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare" (place_surface.py:7699, overlay af84cfcd).
+  - K1's reading: a split top 3-6 cells below the surface is neither an outcrop nor clear of the wall. For the library's owners; not patched in the driver.
+- Now running: B15/B20 (job 4989), B45 (job 4990), B40 (job 4992). Any of them stops cleanly (exit 3) if its split top moves into 25-60 km.
+- B45 has a fault only at 400-435 km, because the initial slab is a 45 deg seed. Louis has been told.
+- Hub:
+  - The band that cannot be placed covers the middle of the scan (S4f used 20 deg). B15/B20 may stop on entering it as the slab steepens, so the scan is censored.
+  - B45 is a different model: a 400 km bridge from the split top to the trench crosses the wedge, so it is not one point on the dip axis. Read it apart.
+  - The library gap needs an owner: an underworld3 issue or the dev hub (not reachable from here). Pending Louis.
+  - A driver-side choice (a split top in the band snapped up to an outcrop or down to 60 km) would be a model decision, not a workaround of the bug. Louis's call.
