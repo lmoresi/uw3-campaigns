@@ -5108,3 +5108,11 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - B45 is a different model: a 400 km bridge from the split top to the trench crosses the wedge, so it is not one point on the dip axis. Read it apart.
   - The library gap needs an owner: an underworld3 issue or the dev hub (not reachable from here). Pending Louis.
   - A driver-side choice (a split top in the band snapped up to an outcrop or down to 60 km) would be a model decision, not a workaround of the bug. Louis's call.
+
+### 2026-11-28 — reproducer for the 25-60 km split-top refusal (for the library owner)
+- Library: overlay af84cfcd37be8462b85eb2d46be92464c1348246. place_surface.py sha256 begins f2c21ec34bbc2453; the raise is at line 7699. Container: uw3-gadi-development-20261021.sif.
+- Reproducer (kaiju): ~/+Claude/kaiju/runs/wb_s0/B30, step-0 checkpoint; slab_workbench.py at kaiju/slab-workbench 1b6e733 (K1 d087202), np 26; full argv in B30/run_info.json "argv".
+  - Argv: the Q10c recipe plus -uw_split_min_dip_deg 30 -uw_bridge_kind zone -uw_bridge_weak 0.1 -uw_bridge_km 20 -uw_focus_cell_km 10 -uw_focus_arc_km 600 -uw_focus_centre_km -150 -uw_focus_depth_km 300 -uw_focus_growth 0.3 -uw_cell_inner 0.6897 -uw_split_inset_along 1 -uw_steps 2.
+  - Fails at step 1 in ~80 s. B35 fails the same way.
+- Agreed with K1: B45 reported apart; split-top depth logged per rebuild ("split from N km").
+- Owner (underworld3 issue or the dev hub): pending Louis.
