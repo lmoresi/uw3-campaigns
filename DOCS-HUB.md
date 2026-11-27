@@ -824,3 +824,4 @@ Measured here, not inherited.
   patch is LU (#912), so that row needs a rerun forced to ILU(0) or a clause naming 799ef021. Hub is off the
   branch. Messages to that session go through send_message (the bridge returned 401).
 - 2026-11-24: fault note ILU(0) row rerun on a673cd52 (forced via -uw_fac_ilu 1): reproduces (180/259/344 over 17; SOR 259/369/532). Timings re-quoted at a673cd52 (LU 0.8/1.0/1.6 s, ILU 1.9/3.1/5.5, SOR 2.2/3.5/6.1). Ready for PR on Louis's word.
+- 2026-11-27: MMPDE 1.3.0 (#90) merged and deposited as 10.6084/m9.figshare.33241170.v4 (new-version dispatch; identifiers #99; History DOI #100). The v4 PDF is clean (no banner, no comments block). #98 (fault-note publication timestamp) merged after approving its held checks.
