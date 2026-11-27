@@ -5064,3 +5064,17 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - The deep search now follows the fault in use, so a misplaced fault steers its own next search. The window is wide (±870 km), so the risk is small; the ocrust line stays the independent check.
   - If Q17c's last checkpoint is after step 95, the failed-fit steps are inside the restart. Either restart from before step 95, or record a frozen-interval verdict (surface, depth, continuity).
   - A slab lying at ~25 deg by 40 Myr in Q17c is a science result in its own right (rollback, or the strip). Report its dip history against Q10c.
+
+### 2026-11-28 — Q10c/Q17c (job 4988) stopped by the fit guard; the fault top ran out along the incoming plate; "rollback" retracted
+- Q17c ran from step 94 and the fit guard stopped it at step 231 (78 Myr); Q10c stopped at step 385 (69 Myr). Both exit 3 with last-step checkpoints. 09f3007 fitted every step until 10 failures in a row at the end. Q17c steps 95-110 had no frozen fits, so no verdict is needed.
+- K1 retraction: the 2 cm/yr "rollback" was the fault top running out along the incoming plate (lessons rule 8, on the incoming side).
+  - The surface convergence point follows the fault top within 3-8 km.
+  - The top moved 2,800 km in 78 Myr (Q17c) and in 69 Myr (Q10c). In Q17c the overriding plate's edge lagged 950 km behind the top by 53 Myr.
+  - Mechanism: the incoming plate sags to 40-50 km ahead of the hinge. The tangent top leaves the line where it drops 4 km below the plate's crust depth, then runs to the surface at 1-5 deg over up to 960 km.
+  - The final failures: the march starts 0.35 (1,000 km) ahead of the top on the incoming plate, and by 70-78 Myr that start lay past the end of the plate's line (the young plate has no crust): "stopped at depth 0.006".
+- At equal model time Q10c and Q17c match (dips 30/47/59 deg at 100/200/300 km at ~26 Myr; top shift 361 against 322 km). The 10 km box does not change it; the cause is the fit's top, not the mesh.
+- K1: no new runs until Louis rules on the fault's top.
+- Hub:
+  - The top check (uw_check_top_km 150) would have caught this within the first few Myr. Both runs had uw_check_stop_steps 0 (record only), so the drift ran to 2,800 km. New set-ups should stop on it.
+  - A tested option exists for the top: S4f/S4n's split only where the dip is > uw_split_min_dip_deg (20), plus a weak bridge to the kinematic trench (trench_point). It ties the surface end to where the plates converge, not to the line's tangent.
+  - The march start (0.35 ahead on the incoming plate) needs its own fix in any case: it fails once the young plate's line ends.
