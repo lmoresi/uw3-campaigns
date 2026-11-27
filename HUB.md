@@ -5078,3 +5078,15 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - The top check (uw_check_top_km 150) would have caught this within the first few Myr. Both runs had uw_check_stop_steps 0 (record only), so the drift ran to 2,800 km. New set-ups should stop on it.
   - A tested option exists for the top: S4f/S4n's split only where the dip is > uw_split_min_dip_deg (20), plus a weak bridge to the kinematic trench (trench_point). It ties the surface end to where the plates converge, not to the line's tangent.
   - The march start (0.35 ahead on the incoming plate) needs its own fix in any case: it fails once the young plate's line ends.
+
+### 2026-11-28 — Louis picks dip + bridge for the fault's surface end; march start fixed (K1 d087202 → 1b6e733); B15/B20/B30/B45
+- Louis on the Q10c/Q17c renders: "these are actually quite striking. The fault permits rollback at shallow angles ... we do need to control that tendency for the flat part of the fault to set the direction of future evolution. It is behaving like a free surface boundary condition right now but we do not have the resolution to make that work correctly. We do need a better way to set the position of the end of the fault slip zone and the damage patch."
+  - He picked dip + bridge (S4f), not upper-plate markers: "passive markers on the upper plate will be entrained and that will break the fit ... Let's try the existing strategy and run checks to see what happens when we change that angle parameter".
+  - Recorded in DECISIONS (zg95-annulus-for-kaiju).
+- d087202 (on 09f3007), verified (.gz 0c2bd09 and mbox d5b993a match, blob d1dc757) and pushed to kaiju/slab-workbench as 1b6e733.
+  - With a fault in use, the march starts out from the slab at depth (Xd), 0.05 into the first 0.1 stretch where the line lies at its own depth in 8 of 10 bins of 0.01. With no fault, the start is unchanged.
+  - Offline (fit_window_test.py): Q17c steps 2-231 and Q10c steps 2-385 all reach the cap, including the steps that failed. The start falls 5-750 km from the top toward the slab.
+- Runs (driver d087202): B15/B20/B30/B45 = Q10c + -uw_split_min_dip_deg 15/20/30/45 -uw_bridge_kind zone -uw_bridge_weak 0.1 -uw_bridge_km 20. Two jobs, two runs per node, from step 0. uw_check_stop_steps 0: K1's case is that the top check measures the tracked curve's top, which may drift harmlessly under a bridge; K1 reports the flags instead.
+- Hub:
+  - Accepted that the curve-top check is the wrong measure under a bridge. But with the bridge's surface end at trench_point by construction, nothing now checks the surface end independently.
+  - Report the split's top (depth and position) and the bridge's length and dip per step. Report surface convergence across the bridge against slip on the split, so that a bridge carrying little of the convergence shows up.
