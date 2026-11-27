@@ -1,0 +1,106 @@
+From 4307aff31ee7e7d305d39e2a3b2aaac10c739928 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 27 Nov 2026 20:11:30 +1100
+Subject: [PATCH 2/2] DDt: the source snapshot substitution reaches inside
+ named expressions
+
+_build_projection_source replaced psi_star[0] with its snapshot by .subs,
+which treats a UWexpression as an atom. A named expression whose contents
+hold psi_star[0] (at yield the viscosity reads E_eff_inv_II) now gives way
+to its contents with the substitution made; every other named expression is
+kept, so parameters still read their current values, and one whose
+contents are a number or a quantity with units is not descended into. The commit's check
+that the snapshot is psi_star[0] stays as a safeguard (UNFILED 11, part a).
+
+Part b of UNFILED 11, the record-projection fallback reading a snapshot
+refreshed after the trace-back, was closed by 22ca45a2: the fallback
+refreshes the snapshot before it projects.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/systems/ddt.py | 48 +++++++++++++++++++++++++++-------
+ 1 file changed, 38 insertions(+), 10 deletions(-)
+
+diff --git a/src/underworld3/systems/ddt.py b/src/underworld3/systems/ddt.py
+index 945a30c4..5ad2203e 100644
+--- a/src/underworld3/systems/ddt.py
++++ b/src/underworld3/systems/ddt.py
+@@ -630,6 +630,34 @@ def _build_weighted_sum(coeffs, psi_fn, psi_star_syms):
+     return result
+ 
+ 
++def _substitute_through_expressions(expr, substitutions):
++    """``expr.subs(substitutions)``, reaching inside named expressions too.
++
++    ``.subs`` treats a ``UWexpression`` as an atom, so a substituted symbol held
++    in its contents is not replaced. Here a named expression whose contents (at
++    any depth) hold one is replaced by those contents with the substitution made.
++    Every other named expression is kept as it is, so a parameter still reads its
++    current value. (UNFILED 11: the source snapshot did not reach psi_star[0]
++    inside E_eff_inv_II.)
++    """
++    from underworld3.function.expressions import UWexpression
++
++    def through(e):
++        replacements = {}
++        for named in e.atoms(UWexpression):
++            contents = named.sym
++            if not isinstance(contents, sympy.Basic):
++                continue        # a number or a quantity with units: nothing to substitute
++            substituted = through(contents)
++            if substituted != contents:
++                replacements[named] = substituted
++        if replacements:
++            e = e.xreplace(replacements)
++        return e.subs(substitutions)
++
++    return through(expr)
++
++
+ class _DDtBase(uw_object):
+     r"""Shared machinery for the DDt history-manager flavors.
+ 
+@@ -1094,11 +1122,11 @@ class _DDtBase(uw_object):
+             indep = self._psi_star_indep_indices
+             row = sympy.Matrix([[source_fn[i, j] for (i, j) in indep]])
+             if self._psi_snapshot_enabled and self._psi_snapshot is not None:
+-                # .subs does not reach psi_star[0] held inside a UWexpression
+-                # (at yield the viscosity reads E_eff_inv_II, whose .sym
+-                # contains it), so that occurrence reads the history live. That
+-                # is harmless only while the snapshot equals psi_star[0] at the
+-                # commit, which commit_flux_to_history checks.
++                # psi_star[0] can sit inside a UWexpression (at yield the
++                # viscosity reads E_eff_inv_II, whose contents hold it), where
++                # .subs does not reach: the substitution goes through such
++                # expressions too (UNFILED 11). commit_flux_to_history still
++                # checks that the snapshot is psi_star[0] at the commit.
+                 ps0 = self.psi_star[0]
+                 psi_snapshot = self._psi_snapshot
+                 substitutions = {
+@@ -1106,7 +1134,7 @@ class _DDtBase(uw_object):
+                     for i in range(self.mesh.dim)
+                     for j in range(self.mesh.dim)
+                 }
+-                row = row.subs(substitutions)
++                row = _substitute_through_expressions(row, substitutions)
+             return row
+         else:
+             # Scalar / vector path: psi_star[0] is a scalar/vector field. If
+@@ -1184,10 +1212,10 @@ class _DDtBase(uw_object):
+     def _check_snapshot_is_level_0(self):
+         """The commit's frozen source must be ``psi_star[0]`` as it is now.
+ 
+-        The substitution of the snapshot for ``psi_star[0]`` does not reach an
+-        occurrence wrapped in a ``UWexpression``, which reads the history live;
+-        the two readings agree only while nothing has written ``psi_star[0]``
+-        since the refresh. Collective: every rank raises or none does.
++        The projection reads the snapshot in place of ``psi_star[0]``, including
++        inside named expressions (UNFILED 11); a ``psi_star[0]`` written after the
++        refresh would make the frozen source and the stored history disagree.
++        Collective: every rank raises or none does.
+         """
+         if not (self._psi_snapshot_enabled and self._psi_snapshot is not None):
+             return
+-- 
+2.53.0
+

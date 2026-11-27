@@ -1,0 +1,123 @@
+From 9a287766985ab84a5a7e7691b29fc88c05b91e3c Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 27 Nov 2026 20:11:30 +1100
+Subject: [PATCH 1/2] Test: the source snapshot reaches psi_star[0] inside a
+ named expression
+
+With the source snapshot enabled, the commit projection of a flux history
+reads a frozen copy of psi_star[0]. The substitution did not reach an
+occurrence held inside a UWexpression (E_eff_inv_II at yield), which kept
+reading the history live. The commit's check that the copy equals the
+history kept every result right, so the test makes them differ on purpose
+and solves the projection directly: on development the diagonal, read
+through the named expression, is 1.0 off, and psi_star[0] is left in the
+compiled source (UNFILED 11). A third case pins a named quantity with
+units (a viscosity in Pa s), which holds no psi_star[0] and must be left as
+it is.
+
+Underworld development team with AI support from Claude Code
+---
+ ...urce_snapshot_reaches_named_expressions.py | 91 +++++++++++++++++++
+ 1 file changed, 91 insertions(+)
+ create mode 100644 tests/test_1322_source_snapshot_reaches_named_expressions.py
+
+diff --git a/tests/test_1322_source_snapshot_reaches_named_expressions.py b/tests/test_1322_source_snapshot_reaches_named_expressions.py
+new file mode 100644
+index 00000000..5c9248e3
+--- /dev/null
++++ b/tests/test_1322_source_snapshot_reaches_named_expressions.py
+@@ -0,0 +1,91 @@
++"""The commit projection's frozen source reaches psi_star[0] inside a named expression.
++
++With the source snapshot enabled, the projection of a flux history reads a frozen
++copy of ``psi_star[0]`` in place of ``psi_star[0]`` itself (``enable_source_snapshot``).
++The substitution used ``.subs``, which does not look inside a ``UWexpression``: an
++occurrence of ``psi_star[0]`` held in one (at yield, the viscosity reads
++``E_eff_inv_II``, whose contents hold it) kept reading the history live. The two
++agree only while ``psi_star[0]`` equals its copy, which the commit checks
++(test_1109), so no result was wrong; but the projection's source was not what its
++docstring says (UNFILED 11). Here the copy and the history differ on purpose, and
++the projection is solved directly, past the commit's check.
++"""
++import numpy as np
++import pytest
++import sympy
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_a]
++
++SHAPE = {(0, 0): lambda x, y: x ** 2, (0, 1): lambda x, y: x * y, (1, 1): lambda x, y: y ** 2}
++
++
++@pytest.fixture(autouse=True)
++def _reset():
++    uw.reset_default_model()
++    yield
++    uw.reset_default_model()
++
++
++def _history():
++    mesh = uw.meshing.UnstructuredSimplexBox(minCoords=(-1.0, -1.0), maxCoords=(1.0, 1.0),
++                                             cellSize=1.0 / 6, qdegree=3)
++    stress = uw.discretisation.MeshVariable("S1322", mesh, (2, 2), vtype=uw.VarType.SYM_TENSOR,
++                                            degree=2)
++    X = stress.coords
++    for (i, j), f in SHAPE.items():
++        stress.array[:, i, j] = f(X[:, 0], X[:, 1])
++    history = uw.systems.ddt.Eulerian(mesh, stress, uw.VarType.SYM_TENSOR, degree=2,
++                                      continuous=True, V_fn=sympy.Matrix([[0, 0]]))
++    history.initialise_history()
++    history.enable_source_snapshot()
++    level_0 = history.psi_star[0]
++    # a flux that reads psi_star[0] directly and through a named expression
++    wrapped = uw.expression(r"s_{1322}", level_0.sym[0, 0], "psi_star[0]_xx, wrapped")
++    history.psi_fn = level_0.sym + wrapped * sympy.eye(2)
++    return history
++
++
++def test_the_projection_reads_the_snapshot_through_a_named_expression():
++    history = _history()
++    level_0, copy = history.psi_star[0], history._psi_snapshot
++    copy.data[...] = np.asarray(level_0.data)
++    level_0.data[...] = np.asarray(level_0.data) + 1.0      # the history moves; its copy does not
++    projection = history._psi_star_projection_solver
++    projection.smoothing = 0.0
++    projection.tolerance = 1.0e-10          # the default 1e-4 leaves 2e-3 of solve error
++    projection.solve()
++    projected = np.asarray(history._psi_star_flat_var.data)
++    frozen = np.asarray(copy.data)
++    xx = frozen[:, level_0._data_layout(0, 0)]
++    for k, (i, j) in enumerate(history._psi_star_indep_indices):
++        expected = frozen[:, level_0._data_layout(i, j)] + (xx if i == j else 0.0)
++        # the copy and the history differ by 1 everywhere: reading the history
++        # through the named expression puts the diagonal 1 off
++        assert np.abs(projected[:, k] - expected).max() < 1.0e-6, (i, j)
++
++
++def test_no_psi_star_symbol_is_left_in_the_compiled_source():
++    from underworld3.function.expressions import unwrap_expression
++
++    history = _history()
++    level_0 = history.psi_star[0]
++    source = history._psi_star_projection_solver.uw_function.applyfunc(
++        lambda entry: unwrap_expression(entry, mode="nondimensional"))
++    left = {level_0.sym[i, j] for i in range(2) for j in range(2)} & source.atoms(sympy.Function)
++    assert not left, left
++
++
++def test_a_named_quantity_with_units_is_left_as_it_is():
++    """A named expression whose contents are a quantity with units (a viscosity in
++    Pa s in a units model) holds no psi_star[0] and is kept as an atom. The first
++    version of the substitution sympified it and raised SympifyError, which broke
++    every stress history in a units model."""
++    history = _history()
++    level_0 = history.psi_star[0]
++    eta = uw.expression(r"\eta_{1322}", uw.quantity(2.0, "Pa*s"), "a viscosity with units")
++    history.psi_fn = level_0.sym * eta
++    source = history._psi_star_projection_solver.uw_function
++    assert eta in source.atoms(type(eta))
++    assert not ({level_0.sym[i, j] for i in range(2) for j in range(2)} & source.atoms(sympy.Function))
+-- 
+2.53.0
+
