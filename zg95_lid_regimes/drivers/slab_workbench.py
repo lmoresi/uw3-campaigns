@@ -1210,7 +1210,19 @@ def crust_spline_points(faults):
     inc = 1.0 if np.median(M[sh, 0]) > np.median(M[deep, 0]) else -1.0
     left = lambda t: np.c_[-t[:, 1], t[:, 0]] if t.ndim == 2 else np.array([-t[1], t[0]])
     tree = cKDTree(M)
-    pts, t, miss = [np.array([X0 + inc * 0.35, -(L0 if FOLLOW_OCRUST else 0.5 * ct)])], np.array([-inc, 0.0]), 0
+    x_start = X0 + inc * 0.35
+    if faults and Xd != X0:
+        # with a fault in use, from the slab at depth (Xd) out along the incoming plate: the first stretch of 0.1 where
+        # the layer lies at its own depth in 8 of 10 bins of 0.01, and 0.05 into it. From the fault's top (X0 + 0.35) the
+        # march began past the young plate's line once that top had run 2,800 km out along the plate (Q10c/Q17c); from
+        # Xd + 0.35 it began on the plate's sag 20 km below the layer's depth (Q17c step 140)
+        u = inc * (M[sh, 0] - Xd)                    # distance out from the slab along the plate
+        occ = np.zeros(int(0.8 * r_o / 0.01) + 12, dtype=bool)
+        occ[(u[(u > 0) & (u < 0.8 * r_o)] / 0.01).astype(int)] = True
+        run = np.convolve(occ.astype(int), np.ones(10, dtype=int), "valid") >= 8
+        if run.any():
+            x_start = Xd + inc * (0.01 * float(np.argmax(run)) + 0.05)
+    pts, t, miss = [np.array([x_start, -(L0 if FOLLOW_OCRUST else 0.5 * ct)])], np.array([-inc, 0.0]), 0
     links, KM_PER = [], MODEL_UNIT["km"]               # uw_fit_gap_km's links: [length, lateral offset] in km
     for _ in range(600):                             # the march along the layer's centre
         q = pts[-1] + ds * t
