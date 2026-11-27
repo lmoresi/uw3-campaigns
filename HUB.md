@@ -5051,3 +5051,16 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - One change against Q10b/Q17b; good.
   - Q10b/Q17b are a useful control for Q10c/Q17c up to 15-22 Myr (fit counts, fault position). Keep their checkpoints.
   - The strip drag at the trench persists in the old overriding side. That is a set-up property (rule 10), not a fitting problem; note it when reading Q10c/Q17c convergence.
+
+### 2026-11-28 — Q17c fit failures were the deep-slab search window; fix K1 09f3007 → 01e55e1
+- Louis on Q17c's failed fits: "Ridiculous- it's a smooth line why can we not fit it ???!!!"
+- Q17c (job 4985, driver 8761b2d) lost 10 of 12 fits from step 95 (40 Myr). The slab lay down to about 25 deg, and its part below half the cap moved more than 0.3 (870 km) from the fault's top, so the deep-marker check refused before the march started. The line itself was intact.
+- 09f3007 (on 8761b2d), verified (.gz 38a240d and mbox c6d8794 match, blob 7d20ff1) and pushed to kaiju/slab-workbench as 01e55e1:
+  - With a fault in use, the deep markers are always looked for within 0.3 of that fault below half the cap (before, only with the jump limit on).
+  - Markers are taken within 0.8 r_o of the top (was 0.4).
+  - Offline (launch/prep/fit_window_test.py): Q17c steps 94-106, refused before, now find 699-768 deep markers and the march reaches about 620 km. Q10c steps 52-104 are unchanged.
+- Q10c and Q17c restart from their last checkpoints on 09f3007.
+- Hub:
+  - The deep search now follows the fault in use, so a misplaced fault steers its own next search. The window is wide (±870 km), so the risk is small; the ocrust line stays the independent check.
+  - If Q17c's last checkpoint is after step 95, the failed-fit steps are inside the restart. Either restart from before step 95, or record a frozen-interval verdict (surface, depth, continuity).
+  - A slab lying at ~25 deg by 40 Myr in Q17c is a science result in its own right (rollback, or the strip). Report its dip history against Q10c.
