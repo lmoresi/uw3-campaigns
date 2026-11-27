@@ -1,6 +1,6 @@
-From 9a287766985ab84a5a7e7691b29fc88c05b91e3c Mon Sep 17 00:00:00 2001
+From 4a45a494db0310986428aea949b9166f64820e9a Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
-Date: Fri, 27 Nov 2026 20:11:30 +1100
+Date: Fri, 27 Nov 2026 23:04:12 +1100
 Subject: [PATCH 1/2] Test: the source snapshot reaches psi_star[0] inside a
  named expression
 
@@ -13,20 +13,22 @@ and solves the projection directly: on development the diagonal, read
 through the named expression, is 1.0 off, and psi_star[0] is left in the
 compiled source (UNFILED 11). A third case pins a named quantity with
 units (a viscosity in Pa s), which holds no psi_star[0] and must be left as
-it is.
+it is. A fourth builds the source through a diamond of shared named
+expressions 16 levels deep, under a 2 s bound: a walk without a memo took
+37 s here (119 s in review), a walk with one 0.4 s.
 
 Underworld development team with AI support from Claude Code
 ---
- ...urce_snapshot_reaches_named_expressions.py | 91 +++++++++++++++++++
- 1 file changed, 91 insertions(+)
+ ...urce_snapshot_reaches_named_expressions.py | 112 ++++++++++++++++++
+ 1 file changed, 112 insertions(+)
  create mode 100644 tests/test_1322_source_snapshot_reaches_named_expressions.py
 
 diff --git a/tests/test_1322_source_snapshot_reaches_named_expressions.py b/tests/test_1322_source_snapshot_reaches_named_expressions.py
 new file mode 100644
-index 00000000..5c9248e3
+index 00000000..ab8df40e
 --- /dev/null
 +++ b/tests/test_1322_source_snapshot_reaches_named_expressions.py
-@@ -0,0 +1,91 @@
+@@ -0,0 +1,112 @@
 +"""The commit projection's frozen source reaches psi_star[0] inside a named expression.
 +
 +With the source snapshot enabled, the projection of a flux history reads a frozen
@@ -117,6 +119,27 @@ index 00000000..5c9248e3
 +    history.psi_fn = level_0.sym * eta
 +    source = history._psi_star_projection_solver.uw_function
 +    assert eta in source.atoms(type(eta))
++    assert not ({level_0.sym[i, j] for i in range(2) for j in range(2)} & source.atoms(sympy.Function))
++
++
++def test_shared_named_expressions_are_walked_once():
++    """Constitutive models are built from shared named expressions. In a diamond
++    (a_k and b_k each read both a_{k-1} and b_{k-1}) a walk without a memo grows 4x
++    a level: 16 levels took 119 s in review, against 3 ms on development. Each named
++    expression is walked once, so this builds in well under a second."""
++    import time
++
++    history = _history()
++    level_0 = history.psi_star[0]
++    a = b = uw.expression(r"d_{1322,0}", level_0.sym[0, 0], "")
++    for k in range(1, 17):
++        a, b = (uw.expression(fr"a_{{1322,{k}}}", a + b, ""),
++                uw.expression(fr"b_{{1322,{k}}}", a - b, ""))
++    start = time.perf_counter()
++    history.psi_fn = level_0.sym + a * sympy.eye(2)
++    elapsed = time.perf_counter() - start
++    assert elapsed < 2.0, elapsed
++    source = history._psi_star_projection_solver.uw_function
 +    assert not ({level_0.sym[i, j] for i in range(2) for j in range(2)} & source.atoms(sympy.Function))
 -- 
 2.53.0
