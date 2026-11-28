@@ -1,0 +1,112 @@
+From fb12ef8b828c1378c745ac89f3bf100ad58de9cf Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 05:23:16 +1100
+Subject: [PATCH 2/2] The 3-D split's seam gate tests the closure of the
+ patch's cell star
+
+split_along_label_3d refuses when any point in the closure of a cell with a
+vertex on the patch is shared; split_fault's gate (_fault_labels_touch_seam)
+tested only the fault facets and the points below them, the 2-D rule. So at
+np 3 a patch whose star reached the seam off the facets was not
+repartitioned, and the split refused it (ptest_0848). One helper,
+_patch_star_touches_seam, now holds the refusal's test; the refusal calls it,
+and the gate calls it in 3-D, still reduced over every rank. The repartition
+it triggers (partition_addon with one layer, or _gather_regions with one
+layer on the extrude path) already makes every point of a star cell
+unshared. 2-D is unchanged.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/fault_split.py | 59 ++++++++++++++++++------
+ 1 file changed, 44 insertions(+), 15 deletions(-)
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 7c6c3a20..6e0991b4 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1284,20 +1284,13 @@ def split_along_label_3d(dm, name, value, plus_name, plus_value,
+         # mis-fire with a misleading message where the true verdict is
+         # the seam. (The union rim | interior used here is
+         # fragment-correct even though the classification is not.)
+-        if problem is None and bool(shared.any()):
+-            patch_verts = rim_verts | interior_verts
+-            for i, tet in enumerate(cell_verts):
+-                if not (set(int(t) for t in tet) & patch_verts):
+-                    continue
+-                closure, _ = dm.getTransitiveClosure(cS + i)
+-                if shared[np.asarray(closure, dtype=np.int64)
+-                          - pStart].any():
+-                    problem = (RuntimeError,
+-                               "fault_split: the fault patch's cell star "
+-                               "touches the partition seam. 3-D faults must "
+-                               "be rank-interior in this version — "
+-                               "partition around the fault.")
+-                    break
++        if problem is None and _patch_star_touches_seam(
++                dm, rim_verts | interior_verts, shared, cell_verts):
++            problem = (RuntimeError,
++                       "fault_split: the fault patch's cell star "
++                       "touches the partition seam. 3-D faults must "
++                       "be rank-interior in this version — "
++                       "partition around the fault.")
+ 
+         if problem is None and any(
+                 dm.getSupportSize(f) != 2 for f in fault_faces):
+@@ -2415,7 +2408,12 @@ def _fault_labels_touch_seam(dm, labels):
+     or has a shared cone vertex, would put a chain vertex on the seam —
+     the configuration the add-on partition
+     (:func:`~underworld3.utilities.addon_partition.partition_addon`)
+-    dissolves. Every rank returns the same verdict (allreduce), so the
++    dissolves. In 3-D the split refuses on more: any shared point in the
++    closure of a cell with a vertex on the patch
++    (:func:`_patch_star_touches_seam`, the refusal's own test), so a 3-D
++    patch is tested on that set too; testing the facets alone let a star
++    whose outer vertices lie on the seam through unpartitioned, to be
++    refused by the split. Every rank returns the same verdict (allreduce), so the
+     caller's partition-or-not decision is collective by construction.
+     """
+     if uw.mpi.size == 1:
+@@ -2440,9 +2438,40 @@ def _fault_labels_touch_seam(dm, labels):
+         below = [closure_points(dm, f, d) for d in range(dm.getDimension() - 1)]
+         pts = np.concatenate([f] + [b[b >= 0] for b in below])
+         touch = bool(shared[pts - pStart].any())
++        if not touch and dm.getDimension() == 3:
++            # the 3-D split refuses on the closure of the patch's whole cell
++            # star, so that is what decides the repartition
++            vS, vE = dm.getDepthStratum(0)
++            verts = pts[(pts >= vS) & (pts < vE)]
++            touch = _patch_star_touches_seam(dm, set(int(v) for v in verts), shared)
+     return bool(uw.mpi.comm.allreduce(touch, op=MPI.LOR))
+ 
+ 
++def _patch_star_touches_seam(dm, patch_verts, shared, cell_verts=None):
++    """Whether any point in the closure of a cell with a vertex in ``patch_verts``
++    is shared: the 3-D split's seam rule, and the test
++    :func:`_fault_labels_touch_seam` applies in 3-D, so the gate and the refusal
++    read one set. ``shared`` is chart-indexed (:func:`_shared_points`);
++    ``cell_verts`` the cells' vertex 4-tuples when the caller has them. Local:
++    the caller reduces."""
++    if not patch_verts or not np.asarray(shared).any():
++        return False
++    pStart, _pEnd = dm.getChart()
++    cS, cE = dm.getHeightStratum(0)
++    if cell_verts is None:
++        vS, vE = dm.getDepthStratum(0)
++        cell_verts = np.empty((cE - cS, 4), dtype=np.int64)
++        for c in range(cS, cE):
++            closure = dm.getTransitiveClosure(c)[0]
++            cell_verts[c - cS] = [int(p) for p in closure if vS <= int(p) < vE]
++    star = np.isin(cell_verts, np.fromiter(patch_verts, dtype=np.int64)).any(axis=1)
++    for i in np.flatnonzero(star):
++        closure = np.asarray(dm.getTransitiveClosure(cS + int(i))[0], dtype=np.int64)
++        if shared[closure - pStart].any():
++            return True
++    return False
++
++
+ def _redistribute_fault_interior(dm, labels, verbose=False):
+     """Redistribute a cut mesh so each fault's cell star is rank-interior.
+ 
+-- 
+2.39.5 (Apple Git-154)
+
