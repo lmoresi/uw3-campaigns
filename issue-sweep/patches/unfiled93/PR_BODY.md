@@ -53,8 +53,9 @@ session on the machine. A developer laptop's `/tmp` held 2,866 build directories
   rank's python subprocess gets none; a supervisor ended by SIGTERM leaves no job process, its
   parent sees -15, the job's stack file was in place until the job ended, and nothing is left.
   All three fail before the change.
-- **ptest_jit_cache** removes the fake build directories its flock test makes. A separate commit makes the fake gdb's frame counter portable: BSD `wc` pads its
-  count, so the moved-between-samples test failed on macOS every time.
+- **test_0063, separately**: a commit makes the fake gdb's frame counter portable. BSD `wc` pads
+  its count, so the moved-between-samples test failed on macOS every time.
+- **ptest_jit_cache** removes the fake build directories its flock test makes.
 - **test_0004** removes the build directories its `debug=True` compiles keep.
 
 Serial on macOS: test_0903, test_0004 and test_jit_cache, 14 passed; the serial test_0063 tests
