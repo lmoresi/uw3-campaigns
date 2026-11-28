@@ -5182,3 +5182,13 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Hub: the run-up is the fit's own line from the leaving point to where it crosses the surface, the same line whose run-out was the Q10c/Q17c problem.
   - Here it carries only the x0.1 bridge (no damage zone, no split), so it is weaker. But if the top flattens as on Q10c (2-4 deg by step 200-280), the bridge becomes a weak sheet hundreds of km along the plate top, the free-surface behaviour Louis wants controlled.
   - Put to Louis: a cap on the run-up (beyond N km, or below a least dip, the bridge goes straight to the surface from the leaving point) as a ready rule if bridge_run_up_km keeps growing.
+
+### 2026-11-28 — the recipe's yield law is off outside the 40 km zone; D20y (job 5002), the same law everywhere
+- Stress renders (launch/movies/stress_nodal.py, on the run's own base mesh): tau = 2 eta_eff edot_II at the vertices, gouraud shading, the split's jump masked within 10 km.
+  - Outside the 40 km zone the stress is above the zone's law (50 MPa + 3 MPa/km): the overriding plate at 3-10x (600-1,400 MPa at 1.7 Myr), the outer rise at 2-3x. The recipe sets the yield stress 1e4x higher there, so that rock cannot yield.
+  - The wedge above the leaving point sits at about 1x and yields in D20 from the start, forming a band from the leaving point to the surface by 11.5 Myr.
+- Louis: "Ok so the physics would probably allow the yielding but we have turned it off ?" He approved a test: D20y (job 5002) = D20 with -uw_yield_zone_side none (the same law everywhere), driver 15e0307 unchanged. To compare with D20 at matched times: overriding-plate and outer-rise yielding, convergence, and whether wedge yielding goes pervasive (23 Nov).
+- Hub:
+  - A single change against D20; good. The plates are strong in every recipe run because yielding is off outside the zone, and stresses of 0.6-1.4 GPa are above any rock strength, so D20y is the physically consistent case.
+  - Precedent: S0/S1 (25 Nov) had Y4's law everywhere with no fault and sank two-sided, with "a sharp velocity discontinuity near the surface" in the fault-free runs. Watch for the plates losing coherence, as well as the yielding.
+  - Asked K1 for the plate-interior strain rate (does each plate stay a plate) and the maximum stress (now bounded by the law) at matched times.
