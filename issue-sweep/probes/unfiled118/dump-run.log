@@ -1,0 +1,50 @@
+# underworld3.__file__ = runs/2026-11-28-u111r2-113-114/ov-u111r2/underworld3/__init__.py
+cmp report (u111r2):
+  wt-u111r2 HEAD 03730af53f21ebb5c758196959efe6e105311c07
+  cmp ov-u111r2/underworld3/utilities/place_surface.py vs wt-u111r2 HEAD: identical
+  diff -rq vs clean dev install: 1 file(s) differ (place_surface.py )
+underworld3.__file__ = runs/2026-11-28-u111r2-113-114/ov-u111r2/underworld3/__init__.py
+place_surface.__file__ = runs/2026-11-28-u111r2-113-114/ov-u111r2/underworld3/utilities/place_surface.py
+mesher = network  seams = conform
+cmp report (u111r2):
+  wt-u111r2 HEAD 03730af53f21ebb5c758196959efe6e105311c07
+  cmp ov-u111r2/underworld3/utilities/place_surface.py vs wt-u111r2 HEAD: identical
+  diff -rq vs clean dev install: 1 file(s) differ (place_surface.py )
+
+np = 3  cellsize = 0.05  h = 0.025  dip = 30.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+  base rank 0: Upper owned 90 (global 252), outer-circle facets owned 90 (global 252), unlabelled outer 0 (global 0), Lower global 104
+  base rank 1: Upper owned 86 (global 252), outer-circle facets owned 86 (global 252), unlabelled outer 0 (global 0), Lower global 104
+  base rank 2: Upper owned 76 (global 252), outer-circle facets owned 76 (global 252), unlabelled outer 0 (global 0), Lower global 104
+[rank 0] fill dump runs/2026-11-28-u111r2-113-114/work/dump-th60-k2.5/fill_rank0_0.npz ring 11 holes 0
+[rank 1] fill dump runs/2026-11-28-u111r2-113-114/work/dump-th60-k2.5/fill_rank1_0.npz ring 30 holes 1
+
+=== MPI SUPERVISOR: no output for 181 s ===
+    no rank moved in 20 s: this is stuck, not slow
+    rank(s) 1 are somewhere the other 2 are not — that is where to look first
+      rank 1 is in generate()
+      the other 2 are in _place_thin_volume_2d()
+    rank 0: 100% CPU, spinning — a busy-wait, which is what an MPI progress engine does
+    rank 1: 100% CPU, spinning — a busy-wait, which is what an MPI progress engine does
+    rank 2: 100% CPU, spinning — a busy-wait, which is what an MPI progress engine does
+    native: rank 0: MPIR_Wait_state < MPIR_Wait < MPIC_Wait < MPIC_Sendrecv < MPIR_Allgather_intra_brucks < MPIR_Allgather_allcomm_auto < MPIR_Allgather_impl < MPIDI_Allgather_intra_composition_beta
+    native: rank 1: robustPredicates::orient2d < GFaceInitialMesh < meshGenerator < meshGenerator < meshGFace::operator < GFace::mesh < Mesh2D < __kmp_api_GOMP_parallel_40_alias
+    native: rank 2: MPIR_Wait_state < MPIR_Wait < MPIC_Wait < MPIC_Sendrecv < MPIR_Allgather_intra_brucks < MPIR_Allgather_allcomm_auto < MPIR_Allgather_impl < MPIDI_Allgather_intra_composition_beta
+    native frames did not move between samples
+    stacks written to cache/tmp-h1/u111-114/uw-stacks-146_7zdy
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 3080154 RUNNING AT hyperion
+=   EXIT CODE: 15
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Terminated (signal 15)
+This typically refers to a problem with your application.
+Please see the FAQ page for debugging suggestions
+EXIT 124
