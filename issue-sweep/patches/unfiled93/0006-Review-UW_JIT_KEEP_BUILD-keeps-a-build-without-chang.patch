@@ -1,8 +1,8 @@
 From 7623c3696b03857c344a9a40a544dc287ee4d30f Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 13:34:25 +1100
-Subject: [PATCH 6/9] Review: UW_JIT_KEEP_BUILD keeps a build without changing
- the kernels; the cache is checked before the discard
+Subject: [PATCH 06/10] Review: UW_JIT_KEEP_BUILD keeps a build without
+ changing the kernels; the cache is checked before the discard
 
 debug=True also adds a trace to every kernel, so it was a poor way to keep
 the sources a run compiles; UW_JIT_KEEP_BUILD=1 keeps the build directory

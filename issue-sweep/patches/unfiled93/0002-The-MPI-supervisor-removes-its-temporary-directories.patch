@@ -1,8 +1,8 @@
 From 6d29ef200b021d5a8a0ae3fb5f5d3622a87b6fe3 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Fri, 27 Nov 2026 16:01:27 +1100
-Subject: [PATCH 2/9] The MPI supervisor removes its temporary directories when
- the job ends
+Subject: [PATCH 02/10] The MPI supervisor removes its temporary directories
+ when the job ends
 
 Every supervised job left a handler directory (uw-supervisor-*) and,
 without --artifacts, a stacks directory (uw-stacks-*) holding an empty

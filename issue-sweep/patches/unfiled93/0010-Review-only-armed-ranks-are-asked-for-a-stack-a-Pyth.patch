@@ -1,0 +1,171 @@
+From 7d359c66b1a056ef5d9e632e4ca4edc50a3aaeb7 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:50:40 +1100
+Subject: [PATCH 10/10] Review: only armed ranks are asked for a stack; a
+ Python launcher is left out; a silent rank is named
+
+- The dump request went to every descendant of the job. mpirun forwards
+  SIGUSR1 to its ranks, so each rank dumped twice per sample. Only processes
+  this module armed (those with a stack file, the newest per pid) are asked.
+- A Python driver that starts its ranks was armed, asked and counted, and
+  could be named as the rank somewhere the others are not. An armed process
+  with an armed descendant of a different rank is a launcher, and is neither
+  asked nor counted. A rank's own helpers inherit its rank variable, so a rank
+  with a compile running is still asked.
+- The report names each asked rank whose stack file stayed empty.
+
+test_0063: a Python driver's ranks are dumped and the driver leaves no file;
+a forwarding launcher (a shell trapping SIGUSR1, standing in for mpirun)
+gets its rank two dumps, not four; the silent rank is named. All three fail
+before this change.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 51 +++++++++++++++++-------
+ tests/test_0063_mpi_hang_supervisor.py | 54 ++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index 62561c2f..fed0549d 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -233,6 +233,32 @@ def _stack_name(path):
+     return rank, int(pid), int(token or 0)
+ 
+ 
++def _armed_ranks(job_pid, dump_dir):
++    """The processes to ask for a stack, as ``{pid: (rank, stack file name)}``.
++
++    Only processes this module armed, the job and its descendants that have a
++    stack file, are asked: a launcher that is not Python (mpirun, srun, a shell)
++    has none, and a SIGUSR1 sent to it may be forwarded to the ranks, which would
++    then dump twice. For a pid held in turn by two processes of the job, the
++    newest file is the live one (the earlier armed first, with a smaller token).
++
++    A Python process with an armed descendant of a different rank is a launcher
++    (a Python driver starting its ranks): it is neither asked nor counted, or it
++    would be named as the odd rank out. A rank's own helpers (a compile) inherit
++    its rank variable, so a rank with a helper running is still asked.
++    """
++    tree = [job_pid] + _descendants(job_pid)
++    newest = {}
++    for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
++        rank, pid, token = _stack_name(path)
++        if pid in tree and token >= newest.get(pid, (-1, None, None))[0]:
++            newest[pid] = (token, rank, path.name)
++    armed = {pid: (rank, name) for pid, (_token, rank, name) in newest.items()}
++    launchers = {pid for pid, (rank, _name) in armed.items()
++                 if any(q in armed and armed[q][0] != rank for q in _descendants(pid))}
++    return {pid: v for pid, v in armed.items() if pid not in launchers}
++
++
+ def _read_dumps(dump_dir):
+     """Every rank's samples, as ``{rank: (pid, [block, ...])}``."""
+     dumps = {}
+@@ -565,20 +591,9 @@ def _supervise(args, command, env, dump_dir, state):
+                   if not overran else f"exceeded the {args.hard_cap:.0f} s cap")
+         print(f"\n=== MPI SUPERVISOR: {reason} ===", flush=True)
+ 
+-        ranks = _descendants(job.pid)
+-        # the job itself, when it is a Python process this module armed (a
+-        # serial job started with no launcher); a launcher is not signalled
+-        if list(Path(dump_dir).glob(f"rank_*_pid_{job.pid}_*.stack")):
+-            ranks = [job.pid] + ranks
+-        # the files the request went to: for each asked pid, its newest file,
+-        # which is the live process's (an earlier holder of a reused pid
+-        # armed first, so its token is smaller)
+-        newest = {}
+-        for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
+-            _rank, pid, token = _stack_name(path)
+-            if pid in ranks and token >= newest.get(pid, (-1, None))[0]:
+-                newest[pid] = (token, path.name)
+-        state["asked"] = {name for _token, name in newest.values()}
++        armed = _armed_ranks(job.pid, dump_dir)
++        ranks = sorted(armed)
++        state["asked"] = {name for _rank, name in armed.values()}
+         _request_dumps(ranks)
+         time.sleep(SECONDS_TO_DUMP)
+ 
+@@ -596,6 +611,14 @@ def _supervise(args, command, env, dump_dir, state):
+         cpu_by_rank = {rank: usage[pid] for rank, (pid, _blocks) in dumps.items()
+                        if pid in usage}
+ 
++        for rank, name in sorted(armed.values()):
++            try:
++                if (Path(dump_dir) / name).stat().st_size == 0:
++                    print(f"    rank {rank} (pid {_stack_name(name)[1]}) did not answer "
++                          f"the dump request: its stack file is empty", flush=True)
++            except OSError:
++                pass
++
+         if dumps:
+             for line in _diagnose(dumps, cpu_by_rank):
+                 print(line, flush=True)
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index 3fba5c01..291e0e2d 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -214,6 +214,60 @@ def test_a_supervised_hang_keeps_its_stacks_and_a_silent_ranks_record(tmp_path):
+     assert stacks["rank_1"].stat().st_size == 0, "the silent rank's record was not kept empty"
+     assert not list(kept[0].glob(f"*_pid_{helper.read_text()}_*.stack"))
+     assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
++    # the report names the rank that did not answer
++    assert "rank 1 (pid" in completed.stdout and "did not answer" in completed.stdout, \
++        completed.stdout
++
++
++def _hang(tmp_path, command):
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    completed = subprocess.run(
++        [sys.executable, str(SUPERVISOR), "--silence", "5", "--", *command],
++        capture_output=True, text=True, timeout=BUDGET, env=dict(os.environ, TMPDIR=str(tmp)))
++    assert completed.returncode == 124, f"{completed.stdout}\n{completed.stderr}"
++    files = [p for d in tmp.iterdir() if d.name.startswith("uw-stacks-")
++             for p in d.glob("rank_*_pid_*.stack")]
++    return completed, files
++
++
++def test_a_python_driver_is_not_asked_or_counted_as_a_rank(tmp_path):
++    """A Python driver that starts its ranks itself is a launcher: it is not
++    asked for a stack, so it cannot be named as the rank somewhere the others
++    are not."""
++    rank = tmp_path / "rank.py"
++    rank.write_text("import time\nprint('rank started', flush=True)\ntime.sleep(600)\n")
++    driver = tmp_path / "driver.py"
++    driver.write_text(
++        "import os, subprocess, sys\n"
++        "print('driver', os.getpid(), flush=True)\n"
++        f"kids = [subprocess.Popen([sys.executable, {str(rank)!r}],\n"
++        "                         env=dict(os.environ, OMPI_COMM_WORLD_RANK=str(r))) for r in (0, 1)]\n"
++        "[k.wait() for k in kids]\n")
++    completed, files = _hang(tmp_path, [sys.executable, str(driver)])
++    driver_pid = completed.stdout.split("driver ", 1)[1].split()[0]
++    assert not [p for p in files if f"_pid_{driver_pid}_" in p.name], [p.name for p in files]
++    assert sorted(p.name.split("_pid_")[0] for p in files) == ["rank_0", "rank_1"]
++    assert all(p.stat().st_size > 0 for p in files)
++
++
++def test_a_launcher_that_forwards_the_signal_is_not_asked(tmp_path):
++    """mpirun forwards SIGUSR1 to its ranks. Asked as well, it would make each rank
++    dump twice per sample; a shell that forwards it stands in for mpirun."""
++    rank = tmp_path / "rank.py"
++    rank.write_text("import time\nprint('rank started', flush=True)\ntime.sleep(600)\n")
++    forwarder = tmp_path / "forwarder.sh"
++    forwarder.write_text(
++        f'OMPI_COMM_WORLD_RANK=0 "{sys.executable}" "{rank}" &\n'
++        "child=$!\n"
++        "trap 'kill -USR1 $child' USR1\n"
++        "while kill -0 $child 2>/dev/null; do wait $child; done\n")
++    # "; exit $?" keeps the outer shell from exec'ing the forwarder: the
++    # forwarder must be a descendant of the job, as mpirun is of a batch script
++    _completed, files = _hang(tmp_path, ["/bin/sh", "-c", f'/bin/sh "{forwarder}"; exit $?'])
++    assert len(files) == 1, files
++    # two samples, one thread: two dumps, not four
++    assert files[0].read_text().count("most recent call first") == 2, files[0].read_text()
+ 
+ 
+ def test_a_serial_supervised_hang_dumps_its_stack(tmp_path):
+-- 
+2.39.5 (Apple Git-154)
+

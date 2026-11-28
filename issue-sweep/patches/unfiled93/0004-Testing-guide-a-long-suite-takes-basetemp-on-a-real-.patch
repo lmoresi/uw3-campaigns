@@ -1,7 +1,7 @@
 From ef6de979029e1615189717aeb7388da62e2b2f8d Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Fri, 27 Nov 2026 16:01:27 +1100
-Subject: [PATCH 4/9] Testing guide: a long suite takes --basetemp on a real
+Subject: [PATCH 04/10] Testing guide: a long suite takes --basetemp on a real
  disk
 
 pytest's default base directory under the system temporary directory kept

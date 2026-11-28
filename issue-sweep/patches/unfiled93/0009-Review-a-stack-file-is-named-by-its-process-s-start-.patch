@@ -1,8 +1,8 @@
 From 9c8881bab026e68ae660570b26982c0a211a4e31 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:24:23 +1100
-Subject: [PATCH 9/9] Review: a stack file is named by its process's start too,
- and the tidy keys on files, not pids
+Subject: [PATCH 09/10] Review: a stack file is named by its process's start
+ too, and the tidy keys on files, not pids
 
 A job that reused a pid would have its later process open (and truncate) the
 earlier one's stack file, and the tidy, deciding by pid, could not tell the

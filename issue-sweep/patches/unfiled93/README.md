@@ -48,3 +48,16 @@ the tidy touches nothing outside it, so a reused pid cannot keep a stranger's fi
 live one elsewhere. One narrow case remains: within the same job, a later process given a reused
 pid opens its file with "w" and truncates an earlier, exited process's file. The kill follows a
 dump within seconds, so this is unlikely; append mode would remove it if wanted.
+
+## H1 r3 lows (117 folded in): 0010
+(a) A Python launcher is excluded: an armed process with an armed descendant of a DIFFERENT rank is
+neither asked nor counted. Python driver: excluded. A rank with a compile helper (same rank
+variable): kept. Under mpirun/srun the ranks have no such descendants: kept.
+(b) Only armed processes are asked (the newest file per pid, from the job's tree), so mpirun or
+any non-Python launcher is never signalled and cannot forward SIGUSR1 a second time.
+(c) The report names each asked rank whose file stayed empty: "rank <r> (pid <p>) did not answer".
+Tests, all failing on 0009: a Python driver's two ranks dumped and no driver file; a shell
+forwarder (trap USR1 -> kill -USR1 child) gets its rank 2 dumps, not 4 (0009: 4); the silent rank
+is named. Serial test_0063 (mpirun cases excluded): 12 passed.
+Known, unchanged: _read_dumps keys by rank, so two armed processes of one rank (`mpirun python
+wrapper.py` spawning the real rank) keep only one dump in the report. Both files stay on disk.
