@@ -54,7 +54,9 @@ agrees the outcome.
 - **A gate on the gathered path.** A cavity ring that meets the wall must hold no vertex shared
   with another rank, since the gathered region includes the band's star and one more layer. A
   ring that still does is refused through the failure gather ("the gathered region does not
-  cover the cavity ring"), not measured on part of itself.
+  cover the cavity ring"), not measured on part of itself. In real runs this branch is
+  unreachable by design (the gather covers the ring); it guards an untested mesh, and the
+  seam-conforming defects are tracked separately.
 
 ## Tests
 - **test_0904** (tier B, level 2), annulus fixture at h = 0.025 and 0.0125:
@@ -67,7 +69,7 @@ agrees the outcome.
     vertex.
   All nine fail before the change.
 - **tests/parallel/test_0904** (np 2-3): gathered places (every outer-wall edge labelled,
-  FaultPlus and FaultMinus equal, over the ranks); seam-conforming refuses with the remedy; the
+  FaultPlus and FaultMinus equal, and the wall facets as the base had them, over the ranks); seam-conforming refuses with the remedy; the
   ranks agree.
 - **test_0865**: its fixture (a gap of 0.67 cells) is now placed, and the wall keeps its labels.
 

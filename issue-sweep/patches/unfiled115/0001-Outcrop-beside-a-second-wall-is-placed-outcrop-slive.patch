@@ -1,0 +1,286 @@
+From caa5f1632a7341fc7677d720e4bc96d5dbd490ab Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 18:51:04 +1100
+Subject: [PATCH] Outcrop beside a second wall is placed; outcrop slivers are
+ warned of; the guide says both
+
+- A ladder band outcropping through one wall, next to a corner, carves a
+  cavity that also reaches the other wall. That was refused ("only a one-band
+  outcrop is built"). It is now placed under the gap rule an interior band
+  beside a wall follows (0.3 wall cells to the second wall).
+- Where an outcropping band meets the wall, a cell's smallest angle depends on
+  where the band crosses the wall relative to the wall's vertices; measured on
+  an annulus it falls below 1 degree between depths a tenth of a cell apart.
+  place_fault_ribbon_2d warns below 5 degrees (computed over the ranks, printed
+  once) and records info['outcrop_min_angle']. Moving the trace's top by
+  0.1-0.4 of a cell cleared 33 of the 43 measured cases below 5 degrees.
+- faults-in-convection.md: a section on a band near the surface (the interior
+  gap rule, the outcrop warning, the cap meshing the fault's last segment).
+
+test_0907 (tier B): the corner outcrop is placed, both walls labelled, the
+corner vertex kept; the warning is printed exactly when the recorded angle is
+below the limit, a sliver-prone outcrop records less than a clean one, and an
+interior placement records none.
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/guides/faults-in-convection.md | 21 +++++
+ src/underworld3/utilities/place_surface.py    | 82 ++++++++++++++++--
+ .../test_0907_outcrop_beside_a_second_wall.py | 86 +++++++++++++++++++
+ 3 files changed, 183 insertions(+), 6 deletions(-)
+ create mode 100644 tests/test_0907_outcrop_beside_a_second_wall.py
+
+diff --git a/docs/developer/guides/faults-in-convection.md b/docs/developer/guides/faults-in-convection.md
+index bfbbe54f..bf65e26f 100644
+--- a/docs/developer/guides/faults-in-convection.md
++++ b/docs/developer/guides/faults-in-convection.md
+@@ -123,6 +123,27 @@ then rebuilt as the trench moves:
+ - rebuild every few rungs (four, half a base cell here), not every rung: a rebuild step
+   costs about twice an ordinary one.
+ 
++## A band near the surface
++
++`place_fault_ribbon_2d` places the band in one of two ways near a domain wall.
++
++- **Interior.** The band stops short of the wall. Its cavity may run along the wall,
++  so the band is placed when its skin is 0.3 wall cells or more from the wall. Closer
++  than that, the cells filled in between would be slivers (about 22 degrees at 0.3
++  wall cells, 1 degree at 0.01), and the placement is refused with the gap in cells and
++  both ways out: move the band further from the wall, or closer, so that it reaches the
++  wall as an outcrop. This holds on the gathered path (`seams="gather"`, the default).
++  The seam-conforming path still refuses a cavity that reaches the wall.
++- **Outcrop.** The band crosses the wall, and an unstructured cap carries it from its
++  last rung to the wall. Where the band meets the wall, a cell's smallest angle depends
++  on where the band crosses the wall relative to the wall's own vertices, and it can
++  drop below 1 degree between depths a tenth of a cell apart. The placement warns when
++  it is below 5 degrees and records it as `info["outcrop_min_angle"]`. Moving the
++  trace's top by 0.1-0.4 of a cell cleared about three cases in four on an annulus,
++  nearly all at dips of 20 degrees and more and about half at 10-15 degrees. When the
++  trace's top row lies in the cap, the cap's unstructured mesh also sets the fault's
++  nodes on that last segment.
++
+ ## Cost and diagnostics
+ 
+ - Through an overturn the nonlinear solve, not the multigrid, sets the cost: 15-25
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 708c341a..b3750006 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7565,7 +7565,8 @@ def _gathered_vertices_2d(h_vertex, d_skin, reach_v):
+ _MIN_WALL_GAP_CELLS = 0.3
+ 
+ 
+-def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs):
++def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs,
++                 among=None):
+     """The gap between the band's skin and the wall a 2-D cavity's ``ring``
+     runs along, and the wall's cell size there.
+ 
+@@ -7575,7 +7576,12 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+     true wall vertices; a chord across a corner cell joins two wall vertices but
+     is not one, and a partition seam's edge is not a wall's). The cell size is the mean length of the ring's wall edges
+     at the nearest wall vertex, or that vertex's ``h`` when no ring edge lies on
+-    the wall. Returns ``(gap, h, point)``, ``point`` the nearest wall vertex."""
++    the wall. ``among`` (a vertex mask) limits both to part of the wall: an
++    outcrop's ring meets the wall it crosses at no gap at all, and the gap that
++    matters is to the other wall it runs along. Returns ``(gap, h, point)``,
++    ``point`` the nearest wall vertex."""
++    if among is not None:
++        on_wall = on_wall & among
+     old = [int(v) for v in ring if v < len(X)]
+     W = np.asarray([v for v in old if on_wall[v]], dtype=np.int64)
+     d_w = _segments_distance(X[W], asm_pts, skin_edges)
+@@ -8017,10 +8023,15 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     off_band = [v for v in ring if v < len(X)
+                                 and on_wall[v] and not near_touched[v]]
+                     if off_band:
+-                        raise RuntimeError(
+-                            "the ribbon's cavity reached the domain "
+-                            "boundary away from the outcrop band; only a "
+-                            "one-band outcrop is built.")
++                        # the cavity runs along a second wall as well (a
++                        # band outcropping beside a corner): placed, under the
++                        # same gap rule as an interior band beside a wall
++                        _refuse_a_partial_ring(ring, shared_v, len(X))
++                        gap, h_gap, at = _wall_gap_2d(
++                            ring, X, on_wall, asm_pts, skin_edges, h_vertex,
++                            boundary_pairs, among=~near_touched)
++                        if gap < _MIN_WALL_GAP_CELLS * h_gap:
++                            raise _wall_gap_refusal_2d(gap, h_gap, at)
+                 old_ring = np.asarray([v for v in ring if v < len(X)])
+                 if victim[old_ring].any():
+                     raise RuntimeError(
+@@ -9532,6 +9543,51 @@ def _ribbon_region_marks(dm, extended, width, clearance, sizes, mesher):
+     return marks
+ 
+ 
++# Below this smallest angle, in degrees, in the cells where an outcropping band meets
++# the wall, the placement warns. Measured on an annulus (dips 10-60 degrees, two cell
++# sizes): the angle there depends on where the band crosses the wall relative to the
++# wall's own vertices, and jumps from below 1 to 30 degrees between depths a tenth of
++# a cell apart. Moving the trace's top by 0.1-0.2 cells cleared 27 of 43 cases below
++# 5 degrees, and by up to 0.4 cells 33 of 43: nearly all at dips of 20 degrees and
++# more, about half at 10-15.
++_OUTCROP_SLIVER_DEG = 5.0
++
++
++def _outcrop_sliver_angle(dm, band, fault_labels=()):
++    """The smallest angle, in degrees, of the cells beside the wall where the band
++    meets it (band cells and their neighbours that touch a wall vertex); 180 when
++    the band does not reach the wall. The same on every rank (a minimum over them).
++
++    A split fault's sides are boundary too; their vertices (``fault_labels``, the
++    split's side labels) are not the wall's, since a fault is strictly interior."""
++    vS, vE = dm.getDepthStratum(0)
++    X = _coords(dm)[: vE - vS]
++    cells = _cells_anticlockwise(dm, X)
++    on_wall = _true_wall_vertex_mask(dm, len(X)).copy()
++    for name in fault_labels:
++        if not dm.hasLabel(name):
++            continue
++        lab = dm.getLabel(name)
++        for value in lab.getValueIS().getIndices():
++            for p in lab.getStratumIS(int(value)).getIndices():
++                for q in dm.getTransitiveClosure(int(p))[0]:
++                    if vS <= q < vE:
++                        on_wall[int(q) - vS] = False
++    band = np.asarray(band, dtype=bool)[: len(cells)]
++    smallest = 180.0
++    if band.any() and on_wall[cells[band]].any():
++        near = np.zeros(len(X), dtype=bool)
++        near[cells[band].ravel()] = True
++        beside = near[cells].any(axis=1) & on_wall[cells].any(axis=1)
++        for tri in cells[beside]:
++            P = X[tri]
++            for i in range(3):
++                u, w = P[(i + 1) % 3] - P[i], P[(i + 2) % 3] - P[i]
++                c = float(u @ w / (np.linalg.norm(u) * np.linalg.norm(w)))
++                smallest = min(smallest, float(np.degrees(np.arccos(np.clip(c, -1, 1)))))
++    return uw.mpi.comm.allreduce(smallest, op=MPI.MIN)
++
++
+ def place_fault_ribbon_2d(base_mesh, traces, width, *, margin_rings=2,
+                           band_label="Band", band_value=71,
+                           clearance=0.3, split=True, mesher="ladder",
+@@ -9772,12 +9828,26 @@ def place_fault_ribbon_2d(base_mesh, traces, width, *, margin_rings=2,
+         half_reach=0.6 * float(width),
+         overhang=0.5 * float(np.mean(spacing_all)))
+ 
++    # where an outcropping band meets the wall the cells can be slivers: a
++    # known limit of the outcrop path, warned about rather than refused
++    outcrop_angle = _outcrop_sliver_angle(
++        mesh.dm, band, [f"{label}{side}" for label, _P in traces for side in ("Plus", "Minus")])
++    if outcrop_angle < _OUTCROP_SLIVER_DEG:
++        uw.pprint(
++            f"place_fault_ribbon_2d: WARNING: where the band meets the domain wall, a "
++            f"cell's smallest angle is {outcrop_angle:.1f} degrees. This is a known "
++            f"limit of an outcropping band: the angle depends on where the band crosses "
++            f"the wall, relative to the wall's own vertices. Moving the trace's top by "
++            f"0.1-0.4 of a cell usually clears it (about three cases in four, fewer at "
++            f"dips below 20 degrees).")
++
+     # The seam ligament's cells (empty under the gather): the band material
+     # the fault is NOT cut through, for apply() to paint the weak plane on.
+     ligament_mask = mesh.cells_labelled(band_label + "_ligament")
+     info = {"n_cells": int(mesh.dm.getHeightStratum(0)[1]),
+             "spacing": spacing_all, "n_rungs": rungs_all,
+             "footprints": footprints, "band": band, "mesher": mesher,
++            "outcrop_min_angle": outcrop_angle,
+             "extended": extended, "width": float(width),
+             "margin_rings": margin_rings,
+             "spines": [label for label, _P in spines],
+diff --git a/tests/test_0907_outcrop_beside_a_second_wall.py b/tests/test_0907_outcrop_beside_a_second_wall.py
+new file mode 100644
+index 00000000..47be9464
+--- /dev/null
++++ b/tests/test_0907_outcrop_beside_a_second_wall.py
+@@ -0,0 +1,86 @@
++"""An outcrop whose cavity also runs along a second wall is placed; slivers are warned of.
++
++A ladder band outcropping through one wall of a box, next to a corner, carves a
++cavity that also reaches the other wall. That was refused ("only a one-band outcrop
++is built"). Like an interior band beside a wall, it is now placed, unless its gap to
++the second wall is below 0.3 wall cells.
++
++Where an outcropping band meets the wall, the cells can be slivers: the smallest
++angle depends on where the band crosses the wall relative to the wall's own
++vertices. That is a known limit of the outcrop path; the placement warns below 5
++degrees, the same on every rank, and records the angle in ``info``.
++
++Asserted as relations: the corner placement keeps both walls' labels and the corner
++vertex; the warning is printed exactly when the recorded angle is below the limit; a
++sliver-prone outcrop records a smaller angle than a clean one; an interior placement
++records none (180).
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities import place_surface
++from underworld3.utilities.place_surface import place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++
++def test_an_outcrop_beside_a_corner_reaching_the_other_wall_is_placed():
++    h = 0.05
++    box = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                            cellSize=h, regular=True)
++    d = np.array([-1.0, -1.0]) / np.sqrt(2)
++    # the band crosses Top (its corner 0.12 cells past it) and its cavity reaches
++    # Right, 1.9 cells away
++    top = np.array([1 - 4 * h, 1 - 2 * h])
++    trace = top + (h * np.arange(7))[:, None] * d
++    mesh, _info = place_fault_ribbon_2d(box, [("Fault", trace)], 2 * h, margin_rings=2,
++                                        clearance=0.3, split=True, mesher="ladder")
++    dm = mesh.dm
++    vS, _vE = dm.getDepthStratum(0)
++    eS, eE = dm.getDepthStratum(1)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    value = {b.name: b.value for b in mesh.boundaries}
++    unlabelled = 0
++    for e in range(eS, eE):
++        if dm.getSupportSize(e) != 1:
++            continue
++        v = [int(q) - vS for q in dm.getCone(e)]
++        for name, ax in (("Top", 1), ("Right", 0)):
++            if (np.abs(X[v, ax] - 1.0) < 1e-9).all():
++                unlabelled += dm.getLabel(name).getValue(e) != value[name]
++    assert unlabelled == 0
++    assert (np.linalg.norm(X - [1.0, 1.0], axis=1) < 1e-12).sum() == 1
++    assert "FaultPlus" in value
++
++
++@pytest.fixture(scope="module")
++def annulus():
++    return uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=0.05,
++                              refinement=1, qdegree=2)
++
++
++def _place(annulus, dip_deg, k):
++    h = 0.025
++    th, dip = np.radians(90.0), np.radians(dip_deg)
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(dip) * t_hat - np.sin(dip) * r_hat
++    trace = (1.0 - k * h) * r_hat + (h * np.arange(7))[:, None] * down
++    _mesh, info = place_fault_ribbon_2d(annulus, [("Fault", trace)], 2 * h, margin_rings=2,
++                                        clearance=0.3, split=True, mesher="ladder")
++    return info["outcrop_min_angle"]
++
++
++def test_the_warning_follows_the_recorded_angle(annulus, capsys):
++    # measured: dip 15 at k 0.15 cells is a sliver (0.3 degrees); dip 45 at k 1.05 is
++    # clean (about 30); dip 30 at k 4 does not reach the wall
++    sliver = _place(annulus, 15, 0.15)
++    warned = "WARNING: where the band meets the domain wall" in capsys.readouterr().out
++    clean = _place(annulus, 45, 1.05)
++    clean_warned = "WARNING: where the band meets" in capsys.readouterr().out
++    interior = _place(annulus, 30, 4.0)
++    assert sliver < clean < 180.0 == interior
++    assert warned == (sliver < place_surface._OUTCROP_SLIVER_DEG)
++    assert clean_warned == (clean < place_surface._OUTCROP_SLIVER_DEG)
++    assert warned, "the sliver-prone outcrop should warn"
+-- 
+2.39.5 (Apple Git-154)
+

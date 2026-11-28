@@ -62,3 +62,6 @@ cells". Parallel test: wall labels and Plus/Minus balance, summed over owned edg
 _refuse_a_partial_ring before the gap is measured on a wall-touching gathered ring, with a unit
 test faking a shared vertex. Serial test_0904 + test_0865: 13 passed. For row 118: the ligament
 path, and _outcrop_ring_splice's unfiltered boundary set.
+
+## H1 r4 lows: 0007
+The parallel test compares the summed wall-facet counts with the base (252 Upper, 104 Lower at np 1). A comment explains that None SF leaves mean no ghosts. PR body: the gate is unreachable by design (row 118). Merge order: 60, then 111.
