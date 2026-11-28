@@ -1,0 +1,70 @@
+From 162686bef277ba562bf614bda7053f09e16e8c7c Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 00:37:48 +1100
+Subject: [PATCH] ptest_0855: the collective 2-D refusal ends 0.11 wall cells
+ short; the old case places
+
+test_2d_refusals_are_collective's ribbon ended 0.4 wall cells short of
+Top, which the wall-gap rule (0001) places by design, so at np 3 no rank
+raised. Its purpose is kept with a band ending 0.11 cells short (the rule
+needs 0.3), asserting the wall refusal on every rank; the old geometry
+becomes a placement asserted identical on every rank, with the label
+counts its info advertises. Serial measures: 0.97 places 56 cells;
+0.975 to 0.99 refuse (0.26 to 0.03 cells).
+
+Underworld development team with AI support from Claude Code
+---
+ .../ptest_0855_place_thin_volume_parallel.py  | 26 +++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/tests/parallel/ptest_0855_place_thin_volume_parallel.py b/tests/parallel/ptest_0855_place_thin_volume_parallel.py
+index 64da736b..4252fe5c 100644
+--- a/tests/parallel/ptest_0855_place_thin_volume_parallel.py
++++ b/tests/parallel/ptest_0855_place_thin_volume_parallel.py
+@@ -241,12 +241,15 @@ def test_a_3d_outcrop_on_a_rotated_box_embeds_in_parallel():
+ 
+ 
+ def test_2d_refusals_are_collective():
+-    """A ribbon stopping short of the wall refuses IDENTICALLY everywhere."""
++    """A ribbon stopping too close to the wall refuses IDENTICALLY everywhere.
++
++    Its band ends 0.11 wall cells from Top (serial measure), under the 0.3 the
++    placement needs between a band and a wall it does not cross."""
+     comm = uw.mpi.comm
+     mesh = uw.meshing.UnstructuredSimplexBox(
+         minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0), cellSize=0.07,
+         regular=False, qdegree=2)
+-    short = np.array([[0.35, 0.40], [0.60, 0.97]])
++    short = np.array([[0.35, 0.40], [0.60, 0.985]])
+     message = None
+     try:
+         place_thin_volume(mesh.dm, [short], width=0.04, label="Bad")
+@@ -256,6 +259,25 @@ def test_2d_refusals_are_collective():
+     assert all(m is not None for m in messages), (
+         f"some rank did NOT raise: {[m is None for m in messages]}")
+     assert len(set(messages)) == 1, "ranks raised different errors"
++    assert "of the domain wall" in messages[0], messages[0]
++
++
++def test_2d_a_ribbon_short_of_the_wall_places_identically():
++    """A ribbon stopping short of the wall with room to spare is placed, the
++    same on every rank. Its band ends about 0.4 wall cells from Top; this
++    geometry was the refusal case before the wall-gap rule."""
++    comm = uw.mpi.comm
++    mesh = uw.meshing.UnstructuredSimplexBox(
++        minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0), cellSize=0.07,
++        regular=False, qdegree=2)
++    short = np.array([[0.35, 0.40], [0.60, 0.97]])
++    new, info = place_thin_volume(mesh.dm, [short], width=0.04,
++                                  label="Zone", label_value=5)
++    assert info["n_zone_cells"] > 0
++    assert _owned_label_count(new, "Zone", 5) == info["n_zone_cells"]
++    assert _owned_label_count(new, "Zone_skin", 5) == info["n_skin_faces"]
++    gathered = comm.allgather(info)
++    assert all(g == gathered[0] for g in gathered)
+ 
+ 
+ def test_the_gather_moves_only_the_shell_around_the_zone():
+-- 
+2.39.5 (Apple Git-154)
+

@@ -65,3 +65,9 @@ path, and _outcrop_ring_splice's unfiltered boundary set.
 
 ## H1 r4 lows: 0007
 The parallel test compares the summed wall-facet counts with the base (252 Upper, 104 Lower at np 1). A comment explains that None SF leaves mean no ghosts. PR body: the gate is unreachable by design (row 118). Merge order: 60, then 111.
+
+## 0008 (2026-11-29, H1 np 3): ptest_0855 test_2d_refusals_are_collective
+Its ribbon (end [0.60, 0.97]) is placed by the gap rule by design. Refusal case moved to end 0.985 (0.11 cells, rule 0.3), asserting the wall message on every rank; the old geometry is a new placement test (info identical on every rank, label counts = info). Serial checks only (no MPI here): 0.97 places 56 zone / 30 skin; 0.975-0.99 refuse. Test-only; applies on 0007.
+
+## Full stack for the parallel suite (C1 2026-11-29)
+111 0001-0008, then 118 0001-0002 (118 is built on 111 0007 + 113 + 114 + 115; 0008 touches only ptest_0855, which nothing else in the stack touches).
