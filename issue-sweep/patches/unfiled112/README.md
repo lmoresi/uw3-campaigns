@@ -9,9 +9,10 @@ store_module now runs inside a try, and its outcome is agreed with _raise_if_any
 cache failed on rank(s) [0], so it fails on every rank".
 
 The new test is in tests/parallel/test_0842. The cache is off on ranks > 0, and rank 0's
-store_module is patched to raise. Fail-first: before the change, rank 0 raises and the others
-hang in the solve's first collective, until the 240 s test timeout or the supervisor's silence
-limit.
+store_module is patched to raise. Fail-first: before the change rank 0 raises alone, and the run either hangs, with the
+other ranks in the solve's first collective until the test timeout or the supervisor's silence
+limit, or aborts quickly. At np 2 on the Linux workstation, H1 saw rank 1 hit MPI_Abort (63) at
+finalize within 4-7 s. Either way, the ranks do not raise together.
 
 Serial: test_0903, test_0004, test_jit_cache, and test_0842 at np 1 (its np >= 2 cases skip):
 15 passed, 3 skipped.
