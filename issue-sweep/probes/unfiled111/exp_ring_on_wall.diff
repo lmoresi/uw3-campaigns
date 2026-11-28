@@ -1,0 +1,16 @@
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 267730fe..1c2245d1 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7865,8 +7865,10 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         chain_k, holes_k = _outcrop_chain_2d(loops_k,
+                                                              band_pairs)
+                 if chain_k is None:
++                    import os as _os
+                     if on_wall[np.asarray([v for v in ring
+-                                           if v < len(X)])].any():
++                                           if v < len(X)])].any() \
++                            and not _os.environ.get("UW_EXP_RING_ON_WALL"):
+                         raise RuntimeError(
+                             "the ribbon's cavity reached the domain wall; "
+                             "the volume must be interior, with clearance "

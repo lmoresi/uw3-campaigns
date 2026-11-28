@@ -1,0 +1,18 @@
+underworld3.__file__ = /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+np = 1  cellsize = 0.05  h = 0.025  dip = 15.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+k =  0.0  top depth = 0.0000 (0.0 h)  band top depth = -0.0379 (-1.52 h)  | REFUSED RuntimeError: place_thin_volume assembly failed: RuntimeError: the ribbon assembly meshed to area 8.608879263116e-03 against CAD 8.608879090004e-03; the layer mesh does not fill its own outlines.
+k =  0.5  top depth = 0.0125 (0.5 h)  band top depth = -0.0254 (-1.02 h)  | placed outcrop (band cells on the wall 12)  n_cells(rank 0) 10416
+k =  1.0  top depth = 0.0250 (1.0 h)  band top depth = -0.0130 (-0.52 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_rank0.npz]
+k =  1.5  top depth = 0.0375 (1.5 h)  band top depth = -0.0005 (-0.02 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_rank0.npz]
+k =  2.0  top depth = 0.0500 (2.0 h)  band top depth = +0.0120 (+0.48 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  2.5  top depth = 0.0625 (2.5 h)  band top depth = +0.0245 (+0.98 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.0  top depth = 0.0750 (3.0 h)  band top depth = +0.0370 (+1.48 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.5  top depth = 0.0875 (3.5 h)  band top depth = +0.0495 (+1.98 h)  | placed interior  n_cells(rank 0) 10330
+k =  4.0  top depth = 0.1000 (4.0 h)  band top depth = +0.0620 (+2.48 h)  | placed interior  n_cells(rank 0) 10332
+k =  4.5  top depth = 0.1125 (4.5 h)  band top depth = +0.0745 (+2.98 h)  | placed interior  n_cells(rank 0) 10338
+k =  5.0  top depth = 0.1250 (5.0 h)  band top depth = +0.0870 (+3.48 h)  | placed interior  n_cells(rank 0) 10340
+k =  5.5  top depth = 0.1375 (5.5 h)  band top depth = +0.0994 (+3.98 h)  | placed interior  n_cells(rank 0) 10338
+k =  6.0  top depth = 0.1500 (6.0 h)  band top depth = +0.1119 (+4.48 h)  | placed interior  n_cells(rank 0) 10338
+DONE

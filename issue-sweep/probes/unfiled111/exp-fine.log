@@ -1,0 +1,114 @@
+dip 30
+k =  1.0 g=-0.88 h | placed outcrop (band cells on the wall 11)  wall-unlabelled 0 minangle 14.5 wall-minangle 14.5 plus True  
+k =  1.1 g=-0.78 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 22.0 wall-minangle 22.0 plus True  
+k =  1.2 g=-0.68 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 3.7 wall-minangle 3.7 plus True  
+k =  1.3 g=-0.58 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 7.3 wall-minangle 7.3 plus True  
+k =  1.4 g=-0.48 h | placed outcrop (band cells on the wall 10)  wall-unlabelled 0 minangle 3.3 wall-minangle 4.6 plus True  
+k =  1.5 g=-0.38 h | placed outcrop (band cells on the wall 11)  wall-unlabelled 0 minangle 16.0 wall-minangle 16.0 plus True  
+k =  1.6 g=-0.28 h | placed outcrop (band cells on the wall 11)  wall-unlabelled 0 minangle 25.7 wall-minangle 25.7 plus True  
+k =  1.7 g=-0.18 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 27.7 wall-minangle 27.7 plus True  
+k =  1.8 g=-0.08 h | placed outcrop (band cells on the wall 10)  wall-unlabelled 0 minangle 8.3 wall-minangle 8.3 plus True  
+k =  1.9 g=+0.01 h | placed interior  wall-unlabelled 0 minangle 1.0 wall-minangle 1.0 plus True  
+k =  2.0 g=+0.11 h | placed interior  wall-unlabelled 0 minangle 8.5 wall-minangle 8.5 plus True  
+k =  2.1 g=+0.21 h | placed interior  wall-unlabelled 0 minangle 15.7 wall-minangle 15.7 plus True  
+k =  2.2 g=+0.31 h | placed interior  wall-unlabelled 0 minangle 22.5 wall-minangle 22.5 plus True  
+k =  2.3 g=+0.41 h | placed interior  wall-unlabelled 0 minangle 28.9 wall-minangle 28.9 plus True  
+k =  2.4 g=+0.51 h | placed interior  wall-unlabelled 0 minangle 34.6 wall-minangle 34.6 plus True  
+k =  2.5 g=+0.61 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 39.6 plus True  
+k =  2.6 g=+0.71 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 44.1 plus True  
+k =  2.7 g=+0.81 h | placed interior  wall-unlabelled 0 minangle 37.4 wall-minangle 44.9 plus True  
+k =  2.8 g=+0.91 h | placed interior  wall-unlabelled 0 minangle 37.5 wall-minangle 46.4 plus True  
+k =  2.9 g=+1.01 h | placed interior  wall-unlabelled 0 minangle 35.5 wall-minangle 35.5 plus True  
+k =  3.0 g=+1.11 h | placed interior  wall-unlabelled 0 minangle 35.6 wall-minangle 37.9 plus True  
+k =  3.1 g=+1.21 h | placed interior  wall-unlabelled 0 minangle 32.2 wall-minangle 36.8 plus True  
+k =  3.2 g=+1.31 h | placed interior  wall-unlabelled 0 minangle 33.8 wall-minangle 43.7 plus True  
+k =  3.3 g=+1.41 h | placed interior  wall-unlabelled 0 minangle 36.3 wall-minangle 47.3 plus True  
+k =  3.4 g=+1.51 h | placed interior  wall-unlabelled 0 minangle 38.3 wall-minangle 47.3 plus True  
+k =  3.5 g=+1.61 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  3.6 g=+1.71 h | placed interior  wall-unlabelled 0 minangle 36.5 wall-minangle 47.3 plus True  
+k =  3.7 g=+1.81 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  3.8 g=+1.91 h | placed interior  wall-unlabelled 0 minangle 37.8 wall-minangle 47.3 plus True  
+k =  3.9 g=+2.01 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  4.0 g=+2.11 h | placed interior  wall-unlabelled 0 minangle 38.3 wall-minangle 47.3 plus True  
+k =  4.1 g=+2.21 h | placed interior  wall-unlabelled 0 minangle 34.3 wall-minangle 47.3 plus True  
+k =  4.2 g=+2.31 h | placed interior  wall-unlabelled 0 minangle 32.4 wall-minangle 47.3 plus True  
+k =  4.3 g=+2.41 h | placed interior  wall-unlabelled 0 minangle 33.0 wall-minangle 47.3 plus True  
+k =  4.4 g=+2.51 h | placed interior  wall-unlabelled 0 minangle 36.9 wall-minangle 47.3 plus True  
+k =  4.5 g=+2.61 h | placed interior  wall-unlabelled 0 minangle 38.3 wall-minangle 47.3 plus True  
+k =  4.6 g=+2.71 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+dip 45
+k =  1.0 g=-1.13 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 30.0 wall-minangle 30.5 plus True  
+k =  1.1 g=-1.03 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 30.3 wall-minangle 30.3 plus True  
+k =  1.2 g=-0.93 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 30.2 wall-minangle 30.2 plus True  
+k =  1.3 g=-0.83 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 26.6 wall-minangle 26.6 plus True  
+k =  1.4 g=-0.73 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 23.5 wall-minangle 23.5 plus True  
+k =  1.5 g=-0.63 h | placed outcrop (band cells on the wall 6)  wall-unlabelled 0 minangle 4.9 wall-minangle 4.9 plus True  
+k =  1.6 g=-0.53 h | placed outcrop (band cells on the wall 6)  wall-unlabelled 0 minangle 10.6 wall-minangle 10.6 plus True  
+k =  1.7 g=-0.43 h | placed outcrop (band cells on the wall 7)  wall-unlabelled 0 minangle 16.0 wall-minangle 16.0 plus True  
+k =  1.8 g=-0.33 h | placed outcrop (band cells on the wall 8)  wall-unlabelled 0 minangle 8.6 wall-minangle 8.6 plus True  
+k =  1.9 g=-0.23 h | placed outcrop (band cells on the wall 8)  wall-unlabelled 0 minangle 16.8 wall-minangle 16.8 plus True  
+k =  2.0 g=-0.13 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 25.1 wall-minangle 25.1 plus True  
+k =  2.1 g=-0.03 h | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 33.2 wall-minangle 33.2 plus True  
+k =  2.2 g=+0.07 h | placed interior  wall-unlabelled 0 minangle 5.6 wall-minangle 5.6 plus True  
+k =  2.3 g=+0.17 h | placed interior  wall-unlabelled 0 minangle 13.5 wall-minangle 13.5 plus True  
+k =  2.4 g=+0.27 h | placed interior  wall-unlabelled 0 minangle 20.8 wall-minangle 20.8 plus True  
+k =  2.5 g=+0.37 h | placed interior  wall-unlabelled 0 minangle 27.5 wall-minangle 27.5 plus True  
+k =  2.6 g=+0.47 h | placed interior  wall-unlabelled 0 minangle 33.4 wall-minangle 33.4 plus True  
+k =  2.7 g=+0.57 h | placed interior  wall-unlabelled 0 minangle 37.9 wall-minangle 38.6 plus True  
+k =  2.8 g=+0.67 h | placed interior  wall-unlabelled 0 minangle 35.8 wall-minangle 42.2 plus True  
+k =  2.9 g=+0.77 h | placed interior  wall-unlabelled 0 minangle 35.9 wall-minangle 47.0 plus True  
+k =  3.0 g=+0.87 h | placed interior  wall-unlabelled 0 minangle 33.7 wall-minangle 47.3 plus True  
+k =  3.1 g=+0.97 h | placed interior  wall-unlabelled 0 minangle 32.7 wall-minangle 47.3 plus True  
+k =  3.2 g=+1.07 h | placed interior  wall-unlabelled 0 minangle 33.9 wall-minangle 47.3 plus True  
+k =  3.3 g=+1.17 h | placed interior  wall-unlabelled 0 minangle 32.6 wall-minangle 36.0 plus True  
+k =  3.4 g=+1.27 h | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 44.3 plus True  
+k =  3.5 g=+1.37 h | placed interior  wall-unlabelled 0 minangle 35.6 wall-minangle 46.3 plus True  
+k =  3.6 g=+1.47 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 41.9 plus True  
+k =  3.7 g=+1.57 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  3.8 g=+1.67 h | placed interior  wall-unlabelled 0 minangle 37.3 wall-minangle 47.3 plus True  
+k =  3.9 g=+1.77 h | placed interior  wall-unlabelled 0 minangle 36.2 wall-minangle 47.3 plus True  
+k =  4.0 g=+1.87 h | placed interior  wall-unlabelled 0 minangle 36.8 wall-minangle 47.3 plus True  
+k =  4.1 g=+1.97 h | placed interior  wall-unlabelled 0 minangle 38.4 wall-minangle 47.3 plus True  
+k =  4.2 g=+2.07 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  4.3 g=+2.17 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  4.4 g=+2.27 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  4.5 g=+2.37 h | placed interior  wall-unlabelled 0 minangle 37.8 wall-minangle 47.3 plus True  
+k =  4.6 g=+2.47 h | placed interior  wall-unlabelled 0 minangle 37.9 wall-minangle 47.3 plus True  
+dip 15
+k =  1.0 g=-0.52 h | REFUSED RuntimeError: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_r
+k =  1.1 g=-0.42 h | REFUSED RuntimeError: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_r
+k =  1.2 g=-0.32 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 3.5 wall-minangle 3.5 plus True  
+k =  1.3 g=-0.22 h | REFUSED RuntimeError: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_r
+k =  1.4 g=-0.12 h | REFUSED RuntimeError: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_r
+k =  1.5 g=-0.02 h | REFUSED RuntimeError: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_r
+k =  1.6 g=+0.08 h | placed interior  wall-unlabelled 0 minangle 6.6 wall-minangle 6.6 plus True  
+k =  1.7 g=+0.18 h | placed interior  wall-unlabelled 0 minangle 14.7 wall-minangle 14.7 plus True  
+k =  1.8 g=+0.28 h | placed interior  wall-unlabelled 0 minangle 22.1 wall-minangle 22.1 plus True  
+k =  1.9 g=+0.38 h | placed interior  wall-unlabelled 0 minangle 28.7 wall-minangle 28.7 plus True  
+k =  2.0 g=+0.48 h | placed interior  wall-unlabelled 0 minangle 34.0 wall-minangle 34.0 plus True  
+k =  2.1 g=+0.58 h | placed interior  wall-unlabelled 0 minangle 34.6 wall-minangle 34.6 plus True  
+k =  2.2 g=+0.68 h | placed interior  wall-unlabelled 0 minangle 37.6 wall-minangle 37.6 plus True  
+k =  2.3 g=+0.78 h | placed interior  wall-unlabelled 0 minangle 37.6 wall-minangle 37.6 plus True  
+k =  2.4 g=+0.88 h | placed interior  wall-unlabelled 0 minangle 36.2 wall-minangle 36.2 plus True  
+k =  2.5 g=+0.98 h | placed interior  wall-unlabelled 0 minangle 37.5 wall-minangle 37.5 plus True  
+k =  2.6 g=+1.08 h | placed interior  wall-unlabelled 0 minangle 35.6 wall-minangle 35.6 plus True  
+k =  2.7 g=+1.18 h | placed interior  wall-unlabelled 0 minangle 35.7 wall-minangle 42.0 plus True  
+k =  2.8 g=+1.28 h | placed interior  wall-unlabelled 0 minangle 35.7 wall-minangle 44.2 plus True  
+k =  2.9 g=+1.38 h | placed interior  wall-unlabelled 0 minangle 37.6 wall-minangle 45.2 plus True  
+k =  3.0 g=+1.48 h | placed interior  wall-unlabelled 0 minangle 34.2 wall-minangle 44.3 plus True  
+k =  3.1 g=+1.58 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 43.4 plus True  
+k =  3.2 g=+1.68 h | placed interior  wall-unlabelled 0 minangle 33.1 wall-minangle 43.9 plus True  
+k =  3.3 g=+1.78 h | placed interior  wall-unlabelled 0 minangle 36.4 wall-minangle 47.3 plus True  
+k =  3.4 g=+1.88 h | placed interior  wall-unlabelled 0 minangle 34.9 wall-minangle 47.3 plus True  
+k =  3.5 g=+1.98 h | placed interior  wall-unlabelled 0 minangle 34.0 wall-minangle 47.3 plus True  
+k =  3.6 g=+2.08 h | placed interior  wall-unlabelled 0 minangle 33.5 wall-minangle 47.3 plus True  
+k =  3.7 g=+2.18 h | placed interior  wall-unlabelled 0 minangle 38.3 wall-minangle 47.3 plus True  
+k =  3.8 g=+2.28 h | placed interior  wall-unlabelled 0 minangle 34.7 wall-minangle 47.3 plus True  
+k =  3.9 g=+2.38 h | placed interior  wall-unlabelled 0 minangle 37.9 wall-minangle 47.3 plus True  
+k =  4.0 g=+2.48 h | placed interior  wall-unlabelled 0 minangle 36.8 wall-minangle 47.3 plus True  
+k =  4.1 g=+2.58 h | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  
+k =  4.2 g=+2.68 h | placed interior  wall-unlabelled 0 minangle 34.9 wall-minangle 47.3 plus True  
+k =  4.3 g=+2.78 h | placed interior  wall-unlabelled 0 minangle 36.3 wall-minangle 47.3 plus True  
+k =  4.4 g=+2.88 h | placed interior  wall-unlabelled 0 minangle 37.8 wall-minangle 47.3 plus True  
+k =  4.5 g=+2.98 h | placed interior  wall-unlabelled 0 minangle 38.6 wall-minangle 47.3 plus True  
+k =  4.6 g=+3.08 h | placed interior  wall-unlabelled 0 minangle 36.6 wall-minangle 47.3 plus True  

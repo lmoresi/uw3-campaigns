@@ -1,0 +1,12 @@
+EXP=
+k =  2.0 g=+0.12 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to s
+k =  2.5 g=+0.62 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to s
+k =  3.0 g=+1.12 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to s
+k =  3.5 g=+1.62 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to s
+k =  6.0 g=+4.12 h | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 40.6 plus True  
+EXP=1
+k =  2.0 g=+0.12 h | placed interior  wall-unlabelled 0 minangle 9.2 wall-minangle 9.2 plus True  
+k =  2.5 g=+0.62 h | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 39.7 plus True  
+k =  3.0 g=+1.12 h | placed interior  wall-unlabelled 0 minangle 32.1 wall-minangle 40.6 plus True  
+k =  3.5 g=+1.62 h | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 40.6 plus True  
+k =  6.0 g=+4.12 h | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 40.6 plus True  
