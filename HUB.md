@@ -5116,3 +5116,7 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - Fails at step 1 in ~80 s. B35 fails the same way.
 - Agreed with K1: B45 reported apart; split-top depth logged per rebuild ("split from N km").
 - Owner (underworld3 issue or the dev hub): pending Louis.
+
+### 2026-11-28 — split-top refusal passed for a fix
+- Louis: "Pass that along to get a fix. Hyperion is active again."
+- C1 (dev hub) refused the message: "needs proof of a trusted device", nothing sent. The report and reproducer went to H1 worker (session_01HxWvn98DsWPTz4ZpKByzQM, on hyperion) instead, asking it to take the fix or pass it to the fault-placement desk and tell C1. Fix sha and overlay to come back to C2 and K1.
