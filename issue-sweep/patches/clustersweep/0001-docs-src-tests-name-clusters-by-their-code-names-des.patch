@@ -1,0 +1,453 @@
+From 0ca52cf81c83b273bfba55ccdd0cf8943215b42e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 28 Nov 2026 12:50:05 +1100
+Subject: [PATCH] docs, src, tests: name clusters by their code names,
+ described as systems
+
+Cluster mentions now follow the platform-naming ruling. Kaiju is the RSES
+kaiju platform, described once per document from the facts in
+hpc-cluster-setup.md (a Slurm system of 8 compute nodes, each with 104 CPUs,
+Intel Xeon Gold 6230R), and Gadi is NCI's Gadi at its first mention in a
+document. Identifiers stay as they are: the UW_CLUSTER values, the install
+and job-script names, and the container image tags.
+
+Text only: in the Python and Cython files only comments and docstrings
+change (token streams with comment and string contents blanked are
+identical; ASTs with docstrings and strings stripped are identical).
+
+Underworld development team with AI support from Claude Code
+---
+ docs/advanced/performance.md                           |  2 +-
+ docs/advanced/troubleshooting.md                       |  2 +-
+ docs/developer/CHANGELOG.md                            |  2 +-
+ .../design/CONVERGENCE_REFERENCE_POLICY_2026-11.md     |  4 ++--
+ .../design/petsc-dmplex-checkpoint-reload-plan.md      |  2 +-
+ docs/developer/guides/fault-multigrid.md               |  8 ++++----
+ docs/developer/guides/faults-in-convection.md          |  4 ++--
+ docs/developer/guides/hpc-cluster-setup.md             | 10 +++++-----
+ docs/developer/guides/release-process.md               |  2 +-
+ docs/developer/hpc_containers/README.md                |  6 +++---
+ docs/developer/hpc_containers/base.rocky-ompi          |  2 +-
+ .../boundary-stress-and-projection-postprocessing.md   |  2 +-
+ docs/developer/subsystems/fault-split-multigrid.md     |  6 +++---
+ docs/developer/subsystems/solvers.md                   |  2 +-
+ docs/docstrings/inventory.json                         |  2 +-
+ .../solver-wall-clock-guard-adversarial-review.md      |  2 +-
+ src/underworld3/cython/petsc_generic_snes_solvers.pyx  |  2 +-
+ src/underworld3/utilities/_jitextension.py             |  2 +-
+ src/underworld3/utilities/_params.py                   |  2 +-
+ src/underworld3/utilities/_petsc_tools.py              |  2 +-
+ tests/test_0821_params_cli_override.py                 |  2 +-
+ tests/test_1063_constrained_traction.py                |  2 +-
+ tests/test_1181_cylindrical_dirichlet.py               |  2 +-
+ 23 files changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/docs/advanced/performance.md b/docs/advanced/performance.md
+index 6f55498a..375df968 100644
+--- a/docs/advanced/performance.md
++++ b/docs/advanced/performance.md
+@@ -25,7 +25,7 @@ Tools for identifying bottlenecks:
+ ## Choosing MPI ranks for a MatMult-bound Stokes solve (#635)
+ 
+ A large nonlinear Stokes solve is usually **memory-bandwidth bound, not
+-compute bound**. In a controlled Gadi campaign on a 2-D power-law Barr–Houseman
++compute bound**. In a controlled campaign on NCI's Gadi on a 2-D power-law Barr–Houseman
+ fault benchmark (P2/P1, cell size 0.01, `n=3`, viscosity contrast 1e5, tolerance
+ 1e-8), roughly **97% of solve time was inside PETSc `MatMult`**, and every
+ configuration ran the identical numerical workload — four SNES solves, 24 KSP
+diff --git a/docs/advanced/troubleshooting.md b/docs/advanced/troubleshooting.md
+index 829b4427..567d469a 100644
+--- a/docs/advanced/troubleshooting.md
++++ b/docs/advanced/troubleshooting.md
+@@ -70,7 +70,7 @@ component was under `NAME_MAX` (255), the filesystem allowed `PATH_MAX=4096`, an
+ was configured with `PETSC_MAX_PATH_LEN=4096`. A 286-character filename still crashed.
+ ```
+ 
+-**Reported thresholds.** On Gadi (PETSc 3.25.4, HDF5 1.12.2p, Open MPI 4.1.7, MPI-enabled
++**Reported thresholds.** On NCI's Gadi (PETSc 3.25.4, HDF5 1.12.2p, Open MPI 4.1.7, MPI-enabled
+ h5py 3.16.0, GPFS) a staged test failed at a **259-character** filename, and 252
+ characters is the shortest length observed to fail on that stack. The exact first unsafe
+ length was not established, so treat these as observations on one stack rather than a
+diff --git a/docs/developer/CHANGELOG.md b/docs/developer/CHANGELOG.md
+index 6b775afa..23158d13 100644
+--- a/docs/developer/CHANGELOG.md
++++ b/docs/developer/CHANGELOG.md
+@@ -892,7 +892,7 @@ and SubDM synchronisation (#178), Cython deallocation and callback hardening
+   projection gained unit-aware `smoothing_length` (#234) and an opt-in
+   `linear_solver()` (#281).
+ - XDMF output moved to PETSc-native topology with explicit cell-to-vertex
+-  connectivity for ParaView (#218, #205); Gadi Singularity container build
++  connectivity for ParaView (#218, #205); NCI's Gadi Singularity container build
+   files (#133); maturity-gated release tooling `./uw dev` (#233); `-uw_*`
+   CLI overrides applied on all platforms (#280).
+ 
+diff --git a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
+index c4f0777d..ddda72fa 100644
+--- a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
++++ b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
+@@ -85,7 +85,7 @@ The adjoint solve is one linear solve from zero, so PETSc's own reference (`||b|
+ | #924 | the helper reading the user's `snes_rtol`, `snes_atol` and `snes_stol` on the rotated route, as `_resolve_owned_option` already does on the native routes |
+ | #883 | the datum rule, which takes the reference from the lifted state at the first increment |
+ | #884 | the null-space rule, which needs the gauge modes collected before the reference is measured; on an uncached rotated solve today they are collected after the first assembly |
+-| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (kaiju measured 28-57 % of Stokes time). The measurement below decides whether both are kept. |
++| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (measured on the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R): 28-57 % of Stokes time). The measurement below decides whether both are kept. |
+ 
+ ## 6. Evidence before merge
+ 
+@@ -99,7 +99,7 @@ The adjoint solve is one linear solve from zero, so PETSc's own reference (`||b|
+ The fixtures:
+ - test_0022 (laptop, plus hyperion with Nehalem and Zen forced);
+ - the rotated parallel set at np 2 and 4;
+-- the zg95 rotated drivers (kaiju);
++- the zg95 rotated drivers (the kaiju platform);
+ - SolCx and the notch (Drucker-Prager, δ-soft-min) on the saddle-point route, and a zg95 viscoplastic run on the rotated route, for the strain-rate-dependent case;
+ - a model with a nonzero weakly imposed velocity, for the one term that carries the viscosity cap;
+ - a warm-started advection-diffusion time loop and an evaluation projector, for the Scalar and Vector routes.
+diff --git a/docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md b/docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md
+index 8d139c02..0f7088c1 100644
+--- a/docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md
++++ b/docs/developer/design/petsc-dmplex-checkpoint-reload-plan.md
+@@ -193,7 +193,7 @@ mpirun -np 2 ./uw python -m pytest \
+ The motivating case is spherical benchmark postprocessing at high MPI counts.
+ The coordinate-remap `read_timestep()` path can build large KDTree mapping
+ structures during reload. At `1/128` this used nearly the full 4.5 TB
+-allocation on Gadi.
++allocation on NCI's Gadi.
+ 
+ The PETSc reload method avoids KDTree reload and preserves velocity/pressure
+ metrics to roundoff. Boundary stress metrics require the benchmark to recover
+diff --git a/docs/developer/guides/fault-multigrid.md b/docs/developer/guides/fault-multigrid.md
+index 4a42f895..b5d81a34 100644
+--- a/docs/developer/guides/fault-multigrid.md
++++ b/docs/developer/guides/fault-multigrid.md
+@@ -121,14 +121,14 @@ the slip unchanged (Louis's ruling on #892, which carries the table). The chain
+ copy of the base's finest level and at $4S$ into a copy of the level below, each split
+ along its rungs, the band widening with the level) is the measured alternative and
+ not the production tail: its levels never carry the patch, and on the same states it
+-takes 83 to 166 and 28 to 76. On the production annulus at np 16 (kaiju,
++takes 83 to 166 and 28 to 76. On the production annulus at np 16 (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R),
+ `development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
+ velocity work, 8.65 against 8.74 F-cycles per solve, in the same time within the
+ run-to-run spread, with the same Newton counts and answers; the welded arm carries a
+ 3584-row patch on one rank and the chain none. The welded tail is no worse there and
+ has one hierarchy fewer to build; the campaign drivers' `uw_chain` default moved to 0
+ with the build move to `development` (b440b88 in `lmoresi/uw3-campaigns`, accepted on
+-kaiju at np 16; the drivers' decisions ledger there,
++the kaiju platform at np 16; the drivers' decisions ledger there,
+ `zg95_lid_regimes/DECISIONS.md`, is the citation). The annulus shows none of the box's gain
+ because its band ratio is 3.9 (base finest cell 0.0156, rung spacing 0.004), below
+ the smallest ratio in the sweep table; the patch's gain appears from a ratio of about
+@@ -284,7 +284,7 @@ parts, in this order of size:
+    extra load on the owning rank for no communication inside the contact solve.
+    A network's faults have their cells placed region by region, so their bands
+    can sit on different ranks. Measured on the production
+-   annulus at np 16 (`development` 25d62812, kaiju's budget): the finest-level
++   annulus at np 16 (`development` 25d62812, the kaiju platform's budget): the finest-level
+    patch, 3584 rows at fault depth 0.15 and 7010 rows at 0.45, each time all on
+    one rank of 16, and its LU solve runs there for 21 to 28 s a step while the
+    other 15 ranks wait, 5 to 6 % of the Stokes solve. At that commit the cost
+@@ -298,7 +298,7 @@ parts, in this order of size:
+    spread the band's cells across ranks, but not that block. It also cannot
+    place a fault that reaches the domain wall as the library stands: it needs
+    `mesher="network"`, which refused the trench fault in a serial reproduction on
+-   kaiju (2026-11-01) with "the ribbon's cavity reached the domain wall away
++   the kaiju platform (2026-11-01) with "the ribbon's cavity reached the domain wall away
+    from the outcrop; the ribbon must clear the other walls", and the ladder,
+    which places a wall-reaching fault, takes only `"gather"`.
+    The 2000-row cap (`fac_block_rows`, or the `UW_FAC_BLOCK_ROWS` environment
+diff --git a/docs/developer/guides/faults-in-convection.md b/docs/developer/guides/faults-in-convection.md
+index bfbbe54f..c0541939 100644
+--- a/docs/developer/guides/faults-in-convection.md
++++ b/docs/developer/guides/faults-in-convection.md
+@@ -70,7 +70,7 @@ change with the fix, and with the LU blocks it costs 3 to 16 times the welded ta
+ iterations on the same states. It stays in the drivers as the measured alternative,
+ for the case where the LU patch is unavailable or its block too large (the block grows
+ with the band's rows; 3-D is not measured). On the production faulted annulus at
+-np 16 (kaiju, `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
++np 16 (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R), `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
+ a 3584-row patch on the one rank the default gather placement gives the band to, the
+ chain with none) the two tails do the same velocity
+ work, 8.65 against 8.74 F-cycles per solve, in the same Stokes time within the ±10 %
+@@ -78,7 +78,7 @@ run-to-run spread, with the same Newton counts and answers; the box's gain does
+ show there because that model's band ratio is 3.9, below the smallest ratio in the
+ table. The welded tail is no worse and has one hierarchy fewer
+ to build; the campaign drivers' `uw_chain` default moved to 0 with the build move to
+-`development` (b440b88 in `lmoresi/uw3-campaigns`, accepted on kaiju at np 16). Split coarse levels are not developed further (Louis,
++`development` (b440b88 in `lmoresi/uw3-campaigns`, accepted on the kaiju platform at np 16). Split coarse levels are not developed further (Louis,
+ 2026-11-02); the chain stays in the library as it is, and no new work builds on it. The record, with the superseded
+ table, is the journal topic
+ [Fault multigrid](https://github.com/underworldcode/underworld3-journal/blob/main/topics/fault-multigrid.md)
+diff --git a/docs/developer/guides/hpc-cluster-setup.md b/docs/developer/guides/hpc-cluster-setup.md
+index 898a1447..b083c4de 100644
+--- a/docs/developer/guides/hpc-cluster-setup.md
++++ b/docs/developer/guides/hpc-cluster-setup.md
+@@ -22,7 +22,7 @@ source build  → mpi4py, PETSc+AMR+petsc4py, h5py                (linked to clu
+ 
+ ---
+ 
+-## Kaiju
++## The RSES kaiju platform
+ 
+ ### Hardware
+ 
+@@ -76,7 +76,7 @@ source kaiju_install_user.sh
+ install_petsc   # run just one step
+ ```
+ 
+-#### What PETSc builds on Kaiju
++#### What PETSc builds on the kaiju platform
+ 
+ - **AMR tools**: mmg, parmmg, pragmatic, eigen, bison
+ - **Solvers**: mumps, scalapack, slepc
+@@ -107,7 +107,7 @@ Use `kaiju_slurm_job.sh` from [uw3-hpc-baremetal-install-run](https://github.com
+ sbatch kaiju_slurm_job.sh
+ ```
+ 
+-`--mpi=pmix` is **required** on Kaiju (Spack has `pmix@5.0.3`):
++`--mpi=pmix` is **required** on the kaiju platform (Spack has `pmix@5.0.3`):
+ 
+ ```bash
+ srun --mpi=pmix python3 my_model.py
+@@ -131,7 +131,7 @@ module load underworld3/development-12Mar26
+ 
+ The shared script adds `fix_permissions()` and `install_modulefile()` on top of the per-user steps. The TCL modulefile hardcodes the Spack OpenMPI and pixi env paths — if Spack is rebuilt (hash changes), update `mpi_root` in `modulefiles/underworld3/development.tcl`.
+ 
+-### Troubleshooting (Kaiju)
++### Troubleshooting (the kaiju platform)
+ 
+ #### `import underworld3` fails on compute nodes
+ 
+@@ -162,7 +162,7 @@ pixi's conda linker requires transitive shared library dependencies to be explic
+ 
+ ---
+ 
+-## Gadi
++## NCI's Gadi
+ 
+ ### Hardware
+ 
+diff --git a/docs/developer/guides/release-process.md b/docs/developer/guides/release-process.md
+index 06ca0dbd..049317d9 100644
+--- a/docs/developer/guides/release-process.md
++++ b/docs/developer/guides/release-process.md
+@@ -330,7 +330,7 @@ links reference a specific branch or tag, update them to point at `vX.Y.Z` or
+ 
+ The serial test suite (`test_levels.sh --isolation`) and the local MPI pass
+ (`--parallel`, 2–4 ranks) do not cover production-scale behaviour. Run scaling
+-benchmarks on a supported HPC facility (NCI Gadi or Pawsey Setonix) on two
++benchmarks on a supported HPC facility (NCI's Gadi or Pawsey Setonix) on two
+ cadences:
+ 
+ **Routine (every ~6 months / every two releases)**
+diff --git a/docs/developer/hpc_containers/README.md b/docs/developer/hpc_containers/README.md
+index 3d0dbeb0..1b8f8255 100644
+--- a/docs/developer/hpc_containers/README.md
++++ b/docs/developer/hpc_containers/README.md
+@@ -11,7 +11,7 @@ this directory is the recipes.
+ One platform base per OS/MPI family; everything above it is shared.
+ 
+ ```
+-base.rocky-ompi    Rocky 8.10 + system OpenMPI      -> uw3-base-rocky-ompi:{runtime,builder}     Gadi, Kaiju
++base.rocky-ompi    Rocky 8.10 + system OpenMPI      -> uw3-base-rocky-ompi:{runtime,builder}     NCI's Gadi, RSES kaiju
+ base.ubuntu-mpich  Ubuntu 24.04 + MPICH 3.4.3       -> uw3-base-ubuntu-mpich:{runtime,builder}   Setonix
+ petsc.hpc          PETSc from source, on a base     -> petsc-{gadi,setonix}:<version>-{ompi,mpich}
+ underworld3.hpc    UW3 + Python stack, on PETSc     -> underworld3-{gadi,setonix}:<branch|tag>
+@@ -23,8 +23,8 @@ Adding a platform means adding a `base.*` file and a matrix row in each workflow
+ 
+ | Platform | Base | MPI in image | On the machine |
+ |---|---|---|---|
+-| Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
+-| Kaiju | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
++| NCI's Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
++| the RSES kaiju platform (Slurm, 8 compute nodes of 104 CPUs) | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
+ | Setonix | Ubuntu 24.04 | MPICH 3.4.3 (`libmpi.so.12`) | host Cray MPICH bind-mounted by `singularity/4.1.0-mpi` |
+ 
+ Setonix needs 3.4.3 specifically: Cray MPICH 8.1 is MPICH-3.4-based, and code compiled
+diff --git a/docs/developer/hpc_containers/base.rocky-ompi b/docs/developer/hpc_containers/base.rocky-ompi
+index 199ca1b1..c979bf3a 100644
+--- a/docs/developer/hpc_containers/base.rocky-ompi
++++ b/docs/developer/hpc_containers/base.rocky-ompi
+@@ -1,5 +1,5 @@
+ #####################################################################
+-# Platform base for the Rocky Linux + OpenMPI family (NCI Gadi, ANU Kaiju).
++# Platform base for the Rocky Linux + OpenMPI family (NCI's Gadi, the RSES kaiju platform).
+ #
+ # Everything OS- and MPI-specific lives in a base file like this one; the
+ # recipes stacked on it (petsc.hpc, underworld3.hpc) build against whatever
+diff --git a/docs/developer/subsystems/boundary-stress-and-projection-postprocessing.md b/docs/developer/subsystems/boundary-stress-and-projection-postprocessing.md
+index 114e7e78..ee0d233f 100644
+--- a/docs/developer/subsystems/boundary-stress-and-projection-postprocessing.md
++++ b/docs/developer/subsystems/boundary-stress-and-projection-postprocessing.md
+@@ -22,7 +22,7 @@ That stack is robust for general nonlinear scalar PDEs, but for projection it is
+ **unnecessarily heavy**: GAMG setup/repartition dominates cost and memory, and
+ when you project many quantities in sequence (e.g. six deviatoric-stress
+ components at large MPI scale) it becomes the bottleneck — runs have been
+-OOM-killed mid-sequence on Gadi.
++OOM-killed mid-sequence on NCI's Gadi.
+ 
+ Switch projectors used purely for output/post-processing to a lightweight linear
+ solve with the opt-in helper:
+diff --git a/docs/developer/subsystems/fault-split-multigrid.md b/docs/developer/subsystems/fault-split-multigrid.md
+index ec43518e..4995e026 100644
+--- a/docs/developer/subsystems/fault-split-multigrid.md
++++ b/docs/developer/subsystems/fault-split-multigrid.md
+@@ -153,7 +153,7 @@ path.
+   80-375 outer iterations on a banded Poisson tail.
+ - **LU with a shift.** PCASM's default, unshifted ILU(0), takes a zero pivot on the
+   rotated Galerkin block or gives no band solve (344 velocity iterations against
+-  67, #892). Inexact block solves were measured on the add-on matrix's box (kaiju,
++  67, #892). Inexact block solves were measured on the add-on matrix's box (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R),
+   np 4, 2026-11). They gave the same Newton counts and slip as LU, and took longer:
+ 
+   | box | LU | ILU(2), 5 steps | GAMG, 5 / 10 steps | hypre, 5 / 10 steps |
+@@ -165,7 +165,7 @@ path.
+ - **Quotient minimum degree.** A fault band's block is long and narrow, and under
+   PETSc's default ordering (nested dissection) its fill followed the subdomain's row
+   numbering: the same block took 8.1e9 flops to factor at np 4 and 2.35e10 at np 8
+-  and 16. Measured on the add-on matrix's row 5 networks (kaiju, np 4 to 16, 2026-11),
++  and 16. Measured on the add-on matrix's row 5 networks (the kaiju platform, np 4 to 16, 2026-11),
+   with the same iterations and slip in every case (reverse Cuthill-McKee was worse
+   than nested dissection):
+ 
+@@ -493,7 +493,7 @@ the velocity solve then took 4 iterations serially, 118 at np 2 and more than 20
+ np 4 (#925). Gathered, it takes 4 at np 1, 2 and 4 (`test_1139`). The structural
+ patch alone, one block per rank, converged but took 3 iterations serially, 4 at np 2
+ and 6 at np 4; gathered it is one block at any rank count (`test_1139`, `test_1133`).
+-On row 5 with no zone at n_rungs 320 (30 048 rows in the block; kaiju, 2026-11), both
++On row 5 with no zone at n_rungs 320 (30 048 rows in the block; the kaiju platform, 2026-11), both
+ take 67 iterations serially, where the code is the same. Cut per rank, the velocity
+ solve took 128, 131, 316 and 445 iterations at np 2, 4, 8 and 16; as one block, 76 to
+ 86. The owning rank's peak memory was 512-541 MB at np 2-16; the others'
+diff --git a/docs/developer/subsystems/solvers.md b/docs/developer/subsystems/solvers.md
+index 877de43f..40e30098 100644
+--- a/docs/developer/subsystems/solvers.md
++++ b/docs/developer/subsystems/solvers.md
+@@ -329,7 +329,7 @@ non-linear. `cg`/`fcg` residual recurrences and standard `gmres` cannot accommod
+ that. FGMRES is right-preconditioned by construction and can.
+ 
+ Settled empirically in [#147](https://github.com/underworldcode/underworld3/issues/147)
+-(spherical Kramer `case1`, free-slip Nitsche, Gadi at np=144, cellsize 1/32):
++(spherical Kramer `case1`, free-slip Nitsche, NCI's Gadi at np=144, cellsize 1/32):
+ `fcg` reported an indefinite matrix / `DIVERGED_PC_FAILED`; `gmres` failed with a
+ residual-recursion mismatch; the same configuration converged on macOS, so this is
+ a robustness cliff exposed by scale, not a formulation error. The rationale is
+diff --git a/docs/docstrings/inventory.json b/docs/docstrings/inventory.json
+index 4b16ed38..747d57de 100644
+--- a/docs/docstrings/inventory.json
++++ b/docs/docstrings/inventory.json
+@@ -48125,7 +48125,7 @@
+       "Use object.__setattr__ to avoid triggering our custom __setattr__",
+       "Ensure command-line options (-uw_*) are loaded into the PETSc options",
+       "database BEFORE we read overrides. petsc4py populates this DB from",
+-      "sys.argv automatically on some platforms but NOT others (e.g. Gadi),",
++      "sys.argv automatically on some platforms but NOT others (e.g. NCI's Gadi),",
+       "where Params previously fell back silently to the defaults even though"
+     ],
+     "status": "partial",
+diff --git a/docs/reviews/2026-07/solver-wall-clock-guard-adversarial-review.md b/docs/reviews/2026-07/solver-wall-clock-guard-adversarial-review.md
+index d3d7e930..da109b93 100644
+--- a/docs/reviews/2026-07/solver-wall-clock-guard-adversarial-review.md
++++ b/docs/reviews/2026-07/solver-wall-clock-guard-adversarial-review.md
+@@ -71,7 +71,7 @@ instrumentation held those entries until the *next* solve, so a rebuild
+ (`is_setup=False`, remesh, adapt) did not free the old KSP, PC, coarse operators or
+ multigrid hierarchy: they survived precisely while the new hierarchy was being built.
+ 
+-The comment at the destroy site records that this exact retention "at Gadi scale … push[ed]
++The comment at the destroy site records that this exact retention "at NCI's Gadi scale … push[ed]
+ past memory limits" for `SNES_Tensor_Projection.solve()` cycling six components in 3D —
+ a loop that drives `is_setup=False` on every component.
+ 
+diff --git a/src/underworld3/cython/petsc_generic_snes_solvers.pyx b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+index fc67b3bb..b22d5137 100644
+--- a/src/underworld3/cython/petsc_generic_snes_solvers.pyx
++++ b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+@@ -5341,7 +5341,7 @@ class SolverBaseClass(uw_object):
+         # Tight is_setup=False loops (notably SNES_Tensor_Projection.solve()
+         # cycling 6 symmetric tensor components in 3D) accumulate one SNES
+         # plus one full coarse-DM hierarchy per iteration — large enough at
+-        # Gadi scale to push past memory limits during stress recovery
++        # NCI's Gadi scale to push past memory limits during stress recovery
+         # postprocessing. _reset() already had the correct destroy
+         # sequence; this brings _build() into line with it.
+         # NB self.snes / self.dm_hierarchy may not exist yet on the first
+diff --git a/src/underworld3/utilities/_jitextension.py b/src/underworld3/utilities/_jitextension.py
+index b9d50284..ad1f4cc0 100644
+--- a/src/underworld3/utilities/_jitextension.py
++++ b/src/underworld3/utilities/_jitextension.py
+@@ -1987,7 +1987,7 @@ cdef extern from "cy_ext.h" nogil:
+     # it avoids difficulties with symbol namespace clashing which
+     # results in only the first JIT module working (with all
+     # subsequent modules pointing towards the first's symbols).
+-    # Tags: RTLD_LOCAL, RTLD_Global, Gadi.
++    # Tags: RTLD_LOCAL, RTLD_Global, NCI's Gadi.
+ 
+     import string
+     import random
+diff --git a/src/underworld3/utilities/_params.py b/src/underworld3/utilities/_params.py
+index e5e81f23..2803a112 100644
+--- a/src/underworld3/utilities/_params.py
++++ b/src/underworld3/utilities/_params.py
+@@ -158,7 +158,7 @@ class Params:
+ 
+         # Ensure command-line options (-uw_*) are loaded into the PETSc options
+         # database BEFORE we read overrides. petsc4py populates this DB from
+-        # sys.argv automatically on some platforms but NOT others (e.g. Gadi),
++        # sys.argv automatically on some platforms but NOT others (e.g. NCI's Gadi),
+         # where Params previously fell back silently to the defaults even though
+         # the CLI args were present (issue #111). parse_cmd_line_options() is
+         # idempotent, so this is safe to call on every Params construction.
+diff --git a/src/underworld3/utilities/_petsc_tools.py b/src/underworld3/utilities/_petsc_tools.py
+index 3f15b684..dab6f947 100644
+--- a/src/underworld3/utilities/_petsc_tools.py
++++ b/src/underworld3/utilities/_petsc_tools.py
+@@ -35,7 +35,7 @@ def parse_cmd_line_options():
+     fixes that class of bug rather than the one instance of it.
+ 
+     It exists at all because petsc4py does NOT populate the options database
+-    from `sys.argv` on every platform (Gadi being the case in #111), so
++    from `sys.argv` on every platform (NCI's Gadi being the case in #111), so
+     something has to do the insertion explicitly. It is idempotent -- re-inserting
+     the same arguments rewrites the same values -- so it is safe to call on every
+     `Params` construction.
+diff --git a/tests/test_0821_params_cli_override.py b/tests/test_0821_params_cli_override.py
+index ba9d32ae..8d23bc8c 100644
+--- a/tests/test_0821_params_cli_override.py
++++ b/tests/test_0821_params_cli_override.py
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ """Regression: uw.Params picks up -uw_* command-line overrides (#111).
+ 
+-On some platforms (e.g. Gadi) petsc4py does NOT auto-populate the PETSc options
++On some platforms (e.g. NCI's Gadi) petsc4py does NOT auto-populate the PETSc options
+ database from sys.argv, so uw.Params silently fell back to its defaults even
+ when the CLI argument was present. Params now calls parse_cmd_line_options()
+ during construction, so a `-uw_<name> <value>` override is applied regardless of
+diff --git a/tests/test_1063_constrained_traction.py b/tests/test_1063_constrained_traction.py
+index c7a641b0..1cfc8095 100644
+--- a/tests/test_1063_constrained_traction.py
++++ b/tests/test_1063_constrained_traction.py
+@@ -31,7 +31,7 @@ ETA_B, RES = 1.0e6, 32
+ 
+ def _solve():
+     # Keep the 32x32 fine mesh while providing geometric multigrid for the
+-    # high-contrast augmented system; a single-level GAMG solve stalls on Gadi.
++    # high-contrast augmented system; a single-level GAMG solve stalls on NCI's Gadi.
+     mesh = uw.meshing.StructuredQuadBox(
+         elementRes=(RES // 2, RES // 2),
+         refinement=1,
+diff --git a/tests/test_1181_cylindrical_dirichlet.py b/tests/test_1181_cylindrical_dirichlet.py
+index 4896cb85..6e33a849 100644
+--- a/tests/test_1181_cylindrical_dirichlet.py
++++ b/tests/test_1181_cylindrical_dirichlet.py
+@@ -299,7 +299,7 @@ def test_lagged_solve_requires_the_standard_pressure_nullspace():
+ def test_absent_local_boundary_is_not_dereferenced(local_stratum, monkeypatch):
+     """PETSc.IS() has a false null handle, distinct from a valid zero-length IS.
+ 
+-    The Gadi MPI16 gate first exposed the real null-handle crash. Never inspect
++    The MPI16 gate on NCI's Gadi first exposed the real null-handle crash. Never inspect
+     its .indices here; a separate false sentinel safely makes any such access
+     an assertion failure instead of triggering the native segmentation fault.
+     A rank holding none of the wall reads no facets, and gathers its share (none)
+-- 
+2.53.0
+
