@@ -1,4 +1,4 @@
-From da86afda69d95d6f48d7a665ed736e61351929b5 Mon Sep 17 00:00:00 2001
+From 71713dcdd0333b2de3a14e4192bc7b80dc784fc9 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Sat, 28 Nov 2026 12:50:05 +1100
 Subject: [PATCH] docs, src, tests: name clusters by their code names,
@@ -82,7 +82,7 @@ index 6b775afa..23158d13 100644
    CLI overrides applied on all platforms (#280).
  
 diff --git a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
-index c4f0777d..b5c526ba 100644
+index c4f0777d..e5a72673 100644
 --- a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
 +++ b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
 @@ -85,7 +85,7 @@ The adjoint solve is one linear solve from zero, so PETSc's own reference (`||b|
@@ -90,7 +90,7 @@ index c4f0777d..b5c526ba 100644
  | #883 | the datum rule, which takes the reference from the lifted state at the first increment |
  | #884 | the null-space rule, which needs the gauge modes collected before the reference is measured; on an uncached rotated solve today they are collected after the first assembly |
 -| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (kaiju measured 28-57 % of Stokes time). The measurement below decides whether both are kept. |
-+| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (28-57 % of Stokes time, measured on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each). The measurement below decides whether both are kept. |
++| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (28-57 % of Stokes time, measured on the RSES kaiju platform, a Slurm system of 8 compute nodes, each with 104 logical CPUs from two Intel Xeon Gold 6230R processors). The measurement below decides whether both are kept. |
  
  ## 6. Evidence before merge
  
@@ -117,7 +117,7 @@ index 8d139c02..0f7088c1 100644
  The PETSc reload method avoids KDTree reload and preserves velocity/pressure
  metrics to roundoff. Boundary stress metrics require the benchmark to recover
 diff --git a/docs/developer/guides/fault-multigrid.md b/docs/developer/guides/fault-multigrid.md
-index 4a42f895..c0243d03 100644
+index 4a42f895..23e82880 100644
 --- a/docs/developer/guides/fault-multigrid.md
 +++ b/docs/developer/guides/fault-multigrid.md
 @@ -121,14 +121,14 @@ the slip unchanged (Louis's ruling on #892, which carries the table). The chain
@@ -126,7 +126,7 @@ index 4a42f895..c0243d03 100644
  not the production tail: its levels never carry the patch, and on the same states it
 -takes 83 to 166 and 28 to 76. On the production annulus at np 16 (kaiju,
 -`development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
-+takes 83 to 166 and 28 to 76. On the production annulus at np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each
++takes 83 to 166 and 28 to 76. On the production annulus at np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes, each with 104 logical CPUs from two Intel Xeon Gold 6230R processors
 +(`development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
  velocity work, 8.65 against 8.74 F-cycles per solve, in the same time within the
  run-to-run spread, with the same Newton counts and answers; the welded arm carries a
@@ -157,7 +157,7 @@ index 4a42f895..c0243d03 100644
     which places a wall-reaching fault, takes only `"gather"`.
     The 2000-row cap (`fac_block_rows`, or the `UW_FAC_BLOCK_ROWS` environment
 diff --git a/docs/developer/guides/faults-in-convection.md b/docs/developer/guides/faults-in-convection.md
-index bfbbe54f..54077b9c 100644
+index bfbbe54f..b1c5fef2 100644
 --- a/docs/developer/guides/faults-in-convection.md
 +++ b/docs/developer/guides/faults-in-convection.md
 @@ -70,7 +70,7 @@ change with the fix, and with the LU blocks it costs 3 to 16 times the welded ta
@@ -165,7 +165,7 @@ index bfbbe54f..54077b9c 100644
  for the case where the LU patch is unavailable or its block too large (the block grows
  with the band's rows; 3-D is not measured). On the production faulted annulus at
 -np 16 (kaiju, `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
-+np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each (`development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
++np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes, each with 104 logical CPUs from two Intel Xeon Gold 6230R processors (`development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
  a 3584-row patch on the one rank the default gather placement gives the band to, the
  chain with none) the two tails do the same velocity
  work, 8.65 against 8.74 F-cycles per solve, in the same Stokes time within the ±10 %
@@ -241,7 +241,7 @@ index 06ca0dbd..049317d9 100644
  
  **Routine (every ~6 months / every two releases)**
 diff --git a/docs/developer/hpc_containers/README.md b/docs/developer/hpc_containers/README.md
-index 3d0dbeb0..5d3f85e4 100644
+index 3d0dbeb0..3aebaf09 100644
 --- a/docs/developer/hpc_containers/README.md
 +++ b/docs/developer/hpc_containers/README.md
 @@ -11,7 +11,7 @@ this directory is the recipes.
@@ -260,7 +260,7 @@ index 3d0dbeb0..5d3f85e4 100644
 -| Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
 -| Kaiju | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
 +| NCI's Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
-+| the RSES kaiju platform: a Slurm system of 8 compute nodes with 104 CPUs each | Rocky 8.10 (the image built for Gadi) | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
++| the RSES kaiju platform: a Slurm system of 8 compute nodes, each with 104 logical CPUs (two Intel Xeon Gold 6230R) | Rocky 8.10 (the image built for Gadi) | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
  | Setonix | Ubuntu 24.04 | MPICH 3.4.3 (`libmpi.so.12`) | host Cray MPICH bind-mounted by `singularity/4.1.0-mpi` |
  
  Setonix needs 3.4.3 specifically: Cray MPICH 8.1 is MPICH-3.4-based, and code compiled
@@ -289,7 +289,7 @@ index 114e7e78..ee0d233f 100644
  Switch projectors used purely for output/post-processing to a lightweight linear
  solve with the opt-in helper:
 diff --git a/docs/developer/subsystems/fault-split-multigrid.md b/docs/developer/subsystems/fault-split-multigrid.md
-index ec43518e..e5c397f7 100644
+index ec43518e..2953bfa2 100644
 --- a/docs/developer/subsystems/fault-split-multigrid.md
 +++ b/docs/developer/subsystems/fault-split-multigrid.md
 @@ -153,8 +153,8 @@ path.
@@ -298,7 +298,7 @@ index ec43518e..e5c397f7 100644
    rotated Galerkin block or gives no band solve (344 velocity iterations against
 -  67, #892). Inexact block solves were measured on the add-on matrix's box (kaiju,
 -  np 4, 2026-11). They gave the same Newton counts and slip as LU, and took longer:
-+  67, #892). Inexact block solves were measured on the add-on matrix's box on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each,
++  67, #892). Inexact block solves were measured on the add-on matrix's box on the RSES kaiju platform, a Slurm system of 8 compute nodes, each with 104 logical CPUs (two Intel Xeon Gold 6230R),
 +  at np 4 (2026-11). They gave the same Newton counts and slip as LU, and took longer:
  
    | box | LU | ILU(2), 5 steps | GAMG, 5 / 10 steps | hypre, 5 / 10 steps |

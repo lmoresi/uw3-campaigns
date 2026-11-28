@@ -1,7 +1,7 @@
 ## docs, src, tests: name clusters by their code names, described as systems
 
 **Why.** This applies the platform-naming ruling: a system is named by its code name and described as a system, never by a hostname, IP, login node, username or filesystem path.
-- Kaiju becomes **the RSES kaiju platform**. Each document describes it once, near its first mention, using only the facts in `hpc-cluster-setup.md`: "a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each". The container README's table row says the same, with its base image (Rocky 8.10, the image built for Gadi). That guide states no interconnect, so none is given.
+- Kaiju becomes **the RSES kaiju platform**. Each document describes it once, near its first mention, using only the facts in `hpc-cluster-setup.md`: "a Slurm system of 8 compute nodes, each with 104 logical CPUs (two Intel Xeon Gold 6230R)" (or "... from two Intel Xeon Gold 6230R processors" where a parenthesis would nest or follow another). The container README's table row says the same, with its base image (Rocky 8.10, the image built for Gadi). That guide states no interconnect, so none is given.
 - Gadi becomes **NCI's Gadi** at its first mention in a document; later mentions stay "Gadi".
 
 There are 36 edits on 36 lines in 23 files (docs, plus Gadi comments in 4 source and 3 test files).
