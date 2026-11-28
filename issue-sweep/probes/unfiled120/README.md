@@ -53,3 +53,16 @@ iterations are equal.
 - Seen while writing it: on the VEP box, a SECOND step from the evolved history had different
   iteration counts with and without the GEMV path (39/691 against 45/519 Newton/linear). That
   nonlinear solve is sensitive to the last-bit difference.
+
+## (3) How far a VEP run drifts (vep_divergence.py, vep/compare.txt)
+The VEP box (cellSize 0.2, refinement 1), 10 steps of 0.1, each arm in its own process,
+threads 1. Relative L2 differences of velocity and of the carried stress per step:
+- GEMV on against on: 0 at steps 0-1, then 1.6e-16 to 5.7e-16 (about 3e-12 of the tolerance),
+  flat; iterations identical.
+- GEMV on against off: 2.5e-16 to 3.6e-15, flat; iterations identical.
+- GEMV off against off: bit-identical at every step.
+So on this run the last-bit noise does not amplify: path noise, not sensitivity. No tighter-
+tolerance run was needed.
+Correction: the earlier "39/691 against 45/519" came from gemv_timing.py's VEP repeats, which
+reset the velocity to the initial shear while the stress history had evolved. That state is
+inconsistent and no real run reaches it. The docs patch now says so.

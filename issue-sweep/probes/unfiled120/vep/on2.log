@@ -1,0 +1,12 @@
+/Users/lmoresi/+Simulations/unfiled120/vep/vep_divergence.py:44: RuntimeWarning: [Solver_7_] a pressure-dependent yield law with no stated plastic_rate_strengthening under the consistent tangent: the yielded tangent has no modulus along the strain-rate direction, which is the near-singular velocity block measured on the Spiegelman notch. State the regularisation (Parameters.plastic_rate_strengthening, units of viscosity) — its scale is the model's, there is no universal default — or accept the risk. Recorded in solve_report.config['regularisation'].
+  s.solve(zero_init_guess=False, timestep=0.1)
+step 0: snes 7 linear 7 reason 2
+step 1: snes 4 linear 4 reason 2
+step 2: snes 3 linear 3 reason 2
+step 3: snes 3 linear 3 reason 2
+step 4: snes 3 linear 3 reason 2
+step 5: snes 2 linear 2 reason 2
+step 6: snes 2 linear 2 reason 2
+step 7: snes 2 linear 2 reason 2
+step 8: snes 2 linear 2 reason 2
+step 9: snes 2 linear 2 reason 2

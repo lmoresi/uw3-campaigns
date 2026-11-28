@@ -1,4 +1,4 @@
-From 511a563a1bae2173d82b2d6c52221bd63a18adf1 Mon Sep 17 00:00:00 2001
+From 968362cd59d3bc57d86345ac05b9135f3030ab39 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 20:40:09 +1100
 Subject: [PATCH] Solvers doc: last-bit differences between runs come from
@@ -7,8 +7,8 @@ Subject: [PATCH] Solvers doc: last-bit differences between runs come from
 Underworld development team with AI support from Claude Code
 ---
  docs/developer/index.md              |  1 +
- docs/developer/subsystems/solvers.md | 24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ docs/developer/subsystems/solvers.md | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/docs/developer/index.md b/docs/developer/index.md
 index 0854f6fb..195ec0f3 100644
@@ -23,10 +23,10 @@ index 0854f6fb..195ec0f3 100644
  | Fault multigrid (split-level hierarchy, parallel pairing) | [subsystems/fault-split-multigrid.md](subsystems/fault-split-multigrid.md) |
  | Fault networks in parallel (placement, split, tail) | [design/fault-parallel-placement-2026-09.md](design/fault-parallel-placement-2026-09.md) (subsystem reference: [conforming-surfaces-and-fault-zones.md](subsystems/conforming-surfaces-and-fault-zones.md)) |
 diff --git a/docs/developer/subsystems/solvers.md b/docs/developer/subsystems/solvers.md
-index 877de43f..00718fa3 100644
+index 877de43f..1a91cc0a 100644
 --- a/docs/developer/subsystems/solvers.md
 +++ b/docs/developer/subsystems/solvers.md
-@@ -433,6 +433,30 @@ application, and the velocity KSP is applied once per Schur `MatMult` — i.e. o
+@@ -433,6 +433,31 @@ application, and the velocity KSP is applied once per Schur `MatMult` — i.e. o
  pressure Krylov iteration. That number is a sample, not work. `SolverInstrumentation`
  (`systems/solver_health.py`) is the mechanism that sums properly.
  
@@ -34,10 +34,11 @@ index 877de43f..00718fa3 100644
 +
 +The same build, on the same input, can finish a Krylov solve in one of two states that
 +differ in the last bit, from one process to the next. A linear solve differs only in those
-+last bits, with the same iteration counts. A strongly nonlinear solve, a yielding
-+visco-elasto-plastic one above all, can amplify the difference into a different iteration
-+path and a solution that differs at the solver's tolerance (a box step from evolved history:
-+39 Newton and 691 linear iterations one way, 45 and 519 the other).
++last bits, with the same iteration counts. A yielding visco-elasto-plastic box run over ten
++steps stays there too: velocity and stress differ by 2e-16 to 4e-15 relative, flat from step
++to step, with the same iteration counts. A hard nonlinear solve can still take a different
++path from such a difference: started from a velocity inconsistent with the stress history,
++the same box step took 39 Newton and 691 linear iterations one way and 45 and 519 the other.
 +The source is PETSc's GEMV path for `VecMDot` and `VecMAXPY`, its default here, which
 +hands the multiple dot products of the Krylov orthogonalisation (and of a null-space
 +projection) to the BLAS `dgemv`. Measured on a rotated free-slip shell solve: two final
