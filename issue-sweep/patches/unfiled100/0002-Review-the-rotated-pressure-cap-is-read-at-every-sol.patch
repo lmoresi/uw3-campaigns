@@ -1,0 +1,109 @@
+From eac5ea67fe0dd56d68b43a791eefcf23895999ba Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 19:38:49 +1100
+Subject: [PATCH 2/2] Review: the rotated pressure cap is read at every solve,
+ so a cap set after the first takes effect
+
+The rotated Krylov solver is built once and cached, so a cap set after the
+first solve did not reach it. The solve's context records the option's full
+key, and _set_absolute_target, which runs before every rotated saddle solve,
+sets the pressure sub-solver's max_it from it. With no user value it sets the
+same 200: the probe is byte-identical, and the solve histories of test_1111,
+test_1087 and test_1018 differ from development only in the two solves that
+already vary from session to session.
+
+test_0908: a cap set between two solves (the load changed through a constant,
+so nothing is rebuilt) reaches the cached solver.
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/subsystems/rotated-freeslip.md |  6 +++---
+ src/underworld3/utilities/rotated_bc.py       | 11 ++++++++++
+ ...0908_pressure_subsolve_cap_is_the_users.py | 21 +++++++++++++++++++
+ 3 files changed, 35 insertions(+), 3 deletions(-)
+
+diff --git a/docs/developer/subsystems/rotated-freeslip.md b/docs/developer/subsystems/rotated-freeslip.md
+index bd70ec7d..84b5ab8f 100644
+--- a/docs/developer/subsystems/rotated-freeslip.md
++++ b/docs/developer/subsystems/rotated-freeslip.md
+@@ -315,9 +315,9 @@ The pressure sub-solve's cap is the solver's own `fieldsplit_pressure_ksp_max_it
+ `stokes.petsc_options["fieldsplit_pressure_ksp_max_it"] = 1000` (or
+ `-<prefix>fieldsplit_pressure_ksp_max_it 1000` on the command line) raises it on
+ the rotated path as on the standard one. Raise it on P2/dP1 triangle meshes, where
+-the Schur complement is poorly conditioned. The rotated Krylov solver is cached, so
+-set the cap before the first solve. The velocity sub-solve's cap on this path stays
+-200.
++the Schur complement is poorly conditioned. The cap is read again before every
++solve, so a value set after the first solve reaches the cached rotated solver. The
++velocity sub-solve's cap on this path stays 200.
+ 
+ Two things make this easy to miss, and both are now instrumented. The outer
+ iteration count does not reveal it — a full Schur factorisation with a good
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 68474480..67556f12 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -3041,6 +3041,11 @@ def _set_absolute_target(ksp, abs_target, bhat, ctx):
+     COLLECTIVE (one norm)."""
+     pc = ksp.getPC()
+     subs = list(pc.getFieldSplitSubKSP()) if pc.getType() == "fieldsplit" else []
++    # the pressure sub-solve's cap is the solver's own option, read at every solve
++    # so a value set after the KSP was built and cached still takes effect
++    cap_key = ctx.get("pressure_cap_key")
++    if cap_key is not None and len(subs) == 2:
++        subs[1].setTolerances(max_it=PETSc.Options().getInt(cap_key, 200))
+     base = ctx.get("floor_base")
+     if base is None:
+         rtol, atol = ksp.getTolerances()[:2]
+@@ -3335,6 +3340,9 @@ def _solve_rotated_iterative(solver, Ahat, bhat, Q, Qt, normal_rows, verbose=Fal
+                "schur_roundoff": schur_roundoff,
+                "declared_exempt": getattr(solver, "_rotated_declared_modes_exempt", None),
+                "custom_Pl": custom_Pl, "pfx": pfx,
++               # read again before every solve (_set_absolute_target), so a cap
++               # set after the first solve reaches the cached KSP
++               "pressure_cap_key": f"{solver.petsc_options_prefix}fieldsplit_pressure_ksp_max_it",
+                # which preconditioner this solve actually got — reported so a model
+                # (or a test) can assert on it instead of inferring it from timings
+                "velocity_pc": "custom-FMG" if custom_Pl is not None else "GAMG",
+@@ -3492,6 +3500,9 @@ def _solve_rotated_vector(solver, Ahat, bhat, normal_rows, custom_Pl=None, nsp=N
+         ctx = {"ksp": ksp, "pc": pc, "Mp": None, "nsp": nsp, "cns": None,
+                "declared_exempt": getattr(solver, "_rotated_declared_modes_exempt", None),
+                "custom_Pl": custom_Pl, "pfx": pfx,
++               # read again before every solve (_set_absolute_target), so a cap
++               # set after the first solve reaches the cached KSP
++               "pressure_cap_key": f"{solver.petsc_options_prefix}fieldsplit_pressure_ksp_max_it",
+                "velocity_pc": "custom-FMG" if custom_Pl is not None else "GAMG",
+                "coarse_solve": _coarse,
+                "schur_pre": "none"}
+diff --git a/tests/test_0908_pressure_subsolve_cap_is_the_users.py b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+index 5b041c16..b5267e65 100644
+--- a/tests/test_0908_pressure_subsolve_cap_is_the_users.py
++++ b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+@@ -57,3 +57,24 @@ def test_the_rotated_pressure_subsolve_takes_the_users_cap():
+     s.solve()
+     pressure = s._rotated_linear_cache["ctx"]["ksp"].getPC().getFieldSplitSubKSP()[1]
+     assert pressure.getTolerances()[3] == 777
++
++
++def test_a_cap_set_after_the_first_rotated_solve_takes_effect():
++    # the rotated Krylov solver is built once and cached; the cap is read again
++    # at every solve. The load's amplitude is a constant, so changing it gives the
++    # second solve a linear solve to do without rebuilding anything.
++    mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.2, qdegree=3)
++    s = _stokes(mesh, p_continuous=False)
++    amplitude = uw.expression("A_0908", 1.0)
++    r = sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
++    s.bodyforce = amplitude * sympy.Matrix(mesh.X) / r * sympy.cos(3 * sympy.atan2(mesh.X[1], mesh.X[0]))
++    s.add_rotated_freeslip_bc(0, "Upper")
++    s.add_rotated_freeslip_bc(0, "Lower")
++    s.solve()
++    ksp = s._rotated_linear_cache["ctx"]["ksp"]
++    assert ksp.getPC().getFieldSplitSubKSP()[1].getTolerances()[3] == 200
++    s.petsc_options["fieldsplit_pressure_ksp_max_it"] = 888
++    amplitude.sym = 2.0
++    s.solve()
++    assert s._rotated_linear_cache["ctx"]["ksp"].handle == ksp.handle, "the KSP was rebuilt"
++    assert ksp.getPC().getFieldSplitSubKSP()[1].getTolerances()[3] == 888
+-- 
+2.39.5 (Apple Git-154)
+

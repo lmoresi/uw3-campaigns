@@ -15,8 +15,8 @@ The pressure sub-solve's iteration cap is the user's on both Stokes paths
   that is harmless while that holds.
 - The rotated path reads the solver's own `fieldsplit_pressure_ksp_max_it` (default 200) from the
   options database under the solver's prefix. The same option, from `petsc_options` or the command
-  line, reaches both paths. The rotated solver is cached, so the cap must be set before the first
-  solve; the governing doc says so.
+  line, reaches both paths. The rotated solver is cached; the cap is read again before every solve (the
+  solve's context holds the option's key), so a value set after the first solve takes effect.
 
 ## Left open
 Strategy still rewrites the sub-solves' `rtol` and `ksp_type`.
@@ -29,7 +29,8 @@ Strategy still rewrites the sub-solves' `rtol` and `ksp_type`.
   final residual norm to full precision) matches a development run exactly. Two rotated solves
   differ between runs: their last residual takes one of two values from session to session, on
   development as well (three development runs and two runs of this branch are attached).
-- A first version recorded the caps in `_managed_pc_options`. That changed the bundle's
+- **The record decides behaviour.** A first version recorded the caps in `_managed_pc_options`,
+  the record the multigrid bundle uses to tell the user's keys from UW3's. That changed the bundle's
   user-override test and one rotated solve's residual, so it was replaced.
 
 ## Tolerances
@@ -39,7 +40,9 @@ None. No coordinate matches.
 **test_0908** (tier B):
 - a user's caps survive a later `strategy`;
 - `strategy` alone keeps 200;
-- the rotated pressure sub-solver carries the user's cap.
-The first and third fail before the change.
+- the rotated pressure sub-solver carries the user's cap;
+- a cap set between two solves (the load changed through a constant, so nothing is rebuilt)
+  reaches the cached rotated solver.
+The first, third and fourth fail before the change.
 
 Underworld development team with AI support from Claude Code
