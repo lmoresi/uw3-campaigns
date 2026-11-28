@@ -1,0 +1,133 @@
+From 4a97c43ec60164f3b0fd1801c5ae16f2fff48526 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 06:06:55 +1100
+Subject: [PATCH] Review: test_0912's rank 0 holds cells outside the region; a
+ non-tetrahedral 3-D mesh is refused collectively
+
+The fixture gave rank 0 only the patch's cell star, so the add-on
+partition's region owner took every cell: at np 2 the partition refused
+('the whole add-on would sit on one rank'), at np 3 rank 0 was left
+empty. Rank 0 now also holds the far end of the box, and the test asserts
+every rank keeps cells after the split.
+
+The star test's fallback built a fixed four-wide vertex array, which
+raises on another cell type on the ranks holding cells while the others
+wait in the reduction. It now reads each cell's vertices whatever their
+number, and the gate refuses a 3-D mesh whose cells are not simplices on
+every rank together, before the per-label loop (a rank holding no cells
+has no say). The closure is still built twice when the facet test is
+False (gate, then split); left as it is.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/fault_split.py      | 20 +++++++---
+ ...split_gate_tests_the_cell_star_parallel.py | 37 +++++++++++++++----
+ 2 files changed, 45 insertions(+), 12 deletions(-)
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 6e0991b4..a2ceebf8 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -2422,6 +2422,16 @@ def _fault_labels_touch_seam(dm, labels):
+     shared = _shared_points(dm)
+     pStart, _pEnd = dm.getChart()
+     fS, fE = dm.getHeightStratum(1)
++    if dm.getDimension() == 3:
++        # the 3-D split reads every cell as a tetrahedron; a rank holding no
++        # cells has no say, and every rank reaches this reduction before the
++        # per-label loop, where a rank without a label skips ahead
++        cS, cE = dm.getHeightStratum(0)
++        simplex = cE == cS or bool(dm.isSimplex())
++        if not uw.mpi.comm.allreduce(simplex, op=MPI.LAND):
++            raise ValueError(
++                "fault_split: a 3-D fault split needs a tetrahedral mesh; "
++                "this mesh's cells are not simplices")
+     touch = False
+     for name, value in labels:
+         if touch:
+@@ -2460,11 +2470,11 @@ def _patch_star_touches_seam(dm, patch_verts, shared, cell_verts=None):
+     cS, cE = dm.getHeightStratum(0)
+     if cell_verts is None:
+         vS, vE = dm.getDepthStratum(0)
+-        cell_verts = np.empty((cE - cS, 4), dtype=np.int64)
+-        for c in range(cS, cE):
+-            closure = dm.getTransitiveClosure(c)[0]
+-            cell_verts[c - cS] = [int(p) for p in closure if vS <= int(p) < vE]
+-    star = np.isin(cell_verts, np.fromiter(patch_verts, dtype=np.int64)).any(axis=1)
++        star = np.array([any(vS <= int(p) < vE and int(p) in patch_verts
++                             for p in dm.getTransitiveClosure(c)[0])
++                         for c in range(cS, cE)], dtype=bool)
++    else:
++        star = np.isin(cell_verts, np.fromiter(patch_verts, dtype=np.int64)).any(axis=1)
+     for i in np.flatnonzero(star):
+         closure = np.asarray(dm.getTransitiveClosure(cS + int(i))[0], dtype=np.int64)
+         if shared[closure - pStart].any():
+diff --git a/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py b/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py
+index a620742b..e8a26086 100644
+--- a/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py
++++ b/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py
+@@ -7,10 +7,11 @@ the star's outer vertices on the seam was not repartitioned, and the split refus
+ ("cell star touches the partition seam"); ptest_0848 met it at np 3.
+ 
+ The partition here is built by hand, so the fixture does not depend on where the
+-default partitioner cuts: every star cell on rank 0, every other cell on the ranks
+-above it by x. The fixture is checked first (no facet point shared anywhere, a
++default partitioner cuts: every star cell on rank 0 with the far end of the box,
++every other cell on the ranks above it by x. The fixture is checked first (no facet point shared anywhere, a
+ star-closure point shared somewhere). Asserted: the gate says touch on every rank, and
+-split_fault succeeds on every rank.
++split_fault succeeds on every rank, leaving every rank with cells. A hexahedral
++mesh is refused by the gate on every rank together.
+ """
+ import numpy as np
+ import pytest
+@@ -40,9 +41,12 @@ def _star_on_rank_zero(mesh, labels):
+     X = np.asarray(work.getCoordinatesLocal().array).reshape(-1, 3)
+     x = np.array([X[[int(p) - vS for p in work.getTransitiveClosure(c)[0]
+                      if vS <= int(p) < vS + len(X)]][:, 0].mean() for c in range(cS, cE)])
++    # rank 0: the star, and the far end of the box (x > 1.5, away from the patch
++    # at x = 0.4), so it holds cells outside the region too and the repartition
++    # has a balance to keep; the other ranks share the rest by x
+     others = comm.size - 1
+-    assign = np.where(cell_region > 0, 0,
+-                      1 + np.minimum((x / 2.0 * others).astype(np.int32), others - 1))
++    assign = np.where((cell_region > 0) | (x > 1.5), 0,
++                      1 + np.minimum((x / 1.5 * others).astype(np.int32), others - 1))
+     assign = assign.astype(np.int32)
+     order = np.argsort(assign, kind="stable").astype(np.int32)
+     sizes = np.bincount(assign, minlength=comm.size).astype(np.int32)
+@@ -100,10 +104,29 @@ def test_a_star_on_the_seam_is_repartitioned_and_split():
+     verdicts = comm.allgather(_fault_labels_touch_seam(dm, labels))
+     assert all(verdicts), verdicts
+ 
+-    message = None
++    message, child = None, None
+     try:
+-        split_fault(moved, "FltA")
++        child = split_fault(moved, "FltA")
+     except (RuntimeError, ValueError) as exc:
+         message = f"{type(exc).__name__}: {exc}"
+     messages = comm.allgather(message)
+     assert all(m is None for m in messages), messages
++    # the repartition kept every rank in use
++    cS, cE = child.dm.getHeightStratum(0)
++    cells = comm.allgather(cE - cS)
++    assert all(n > 0 for n in cells), cells
++
++
++def test_a_hexahedral_mesh_is_refused_on_every_rank():
++    """The 3-D split reads cells as tetrahedra; the gate refuses another cell type
++    on every rank together, before any rank reads a cell."""
++    comm = uw.mpi.comm
++    mesh = uw.meshing.StructuredQuadBox(elementRes=(3, 3, 3), minCoords=(0, 0, 0),
++                                        maxCoords=(1, 1, 1))
++    message = None
++    try:
++        _fault_labels_touch_seam(mesh.dm, [("Top", int(mesh.boundaries["Top"].value))])
++    except ValueError as exc:
++        message = str(exc)
++    messages = comm.allgather(message)
++    assert all(m is not None and "tetrahedral" in m for m in messages), messages
+-- 
+2.39.5 (Apple Git-154)
+
