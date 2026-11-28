@@ -1,0 +1,153 @@
+From 5b1d7e4b1625df03952084f9febbf2bf2e0f18ff Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:35:34 +1100
+Subject: [PATCH 3/3] Review: the wall's cell size from true boundary edges;
+ bands just past the floor are placed without slivers
+
+- A ring's "wall edges" were any two consecutive wall vertices, so at a box
+  corner a chord across the corner cell counted, and h came out up to about
+  20% large. Only an edge of the domain boundary counts now.
+- test_0904: a band 0.31 cells from the wall (h = 0.025) and 0.37 cells
+  (h = 0.0125) is placed, the wall keeps its labels, and no cell anywhere
+  is below half the deep placement's smallest angle (measured 22.5 and 24.3
+  degrees against about 38). A threshold in mesh units, not cells, fails the
+  finer case; an angle check below 0.6 cells was missing.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 21 +++++++-----
+ ...4_place_ribbon_interior_beside_the_wall.py | 33 +++++++++++++++----
+ 2 files changed, 40 insertions(+), 14 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 7f2b36ad..f9c15959 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7565,13 +7565,14 @@ def _gathered_vertices_2d(h_vertex, d_skin, reach_v):
+ _MIN_WALL_GAP_CELLS = 0.3
+ 
+ 
+-def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex):
++def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs):
+     """The gap between the band's skin and the wall a 2-D cavity's ``ring``
+     runs along, and the wall's cell size there.
+ 
+     The gap is the smaller of the wall vertices' distance to the skin and the
+-    skin's vertices' distance to the ring's wall edges (consecutive ring entries,
+-    both existing wall vertices). The cell size is the mean length of the ring's wall edges
++    skin's vertices' distance to the ring's wall edges (consecutive ring entries
++    that are an edge of the domain boundary, ``boundary_pairs``; a chord across a
++    corner cell joins two wall vertices but is not one). The cell size is the mean length of the ring's wall edges
+     at the nearest wall vertex, or that vertex's ``h`` when no ring edge lies on
+     the wall. Returns ``(gap, h, point)``, ``point`` the nearest wall vertex."""
+     old = [int(v) for v in ring if v < len(X)]
+@@ -7581,7 +7582,7 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex):
+     gap = float(d_w.min())
+     ring = [int(v) for v in ring]
+     wall_edges = [(a, b) for a, b in zip(ring, ring[1:] + ring[:1])
+-                  if a < len(X) and b < len(X) and on_wall[a] and on_wall[b]]
++                  if a < len(X) and b < len(X) and frozenset((a, b)) in boundary_pairs]
+     if wall_edges:
+         skin_v = np.unique(np.asarray(skin_edges, dtype=np.int64).ravel())
+         gap = min(gap, float(_segments_distance(asm_pts[skin_v], X, wall_edges).min()))
+@@ -7912,8 +7913,10 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     if len(old_ring) and on_wall[old_ring].any():
+                         # the cavity runs along the wall: placed, unless the
+                         # band is too close to it for the fill between
+-                        gap, h_gap, at = _wall_gap_2d(outer, X, on_wall, asm_pts,
+-                                                      skin_edges, h_vertex)
++                        gap, h_gap, at = _wall_gap_2d(
++                            outer, X, on_wall, asm_pts, skin_edges, h_vertex,
++                            boundary_pairs or {frozenset((a, b)) for _e, a, b
++                                               in _boundary_edges(dm_work)})
+                         if gap < _MIN_WALL_GAP_CELLS * h_gap:
+                             raise _wall_gap_refusal_2d(gap, h_gap, at)
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+@@ -7976,8 +7979,10 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                                            if v < len(X)])].any():
+                         # the cavity runs along the wall: placed, unless the
+                         # band is too close to it for the fill between
+-                        gap, h_gap, at = _wall_gap_2d(ring, X, on_wall, asm_pts,
+-                                                      skin_edges, h_vertex)
++                        gap, h_gap, at = _wall_gap_2d(
++                            ring, X, on_wall, asm_pts, skin_edges, h_vertex,
++                            boundary_pairs or {frozenset((a, b)) for _e, a, b
++                                               in _boundary_edges(dm_work)})
+                         if gap < _MIN_WALL_GAP_CELLS * h_gap:
+                             raise _wall_gap_refusal_2d(gap, h_gap, at)
+                 else:
+diff --git a/tests/test_0904_place_ribbon_interior_beside_the_wall.py b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+index ecca1fc7..c8bd9f5f 100644
+--- a/tests/test_0904_place_ribbon_interior_beside_the_wall.py
++++ b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+@@ -84,7 +84,7 @@ def _inspect(mesh, info, on_wall_of, wall_labels, near):
+         for name in wall_labels:
+             if on_wall_of[name](X[v]).all() and dm.getLabel(name).getValue(e) != value[name]:
+                 unlabelled += 1
+-    band_on_wall, smallest = 0, 180.0
++    band_on_wall, smallest, smallest_all = 0, 180.0, 180.0
+     band = np.asarray(info["band"])
+     for c in range(cS, cE):
+         cl = dm.getTransitiveClosure(c)[0]
+@@ -92,11 +92,14 @@ def _inspect(mesh, info, on_wall_of, wall_labels, near):
+         touches = any(on_wall_of[n](P).any() for n in wall_labels)
+         if touches and band[c - cS]:
+             band_on_wall += 1
++        angle = _angles(P)
++        smallest_all = min(smallest_all, angle)
+         if touches and np.linalg.norm(P.mean(0) - near) < 0.3:
+-            smallest = min(smallest, _angles(P))
++            smallest = min(smallest, angle)
+     comm = uw.mpi.comm
+     return (comm.allreduce(band_on_wall), comm.allreduce(unlabelled),
+-            comm.allreduce(smallest, op=MPI.MIN), "FaultPlus" in value)
++            comm.allreduce(smallest, op=MPI.MIN), "FaultPlus" in value,
++            comm.allreduce(smallest_all, op=MPI.MIN))
+ 
+ 
+ OUTER = {"Upper": lambda P: np.linalg.norm(P, axis=1) > 1.0 - 1e-6}
+@@ -106,12 +109,30 @@ OUTER = {"Upper": lambda P: np.linalg.norm(P, axis=1) > 1.0 - 1e-6}
+ def test_a_band_two_cells_below_the_wall_is_placed_inside(annulus, k):
+     mesh, h = annulus
+     deep = _inspect(*_place(mesh, h, 6.0), OUTER, ["Upper"], R_HAT)
+-    band_on_wall, unlabelled, smallest, split = _inspect(*_place(mesh, h, k), OUTER,
+-                                                         ["Upper"], R_HAT)
++    band_on_wall, unlabelled, smallest, split, _all = _inspect(*_place(mesh, h, k), OUTER,
++                                                               ["Upper"], R_HAT)
+     assert band_on_wall == 0 and unlabelled == 0 and split
+     assert smallest >= 0.8 * deep[2], (smallest, deep[2])
+ 
+ 
++# just past the floor: 0.31 cells at h = 0.025 (k = 2.2) and 0.37 at h = 0.0125
++# (k = 2.25). Placed at both sizes, so the floor is in cells, not mesh units; and
++# no cell anywhere is a sliver (measured 22.5 and 24.3 degrees, against about 38
++# for the deep placement)
++JUST_PAST = {"h0.025": 2.2, "h0.0125": 2.25}
++
++
++def test_a_band_just_past_the_floor_is_placed_without_slivers(annulus, request):
++    mesh, h = annulus
++    k = JUST_PAST[request.node.callspec.id]
++    assert 0.3 < _band_gap_cells(h, k) < 0.4
++    deep = _inspect(*_place(mesh, h, 6.0), OUTER, ["Upper"], R_HAT)
++    band_on_wall, unlabelled, _smallest, split, smallest_all = _inspect(
++        *_place(mesh, h, k), OUTER, ["Upper"], R_HAT)
++    assert band_on_wall == 0 and unlabelled == 0 and split
++    assert smallest_all >= 0.5 * deep[4], (smallest_all, deep[4])
++
++
+ def test_a_sliver_gap_is_refused_with_the_gap_in_cells(annulus):
+     mesh, h = annulus
+     k = 1.95
+@@ -139,7 +160,7 @@ def test_a_band_beside_a_box_corner_keeps_both_walls():
+                                        clearance=0.3, split=True, mesher="ladder")
+     walls = {"Top": lambda P: np.abs(P[:, 1] - 1) < 1e-9,
+              "Right": lambda P: np.abs(P[:, 0] - 1) < 1e-9}
+-    band_on_wall, unlabelled, _smallest, split = _inspect(mesh, info, walls,
++    band_on_wall, unlabelled, _smallest, split, _all = _inspect(mesh, info, walls,
+                                                           ["Top", "Right"], np.array([1.0, 1.0]))
+     dm = mesh.dm
+     vS, vE = dm.getDepthStratum(0)
+-- 
+2.39.5 (Apple Git-154)
+

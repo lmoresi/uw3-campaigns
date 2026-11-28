@@ -27,3 +27,13 @@ test_0904's box corner counted the corner vertex per rank and failed on rank 1 a
 counts owned vertices only (ghosts excluded through the point SF, none in serial), summed over
 the ranks. _inspect also reduces its counts (sum) and the smallest angle (min), so every rank
 asserts the same. Serial: test_0904 + test_0865, 10 passed. Owed: H1's np 2 re-run of test_0904.
+
+## H7's lows: 0003
+L1: wall edges, and so h, come only from true domain-boundary edges (built on demand where a
+ring meets the wall), so a corner chord no longer inflates h.
+L2 + L3: test_0904 gains bands just past the floor, 0.31 cells (h 0.025, k 2.2) and 0.37 cells
+(h 0.0125, k 2.25). Both must place with walls labelled, and the smallest angle over ALL cells
+must be >= 0.5 x the deep placement's (measured 22.5 and 24.3 deg against about 38). A fixed
+0.0075 mesh-unit threshold refuses the 0.37-cell case (0.0046), so H7's mutant now fails.
+Serial: test_0904 + test_0865, 12 passed. The conform-path partition question waits on H1's
+0.28-0.33-cell sweep.
