@@ -2,9 +2,7 @@
 
 H4, 2026-11-28. **Not a branch yet:** C1 ruled not to build it until Louis rules, so this is the measurement scaffold that row 32's evidence was taken with.
 
-**Base:** underworld3 development fbef72fa, plus UNFILED 89 (three commits, local because of the GitHub pause), which makes the rotated operator bit-identical run to run:
-- `0001-0003-*.patch` (`git format-patch`, ending at 3cb23ef3);
-- `0004-row32-floor-measurement-scaffold.diff`: uncommitted, on top of 3cb23ef3. Apply with `git apply`.
+**Base:** UNFILED 89, applied first (issue-sweep/patches/unfiled89/, three commits ending at 3cb23ef3, on development fbef72fa). Then `0004-row32-floor-measurement-scaffold.diff`, uncommitted on top of 3cb23ef3, applied with `git apply`. In H4's worktree the branch name local/schur-pressure-floor-u94 is only a pointer at 3cb23ef3: row 32 has no commit of its own. **Row 32 needs Louis's ruling; 89 does not.**
 
 **The floor (env-gated, off by default):**
 - `UW94_FLOOR=1` switches it on.
