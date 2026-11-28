@@ -87,3 +87,17 @@ Region share, with the ceiling 1/share in brackets:
     0.05   13 % (7.6) / 13 % (7.7)  23 % (4.4) / 23 % (4.4)  38 % (2.6) / 38 % (2.7)
 (each cell: width 0.08 / wide)
 adapt_partition_balance.py: adapt's own partition, max/mean at np 8 (for H1).
+
+## adapt's own partition at np 8 (H1, development fbef72fa) against add_fault's
+add_fault's owner holds at least the region, so its max/mean at np 8 is at least
+8 x share. At h 0.1, k 3, width 0.08 that gives 3.96, which is H1's measured
+region arm exactly. Each entry is adapt's own / add_fault's lower bound, for
+width 0.08 then wide:
+    h      k 1                     k 2                     k 3
+    0.2    1.30/3.47  1.42/4.06    1.70/4.28  1.89/4.22    2.18/5.43  2.33/5.43
+    0.1    1.22/1.78  1.36/2.04    1.47/2.76  1.69/3.12    1.69/3.96  1.98/4.50
+    0.05   1.31/1.05  1.30/1.04    1.63/1.82  1.62/1.81    2.08/3.07  2.04/3.01
+- At h 0.05, k 1 the region (13 %) is near 1/8. partition_addon's peel balances
+  the free cells, so add_fault's partition can be better there than adapt's own.
+- adapt's own partition is 1.2-2.3 everywhere, rising with k: the refined cells
+  stay on the ranks that own the trace's base cells.
