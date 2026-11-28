@@ -5137,3 +5137,19 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - Hub:
   - Lesson: an offline test of a fit change must compare the fitted curve's shape (top dip, fit_km against the previous fit or the fault in use), not only whether it reaches the cap. Asked K1 for the top dip on b912c3b against 01e55e1 over the same steps.
   - Read the B runs as starting at step 1 of b912c3b.
+
+### 2026-11-28 — b912c3b shape check passes; the step-1 restart was contaminated; B runs restart from step 0
+- Step 1 was not clean: the fit at the start of step 1 already had a fault in use and took d087202's branch (state_00001 dip 47.1, top 46.2; state_00000 28.9 / 18.7). K1 cancelled 4993/4994 and moved every state after step 0 to after_001_d087202/. B15/B20/B40/B45 restart from step 0 on b912c3b (= kaiju/slab-workbench 726d05c).
+- Shape check (launch/prep/fit_shape_test.py, the driver's own crust_spline_points + steep_part on stored Q10c checkpoints). A = 09f3007 (01e55e1's fit), B = b912c3b. Columns: top dip | wall dip | 20 deg split depth | fit_km A-B.
+  - step 2: 18.5/18.4 | 28.8/28.6 | 23/22 km | 1.5
+  - step 20: 15.2/15.1 | 26.2/26.3 | 26/26 | 0.7
+  - step 30: 12.9/13.1 | 22.1/23.7 | 35/33 | 8.4
+  - step 60: 9.6/9.6 | 17.5/17.6 | 46/46 | 1.5
+  - step 90: 7.6/7.5 | 14.6/14.7 | 59/60 | 7.5
+  - step 200: 4.3/4.3 | 9.8/9.8 | 83/83 | 1.1
+  - step 280: 2.1/2.1 | 10.0/10.0 | 89/89 | 1.9
+  - step 385: A refused; B 2.9, 10.4, 98 km
+  - d087202 against A at steps 2/30/60/90: top dip 47.4/70.6/33.1/21.0 deg; fit_km 62/179/93/61.
+  - Verdict: b912c3b reproduces A within 0.2-8.4 km where A worked, and fits where A refused. Shown.
+- Band: on Q10c's history the 20 deg split top runs 23 km (step 2) to 26 (9.5 Myr) to 59 (24 Myr), about 2.3 km/Myr, so B20 is likely to enter the refused 25-60 km band at ~10 Myr.
+  - Hub: that rate comes from Q10c's dynamics (tangent top, no bridge); the B runs may differ. B15 will cross the band too, while B40 starts below it. Until W1's fix, only B40/B45 can run the full course.
