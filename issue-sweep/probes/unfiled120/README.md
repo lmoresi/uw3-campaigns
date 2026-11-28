@@ -40,3 +40,16 @@ H1 sees the same two-state round-off at np 2 on development, so it is not serial
   OpenBLAS dgemv. The loop path is deterministic.
 - Scope: FGMRES orthogonalisation also uses VecMDot/VecMAXPY, so every Krylov solve is exposed,
   not only the rotated null-space projection.
+
+## (a) Timing the GEMV path off (for H1, hyperion)
+gemv_timing.py times four cases; run_gemv_timing.sh runs it with PETSC_OPTIONS unset and with
+`-vec_mdot_use_gemv 0 -vec_maxpy_use_gemv 0`, every thread variable 1, then
+gemv_timing_compare.py prints the median wall times, the off/default ratio, and whether
+iterations are equal.
+- Cases: rotated FMG annulus, 3-D shell Stokes (rotated free slip), a VEP box step (velocity
+  GMRES restart 30; each repeat a fresh solver's first step, since a step advances the elastic
+  history), an advection-diffusion step. 5 timed repeats after a warm-up.
+- Laptop smoke test (scale 0.5, 2 repeats, serial): iterations equal; ratio 0.997-1.03.
+- Seen while writing it: on the VEP box, a SECOND step from the evolved history had different
+  iteration counts with and without the GEMV path (39/691 against 45/519 Newton/linear). That
+  nonlinear solve is sensitive to the last-bit difference.

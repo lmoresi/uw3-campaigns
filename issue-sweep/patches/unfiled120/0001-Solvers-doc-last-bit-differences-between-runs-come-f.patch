@@ -1,0 +1,45 @@
+From 250542ba6d257563f601f21961cc68e962751067 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 20:40:09 +1100
+Subject: [PATCH] Solvers doc: last-bit differences between runs come from
+ PETSc's GEMV path
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/subsystems/solvers.md | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/docs/developer/subsystems/solvers.md b/docs/developer/subsystems/solvers.md
+index 877de43f..6f9e15ee 100644
+--- a/docs/developer/subsystems/solvers.md
++++ b/docs/developer/subsystems/solvers.md
+@@ -433,6 +433,26 @@ application, and the velocity KSP is applied once per Schur `MatMult` — i.e. o
+ pressure Krylov iteration. That number is a sample, not work. `SolverInstrumentation`
+ (`systems/solver_health.py`) is the mechanism that sums properly.
+ 
++### Last-bit differences between runs
++
++The same build, on the same input, can finish a Krylov solve in one of two states that
++differ in the last bit, from one process to the next. The iteration counts are the same.
++The source is PETSc's GEMV path for `VecMDot` and `VecMAXPY`, its default here, which
++hands the multiple dot products of the Krylov orthogonalisation (and of a null-space
++projection) to the BLAS `dgemv`. Measured on a rotated free-slip shell solve: two final
++residuals, 7.380098e-08 and 7.380102e-08, in about half the runs each; with the GEMV path
++off, one value in every run. The hash seed, the thread counts and the JIT are not involved.
++
++To make a comparison between runs exact, turn the path off:
++
++```bash
++-vec_mdot_use_gemv 0 -vec_maxpy_use_gemv 0
++```
++
++(on the command line, or in `PETSC_OPTIONS`). Otherwise, before calling a last-bit
++difference between two runs a regression, check whether it goes away with these options.
++A rare flip needs many fresh processes to show: one in 40 in a bare petsc4py replay.
++
+ ## The multigrid option bundle, and its one owner
+ 
+ Three routes reach a multigrid velocity block, and they are **the same
+-- 
+2.39.5 (Apple Git-154)
+
