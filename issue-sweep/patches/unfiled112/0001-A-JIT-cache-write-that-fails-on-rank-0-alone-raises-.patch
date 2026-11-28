@@ -1,4 +1,4 @@
-From df9adbcaac8c09714710ed08b19cee69f3f277c6 Mon Sep 17 00:00:00 2001
+From a82c31f2ac648f134a28b79e272a70ff7f3e2664 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 13:57:52 +1100
 Subject: [PATCH] A JIT cache write that fails on rank 0 alone raises on every

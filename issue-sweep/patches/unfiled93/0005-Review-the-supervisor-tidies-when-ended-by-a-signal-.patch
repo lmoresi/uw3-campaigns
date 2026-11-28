@@ -1,7 +1,7 @@
 From c734f49bafc7af6c0652bb26dca5313480ed25ea Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Fri, 27 Nov 2026 16:09:01 +1100
-Subject: [PATCH 5/8] Review: the supervisor tidies when ended by a signal, and
+Subject: [PATCH 5/9] Review: the supervisor tidies when ended by a signal, and
  keeps a silent rank's placeholder after a kill
 
 A SIGTERM or SIGHUP (a walltime, a timeout, a cancelled CI job) ended the

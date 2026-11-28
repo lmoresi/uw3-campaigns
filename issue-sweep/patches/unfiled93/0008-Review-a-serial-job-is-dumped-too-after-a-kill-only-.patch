@@ -1,7 +1,7 @@
 From dd49c8945270f2756c9570059141c38a60271d77 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:01:46 +1100
-Subject: [PATCH 8/8] Review: a serial job is dumped too; after a kill only the
+Subject: [PATCH 8/9] Review: a serial job is dumped too; after a kill only the
  asked processes' empty files stay
 
 The parentage rule of the last commit took a rank's Python children for

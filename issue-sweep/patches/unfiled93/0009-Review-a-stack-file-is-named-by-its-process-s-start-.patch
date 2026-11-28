@@ -1,0 +1,145 @@
+From 9c8881bab026e68ae660570b26982c0a211a4e31 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:24:23 +1100
+Subject: [PATCH 9/9] Review: a stack file is named by its process's start too,
+ and the tidy keys on files, not pids
+
+A job that reused a pid would have its later process open (and truncate) the
+earlier one's stack file, and the tidy, deciding by pid, could not tell the
+two apart. Each file is now rank_<r>_pid_<p>_<time_ns at arming>.stack. At a
+dump request the supervisor records, for each asked pid, its newest file,
+the live process's, and the tidy keeps an empty file only if it is one of
+those.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 37 +++++++++++++++++++-------
+ tests/test_0063_mpi_hang_supervisor.py | 17 ++++++++++--
+ 2 files changed, 42 insertions(+), 12 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index a0981cd4..62561c2f 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -111,7 +111,10 @@ _rank = (os.environ.get("OMPI_COMM_WORLD_RANK")
+ # Held open for the life of the process on purpose: faulthandler keeps the
+ # descriptor, not this object, so letting it close would point the handler at
+ # whatever reuses the fd.
+-_path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d.stack" % (_rank, os.getpid()))
++# The start token makes the name unique even when the job reuses a pid.
++import time
++_path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d_%d.stack"
++                     % (_rank, os.getpid(), time.time_ns()))
+ _stream = open(_path, "w")
+ faulthandler.register(signal.SIGUSR1, file=_stream, all_threads=True, chain=False)
+ 
+@@ -223,14 +226,21 @@ def _stack_signature(block):
+     return tuple(frames[:4])
+ 
+ 
++def _stack_name(path):
++    """``(rank, pid, token)`` from ``rank_<r>_pid_<p>_<token>.stack``."""
++    rank, _, rest = Path(path).stem.removeprefix("rank_").partition("_pid_")
++    pid, _, token = rest.partition("_")
++    return rank, int(pid), int(token or 0)
++
++
+ def _read_dumps(dump_dir):
+     """Every rank's samples, as ``{rank: (pid, [block, ...])}``."""
+     dumps = {}
+     for path in sorted(Path(dump_dir).glob("rank_*_pid_*.stack")):
+-        rank, _, pid = path.stem.removeprefix("rank_").partition("_pid_")
++        rank, pid, _token = _stack_name(path)
+         blocks = _dump_blocks(path.read_text())
+         if blocks:
+-            dumps[rank] = (int(pid), blocks)
++            dumps[rank] = (pid, blocks)
+     return dumps
+ 
+ 
+@@ -505,8 +515,8 @@ def _tidy(handler_dir, dump_dir, ours, asked=None):
+     directory. Kept, they filled a server's /tmp. A directory of our own making
+     goes too once it is empty; one named by --artifacts stays.
+ 
+-    After a dump request (``asked``, the pids it went to) an empty placeholder
+-    of a process that was asked stays: it is the record of a rank (and its pid)
++    After a dump request (``asked``, the files of the processes it went to) an
++    empty placeholder of a process that was asked stays: it is the record of a rank (and its pid)
+     that did not answer. One of a process no longer alive by then (a rank's
+     compiler, a build) goes, so that record is not buried among them.
+     """
+@@ -514,10 +524,9 @@ def _tidy(handler_dir, dump_dir, ours, asked=None):
+     asked = asked or set()
+     for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
+         try:
+-            pid = int(path.stem.rsplit("_pid_", 1)[1])
+-            if path.stat().st_size == 0 and pid not in asked:
++            if path.stat().st_size == 0 and path.name not in asked:
+                 path.unlink()
+-        except (OSError, ValueError):
++        except OSError:
+             pass
+     if ours:
+         try:
+@@ -559,9 +568,17 @@ def _supervise(args, command, env, dump_dir, state):
+         ranks = _descendants(job.pid)
+         # the job itself, when it is a Python process this module armed (a
+         # serial job started with no launcher); a launcher is not signalled
+-        if list(Path(dump_dir).glob(f"rank_*_pid_{job.pid}.stack")):
++        if list(Path(dump_dir).glob(f"rank_*_pid_{job.pid}_*.stack")):
+             ranks = [job.pid] + ranks
+-        state["asked"] = set(ranks)
++        # the files the request went to: for each asked pid, its newest file,
++        # which is the live process's (an earlier holder of a reused pid
++        # armed first, so its token is smaller)
++        newest = {}
++        for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
++            _rank, pid, token = _stack_name(path)
++            if pid in ranks and token >= newest.get(pid, (-1, None))[0]:
++                newest[pid] = (token, path.name)
++        state["asked"] = {name for _token, name in newest.values()}
+         _request_dumps(ranks)
+         time.sleep(SECONDS_TO_DUMP)
+ 
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index c8e9364e..3fba5c01 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -212,7 +212,7 @@ def test_a_supervised_hang_keeps_its_stacks_and_a_silent_ranks_record(tmp_path):
+     assert sorted(stacks) == ["rank_0", "rank_1"], sorted(p.name for p in kept[0].iterdir())
+     assert stacks["rank_0"].stat().st_size > 0
+     assert stacks["rank_1"].stat().st_size == 0, "the silent rank's record was not kept empty"
+-    assert not list(kept[0].glob(f"*_pid_{helper.read_text()}.stack"))
++    assert not list(kept[0].glob(f"*_pid_{helper.read_text()}_*.stack"))
+     assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
+ 
+ 
+@@ -252,7 +252,7 @@ def test_a_supervisor_ended_by_sigterm_ends_the_job_then_tidies(tmp_path):
+         "import glob, os, signal, sys, time\n"
+         "def ended(*_):\n"
+         "    mine = glob.glob(os.path.join(os.environ['TMPDIR'], 'uw-stacks-*',\n"
+-        "                                  '*_pid_%d.stack' % os.getpid()))\n"
++        "                                  '*_pid_%d_*.stack' % os.getpid()))\n"
+         f"    open({str(report)!r}, 'w').write('present' if mine else 'gone')\n"
+         "    sys.exit(0)\n"
+         "signal.signal(signal.SIGTERM, ended)\n"
+@@ -353,3 +353,16 @@ def test_no_gdb_is_one_line_and_no_stack(supervisor, tmp_path, monkeypatch):
+     monkeypatch.setattr(supervisor.shutil, "which", lambda name: None)
+     assert supervisor._collect_native_stacks(DUMPS, tmp_path) == [
+         "    no gdb on PATH: Python stacks only"]
++
++
++def test_a_reused_pid_keeps_only_the_asked_processs_record(supervisor, tmp_path):
++    """Two processes of one job held pid 4242 in turn. The tidy keys on the file
++    the dump request went to (the newer start token), not on the pid."""
++    stacks = tmp_path / "stacks"
++    stacks.mkdir()
++    earlier, live = stacks / "rank_0_pid_4242_100.stack", stacks / "rank_0_pid_4242_200.stack"
++    earlier.touch()
++    live.touch()
++    assert supervisor._stack_name(live) == ("0", 4242, 200)
++    supervisor._tidy(tmp_path / "no-handler", stacks, ours=False, asked={live.name})
++    assert sorted(p.name for p in stacks.iterdir()) == [live.name]
+-- 
+2.39.5 (Apple Git-154)
+
