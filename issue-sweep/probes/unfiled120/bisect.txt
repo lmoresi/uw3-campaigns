@@ -1,0 +1,10 @@
+petsc4py only                       20 9593eea309 
+numpy                               20 9593eea309 
+scipy                             
+sympy                               20 9593eea309 
+gmsh                                18 9593eea309    2 c43e677cc9 
+underworld3                         20 9593eea309 
+underworld3, all threads 1          20 9593eea309 
+petsc4py only (40)                  39 9593eea309    1 c43e677cc9 
+gmsh (40)                           37 9593eea309    3 c43e677cc9 
+gmsh, all threads 1 (40)            39 9593eea309    1 c43e677cc9 

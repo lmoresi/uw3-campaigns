@@ -23,3 +23,20 @@ macOS arm64, OpenBLAS 0.3.30.
 7. Not OpenBLAS's kernel choice: with OPENBLAS_CORETYPE forced to VORTEX or ARMV8, both values
    still appear.
 H1 sees the same two-state round-off at np 2 on development, so it is not serial-only.
+
+## Correction and the source (later the same day)
+- Item 6 above was wrong. petsc4py alone also flips: 1 of 40 fresh processes (import_bisect.py,
+  bisect.txt). The earlier 10/10 was too small a sample. gmsh 3/40 and underworld3 0/20 sit in the
+  same noise, so it is not the import.
+- prims.py: in the replay it is VecMDot that varies. The second coefficient is -0x1.7fcp-53 in
+  39 runs and -0x1.d027d85cd239dp-52 in 1. VecDot one at a time and numpy give -0x1.1027d85cd239dp-52
+  in every run. The coefficient is round-off: the right-hand side is already orthogonal to that
+  rotation.
+- The GEMV path (prims_opt.py, and test_1111 itself through PETSC_OPTIONS, 10 runs each):
+  - unset (the default): two values, 6/4;
+  - -vec_mdot_use_gemv 0 -vec_maxpy_use_gemv 0: one value, 10/10 (a third value);
+  - -vec_mdot_use_gemv 1 -vec_maxpy_use_gemv 1: two values, 6/4.
+  So the nondeterminism is PETSc's GEMV path for VecMDot/VecMAXPY (the default here), which calls
+  OpenBLAS dgemv. The loop path is deterministic.
+- Scope: FGMRES orthogonalisation also uses VecMDot/VecMAXPY, so every Krylov solve is exposed,
+  not only the rotated null-space projection.
