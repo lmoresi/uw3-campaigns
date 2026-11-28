@@ -1,0 +1,72 @@
+From 907fcf2979b56ca3457b79b0068fbb48d8937676 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:18:52 +1100
+Subject: [PATCH 2/2] test_0904: the counts and the angle are reduced over the
+ ranks, the corner counted where owned
+
+At np 2 the box-corner case counted the corner vertex on each rank and
+failed on the rank without it (the library was right). The corner is now
+counted on the rank that owns it and summed; the band-on-wall and unlabelled
+counts are summed and the smallest angle is the least over the ranks, so a
+rank with no wall cells in one placement cannot fail the comparison.
+
+Underworld development team with AI support from Claude Code
+---
+ ...4_place_ribbon_interior_beside_the_wall.py | 22 +++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_0904_place_ribbon_interior_beside_the_wall.py b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+index c5adc655..ecca1fc7 100644
+--- a/tests/test_0904_place_ribbon_interior_beside_the_wall.py
++++ b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+@@ -26,6 +26,7 @@ import numpy as np
+ import pytest
+ 
+ import underworld3 as uw
++from mpi4py import MPI
+ from underworld3.utilities.place_surface import place_fault_ribbon_2d
+ 
+ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
+@@ -67,7 +68,8 @@ def _angles(P):
+ 
+ def _inspect(mesh, info, on_wall_of, wall_labels, near):
+     """Band cells on the wall, wall edges without their label, the smallest
+-    angle of the cells touching a wall near ``near``."""
++    angle of the cells touching a wall near ``near``: reduced over the ranks
++    (counts summed, the angle the least), so every rank asserts the same."""
+     dm = mesh.dm
+     vS, vE = dm.getDepthStratum(0)
+     eS, eE = dm.getDepthStratum(1)
+@@ -92,7 +94,9 @@ def _inspect(mesh, info, on_wall_of, wall_labels, near):
+             band_on_wall += 1
+         if touches and np.linalg.norm(P.mean(0) - near) < 0.3:
+             smallest = min(smallest, _angles(P))
+-    return band_on_wall, unlabelled, smallest, "FaultPlus" in value
++    comm = uw.mpi.comm
++    return (comm.allreduce(band_on_wall), comm.allreduce(unlabelled),
++            comm.allreduce(smallest, op=MPI.MIN), "FaultPlus" in value)
+ 
+ 
+ OUTER = {"Upper": lambda P: np.linalg.norm(P, axis=1) > 1.0 - 1e-6}
+@@ -137,6 +141,16 @@ def test_a_band_beside_a_box_corner_keeps_both_walls():
+              "Right": lambda P: np.abs(P[:, 0] - 1) < 1e-9}
+     band_on_wall, unlabelled, _smallest, split = _inspect(mesh, info, walls,
+                                                           ["Top", "Right"], np.array([1.0, 1.0]))
+-    X = mesh.dm.getCoordinatesLocal().array.reshape(-1, 2)
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    ghost = set()
++    if uw.mpi.size > 1:                 # serially the point SF has no graph
++        _n, leaves, _r = dm.getPointSF().getGraph()
++        ghost = {int(p) - vS for p in (leaves if leaves is not None else [])
++                 if vS <= int(p) < vE}
++    corner = [v for v in np.flatnonzero(np.linalg.norm(X - [1.0, 1.0], axis=1) < 1e-12)
++              if int(v) not in ghost]
+     assert band_on_wall == 0 and unlabelled == 0 and split
+-    assert (np.linalg.norm(X - [1.0, 1.0], axis=1) < 1e-12).sum() == 1
++    # the corner vertex survives once, on whichever rank owns it
++    assert uw.mpi.comm.allreduce(len(corner)) == 1
+-- 
+2.39.5 (Apple Git-154)
+

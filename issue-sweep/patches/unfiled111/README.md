@@ -21,3 +21,9 @@ C1's conditions:
 Fail-first: test_0904's nine cases all fail on 60's build.
 test_0865 (60's) changes: its fixture (gap 0.67 cells) now places, so the test asserts that it
 places and keeps the wall's labels. 60's ribbon message no longer fires; its sheet message stands.
+
+## Review fold-in (H1 at np 2): 0002
+test_0904's box corner counted the corner vertex per rank and failed on rank 1 at np 2. It now
+counts owned vertices only (ghosts excluded through the point SF, none in serial), summed over
+the ranks. _inspect also reduces its counts (sum) and the smallest angle (min), so every rank
+asserts the same. Serial: test_0904 + test_0865, 10 passed. Owed: H1's np 2 re-run of test_0904.
