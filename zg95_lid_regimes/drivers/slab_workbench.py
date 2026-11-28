@@ -1213,15 +1213,20 @@ def crust_spline_points(faults):
     x_start = X0 + inc * 0.35
     if faults and Xd != X0:
         # with a fault in use, from the slab at depth (Xd) out along the incoming plate: the first stretch of 0.1 where
-        # the layer lies at its own depth in 8 of 10 bins of 0.01, and 0.05 into it. From the fault's top (X0 + 0.35) the
-        # march began past the young plate's line once that top had run 2,800 km out along the plate (Q10c/Q17c); from
-        # Xd + 0.35 it began on the plate's sag 20 km below the layer's depth (Q17c step 140)
+        # the layer lies at its own depth in 8 of 10 bins of 0.01, and 0.35 beyond where it begins (as far out on the
+        # flat plate as the start from the top always was), but no further than 0.05 short of where that run of
+        # occupied stretches ends. From the fault's top (X0 + 0.35) the march began past the young plate's line once
+        # that top had run 2,800 km out along the plate (Q10c/Q17c); from Xd + 0.35 it began on the plate's sag 20 km
+        # below the layer's depth (Q17c step 140); 0.05 into the flat stretch (d087202) was too near the bend: the
+        # fitted top came out at ~47 deg and the march lost the line at 55-130 km (B15-B45, 28 Nov)
         u = inc * (M[sh, 0] - Xd)                    # distance out from the slab along the plate
         occ = np.zeros(int(0.8 * r_o / 0.01) + 12, dtype=bool)
         occ[(u[(u > 0) & (u < 0.8 * r_o)] / 0.01).astype(int)] = True
         run = np.convolve(occ.astype(int), np.ones(10, dtype=int), "valid") >= 8
         if run.any():
-            x_start = Xd + inc * (0.01 * float(np.argmax(run)) + 0.05)
+            k0 = int(np.argmax(run))
+            k1 = k0 + (int(np.argmin(run[k0:])) if not run[k0:].all() else len(run) - k0)
+            x_start = Xd + inc * 0.01 * min(k0 + 35, max(k0 + 5, k1 + 5))
     pts, t, miss = [np.array([x_start, -(L0 if FOLLOW_OCRUST else 0.5 * ct)])], np.array([-inc, 0.0]), 0
     links, KM_PER = [], MODEL_UNIT["km"]               # uw_fit_gap_km's links: [length, lateral offset] in km
     for _ in range(600):                             # the march along the layer's centre
