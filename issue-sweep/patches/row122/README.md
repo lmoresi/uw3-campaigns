@@ -29,6 +29,6 @@ tests/parallel/test_0848_fault_split_3d_parallel.py: every check of the script a
 
 ## 0004 (2026-11-29, H1 HIGH + two LOWs)
 - Fixture: rank 0 = star + cells with centroid x > 1.5 (far from the patch at 0.4); the rest by x over [0, 1.5]. Asserts every rank keeps cells after the split.
-- Non-simplex 3-D: the gate refuses collectively (LAND over ranks, an empty rank votes yes), placed before the per-label loop; new parallel case with a 3x3x3 hex box. The helper fallback reads cell vertices of any count (checked on hexes).
+- Non-simplex 3-D: development's split is tetrahedra only (fault_split.py:1263 `np.empty((nc, 4))`, :1391 `setConeSize(i, 4)`), so a hex mesh raised rank-locally at :1264. The gate now refuses it collectively (LAND, an empty rank votes yes), before the per-label loop; parallel case with a 3x3x3 hex box. The helper keeps the four-wide form (no dead any-count path).
 - Double closure build (gate then split): left as it is.
 Serial: test_0912 5 passed; fault-split files 113 passed. For H1: test_0912 parallel at np 2 and 3.

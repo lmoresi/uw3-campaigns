@@ -1,4 +1,4 @@
-From 4a97c43ec60164f3b0fd1801c5ae16f2fff48526 Mon Sep 17 00:00:00 2001
+From c5594f6ed745eb6e78237af985cbd3a9b053d28f Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sun, 29 Nov 2026 06:06:55 +1100
 Subject: [PATCH] Review: test_0912's rank 0 holds cells outside the region; a
@@ -10,32 +10,36 @@ partition's region owner took every cell: at np 2 the partition refused
 empty. Rank 0 now also holds the far end of the box, and the test asserts
 every rank keeps cells after the split.
 
-The star test's fallback built a fixed four-wide vertex array, which
-raises on another cell type on the ranks holding cells while the others
-wait in the reduction. It now reads each cell's vertices whatever their
-number, and the gate refuses a 3-D mesh whose cells are not simplices on
-every rank together, before the per-label loop (a rank holding no cells
-has no say). The closure is still built twice when the facet test is
+The 3-D split handles tetrahedra only (split_along_label_3d's vertex
+array is four wide and its rebuilt cones are four), so a hexahedral mesh
+raised there on the ranks holding cells while the others went on into
+the collectives. The gate now refuses a 3-D mesh whose cells are not
+simplices on every rank together, before the per-label loop (a rank
+holding no cells has no say); the refusal comes earlier than the split's
+own, and collectively. The closure is still built twice when the facet test is
 False (gate, then split); left as it is.
 
 Underworld development team with AI support from Claude Code
 ---
- src/underworld3/utilities/fault_split.py      | 20 +++++++---
+ src/underworld3/utilities/fault_split.py      | 14 +++++++
  ...split_gate_tests_the_cell_star_parallel.py | 37 +++++++++++++++----
- 2 files changed, 45 insertions(+), 12 deletions(-)
+ 2 files changed, 44 insertions(+), 7 deletions(-)
 
 diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
-index 6e0991b4..a2ceebf8 100644
+index 6e0991b4..60c29ec1 100644
 --- a/src/underworld3/utilities/fault_split.py
 +++ b/src/underworld3/utilities/fault_split.py
-@@ -2422,6 +2422,16 @@ def _fault_labels_touch_seam(dm, labels):
+@@ -2422,6 +2422,19 @@ def _fault_labels_touch_seam(dm, labels):
      shared = _shared_points(dm)
      pStart, _pEnd = dm.getChart()
      fS, fE = dm.getHeightStratum(1)
 +    if dm.getDimension() == 3:
-+        # the 3-D split reads every cell as a tetrahedron; a rank holding no
-+        # cells has no say, and every rank reaches this reduction before the
-+        # per-label loop, where a rank without a label skips ahead
++        # the 3-D split reads every cell as a tetrahedron (its vertex array is
++        # four wide and its rebuilt cones are four), so another cell type raised
++        # there on the ranks holding cells while the rest went on. Refused here
++        # instead, on every rank: a rank holding no cells has no say, and every
++        # rank reaches this reduction before the per-label loop, where a rank
++        # without a label skips ahead
 +        cS, cE = dm.getHeightStratum(0)
 +        simplex = cE == cS or bool(dm.isSimplex())
 +        if not uw.mpi.comm.allreduce(simplex, op=MPI.LAND):
@@ -45,23 +49,14 @@ index 6e0991b4..a2ceebf8 100644
      touch = False
      for name, value in labels:
          if touch:
-@@ -2460,11 +2470,11 @@ def _patch_star_touches_seam(dm, patch_verts, shared, cell_verts=None):
+@@ -2459,6 +2472,7 @@ def _patch_star_touches_seam(dm, patch_verts, shared, cell_verts=None):
+     pStart, _pEnd = dm.getChart()
      cS, cE = dm.getHeightStratum(0)
      if cell_verts is None:
++        # tetrahedra only, as the split: the gate refuses other cells first
          vS, vE = dm.getDepthStratum(0)
--        cell_verts = np.empty((cE - cS, 4), dtype=np.int64)
--        for c in range(cS, cE):
--            closure = dm.getTransitiveClosure(c)[0]
--            cell_verts[c - cS] = [int(p) for p in closure if vS <= int(p) < vE]
--    star = np.isin(cell_verts, np.fromiter(patch_verts, dtype=np.int64)).any(axis=1)
-+        star = np.array([any(vS <= int(p) < vE and int(p) in patch_verts
-+                             for p in dm.getTransitiveClosure(c)[0])
-+                         for c in range(cS, cE)], dtype=bool)
-+    else:
-+        star = np.isin(cell_verts, np.fromiter(patch_verts, dtype=np.int64)).any(axis=1)
-     for i in np.flatnonzero(star):
-         closure = np.asarray(dm.getTransitiveClosure(cS + int(i))[0], dtype=np.int64)
-         if shared[closure - pStart].any():
+         cell_verts = np.empty((cE - cS, 4), dtype=np.int64)
+         for c in range(cS, cE):
 diff --git a/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py b/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py
 index a620742b..e8a26086 100644
 --- a/tests/parallel/test_0912_3d_split_gate_tests_the_cell_star_parallel.py
