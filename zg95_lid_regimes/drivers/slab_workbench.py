@@ -303,7 +303,13 @@ params = uw.Params(
                                 #   weak zone along the straight line from the split's top to the trench, the surface
                                 #   point of strongest convergence (the surface velocity's steepest decrease toward
                                 #   +theta within 0.25 rad of the split's top; the fitted curve's surface point before
-                                #   there is a flow), viscosity and yield stress times uw_bridge_weak; no weak plane
+                                #   there is a flow), viscosity and yield stress times uw_bridge_weak; no weak plane.
+                                #   "curve" (Louis, 2026-11-28: "fit the fault as before and then the lower part becomes
+                                #   a split and the near-surface becomes damage - the flat asymptote to the surface is
+                                #   passive and not part of the mechanical response"): the same isotropic weak zone, but
+                                #   along the fitted curve from the split's top up to where the curve leaves the incoming
+                                #   plate (the fit's leaving point); the run from there to the surface is tracked only,
+                                #   and the damage zone (uw_yield_zone_km) also stops at the leaving point
     uw_bridge_weak=0.1,
     uw_bridge_km=20.0,          #   the bridge's width: cells whose centre lies within half of it (at least 0.75 of a
                                 #   base cell, so the band has no gaps) of the line
@@ -615,8 +621,20 @@ if str(params.uw_fault_follow) not in ("melange", "ocrust"):
 if FOLLOW_OCRUST and not ocrust_on:
     raise ValueError("-uw_fault_follow ocrust needs the oceanic-crust line (uw_ocrust_depth_km > 0)")
 BRIDGE = str(params.uw_bridge_kind)    # not "uw_bridge": with uw_bridge_km that reads as a retired model-unit name
-if BRIDGE not in ("plane", "zone"):
-    raise ValueError(f"-uw_bridge_kind must be plane or zone, not {BRIDGE!r}")
+if BRIDGE not in ("plane", "zone", "curve"):
+    raise ValueError(f"-uw_bridge_kind must be plane, zone or curve, not {BRIDGE!r}")
+
+
+def below_leaving(fault, spine):
+    """The part of a fault's spine from where its fitted curve leaves the incoming plate (the fit's
+    spline_trench_depth) down: without the run to the surface over the plate, the flat asymptote that with
+    uw_bridge_kind curve is tracked only. The whole spine inside the wall for a fault without a leaving point."""
+    z = fault.get("spline_trench_depth")
+    if z is None:
+        return line_inside(spine)[0]
+    d = r_o - np.hypot(spine[:, 0], spine[:, 1])
+    k = int(np.argmax(d >= float(z) - 1e-9))
+    return spine[k:]
 FAULT_TOP = str(params.uw_fault_top)
 if FAULT_TOP not in ("tangent", "plate", "bounded"):
     raise ValueError(f"-uw_fault_top must be tangent, plate or bounded, not {FAULT_TOP!r}")
@@ -765,7 +783,14 @@ def fault_trace(fault):
     (trace_inset() rungs inside the wall): the fault's ``points``, a polyline already at
     the rung spacing with its surface end above the wall."""
     spine = np.asarray(fault["points"], dtype=float)
-    return spine, cut_of(spine)
+    cut = cut_of(spine)
+    if BRIDGE == "curve" and fault.get("spline_trench_depth") is not None:
+        # the split never runs up into the flat run to the surface (tracked only): it starts at the leaving point at
+        # the shallowest (at least four points kept, as steep_part)
+        d = r_o - np.hypot(cut[:, 0], cut[:, 1])
+        k = int(np.argmax(d >= float(fault["spline_trench_depth"]) - 1e-9)) if (d >= float(fault["spline_trench_depth"]) - 1e-9).any() else 0
+        cut = cut[min(k, len(cut) - 4):]
+    return spine, cut
 
 
 def cut_of(spine):
@@ -1521,8 +1546,31 @@ class FaultedMesh:
                 inb |= dist < max(0.5 * float(model.bridge), 0.75 * H_B)
             self.bridge.array[:, 0, 0] = inb.astype(float)
             bridge_cells = int(uw.utilities.gather_data(int(inb.sum()), bcast=True).sum())
+        # the bridge (uw_bridge_kind curve): along the fitted curve from where it leaves the incoming plate down to the
+        # split's top, an isotropic weak zone; the run to the surface above the leaving point is tracked only
+        self.leave = {}
+        if self.faults and BRIDGE == "curve":
+            self.bridge = uw.discretisation.MeshVariable(f"bridge_{tag}", mesh, 1, degree=0, continuous=False)
+            centroids = np.asarray(model_xy(self.bridge))
+            inb = np.zeros(len(centroids), dtype=bool)
+            by_name = {f["name"]: f for f in self.faults}
+            for name, (spine, trace) in self.pieces.items():
+                part = below_leaving(by_name[name], spine)
+                k = int(np.argmin(np.linalg.norm(part - trace[0], axis=1)))
+                part = part[:k + 1]
+                self.leave[name] = float((r_o - np.hypot(*part[0])) * MODEL_UNIT["km"])
+                if len(part) >= 2:
+                    dist, _ = segment_side(centroids, part)
+                    inb |= dist < max(0.5 * float(model.bridge), 0.75 * H_B)
+            self.bridge.array[:, 0, 0] = inb.astype(float)
+            bridge_cells = int(uw.utilities.gather_data(int(inb.sum()), bcast=True).sum())
         bridge_note = ""
-        if self.bridge is not None:
+        if self.bridge is not None and BRIDGE == "curve":
+            km = MODEL_UNIT["km"]
+            bridge_note = (", bridge %d cells along the curve from %s km, split from %s km" % (
+                bridge_cells, ", ".join("%.0f" % v for v in self.leave.values()),
+                ", ".join("%.0f" % ((r_o - np.hypot(*tr[0])) * km) for sp, tr in self.pieces.values())))
+        elif self.bridge is not None:
             km = MODEL_UNIT["km"]
             bridge_note = (", bridge %d cells to the trench at %s deg, split from %s km" % (
                 bridge_cells, ", ".join("%.2f" % np.degrees(a) for a in self.trench.values()),
@@ -1535,8 +1583,11 @@ class FaultedMesh:
             self.yzone = uw.discretisation.MeshVariable(f"yzone_{tag}", mesh, 1, degree=0, continuous=False)
             centroids = np.asarray(model_xy(self.yzone))
             inz = np.zeros(len(centroids), dtype=bool)
+            by_name = {f["name"]: f for f in self.faults}
             for name, (spine, trace) in self.pieces.items():
                 line, th = line_inside(spine)
+                if BRIDGE == "curve":                # the flat run to the surface is tracked only: no damage zone on it
+                    line = below_leaving(by_name[name], spine)
                 dist, side = segment_side(centroids, line)
                 keep = dist < float(model.yield_zone)
                 if float(model.yield_zone_depth) > 0:
