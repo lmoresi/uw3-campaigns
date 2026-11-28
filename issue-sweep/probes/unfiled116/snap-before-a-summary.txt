@@ -1,0 +1,9 @@
+h0125-dip15: outcrops 9; <5 0, <10 1, <15 6; min 5.4, median 12.6; refused 0
+h0125-dip30: outcrops 11; <5 1, <10 2, <15 3; min 4.7, median 23.0; refused 0
+h0125-dip45: outcrops 12; <5 1, <10 1, <15 2; min 3.8, median 24.6; refused 0
+h025-dip10: outcrops 9; <5 0, <10 4, <15 9; min 7.1, median 10.2; refused 8
+h025-dip15: outcrops 17; <5 0, <10 2, <15 11; min 6.9, median 12.9; refused 1
+h025-dip20: outcrops 18; <5 0, <10 3, <15 9; min 5.7, median 16.3; refused 2
+h025-dip30: outcrops 20; <5 1, <10 2, <15 4; min 4.7, median 22.9; refused 2
+h025-dip45: outcrops 23; <5 1, <10 1, <15 3; min 4.2, median 26.3; refused 1
+h025-dip60: outcrops 24; <5 0, <10 1, <15 2; min 8.3, median 30.0; refused 1

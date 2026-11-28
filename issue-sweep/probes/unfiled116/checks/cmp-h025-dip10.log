@@ -1,0 +1,26 @@
+k 0.05 | REFUSED place_thin_volume assembly faile -> REFUSED place_thin_volume assembly faile
+k 0.15 | REFUSED place_thin_volume assembly faile -> REFUSED place_thin_volume assembly faile
+k 0.25 | REFUSED place_thin_volume assembly faile -> REFUSED place_thin_volume assembly faile
+k 0.35 | REFUSED place_thin_volume assembly faile -> REFUSED place_thin_volume assembly faile
+k 0.45 | outcrop -> REFUSED the zone meets the domain bounda
+k 0.55 | outcrop -> REFUSED the zone meets the domain bounda
+k 0.65 | outcrop -> REFUSED the zone meets the domain bounda
+k 0.75 | outcrop  -> outcrop  | angle   3.6 ->   3.6 | fault same False | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.262 cells | fault nodes 8->8, off trace 4.1e-15, paired True/True, shortest fault edge 0.33->0.41 cells
+k 0.85 | outcrop  -> outcrop  | angle   1.4 ->   1.4 | fault same False | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.092 cells | fault nodes 7->8, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->0.45 cells
+k 0.95 | outcrop  -> outcrop  | angle   5.8 ->   6.1 | fault same False | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.399 cells | fault nodes 8->7, off trace 4.1e-15, paired True/True, shortest fault edge 0.34->1.00 cells
+k 1.05 | outcrop  -> outcrop  | angle   3.6 ->   4.4 | fault same True | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.349 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.15 | outcrop  -> outcrop  | angle   5.3 ->   8.1 | fault same True | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.284 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.25 | outcrop  -> outcrop  | angle   1.6 ->  12.9 | fault same True | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.217 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.35 | outcrop  -> outcrop  | angle   3.8 ->  10.4 | fault same True | mesh bit-identical False | wall off 0.0e+00 unlabelled 0 | snap move 0.457 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.45 | REFUSED place_thin_volume failed on the  -> REFUSED place_thin_volume failed on the 
+k 1.55 | REFUSED place_thin_volume failed on the  -> REFUSED place_thin_volume failed on the 
+k 1.65 | REFUSED place_thin_volume failed on the  -> REFUSED place_thin_volume failed on the 
+k 1.75 | interior -> interior | angle  24.8 ->  24.8 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 3.9e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.85 | interior -> interior | angle  29.6 ->  29.6 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 1.95 | interior -> interior | angle  33.3 ->  33.3 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.05 | interior -> interior | angle  34.7 ->  34.7 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.15 | interior -> interior | angle  34.9 ->  34.9 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 3.9e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.25 | interior -> interior | angle  36.0 ->  36.0 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.35 | interior -> interior | angle  36.6 ->  36.6 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 3.9e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.45 | interior -> interior | angle  37.4 ->  37.4 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 4.1e-15, paired True/True, shortest fault edge 1.00->1.00 cells
+k 2.55 | interior -> interior | angle  37.1 ->  37.1 | fault same True | mesh bit-identical True | wall off 0.0e+00 unlabelled 0 | snap move 0.000 cells | fault nodes 7->7, off trace 3.9e-15, paired True/True, shortest fault edge 1.00->1.00 cells

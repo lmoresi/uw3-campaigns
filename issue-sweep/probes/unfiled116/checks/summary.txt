@@ -1,0 +1,45 @@
+h0125-dip15: outcrops 8 | before min 0.4 | after min 1.5, median 10.6, <15: 7, <20: 8
+     fault identical at 3 (after min 10.2); fault in cap at 5 (after min 1.5)
+     in-cap: max fault node off trace 4.7e-15; paired all True; node count change -3..1; shortest fault edge before 0.06-1.00, after 0.07-0.48 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.48 cells
+     interior both: 4, bit-identical 4; outcome changes []
+h0125-dip30: outcrops 9 | before min 3.6 | after min 3.5, median 13.7, <15: 5, <20: 5
+     fault identical at 6 (after min 3.5); fault in cap at 3 (after min 5.7)
+     in-cap: max fault node off trace 4.4e-15; paired all True; node count change -1..1; shortest fault edge before 0.07-0.32, after 0.08-0.47 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.49 cells
+     interior both: 2, bit-identical 2; outcome changes []
+h0125-dip45: outcrops 11 | before min 4.8 | after min 3.8, median 23.1, <15: 3, <20: 5
+     fault identical at 7 (after min 14.9); fault in cap at 4 (after min 3.8)
+     in-cap: max fault node off trace 1.3e-16; paired all True; node count change -3..0; shortest fault edge before 0.07-0.50, after 0.44-1.00 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.50 cells
+     interior both: 1, bit-identical 1; outcome changes []
+h025-dip10: outcrops 7 | before min 1.4 | after min 1.4, median 6.1, <15: 7, <20: 7
+     fault identical at 4 (after min 4.4); fault in cap at 3 (after min 1.4)
+     in-cap: max fault node off trace 4.1e-15; paired all True; node count change -1..1; shortest fault edge before 0.33-1.00, after 0.41-1.00 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.46 cells
+     interior both: 9, bit-identical 9; outcome changes [(0.45, 'outcrop', 'REF:the zone m'), (0.55, 'outcrop', 'REF:the zone m'), (0.65, 'outcrop', 'REF:the zone m')]
+h025-dip15: outcrops 14 | before min 0.1 | after min 0.3, median 9.1, <15: 12, <20: 13
+     fault identical at 5 (after min 6.3); fault in cap at 9 (after min 0.3)
+     in-cap: max fault node off trace 5.6e-15; paired all True; node count change -5..2; shortest fault edge before 0.07-1.00, after 0.10-0.41 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.49 cells
+     interior both: 8, bit-identical 8; outcome changes []
+h025-dip20: outcrops 16 | before min 0.5 | after min 0.5, median 10.3, <15: 10, <20: 14
+     fault identical at 8 (after min 0.5); fault in cap at 8 (after min 2.3)
+     in-cap: max fault node off trace 5.7e-15; paired all True; node count change -3..2; shortest fault edge before 0.11-0.49, after 0.09-1.00 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.50 cells
+     interior both: 6, bit-identical 6; outcome changes []
+h025-dip30: outcrops 18 | before min 1.0 | after min 5.3, median 21.5, <15: 6, <20: 9
+     fault identical at 10 (after min 8.8); fault in cap at 8 (after min 5.3)
+     in-cap: max fault node off trace 5.3e-15; paired all True; node count change -2..1; shortest fault edge before 0.10-1.00, after 0.08-0.48 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.50 cells
+     interior both: 4, bit-identical 4; outcome changes [(0.05, 'outcrop', 'REF:pull_verte')]
+h025-dip45: outcrops 20 | before min 1.4 | after min 2.8, median 24.4, <15: 6, <20: 8
+     fault identical at 14 (after min 2.8); fault in cap at 6 (after min 5.5)
+     in-cap: max fault node off trace 1.4e-16; paired all True; node count change -3..0; shortest fault edge before 0.05-0.42, after 0.44-1.00 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.49 cells
+     interior both: 2, bit-identical 2; outcome changes [(0.05, 'outcrop', 'REF:place_thin')]
+h025-dip60: outcrops 21 | before min 2.5 | after min 2.6, median 28.3, <15: 4, <20: 5
+     fault identical at 17 (after min 2.6); fault in cap at 4 (after min 8.3)
+     in-cap: max fault node off trace 4.2e-15; paired all True; node count change -1..-1; shortest fault edge before 0.27-0.38, after 1.00-1.00 cells
+     wall: max off 0.0e+00, unlabelled 0; max snap move 0.49 cells
+     interior both: 1, bit-identical 1; outcome changes [(0.05, 'outcrop', 'REF:pull_verte')]

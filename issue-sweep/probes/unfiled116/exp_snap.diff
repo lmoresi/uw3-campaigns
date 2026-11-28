@@ -1,12 +1,12 @@
 diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
-index e0c1099c..fc4c1123 100644
+index e0c1099c..fa27778f 100644
 --- a/src/underworld3/utilities/place_surface.py
 +++ b/src/underworld3/utilities/place_surface.py
-@@ -5798,6 +5798,52 @@ def _distance_to_loops_2d(pts, domain):
+@@ -5798,6 +5798,53 @@ def _distance_to_loops_2d(pts, domain):
      return best
  
  
-+def _exp_snap_direction(P0, t, domain, s):
++def _exp_snap_direction(P0, t, domain, s, size):
 +    """EXPERIMENT (UNFILED 116): the rail from ``P0`` along ``t`` crosses the wall
 +    at X; if a wall vertex lies within s x its local edge length of X, aim the
 +    rail at that vertex instead. Logs the move (in local edge lengths) to the
@@ -28,14 +28,15 @@ index e0c1099c..fc4c1123 100644
 +            if lam > 0 and -1e-12 <= mu <= 1 + 1e-12 and lam < best[0]:
 +                best = (lam, (L, i, mu))
 +    if best[1] is None:
-+        return t
++        return t, 0.0
 +    L, i, mu = best[1]
 +    n = len(L)
 +    Xc = P0 + best[0] * t
 +    cand = []
 +    for j in (i, (i + 1) % n):
-+        h_loc = 0.5 * (np.linalg.norm(L[j] - L[j - 1]) + np.linalg.norm(L[(j + 1) % n] - L[j]))
-+        cand.append((np.linalg.norm(L[j] - Xc) / h_loc, j))
++        # in band cells: a domain given by its corners alone must not pull the
++        # rail across the wall to a far corner
++        cand.append((np.linalg.norm(L[j] - Xc) / size, j))
 +    d, j = min(cand)
 +    _dbg = os.environ.get("UW_EXP_SNAP_DEBUG")
 +    if _dbg:
@@ -48,29 +49,61 @@ index e0c1099c..fc4c1123 100644
 +        if log:
 +            with open(log, "a") as f:
 +                f.write(f"{d:.6f}\n")
-+        return v / np.linalg.norm(v)
-+    return t
++        return v / np.linalg.norm(v), float(np.linalg.norm(v))
++    return t, float(best[0])
 +
 +
  def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
      """The ladder that OUTCROPS: the structured band on the samples inside
      the domain, stopping one rung short of the wall, closed by a small
-@@ -5862,8 +5908,12 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+@@ -5823,11 +5870,23 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+     # A row counts as inside when its three points are inside the domain and
+     # at least _LADDER_CAP_MARGIN from its boundary; a closer rung goes to the
+     # cap, which then starts at the rung before it (#1090).
+-    inside = (_inside_domain_2d(flat, domain)
+-              & (_distance_to_loops_2d(flat, domain) >= _LADDER_CAP_MARGIN)
+-              ).reshape(-1, 3).all(axis=1)
++    in_domain = _inside_domain_2d(flat, domain)
++    to_wall = _distance_to_loops_2d(flat, domain)
++    inside = (in_domain & (to_wall >= _LADDER_CAP_MARGIN)).reshape(-1, 3).all(axis=1)
+     if inside.all():
+         return _ladder_curved_assembly_2d(S, width, size, reach=R)
++    _c = float(__import__("os").environ.get("UW_EXP_CAP_CELLS", "0") or 0)
++    _m = int(__import__("os").environ.get("UW_EXP_MARGIN_ROWS", "0") or 0)
++    if _c > 0 and _m > 0:
++        # EXPERIMENT 116 (a): the band already outcrops, so a MARGIN rung (one
++        # of the _m rows past either end of the trace) within c cells of the
++        # wall goes to the cap too; a trace row never does, and an interior
++        # band is untouched
++        near = (in_domain & (to_wall >= max(_LADDER_CAP_MARGIN, _c * float(size)))
++                ).reshape(-1, 3).all(axis=1)
++        margin_row = np.zeros(len(S), dtype=bool)
++        margin_row[:_m] = margin_row[len(S) - _m:] = True
++        inside = np.where(margin_row, near, inside)
+     idx = np.flatnonzero(inside)
+     if idx.size < 2:
+         raise ValueError(
+@@ -5862,8 +5921,17 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
              ext = 3.0 * size + width
              gmsh.model.add(f"uw_ladder_cap_{k}")
              occ = gmsh.model.occ
 -            corners = [rung[0], rung[1], rung[2], rung[2] + ext * t,
 -                       rung[0] + ext * t]
-+            dirs = {0: t, 2: t}
++            dirs, exts = {0: t, 2: t}, {0: ext, 2: ext}
 +            _s = float(__import__("os").environ.get("UW_EXP_SNAP", "0") or 0)
 +            if _s > 0:
-+                dirs = {i: _exp_snap_direction(rung[i], t, domain, _s) for i in (0, 2)}
-+            corners = [rung[0], rung[1], rung[2], rung[2] + ext * dirs[2],
-+                       rung[0] + ext * dirs[0]]
++                for i in (0, 2):
++                    dirs[i], lam = _exp_snap_direction(rung[i], t, domain, _s, float(size))
++                    # each rail reaches the wall itself, so every wall crossing
++                    # of the cap is a rail's (and can be snapped), never the
++                    # crossing of the edge joining two short rails
++                    exts[i] = max(ext, 1.5 * lam)
++            corners = [rung[0], rung[1], rung[2], rung[2] + exts[2] * dirs[2],
++                       rung[0] + exts[0] * dirs[0]]
              ptags = [occ.addPoint(q[0], q[1], 0.0) for q in corners]
              ltags = [occ.addLine(ptags[i], ptags[(i + 1) % 5]) for i in range(5)]
              face = occ.addPlaneSurface([occ.addCurveLoop(ltags)])
-@@ -5884,6 +5934,11 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+@@ -5884,6 +5952,11 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
                  if len(xy) == 2 and all(
                          min(np.linalg.norm(q - r) for r in rung) < 1e-9 for q in xy):
                      gmsh.model.mesh.setTransfiniteCurve(c, 2)
@@ -82,7 +115,7 @@ index e0c1099c..fc4c1123 100644
              gmsh.option.setNumber("Mesh.MeshSizeMin", 0.7 * size)
              gmsh.option.setNumber("Mesh.MeshSizeMax", 1.3 * size)
              gmsh.model.mesh.generate(2)
-@@ -6564,8 +6619,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
+@@ -6564,8 +6637,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
  
  
  def _loop_self_crossings(P):
@@ -100,7 +133,7 @@ index e0c1099c..fc4c1123 100644
      n = len(P)
      if n < 4:
          return 0
-@@ -6573,6 +6635,9 @@ def _loop_self_crossings(P):
+@@ -6573,6 +6653,9 @@ def _loop_self_crossings(P):
      def orient(a, b, c):
          return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
  
@@ -110,7 +143,7 @@ index e0c1099c..fc4c1123 100644
      count = 0
      for i in range(n):
          A, B = P[i], P[(i + 1) % n]
-@@ -6580,9 +6645,9 @@ def _loop_self_crossings(P):
+@@ -6580,9 +6663,9 @@ def _loop_self_crossings(P):
              if i == 0 and j == n - 1:
                  continue
              C, D = P[j], P[(j + 1) % n]
@@ -123,7 +156,7 @@ index e0c1099c..fc4c1123 100644
                  count += 1
      return count
  
-@@ -7467,6 +7532,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+@@ -7467,6 +7550,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
      return [keys[i] for i in np.flatnonzero(on)]
  
  
@@ -154,7 +187,7 @@ index e0c1099c..fc4c1123 100644
  def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
      """The ribbon's assembly, clipped to the domain: meshed once (rank 0) and
      broadcast. Collective.
-@@ -7502,15 +7591,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+@@ -7502,15 +7609,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
              else:
                  asm_pts, asm_tris, cad_area = _occ_assembly_2d(
                      polylines, width, size, assembly, domain=domain_loops)

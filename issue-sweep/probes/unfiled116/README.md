@@ -43,3 +43,20 @@ vertex, which varies erratically with depth.
   vertices (252/252 and 504/504 kept).
 - Not yet known: which step puts a band vertex on the wall between the crossings, 0.04 h from a
   wall vertex.
+
+## Experiment (ii) + rail reach + cap margin (a), margin rows only: the comparison (checks/)
+compare.py places each point with the experiment off, then on (UW_EXP_SNAP 0.5, UW_EXP_CAP_CELLS
+0.25, UW_EXP_MARGIN_ROWS 2), and compares them. checks/summary.txt has it per dip. In short:
+- Smallest angle over all cells, outcrops: medians up (h 0.025: dip 15 9.1, dip 30 21.5, dip 45
+  24.4, dip 60 28.3), but the worst cases are still 0.3 (dip 15), 0.5 (dip 20), 1.4 (dip 10) and
+  2.6-5.3 (dips 30-60). No setting brings every outcrop to 20 deg.
+- Wall: every vertex on the base polygon (0.0e+00), no label missing. Interior placements:
+  bit-identical at every point (37 of 37).
+- Fault identical (fault vertex set and pairing) wherever the trace's top row is outside the cap.
+  Where the cap meshes the fault's top segment ("fault in cap"): every fault node on the trace to
+  <= 5.7e-15, Plus/Minus paired exactly, node count changes by -5..+2, shortest fault edge
+  0.05-1.0 cells before and 0.07-1.0 after (coarser at dips 45/60, mixed at 15-30).
+- New refusals with the experiment on: dip 10 k 0.45-0.65 ("the zone meets the domain
+  boundary"); k 0.05 at dips 30/45/60 (assembly / pull_vertex_onto). These are side effects of
+  the rail reach or cap changes, not investigated.
+- Not identified: the mechanism of the residual worst cells (below about 15 deg).
