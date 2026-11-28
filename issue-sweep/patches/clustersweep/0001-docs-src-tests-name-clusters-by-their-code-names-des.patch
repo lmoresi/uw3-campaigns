@@ -1,4 +1,4 @@
-From 0ca52cf81c83b273bfba55ccdd0cf8943215b42e Mon Sep 17 00:00:00 2001
+From da86afda69d95d6f48d7a665ed736e61351929b5 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Sat, 28 Nov 2026 12:50:05 +1100
 Subject: [PATCH] docs, src, tests: name clusters by their code names,
@@ -22,14 +22,14 @@ Underworld development team with AI support from Claude Code
  docs/developer/CHANGELOG.md                            |  2 +-
  .../design/CONVERGENCE_REFERENCE_POLICY_2026-11.md     |  4 ++--
  .../design/petsc-dmplex-checkpoint-reload-plan.md      |  2 +-
- docs/developer/guides/fault-multigrid.md               |  8 ++++----
+ docs/developer/guides/fault-multigrid.md               | 10 +++++-----
  docs/developer/guides/faults-in-convection.md          |  4 ++--
  docs/developer/guides/hpc-cluster-setup.md             | 10 +++++-----
  docs/developer/guides/release-process.md               |  2 +-
  docs/developer/hpc_containers/README.md                |  6 +++---
  docs/developer/hpc_containers/base.rocky-ompi          |  2 +-
  .../boundary-stress-and-projection-postprocessing.md   |  2 +-
- docs/developer/subsystems/fault-split-multigrid.md     |  6 +++---
+ docs/developer/subsystems/fault-split-multigrid.md     |  8 ++++----
  docs/developer/subsystems/solvers.md                   |  2 +-
  docs/docstrings/inventory.json                         |  2 +-
  .../solver-wall-clock-guard-adversarial-review.md      |  2 +-
@@ -40,7 +40,7 @@ Underworld development team with AI support from Claude Code
  tests/test_0821_params_cli_override.py                 |  2 +-
  tests/test_1063_constrained_traction.py                |  2 +-
  tests/test_1181_cylindrical_dirichlet.py               |  2 +-
- 23 files changed, 36 insertions(+), 36 deletions(-)
+ 23 files changed, 38 insertions(+), 38 deletions(-)
 
 diff --git a/docs/advanced/performance.md b/docs/advanced/performance.md
 index 6f55498a..375df968 100644
@@ -82,7 +82,7 @@ index 6b775afa..23158d13 100644
    CLI overrides applied on all platforms (#280).
  
 diff --git a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
-index c4f0777d..ddda72fa 100644
+index c4f0777d..b5c526ba 100644
 --- a/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
 +++ b/docs/developer/design/CONVERGENCE_REFERENCE_POLICY_2026-11.md
 @@ -85,7 +85,7 @@ The adjoint solve is one linear solve from zero, so PETSc's own reference (`||b|
@@ -90,7 +90,7 @@ index c4f0777d..ddda72fa 100644
  | #883 | the datum rule, which takes the reference from the lifted state at the first increment |
  | #884 | the null-space rule, which needs the gauge modes collected before the reference is measured; on an uncached rotated solve today they are collected after the first assembly |
 -| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (kaiju measured 28-57 % of Stokes time). The measurement below decides whether both are kept. |
-+| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (measured on the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R): 28-57 % of Stokes time). The measurement below decides whether both are kept. |
++| the pressure rtol default (feature/rotated-pressure-rtol-default) | an overlap, not settled. The floor removes the last steps' pressure caps; the 1e-2 default cuts the pressure work of every step (28-57 % of Stokes time, measured on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each). The measurement below decides whether both are kept. |
  
  ## 6. Evidence before merge
  
@@ -117,7 +117,7 @@ index 8d139c02..0f7088c1 100644
  The PETSc reload method avoids KDTree reload and preserves velocity/pressure
  metrics to roundoff. Boundary stress metrics require the benchmark to recover
 diff --git a/docs/developer/guides/fault-multigrid.md b/docs/developer/guides/fault-multigrid.md
-index 4a42f895..b5d81a34 100644
+index 4a42f895..c0243d03 100644
 --- a/docs/developer/guides/fault-multigrid.md
 +++ b/docs/developer/guides/fault-multigrid.md
 @@ -121,14 +121,14 @@ the slip unchanged (Louis's ruling on #892, which carries the table). The chain
@@ -125,8 +125,9 @@ index 4a42f895..b5d81a34 100644
  along its rungs, the band widening with the level) is the measured alternative and
  not the production tail: its levels never carry the patch, and on the same states it
 -takes 83 to 166 and 28 to 76. On the production annulus at np 16 (kaiju,
-+takes 83 to 166 and 28 to 76. On the production annulus at np 16 (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R),
- `development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
+-`development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
++takes 83 to 166 and 28 to 76. On the production annulus at np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each
++(`development` 25d62812, steps from a TAf checkpoint; the budget is on #892) the two tails do the same
  velocity work, 8.65 against 8.74 F-cycles per solve, in the same time within the
  run-to-run spread, with the same Newton counts and answers; the welded arm carries a
  3584-row patch on one rank and the chain none. The welded tail is no worse there and
@@ -156,7 +157,7 @@ index 4a42f895..b5d81a34 100644
     which places a wall-reaching fault, takes only `"gather"`.
     The 2000-row cap (`fac_block_rows`, or the `UW_FAC_BLOCK_ROWS` environment
 diff --git a/docs/developer/guides/faults-in-convection.md b/docs/developer/guides/faults-in-convection.md
-index bfbbe54f..c0541939 100644
+index bfbbe54f..54077b9c 100644
 --- a/docs/developer/guides/faults-in-convection.md
 +++ b/docs/developer/guides/faults-in-convection.md
 @@ -70,7 +70,7 @@ change with the fix, and with the LU blocks it costs 3 to 16 times the welded ta
@@ -164,7 +165,7 @@ index bfbbe54f..c0541939 100644
  for the case where the LU patch is unavailable or its block too large (the block grows
  with the band's rows; 3-D is not measured). On the production faulted annulus at
 -np 16 (kaiju, `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
-+np 16 (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R), `development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
++np 16 on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each (`development` 25d62812, steps from a TAf checkpoint, budgeted on #892; the welded arm with
  a 3584-row patch on the one rank the default gather placement gives the band to, the
  chain with none) the two tails do the same velocity
  work, 8.65 against 8.74 F-cycles per solve, in the same Stokes time within the ±10 %
@@ -240,7 +241,7 @@ index 06ca0dbd..049317d9 100644
  
  **Routine (every ~6 months / every two releases)**
 diff --git a/docs/developer/hpc_containers/README.md b/docs/developer/hpc_containers/README.md
-index 3d0dbeb0..1b8f8255 100644
+index 3d0dbeb0..5d3f85e4 100644
 --- a/docs/developer/hpc_containers/README.md
 +++ b/docs/developer/hpc_containers/README.md
 @@ -11,7 +11,7 @@ this directory is the recipes.
@@ -259,7 +260,7 @@ index 3d0dbeb0..1b8f8255 100644
 -| Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
 -| Kaiju | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
 +| NCI's Gadi | Rocky 8.10 | OpenMPI 4.1.1 (`libmpi.so.40`) | host `openmpi/4.1.7` injected via `LD_LIBRARY_PATH` — measured equal to bare metal |
-+| the RSES kaiju platform (Slurm, 8 compute nodes of 104 CPUs) | same image as Gadi | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
++| the RSES kaiju platform: a Slurm system of 8 compute nodes with 104 CPUs each | Rocky 8.10 (the image built for Gadi) | OpenMPI 4.1.1 | runs as-is under `srun --mpi=pmix` |
  | Setonix | Ubuntu 24.04 | MPICH 3.4.3 (`libmpi.so.12`) | host Cray MPICH bind-mounted by `singularity/4.1.0-mpi` |
  
  Setonix needs 3.4.3 specifically: Cray MPICH 8.1 is MPICH-3.4-based, and code compiled
@@ -288,18 +289,20 @@ index 114e7e78..ee0d233f 100644
  Switch projectors used purely for output/post-processing to a lightweight linear
  solve with the opt-in helper:
 diff --git a/docs/developer/subsystems/fault-split-multigrid.md b/docs/developer/subsystems/fault-split-multigrid.md
-index ec43518e..4995e026 100644
+index ec43518e..e5c397f7 100644
 --- a/docs/developer/subsystems/fault-split-multigrid.md
 +++ b/docs/developer/subsystems/fault-split-multigrid.md
-@@ -153,7 +153,7 @@ path.
+@@ -153,8 +153,8 @@ path.
    80-375 outer iterations on a banded Poisson tail.
  - **LU with a shift.** PCASM's default, unshifted ILU(0), takes a zero pivot on the
    rotated Galerkin block or gives no band solve (344 velocity iterations against
 -  67, #892). Inexact block solves were measured on the add-on matrix's box (kaiju,
-+  67, #892). Inexact block solves were measured on the add-on matrix's box (the RSES kaiju platform (a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R),
-   np 4, 2026-11). They gave the same Newton counts and slip as LU, and took longer:
+-  np 4, 2026-11). They gave the same Newton counts and slip as LU, and took longer:
++  67, #892). Inexact block solves were measured on the add-on matrix's box on the RSES kaiju platform, a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each,
++  at np 4 (2026-11). They gave the same Newton counts and slip as LU, and took longer:
  
    | box | LU | ILU(2), 5 steps | GAMG, 5 / 10 steps | hypre, 5 / 10 steps |
+   |---|---|---|---|---|
 @@ -165,7 +165,7 @@ path.
  - **Quotient minimum degree.** A fault band's block is long and narrow, and under
    PETSc's default ordering (nested dissection) its fill followed the subdomain's row

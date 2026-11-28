@@ -1,7 +1,7 @@
 ## docs, src, tests: name clusters by their code names, described as systems
 
 **Why.** This applies the platform-naming ruling: a system is named by its code name and described as a system, never by a hostname, IP, login node, username or filesystem path.
-- Kaiju becomes **the RSES kaiju platform**. Each document describes it once, near its first mention, using only the facts in `hpc-cluster-setup.md`: a Slurm system of 8 compute nodes, each with 104 CPUs, Intel Xeon Gold 6230R. That guide states no interconnect, so none is given.
+- Kaiju becomes **the RSES kaiju platform**. Each document describes it once, near its first mention, using only the facts in `hpc-cluster-setup.md`: "a Slurm system of 8 compute nodes with 104 Intel Xeon Gold 6230R CPUs each". The container README's table row says the same, with its base image (Rocky 8.10, the image built for Gadi). That guide states no interconnect, so none is given.
 - Gadi becomes **NCI's Gadi** at its first mention in a document; later mentions stay "Gadi".
 
 There are 36 edits on 36 lines in 23 files (docs, plus Gadi comments in 4 source and 3 test files).
@@ -21,6 +21,8 @@ The ruling's "never a filesystem path" would replace them with placeholders, but
 - For the 7 Python and Cython files, the token streams with comment and string contents blanked are identical. For the 6 Python files, the ASTs with docstrings and strings stripped are identical too.
 - The one JSON file (`docs/docstrings/inventory.json`, which mirrors `_params.py`'s comment) still parses.
 - The rest is Markdown and comments. A review document quotes the `petsc_generic_snes_solvers.pyx` comment, so the two change together.
+
+**Docs build.** `sphinx -b html docs` on development and on this branch: 89 warnings each, identical once paths are normalised (the edited tables included).
 
 **Base.** development fbef72fa. One commit, as a `git format-patch` file. It merges cleanly with the tests/, src/, docs/ and local-paths sweeps. Not pushed (GitHub pause).
 
