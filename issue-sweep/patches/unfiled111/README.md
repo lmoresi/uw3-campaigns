@@ -51,3 +51,7 @@ It is in scripts/test.sh. Serially (np 1, where conform takes the gathered route
 Serial test_0904 + test_0865: 12 passed.
 For a new row: the conform-path defects (the 5.4-cell chord at the seam; theta 15 partition
 dependence; seam faces in _boundary_edges).
+
+Note for the conform-defects row (118): on the conform path the outcome now depends on np. At np 1
+it takes the gathered route and places; at np >= 2 it refuses with the remedy. This is an explicit,
+interim state, also stated in PR_BODY.

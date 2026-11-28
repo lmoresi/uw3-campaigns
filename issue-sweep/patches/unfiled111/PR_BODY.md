@@ -35,6 +35,13 @@ of its dip scan.
 - No coordinate matches.
 
 ## Parallel
+**The seam-conforming path is not changed in substance.** It still refuses a cavity that reaches
+the wall, now with a message naming `seams='gather'`, through the same failure gather, so no rank
+meshes. At np 1 a seam-conforming call takes the gathered route and places, so on that path the
+outcome depends on the rank count: placed at np 1, refused with the remedy at np 2 or more. This
+is an interim state, kept until that path is sound (tracked separately). At np 3 it held a
+chord across the band, on which gmsh spun while the other ranks waited.
+
 The gap and the decision are computed by the rank whose cavity reaches the wall, from that
 cavity's ring and the whole band's skin (every rank holds the assembly), and a refusal goes
 through the placement's existing failure gather: every rank raises the same message or none
