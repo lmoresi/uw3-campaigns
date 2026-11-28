@@ -35,3 +35,18 @@ topological check (every boundary edge on the CAD outline) needs the outline, wh
 does not have without redoing the CAD; not added. The edge-multiplicity check covers doubling.
 Mutants: the smallest-triangle allowance and 1e-3 x CAD both fail test_a_missing_sliver_is_refused.
 test_0906: 5 passed. Placement suite: 93 passed.
+
+## C1's length check, measured, and what was done instead: 0003
+The boundary-length check needs the CAD perimeter, which no assembly returns (three functions and
+their tests unpack (pts, tris, area)). It also misses a missing BOUNDARY sliver, whose length
+change is second order like a displaced vertex. Instead, the Euler characteristic (euler.py,
+euler_annulus.py):
+- every real annulus assembly measured has V - E + F = 1;
+- the strip is 1; the strip with the interior sliver removed is 0;
+- a notch (a boundary cell removed) stays at 1.
+So for ladder assemblies (outlines without holes) V - E + F == pieces is exact for any missing
+interior cell. The edge multiplicity covers doubling. The area check is the backstop for notches,
+loosened to perimeter x 1e-8 x diameter (wall excess 1.7e-10 against 1.0e-9). The network mesher
+is not checked for holes; its fused outlines may enclose them.
+test_0906: 6 passed (adds a missing interior triangle touching the boundary at one vertex).
+Placement suite: 94 passed.

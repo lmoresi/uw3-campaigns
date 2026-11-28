@@ -1,0 +1,163 @@
+From c21ca6c0aea3c43123c6f6ef9d7470af5cb5cd37 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 18:15:32 +1100
+Subject: [PATCH 3/3] Review: a missing cell inside a ladder assembly is
+ refused by its hole, exactly; the area check is a backstop
+
+An area tolerance could separate the wall's excess from a missing 1e-6 sliver
+by only about a factor of two each way. A ladder assembly's outlines have no
+holes, so its mesh must have V - E + F equal to its number of pieces; a cell
+missing from inside, of any size, opens a hole and fails that with no
+tolerance (every assembly measured has 1). With the check that no edge
+borders more than two triangles (a doubled cell), the area comparison is a
+backstop for a missing cell along the boundary, at the perimeter times 1e-8
+of the diameter (the wall's excess is 1.7e-10 against 1.0e-9).
+
+test_0906: the missing sliver is now refused by the hole; a missing interior
+triangle touching the boundary at one vertex is refused; the doubled-cell and
+wall-excess cases stand.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 45 +++++++++++++------
+ ...t_0906_ribbon_assembly_area_at_the_wall.py | 31 +++++++++++--
+ 2 files changed, 59 insertions(+), 17 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 41da7832..11b71c4d 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7413,23 +7413,24 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+     return [keys[i] for i in np.flatnonzero(on)]
+ 
+ 
+-def _check_assembly_area(asm_pts, asm_tris, cad_area):
++def _check_assembly_area(asm_pts, asm_tris, cad_area, simply_connected=False):
+     """Refuse an assembly mesh that does not fill its own CAD outlines.
+ 
+-    Two checks. No edge may border more than two triangles, which catches a
+-    doubled cell of any size. And the mesh's area must match the CAD's to within
+-    what a boundary vertex displaced along the outline can add: the perimeter
+-    times 3e-9 of the assembly's diameter.
++    Three checks, the first two exact:
++
++    * no edge borders more than two triangles (a doubled cell, of any size);
++    * with ``simply_connected`` (a ladder assembly, whose outlines have no
++      holes), V - E + F equals the number of connected pieces: a missing cell
++      inside the mesh, of any size, opens a hole and fails it;
++    * the area matches the CAD's to the perimeter times 1e-8 of the diameter, a
++      backstop for a missing cell along the boundary (a notch), which keeps the
++      count.
+ 
+     Measured: on 296 ladder assemblies (an annulus, dips 10-45 degrees, trace tops
+     0-3 cells below the wall) the areas agree to 8.3e-16 of the CAD's, except where
+     the trace's top lies on the curved wall. There the mesher puts that vertex
+-    4.6e-9 from the CAD's, and the excess (1.7e-10, perimeter 0.48, diameter 0.22)
+-    needs 1.65e-9 of the diameter. A strip of eight unit cells missing a 1e-6
+-    sliver (perimeter 18, diameter 8.06) is refused only below 6.9e-9. So 3e-9 sits
+-    within about a factor of two of each; an area check cannot do better than that
+-    for a missing piece that small, which is what the edge check is for when the
+-    piece is doubled rather than missing."""
++    4.6e-9 from the CAD's, an excess of 1.7e-10 against an allowance of 1.0e-9
++    (perimeter 0.48, diameter 0.22). Every assembly measured has V - E + F = 1."""
+     from collections import Counter
+     tris = np.asarray(asm_tris, dtype=np.int64)
+     edges = Counter(tuple(sorted((int(a), int(b))))
+@@ -7438,6 +7439,23 @@ def _check_assembly_area(asm_pts, asm_tris, cad_area):
+         raise RuntimeError(
+             "the ribbon assembly has an edge shared by more than two triangles; the "
+             "layer mesh is not a single layer.")
++    if simply_connected and len(tris):
++        parent = {}
++
++        def root(v):
++            while parent.setdefault(v, v) != v:
++                parent[v] = parent[parent[v]]
++                v = parent[v]
++            return v
++
++        for a, b in edges:
++            parent[root(a)] = root(b)
++        verts = np.unique(tris)
++        pieces = len({root(int(v)) for v in verts})
++        if len(verts) - len(edges) + len(tris) != pieces:
++            raise RuntimeError(
++                "the ribbon assembly has a hole its CAD outline does not: a cell is "
++                "missing from inside the layer mesh.")
+     P = asm_pts[tris]
+     twice = np.abs((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
+                    - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
+@@ -7445,7 +7463,7 @@ def _check_assembly_area(asm_pts, asm_tris, cad_area):
+     perimeter = sum(float(np.linalg.norm(asm_pts[a] - asm_pts[b]))
+                     for (a, b), c in edges.items() if c == 1)
+     diameter = float(np.linalg.norm(asm_pts.max(axis=0) - asm_pts.min(axis=0))) if len(asm_pts) else 0.0
+-    allowed = max(perimeter * 3e-9 * diameter, 1e-9 * cad_area)
++    allowed = max(perimeter * 1e-8 * diameter, 1e-9 * cad_area)
+     if abs(mesh_area - cad_area) > allowed:
+         raise RuntimeError(
+             f"the ribbon assembly meshed to area {mesh_area:.12e} "
+@@ -7488,7 +7506,8 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+             else:
+                 asm_pts, asm_tris, cad_area = _occ_assembly_2d(
+                     polylines, width, size, assembly, domain=domain_loops)
+-            _check_assembly_area(asm_pts, asm_tris, cad_area)
++            _check_assembly_area(asm_pts, asm_tris, cad_area,
++                                 simply_connected=(mesher == "ladder"))
+             asm_pts, asm_tris = _collapse_boundary_imprints(
+                 asm_pts, asm_tris, domain_loops, 0.1 * size)
+             payload = (asm_pts, asm_tris)
+diff --git a/tests/test_0906_ribbon_assembly_area_at_the_wall.py b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+index cd5ec07e..43f74027 100644
+--- a/tests/test_0906_ribbon_assembly_area_at_the_wall.py
++++ b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+@@ -70,7 +70,8 @@ def test_the_check_accepts_round_off_and_refuses_a_missing_triangle():
+     pts, tris, area = _strip()
+     _check_assembly_area(pts, tris, area)
+     # the wall's excess, scaled: 1.7e-10 on a perimeter of 0.48 and diameter 0.22
+-    _check_assembly_area(pts, tris, area - 18 * 1.65e-9 * np.linalg.norm([8, 1]) * 0.9)
++    # the wall's excess, at its own scale: 1.7e-10 on an allowance of 1.0e-9
++    _check_assembly_area(pts, tris, area - 0.17 * 18 * 1e-8 * np.linalg.norm([8, 1]))
+     with pytest.raises(RuntimeError, match="does not fill its own outlines"):
+         _check_assembly_area(pts, tris[1:], area)
+ 
+@@ -91,12 +92,34 @@ def test_a_missing_sliver_is_refused():
+     sliver = [b, c, q]
+     split = np.array([[a, b, q], [a, q, c], sliver])
+     full = np.vstack([split, tris[1:]])
+-    _check_assembly_area(pts, full, area)
+-    with pytest.raises(RuntimeError, match="does not fill its own outlines"):
+-        _check_assembly_area(pts, full[[i for i in range(len(full)) if i != 2]], area)
++    _check_assembly_area(pts, full, area, simply_connected=True)
++    with pytest.raises(RuntimeError, match="a cell is missing from inside"):
++        _check_assembly_area(pts, full[[i for i in range(len(full)) if i != 2]], area,
++                             simply_connected=True)
+ 
+ 
+ def test_a_doubled_triangle_is_refused():
+     pts, tris, area = _strip()
+     with pytest.raises(RuntimeError, match="more than two triangles"):
+         _check_assembly_area(pts, np.vstack([tris, tris[:1]]), area + 0.5)
++
++
++def test_a_missing_interior_cell_is_refused_whatever_its_size():
++    """Two rows of cells; one cell inside, touching the boundary only at a
++    vertex or not at all, removed. The hole fails the count exactly."""
++    n = 6
++    pts = np.array([[i, j] for i in range(n + 1) for j in range(3)], dtype=float)
++    tris = []
++    for i in range(n):
++        for j in range(2):
++            a, b = 3 * i + j, 3 * i + j + 1
++            c, d = a + 3, b + 3
++            tris += [[a, c, b], [b, c, d]]
++    tris = np.array(tris)
++    _check_assembly_area(pts, tris, float(2 * n), simply_connected=True)
++    # the upper triangle of the lower-row cell at i = 2 has the middle row's
++    # vertices and one interior edge more: removing it opens a hole
++    hole = [k for k, t in enumerate(tris) if set(t) == {7, 9, 10}][0]
++    with pytest.raises(RuntimeError, match="a cell is missing from inside"):
++        _check_assembly_area(pts, np.delete(tris, hole, axis=0), float(2 * n) - 0.5,
++                             simply_connected=True)
+-- 
+2.39.5 (Apple Git-154)
+
