@@ -1,0 +1,101 @@
+From 0b5d2d9d91ab4d02d70290e9bbfabdaf80f38884 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 05:44:35 +1100
+Subject: [PATCH] The subsampler's repaired guard has a test of its own; the
+ ptest comment drops the counts
+
+Under adapt, nvb.nested_cell_parents already finds no single parent for a
+flipped cell, so _subsample_mg_levels' own 'repaired' guard is masked
+there and nothing tested it alone. A serial test now calls the subsampler
+directly on an unrepaired hierarchy (the arguments adapt passes, captured)
+with the recorded maps blanked: unmarked, maps are derived; every level
+marked repaired, none is; one level marked, only its map goes. Removing
+the guard fails it. The parallel test's comment states the pattern, the
+map is kept only on levels whose pass made no flips, without pass counts,
+which vary between runs.
+
+Underworld development team with AI support from Claude Code
+---
+ .../parallel/ptest_0844_reconnect_parallel.py |  2 +-
+ tests/test_0844_reconnect_repair.py           | 55 +++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+
+diff --git a/tests/parallel/ptest_0844_reconnect_parallel.py b/tests/parallel/ptest_0844_reconnect_parallel.py
+index 11f7eac8..a0cbd850 100644
+--- a/tests/parallel/ptest_0844_reconnect_parallel.py
++++ b/tests/parallel/ptest_0844_reconnect_parallel.py
+@@ -165,7 +165,7 @@ def test_adapt_with_repair_runs_in_parallel(monkeypatch):
+     # generations, a cell has no single parent whatever the repair did, and the
+     # map is None in BOTH arms — so asserting it there says nothing about repair.
+     # A repair pass that flips nothing changes no cell, so its level keeps the
+-    # map (at np 3 the last of six passes flips none): the map is None exactly
++    # map (at np 3 a late pass can flip none): the map is None exactly
+     # on the levels whose pass flipped. The flip counts are summed over ranks.
+     flips = []
+     real_flip = reconnect.flip_to_reduce_max_angle
+diff --git a/tests/test_0844_reconnect_repair.py b/tests/test_0844_reconnect_repair.py
+index 513241bb..ec4b242e 100644
+--- a/tests/test_0844_reconnect_repair.py
++++ b/tests/test_0844_reconnect_repair.py
+@@ -450,3 +450,58 @@ def test_removal_declines_a_mesh_it_cannot_improve():
+                                        np.arange(*mesh.dm.getDepthStratum(0)))
+     assert n == 0
+     assert out is mesh.dm
++
++
++def test_the_subsampler_drops_the_map_of_a_repaired_level(monkeypatch):
++    """_subsample_mg_levels' own guard: a level whose pass is marked repaired keeps
++    no parent map, even where the map derived from the transfer would exist.
++
++    Under adapt the derivation (nvb.nested_cell_parents) already finds no single
++    parent for a flipped cell, so the guard is masked there. Here the subsampler is
++    called directly on an unrepaired hierarchy (the arguments adapt passes it,
++    captured), with the recorded maps blanked so the derivation runs: without the
++    flag a map is derived; with it, none is."""
++    base = uw.meshing.UnstructuredSimplexBox(
++        minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0), cellSize=0.2,
++        regular=False, refinement=1, qdegree=3)
++    centre = np.array([0.4, 0.55])
++
++    def metric(centroids):
++        d = np.linalg.norm(np.asarray(centroids) - centre, axis=1)
++        return 1.0 / np.where(d < 0.2, 0.04, 0.15) ** 2
++
++    mesh_class = type(base)
++    real = mesh_class._subsample_mg_levels
++    captured = {}
++
++    def capture(self, base_finest, level_dms, nested_Ps, nested_parent_cells, **kwargs):
++        captured.update(self=self, args=(base_finest, list(level_dms), list(nested_Ps),
++                                         list(nested_parent_cells)), kwargs=dict(kwargs))
++        return real(self, base_finest, level_dms, nested_Ps, nested_parent_cells, **kwargs)
++
++    monkeypatch.setattr(mesh_class, "_subsample_mg_levels", capture)
++    base.adapt(metric, max_levels=2, engine="edge_split", repair=False,
++               mg_coarsening_ratio=1.0)
++    monkeypatch.setattr(mesh_class, "_subsample_mg_levels", real)
++
++    base_finest, level_dms, Ps, _recorded = captured["args"]
++    kwargs = {k: v for k, v in captured["kwargs"].items() if k != "repaired"}
++    n = len(level_dms)
++    blank = [None] * n
++
++    def maps(repaired):
++        _dms, _P, parent_cells = real(captured["self"], base_finest, level_dms, Ps,
++                                      blank, repaired=repaired, **kwargs)
++        return parent_cells
++
++    derived = maps([False] * n)
++    assert len(derived) == n and any(pc is not None for pc in derived), (
++        "no map derived for an unrepaired level, so the guard cannot be seen")
++    assert all(pc is None for pc in maps([True] * n))
++    # one level marked: its map alone goes
++    k = next(i for i, pc in enumerate(derived) if pc is not None)
++    one = [i == k for i in range(n)]
++    marked = maps(one)
++    assert marked[k] is None
++    assert all((pc is None) == (d is None) for i, (pc, d) in enumerate(zip(marked, derived))
++               if i != k)
+-- 
+2.39.5 (Apple Git-154)
+
