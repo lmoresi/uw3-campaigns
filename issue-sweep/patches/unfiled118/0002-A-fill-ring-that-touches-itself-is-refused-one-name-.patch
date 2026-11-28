@@ -1,0 +1,550 @@
+From 18afb07c6d41fa811d75c0386996ae76cc783993 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 22:51:37 +1100
+Subject: [PATCH] A fill ring that touches itself is refused; one name for the
+ seam-conforming path's refusals
+
+A cavity ring with a vertex on one of its own non-adjacent edges (a touch,
+not a proper crossing, so the crossing count is 0) hung gmsh: two outcrop
+placements with a rail point projected onto the wall built such rings at
+1e-15 of the edge, and no gmsh option (algorithm, retries, abort on error)
+turned the spin into an error. _refuse_a_ring_touching_itself refuses a
+ring whose vertex lies within 1e-9 of the local edge length of a
+non-adjacent edge, naming the vertex and the edge, inside the gathered
+tries of the three 2-D fills. Rings of placements that complete come no
+closer than 1.8e-2.
+
+Also, from the reviews of the previous commit:
+- every refusal on the seam-conforming path starts 'seam-conforming path:',
+  set once where _place_thin_volume_2d raises its gathered failures, so the
+  connector refusal no longer breaks test_0904's parallel assertion;
+- _loop_self_crossings and the ring/hole inside test are vectorised
+  (n = 1000: 2.3 s to 0.03 s; all three guards 0.15 s), with the same rule
+  (400 random polygons agree);
+- _inside_polygon's on-edge band is 1e-12 of the polygon's diameter, not an
+  absolute 1e-14, and the connector's touch test is relative too;
+- the band guard names its remedy, seams='gather'.
+
+Tests (test_0909): both dumped rings refused; the vertex moved 1e-6 and
+1e-2 inside passes, 1e-12 refused; the closest completing ring passes; each
+guard reached through place_fault_ribbon_2d (a spy); the inside test and
+the connector's touch test at scales 1 and 1e-6. Shown to fail on:
+threshold 0, threshold 2e-2, each call site removed, the old on-edge band,
+the old connector tolerance.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 160 +++++++++-----
+ tests/test_0909_fill_ring_against_the_band.py | 203 +++++++++++++++++-
+ 2 files changed, 314 insertions(+), 49 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index c128d36d..212d8761 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -419,21 +419,31 @@ def _inside_polygon(P, q):
+ 
+     Ray crossing, with the strictness the fill's precondition needs: a chain
+     point exactly on the cavity boundary is as unplaceable as one beyond it.
++    On an edge means within 1e-12 of the polygon's diameter, the tolerance the
++    ring tests use, so the answer does not depend on the polygon's scale.
+     """
+-    x, y = float(q[0]), float(q[1])
+-    inside = False
+-    for (x0, y0), (x1, y1) in zip(P, np.vstack([P[1:], P[:1]])):
+-        # On-edge: collinear and within the segment's span.
+-        cross = (x1 - x0) * (y - y0) - (y1 - y0) * (x - x0)
+-        if (abs(cross) < 1e-14 * max(abs(x1 - x0) + abs(y1 - y0), 1e-300)
+-                and min(x0, x1) - 1e-14 <= x <= max(x0, x1) + 1e-14
+-                and min(y0, y1) - 1e-14 <= y <= max(y0, y1) + 1e-14):
+-            return False
+-        if (y0 > y) != (y1 > y):
+-            xi = x0 + (y - y0) * (x1 - x0) / (y1 - y0)
+-            if x < xi:
+-                inside = not inside
+-    return inside
++    return bool(_inside_polygon_many(P, np.asarray(q, dtype=float)[None, :2])[0])
++
++
++def _inside_polygon_many(P, Q):
++    """:func:`_inside_polygon` for every row of ``Q`` at once."""
++    P = np.asarray(P, dtype=float)
++    Q = np.asarray(Q, dtype=float).reshape(-1, 2)
++    tol = 1e-12 * float(np.linalg.norm(P.max(axis=0) - P.min(axis=0)))
++    x0, y0 = P[None, :, 0], P[None, :, 1]
++    R = np.roll(P, -1, axis=0)
++    x1, y1 = R[None, :, 0], R[None, :, 1]
++    x, y = Q[:, None, 0], Q[:, None, 1]
++    # on an edge: within tol of the edge's line and within its span
++    cross = (x1 - x0) * (y - y0) - (y1 - y0) * (x - x0)
++    on = ((np.abs(cross) <= tol * np.hypot(x1 - x0, y1 - y0))
++          & (np.minimum(x0, x1) - tol <= x) & (x <= np.maximum(x0, x1) + tol)
++          & (np.minimum(y0, y1) - tol <= y) & (y <= np.maximum(y0, y1) + tol))
++    straddle = (y0 > y) != (y1 > y)
++    dy = np.where(straddle, y1 - y0, 1.0)
++    xi = x0 + (y - y0) * (x1 - x0) / dy
++    hits = (straddle & (x < xi)).sum(axis=1)
++    return (hits % 2 == 1) & ~on.any(axis=1)
+ 
+ 
+ def _gmsh_fill_2d(Xall, ring, chain, holes=(), size_of=None):
+@@ -1085,6 +1095,7 @@ def _place_one_parallel(dm, pts, label, label_value, clearance, spacing):
+                     f"{len(outside)} point(s) of the surface fall outside "
+                     "the cavity cleared for it; raise `clearance`.")
+ 
++            _refuse_a_ring_touching_itself(Xall, ring)
+             tris, extra = _gmsh_fill_2d(Xall, ring, chain)
+             placed = np.vstack([pts_r, extra]) if len(extra) else pts_r
+ 
+@@ -6574,28 +6585,72 @@ def _loop_self_crossings(P):
+     runs along it through several points; two of its edges had orientations of
+     exactly 0 and 5e-20 against each other, which a bare sign test read as
+     opposite sides of a crossing, and refused the fill."""
++    P = np.asarray(P, dtype=float)
+     n = len(P)
+     if n < 4:
+         return 0
++    a, b = P[:, None, :], np.roll(P, -1, axis=0)[:, None, :]
++    c, d = P[None, :, :], np.roll(P, -1, axis=0)[None, :, :]
+ 
+-    def orient(a, b, c):
+-        return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
++    def orient(p, q, r):
++        return ((q[..., 0] - p[..., 0]) * (r[..., 1] - p[..., 1])
++                - (q[..., 1] - p[..., 1]) * (r[..., 0] - p[..., 0]))
+ 
+-    def side(o, tol):
+-        return 0 if abs(o) <= tol else (1 if o > 0 else -1)
++    tol = 1e-12 * (np.linalg.norm(b - a, axis=-1) * np.linalg.norm(d - c, axis=-1))
+ 
+-    count = 0
+-    for i in range(n):
+-        A, B = P[i], P[(i + 1) % n]
+-        for j in range(i + 2, n):
+-            if i == 0 and j == n - 1:
+-                continue
+-            C, D = P[j], P[(j + 1) % n]
+-            tol = 1e-12 * float(np.linalg.norm(B - A)) * float(np.linalg.norm(D - C))
+-            if (side(orient(A, B, C), tol) * side(orient(A, B, D), tol) < 0
+-                    and side(orient(C, D, A), tol) * side(orient(C, D, B), tol) < 0):
+-                count += 1
+-    return count
++    def side(o):
++        return np.where(np.abs(o) <= tol, 0, np.sign(o))
++
++    i, j = np.indices((n, n))
++    pairs = (j >= i + 2) & ~((i == 0) & (j == n - 1))
++    crossing = ((side(orient(a, b, c)) * side(orient(a, b, d)) < 0)
++                & (side(orient(c, d, a)) * side(orient(c, d, b)) < 0))
++    return int((crossing & pairs).sum())
++
++
++_RING_TOUCH_REL = 1e-9
++
++
++def _ring_self_touch(P):
++    """The closest a vertex of the closed polygon ``P`` comes to an edge of it that
++    does not end at that vertex, relative to the shorter of that edge and the
++    vertex's own two edges: ``(relative distance, vertex, edge)``, the edge named by
++    its first vertex. A touch (a vertex lying on another edge) is not a proper
++    crossing, so :func:`_loop_self_crossings` does not count it."""
++    P = np.asarray(P, dtype=float)
++    n = len(P)
++    if n < 4:
++        return np.inf, None, None
++    E = np.roll(P, -1, axis=0) - P
++    L = np.linalg.norm(E, axis=1)
++    rel = P[:, None, :] - P[None, :, :]                        # vertex i against edge j
++    u = np.clip((rel * E[None]).sum(-1) / (L * L)[None], 0.0, 1.0)
++    d = np.linalg.norm(rel - u[..., None] * E[None], axis=-1)
++    own = np.minimum(L, np.roll(L, 1))                         # vertex i's two edges
++    d = d / np.minimum(L[None, :], own[:, None])
++    i = np.arange(n)
++    d[i, i] = np.inf
++    d[i, (i - 1) % n] = np.inf
++    k = int(np.argmin(d))
++    return float(d.flat[k]), k // n, k % n
++
++
++def _refuse_a_ring_touching_itself(Xall, ring):
++    """Refuse a fill whose ring has a vertex on one of its own non-adjacent edges
++    (within ``_RING_TOUCH_REL`` of the edge): gmsh does not refuse such a boundary,
++    it spins (measured: a cavity ring with a rail point projected onto a wall edge of
++    the same ring, at 1e-15 of the edge; rings of placements that complete come no
++    closer than 1.8e-2). Raised before any meshing, inside the placement's failure
++    gather, so every rank refuses."""
++    P = np.asarray(Xall)[np.asarray(ring, dtype=int)]
++    rel, i, j = _ring_self_touch(P)
++    if rel <= _RING_TOUCH_REL:
++        raise ValueError(
++            f"the fill ring touches itself: its vertex at ({P[i][0]:.6g}, "
++            f"{P[i][1]:.6g}) lies on the ring's edge from ({P[j][0]:.6g}, "
++            f"{P[j][1]:.6g}) to ({P[(j + 1) % len(P)][0]:.6g}, "
++            f"{P[(j + 1) % len(P)][1]:.6g}), {rel:.1e} of the edge length away; "
++            f"the cavity's boundary pinches there and is not one this placement can fill")
+ 
+ 
+ def _ring_crossings_with_holes(Xall, ring, holes):
+@@ -6632,7 +6687,7 @@ def _ring_crossings_with_holes(Xall, ring, holes):
+         crossings += int(((s1 * s2 < 0) & (s3 * s4 < 0)).sum())
+         on_ring = _segments_distance(H, P, [(i, (i + 1) % len(P)) for i in range(len(P))]) \
+             <= 1e-12 * scale
+-        if any(not on and not _inside_polygon(P, q) for q, on in zip(H, on_ring)):
++        if (~on_ring & ~_inside_polygon_many(P, H)).any():
+             outside += 1
+     return crossings, outside
+ 
+@@ -6647,7 +6702,8 @@ def _refuse_a_ring_crossing_the_band(Xall, ring, holes):
+         raise ValueError(
+             f"the fill ring crosses the band's skin {crossings} time(s) and leaves "
+             f"{outside} hole(s) outside it; the cavity's boundary is not one this "
+-            f"placement can fill")
++            f"placement can fill. It is met on the seam-conforming path, where a seam "
++            f"skirts the band's tip: use seams='gather' (the default)")
+ 
+ 
+ def _segments_cross(P, Q, A, B):
+@@ -6658,9 +6714,13 @@ def _segments_cross(P, Q, A, B):
+     d3, d4 = orient(P, Q, A), orient(P, Q, B)
+     if ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0)):
+         return True
+-    eps = 1e-14
+-    return (abs(d1) < eps or abs(d2) < eps or abs(d3) < eps
+-            or abs(d4) < eps) and (
++    # touching: relative, as the ring tests are (an orientation within 1e-12 of
++    # the two lengths' product, a span within 1e-12 of the longer)
++    lpq = float(np.hypot(Q[0] - P[0], Q[1] - P[1]))
++    lab = float(np.hypot(B[0] - A[0], B[1] - A[1]))
++    eps_o, eps = 1e-12 * lpq * lab, 1e-12 * max(lpq, lab)
++    return (abs(d1) <= eps_o or abs(d2) <= eps_o or abs(d3) <= eps_o
++            or abs(d4) <= eps_o) and (
+         min(A[0], B[0]) - eps <= max(P[0], Q[0])
+         and max(A[0], B[0]) + eps >= min(P[0], Q[0])
+         and min(A[1], B[1]) - eps <= max(P[1], Q[1])
+@@ -6732,11 +6792,10 @@ def _conform_fill_loops_2d(rings, X, victim, seam_edge_set, asm_pts,
+                 # gmsh on one rank)
+                 if _edge_meets_band(X[v1], X[v2], asm_pts, loops_asm):
+                     raise RuntimeError(
+-                        "seam-conforming placement: the band's tip lies across the "
+-                        "seam near a span the band does not cross, so the straight "
+-                        "connector closing that span would cut through the band. "
+-                        "This path does not place it; use seams='gather' (the "
+-                        "default).")
++                        "the band's tip lies across the seam near a span the band "
++                        "does not cross, so the straight connector closing that "
++                        "span would cut through the band. This path does not place "
++                        "it; use seams='gather' (the default).")
+                 link(v1, v2)
+         for i in range(n):
+             if not removed[i]:
+@@ -7175,6 +7234,7 @@ def _remove_embedded_2d(dm, label, label_value, clearance, verbose):
+                     "the removal would strand a domain-wall vertex")
+             victim |= orphan
+ 
++            _refuse_a_ring_touching_itself(X, ring)
+             gap_tris, extra = _gmsh_fill_2d(X, ring, None)
+             placed = np.asarray(extra, dtype=float).reshape(-1, 2)
+ 
+@@ -7863,6 +7923,9 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+     # connector back — the outcrop splice with the seam as the wall. The
+     # band vertices both sides use become shared points of the rebuild.
+     conform = seams == "conform" and comm.size > 1
++    # every refusal on the seam-conforming path is named as one: the users and
++    # the tests see one family, whichever check fires first
++    path = "seam-conforming path: " if conform else ""
+     seam_edge_set = set()
+     n_spine_moved = 0
+     if conform:
+@@ -7923,7 +7986,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+     real = [f for f in failures if f]
+     if real:
+         raise RuntimeError(
+-            f"place_thin_volume failed on the surgery rank: {real[0]}")
++            f"{path}place_thin_volume failed on the surgery rank: {real[0]}")
+ 
+     # Seam-conforming: the victims on the seam are one decision on both
+     # sides (their reach is SF-reconciled already; this makes it a gate
+@@ -8067,9 +8130,9 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         # others waited, and the outcome depended on the
+                         # partition. The gathered path (the default) places it.
+                         raise RuntimeError(
+-                            "the ribbon's cavity reached the domain wall on the "
+-                            "seam-conforming path, which does not yet place a band "
+-                            "this close to a wall; use seams='gather' (the default), "
++                            "the ribbon's cavity reached the domain wall, and this "
++                            "path does not yet place a band this close to a wall; "
++                            "use seams='gather' (the default), "
+                             "which places it when the band's skin is at least "
+                             f"{_MIN_WALL_GAP_CELLS:g} wall cells from it")
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+@@ -8292,6 +8355,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     if n_x:
+                         raise ValueError(
+                             f"the fill ring crosses itself {n_x} time(s)")
++                    _refuse_a_ring_touching_itself(Xall, ring)
+                     _refuse_a_ring_crossing_the_band(Xall, ring, holes)
+                     gap_tris, extra = _gmsh_fill_2d(Xall, ring, None,
+                                                     holes=holes,
+@@ -8368,7 +8432,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+     real = [f for f in failures if f]
+     if real:
+         raise RuntimeError(
+-            f"place_thin_volume failed on the surgery rank: {real[0]}")
++            f"{path}place_thin_volume failed on the surgery rank: {real[0]}")
+ 
+     n_cross_local = 0
+     if surgery is not None:
+@@ -8459,7 +8523,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+     failures = comm.allgather(failure)
+     real = [f for f in failures if f]
+     if real:
+-        raise RuntimeError(real[0])
++        raise RuntimeError(f"{path}{real[0]}")
+ 
+     # The ligament cells: base cells the clipped-away assembly cells
+     # cover (centroid inside one). Zone AND ligament labelled, so the band
+@@ -8545,7 +8609,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+         failures = comm.allgather(failure)
+         real = [f for f in failures if f]
+         if real:
+-            raise RuntimeError(real[0])
++            raise RuntimeError(f"{path}{real[0]}")
+         n_wall = np.array([n_wall_local], dtype=np.int64)
+         comm.Allreduce(MPI.IN_PLACE, n_wall, op=MPI.SUM)
+         if int(n_wall[0]) != 2 + len(band_pairs):
+@@ -8587,7 +8651,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+     breaches = comm.allgather(breach)
+     real = [b for b in breaches if b]
+     if real:
+-        raise RuntimeError(real[0])
++        raise RuntimeError(f"{path}{real[0]}")
+ 
+     _validity_and_orientation_gates(new_dm, comm)
+ 
+diff --git a/tests/test_0909_fill_ring_against_the_band.py b/tests/test_0909_fill_ring_against_the_band.py
+index 0bfc2441..39af4447 100644
+--- a/tests/test_0909_fill_ring_against_the_band.py
++++ b/tests/test_0909_fill_ring_against_the_band.py
+@@ -11,13 +11,37 @@ two crossings and the band's tip outside the ring; a hole inside its ring, one t
+ along an edge pass; a hole outside is refused; and the seam-conforming loop builder
+ refuses a connector that would cut the band, naming seams='gather', while a span whose
+ connector clears the band is closed as before.
++
++A ring that touches itself is refused too. Two outcrop placements with a rail point
++projected onto the wall (an experiment, not on this branch) built cavity rings in
++which a vertex lies on a non-adjacent edge of the same ring, at 1e-15 of the edge: not
++a proper crossing, so the crossing count is 0, and gmsh spun on both. What is asserted:
++both dumped rings are refused, naming the vertex and the edge; the first ring with
++that vertex moved 1e-6 and 1e-2 of the edge to the inside passes, and moved 1e-12 (within
++the guard's 1e-9) is refused; and the closest ring of a placement that completes
++(1.8e-2) passes.
++
++Both guards are reached through the placement: each, made to raise, makes
++place_fault_ribbon_2d refuse with its reason. And the on-edge band of the inside test is
++relative to the ring's size: at a ring 1e-6 across, a hole vertex 1e-15 inside an edge
++is inside, and one on the edge is still not; and the connector's touch test is
++relative too, so a segment 1e-9 of its length beside a band edge is not touching it at
++any scale.
+ """
+ import numpy as np
+ import pytest
+ 
++import underworld3 as uw
++from underworld3.utilities import place_surface
++
+ from underworld3.utilities.place_surface import (_conform_fill_loops_2d,
++                                                 _inside_polygon,
++                                                 _loop_self_crossings,
+                                                  _refuse_a_ring_crossing_the_band,
+-                                                 _ring_crossings_with_holes)
++                                                 _refuse_a_ring_touching_itself,
++                                                 _ring_crossings_with_holes,
++                                                 _ring_self_touch,
++                                                 _segments_cross)
+ 
+ pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
+ 
+@@ -145,3 +169,180 @@ def test_a_connector_clear_of_the_band_closes_the_span():
+     clear = [[2.0, 0.5], [2.3, 1.0], [2.0, 1.5], [1.7, 1.0]]
+     loops = _loops(clear)
+     assert loops and len(loops[0][0]) == 4          # 0, 1, 2, 5: the span closed
++
++
++# the touching rings (116 experiment, campaigns issue-sweep/probes/gmsh-spin) and the
++# closest ring of a placement that completes (dip 20, k 0.95, the same build)
++_RING_DIP15 = np.array([
++    [-0.1243437088860771, 0.9922392060690076], [-0.13419919466002833, 0.9749659520020152],
++    [-0.11995506973292487, 0.9541732437462267], [-0.09585545903187015, 0.9506537895574305],
++    [-0.07308629694481276, 0.93713957181159], [-0.04924414041235953, 0.9444128000064199],
++    [-0.027106455441841277, 0.938133329820901], [-0.0051124576898938755, 0.9272869537036792],
++    [0.012055114874028128, 0.910899497794213], [0.03043936910191683, 0.9198663937571202],
++    [0.053246934963723576, 0.9150313145966408], [0.07605450082553032, 0.9101962354361613],
++    [0.09921303801827827, 0.8963100050499093], [0.11968693777112996, 0.9023574251859714],
++    [0.14014455408166196, 0.8949829333968933], [0.16262031273580907, 0.885074608085626],
++    [0.1875676759113084, 0.8769239517024146], [0.2078122593032964, 0.8912407793637062],
++    [0.22460293454567848, 0.9062876777995433], [0.2413936097880606, 0.9213345762353805],
++    [0.231957269935515, 0.9481312446506349], [0.2225209300829694, 0.9749279130658893],
++    [0.19814613924660193, 0.9801724886476189], [0.1736481736365504, 0.9848077537228728],
++    [0.14904226206906632, 0.9888308268441757], [0.124343700465749, 0.9922392071242117],
++    [0.10307648993591371, 0.994635446166131], [0.12772549375173967, 0.9917725225564116],
++    [0.15135935007092335, 0.9815752888918485], [0.1755074957281501, 0.9751048127642855],
++    [0.19965564138537686, 0.9686343366367225], [0.19318516525781385, 0.9444861909794958],
++    [0.18671468913025083, 0.9203380453222691], [0.16256654347302407, 0.9268085214498322],
++    [0.13841839781579732, 0.9332789975773952], [0.11427025215857058, 0.9397494737049582],
++    [0.09012210650134388, 0.9462199498325212], [0.07115311076003644, 0.951101032342622],
++    [0.05218411501872901, 0.9559821148527228], [0.03321511927742158, 0.9608631973628236],
++    [0.014246123536114139, 0.9657442798729243], [-0.004722872205193276, 0.9706253623830251],
++    [-0.023691867946500716, 0.9755064448931259], [-0.042660863687808144, 0.9803875274032267],
++    [-0.0616298594291156, 0.9852686099133274], [-0.08059885517042305, 0.9901496924234282],
++    [-0.09956785091173063, 0.9950307749335291],
++])
++_RING_DIP10 = np.array([
++    [-0.19814614716209503, 0.9801724870474674], [-0.2043313481850557, 0.9559647707476244],
++    [-0.1861417585552476, 0.9370016301941139], [-0.1650982194946136, 0.9473471640645683],
++    [-0.1409366293962927, 0.9372331116433934], [-0.11683701869523798, 0.9337136574545972],
++    [-0.09385477326863156, 0.9232644524020261], [-0.07108561118157418, 0.9097502346561857],
++    [-0.05031713485775537, 0.9236253540657495], [-0.02832313710580797, 0.9127789779485276],
++    [-0.006329139353860574, 0.9019326018313057], [0.012055114874028128, 0.910899497794213],
++    [0.03387847732197884, 0.8992053377729211], [0.05668604318378558, 0.8943702586124417],
++    [0.07923115902855897, 0.8841369054066848], [0.09921303801827827, 0.8963100050499093],
++    [0.1223715752110262, 0.8824237746636574], [0.14014455408166196, 0.8949829333968933],
++    [0.16262031273580907, 0.885074608085626], [0.1875676759113084, 0.8769239517024146],
++    [0.2078122593032964, 0.8912407793637062], [0.22460293454567848, 0.9062876777995433],
++    [0.2413936097880606, 0.9213345762353805], [0.231957269935515, 0.9481312446506349],
++    [0.2225209300829694, 0.9749279130658893], [0.19814613924660193, 0.9801724886476189],
++    [0.1736481736365504, 0.9848077537228728], [0.14904226206906632, 0.9888308268441757],
++    [0.124343700465749, 0.9922392071242117], [0.0995678422928587, 0.9950307757959774],
++    [0.07473008916437321, 0.997203797512567], [0.04984588116184589, 0.9987569214434507],
++    [0.028980431054779675, 0.9995376514080088], [0.05382008178960378, 0.9985088755301359],
++    [0.07820178591758896, 0.9903465805002855], [0.1028219797428941, 0.9860053760586122],
++    [0.1274421735681993, 0.981664171616939], [0.15206236739350457, 0.9773229671752657],
++    [0.17668256121880976, 0.9729817627335924], [0.20130275504411496, 0.9686405582919191],
++    [0.19696155060244167, 0.9440203644666139], [0.19262034616076837, 0.9194001706413086],
++    [0.16800015233546317, 0.9237413750829819], [0.14337995851015797, 0.9280825795246552],
++    [0.11875976468485282, 0.9324237839663285], [0.09413957085954762, 0.9367649884080017],
++    [0.06951937703424237, 0.941106192849675], [0.044899183208937224, 0.9454473972913483],
++    [0.02027898938363202, 0.9497886017330215], [0.0008862722720534887, 0.9532905167892594],
++    [-0.018506444839525044, 0.9567924318454971], [-0.03789916195110358, 0.960294346901735],
++    [-0.057291879062682106, 0.9637962619579727], [-0.07668459617426063, 0.9672981770142106],
++    [-0.09607731328583918, 0.9708000920704484], [-0.1154700303974177, 0.9743020071266862],
++    [-0.13486274750899624, 0.977803922182924], [-0.15425546462057468, 0.9813058372391618],
++    [-0.173648181732153, 0.9848077522953996],
++])
++_RING_PASSING = np.array([
++    [-0.14904227032910533, 0.9888308255991749], [-0.1588514310830663, 0.9712502251152112],
++    [-0.1440546804339796, 0.9576926979350228], [-0.11995506973292487, 0.9541732437462267],
++    [-0.09585545903187015, 0.9506537895574305], [-0.07308629694481276, 0.93713957181159],
++    [-0.05031713485775537, 0.9236253540657495], [-0.02832313710580797, 0.9127789779485276],
++    [-0.006329139353860574, 0.9019326018313057], [0.012055114874028128, 0.910899497794213],
++    [0.03387847732197884, 0.8992053377729211], [0.05668604318378558, 0.8943702586124417],
++    [0.07923115902855897, 0.8841369054066848], [0.10238969622130692, 0.8702506750204329],
++    [0.12473339891598045, 0.859613187998179], [0.14720915757012754, 0.8497048626869117],
++    [0.16943174764641833, 0.8389052746916035], [0.18991779004722437, 0.852543513221057],
++    [0.21016237343921235, 0.8668603408823488], [0.2299352926141711, 0.8806723057940558],
++    [0.22460293454567848, 0.9062876777995433], [0.2413936097880606, 0.9213345762353805],
++    [0.231957269935515, 0.9481312446506349], [0.2225209300829694, 0.9749279130658893],
++    [0.19814613924660193, 0.9801724886476189], [0.1736481736365504, 0.9848077537228728],
++    [0.14904226206906632, 0.9888308268441757], [0.124343700465749, 0.9922392071242117],
++    [0.0995678422928587, 0.9950307757959774], [0.07473008916437321, 0.997203797512567],
++    [0.04984588116184589, 0.9987569214434507], [0.02493068716504404, 0.9996891821148605],
++    [-4.574857317995946e-09, 1.0], [0.008550503583141753, 0.9997423155196477],
++    [0.03204281910278951, 0.991191811936506], [0.055535134622437234, 0.9826413083533642],
++    [0.07902745014208488, 0.9740908047702225], [0.1025197656617326, 0.9655403011870808],
++    [0.12601208118138035, 0.9569897976039391], [0.1495043967010281, 0.9484392940207973],
++    [0.17299671222067584, 0.9398887904376555], [0.19648902774032356, 0.9313382868545137],
++    [0.1879385241571818, 0.907845971334866], [0.17938802057404002, 0.8843536558152183],
++    [0.1558957050543923, 0.8929041593983601], [0.13240338953474456, 0.9014546629815019],
++    [0.10891107401509686, 0.9100051665646437], [0.08541875849544922, 0.9185556701477854],
++    [0.06192644297580151, 0.9271061737309271], [0.038434127456153745, 0.9356566773140688],
++    [0.01494181193650603, 0.9442071808972106], [-0.008550503583141635, 0.9527576844803523],
++    [-0.025092390054989533, 0.9583979018501602], [-0.041634276526837405, 0.9640381192199681],
++    [-0.05817616299868534, 0.969678336589776], [-0.07471804947053329, 0.9753185539595839],
++    [-0.09125993594238122, 0.9809587713293918], [-0.10780182241422916, 0.9865989886991997],
++    [-0.1243437088860771, 0.9922392060690076],
++])
++
++
++def _all(P):
++    return np.arange(len(P))
++
++
++@pytest.mark.parametrize("ring, vertex, edge", [(_RING_DIP15, 27, 24), (_RING_DIP10, 33, 30)],
++                         ids=["dip15", "dip10"])
++def test_a_ring_touching_itself_is_refused(ring, vertex, edge):
++    assert _loop_self_crossings(ring) == 0
++    rel, i, j = _ring_self_touch(ring)
++    assert (i, j) == (vertex, edge) and rel < 1e-12
++    x, y = ring[vertex]
++    with pytest.raises(ValueError, match=rf"touches itself: its vertex at \({x:.6g}, {y:.6g}\)"):
++        _refuse_a_ring_touching_itself(ring, _all(ring))
++
++
++def _moved_inside(rel):
++    P = _RING_DIP15.copy()
++    e = P[25] - P[24]
++    P[27] = P[27] + rel * np.array([-e[1], e[0]])
++    return P
++
++
++@pytest.mark.parametrize("rel", [1e-6, 1e-2])
++def test_the_vertex_moved_inside_passes(rel):
++    P = _moved_inside(rel)
++    assert _loop_self_crossings(P) == 0
++    _refuse_a_ring_touching_itself(P, _all(P))
++
++
++def test_a_vertex_within_the_tolerance_is_refused():
++    # gmsh meshes the ring at 1e-12 inside, but only with a cell 1e-12 of the edge
++    # across: the guard's 1e-9 refuses it on purpose
++    P = _moved_inside(1e-12)
++    with pytest.raises(ValueError, match="touches itself"):
++        _refuse_a_ring_touching_itself(P, _all(P))
++
++
++def test_the_closest_completing_ring_passes():
++    rel, _, _ = _ring_self_touch(_RING_PASSING)
++    assert 1e-2 < rel < 3e-2
++    _refuse_a_ring_touching_itself(_RING_PASSING, _all(_RING_PASSING))
++
++
++@pytest.mark.parametrize("scale", [1.0, 1e-6])
++def test_the_inside_test_is_relative_to_the_rings_size(scale):
++    ring = scale * np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
++    hole = scale * np.array([[0.4, 0.0], [0.6, 0.3], [0.4, 0.3]])
++    hole[0, 1] += 1e-9 * scale                     # 1e-15 inside the edge at scale 1e-6
++    X = np.vstack([ring, hole])
++    assert _ring_crossings_with_holes(X, [0, 1, 2, 3], [[4, 5, 6]]) == (0, 0)
++    assert _inside_polygon(ring, hole[0])
++    assert not _inside_polygon(ring, scale * np.array([0.4, 0.0]))
++
++
++@pytest.mark.skipif(uw.mpi.size > 1, reason="serial: the spy raises on one rank")
++@pytest.mark.parametrize("guard", ["_refuse_a_ring_touching_itself",
++                                   "_refuse_a_ring_crossing_the_band"])
++def test_the_placement_refuses_through_each_guard(guard, monkeypatch):
++    h = 0.05
++    box = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                            cellSize=h, regular=True)
++    trace = np.array([0.3, 0.6]) + (h * np.arange(7))[:, None] * np.array([0.8, -0.6])
++
++    def refuse(*args, **kwargs):
++        raise ValueError(f"spy {guard}")
++
++    monkeypatch.setattr(place_surface, guard, refuse)
++    with pytest.raises(Exception, match=f"spy {guard}"):
++        place_surface.place_fault_ribbon_2d(box, [("Fault", trace)], 2 * h, margin_rings=2,
++                                            clearance=0.3, split=True, mesher="ladder")
++
++
++@pytest.mark.parametrize("scale", [1.0, 1e-6])
++def test_the_connectors_touch_test_is_relative(scale):
++    A, B = scale * np.array([0.0, 0.0]), scale * np.array([1.0, 0.0])
++    # parallel, 1e-9 of its length away (1e-15 at scale 1e-6), over the edge's
++    # span: not touching
++    P, Q = scale * np.array([0.2, 1e-9]), scale * np.array([0.8, 1e-9])
++    assert not _segments_cross(P, Q, A, B)
++    # one end on the edge: touching
++    assert _segments_cross(scale * np.array([0.5, 0.0]), scale * np.array([0.5, 1.0]), A, B)
+-- 
+2.39.5 (Apple Git-154)
+
