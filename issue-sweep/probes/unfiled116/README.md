@@ -60,3 +60,14 @@ compare.py places each point with the experiment off, then on (UW_EXP_SNAP 0.5, 
   boundary"); k 0.05 at dips 30/45/60 (assembly / pull_vertex_onto). These are side effects of
   the rail reach or cap changes, not investigated.
 - Not identified: the mechanism of the residual worst cells (below about 15 deg).
+
+## The residual worst cells (C1, 2026-11-28; residual.py on the experiment stack)
+The three worst outcrops after snap + rail reach + margin-row cap margin were unchanged by the
+experiment: dip 15 k 0.15 (0.32 deg), dip 20 k 0.95 (0.53), dip 10 k 0.85 (1.40). Each worst cell
+is the same construction:
+- two consecutive BASE wall vertices (a wall edge, length 1.0 h);
+- the rail+ point of a TRACE row of the ladder (rows 6, 2 and 3), 0.005 / 0.006 / 0.020 cells
+  inside the wall, near the middle of that edge.
+The fill joins the rail point to the wall edge beneath it: a triangle with angles about 1, 178 and
+0.3-1.4 degrees. This is cause 3 (a rung on the wall), on a trace row. The margin-row restriction
+(kept so the fault's vertices do not change) excludes it.
