@@ -1,7 +1,7 @@
 From 7d359c66b1a056ef5d9e632e4ca4edc50a3aaeb7 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:50:40 +1100
-Subject: [PATCH 10/10] Review: only armed ranks are asked for a stack; a
+Subject: [PATCH 10/11] Review: only armed ranks are asked for a stack; a
  Python launcher is left out; a silent rank is named
 
 - The dump request went to every descendant of the job. mpirun forwards

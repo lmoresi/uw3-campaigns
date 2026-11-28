@@ -1,7 +1,7 @@
 From d1f55fb3d4db74ca892a15746fa564ca241942c7 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 14:56:53 +1100
-Subject: [PATCH 07/10] Review: a supervisor ended by a signal ends the job
+Subject: [PATCH 07/11] Review: a supervisor ended by a signal ends the job
  first; only ranks get a stack file
 
 - A SIGTERM or SIGHUP to the supervisor left mpirun and the ranks running,

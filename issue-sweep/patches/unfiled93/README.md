@@ -61,3 +61,6 @@ forwarder (trap USR1 -> kill -USR1 child) gets its rank 2 dumps, not 4 (0009: 4)
 is named. Serial test_0063 (mpirun cases excluded): 12 passed.
 Known, unchanged: _read_dumps keys by rank, so two armed processes of one rank (`mpirun python
 wrapper.py` spawning the real rank) keep only one dump in the report. Both files stay on disk.
+
+## H1 r4 residue: 0011
+_read_dumps reads only the asked files; "did not answer" lines sort ranks as numbers; one answering process is reported as such, not as a collective. The driver test now has the driver dump itself first; on 0010 it is voted "rank(s) unknown". The diff touches only _read_dumps, its call, and report text.

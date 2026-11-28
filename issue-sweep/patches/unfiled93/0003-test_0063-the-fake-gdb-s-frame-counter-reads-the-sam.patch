@@ -1,7 +1,7 @@
 From f33ca440459ecf3260850d6bd171ec31b57a2d62 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Fri, 27 Nov 2026 16:01:27 +1100
-Subject: [PATCH 03/10] test_0063: the fake gdb's frame counter reads the same
+Subject: [PATCH 03/11] test_0063: the fake gdb's frame counter reads the same
  on BSD wc
 
 BSD wc pads its count with spaces, so the fake gdb printed 'frame_       1'

@@ -1,0 +1,106 @@
+From 5b23ef695e9d87a666800f97e2b00322c7c87780 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 16:51:24 +1100
+Subject: [PATCH 11/11] Review: only the asked files are read into the report;
+ ranks sort as numbers; a lone process is not called a collective
+
+- The report read every non-empty stack file, so a launcher holding a dump
+  from some other SIGUSR1 (a user's kill to the group) was voted as rank
+  'unknown'. Only the files the request went to are read.
+- The 'did not answer' lines sort ranks as numbers (2 before 10).
+- With one process answering, the diagnosis names where it is instead of
+  suspecting a collective.
+
+test_0063: the Python driver dumps itself before the hang; it is not named
+as a rank (fails before this change).
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 19 ++++++++++++++-----
+ tests/test_0063_mpi_hang_supervisor.py | 11 ++++++++---
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index fed0549d..addf9076 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -259,10 +259,14 @@ def _armed_ranks(job_pid, dump_dir):
+     return {pid: v for pid, v in armed.items() if pid not in launchers}
+ 
+ 
+-def _read_dumps(dump_dir):
+-    """Every rank's samples, as ``{rank: (pid, [block, ...])}``."""
++def _read_dumps(dump_dir, only=None):
++    """Every rank's samples, as ``{rank: (pid, [block, ...])}``: only the files
++    named in ``only`` when it is given (the ones the request went to), so a
++    launcher holding a dump from some other SIGUSR1 is not read as a rank."""
+     dumps = {}
+     for path in sorted(Path(dump_dir).glob("rank_*_pid_*.stack")):
++        if only is not None and path.name not in only:
++            continue
+         rank, pid, _token = _stack_name(path)
+         blocks = _dump_blocks(path.read_text())
+         if blocks:
+@@ -405,7 +409,10 @@ def _diagnose(dumps, cpu_by_rank):
+     def _where(rank):
+         return signatures[rank][0] if signatures[rank] else "an unknown frame"
+ 
+-    if len(tally) == 1:
++    if len(dumps) == 1:
++        lines.append(f"    one process answered; it is in "
++                     f"{majority[0] if majority else 'an unknown frame'}()")
++    elif len(tally) == 1:
+         lines.append(f"    every rank is in {majority[0] if majority else 'the same place'}()"
+                      " — no rank is the odd one out, so suspect a collective they "
+                      "have all entered")
+@@ -603,7 +610,7 @@ def _supervise(args, command, env, dump_dir, state):
+ 
+         # One read: faulthandler appends, so each rank's file already holds
+         # both samples in order.
+-        dumps = _read_dumps(dump_dir)
++        dumps = _read_dumps(dump_dir, only=state["asked"])
+ 
+         # Attribute CPU through the pid the handler recorded. Guessing which
+         # rank owned which figure would produce a confident, wrong label.
+@@ -611,7 +618,9 @@ def _supervise(args, command, env, dump_dir, state):
+         cpu_by_rank = {rank: usage[pid] for rank, (pid, _blocks) in dumps.items()
+                        if pid in usage}
+ 
+-        for rank, name in sorted(armed.values()):
++        for rank, name in sorted(armed.values(),
++                                 key=lambda rn: (not rn[0].isdigit(),
++                                                 int(rn[0]) if rn[0].isdigit() else 0, rn[0])):
+             try:
+                 if (Path(dump_dir) / name).stat().st_size == 0:
+                     print(f"    rank {rank} (pid {_stack_name(name)[1]}) did not answer "
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index 291e0e2d..c339c4f8 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -240,15 +240,20 @@ def test_a_python_driver_is_not_asked_or_counted_as_a_rank(tmp_path):
+     driver = tmp_path / "driver.py"
+     driver.write_text(
+         "import os, subprocess, sys\n"
++        "import signal\n"
+         "print('driver', os.getpid(), flush=True)\n"
+         f"kids = [subprocess.Popen([sys.executable, {str(rank)!r}],\n"
+         "                         env=dict(os.environ, OMPI_COMM_WORLD_RANK=str(r))) for r in (0, 1)]\n"
++        # a dump of its own from some other SIGUSR1 (a user's kill to the group)
++        "os.kill(os.getpid(), signal.SIGUSR1)\n"
+         "[k.wait() for k in kids]\n")
+     completed, files = _hang(tmp_path, [sys.executable, str(driver)])
+     driver_pid = completed.stdout.split("driver ", 1)[1].split()[0]
+-    assert not [p for p in files if f"_pid_{driver_pid}_" in p.name], [p.name for p in files]
+-    assert sorted(p.name.split("_pid_")[0] for p in files) == ["rank_0", "rank_1"]
+-    assert all(p.stat().st_size > 0 for p in files)
++    ranks = sorted(p.name.split("_pid_")[0] for p in files if f"_pid_{driver_pid}_" not in p.name)
++    assert ranks == ["rank_0", "rank_1"], [p.name for p in files]
++    assert all(p.stat().st_size > 0 for p in files if f"_pid_{driver_pid}_" not in p.name)
++    assert "rank(s) unknown" not in completed.stdout and "rank unknown" not in completed.stdout, \
++        completed.stdout
+ 
+ 
+ def test_a_launcher_that_forwards_the_signal_is_not_asked(tmp_path):
+-- 
+2.39.5 (Apple Git-154)
+
