@@ -1,7 +1,7 @@
 From 5b1d7e4b1625df03952084f9febbf2bf2e0f18ff Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:35:34 +1100
-Subject: [PATCH 3/6] Review: the wall's cell size from true boundary edges;
+Subject: [PATCH 3/7] Review: the wall's cell size from true boundary edges;
  bands just past the floor are placed without slivers
 
 - A ring's "wall edges" were any two consecutive wall vertices, so at a box

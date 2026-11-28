@@ -1,0 +1,77 @@
+From 8c9e472dc4780b6e4b90a4813870113326e34af3 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 18:59:31 +1100
+Subject: [PATCH 7/7] Review: the parallel test compares the wall facets with
+ the base; why a None SF leaf array means no ghosts
+
+Underworld development team with AI support from Claude Code
+---
+ ...4_place_ribbon_beside_the_wall_parallel.py | 26 ++++++++++++++-----
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+index 1acc7ff6..2c527b11 100644
+--- a/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
++++ b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+@@ -45,20 +45,29 @@ def _checks(mesh):
+     ghost = set()
+     if uw.mpi.size > 1:                 # serially the point SF has no graph
+         _n, leaves, _r = dm.getPointSF().getGraph()
++        # Plex returns None for the leaves when the SF holds the identity (no
++        # ghosts on this rank): that is "no ghosts", not "unknown"
+         ghost = {int(p) for p in (leaves if leaves is not None else [])}
+     value = {b.name: b.value for b in mesh.boundaries}
+     unlabelled = 0
+-    sides = {"FaultPlus": 0, "FaultMinus": 0}
++    # only labels the mesh has (the base has no fault): getValue on a label the
++    # DM lacks dereferences a null handle
++    walls = {w: 0 for w in ("Upper", "Lower") if dm.hasLabel(w)}
++    sides = {s: 0 for s in ("FaultPlus", "FaultMinus") if dm.hasLabel(s)}
+     for e in range(eS, eE):
+         if e in ghost:
+             continue
+         v = [int(q) - vS for q in dm.getCone(e)]
+         if dm.getSupportSize(e) == 1 and (np.linalg.norm(X[v], axis=1) > 1 - 2e-4).all():
+-            unlabelled += dm.getLabel("Upper").getValue(e) != value["Upper"]
++            unlabelled += int(dm.getLabel("Upper").getValue(e) != value["Upper"])
+         for side in sides:
+             sides[side] += dm.getLabel(side).getValue(e) == value[side]
++        for wall in walls:
++            walls[wall] += dm.getLabel(wall).getValue(e) == value[wall]
+     comm = uw.mpi.comm
+-    return comm.allreduce(unlabelled), {s: comm.allreduce(n) for s, n in sides.items()}
++    sides = {s: sides.get(s, 0) for s in ("FaultPlus", "FaultMinus")}
++    return (comm.allreduce(unlabelled), {s: comm.allreduce(n) for s, n in sides.items()},
++            {w: comm.allreduce(n) for w, n in walls.items()})
+ 
+ 
+ def _outcome(annulus, k, seams):
+@@ -68,9 +77,10 @@ def _outcome(annulus, k, seams):
+                               # as the slab driver pairs them: the seam-conforming
+                               # path takes the network mesher
+                               mesher="ladder" if seams == "gather" else "network")
+-        unlabelled, sides = _checks(placed)
++        unlabelled, sides, walls = _checks(placed)
++        _u, _s, base_walls = _checks(annulus)
+         out = (f"placed (wall unlabelled {unlabelled}, Plus {sides['FaultPlus']}, "
+-               f"Minus {sides['FaultMinus']})")
++               f"Minus {sides['FaultMinus']}, walls {walls == base_walls})")
+     except Exception as exc:     # noqa: BLE001 - compared across the ranks
+         out = f"{type(exc).__name__}: {exc}"
+     every = uw.mpi.comm.allgather(out)
+@@ -81,8 +91,10 @@ def _outcome(annulus, k, seams):
+ @pytest.mark.parametrize("k", [2.196, 2.5], ids=["gap0.31", "gap0.61"])
+ def test_the_gathered_path_places_it(annulus, k):
+     out = _outcome(annulus, k, "gather")
+-    assert out.startswith("placed (wall unlabelled 0, "), out
+-    plus, minus = (int(x.split()[-1]) for x in out[len("placed (wall unlabelled 0, "):-1].split(", "))
++    assert out.startswith("placed (wall unlabelled 0, ") and out.endswith("walls True)"), out
++    fields = out[len("placed (wall unlabelled 0, "):-1].split(", ")
++    plus, minus = (int(x.split()[-1]) for x in fields[:2])
++    # the placement leaves every wall facet as the base had it, on both walls
+     assert plus == minus > 0, out
+ 
+ 
+-- 
+2.39.5 (Apple Git-154)
+

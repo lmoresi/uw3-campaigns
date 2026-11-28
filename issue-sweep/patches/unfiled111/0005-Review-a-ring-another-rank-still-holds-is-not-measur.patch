@@ -1,7 +1,7 @@
 From 909c81458fc5a083d095345996c00082e314600c Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 17:17:45 +1100
-Subject: [PATCH 5/6] Review: a ring another rank still holds is not measured;
+Subject: [PATCH 5/7] Review: a ring another rank still holds is not measured;
  '0.3 wall cells'; the parallel test counts labels and sides
 
 - The gathered path should leave no shared vertex on a cavity ring that meets

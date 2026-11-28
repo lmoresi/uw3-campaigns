@@ -1,7 +1,7 @@
 From c4e6f346999fce90bd2665e700bc041dbcc9218d Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 18:31:51 +1100
-Subject: [PATCH 6/6] test_0904: say the gate's unit test cannot pin its call
+Subject: [PATCH 6/7] test_0904: say the gate's unit test cannot pin its call
  site
 
 Underworld development team with AI support from Claude Code
