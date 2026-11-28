@@ -1,0 +1,97 @@
+From 3cb23ef3ebf9dd66200e473a0d8d104b392bc5e7 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 27 Nov 2026 19:40:46 +1100
+Subject: [PATCH 3/3] UNFILED 89 review lows: the scale's helper is counted; no
+ session code in the test
+
+- test_1089's operator case counts the calls to _sum_abs_deterministic (a
+  monkeypatch). A _velocity_diag_scale rewired back to NORM_1 makes no such
+  call and fails the test serially: 3 runs of 3, 0 calls against 30.
+- The helper's docstring says it must read the values where they sit. A sum
+  that copied first would put every offset at one alignment and pass the
+  offset test while still depending on it.
+- The test docstring describes the fixture (a rotated free-slip annulus with
+  viscosity 1 + T, re-solved warm after T changes) instead of naming the
+  session that measured it.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/rotated_bc.py       |  7 +++++-
+ ...89_velocity_diag_scale_is_bit_identical.py | 22 ++++++++++++++-----
+ 2 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 7c9f5559..322b8aa5 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -2740,7 +2740,12 @@ def _sum_abs_deterministic(values):
+     ``math.fsum`` rounds once, from the exact sum, so neither the summation order
+     nor the array's alignment can move it. BLAS dasum (PETSc's ``NORM_1``) can:
+     on AVX-512 OpenBLAS the same data at different offsets from a 64-byte boundary
+-    gives one of two results an ulp apart."""
++    gives one of two results an ulp apart.
++
++    It must read ``values`` where they sit and never copy them into a fresh
++    buffer: test_1089 checks it at 8 offsets, and a sum that copied first (a
++    NORM_1 on a new Vec, say) would put every offset at the same alignment and
++    pass while still depending on it."""
+     import math
+ 
+     return math.fsum(np.abs(np.asarray(values)).tolist())
+diff --git a/tests/test_1089_velocity_diag_scale_is_bit_identical.py b/tests/test_1089_velocity_diag_scale_is_bit_identical.py
+index 416a17a3..9360d0ba 100644
+--- a/tests/test_1089_velocity_diag_scale_is_bit_identical.py
++++ b/tests/test_1089_velocity_diag_scale_is_bit_identical.py
+@@ -5,13 +5,15 @@ the eliminated wall-normal rows by ``zeroRowsColumns``) was ``NORM_1`` of a
+ sub-vector, which is BLAS dasum. On AVX-512 OpenBLAS dasum of the same data gives
+ one of two results an ulp apart depending on where the array sits in memory, and
+ getSubVector's array lands somewhere new on each call. The ulp moved Krylov
+-round-off: on H7's warm re-solve fixture (an annulus, viscosity 1 + T, T from 0 to
+-1) the pressure sub-solve took 12, 13 or its 200 cap from run to run at np 2, with
+-the same answer.
++round-off: on a rotated free-slip annulus with viscosity 1 + T, re-solved warm after
++T changes from 0 to 1, the pressure sub-solve took 12, 13 or its 200 cap from run
++to run at np 2, with the same answer.
+ 
+ - the per-rank sum gives the same bits for the same data at every memory offset
+   (dasum, measured on the review machine, does not);
+-- the scale is the same on repeated calls and on freshly assembled operators.
++- the scale is the same on repeated calls and on freshly assembled operators, and
++  it is computed through that helper (so a scale rewired to NORM_1 fails here in
++  serial too).
+ """
+ import numpy as np
+ import pytest
+@@ -44,7 +46,7 @@ def test_the_per_rank_sum_does_not_depend_on_where_the_array_sits(n):
+     assert len(sums) == 1, sorted(sums)
+ 
+ 
+-def test_the_diagonal_scale_is_the_same_on_every_call_and_every_assembly():
++def test_the_diagonal_scale_is_the_same_on_every_call_and_every_assembly(monkeypatch):
+     mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.2, qdegree=3)
+     T = uw.discretisation.MeshVariable("T1089", mesh, 1, degree=1)
+     v = uw.discretisation.MeshVariable("V1089", mesh, 2, degree=2)
+@@ -64,6 +66,14 @@ def test_the_diagonal_scale_is_the_same_on_every_call_and_every_assembly():
+     stokes.solve()
+ 
+     J, Qt = stokes.snes.getJacobian()[0], stokes._rotated_freeslip_info["Qt"]
++    calls = []
++    original = rotated_bc._sum_abs_deterministic
++
++    def counted(values):
++        calls.append(len(values))
++        return original(values)
++
++    monkeypatch.setattr(rotated_bc, "_sum_abs_deterministic", counted)
+     scales = set()
+     for _ in range(CALLS):
+         # a freshly assembled operator each time: new arrays, new placements
+@@ -73,3 +83,5 @@ def test_the_diagonal_scale_is_the_same_on_every_call_and_every_assembly():
+         Ahat.destroy()
+     # development: two values an ulp apart (dasum's alignment)
+     assert len(scales) == 1, sorted(scales)
++    # every call went through the deterministic sum, once per call
++    assert len(calls) == 3 * CALLS, len(calls)
+-- 
+2.53.0
+

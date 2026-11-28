@@ -1,0 +1,208 @@
+From fb11a06245d51a6528e8827c070a66afc8923a5c Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 27 Nov 2026 17:29:33 +1100
+Subject: [PATCH 2/3] UNFILED 89 review: a test that catches the defect;
+ deterministic, not exact
+
+- The per-rank sum is a helper, _sum_abs_deterministic, tested on the same data
+  at 8 memory offsets (n = 384, 1536, 20011). A NORM_1 version of it fails that
+  test every time on AVX-512 OpenBLAS (2 or 3 distinct values per size). The
+  old test compared against a recomputation through getSubVector, which always
+  copies, and development passed it 5 of 12 runs serially.
+- The operator test now calls the scale on freshly assembled operators (10
+  ptaps, 3 calls each).
+- "Exact" is now "deterministic": fsum of per-rank fsums, divided by n, rounds
+  more than once, so the scale is reproducible but not the correctly rounded
+  mean.
+- The gather is on the operator's communicator, not COMM_WORLD.
+- The CHANGES title says the rotated operator is bit-identical, since VecMDot's
+  gemv path is alignment-dependent too.
+
+Underworld development team with AI support from Claude Code
+---
+ CHANGES.md                                    |  7 +-
+ src/underworld3/utilities/rotated_bc.py       | 39 +++++++----
+ ...89_velocity_diag_scale_is_bit_identical.py | 67 +++++++++++--------
+ 3 files changed, 70 insertions(+), 43 deletions(-)
+
+diff --git a/CHANGES.md b/CHANGES.md
+index 7b1deee6..9802c021 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -2,14 +2,15 @@
+ 
+ ## 2026-11-27
+ 
+-  - **Rotated free slip is repeatable from run to run (PR #NNNN, UNFILED 89)**:
++  - **The rotated free-slip operator is bit-identical from run to run (PR #NNNN, UNFILED 89)**:
+     the diagonal written on the eliminated wall-normal rows (the mean |diag| of
+     the rotated velocity block) came from PETSc's ``NORM_1``, which is BLAS dasum.
+     On AVX-512 OpenBLAS, dasum of the same data can differ by an ulp depending on
+     where the array sits in memory. The ulp moved Krylov round-off: a warm
+     re-solve's pressure sub-solve took 12, 13 or its 200-iteration cap from run
+-    to run at np 2, with the same answer. The scale is now an exactly rounded
+-    sum, so the operator is bit-identical every run.
++    to run at np 2, with the same answer. The scale is now a deterministic sum
++    (``math.fsum`` per rank, gathered and summed the same way), so the rotated
++    operator is bit-identical every run at a given rank count.
+ 
+ ## 2026-05-20
+ 
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index f56e7c00..7c9f5559 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -2734,28 +2734,43 @@ def _pressure_mass_schur_pmat(solver):
+     return Mp
+ 
+ 
++def _sum_abs_deterministic(values):
++    """sum |values|, the same bits wherever ``values`` sits in memory (UNFILED 89).
++
++    ``math.fsum`` rounds once, from the exact sum, so neither the summation order
++    nor the array's alignment can move it. BLAS dasum (PETSc's ``NORM_1``) can:
++    on AVX-512 OpenBLAS the same data at different offsets from a 64-byte boundary
++    gives one of two results an ulp apart."""
++    import math
++
++    return math.fsum(np.abs(np.asarray(values)).tolist())
++
++
+ def _velocity_diag_scale(Ahat, solver):
+     """Mean |diag| of the (rotated) velocity block — the representative diagonal
+-    for constraint rows (see the zeroRowsColumns call sites). Collective.
+-
+-    Bit-identical from run to run (UNFILED 89): each rank's sum is ``math.fsum``
+-    (exactly rounded, so independent of order and of where the array sits in
+-    memory), and the ranks' sums are gathered and summed the same way. It was
+-    ``NORM_1``, which is BLAS dasum, and on AVX-512 OpenBLAS dasum of the same
+-    data gives one of two results an ulp apart depending on the array's
+-    alignment; getSubVector's array lands somewhere new each call. The ulp went
+-    into the eliminated rows' diagonal and moved Krylov round-off: a warm
+-    re-solve's pressure sub-solve took 12, 13 or its 200 cap from run to run."""
++    for constraint rows (see the zeroRowsColumns call sites). Collective on
++    ``Ahat``'s communicator.
++
++    Deterministic from run to run at a given rank count (UNFILED 89): each rank's
++    sum is :func:`_sum_abs_deterministic`, and the ranks' sums are gathered on the
++    operator's communicator and summed the same way. (fsum of per-rank fsums,
++    divided by n, rounds more than once, so it is reproducible, not the correctly
++    rounded mean.) It was ``NORM_1``, which is BLAS dasum; on AVX-512 OpenBLAS
++    dasum depends on the array's alignment, and getSubVector's array lands
++    somewhere new each call. The ulp went into the eliminated rows' diagonal and
++    moved Krylov round-off: a warm re-solve's pressure sub-solve took 12, 13 or
++    its 200 cap from run to run."""
+     import math
+ 
+     d = Ahat.getDiagonal()
+     vis = solver._subdict["velocity"][0]
+     sub = d.getSubVector(vis)
+     n = sub.getSize()
+-    local = math.fsum(np.abs(sub.getArray(readonly=True)).tolist())
++    local = _sum_abs_deterministic(sub.getArray(readonly=True))
+     d.restoreSubVector(vis, sub)
+     d.destroy()
+-    s = math.fsum(mpi.comm.allgather(local)) / max(n, 1)
++    comm = Ahat.getComm().tompi4py()
++    s = math.fsum(comm.allgather(local)) / max(n, 1)
+     return float(s) if s > 0.0 else 1.0
+ 
+ 
+diff --git a/tests/test_1089_velocity_diag_scale_is_bit_identical.py b/tests/test_1089_velocity_diag_scale_is_bit_identical.py
+index 32bbc113..416a17a3 100644
+--- a/tests/test_1089_velocity_diag_scale_is_bit_identical.py
++++ b/tests/test_1089_velocity_diag_scale_is_bit_identical.py
+@@ -1,19 +1,18 @@
+-"""The rotated route's constraint-row diagonal scale is bit-identical (UNFILED 89).
++"""The rotated route's constraint-row diagonal scale is deterministic (UNFILED 89).
+ 
+ ``_velocity_diag_scale`` (the mean |diag| of the rotated velocity block, written on
+ the eliminated wall-normal rows by ``zeroRowsColumns``) was ``NORM_1`` of a
+ sub-vector, which is BLAS dasum. On AVX-512 OpenBLAS dasum of the same data gives
+ one of two results an ulp apart depending on where the array sits in memory, and
+-getSubVector's array lands somewhere new each call. The ulp moved Krylov round-off:
+-on H7's warm re-solve fixture (an annulus, viscosity 1 + T, T from 0 to 1) the
+-pressure sub-solve took 12, 13 or its 200 cap from run to run at np 2, with the
+-same answer.
++getSubVector's array lands somewhere new on each call. The ulp moved Krylov
++round-off: on H7's warm re-solve fixture (an annulus, viscosity 1 + T, T from 0 to
++1) the pressure sub-solve took 12, 13 or its 200 cap from run to run at np 2, with
++the same answer.
+ 
+-The scale is now an exactly rounded sum on each rank, and the ranks' sums are
+-summed the same way, so every call returns the same bits (in serial, the exact mean).
++- the per-rank sum gives the same bits for the same data at every memory offset
++  (dasum, measured on the review machine, does not);
++- the scale is the same on repeated calls and on freshly assembled operators.
+ """
+-import math
+-
+ import numpy as np
+ import pytest
+ import sympy
+@@ -23,10 +22,29 @@ from underworld3.utilities import rotated_bc
+ 
+ pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
+ 
+-CALLS = 50
++OFFSETS = 8
++CALLS = 10
++
++
++def _at_offset(values, offset):
++    """``values`` copied into a buffer ``offset`` doubles past a 64-byte boundary."""
++    buf = np.empty(values.size + 16)
++    base = (-(buf.ctypes.data // 8)) % 8
++    view = buf[base + offset: base + offset + values.size]
++    view[:] = values
++    return view
++
+ 
++@pytest.mark.parametrize("n", [384, 1536, 20011])
++def test_the_per_rank_sum_does_not_depend_on_where_the_array_sits(n):
++    # random data: dasum of these differs by offset for 89 of 90 vectors on AVX-512
++    values = np.random.default_rng(n).standard_normal(n)
++    sums = {rotated_bc._sum_abs_deterministic(_at_offset(values, k)).hex()
++            for k in range(OFFSETS)}
++    assert len(sums) == 1, sorted(sums)
+ 
+-def test_the_diagonal_scale_is_the_same_on_every_call():
++
++def test_the_diagonal_scale_is_the_same_on_every_call_and_every_assembly():
+     mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.2, qdegree=3)
+     T = uw.discretisation.MeshVariable("T1089", mesh, 1, degree=1)
+     v = uw.discretisation.MeshVariable("V1089", mesh, 2, degree=2)
+@@ -45,20 +63,13 @@ def test_the_diagonal_scale_is_the_same_on_every_call():
+     stokes.tolerance = 1.0e-8
+     stokes.solve()
+ 
+-    info = stokes._rotated_freeslip_info
+-    Ahat = stokes.snes.getJacobian()[0].ptap(info["Qt"])
+-    scales = {rotated_bc._velocity_diag_scale(Ahat, stokes).hex() for _ in range(CALLS)}
+-
+-    # the reference, independently: each rank's exactly rounded sum of |diag| over
+-    # its velocity rows, then the ranks' sums summed the same way (exact in serial)
+-    d = Ahat.getDiagonal()
+-    sub = d.getSubVector(stokes._subdict["velocity"][0])
+-    n = sub.getSize()
+-    local = math.fsum(np.abs(np.asarray(sub.getArray(readonly=True))).tolist())
+-    d.restoreSubVector(stokes._subdict["velocity"][0], sub)
+-    d.destroy()
+-    Ahat.destroy()
+-    exact = math.fsum(uw.mpi.comm.allgather(local)) / n
+-
+-    # development: two values an ulp apart within one process (dasum's alignment)
+-    assert scales == {exact.hex()}, (sorted(scales), exact.hex())
++    J, Qt = stokes.snes.getJacobian()[0], stokes._rotated_freeslip_info["Qt"]
++    scales = set()
++    for _ in range(CALLS):
++        # a freshly assembled operator each time: new arrays, new placements
++        Ahat = J.ptap(Qt)
++        for _ in range(3):
++            scales.add(rotated_bc._velocity_diag_scale(Ahat, stokes).hex())
++        Ahat.destroy()
++    # development: two values an ulp apart (dasum's alignment)
++    assert len(scales) == 1, sorted(scales)
+-- 
+2.53.0
+

@@ -1,0 +1,49 @@
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 322b8aa5..aac35d7b 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -2830,6 +2830,11 @@ def _destroy_rotated_ksp_ctx(ctx):
+ # np 2), so its count there is not np-invariant; the decision is rank-uniform.
+ _SCHUR_ROUNDOFF = 1.0e6 * np.finfo(float).eps
+ 
++# UNFILED 94 MEASUREMENT SCAFFOLD (not for merge as is): the pressure sub-solve's
++# floor relative to the fieldsplit input's velocity part, switched by env UW94_FLOOR
++_SCHUR_PRESSURE_FLOOR = bool(int(__import__("os").environ.get("UW94_FLOOR", "0")))
++_SCHUR_PRESSURE_FLOOR_C = float(__import__("os").environ.get("UW94_C", "1"))
++
+ 
+ class _SchurRoundoffTest:
+     """A convergence test, prepended on the pressure (Schur) sub-KSP, that stops it at
+@@ -2863,6 +2868,9 @@ class _SchurRoundoffTest:
+         self.abs_x = None
+         self.work = None
+         self.fired = 0
++        self.floored = 0
++        self.scale_mismatch = 0
++        self.input_scale = None
+         self.refresh(Ahat)
+ 
+     def refresh(self, Ahat):
+@@ -2876,7 +2884,22 @@ class _SchurRoundoffTest:
+ 
+     def __call__(self, ksp, its, rnorm):
+         if its != 0:
++            if (_SCHUR_PRESSURE_FLOOR and self.input_scale is not None
++                    and rnorm <= _SCHUR_PRESSURE_FLOOR_C * ksp.getTolerances()[0]
++                    * self.input_scale):
++                self.floored += 1
++                return PETSc.KSP.ConvergedReason.CONVERGED_ATOL
+             return PETSc.KSP.ConvergedReason.ITERATING
++        # the fieldsplit input's velocity part, before the Schur solve's own
++        # velocity applications overwrite the sub-KSP's right-hand side
++        self.input_scale = float(self.vel_ksp.getRhs().norm())
++        # measurement: a reduced norm must be the same on every rank (row 32)
++        _comm = ksp.getComm().tompi4py()
++        if _comm.size > 1:
++            from mpi4py import MPI as _MPI
++            if (_comm.allreduce(self.input_scale, op=_MPI.MAX)
++                    != _comm.allreduce(self.input_scale, op=_MPI.MIN)):
++                self.scale_mismatch += 1
+         x = self.vel_ksp.getSolution()
+         if self.abs_x is None:
+             self.abs_x = x.duplicate()
