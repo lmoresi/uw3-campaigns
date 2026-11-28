@@ -1,0 +1,218 @@
+From f9df667481cc9a1b3dde76a262b16880cfab8894 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 19:30:01 +1100
+Subject: [PATCH] The pressure sub-solve's iteration cap is the user's on both
+ Stokes paths
+
+- Setting strategy wrote fieldsplit_pressure_ksp_max_it and
+  fieldsplit_velocity_ksp_max_it back to 200 over the user's values. Both are
+  now written by _push_default_option, which leaves a value it did not write
+  (set on petsc_options or on the command line) alone. Its record is its own,
+  so the multigrid bundle's test of which keys are the user's is unchanged.
+  Every writer of these keys writes 200; a user value of exactly 200 is not
+  told apart from the default, which is then harmless.
+- The rotated free-slip path builds its own Krylov solver under a per-solve
+  prefix and fixed its pressure cap at 200, out of the user's reach; on P2/dP1
+  triangle meshes the cap could not be raised. It now reads the solver's own
+  fieldsplit_pressure_ksp_max_it (default 200) from the options database, so
+  the same option reaches both paths.
+- rotated-freeslip.md says so, and that the cached solver takes the cap set
+  before the first solve.
+
+Left open: the sub-solves' rtol and ksp_type are still rewritten by strategy.
+
+Default unchanged: a probe of a standard, a standard-with-strategy and a
+rotated P2/dP1 solve gives identical solution bytes and iteration counts;
+every SNES and KSP solve in test_1111, test_1087 and test_1018 (221) matches a
+development run exactly, apart from two rotated solves whose last residual
+takes one of two values from session to session on development as well.
+
+test_0908 (tier B): a user's caps survive a later strategy; a strategy alone
+keeps 200; the rotated pressure sub-solver carries the user's cap. The first
+and third fail before the change.
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/subsystems/rotated-freeslip.md |  9 +++
+ .../cython/petsc_generic_snes_solvers.pyx     | 31 ++++++++--
+ src/underworld3/utilities/rotated_bc.py       |  7 ++-
+ ...0908_pressure_subsolve_cap_is_the_users.py | 59 +++++++++++++++++++
+ 4 files changed, 101 insertions(+), 5 deletions(-)
+ create mode 100644 tests/test_0908_pressure_subsolve_cap_is_the_users.py
+
+diff --git a/docs/developer/subsystems/rotated-freeslip.md b/docs/developer/subsystems/rotated-freeslip.md
+index f3af73ca..bd70ec7d 100644
+--- a/docs/developer/subsystems/rotated-freeslip.md
++++ b/docs/developer/subsystems/rotated-freeslip.md
+@@ -310,6 +310,15 @@ their multigrid this way; the rotated custom-FMG branch was the sole exception.
+ `max_it` matches both (200); `rtol` matches the GAMG fallback (0.1 × tol), where
+ the native path asks for 0.033 × tol.
+ 
++The pressure sub-solve's cap is the solver's own `fieldsplit_pressure_ksp_max_it`
++(default 200), read from the options database under the solver's prefix, so
++`stokes.petsc_options["fieldsplit_pressure_ksp_max_it"] = 1000` (or
++`-<prefix>fieldsplit_pressure_ksp_max_it 1000` on the command line) raises it on
++the rotated path as on the standard one. Raise it on P2/dP1 triangle meshes, where
++the Schur complement is poorly conditioned. The rotated Krylov solver is cached, so
++set the cap before the first solve. The velocity sub-solve's cap on this path stays
++200.
++
+ Two things make this easy to miss, and both are now instrumented. The outer
+ iteration count does not reveal it — a full Schur factorisation with a good
+ pressure mass still reports ~1 outer iteration while the inner solve grinds
+diff --git a/src/underworld3/cython/petsc_generic_snes_solvers.pyx b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+index fc67b3bb..0dd16456 100644
+--- a/src/underworld3/cython/petsc_generic_snes_solvers.pyx
++++ b/src/underworld3/cython/petsc_generic_snes_solvers.pyx
+@@ -942,6 +942,29 @@ class SolverBaseClass(uw_object):
+             return strategy
+         return "robust"
+ 
++    def _push_default_option(self, key, value):
++        """Write a framework default that a user's own value must survive.
++
++        The key is written unless it already holds a value other than the one this
++        method last wrote there: that value is the user's (set on ``petsc_options``
++        or on the command line) and is left alone, so a later ``strategy`` change
++        cannot overwrite it. A user value equal to the framework default cannot be
++        told apart from it, which is harmless while every writer of the key writes
++        that same default.
++
++        The record is its own, not ``_managed_pc_options``: that one decides which
++        multigrid-bundle keys count as the user's, and these writes must not change
++        that.
++        """
++        if not hasattr(self, "_framework_defaults"):
++            self._framework_defaults = {}
++        if self.petsc_options.hasName(key):
++            current = self.petsc_options.getString(key)
++            if current != self._framework_defaults.get(key):
++                return
++        self.petsc_options[key] = value
++        self._framework_defaults[key] = multigrid_options.option_string(value)
++
+     def _push_managed_option(self, key, value):
+         """Write a PETSc option UW3 owns, recording that we wrote it.
+ 
+@@ -10100,7 +10123,7 @@ class SNES_Stokes_SaddlePt(SolverBaseClass):
+         # Pressure subsolve — flexible GMRES + GASM. (FGMRES is right-
+         # preconditioned by construction; no need to set pc_side explicitly.)
+         self.petsc_options[f"fieldsplit_{p_name}_ksp_type"] = "fgmres"
+-        self.petsc_options[f"fieldsplit_{p_name}_ksp_max_it"] = 200
++        self._push_default_option(f"fieldsplit_{p_name}_ksp_max_it", 200)
+         self.petsc_options[f"fieldsplit_{p_name}_ksp_rtol"]  = self._tolerance
+         self.petsc_options[f"fieldsplit_{p_name}_pc_type"] = "gasm"
+         # self.petsc_options[f"fieldsplit_{p_name}_pc_gasm_type"] = "basic"
+@@ -10125,7 +10148,7 @@ class SNES_Stokes_SaddlePt(SolverBaseClass):
+         # gthyagi's validated FGMRES configuration completed at np=144,
+         # cellsize=1/32 where CG/FCG and standard GMRES both failed.
+         self.petsc_options[f"fieldsplit_{v_name}_ksp_type"] = "fgmres"
+-        self.petsc_options[f"fieldsplit_{v_name}_ksp_max_it"] = 200
++        self._push_default_option(f"fieldsplit_{v_name}_ksp_max_it", 200)
+         self.petsc_options[f"fieldsplit_{v_name}_ksp_rtol"]  = self._tolerance * 0.1
+         # The velocity field carries mesh.dim components per node; say so, or
+         # GAMG aggregates scalars. See multigrid_options._gamg_settings.
+@@ -11064,7 +11087,7 @@ class SNES_Stokes_SaddlePt(SolverBaseClass):
+         # Pressure subsolve — flexible GMRES + GASM. (FGMRES is right-
+         # preconditioned by construction; no need to set pc_side explicitly.)
+         self.petsc_options[f"fieldsplit_{p_name}_ksp_type"] = "fgmres"
+-        self.petsc_options[f"fieldsplit_{p_name}_ksp_max_it"] = 200
++        self._push_default_option(f"fieldsplit_{p_name}_ksp_max_it", 200)
+         self.petsc_options[f"fieldsplit_{p_name}_ksp_rtol"]  = self._tolerance
+         self.petsc_options[f"fieldsplit_{p_name}_pc_type"] = "gasm"
+         self.petsc_options[f"fieldsplit_{p_name}_pc_gasm_type"] = "basic"
+@@ -11080,7 +11103,7 @@ class SNES_Stokes_SaddlePt(SolverBaseClass):
+         # rationale (FGMRES default for robustness to non-stationary GAMG
+         # preconditioning and weakly-indefinite coarse operators; issue #147).
+         self.petsc_options[f"fieldsplit_velocity_ksp_type"] = "fgmres"
+-        self.petsc_options[f"fieldsplit_velocity_ksp_max_it"] = 200
++        self._push_default_option(f"fieldsplit_velocity_ksp_max_it", 200)
+         # The velocity BLOCK's preconditioner is not set here. `strategy` used to
+         # write the whole GAMG bundle plus `pc_mg_type=kaskade`, and every one of
+         # those writes was DEAD: `_apply_preconditioner_options` runs later (at
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 5872290b..68474480 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -3151,7 +3151,12 @@ def _solve_rotated_iterative(solver, Ahat, bhat, Q, Qt, normal_rows, verbose=Fal
+             # the resolved rule replaces it.
+             "fieldsplit_pres_ksp_rtol": str(
+                 getattr(solver, "_rotated_pres_rtol", tol * 0.1)),
+-            "fieldsplit_pres_ksp_max_it": "200",
++            # The cap is the solver's own fieldsplit_pressure_ksp_max_it (default
++            # 200), read from the options database under the solver's prefix, so
++            # a value set on stokes.petsc_options or on the command line reaches
++            # this sub-solve as it reaches the standard path's.
++            "fieldsplit_pres_ksp_max_it": str(PETSc.Options().getInt(
++                f"{solver.petsc_options_prefix}fieldsplit_pressure_ksp_max_it", 200)),
+         }
+         if Mp is not None:
+             cfg["fieldsplit_pres_pc_type"] = "gasm"
+diff --git a/tests/test_0908_pressure_subsolve_cap_is_the_users.py b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+new file mode 100644
+index 00000000..5b041c16
+--- /dev/null
++++ b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+@@ -0,0 +1,59 @@
++"""The pressure sub-solve's iteration cap is the user's to set, on both Stokes paths.
++
++The cap is ``fieldsplit_pressure_ksp_max_it`` (default 200). Two things defeated it:
++
++* setting ``strategy`` after the option wrote 200 back over the user's value;
++* the rotated free-slip path builds its own Krylov solver under a per-solve prefix
++  and fixed its pressure cap at 200, so no option reached it. On P2/dP1 triangle
++  meshes, where the Schur complement is poorly conditioned, that cap could not be
++  raised.
++
++What is asserted: a value set before ``strategy`` survives it (for the velocity cap
++too); and the rotated solve's live pressure sub-solver carries the value set on the
++solver's options.
++"""
++import pytest
++import sympy
++
++import underworld3 as uw
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++
++def _stokes(mesh, p_continuous=True):
++    v = uw.discretisation.MeshVariable("v0908", mesh, 2, degree=2)
++    p = uw.discretisation.MeshVariable("p0908", mesh, 1, degree=1, continuous=p_continuous)
++    s = uw.systems.Stokes(mesh, velocityField=v, pressureField=p)
++    s.constitutive_model = uw.constitutive_models.ViscousFlowModel
++    s.constitutive_model.Parameters.shear_viscosity_0 = 1
++    return s
++
++
++def test_a_users_caps_survive_a_later_strategy():
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    s = _stokes(mesh)
++    s.petsc_options["fieldsplit_pressure_ksp_max_it"] = 777
++    s.petsc_options["fieldsplit_velocity_ksp_max_it"] = 555
++    s.strategy = "fast"
++    assert s.petsc_options.getInt("fieldsplit_pressure_ksp_max_it") == 777
++    assert s.petsc_options.getInt("fieldsplit_velocity_ksp_max_it") == 555
++
++
++def test_a_strategy_alone_keeps_the_default():
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    s = _stokes(mesh)
++    s.strategy = "robust"
++    assert s.petsc_options.getInt("fieldsplit_pressure_ksp_max_it") == 200
++
++
++def test_the_rotated_pressure_subsolve_takes_the_users_cap():
++    mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.2, qdegree=3)
++    s = _stokes(mesh, p_continuous=False)
++    r = sympy.sqrt(mesh.X[0] ** 2 + mesh.X[1] ** 2)
++    s.bodyforce = sympy.Matrix(mesh.X) / r * sympy.cos(3 * sympy.atan2(mesh.X[1], mesh.X[0]))
++    s.add_rotated_freeslip_bc(0, "Upper")
++    s.add_rotated_freeslip_bc(0, "Lower")
++    s.petsc_options["fieldsplit_pressure_ksp_max_it"] = 777
++    s.solve()
++    pressure = s._rotated_linear_cache["ctx"]["ksp"].getPC().getFieldSplitSubKSP()[1]
++    assert pressure.getTolerances()[3] == 777
+-- 
+2.39.5 (Apple Git-154)
+
