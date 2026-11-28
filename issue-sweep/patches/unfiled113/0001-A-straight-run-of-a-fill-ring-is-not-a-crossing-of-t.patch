@@ -1,8 +1,8 @@
 From 9be169a32b82e388757b653e1e576b201ecd71f9 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:06:08 +1100
-Subject: [PATCH] A straight run of a fill ring is not a crossing of the ring
- with itself
+Subject: [PATCH 1/2] A straight run of a fill ring is not a crossing of the
+ ring with itself
 
 Before meshing the fill around a ribbon the placement refuses a ring that
 crosses itself. A ladder ribbon's rail is straight, and the ring runs along it

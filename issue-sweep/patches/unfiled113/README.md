@@ -23,3 +23,6 @@ Not this defect, for C1 to decide whether it is a row: on these outcrop placemen
 smallest angle is 0.3-5.8 deg (e.g. 0.3 at k 0.8, 0.8 at k 1.4). Development's outcrop path
 already gives 3.3-8.6 deg at dips 30 and 45. This is the outcrop-floor question C1 raised under
 111's ruling.
+
+## H7 lows: 0002
+Bowtie at 1e-7 (kills the absolute-1e-12 mutant), a 1e-8 rad mid-edge crossing (kills the relative-1e-6 mutant), and 2000 seeded random rails (seed 1; development counts 2 false crossings, the fix 0). Docstring: an end on the other edge is a touching. test_0905: 5 passed.

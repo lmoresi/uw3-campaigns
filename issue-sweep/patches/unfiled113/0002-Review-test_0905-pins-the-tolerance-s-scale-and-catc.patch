@@ -1,0 +1,79 @@
+From a4501ca63e303d709ef8775034a984dc2e6e867c Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 17:05:27 +1100
+Subject: [PATCH 2/2] Review: test_0905 pins the tolerance's scale and catches
+ the false crossing at random
+
+- A bowtie 1e-7 across still crosses (an absolute 1e-12 tolerance misses it),
+  and so do two unit edges crossing at their middles at 1e-8 rad (a relative
+  1e-6 tolerance misses that).
+- 2000 seeded random rails (straight runs of five points, closed by a detour)
+  are never a crossing; the bare sign test found two in this set.
+- The docstring says an end on the other edge is a touching, not counted.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    |  3 ++-
+ ...5_fill_ring_collinear_is_not_a_crossing.py | 25 ++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index a161a524..fe8f24ad 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -6515,7 +6515,8 @@ def _loop_self_crossings(P):
+     strictly on opposite sides of the other's line.
+ 
+     An orientation within 1e-12 of the product of the two edges' lengths counts
+-    as zero, on neither side. A ladder ribbon's rail is straight and a fill ring
++    as zero, on neither side, so an end lying on (or within that of) the other
++    edge is a touching, and not counted. A ladder ribbon's rail is straight and a fill ring
+     runs along it through several points; two of its edges had orientations of
+     exactly 0 and 5e-20 against each other, which a bare sign test read as
+     opposite sides of a crossing, and refused the fill."""
+diff --git a/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py b/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
+index 1702c96f..178656e2 100644
+--- a/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
++++ b/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
+@@ -8,7 +8,8 @@ crossing. An outcropping ribbon dipping 15 degrees was refused for it, at most o
+ depths where its band crossed the wall ("the fill ring crosses itself 1 time(s)").
+ 
+ What is asserted: two disjoint collinear edges, the dumped ring's four rail points
+-included, are not a crossing; a proper crossing, a shallow one included, still is; and
++and 2000 seeded random rails included, are not a crossing; a proper crossing still is,
++a shallow one, one 1e-7 across and one at 1e-8 rad included; and
+ the ribbon that was refused is placed, its band on the wall, the wall's edges labelled
+ and the fault split.
+ """
+@@ -55,6 +56,28 @@ def test_a_proper_crossing_is_still_counted():
+     # a crossing at a shallow angle, far above the tolerance
+     shallow = np.array([[0, 0], [1, 0.001], [1, 0], [0, 0.001]], dtype=float)
+     assert _loop_self_crossings(shallow) == 1
++    # the tolerance is relative to the edges: a bowtie 1e-7 across still crosses
++    assert _loop_self_crossings(1e-7 * bowtie) == 1
++    # and small: two unit edges crossing at their middles at 1e-8 rad
++    d = 0.5e-8
++    assert _loop_self_crossings(np.array([[0, 0], [1, 0], [1, d], [0, -d]])) == 1
++
++
++def _rails(seed, n):
++    """Straight runs of five points, as a ladder's rail, at random angles,
++    spacings and places, each closed by a detour beside it."""
++    rng = np.random.default_rng(seed)
++    for _ in range(n):
++        ang, h, c = rng.uniform(0, np.pi), rng.uniform(0.005, 0.05), rng.uniform(-1, 1, 2)
++        t = np.array([np.cos(ang), np.sin(ang)])
++        nrm = np.array([-t[1], t[0]])
++        run = c + np.outer(np.arange(5) * h, t)
++        yield np.vstack([run, run[-1] - 3 * h * nrm, run[0] - 3 * h * nrm])
++
++
++def test_no_random_straight_run_is_a_crossing():
++    # this seeded set held two false crossings for the bare sign test
++    assert sum(_loop_self_crossings(ring) for ring in _rails(1, 2000)) == 0
+ 
+ 
+ def test_an_outcropping_ribbon_dipping_15_degrees_is_placed():
+-- 
+2.39.5 (Apple Git-154)
+
