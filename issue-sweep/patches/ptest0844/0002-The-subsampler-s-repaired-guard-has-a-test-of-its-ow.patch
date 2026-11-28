@@ -1,8 +1,8 @@
-From 0b5d2d9d91ab4d02d70290e9bbfabdaf80f38884 Mon Sep 17 00:00:00 2001
+From b79c5d99a2da9a5823c7047bebec5fd2dd49badc Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
-Date: Sun, 29 Nov 2026 05:44:35 +1100
-Subject: [PATCH] The subsampler's repaired guard has a test of its own; the
- ptest comment drops the counts
+Date: Sun, 29 Nov 2026 05:45:10 +1100
+Subject: [PATCH 2/2] The subsampler's repaired guard has a test of its own;
+ the ptest comment drops the counts
 
 Under adapt, nvb.nested_cell_parents already finds no single parent for a
 flipped cell, so _subsample_mg_levels' own 'repaired' guard is masked
@@ -10,9 +10,10 @@ there and nothing tested it alone. A serial test now calls the subsampler
 directly on an unrepaired hierarchy (the arguments adapt passes, captured)
 with the recorded maps blanked: unmarked, maps are derived; every level
 marked repaired, none is; one level marked, only its map goes. Removing
-the guard fails it. The parallel test's comment states the pattern, the
-map is kept only on levels whose pass made no flips, without pass counts,
-which vary between runs.
+the guard fails it. The parallel test's comment states the pattern
+without pass counts: the map is kept only on levels whose pass made no
+flips, and which levels those are depends on the mesh, metric and rank
+count.
 
 Underworld development team with AI support from Claude Code
 ---

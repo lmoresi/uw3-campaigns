@@ -1,16 +1,17 @@
-From 1ab28fc3578ce3464a199a5145978dafdfda54bb Mon Sep 17 00:00:00 2001
+From e544cefcd3d2840c00fa246abbddf58f30411ca8 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
-Date: Sun, 29 Nov 2026 05:24:39 +1100
-Subject: [PATCH] ptest_0844: the parent map is None exactly on the levels
+Date: Sun, 29 Nov 2026 05:45:10 +1100
+Subject: [PATCH 1/2] ptest_0844: the parent map is None exactly on the levels
  whose repair pass flipped
 
 The repair arm asserted every level's cell-parent map is None. A repair
 pass that flips nothing changes no cell, and the adapt keeps that level's
-map, correctly: at np 3 the last of six passes flips none (3, 11, 23, 47,
-17, 0). The assertion now follows the flip counts, recorded per pass by
-wrapping reconnect.flip_to_reduce_max_angle (its count is summed over
-ranks): None where the pass flipped, kept where it did not, and at least
-one pass flipped. Serial check of the alignment: six passes, six levels.
+map, correctly; at np 3 a late pass flips none. The assertion now follows
+the flip counts, recorded per pass by wrapping
+reconnect.flip_to_reduce_max_angle (its count is summed over ranks): None
+where the pass flipped, kept where it did not, and at least one pass
+flipped. The map is kept only on levels whose pass made no flips; which
+levels those are depends on the mesh, metric and rank count.
 
 Underworld development team with AI support from Claude Code
 ---
