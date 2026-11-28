@@ -23,3 +23,6 @@ Laptop (serial only): test_0912 5 passed; 13 fault-split files 113 passed. A fac
 helper fails 2 of 5 (the off-facet and fragment cases). scripts/check_test_coverage.py OK.
 For H1: tests/parallel/test_0912 at np 2 and 3 on 0001 alone (must fail) and on 0001+0002 (must
 pass); ptest_0848 at np 3 on 0001+0002.
+
+## 0003 (2026-11-29): ptest_0848 in pytest form
+tests/parallel/test_0848_fault_split_3d_parallel.py: every check of the script as an assert (two tests: away from the cut; on the cut). u.data -> u.array[:, 0, 0] (same order, checked). Serial run of both test bodies passes. The old script stays. For H1: np 2 and 3 under the supervisor on labels70-22 + row122 0001-0003; on 0001 alone (no fix) np 3 is expected to fail.

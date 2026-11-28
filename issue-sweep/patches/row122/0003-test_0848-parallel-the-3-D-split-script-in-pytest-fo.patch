@@ -1,0 +1,149 @@
+From 157fcd32e41d087543a9c81d0d9a52cd08fbb535 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 05:29:18 +1100
+Subject: [PATCH] test_0848 parallel: the 3-D split script in pytest form
+
+ptest_0848_fault_split_3d_parallel.py is a script CI cannot collect, so
+it ran nowhere; it failed at np 3 on development (the seam gate this
+branch fixes). Its checks become assertions in a pytest file under
+tests/parallel, which the np 2 batches pick up: a patch away from the
+balance cut splits with its plus faces on one rank, zero SF coordinate
+drift, and a P2 Poisson solve that stays within the data and leaves the
+Minus DOFs below their Plus partners; a patch on the cut is repartitioned
+and splits on one rank with zero drift. The script stays until its
+retirement is decided.
+
+Underworld development team with AI support from Claude Code
+---
+ .../test_0848_fault_split_3d_parallel.py      | 119 ++++++++++++++++++
+ 1 file changed, 119 insertions(+)
+ create mode 100644 tests/parallel/test_0848_fault_split_3d_parallel.py
+
+diff --git a/tests/parallel/test_0848_fault_split_3d_parallel.py b/tests/parallel/test_0848_fault_split_3d_parallel.py
+new file mode 100644
+index 00000000..26f9f7bb
+--- /dev/null
++++ b/tests/parallel/test_0848_fault_split_3d_parallel.py
+@@ -0,0 +1,119 @@
++"""3-D split-node faults in parallel: the split works at any rank count.
++
++The pytest form of ptest_0848_fault_split_3d_parallel.py, a script CI could not
++collect. Every check the script makes is an assertion here.
++
++The 3-D contract is conservative: the patch's whole cell star must be rank-interior
++(a 3-D seam crossing is a curve, deferred). split_fault repartitions the star onto
++one rank when it touches the seam, so
++
++1. a patch away from the balance cut splits: plus faces exist on exactly one rank,
++   the star forest carries the coordinates with zero drift, and a P2 Poisson solve
++   with the Plus side held at 1 stays within the data and leaves the coincident
++   Minus DOFs below their Plus partners;
++2. a patch where the balance cut runs splits too, after the repartition: one owner,
++   zero drift.
++"""
++import numpy as np
++import pytest
++from mpi4py import MPI
++
++import underworld3 as uw
++from underworld3.utilities.fault_split import split_fault
++
++pytestmark = [pytest.mark.mpi(min_size=2), pytest.mark.level_2, pytest.mark.tier_b,
++              pytest.mark.timeout(600)]
++
++
++def _sf_coordinate_drift(mesh):
++    """Broadcast every vertex coordinate root to leaf, one component per pass (the
++    SF's unit is one double per point); leaves must agree with their own
++    coordinates."""
++    comm = uw.mpi.comm
++    dm = mesh.dm
++    sf = dm.getPointSF()
++    try:
++        sf.getGraph()
++    except (ValueError, TypeError):
++        return 0.0
++    pStart, pEnd = dm.getChart()
++    vS, vE = dm.getDepthStratum(0)
++    X = np.asarray(dm.getCoordinatesLocal().array).reshape(-1, mesh.dim)
++    worst = 0.0
++    for comp in range(mesh.dim):
++        root = np.zeros(pEnd - pStart, dtype=np.float64)
++        root[vS - pStart: vE - pStart] = X[: vE - vS, comp]
++        leaf = np.full(pEnd - pStart, np.nan, dtype=np.float64)
++        sf.bcastBegin(MPI.DOUBLE, root, leaf, MPI.REPLACE)
++        sf.bcastEnd(MPI.DOUBLE, root, leaf, MPI.REPLACE)
++        seen = np.isfinite(leaf[vS - pStart: vE - pStart])
++        if seen.any():
++            worst = max(worst, float(np.abs(
++                leaf[vS - pStart: vE - pStart][seen] - X[: vE - vS, comp][seen]).max()))
++    return float(comm.allreduce(worst, MPI.MAX))
++
++
++def _plus_faces(child, name):
++    value = int(child.boundaries[name].value)
++    if child.dm.hasLabel(name) and child.dm.getLabel(name).getStratumSize(value) > 0:
++        return child.dm.getLabel(name).getStratumSize(value)
++    return 0
++
++
++def _patch_box(x, name):
++    patch = np.array([[x, 0.35, 0.35], [x, 0.65, 0.35],
++                      [x, 0.65, 0.65], [x, 0.35, 0.65]])
++    # an elongated box: the balance cut runs across the long axis, near x = 1
++    return uw.meshing.BoxInternalPatch(cellSize=0.15, minCoords=(0, 0, 0),
++                                       maxCoords=(2, 1, 1), patch_points=patch,
++                                       patch_name=name)
++
++
++def test_a_patch_away_from_the_cut_splits_and_decouples():
++    comm = uw.mpi.comm
++    child = split_fault(_patch_box(0.4, "FltA"), "FltA")
++    assert child is not None
++
++    n_plus_local = _plus_faces(child, "FltAPlus")
++    assert comm.allreduce(n_plus_local, MPI.SUM) > 0, "no plus faces on any rank"
++    assert comm.allreduce(1 if n_plus_local else 0, MPI.SUM) == 1, (
++        "the fault's plus faces are on more than one rank")
++    assert _sf_coordinate_drift(child) == 0.0
++
++    u = uw.discretisation.MeshVariable("u", child, 1, degree=2)
++    poisson = uw.systems.Poisson(child, u_Field=u)
++    poisson.constitutive_model = uw.constitutive_models.DiffusionModel
++    poisson.constitutive_model.Parameters.diffusivity = 1.0
++    poisson.f = 0.0
++    for wall in ("Bottom", "Top", "Right", "Left", "Front", "Back"):
++        poisson.add_dirichlet_bc(0.0, wall)
++    poisson.add_dirichlet_bc(1.0, "FltAPlus")
++    poisson.solve()
++
++    vals = np.asarray(u.array[:, 0, 0])
++    lo = float(comm.allreduce(vals.min() if vals.size else 1e30, MPI.MIN))
++    hi = float(comm.allreduce(vals.max() if vals.size else -1e30, MPI.MAX))
++    assert lo >= -1e-9 and hi <= 1.0 + 1e-9, (lo, hi)
++
++    # the Minus side of a coincident pair sits below its Plus partner somewhere:
++    # the Plus datum has not leaked across the fault
++    sec = child.dm.getLocalSection()
++    decoupled = 0
++    for q_minus, q_plus in child._fault_point_pairs["FltA"].items():
++        if sec.getFieldDof(q_minus, 0) == 0:
++            continue
++        d_minus = sec.getFieldOffset(q_minus, 0)
++        d_plus = sec.getFieldOffset(q_plus, 0)
++        if vals[d_plus] > vals[d_minus] + 1e-9:
++            decoupled += 1
++    assert comm.allreduce(decoupled, MPI.SUM) > 0, "the Minus DOFs follow the Plus datum"
++
++
++def test_a_patch_on_the_cut_is_repartitioned_and_splits():
++    comm = uw.mpi.comm
++    child = split_fault(_patch_box(1.0, "FltB"), "FltB")
++    n_local = _plus_faces(child, "FltBPlus")
++    assert comm.allreduce(n_local, MPI.SUM) > 0, "the seam patch did not split"
++    assert comm.allreduce(1 if n_local else 0, MPI.SUM) == 1, (
++        "the seam patch's plus faces are on more than one rank")
++    assert _sf_coordinate_drift(child) == 0.0
+-- 
+2.39.5 (Apple Git-154)
+
