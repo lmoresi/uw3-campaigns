@@ -1,0 +1,12 @@
+k =  0.5 g=-1.02 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 5.4 wall-minangle 5.4 plus True  
+k =  0.6 g=-0.92 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 1.1 wall-minangle 1.1 plus True  
+k =  0.7 g=-0.82 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 5.8 wall-minangle 5.8 plus True  
+k =  0.8 g=-0.72 h | placed outcrop (band cells on the wall 14)  wall-unlabelled 0 minangle 0.3 wall-minangle 0.3 plus True  
+k =  0.9 g=-0.62 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 2.5 wall-minangle 2.5 plus True  
+k =  1.0 g=-0.52 h | placed outcrop (band cells on the wall 16)  wall-unlabelled 0 minangle 2.4 wall-minangle 2.4 plus True  
+k =  1.1 g=-0.42 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 1.0 wall-minangle 1.0 plus True  
+k =  1.2 g=-0.32 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 3.5 wall-minangle 3.5 plus True  
+k =  1.3 g=-0.22 h | placed outcrop (band cells on the wall 16)  wall-unlabelled 0 minangle 5.4 wall-minangle 5.4 plus True  
+k =  1.4 g=-0.12 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 0.8 wall-minangle 0.8 plus True  
+k =  1.5 g=-0.02 h | placed outcrop (band cells on the wall 12)  wall-unlabelled 0 minangle 3.8 wall-minangle 3.8 plus True  
+k =  1.6 g=+0.08 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clea

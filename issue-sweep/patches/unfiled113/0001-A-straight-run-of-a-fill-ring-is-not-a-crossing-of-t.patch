@@ -1,0 +1,173 @@
+From 7defddd0a7ab9d696ac5607bd3bf4cea3352986a Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:06:08 +1100
+Subject: [PATCH] A straight run of a fill ring is not a crossing of the ring
+ with itself
+
+Before meshing the fill around a ribbon the placement refuses a ring that
+crosses itself. A ladder ribbon's rail is straight, and the ring runs along it
+through several collinear points. Two non-adjacent edges of that run had
+orientations of exactly 0 and 5e-20 against each other, which the sign test
+read as opposite sides of a crossing. An outcropping ribbon dipping 15 degrees
+on an annulus was refused for it at 6 of the 11 depths where its band crossed
+the wall ("the fill ring crosses itself 1 time(s)"); a trace built with
+cos(90 degrees) = 6e-17 rather than 0 was enough to decide it.
+
+The count is of PROPER crossings, as its docstring said, and an orientation
+within 1e-12 of the product of the two edges' lengths is now zero, on neither
+side. Every one of those depths places, with the wall's edges labelled and the
+fault split.
+
+test_0905 (tier B): the refused ring's four rail points, at full precision,
+and the ribbon that was refused (both fail before the change); a straight run
+at 26 rotations is not a crossing, and a proper crossing, a shallow one
+included, still is.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 20 +++--
+ ...5_fill_ring_collinear_is_not_a_crossing.py | 87 +++++++++++++++++++
+ 2 files changed, 102 insertions(+), 5 deletions(-)
+ create mode 100644 tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 267730fe..a161a524 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -6510,8 +6510,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
+ 
+ 
+ def _loop_self_crossings(P):
+-    """The number of PROPER crossings between non-adjacent edges of the
+-    closed polygon ``P`` (an ``(n, 2)`` array in loop order)."""
++    """The number of PROPER crossings between non-adjacent edges of the closed
++    polygon ``P`` (an ``(n, 2)`` array in loop order): each edge's ends lie
++    strictly on opposite sides of the other's line.
++
++    An orientation within 1e-12 of the product of the two edges' lengths counts
++    as zero, on neither side. A ladder ribbon's rail is straight and a fill ring
++    runs along it through several points; two of its edges had orientations of
++    exactly 0 and 5e-20 against each other, which a bare sign test read as
++    opposite sides of a crossing, and refused the fill."""
+     n = len(P)
+     if n < 4:
+         return 0
+@@ -6519,6 +6526,9 @@ def _loop_self_crossings(P):
+     def orient(a, b, c):
+         return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+ 
++    def side(o, tol):
++        return 0 if abs(o) <= tol else (1 if o > 0 else -1)
++
+     count = 0
+     for i in range(n):
+         A, B = P[i], P[(i + 1) % n]
+@@ -6526,9 +6536,9 @@ def _loop_self_crossings(P):
+             if i == 0 and j == n - 1:
+                 continue
+             C, D = P[j], P[(j + 1) % n]
+-            d1, d2 = orient(A, B, C), orient(A, B, D)
+-            d3, d4 = orient(C, D, A), orient(C, D, B)
+-            if ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0)):
++            tol = 1e-12 * float(np.linalg.norm(B - A)) * float(np.linalg.norm(D - C))
++            if (side(orient(A, B, C), tol) * side(orient(A, B, D), tol) < 0
++                    and side(orient(C, D, A), tol) * side(orient(C, D, B), tol) < 0):
+                 count += 1
+     return count
+ 
+diff --git a/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py b/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
+new file mode 100644
+index 00000000..1702c96f
+--- /dev/null
++++ b/tests/test_0905_fill_ring_collinear_is_not_a_crossing.py
+@@ -0,0 +1,87 @@
++"""A straight run of a fill ring is not a crossing of the ring with itself.
++
++Before meshing the fill around a ribbon the placement refuses a ring that crosses
++itself. A ladder ribbon's rail is straight, and the ring runs along it through
++several collinear points; two non-adjacent edges of that run have orientations of
++exactly 0 and 5e-20 against each other, which the count read as opposite sides of a
++crossing. An outcropping ribbon dipping 15 degrees was refused for it, at most of the
++depths where its band crossed the wall ("the fill ring crosses itself 1 time(s)").
++
++What is asserted: two disjoint collinear edges, the dumped ring's four rail points
++included, are not a crossing; a proper crossing, a shallow one included, still is; and
++the ribbon that was refused is placed, its band on the wall, the wall's edges labelled
++and the fault split.
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import _loop_self_crossings, place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++# four consecutive points of the refused ring, on the ribbon's rail (dip 15, k = 1)
++# (full precision: the defect lives in the last bits)
++RAIL = np.array([[0.006470476127563078, 0.9991481456572266],
++                 [0.030618621784789787, 0.9926776695296636],
++                 [0.0547667674420165, 0.9862071934021006],
++                 [0.07891491309924321, 0.9797367172745376]])
++
++
++def _closed(run, back):
++    """The run, closed by a detour well away from it."""
++    return np.vstack([run, back])
++
++
++def test_a_straight_run_is_not_a_crossing():
++    # every rotation of a straight run sampled at four points: whatever the
++    # round-off, two of its edges are never a crossing
++    for deg in range(0, 180, 7):
++        t = np.array([np.cos(np.radians(deg)), np.sin(np.radians(deg))])
++        n = np.array([-t[1], t[0]])
++        run = np.array([0.1, 0.9]) + np.outer(np.arange(4) * 0.0249, t)
++        back = run[-1] - 0.3 * n, run[0] - 0.3 * n
++        assert _loop_self_crossings(_closed(run, back)) == 0, deg
++
++
++def test_the_refused_rings_rail_is_not_a_crossing():
++    back = np.array([[0.08, 0.90], [0.0, 0.90]])
++    assert _loop_self_crossings(_closed(RAIL, back)) == 0
++
++
++def test_a_proper_crossing_is_still_counted():
++    bowtie = np.array([[0, 0], [1, 1], [1, 0], [0, 1]], dtype=float)
++    assert _loop_self_crossings(bowtie) == 1
++    # a crossing at a shallow angle, far above the tolerance
++    shallow = np.array([[0, 0], [1, 0.001], [1, 0], [0, 0.001]], dtype=float)
++    assert _loop_self_crossings(shallow) == 1
++
++
++def test_an_outcropping_ribbon_dipping_15_degrees_is_placed():
++    base = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=0.05,
++                              refinement=1, qdegree=2)
++    h, dip, th = 0.025, np.radians(15.0), np.radians(90.0)
++    # built as the slab probe built it: cos(90 degrees) is 6e-17, not 0, and that
++    # round-off is what put the rail's run onto both sides of itself
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(dip) * t_hat - np.sin(dip) * r_hat
++    trace = (1.0 - h) * r_hat + (h * np.arange(7))[:, None] * down
++    mesh, info = place_fault_ribbon_2d(base, [("Fault", trace)], 2 * h, margin_rings=2,
++                                       clearance=0.3, split=True, mesher="ladder")
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    eS, eE = dm.getDepthStratum(1)
++    cS, _cE = dm.getHeightStratum(0)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    upper = [b for b in mesh.boundaries if b.name == "Upper"][0]
++    outer = [e for e in range(eS, eE) if dm.getSupportSize(e) == 1
++             and (np.linalg.norm(X[[int(q) - vS for q in dm.getCone(e)]], axis=1) > 1 - 1e-6).all()]
++    assert outer and all(dm.getLabel("Upper").getValue(e) == upper.value for e in outer)
++    on_wall = 0
++    for c in np.flatnonzero(np.asarray(info["band"])):
++        cl = dm.getTransitiveClosure(cS + int(c))[0]
++        v = cl[(cl >= vS) & (cl < vE)] - vS
++        on_wall += int((np.linalg.norm(X[v], axis=1) > 1 - 1e-6).any())
++    assert on_wall > 0, "the band should reach the wall: an outcrop"
++    assert "FaultPlus" in [b.name for b in mesh.boundaries]
+-- 
+2.39.5 (Apple Git-154)
+
