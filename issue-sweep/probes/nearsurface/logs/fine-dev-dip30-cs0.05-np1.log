@@ -1,0 +1,17 @@
+underworld3.__file__ = /mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-dev1295/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/__init__.py
+np = 1  cellsize = 0.05  h = 0.025  dip = 30.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+k =  1.6  top depth = 0.0400 (1.6 h)  band top depth = -0.0071 (-0.28 h)  | placed outcrop (band cells on the wall 11)  n_cells 10361
+k =  1.7  top depth = 0.0425 (1.7 h)  band top depth = -0.0046 (-0.18 h)  | placed outcrop (band cells on the wall 12)  n_cells 10378
+k =  1.8  top depth = 0.0450 (1.8 h)  band top depth = -0.0021 (-0.08 h)  | placed outcrop (band cells on the wall 10)  n_cells 10375
+k =  1.9  top depth = 0.0475 (1.9 h)  band top depth = +0.0004 (+0.01 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  2.0  top depth = 0.0500 (2.0 h)  band top depth = +0.0029 (+0.11 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.6  top depth = 0.0900 (3.6 h)  band top depth = +0.0429 (+1.71 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.7  top depth = 0.0925 (3.7 h)  band top depth = +0.0454 (+1.81 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.8  top depth = 0.0950 (3.8 h)  band top depth = +0.0479 (+1.91 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.9  top depth = 0.0975 (3.9 h)  band top depth = +0.0503 (+2.01 h)  | placed interior  n_cells 10338
+k =  4.0  top depth = 0.1000 (4.0 h)  band top depth = +0.0528 (+2.11 h)  | placed interior  n_cells 10336
+k =  4.1  top depth = 0.1025 (4.1 h)  band top depth = +0.0553 (+2.21 h)  | placed interior  n_cells 10338
+DONE
+EXIT 0

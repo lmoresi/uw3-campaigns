@@ -1,0 +1,27 @@
+underworld3.__file__ = /mnt/nvme0n1p4/home/lmorese/hyperion-work/wt-h6-dev1295/.pixi/envs/dev/lib/python3.12/site-packages/underworld3/__init__.py
+np = 1  cellsize = 0.1  h = 0.05  dip = 30.0 deg  width = 0.1 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.06 = 1.2 h
+measured wall edge length near the top = 0.04908
+k =  0.0  top depth = 0.0000 (0.0 h)  band top depth = -0.0950 (-1.90 h)  | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in this version.
+k =  0.5  top depth = 0.0250 (0.5 h)  band top depth = -0.0701 (-1.40 h)  | placed outcrop (band cells on the wall 11)  n_cells 2481
+k =  1.0  top depth = 0.0500 (1.0 h)  band top depth = -0.0451 (-0.90 h)  | placed outcrop (band cells on the wall 10)  n_cells 2479
+k =  1.5  top depth = 0.0750 (1.5 h)  band top depth = -0.0202 (-0.40 h)  | placed outcrop (band cells on the wall 9)  n_cells 2490
+k =  2.0  top depth = 0.1000 (2.0 h)  band top depth = +0.0048 (+0.10 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  2.5  top depth = 0.1250 (2.5 h)  band top depth = +0.0297 (+0.59 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.0  top depth = 0.1500 (3.0 h)  band top depth = +0.0547 (+1.09 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  3.5  top depth = 0.1750 (3.5 h)  band top depth = +0.0796 (+1.59 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  4.0  top depth = 0.2000 (4.0 h)  band top depth = +0.1046 (+2.09 h)  | placed interior  n_cells 2468
+k =  4.5  top depth = 0.2250 (4.5 h)  band top depth = +0.1295 (+2.59 h)  | placed interior  n_cells 2458
+k =  5.0  top depth = 0.2500 (5.0 h)  band top depth = +0.1545 (+3.09 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  5.5  top depth = 0.2750 (5.5 h)  band top depth = +0.1794 (+3.59 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  6.0  top depth = 0.3000 (6.0 h)  band top depth = +0.2043 (+4.09 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  6.5  top depth = 0.3250 (6.5 h)  band top depth = +0.2292 (+4.58 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  7.0  top depth = 0.3500 (7.0 h)  band top depth = +0.2542 (+5.08 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall; the volume must be interior, with clearance to spare
+k =  7.5  top depth = 0.3750 (7.5 h)  band top depth = +0.2791 (+5.58 h)  | placed interior  n_cells 2535
+k =  8.0  top depth = 0.4000 (8.0 h)  band top depth = +0.3040 (+6.08 h)  | placed interior  n_cells 2536
+k =  8.5  top depth = 0.4250 (8.5 h)  band top depth = +0.3289 (+6.58 h)  | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in this version.
+k =  9.0  top depth = 0.4500 (9.0 h)  band top depth = +0.3538 (+7.08 h)  | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in this version.
+k =  9.5  top depth = 0.4750 (9.5 h)  band top depth = +0.3786 (+7.57 h)  | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in this version.
+k = 10.0  top depth = 0.5000 (10.0 h)  band top depth = +0.4035 (+8.07 h)  | REFUSED RuntimeError: place_thin_volume assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+DONE
+EXIT 0

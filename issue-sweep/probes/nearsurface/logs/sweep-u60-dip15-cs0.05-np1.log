@@ -1,0 +1,27 @@
+underworld3.__file__ = /mnt/nvme0n1p4/home/lmorese/hyperion-work/runs/2026-11-28-nearsurface/ov-u60/underworld3/__init__.py
+np = 1  cellsize = 0.05  h = 0.025  dip = 15.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+k =  0.0  top depth = 0.0000 (0.0 h)  band top depth = -0.0379 (-1.52 h)  | REFUSED RuntimeError: place_thin_volume assembly failed: RuntimeError: the ribbon assembly meshed to area 8.608879262612e-03 against CAD 8.608879092678e-03; the layer mesh does not fill its own outlines.
+k =  0.5  top depth = 0.0125 (0.5 h)  band top depth = -0.0254 (-1.02 h)  | placed outcrop (band cells on the wall 12)  n_cells 10416
+k =  1.0  top depth = 0.0250 (1.0 h)  band top depth = -0.0130 (-0.52 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_rank0.npz]
+k =  1.5  top depth = 0.0375 (1.5 h)  band top depth = -0.0005 (-0.02 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: ValueError: the fill ring crosses itself 1 time(s) [fill inputs saved to place_fill_failure_rank0.npz]
+k =  2.0  top depth = 0.0500 (2.0 h)  band top depth = +0.0120 (+0.48 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall, touching it at (-0.04985, 0.9988). In mesh units: the cavity reaches 0.0524 from the band's skin, and the nearest wall vertex is 0.0142 from the skin. At the touched vertex the carve takes the cells within max(clearance x h = 0.00748, 0.6 x width = 0.03) of the skin, and the cavity's boundary is the ring of vertices around them. The volume must be interior, with clearance to spare: moving it about 0.0382 away from this wall would bring the cavity onto the wall at (0.1736, 0.9848): first narrow the band: its width sets the carve down to a width of about 0.0125, where clearance x h takes over, then move it if it is still refused
+k =  2.5  top depth = 0.0625 (2.5 h)  band top depth = +0.0245 (+0.98 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall, touching it at (-0.04985, 0.9988). In mesh units: the cavity reaches 0.053 from the band's skin, and the nearest wall vertex is 0.0255 from the skin. At the touched vertex the carve takes the cells within max(clearance x h = 0.00748, 0.6 x width = 0.03) of the skin, and the cavity's boundary is the ring of vertices around them. The volume must be interior, with clearance to spare: moving it about 0.0276 away from this wall would bring the cavity onto the wall at (0.1736, 0.9848): first narrow the band: its width sets the carve down to a width of about 0.0125, where clearance x h takes over, then move it if it is still refused
+k =  3.0  top depth = 0.0750 (3.0 h)  band top depth = +0.0370 (+1.48 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall, touching it at (-0.04985, 0.9988). In mesh units: the cavity reaches 0.0536 from the band's skin, and the nearest wall vertex is 0.0375 from the skin. At the touched vertex the carve takes the cells within max(clearance x h = 0.00748, 0.6 x width = 0.03) of the skin, and the cavity's boundary is the ring of vertices around them. The volume must be interior, with clearance to spare: move it at least about 0.0161 further from the wall (a guide: the cavity is re-cut at the new position), or narrow the band: its width sets the carve down to a width of about 0.0125, where clearance x h takes over
+k =  3.5  top depth = 0.0875 (3.5 h)  band top depth = +0.0495 (+1.98 h)  | placed interior  n_cells 10330
+k =  4.0  top depth = 0.1000 (4.0 h)  band top depth = +0.0620 (+2.48 h)  | placed interior  n_cells 10332
+k =  4.5  top depth = 0.1125 (4.5 h)  band top depth = +0.0745 (+2.98 h)  | placed interior  n_cells 10338
+k =  5.0  top depth = 0.1250 (5.0 h)  band top depth = +0.0870 (+3.48 h)  | placed interior  n_cells 10340
+k =  5.5  top depth = 0.1375 (5.5 h)  band top depth = +0.0994 (+3.98 h)  | placed interior  n_cells 10338
+k =  6.0  top depth = 0.1500 (6.0 h)  band top depth = +0.1119 (+4.48 h)  | placed interior  n_cells 10338
+k =  6.5  top depth = 0.1625 (6.5 h)  band top depth = +0.1244 (+4.98 h)  | placed interior  n_cells 10336
+k =  7.0  top depth = 0.1750 (7.0 h)  band top depth = +0.1369 (+5.48 h)  | placed interior  n_cells 10340
+k =  7.5  top depth = 0.1875 (7.5 h)  band top depth = +0.1494 (+5.98 h)  | placed interior  n_cells 10336
+k =  8.0  top depth = 0.2000 (8.0 h)  band top depth = +0.1619 (+6.47 h)  | placed interior  n_cells 10336
+k =  8.5  top depth = 0.2125 (8.5 h)  band top depth = +0.1744 (+6.97 h)  | placed interior  n_cells 10340
+k =  9.0  top depth = 0.2250 (9.0 h)  band top depth = +0.1868 (+7.47 h)  | placed interior  n_cells 10340
+k =  9.5  top depth = 0.2375 (9.5 h)  band top depth = +0.1993 (+7.97 h)  | placed interior  n_cells 10338
+k = 10.0  top depth = 0.2500 (10.0 h)  band top depth = +0.2118 (+8.47 h)  | placed interior  n_cells 10336
+DONE
+EXIT 0
