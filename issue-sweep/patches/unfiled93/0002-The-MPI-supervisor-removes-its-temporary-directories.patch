@@ -1,0 +1,126 @@
+From 6d29ef200b021d5a8a0ae3fb5f5d3622a87b6fe3 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Fri, 27 Nov 2026 16:01:27 +1100
+Subject: [PATCH 2/6] The MPI supervisor removes its temporary directories when
+ the job ends
+
+Every supervised job left a handler directory (uw-supervisor-*) and,
+without --artifacts, a stacks directory (uw-stacks-*) holding an empty
+placeholder stack file per Python process: faulthandler needs the file open
+from start-up, so it is made whether or not a dump is ever asked for. They
+helped fill a Linux server's /tmp.
+
+At exit the supervisor now removes the handler directory and the empty
+placeholders, then its own stacks directory if nothing is left in it.
+Dumped stacks stay, and a directory named by --artifacts stays.
+
+Two serial tests in test_0063 (a shell running one python process stands in
+for mpirun): three supervised jobs leave the temporary directory empty, and
+a dumped hang keeps its non-empty stacks. Both fail before the change.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 31 ++++++++++++++++++-
+ tests/test_0063_mpi_hang_supervisor.py | 43 ++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index 086c9d34..49208a9c 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -459,8 +459,37 @@ def main():
+     dump_dir.mkdir(parents=True, exist_ok=True)
+ 
+     env = os.environ.copy()
+-    _install_dump_handler(dump_dir, env)
++    handler_dir = _install_dump_handler(dump_dir, env)
++    try:
++        return _supervise(args, command, env, dump_dir)
++    finally:
++        _tidy(handler_dir, dump_dir, ours=args.artifacts is None)
++
++
++def _tidy(handler_dir, dump_dir, ours):
++    """Leave nothing behind but stacks that were actually dumped.
++
++    Every Python process of the job opens its stack file at start-up (the
++    handler needs the descriptor before any signal arrives), so a healthy job
++    leaves one empty placeholder per process, and every job leaves its handler
++    directory. Kept, they filled a server's /tmp (UNFILED 93). A directory of
++    our own making goes too once it is empty; one named by --artifacts stays.
++    """
++    shutil.rmtree(handler_dir, ignore_errors=True)
++    for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
++        try:
++            if path.stat().st_size == 0:
++                path.unlink()
++        except OSError:
++            pass
++    if ours:
++        try:
++            Path(dump_dir).rmdir()   # only if empty
++        except OSError:
++            pass
++
+ 
++def _supervise(args, command, env, dump_dir):
+     job = subprocess.Popen(
+         command, env=env, start_new_session=True,
+         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index f49d19a0..eb59675a 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -148,6 +148,49 @@ def test_a_healthy_job_is_left_alone(tmp_path):
+         "the job's own output was not forwarded")
+ 
+ 
++# The temporary directories, serially: a shell running one python process stands
++# in for mpirun and its rank (the supervisor dumps the job's descendants).
++# Every supervised job made a handler directory (uw-supervisor-*) and, without
++# --artifacts, a stacks directory (uw-stacks-*) holding an empty placeholder per
++# process, and kept both; a Linux server's /tmp filled with them (UNFILED 93).
++N_SUPERVISED = 3
++
++
++def _supervise_without_artifacts(job, tmp, silence=SILENCE):
++    env = dict(os.environ, TMPDIR=str(tmp))
++    return subprocess.run(
++        [sys.executable, str(SUPERVISOR), "--silence", str(silence), "--",
++         "/bin/sh", "-c", f'"{sys.executable}" "{job}"; exit $?'],
++        capture_output=True, text=True, timeout=BUDGET, env=env)
++
++
++def test_supervised_jobs_leave_the_temporary_directory_as_they_found_it(tmp_path):
++    job = tmp_path / "quick_job.py"
++    job.write_text("print('done', flush=True)\n")
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    for _ in range(N_SUPERVISED):
++        completed = _supervise_without_artifacts(job, tmp)
++        assert completed.returncode == 0, f"{completed.stdout}\n{completed.stderr}"
++        assert "done" in completed.stdout
++    assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
++
++
++def test_a_supervised_hang_keeps_its_stacks(tmp_path):
++    """The cleanup's counter-test: a job that was dumped keeps what it dumped."""
++    job = tmp_path / "silent_job.py"
++    job.write_text("import time\nprint('started', flush=True)\ntime.sleep(600)\n")
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    completed = _supervise_without_artifacts(job, tmp, silence=5.0)
++    assert completed.returncode == 124, f"{completed.stdout}\n{completed.stderr}"
++    kept = [d for d in tmp.iterdir() if d.name.startswith("uw-stacks-")]
++    assert len(kept) == 1, sorted(os.listdir(tmp))
++    stacks = list(kept[0].glob("rank_*_pid_*.stack"))
++    assert stacks and all(p.stat().st_size > 0 for p in stacks), stacks
++    assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
++
++
+ # The native path, serially: a script stands in for gdb.
+ TRANSCRIPT = """Thread 2 (Thread 0x7f (LWP 2) "async"):
+ #0  __GI___poll (fds=0x1) at poll.c:29
+-- 
+2.39.5 (Apple Git-154)
+

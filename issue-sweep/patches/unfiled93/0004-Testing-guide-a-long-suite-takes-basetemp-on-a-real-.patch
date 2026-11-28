@@ -1,0 +1,37 @@
+From ef6de979029e1615189717aeb7388da62e2b2f8d Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Fri, 27 Nov 2026 16:01:27 +1100
+Subject: [PATCH 4/6] Testing guide: a long suite takes --basetemp on a real
+ disk
+
+pytest's default base directory under the system temporary directory kept
+thousands of tmp_path directories across sweeps on a server whose /tmp is a
+fixed-inode tmpfs.
+
+Underworld development team with AI support from Claude Code
+---
+ docs/developer/TESTING-RELIABILITY-SYSTEM.md | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/docs/developer/TESTING-RELIABILITY-SYSTEM.md b/docs/developer/TESTING-RELIABILITY-SYSTEM.md
+index a6d6f5ee..ebbf5c98 100644
+--- a/docs/developer/TESTING-RELIABILITY-SYSTEM.md
++++ b/docs/developer/TESTING-RELIABILITY-SYSTEM.md
+@@ -244,6 +244,14 @@ pytest
+ pytest -m "not tier_c"
+ ```
+ 
++For a long suite, or repeated sweeps, give pytest a base temporary directory
++on a real disk: `pytest tests --basetemp=$HOME/scratch/pytest-tmp -m ...`.
++By default pytest keeps the `tmp_path` directories of its last three runs
++under the system temporary directory. On a server where `/tmp` is a tmpfs
++with a fixed number of inodes, thousands of them, together with any other
++leftovers, can fill it and stop every session on the machine. `--basetemp`
++is emptied at the start of each run, so give each concurrent run its own.
++
+ ## Current Test Classification Status
+ 
+ ### 2025-11-15 Audit Results
+-- 
+2.39.5 (Apple Git-154)
+

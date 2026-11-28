@@ -1,0 +1,109 @@
+From c734f49bafc7af6c0652bb26dca5313480ed25ea Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Fri, 27 Nov 2026 16:09:01 +1100
+Subject: [PATCH 5/6] Review: the supervisor tidies when ended by a signal, and
+ keeps a silent rank's placeholder after a kill
+
+A SIGTERM or SIGHUP (a walltime, a timeout, a cancelled CI job) ended the
+supervisor without running the tidy; it now exits through it (status
+128 + signal). After a kill the empty placeholders stay: one is the record
+of a rank that did not answer the dump request. The test that a supervisor
+ended by SIGTERM leaves the temporary directory empty fails before this.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 27 +++++++++++++++++++++-----
+ tests/test_0063_mpi_hang_supervisor.py | 21 +++++++++++++++++++-
+ 2 files changed, 42 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index 49208a9c..62ceeeb0 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -460,22 +460,39 @@ def main():
+ 
+     env = os.environ.copy()
+     handler_dir = _install_dump_handler(dump_dir, env)
++
++    # A supervisor ended by a signal (a walltime, a `timeout`, a cancelled CI
++    # job) still tidies: the exit runs the `finally` below.
++    def ended_by(signum, _frame):
++        sys.exit(128 + signum)
++
++    for sig in (signal.SIGTERM, signal.SIGHUP):
++        signal.signal(sig, ended_by)
++
++    status = None
+     try:
+-        return _supervise(args, command, env, dump_dir)
++        status = _supervise(args, command, env, dump_dir)
++        return status
+     finally:
+-        _tidy(handler_dir, dump_dir, ours=args.artifacts is None)
++        _tidy(handler_dir, dump_dir, ours=args.artifacts is None,
++              killed=status == EXIT_KILLED)
+ 
+ 
+-def _tidy(handler_dir, dump_dir, ours):
++def _tidy(handler_dir, dump_dir, ours, killed=False):
+     """Leave nothing behind but stacks that were actually dumped.
+ 
+     Every Python process of the job opens its stack file at start-up (the
+     handler needs the descriptor before any signal arrives), so a healthy job
+     leaves one empty placeholder per process, and every job leaves its handler
+-    directory. Kept, they filled a server's /tmp (UNFILED 93). A directory of
+-    our own making goes too once it is empty; one named by --artifacts stays.
++    directory. Kept, they filled a server's /tmp. A directory of our own making
++    goes too once it is empty; one named by --artifacts stays.
++
++    After a kill the placeholders stay: an empty one is the record of a rank
++    (and its pid) that did not answer the dump request.
+     """
+     shutil.rmtree(handler_dir, ignore_errors=True)
++    if killed:
++        return
+     for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
+         try:
+             if path.stat().st_size == 0:
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index f56427e4..91826a19 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -152,7 +152,7 @@ def test_a_healthy_job_is_left_alone(tmp_path):
+ # in for mpirun and its rank (the supervisor dumps the job's descendants).
+ # Every supervised job made a handler directory (uw-supervisor-*) and, without
+ # --artifacts, a stacks directory (uw-stacks-*) holding an empty placeholder per
+-# process, and kept both; a Linux server's /tmp filled with them (UNFILED 93).
++# process, and kept both; a Linux server's /tmp filled with them.
+ N_SUPERVISED = 3
+ 
+ 
+@@ -191,6 +191,25 @@ def test_a_supervised_hang_keeps_its_stacks(tmp_path):
+     assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
+ 
+ 
++def test_a_supervisor_ended_by_sigterm_still_tidies(tmp_path):
++    """A walltime, a `timeout` or a cancelled CI job ends the supervisor with
++    SIGTERM; its directories go all the same."""
++    import signal
++    job = tmp_path / "slow_job.py"
++    job.write_text("import time\nprint('started', flush=True)\ntime.sleep(20)\n")
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    env = dict(os.environ, TMPDIR=str(tmp))
++    supervisor = subprocess.Popen(
++        [sys.executable, str(SUPERVISOR), "--silence", str(SILENCE), "--",
++         "/bin/sh", "-c", f'"{sys.executable}" "{job}"; exit $?'],
++        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
++    assert "started" in supervisor.stdout.readline()
++    supervisor.send_signal(signal.SIGTERM)
++    assert supervisor.wait(timeout=30) == 128 + signal.SIGTERM
++    assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
++
++
+ # The native path, serially: a script stands in for gdb.
+ TRANSCRIPT = """Thread 2 (Thread 0x7f (LWP 2) "async"):
+ #0  __GI___poll (fds=0x1) at poll.c:29
+-- 
+2.39.5 (Apple Git-154)
+

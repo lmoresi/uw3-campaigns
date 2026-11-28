@@ -1,0 +1,248 @@
+From ecaffdc9a685abe641241a074bf0a9574da15291 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Fri, 27 Nov 2026 16:01:19 +1100
+Subject: [PATCH 1/6] The JIT builds under TMPDIR and removes its build
+ directory once loaded
+
+compile_and_load built every extension in a directory under a hard-coded
+/tmp and nothing removed it: one fn_ptr_ext_<hash>_<pid>_<time>_<n> per
+compile per rank, a dozen or more inodes each. They filled a Linux server's
+/tmp (a tmpfs of 1,048,576 inodes) and stopped every session on it.
+
+The directory is now made by tempfile.mkdtemp, so TMPDIR is honoured, and
+getext removes it after the module is loaded and stored in the disk cache.
+The loaded module does not need it: the mapped .so survives its unlink, on
+macOS as on Linux (test_0903 solves with kernels whose build directory is
+gone). debug=True keeps it for reading the sources; a failed build keeps it
+because the error names it. The removal is rank-local and best-effort and
+decides nothing, so the ranks cannot diverge on it.
+
+test_0903 (tier B) fails before the change: the build directories were
+under /tmp, not TMPDIR, and remained.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/_jitextension.py    |  55 ++++++---
+ .../test_0903_jit_build_leaves_no_temp_dir.py | 104 ++++++++++++++++++
+ 2 files changed, 145 insertions(+), 14 deletions(-)
+ create mode 100644 tests/test_0903_jit_build_leaves_no_temp_dir.py
+
+diff --git a/src/underworld3/utilities/_jitextension.py b/src/underworld3/utilities/_jitextension.py
+index b9d50284..c62a00f2 100644
+--- a/src/underworld3/utilities/_jitextension.py
++++ b/src/underworld3/utilities/_jitextension.py
+@@ -1030,13 +1030,16 @@ def getext(
+                         build_error = error
+                     else:
+                         if verbose:
+-                            print(f"Location of compiled module: {tmpdir}", flush=True)
++                            print(f"Location of compiled module: {tmpdir}"
++                              + ("" if debug else "\n(removed once loaded; debug=True keeps it)"),
++                              flush=True)
+                         try:
+                             _jc.store_module(
+                                 source_hash, real_modname, tmpdir, constants_manifest
+                             )
+                         except Exception as error:
+                             store_error = error
++                        _discard_build(tmpdir, keep=debug)
+                 # Rank 0 has now published the entry, or failed to; the bcast
+                 # waits for it, so no barrier is needed before it.
+                 verdict = comm.bcast(
+@@ -1068,6 +1071,8 @@ def getext(
+                             )
+                         except Exception as error:
+                             fallback_error = error
++                        else:
++                            _discard_build(_tmpdir, keep=debug)
+                 _raise_if_any_rank_failed(comm, real_modname, fallback_error)
+             else:
+                 if verbose and underworld3.mpi.rank == 0:
+@@ -1095,11 +1100,16 @@ def getext(
+                     if verbose and underworld3.mpi.rank == 0:
+                         # Tests in test_0004_pointwise_fns parse this exact
+                         # prefix to find the per-call build directory.
+-                        print(f"Location of compiled module: {tmpdir}", flush=True)
+-                    if cache:
+-                        _jc.store_module(
+-                            source_hash, real_modname, tmpdir, constants_manifest
+-                        )
++                        print(f"Location of compiled module: {tmpdir}"
++                              + ("" if debug else "\n(removed once loaded; debug=True keeps it)"),
++                              flush=True)
++                    try:
++                        if cache:
++                            _jc.store_module(
++                                source_hash, real_modname, tmpdir, constants_manifest
++                            )
++                    finally:
++                        _discard_build(tmpdir, keep=debug)
+ 
+         if cache:
+             _ext_dict[source_hash] = module
+@@ -2152,6 +2162,23 @@ def _raise_if_any_rank_failed(comm, modname, error):
+             f"rank:\n{_describe(error) or failed[ranks[0]]}") from error
+ 
+ 
++def _discard_build(tmpdir, keep=False):
++    """Remove a build directory once its module is loaded (and cached).
++
++    The loaded module does not need it: the dynamic loader holds the mapped
++    ``.so`` open, and an unlinked file stays readable for as long as it is
++    mapped, on Linux and on macOS. Kept were one directory, and a dozen or more
++    inodes, per compile per rank, for good; they filled a server's ``/tmp``
++    (UNFILED 93). Rank-local and best-effort: a directory that cannot be removed
++    is left, and nothing is decided on it, so the ranks cannot diverge here.
++
++    ``keep`` (``debug=True``) leaves it for reading the generated sources.
++    """
++    if keep or tmpdir is None:
++        return
++    shutil.rmtree(tmpdir, ignore_errors=True)
++
++
+ def compile_and_load(modname, codeguys, verbose=False):
+     """Write ``codeguys`` files to a temp directory, build with Cython, and dynamically load.
+ 
+@@ -2176,20 +2203,20 @@ def compile_and_load(modname, codeguys, verbose=False):
+     """
+     import os
+     import sys
+-    import time
+-    import random
++    import tempfile
+     import importlib.machinery
+     from importlib._bootstrap import _load
+ 
+-    unique_suffix = f"{os.getpid()}_{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
+-    tmpdir = os.path.join("/tmp", f"{modname}_{unique_suffix}")
+-
++    # Under the temporary directory Python is pointed at (TMPDIR), unique to
++    # this call. The caller removes it once the module is loaded and cached
++    # (_discard_build); a failed build keeps it, since the error names it.
+     try:
+-        os.makedirs(tmpdir, exist_ok=True)
++        tmpdir = tempfile.mkdtemp(prefix=f"{modname}_")
+     except OSError as e:
+         if verbose:
+-            print(f"Warning: Failed to create tmpdir {tmpdir}: {e}")
+-        raise RuntimeError(f"Cannot create temporary directory {tmpdir}") from e
++            print(f"Warning: Failed to create a build directory: {e}")
++        raise RuntimeError(
++            f"Cannot create a temporary build directory under {tempfile.gettempdir()}") from e
+ 
+     for thing in codeguys:
+         filename = thing[0]
+diff --git a/tests/test_0903_jit_build_leaves_no_temp_dir.py b/tests/test_0903_jit_build_leaves_no_temp_dir.py
+new file mode 100644
+index 00000000..de601b33
+--- /dev/null
++++ b/tests/test_0903_jit_build_leaves_no_temp_dir.py
+@@ -0,0 +1,104 @@
++"""A JIT compile leaves nothing behind in the temporary directory (UNFILED 93).
++
++Every compile built its extension in a directory of its own under a hard-coded
++``/tmp`` and left it there: one ``fn_ptr_ext_<hash>_<pid>_<time>_<n>`` per
++compile. A Linux server's ``/tmp`` (a tmpfs of 1,048,576 inodes) filled with
++them and stopped every session on it.
++
++What is asserted:
++
++* the build directory is made under the temporary directory Python is pointed
++  at (``TMPDIR``), not ``/tmp`` regardless;
++* after N compiles the temporary directory holds nothing new, the compiler's
++  own scratch files included;
++* a solver whose kernels were loaded from a build directory that has since been
++  removed still solves, exactly: u = x^2 - y^2 is harmonic and quadratic, so a
++  degree-2 field reproduces it to the solver's tolerance (1e-12 here);
++* ``debug=True`` keeps the directory, for reading the generated sources.
++"""
++import os
++import tempfile
++
++import numpy as np
++import pytest
++import sympy
++
++import underworld3 as uw
++from underworld3.utilities import _jitextension as _jitext
++from underworld3.utilities._jitextension import JITCallbackSet, getext
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++N_COMPILES = 3
++
++
++@pytest.fixture
++def private_tmp(tmp_path, monkeypatch):
++    """A fresh temporary directory for this process and the compiler it runs,
++    a cold disk cache, an empty in-memory cache, and a record of every build
++    directory compile_and_load returns."""
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    monkeypatch.setenv("TMPDIR", str(tmp))
++    monkeypatch.setattr(tempfile, "tempdir", str(tmp))
++    monkeypatch.setenv("UW_JIT_CACHE_DIR", str(tmp_path / "jit-cache"))
++    monkeypatch.setattr(_jitext, "_ext_dict", {})
++    built = []
++    real = _jitext.compile_and_load
++
++    def recording(*args, **kwargs):
++        module, where = real(*args, **kwargs)
++        built.append(where)
++        return module, where
++
++    monkeypatch.setattr(_jitext, "compile_and_load", recording)
++    return tmp, built
++
++
++def _compile(mesh, salt, **kwargs):
++    x, y = mesh.X
++    fn = sympy.ImmutableDenseMatrix([x * salt, y])
++    getext(mesh, JITCallbackSet(residual=(fn,)), mesh.vars.values(), cache=False, **kwargs)
++
++
++def test_n_compiles_leave_the_temporary_directory_as_they_found_it(private_tmp):
++    tmp, built = private_tmp
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    for k in range(N_COMPILES):
++        _compile(mesh, k + 2)
++    assert len(built) == N_COMPILES, built
++    assert all(os.path.dirname(os.path.abspath(d)) == str(tmp) for d in built), \
++        f"the build directories are not under TMPDIR={tmp}: {built}"
++    assert not any(os.path.exists(d) for d in built), \
++        f"build directories left behind: {[d for d in built if os.path.exists(d)]}"
++    assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
++
++
++def test_kernels_loaded_from_a_removed_build_directory_still_solve(private_tmp):
++    tmp, built = private_tmp
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    u = uw.discretisation.MeshVariable("u_0903", mesh, 1, degree=2)
++    x, y = mesh.X
++    exact = x**2 - y**2
++    poisson = uw.systems.Poisson(mesh, u_Field=u)
++    poisson.constitutive_model = uw.constitutive_models.DiffusionModel
++    poisson.constitutive_model.Parameters.diffusivity = 1
++    poisson.f = 0.0
++    for side in ("Top", "Bottom", "Left", "Right"):
++        poisson.add_dirichlet_bc(sympy.Matrix([exact]), side)
++    poisson.tolerance = 1e-12
++    poisson.solve()
++    assert built, "the solve compiled nothing, so it did not load from a build directory"
++    assert not any(os.path.exists(d) for d in built)
++    assert poisson.snes.getConvergedReason() > 0
++    X = u.coords
++    err = np.abs(u.array[:, 0, 0] - (X[:, 0] ** 2 - X[:, 1] ** 2)).max()
++    assert err < 1e-9, err
++    assert sorted(os.listdir(tmp)) == []
++
++
++def test_debug_keeps_the_build_directory(private_tmp):
++    _tmp, built = private_tmp
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    _compile(mesh, 7, debug=True, debug_name="T0903")
++    assert len(built) == 1 and os.path.exists(os.path.join(built[0], "cy_ext.h")), built
+-- 
+2.39.5 (Apple Git-154)
+

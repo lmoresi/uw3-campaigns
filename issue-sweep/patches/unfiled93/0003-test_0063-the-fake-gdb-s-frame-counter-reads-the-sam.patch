@@ -1,0 +1,32 @@
+From f33ca440459ecf3260850d6bd171ec31b57a2d62 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Fri, 27 Nov 2026 16:01:27 +1100
+Subject: [PATCH 3/6] test_0063: the fake gdb's frame counter reads the same on
+ BSD wc
+
+BSD wc pads its count with spaces, so the fake gdb printed 'frame_       1'
+and 'frame_       2'; the frame parser stops at the space, both samples read
+'frame_', and the moved-between-samples case failed on macOS every time.
+
+Underworld development team with AI support from Claude Code
+---
+ tests/test_0063_mpi_hang_supervisor.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index eb59675a..f56427e4 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -257,7 +257,8 @@ def test_two_samples_tell_a_rank_still_working_from_one_that_is_not(supervisor,
+                                                                     monkeypatch):
+     counter = tmp_path / "count"
+     _fake_gdb(tmp_path, monkeypatch,
+-              f'echo x >> {counter}; echo "#0  frame_$(wc -l < {counter}) ()"')
++              # tr: BSD wc pads the count with spaces, which the frame parser stops at
++              f'echo x >> {counter}; echo "#0  frame_$(wc -l < {counter} | tr -d \' \') ()"')
+     moved = supervisor._collect_native_stacks({"0": (101, [])}, tmp_path)
+     assert any("moved between samples on rank(s) 0" in line for line in moved), moved
+ 
+-- 
+2.39.5 (Apple Git-154)
+

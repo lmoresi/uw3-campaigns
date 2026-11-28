@@ -1,0 +1,201 @@
+From 7623c3696b03857c344a9a40a544dc287ee4d30f Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 13:34:25 +1100
+Subject: [PATCH 6/6] Review: UW_JIT_KEEP_BUILD keeps a build without changing
+ the kernels; the cache is checked before the discard
+
+debug=True also adds a trace to every kernel, so it was a poor way to keep
+the sources a run compiles; UW_JIT_KEEP_BUILD=1 keeps the build directory
+and changes nothing else. test_0903 now asserts the module reached the disk
+cache: a discard moved ahead of store_module would store nothing and send
+every other rank to compile its own copy, and no test would have noticed.
+The discard's docstring says what is lost (native frames in a kernel read
+as ??, tracebacks lose cy_ext.pyx lines) and that on NFS an empty directory
+stays per compile. test_0004 removes the build directories its debug=True
+compiles keep.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/_jitextension.py    | 41 ++++++++++++-------
+ tests/test_0004_pointwise_fns.py              |  6 +++
+ .../test_0903_jit_build_leaves_no_temp_dir.py | 20 +++++++--
+ 3 files changed, 49 insertions(+), 18 deletions(-)
+
+diff --git a/src/underworld3/utilities/_jitextension.py b/src/underworld3/utilities/_jitextension.py
+index c62a00f2..582ff79a 100644
+--- a/src/underworld3/utilities/_jitextension.py
++++ b/src/underworld3/utilities/_jitextension.py
+@@ -1030,16 +1030,14 @@ def getext(
+                         build_error = error
+                     else:
+                         if verbose:
+-                            print(f"Location of compiled module: {tmpdir}"
+-                              + ("" if debug else "\n(removed once loaded; debug=True keeps it)"),
+-                              flush=True)
++                            print(f"Location of compiled module: {tmpdir}{_kept_note(debug)}", flush=True)
+                         try:
+                             _jc.store_module(
+                                 source_hash, real_modname, tmpdir, constants_manifest
+                             )
+                         except Exception as error:
+                             store_error = error
+-                        _discard_build(tmpdir, keep=debug)
++                        _discard_build(tmpdir, keep=_keep_build(debug))
+                 # Rank 0 has now published the entry, or failed to; the bcast
+                 # waits for it, so no barrier is needed before it.
+                 verdict = comm.bcast(
+@@ -1072,7 +1070,7 @@ def getext(
+                         except Exception as error:
+                             fallback_error = error
+                         else:
+-                            _discard_build(_tmpdir, keep=debug)
++                            _discard_build(_tmpdir, keep=_keep_build(debug))
+                 _raise_if_any_rank_failed(comm, real_modname, fallback_error)
+             else:
+                 if verbose and underworld3.mpi.rank == 0:
+@@ -1100,16 +1098,14 @@ def getext(
+                     if verbose and underworld3.mpi.rank == 0:
+                         # Tests in test_0004_pointwise_fns parse this exact
+                         # prefix to find the per-call build directory.
+-                        print(f"Location of compiled module: {tmpdir}"
+-                              + ("" if debug else "\n(removed once loaded; debug=True keeps it)"),
+-                              flush=True)
++                        print(f"Location of compiled module: {tmpdir}{_kept_note(debug)}", flush=True)
+                     try:
+                         if cache:
+                             _jc.store_module(
+                                 source_hash, real_modname, tmpdir, constants_manifest
+                             )
+                     finally:
+-                        _discard_build(tmpdir, keep=debug)
++                        _discard_build(tmpdir, keep=_keep_build(debug))
+ 
+         if cache:
+             _ext_dict[source_hash] = module
+@@ -2162,17 +2158,34 @@ def _raise_if_any_rank_failed(comm, modname, error):
+             f"rank:\n{_describe(error) or failed[ranks[0]]}") from error
+ 
+ 
++def _keep_build(debug):
++    """Whether a build directory is kept: ``debug=True``, or ``UW_JIT_KEEP_BUILD=1``
++    to keep the sources of the kernels a run actually compiles (``debug`` also
++    changes them, adding a trace to every kernel)."""
++    return bool(debug) or os.environ.get("UW_JIT_KEEP_BUILD", "").lower() in ("1", "true", "yes")
++
++
++def _kept_note(debug):
++    """What the verbose build line adds about the directory it names."""
++    return "" if _keep_build(debug) else "\n(removed once loaded; UW_JIT_KEEP_BUILD=1 keeps it)"
++
++
+ def _discard_build(tmpdir, keep=False):
+     """Remove a build directory once its module is loaded (and cached).
+ 
+     The loaded module does not need it: the dynamic loader holds the mapped
+     ``.so`` open, and an unlinked file stays readable for as long as it is
+     mapped, on Linux and on macOS. Kept were one directory, and a dozen or more
+-    inodes, per compile per rank, for good; they filled a server's ``/tmp``
+-    (UNFILED 93). Rank-local and best-effort: a directory that cannot be removed
+-    is left, and nothing is decided on it, so the ranks cannot diverge here.
+-
+-    ``keep`` (``debug=True``) leaves it for reading the generated sources.
++    inodes, per compile per rank, for good, and they filled a server's ``/tmp``.
++    Rank-local and best-effort: a directory that cannot be removed is left, and
++    nothing is decided on it, so the ranks cannot diverge here.
++
++    What is lost: a debugger reads no symbols from the deleted mapping, so
++    native frames inside a kernel show as ``??``, and a traceback through
++    ``cy_ext.pyx`` has no source lines; keep the build to have them. With
++    ``TMPDIR`` on NFS the client renames the mapped ``.so`` to ``.nfsXXXX``
++    rather than removing it, so an empty directory stays per compile; keep
++    ``TMPDIR`` on a local disk.
+     """
+     if keep or tmpdir is None:
+         return
+diff --git a/tests/test_0004_pointwise_fns.py b/tests/test_0004_pointwise_fns.py
+index 63c2570d..c2802552 100644
+--- a/tests/test_0004_pointwise_fns.py
++++ b/tests/test_0004_pointwise_fns.py
+@@ -95,6 +95,8 @@ def test_getext_simple():
+     assert os.path.exists(
+         os.path.join(module_path, "cy_ext.h")
+     ), f"Header file not found in {module_path}"
++    # debug=True keeps the build directory for reading; the test has read it
++    shutil.rmtree(module_path, ignore_errors=True)
+     assert r"Processing JIT    5 / Matrix([[1], [2]])" in captured_setup_solver
+ 
+ 
+@@ -142,6 +144,8 @@ def test_getext_sympy_fns():
+     assert os.path.exists(
+         os.path.join(module_path, "cy_ext.h")
+     ), f"Header file not found in {module_path}"
++    # debug=True keeps the build directory for reading; the test has read it
++    shutil.rmtree(module_path, ignore_errors=True)
+     # Check for JIT 5 with exp term - allow either N.x*N.y or N.y*N.x (mathematically equivalent)
+     jit5_found = any(
+         "Processing JIT    5" in line and "1/N.x" in line and "exp(" in line
+@@ -204,6 +208,8 @@ def test_getext_meshVar():
+     assert os.path.exists(
+         os.path.join(module_path, "cy_ext.h")
+     ), f"Header file not found in {module_path}"
++    # debug=True keeps the build directory for reading; the test has read it
++    shutil.rmtree(module_path, ignore_errors=True)
+ 
+     # Check that JIT processing happened for function 5
+     # We verify the essential mathematical content while ignoring LaTeX spacing which varies
+diff --git a/tests/test_0903_jit_build_leaves_no_temp_dir.py b/tests/test_0903_jit_build_leaves_no_temp_dir.py
+index de601b33..2e39a1a5 100644
+--- a/tests/test_0903_jit_build_leaves_no_temp_dir.py
++++ b/tests/test_0903_jit_build_leaves_no_temp_dir.py
+@@ -1,4 +1,4 @@
+-"""A JIT compile leaves nothing behind in the temporary directory (UNFILED 93).
++"""A JIT compile leaves nothing behind in the temporary directory.
+ 
+ Every compile built its extension in a directory of its own under a hard-coded
+ ``/tmp`` and left it there: one ``fn_ptr_ext_<hash>_<pid>_<time>_<n>`` per
+@@ -13,8 +13,9 @@ What is asserted:
+   own scratch files included;
+ * a solver whose kernels were loaded from a build directory that has since been
+   removed still solves, exactly: u = x^2 - y^2 is harmonic and quadratic, so a
+-  degree-2 field reproduces it to the solver's tolerance (1e-12 here);
+-* ``debug=True`` keeps the directory, for reading the generated sources.
++  degree-2 field reproduces it (solver tolerance 1e-12, asserted to 1e-9), and
++  the module was stored in the disk cache before its build directory went;
++* ``debug=True``, or ``UW_JIT_KEEP_BUILD=1``, keeps the directory.
+ """
+ import os
+ import tempfile
+@@ -74,7 +75,7 @@ def test_n_compiles_leave_the_temporary_directory_as_they_found_it(private_tmp):
+     assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
+ 
+ 
+-def test_kernels_loaded_from_a_removed_build_directory_still_solve(private_tmp):
++def test_kernels_loaded_from_a_removed_build_directory_still_solve(private_tmp, tmp_path):
+     tmp, built = private_tmp
+     mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
+     u = uw.discretisation.MeshVariable("u_0903", mesh, 1, degree=2)
+@@ -95,6 +96,9 @@ def test_kernels_loaded_from_a_removed_build_directory_still_solve(private_tmp):
+     err = np.abs(u.array[:, 0, 0] - (X[:, 0] ** 2 - X[:, 1] ** 2)).max()
+     assert err < 1e-9, err
+     assert sorted(os.listdir(tmp)) == []
++    # stored before the discard: removed first, store_module finds no .so and
++    # quietly stores nothing, and every other rank compiles its own copy
++    assert list((tmp_path / "jit-cache").glob("*.so")), "nothing reached the disk cache"
+ 
+ 
+ def test_debug_keeps_the_build_directory(private_tmp):
+@@ -102,3 +106,11 @@ def test_debug_keeps_the_build_directory(private_tmp):
+     mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
+     _compile(mesh, 7, debug=True, debug_name="T0903")
+     assert len(built) == 1 and os.path.exists(os.path.join(built[0], "cy_ext.h")), built
++
++
++def test_the_environment_keeps_the_build_directory(private_tmp, monkeypatch):
++    _tmp, built = private_tmp
++    monkeypatch.setenv("UW_JIT_KEEP_BUILD", "1")
++    mesh = uw.meshing.UnstructuredSimplexBox(cellSize=0.25)
++    _compile(mesh, 11)
++    assert len(built) == 1 and os.path.exists(os.path.join(built[0], "cy_ext.h")), built
+-- 
+2.39.5 (Apple Git-154)
+
