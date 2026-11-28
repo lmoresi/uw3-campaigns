@@ -1,0 +1,18 @@
+underworld3.__file__ = /mnt/nvme0n1p4/home/lmorese/hyperion-work/runs/2026-11-28-nearsurface/ov-u60/underworld3/__init__.py
+np = 3  cellsize = 0.05  h = 0.025  dip = 30.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+k =  1.0  top depth = 0.0250 (1.0 h)  band top depth = -0.0221 (-0.88 h)  | placed outcrop (band cells on the wall 11)  n_cells(rank 0) 3565
+    ranks agree: True
+k =  2.5  top depth = 0.0625 (2.5 h)  band top depth = +0.0154 (+0.61 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall, touching it at (-0.02493, 0.9997). In mesh units: the cavity reaches 0.053 from the band's skin, and the nearest wall vertex is 0.0166 from the skin. At the touched vertex the carve takes the cells within max(clearance x h = 0.00748, 0.6 x width = 0.03) of the skin, and the cavity's boundary is the ring of vertices around them. The volume must be interior, with clearance to spare: move it at least about 0.0364 further from the wall (a guide: the cavity is re-cut at the new position), or narrow the band: its width sets the carve down to a width of about 0.0125, where clearance x h takes over
+    ranks agree: True
+k =  3.5  top depth = 0.0875 (3.5 h)  band top depth = +0.0404 (+1.61 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain wall, touching it at (-0.02493, 0.9997). In mesh units: the cavity reaches 0.0521 from the band's skin, and the nearest wall vertex is 0.041 from the skin. At the touched vertex the carve takes the cells within max(clearance x h = 0.00748, 0.6 x width = 0.03) of the skin, and the cavity's boundary is the ring of vertices around them. The volume must be interior, with clearance to spare: move it at least about 0.0111 further from the wall (a guide: the cavity is re-cut at the new position), or narrow the band: its width sets the carve down to a width of about 0.0125, where clearance x h takes over
+    ranks agree: True
+k =  5.0  top depth = 0.1250 (5.0 h)  band top depth = +0.0778 (+3.11 h)  | placed interior  n_cells(rank 0) 3540
+    ranks agree: True
+k =  6.0  top depth = 0.1500 (6.0 h)  band top depth = +0.1028 (+4.11 h)  | placed interior  n_cells(rank 0) 3540
+    ranks agree: True
+k =  8.0  top depth = 0.2000 (8.0 h)  band top depth = +0.1528 (+6.11 h)  | placed interior  n_cells(rank 0) 3540
+    ranks agree: True
+DONE
+EXIT 0
