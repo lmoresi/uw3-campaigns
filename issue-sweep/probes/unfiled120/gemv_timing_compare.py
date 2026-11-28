@@ -12,7 +12,24 @@ import sys
 a, b = (json.load(open(p)) for p in sys.argv[1:3])
 print(f"default: PETSC_OPTIONS={a['PETSC_OPTIONS']!r}  off: PETSC_OPTIONS={b['PETSC_OPTIONS']!r}  "
       f"np {a['np']}/{b['np']}  repeats {a['repeats']}")
-print(f"{'case':22s} {'median default s':>16s} {'median off s':>13s} {'off/default':>11s}  iterations")
+print(f"{'case':22s} {'median default s':>16s} {'median off s':>13s} {'off/default':>11s} "
+      f"{'s/lin-it default':>16s} {'s/lin-it off':>13s} {'ratio':>7s}  iterations")
+
+
+def per_it(runs):
+    # wall time per linear iteration: comparable when the two arms take different
+    # paths (a yielding nonlinear solve); the rotated loop reports its own KSP count
+    vals = []
+    for r in runs:
+        its = r["linear_its"]
+        rot = r.get("rotated_ksp_its")
+        if rot not in (None, "None"):
+            its = sum(rot) if isinstance(rot, list) else int(rot)
+        if its:
+            vals.append(r["wall"] / its)
+    return statistics.median(vals) if vals else float("nan")
+
+
 for name in a["cases"]:
     ra, rb = a["cases"][name], b["cases"].get(name)
     if isinstance(ra, dict) or isinstance(rb, dict) or rb is None:
@@ -20,7 +37,10 @@ for name in a["cases"]:
         continue
     ma = statistics.median(r["wall"] for r in ra)
     mb = statistics.median(r["wall"] for r in rb)
+    pa, pb = per_it(ra), per_it(rb)
     keys = ("snes_its", "linear_its", "rotated_ksp_its", "rotated_newton_its", "reason")
     its = {tuple(str(r[k]) for k in keys) for r in ra + rb}
-    same = "equal" if len(its) == 1 else f"DIFFER: {sorted(its, key=str)}"
-    print(f"{name:22s} {ma:16.3f} {mb:13.3f} {mb / ma:11.3f}  {same}")
+    same = ("equal" if len(its) == 1 else
+            f"DIFFER (use the per-iteration ratio, not the total): {sorted(its, key=str)}")
+    print(f"{name:22s} {ma:16.3f} {mb:13.3f} {mb / ma:11.3f} {pa:16.4g} {pb:13.4g} "
+          f"{pb / pa:7.3f}  {same}")
