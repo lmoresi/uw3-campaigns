@@ -1,0 +1,261 @@
+From d1f55fb3d4db74ca892a15746fa564ca241942c7 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 14:56:53 +1100
+Subject: [PATCH 7/7] Review: a supervisor ended by a signal ends the job
+ first; only ranks get a stack file
+
+- A SIGTERM or SIGHUP to the supervisor left mpirun and the ranks running,
+  and the tidy then unlinked the stack files the live ranks held open, so a
+  later dump was lost; the parent also saw exit 143. The supervisor now kills
+  the job's tree and waits for it (the kill ladder bounds it), tidies, and
+  dies of the signal it was sent.
+- Every Python process of the job got a stack file, a rank's own build
+  subprocesses included, so after a kill a silent rank's empty file was lost
+  among them. A process whose direct parent is an armed process (or a helper)
+  of the same rank is a helper and gets none; a rank, a child of its launcher,
+  is armed under any launcher. The rank is read from Open MPI's, PMIx's,
+  MPICH/Hydra's, MVAPICH's or Slurm's variable, 'unknown' otherwise.
+- ptest_jit_cache removes its fake build directories.
+
+test_0063: a two-rank hang with one rank ignoring SIGUSR1 keeps that rank's
+empty file and the other's stack, and the rank's python subprocess gets no
+file; SIGTERM leaves no job process, the parent sees -15, and the job's
+stack file was still there when it ended. Both fail before this change.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 59 ++++++++++++++------
+ tests/parallel/ptest_jit_cache.py      |  1 +
+ tests/test_0063_mpi_hang_supervisor.py | 77 +++++++++++++++++++++-----
+ 3 files changed, 106 insertions(+), 31 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index 62ceeeb0..06e82f9b 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -99,18 +99,32 @@ import os
+ import signal
+ 
+ # Rank as the launchers advertise it, so a dump can be attributed without
+-# asking mpi4py (importing it here would run before the job's own import).
++# asking mpi4py (importing it here would run before the job's own import):
++# Open MPI, PMIx (Open MPI 5, srun --mpi=pmix), MPICH/Hydra, MVAPICH, Slurm.
+ _rank = (os.environ.get("OMPI_COMM_WORLD_RANK")
++         or os.environ.get("PMIX_RANK")
+          or os.environ.get("PMI_RANK")
+          or os.environ.get("MV2_COMM_WORLD_RANK")
++         or os.environ.get("SLURM_PROCID")
+          or "unknown")
+ 
+-# Held open for the life of the process on purpose: faulthandler keeps the
+-# descriptor, not this object, so letting it close would point the handler at
+-# whatever reuses the fd.
+-_path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d.stack" % (_rank, os.getpid()))
+-_stream = open(_path, "w")
+-faulthandler.register(signal.SIGUSR1, file=_stream, all_threads=True, chain=False)
++# A rank's own Python subprocesses (a setup.py build, its compiler driver)
++# inherit this module and the rank variable alike. One whose direct parent is a
++# process of the same rank that this module has already seen is such a helper,
++# and is not armed (it passes that on to its own children), so the stack files
++# are the ranks', and a silent rank's empty one is not buried among them. A rank
++# is a child of its launcher, not of an armed process, so it is armed under any
++# launcher, a rank variable or none.
++_seen = os.environ.get("UW_SUPERVISOR_SEEN", "")
++_helper = _seen == "%s:%d" % (_rank, os.getppid())
++os.environ["UW_SUPERVISOR_SEEN"] = "%s:%d" % (_rank, os.getpid())
++if not _helper:
++    # Held open for the life of the process on purpose: faulthandler keeps the
++    # descriptor, not this object, so letting it close would point the handler
++    # at whatever reuses the fd.
++    _path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d.stack" % (_rank, os.getpid()))
++    _stream = open(_path, "w")
++    faulthandler.register(signal.SIGUSR1, file=_stream, all_threads=True, chain=False)
+ 
+ # Let the supervisor's gdb attach: where the kernel restricts ptrace to a process's
+ # own descendants (Yama, the Ubuntu default), it would otherwise need root.
+@@ -462,16 +476,30 @@ def main():
+     handler_dir = _install_dump_handler(dump_dir, env)
+ 
+     # A supervisor ended by a signal (a walltime, a `timeout`, a cancelled CI
+-    # job) still tidies: the exit runs the `finally` below.
++    # job) ends the job first, and waits for it (bounded by the kill ladder):
++    # the ranks hold their stack files open, and mpirun and the ranks would
++    # otherwise run on. Then it tidies (no dump was asked for), and dies of the
++    # same signal, so its parent sees what ended it.
++    state = {}
++
+     def ended_by(signum, _frame):
+-        sys.exit(128 + signum)
++        job = state.get("job")
++        if job is not None and job.poll() is None:
++            _kill_the_job(job.pid)
++            try:
++                job.wait(timeout=SECONDS_TO_TERMINATE)
++            except subprocess.TimeoutExpired:
++                pass
++        _tidy(handler_dir, dump_dir, ours=args.artifacts is None)
++        signal.signal(signum, signal.SIG_DFL)
++        os.kill(os.getpid(), signum)
+ 
+     for sig in (signal.SIGTERM, signal.SIGHUP):
+         signal.signal(sig, ended_by)
+ 
+     status = None
+     try:
+-        status = _supervise(args, command, env, dump_dir)
++        status = _supervise(args, command, env, dump_dir, state)
+         return status
+     finally:
+         _tidy(handler_dir, dump_dir, ours=args.artifacts is None,
+@@ -481,10 +509,9 @@ def main():
+ def _tidy(handler_dir, dump_dir, ours, killed=False):
+     """Leave nothing behind but stacks that were actually dumped.
+ 
+-    Every Python process of the job opens its stack file at start-up (the
+-    handler needs the descriptor before any signal arrives), so a healthy job
+-    leaves one empty placeholder per process, and every job leaves its handler
+-    directory. Kept, they filled a server's /tmp. A directory of our own making
++    Every rank of the job opens its stack file at start-up (the handler needs
++    the descriptor before any signal arrives), so a healthy job leaves one empty
++    placeholder per rank, and every job leaves its handler directory. Kept, they filled a server's /tmp. A directory of our own making
+     goes too once it is empty; one named by --artifacts stays.
+ 
+     After a kill the placeholders stay: an empty one is the record of a rank
+@@ -506,8 +533,8 @@ def _tidy(handler_dir, dump_dir, ours, killed=False):
+             pass
+ 
+ 
+-def _supervise(args, command, env, dump_dir):
+-    job = subprocess.Popen(
++def _supervise(args, command, env, dump_dir, state):
++    job = state["job"] = subprocess.Popen(
+         command, env=env, start_new_session=True,
+         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+ 
+diff --git a/tests/parallel/ptest_jit_cache.py b/tests/parallel/ptest_jit_cache.py
+index 6b6921b9..730db953 100644
+--- a/tests/parallel/ptest_jit_cache.py
++++ b/tests/parallel/ptest_jit_cache.py
+@@ -374,6 +374,7 @@ def test_4_flock_serialises_disk_writes():
+     # All ranks try to publish at roughly the same time
+     _jc.store_module(bogus_hash, "fn_ptr_ext_flock", str(fake_dir), [(0, _FakeExpr())])
+     COMM.Barrier()
++    shutil.rmtree(fake_dir, ignore_errors=True)      # the store copied it, or not
+ 
+     if RANK == 0:
+         so_path = cache_dir / f"{bogus_hash}.so"
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index 91826a19..766fe982 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -152,7 +152,7 @@ def test_a_healthy_job_is_left_alone(tmp_path):
+ # in for mpirun and its rank (the supervisor dumps the job's descendants).
+ # Every supervised job made a handler directory (uw-supervisor-*) and, without
+ # --artifacts, a stacks directory (uw-stacks-*) holding an empty placeholder per
+-# process, and kept both; a Linux server's /tmp filled with them.
++# Python process, and kept both; a Linux server's /tmp filled with them.
+ N_SUPERVISED = 3
+ 
+ 
+@@ -176,37 +176,84 @@ def test_supervised_jobs_leave_the_temporary_directory_as_they_found_it(tmp_path
+     assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
+ 
+ 
+-def test_a_supervised_hang_keeps_its_stacks(tmp_path):
+-    """The cleanup's counter-test: a job that was dumped keeps what it dumped."""
+-    job = tmp_path / "silent_job.py"
+-    job.write_text("import time\nprint('started', flush=True)\ntime.sleep(600)\n")
++def _two_ranks(tmp_path, rank0, rank1):
++    """A shell standing in for a launcher: two python processes, each with a rank
++    variable, as Open MPI's would carry."""
++    for name, body in (("rank0.py", rank0), ("rank1.py", rank1)):
++        (tmp_path / name).write_text(body)
++    py = sys.executable
++    return ["/bin/sh", "-c",
++            f'OMPI_COMM_WORLD_RANK=0 "{py}" "{tmp_path / "rank0.py"}" & '
++            f'OMPI_COMM_WORLD_RANK=1 "{py}" "{tmp_path / "rank1.py"}" & wait']
++
++
++def test_a_supervised_hang_keeps_its_stacks_and_a_silent_ranks_record(tmp_path):
++    """The cleanup's counter-test: a job that was dumped keeps what it dumped, and
++    a rank that did not answer keeps its empty stack file, the record that it was
++    there and silent. A rank's own python subprocess (as a build would run) gets
++    no stack file, so it cannot bury that record."""
++    helper = tmp_path / "helper_pid"
++    rank0 = ("import subprocess, sys, time\n"
++             f"p = subprocess.run([sys.executable, '-c', 'import os; print(os.getpid())'],\n"
++             "                   capture_output=True, text=True)\n"
++             f"open({str(helper)!r}, 'w').write(p.stdout.strip())\n"
++             "print('rank 0 started', flush=True)\ntime.sleep(600)\n")
++    rank1 = ("import signal, time\nsignal.signal(signal.SIGUSR1, signal.SIG_IGN)\n"
++             "print('rank 1 started', flush=True)\ntime.sleep(600)\n")
+     tmp = tmp_path / "tmp"
+     tmp.mkdir()
+-    completed = _supervise_without_artifacts(job, tmp, silence=5.0)
++    completed = subprocess.run(
++        [sys.executable, str(SUPERVISOR), "--silence", "5", "--", *_two_ranks(tmp_path, rank0, rank1)],
++        capture_output=True, text=True, timeout=BUDGET, env=dict(os.environ, TMPDIR=str(tmp)))
+     assert completed.returncode == 124, f"{completed.stdout}\n{completed.stderr}"
+     kept = [d for d in tmp.iterdir() if d.name.startswith("uw-stacks-")]
+     assert len(kept) == 1, sorted(os.listdir(tmp))
+-    stacks = list(kept[0].glob("rank_*_pid_*.stack"))
+-    assert stacks and all(p.stat().st_size > 0 for p in stacks), stacks
++    stacks = {p.name.split("_pid_")[0]: p for p in kept[0].glob("rank_*_pid_*.stack")}
++    assert sorted(stacks) == ["rank_0", "rank_1"], sorted(p.name for p in kept[0].iterdir())
++    assert stacks["rank_0"].stat().st_size > 0
++    assert stacks["rank_1"].stat().st_size == 0, "the silent rank's record was not kept empty"
++    assert not list(kept[0].glob(f"*_pid_{helper.read_text()}.stack"))
+     assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
+ 
+ 
+-def test_a_supervisor_ended_by_sigterm_still_tidies(tmp_path):
++def _gone(pid):
++    try:
++        os.kill(pid, 0)
++    except ProcessLookupError:
++        return True
++    return False
++
++
++def test_a_supervisor_ended_by_sigterm_ends_the_job_then_tidies(tmp_path):
+     """A walltime, a `timeout` or a cancelled CI job ends the supervisor with
+-    SIGTERM; its directories go all the same."""
++    SIGTERM. The job goes first (it ran on for a minute or more), its stack file
++    still in place while it ran, then the directories, and the supervisor dies
++    of the signal it was sent."""
+     import signal
++    report = tmp_path / "report"
+     job = tmp_path / "slow_job.py"
+-    job.write_text("import time\nprint('started', flush=True)\ntime.sleep(20)\n")
++    job.write_text(
++        "import glob, os, signal, sys, time\n"
++        "def ended(*_):\n"
++        "    mine = glob.glob(os.path.join(os.environ['TMPDIR'], 'uw-stacks-*',\n"
++        "                                  '*_pid_%d.stack' % os.getpid()))\n"
++        f"    open({str(report)!r}, 'w').write('present' if mine else 'gone')\n"
++        "    sys.exit(0)\n"
++        "signal.signal(signal.SIGTERM, ended)\n"
++        "print(os.getpid(), os.getppid(), flush=True)\n"
++        "time.sleep(60)\n")
+     tmp = tmp_path / "tmp"
+     tmp.mkdir()
+-    env = dict(os.environ, TMPDIR=str(tmp))
+     supervisor = subprocess.Popen(
+         [sys.executable, str(SUPERVISOR), "--silence", str(SILENCE), "--",
+          "/bin/sh", "-c", f'"{sys.executable}" "{job}"; exit $?'],
+-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
+-    assert "started" in supervisor.stdout.readline()
++        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
++        env=dict(os.environ, TMPDIR=str(tmp)))
++    pid, shell = (int(x) for x in supervisor.stdout.readline().split())
+     supervisor.send_signal(signal.SIGTERM)
+-    assert supervisor.wait(timeout=30) == 128 + signal.SIGTERM
++    assert supervisor.wait(timeout=60) == -signal.SIGTERM
++    assert _gone(pid) and _gone(shell), "the job outlived its supervisor"
++    assert report.read_text() == "present", "the stack file went before the job did"
+     assert sorted(os.listdir(tmp)) == [], f"left in the temporary directory: {os.listdir(tmp)}"
+ 
+ 
+-- 
+2.39.5 (Apple Git-154)
+

@@ -18,8 +18,9 @@ of its dip scan.
   are a strip of the gap's width. Below 0.3 of the wall's cells (`_MIN_WALL_GAP_CELLS`) the
   placement is refused, with the gap in cells and in mesh units and both ways out: move the band
   further from the wall, or closer, so that it reaches the wall and is placed as an outcrop.
-- **The reach-and-distance message** added for this refusal no longer fires (every such case now
-  places, or gets the gap message); the 3-D sheet's wall message is unchanged.
+- **The reach-and-distance message** added for this refusal (`_wall_refusal_2d`) could no longer
+  fire, since every such case now places or gets the gap message, so it is removed here. The 3-D
+  sheet's wall message is unchanged.
 
 ## Tolerances and thresholds
 - **0.3 cells.** Measured smallest angle of the cells between skin and wall, against the gap g

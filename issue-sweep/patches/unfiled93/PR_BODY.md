@@ -20,11 +20,19 @@ session on the machine. A developer laptop's `/tmp` held 2,866 build directories
   best-effort and decides nothing, so the ranks cannot diverge on it.
 - The supervisor removes its handler directory and the empty placeholders at exit, and its own
   stacks directory if that is then empty. Dumped stacks stay. After a kill the placeholders stay
-  too: an empty one records a rank that did not answer. SIGTERM and SIGHUP now exit through the
-  same tidy, with status 128 + signal.
+  too: an empty one records a rank that did not answer.
+- Only ranks get a stack file. A process whose direct parent is an armed process, or a helper, of
+  the same rank (a rank's setup.py build, say) is a helper and gets none; a rank is a child of its
+  launcher and is armed under any launcher. The rank is read from `OMPI_COMM_WORLD_RANK`,
+  `PMIX_RANK`, `PMI_RANK`, `MV2_COMM_WORLD_RANK` or `SLURM_PROCID`, `unknown` otherwise.
+- A SIGTERM or SIGHUP to the supervisor ends the job's process tree first and waits for it
+  (bounded by the kill ladder), then tidies, then dies of the same signal, so its parent sees it.
+  Before, mpirun and the ranks ran on for a minute or more.
 - The testing guide recommends `--basetemp` on a real disk for long suites, one per concurrent run.
 
 ## Known, not changed
+- A rank killed in the middle of a compile leaves its build directory. Nothing sweeps the
+  temporary directory by age: that would delete other processes' files.
 - With `TMPDIR` on NFS the client renames a mapped, unlinked `.so` to `.nfsXXXX`, so one empty
   directory stays per compile. Keep `TMPDIR` on a local disk.
 - After the removal a debugger reads no symbols for frames inside a kernel, and tracebacks through
@@ -40,9 +48,12 @@ session on the machine. A developer laptop's `/tmp` held 2,866 build directories
   directory made under it; a Poisson solve on kernels whose build directory is gone is exact, and
   the module reached the disk cache first; `debug=True` and `UW_JIT_KEEP_BUILD=1` keep the
   directory. It fails before the change (directories under `/tmp`, and left there).
-- **test_0063**: three supervised jobs leave the temporary directory empty; a dumped hang keeps its
-  non-empty stacks; a supervisor ended by SIGTERM leaves nothing. The first and third fail before
-  the change. A separate commit makes the fake gdb's frame counter portable: BSD `wc` pads its
+- **test_0063**: three supervised jobs leave the temporary directory empty; a two-rank hang
+  keeps the answering rank's stack and the silent rank's (it ignores SIGUSR1) empty file, and the
+  rank's python subprocess gets none; a supervisor ended by SIGTERM leaves no job process, its
+  parent sees -15, the job's stack file was in place until the job ended, and nothing is left.
+  All three fail before the change.
+- **ptest_jit_cache** removes the fake build directories its flock test makes. A separate commit makes the fake gdb's frame counter portable: BSD `wc` pads its
   count, so the moved-between-samples test failed on macOS every time.
 - **test_0004** removes the build directories its `debug=True` compiles keep.
 
