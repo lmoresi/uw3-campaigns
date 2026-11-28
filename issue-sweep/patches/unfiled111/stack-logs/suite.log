@@ -1,0 +1,162 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 58%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+............                                                             [100%]
+=============================== warnings summary ===============================
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/src/underworld3/constitutive_models.py:2136: SyntaxWarning: invalid escape sequence '\p'
+    :math:`\psi = \log(\sigma/G + I)` and the model reads
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/src/underworld3/__init__.py:665: SyntaxWarning: invalid escape sequence '\e'
+    eta = uw.expression(r"\eta_0", uw.quantity(1e22, "Pa*s"), "viscosity")
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/src/underworld3/utilities/multigrid_options.py:430: SyntaxWarning: invalid escape sequence '\e'
+    Spiegelman notch, :math:`\eta` contrast 1e26, nested 4-level hierarchy:
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/src/underworld3/systems/ddt.py:850: SyntaxWarning: invalid escape sequence '\k'
+    :math:`\kappa \nabla T`). Both are semi-Lagrangian, both follow the
+
+test_0052_collective_guard_scan.py::test_source_tree_is_scannable
+test_0052_collective_guard_scan.py::test_no_collective_under_a_rank_local_guard
+test_0052_collective_guard_scan.py::test_accepted_list_has_no_stale_entries
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/src/underworld3/systems/thin_sheet.py:222: SyntaxWarning: invalid escape sequence '\m'
+    model is the in-plane one, :math:`\mathbf{P}\,\mathrm{sym}(\nabla_s
+
+test_0856_remove_embedded.py::test_a_zone_is_removed_and_the_mesh_returns_to_health
+test_0856_remove_embedded.py::test_a_sheet_is_removed_the_same_way
+test_0856_remove_embedded.py::test_removal_leaves_an_unrelated_surface_intact
+test_0856_remove_embedded.py::test_add_remove_add_composes
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/place_surface.py:1428: RuntimeWarning: invalid value encountered in cast
+    keys = np.floor((X[sel] - origin) / pitch).astype(np.int64)
+
+test_0856_remove_embedded.py::test_a_zone_is_removed_and_the_mesh_returns_to_health
+test_0856_remove_embedded.py::test_a_sheet_is_removed_the_same_way
+test_0856_remove_embedded.py::test_removal_leaves_an_unrelated_surface_intact
+test_0856_remove_embedded.py::test_add_remove_add_composes
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/place_surface.py:1438: RuntimeWarning: invalid value encountered in cast
+    / pitch).astype(np.int64)
+
+test_0856_remove_embedded.py::test_a_zone_is_removed_and_the_mesh_returns_to_health
+test_0856_remove_embedded.py::test_a_sheet_is_removed_the_same_way
+test_0856_remove_embedded.py::test_removal_leaves_an_unrelated_surface_intact
+test_0856_remove_embedded.py::test_add_remove_add_composes
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/place_surface.py:1440: RuntimeWarning: invalid value encountered in cast
+    / pitch).astype(np.int64)
+
+test_0856_remove_embedded.py::test_a_zone_is_removed_and_the_mesh_returns_to_health
+test_0856_remove_embedded.py::test_a_sheet_is_removed_the_same_way
+test_0856_remove_embedded.py::test_removal_leaves_an_unrelated_surface_intact
+test_0856_remove_embedded.py::test_add_remove_add_composes
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/place_surface.py:1441: RuntimeWarning: overflow encountered in scalar add
+    for kx in range(k_lo[0], k_hi[0] + 1):
+
+test_0863_fault_network_3d_width.py: 76 warnings
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/meshing/fault_network_3d.py:67: DeprecationWarning: Arrays of 2-dimensional vectors are deprecated. Use arrays of 3-dimensional vectors instead. (deprecated in NumPy 2.0)
+    cross = np.array([np.cross(P[(i + 1) % n] - P[i],
+
+test_0866_fault_pair_sign_at_a_junction.py::test_every_strand_slips_the_way_the_rock_says
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/fault_mg.py:1299: UserWarning: fault_mg: the fault(s) ['Main', 'Splay'] could not be carried onto add-on level 0 of 1 (RuntimeError: the cut leaves 1 flat cell(s) (area below 1e-09 of the cell's longest edge squared), the worst at (0.683851, 0.654269), beside the trace's sample at (0.683851, 0.654269); the trace runs straight there. A sharp turn needs a mesh vertex of its own, and so do the samples just beside it (add_fault puts one on each sample it pulls); reduce the turn's angle, or resample the trace near it about a cell apart.); that level and the levels beneath it stay welded there, the 0 finer add-on level(s) are split.
+    warnings.warn(
+
+test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_trace_that_came_back_short_is_split_whole[was_empty]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 15 of the call's 21 target(s) were left without a vertex, the first at (0.6579721148075873, 0.32496585385737686): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_trace_that_came_back_short_is_split_whole[was_short]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 12 of the call's 21 target(s) were left without a vertex, the first at (0.3547633508334245, 0.35059224467627326): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_whole_cut_is_added
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 1 of the call's 7 target(s) were left without a vertex, the first at (0.46992953793750825, 0.4588558373261279): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_tip_keeps_its_vertex
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 5 of the call's 13 target(s) were left without a vertex, the first at (0.36772174508825706, 0.3610735516612871): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_0897_add_fault_refuses_an_empty_or_partial_cut.py::test_a_turn_keeps_its_vertex
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 6 of the call's 11 target(s) were left without a vertex, the first at (0.39229729161262283, 0.5085275294261167): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_0940_essential_condition_on_a_fault_with_a_law.py::test_conditions_on_both_sides_without_a_law_still_solve
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_0940_essential_condition_on_a_fault_with_a_law.py:63: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    s.solve()
+
+test_1083_thin_thick_alignment.py::test_dragged_shell_thin_and_thick_agree_on_the_sphere
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1083_thin_thick_alignment.py:186: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    shell.solve()
+
+test_1079_thin_sheet_sphere_faults.py::test_a_killing_field_leaves_the_fault_untouched
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 2 of the call's 9 target(s) were left without a vertex, the first at (0.9238795325112867, -0.3826834323650898, 0.0): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_1079_thin_sheet_sphere_faults.py::test_a_viscous_interface_law_penalises_the_slip_on_the_sphere
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 2 of the call's 9 target(s) were left without a vertex, the first at (0.9824733131012553, -0.18640329676226988, 0.0): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_1087_fault_split_multigrid.py::test_a_moving_fault_re_splits_the_levels_at_every_position
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/custom_mg.py:2378: UserWarning: fault_mg: 3 of 7 weak coarse fault copies in a split-level transfer have no recorded-parent row to repair them, so they keep a (nearly) empty column and the coarse level may have null directions (#1120). This happens when the coarse levels do not follow a move of the finest; the count is in solve_report.config['multigrid_hierarchy']['unrepaired_fault_copies'].
+    Pn = fault_mg.cell_located_prolongation(
+
+test_1092_thin_sheet_prescribed_normal.py::test_fault_reaction_is_the_membrane_resultant
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/utilities/line_cut.py:1601: UserWarning: pull_vertex_onto: 2 of the call's 9 target(s) were left without a vertex, the first at (0.9887710779360422, -0.14943813247359922, 0.0): a later target of the call chose the same vertex and took it. The trace is sampled finer than the mesh there; thin it to the cell spacing (line_cut.resample) or refine the mesh (#559).
+    warnings.warn(
+
+test_1131_rotated_nullspace_from_mesh.py::test_a_units_model_shell_solves_with_its_declared_modes[plain_velocity]
+test_1131_rotated_nullspace_from_mesh.py::test_a_units_model_shell_solves_with_its_declared_modes[unit_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1131_rotated_nullspace_from_mesh.py:573: RuntimeWarning: SNES_Stokes: the rotated free-slip velocity sub-solve stopped at its iteration cap without converging, in 3 application(s), so the solve's convergence does not mean that block solved. Counts in _rotated_freeslip_info['sub_capped'] (#625).
+    stokes.solve()
+
+test_1146_custom_mg_after_deform.py::test_the_hierarchy_is_installed_once_and_again_after_a_deform[poisson]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1146_custom_mg_after_deform.py:91: UserWarning: custom_mg: the mesh of solver 'Solver_4264_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()                       # PETSc error 73 here before the fix
+
+test_1146_custom_mg_after_deform.py::test_the_hierarchy_is_installed_once_and_again_after_a_deform[stokes_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1146_custom_mg_after_deform.py:91: UserWarning: custom_mg: the mesh of solver 'Solver_4304_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()                       # PETSc error 73 here before the fix
+
+test_1149_custom_mg_hierarchy_lifecycle.py::test_gamg_after_a_fac_install_on_an_adapt_child[stokes_velocity]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1149_custom_mg_hierarchy_lifecycle.py:91: RuntimeWarning: SNES_Stokes: the pressure sub-solve stopped at its iteration cap (200) without converging, so the solve's convergence does not mean that block solved. Counts in solve_report.sub['pressure'].capped. A higher fieldsplit_pressure_ksp_max_it helps only a block that converges slowly; one that stagnates needs a better preconditioner (#585, #625).
+    s.solve()
+
+test_1149_custom_mg_hierarchy_lifecycle.py::test_a_rebuilt_stokes_snes_lets_its_ksps_go[gauge]
+test_1149_custom_mg_hierarchy_lifecycle.py::test_a_rebuilt_stokes_snes_lets_its_ksps_go[guard_armed]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1149_custom_mg_hierarchy_lifecycle.py:292: RuntimeWarning: Stokes: the velocity block fell back to 'gamg': no mesh hierarchy was available. FMG is 4x faster on this class of problem and does ~45x less velocity work (#625); 'gamg' degrades under refinement until it hits its iteration cap, which corrupts the Schur operator and stalls the pressure solve. Build the base mesh with refinement>=1 to get a hierarchy.
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_the_transfers_after_a_move_are_those_before_it[placed-deform]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:159: UserWarning: custom_mg: the mesh of solver 'Solver_5584_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_the_transfers_after_a_move_are_those_before_it[placed-mover]
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:159: UserWarning: custom_mg: the mesh of solver 'Solver_5622_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_relaxed_adapt_child_is_read_where_the_relax_left_it
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:299: UserWarning: custom_mg: the mesh of solver 'Solver_6067_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_relax_in_a_call_of_its_own_is_part_of_making_the_mesh
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/tests/test_1176_custom_mg_transfer_after_a_move.py:315: UserWarning: custom_mg: the mesh of solver 'Solver_6108_' was deformed after its FAC patch was built, so the patch is gone and the fault is absent from the preconditioner. Rebuild it with the moved fault: re-refine the base from it and register the new levels (set_custom_fmg). Registering the old coarse levels again does not bring it back: they did not move with the mesh, and the patch is declined at the cover gate (#1017).
+    s.solve()
+
+test_1176_custom_mg_transfer_after_a_move.py::test_a_reloaded_mesh_is_read_on_its_rebuilt_refinement
+  /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/timing.py:383: FutureWarning: write_checkpoint() is deprecated and retained for compatibility. Use write_timestep(..., petsc_reload=True) for PETSc reload output; set create_xdmf=True when visualization/remap payloads are also needed.
+    result = routine(*args, **kwargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+372 passed, 131 warnings in 2054.67s (0:34:14)
+underworld3: transcript -> /Users/lmoresi/+Simulations/pytest-tmp-w1/test_a_solver_that_solved_in_a0/transcripts/2026-11-28T14-15-29-__main__

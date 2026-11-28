@@ -1,0 +1,11 @@
+underworld3.__file__ = /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+np = 1  cellsize = 0.025  h = 0.0125  dip = 30.0 deg  width = 0.025 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.015 = 1.2 h
+measured wall edge length near the top = 0.01247
+k =  1.5  top depth = 0.0188 (1.5 h)  band top depth = -0.0047 (-0.38 h)  | placed outcrop (band cells on the wall 11)  wall-unlabelled 0 minangle 19.7 wall-minangle 19.7 plus True  n_cells(rank 0) 40051
+k =  2.0  top depth = 0.0250 (2.0 h)  band top depth = +0.0016 (+0.12 h)  | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's band comes within 0.12 cells (0.00154) of the domain wall at (-0.01247, 0.9999), whose cells there are 0.0125. An interior band needs at least 0.3 cells between its skin and the wall: the cells filled in between are slivers below that (smallest angle about 22 degrees at 0.3 cells, 1 degree at 0.01). Move the band at least 0.0022 further from the wall, or about 0.00154 closer, so that it reaches the wall and is placed as an outcrop.
+k =  2.5  top depth = 0.0312 (2.5 h)  band top depth = +0.0078 (+0.62 h)  | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 39.7 plus True  n_cells(rank 0) 40018
+k =  3.0  top depth = 0.0375 (3.0 h)  band top depth = +0.0141 (+1.12 h)  | placed interior  wall-unlabelled 0 minangle 32.1 wall-minangle 40.6 plus True  n_cells(rank 0) 40008
+k =  3.5  top depth = 0.0438 (3.5 h)  band top depth = +0.0203 (+1.62 h)  | placed interior  wall-unlabelled 0 minangle 36.7 wall-minangle 40.6 plus True  n_cells(rank 0) 40016
+k =  4.0  top depth = 0.0500 (4.0 h)  band top depth = +0.0266 (+2.12 h)  | placed interior  wall-unlabelled 0 minangle 36.6 wall-minangle 40.6 plus True  n_cells(rank 0) 40012
+DONE

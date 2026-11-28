@@ -1,0 +1,399 @@
+From cffdad86020f9c7afa6f1c122988af81333cd694 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 14:04:21 +1100
+Subject: [PATCH] An interior ribbon whose cavity runs along the wall is
+ placed; only a sliver's gap is refused
+
+A ribbon whose band ended a few cells below a domain wall was refused: the
+cavity around the band reached the wall, and the band did not reach it, so
+it was neither interior nor an outcrop. On an annulus with a ladder ribbon,
+every band whose highest corner lay between 0 and about 2 cells below the
+wall was refused, at dips of 15 to 45 degrees and at two cell sizes. A slab
+model lost the middle of its dip scan to it.
+
+The wall's vertices are protected from the carve, so the cavity can run
+along the wall and keep the wall's edges and labels. Measured with the
+refusal removed: every such band is placed, no wall edge loses its label (an
+annulus at three dips and two cell sizes, and a box corner where the cavity
+runs along two walls), and the cells' smallest angle matches a deep
+placement from about half a cell of gap on. Below that the cells filled in
+between the skin and the wall become slivers: about 22 degrees at 0.3 cells,
+1 degree at 0.01.
+
+So the refusal now applies only when the gap between the band's skin and
+the wall is below 0.3 of the wall's cells there (_MIN_WALL_GAP_CELLS; the
+cell size is the mean length of the ring's wall edges at the nearest wall
+vertex, not the mesh's nominal size). Its message gives the gap in cells and
+in mesh units and both ways out: move the band further from the wall, or
+closer, so it reaches the wall as an outcrop. The decision is made by the
+rank holding the cavity and agreed through the placement's failure gather,
+so every rank refuses or places alike, on the gather and the
+seam-conforming paths. It replaces the reach-and-distance message for this
+case, which no longer fires.
+
+test_0904 (tier B): bands 2.5-3.5 cells below the wall at two cell sizes are
+placed inside, the wall keeps its labels, the fault is split, and the cells
+beside the wall are no worse than 0.8 of a deep placement's; a band 1.95
+cells below is refused with a gap in cells within 0.05 of the geometry's; a
+box corner keeps both walls and its corner vertex. test_0865's fixture
+(0.67 cells of gap) is now placed.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 103 +++++++------
+ ..._0865_place_ribbon_wall_refusal_numbers.py |  48 +++---
+ ...4_place_ribbon_interior_beside_the_wall.py | 142 ++++++++++++++++++
+ 3 files changed, 222 insertions(+), 71 deletions(-)
+ create mode 100644 tests/test_0904_place_ribbon_interior_beside_the_wall.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 2545d1a9..7f2b36ad 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7554,46 +7554,55 @@ def _gathered_vertices_2d(h_vertex, d_skin, reach_v):
+     return d_skin < reach_v + 1.0 * h_vertex
+ 
+ 
+-def _wall_refusal_2d(ring, X, on_wall, d_skin, h_vertex, clearance, width):
+-    """The refusal for a 2-D cavity whose boundary ``ring`` reached the domain
+-    wall, with the numbers that decide it, in mesh units: how far the cavity
+-    reaches from the band's skin, how far the nearest wall vertex is from the
+-    skin, and the two terms of the carve's reach at the wall vertex the ring
+-    touched. The suggestions are guides: the cavity is re-cut wherever the band
+-    is moved, so its reach changes too. The phrase "reached the domain wall"
+-    leads, because callers match it to retry with other margins."""
+-    ring = np.asarray([v for v in ring if v < len(X)], dtype=np.int64)
+-    hit = ring[on_wall[ring]]
+-    w = int(hit[np.argmin(d_skin[hit])])
+-    reach = float(d_skin[ring].max())
+-    walls = d_skin[on_wall]
+-    wall = float(walls.min()) if walls.size else float("nan")
+-    by_h, by_w = float(clearance * h_vertex[w]), 0.6 * float(width)
+-    if by_h >= by_w:
+-        lever = "reduce clearance or the cell size near the wall"
+-    else:
+-        lever = (f"narrow the band: its width sets the carve down to a width of "
+-                 f"about {by_h / 0.6:.3g}, where clearance x h takes over")
+-    # a wall elsewhere (the other side of the band) that the cavity would reach
+-    # after the suggested move: moving away from one wall moves it onto the other
+-    far = (on_wall & (d_skin < reach + (reach - wall))
+-           & (np.linalg.norm(X - X[w], axis=1) > 4.0 * reach))
+-    move = (f"move it at least about {reach - wall:.3g} further from the wall (a "
+-            f"guide: the cavity is re-cut at the new position), or {lever}")
+-    if far.any():
+-        o = int(np.flatnonzero(far)[np.argmin(d_skin[far])])
+-        move = (f"moving it about {reach - wall:.3g} away from this wall would bring "
+-                f"the cavity onto the wall at ({X[o, 0]:.4g}, {X[o, 1]:.4g}): first "
+-                f"{lever}, then move it if it is still refused")
++# The smallest gap, in cells of the wall beside it, between an interior band's
++# skin and a domain wall its cavity reaches. The cavity may run along the wall
++# (its wall vertices are protected, so the wall's edges and labels stay), but
++# the fill between the skin and the wall is a strip of that gap's width.
++# Measured on an annulus with a ladder ribbon at dips 15-45 degrees and two cell
++# sizes: the strip's smallest angle is about 1 degree at 0.01 cells, 8.5 at
++# 0.11, 15.7 at 0.21 and 22.5 at 0.31, and 32-39 degrees (as deep inside the
++# mesh) from about 0.5 cells on.
++_MIN_WALL_GAP_CELLS = 0.3
++
++
++def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex):
++    """The gap between the band's skin and the wall a 2-D cavity's ``ring``
++    runs along, and the wall's cell size there.
++
++    The gap is the smaller of the wall vertices' distance to the skin and the
++    skin's vertices' distance to the ring's wall edges (consecutive ring entries,
++    both existing wall vertices). The cell size is the mean length of the ring's wall edges
++    at the nearest wall vertex, or that vertex's ``h`` when no ring edge lies on
++    the wall. Returns ``(gap, h, point)``, ``point`` the nearest wall vertex."""
++    old = [int(v) for v in ring if v < len(X)]
++    W = np.asarray([v for v in old if on_wall[v]], dtype=np.int64)
++    d_w = _segments_distance(X[W], asm_pts, skin_edges)
++    w = int(W[np.argmin(d_w)])
++    gap = float(d_w.min())
++    ring = [int(v) for v in ring]
++    wall_edges = [(a, b) for a, b in zip(ring, ring[1:] + ring[:1])
++                  if a < len(X) and b < len(X) and on_wall[a] and on_wall[b]]
++    if wall_edges:
++        skin_v = np.unique(np.asarray(skin_edges, dtype=np.int64).ravel())
++        gap = min(gap, float(_segments_distance(asm_pts[skin_v], X, wall_edges).min()))
++    at_w = [float(np.linalg.norm(X[a] - X[b])) for a, b in wall_edges if w in (a, b)]
++    h = float(np.mean(at_w)) if at_w else float(h_vertex[w])
++    return gap, h, X[w]
++
++
++def _wall_gap_refusal_2d(gap, h, point):
++    """The refusal for an interior band closer to a wall than
++    ``_MIN_WALL_GAP_CELLS`` of the wall's cells: the gap, in cells and in mesh
++    units, and the two ways out."""
++    need = _MIN_WALL_GAP_CELLS * h
+     return RuntimeError(
+-        f"the ribbon's cavity reached the domain wall, touching it at "
+-        f"({X[w, 0]:.4g}, {X[w, 1]:.4g}). In mesh units: the cavity reaches "
+-        f"{reach:.3g} from the band's skin, and the nearest wall vertex is "
+-        f"{wall:.3g} from the skin. At the touched vertex the carve takes the "
+-        f"cells within max(clearance x h = {by_h:.3g}, 0.6 x width = "
+-        f"{by_w:.3g}) of the skin, and the cavity's boundary is the ring of "
+-        f"vertices around them. The volume must be interior, with clearance to "
+-        f"spare: {move}")
++        f"the ribbon's band comes within {gap / h:.2f} cells ({gap:.3g}) of the domain "
++        f"wall at ({point[0]:.4g}, {point[1]:.4g}), whose cells there are {h:.3g}. An "
++        f"interior band needs at least {_MIN_WALL_GAP_CELLS:g} cells between its skin "
++        f"and the wall: the cells filled in between are slivers below that (smallest "
++        f"angle about 22 degrees at 0.3 cells, 1 degree at 0.01). Move the band at "
++        f"least {need - gap:.3g} further from the wall, or about {gap:.3g} closer, so "
++        f"that it reaches the wall and is placed as an outcrop.")
+ 
+ 
+ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+@@ -7901,8 +7910,12 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         raise RuntimeError(
+                             "a deleted vertex is on the cavity boundary")
+                     if len(old_ring) and on_wall[old_ring].any():
+-                        raise _wall_refusal_2d(old_ring, X, on_wall, d_skin,
+-                                               h_vertex, clearance, width)
++                        # the cavity runs along the wall: placed, unless the
++                        # band is too close to it for the fill between
++                        gap, h_gap, at = _wall_gap_2d(outer, X, on_wall, asm_pts,
++                                                      skin_edges, h_vertex)
++                        if gap < _MIN_WALL_GAP_CELLS * h_gap:
++                            raise _wall_gap_refusal_2d(gap, h_gap, at)
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+                 comps = []                  # handled
+             for ring, comp in comps:
+@@ -7961,8 +7974,12 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                 if chain_k is None:
+                     if on_wall[np.asarray([v for v in ring
+                                            if v < len(X)])].any():
+-                        raise _wall_refusal_2d(ring, X, on_wall, d_skin,
+-                                               h_vertex, clearance, width)
++                        # the cavity runs along the wall: placed, unless the
++                        # band is too close to it for the fill between
++                        gap, h_gap, at = _wall_gap_2d(ring, X, on_wall, asm_pts,
++                                                      skin_edges, h_vertex)
++                        if gap < _MIN_WALL_GAP_CELLS * h_gap:
++                            raise _wall_gap_refusal_2d(gap, h_gap, at)
+                 else:
+                     chain_ids = [len(X) + int(v) for v in chain_k]
+                     chain_ends = (asm_pts[chain_k[0]], asm_pts[chain_k[-1]])
+diff --git a/tests/test_0865_place_ribbon_wall_refusal_numbers.py b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+index 9736c6ab..2201006b 100644
+--- a/tests/test_0865_place_ribbon_wall_refusal_numbers.py
++++ b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+@@ -1,14 +1,14 @@
+-"""The ribbon's wall refusal says how far the cavity reaches and how far the wall is.
++"""A ribbon whose cavity runs along the wall, with room for the cells between, is placed.
+ 
+ The fixture is an interior ribbon 0.1 from the outer wall of an annulus with cells of
+-0.05: the cavity around it reaches the wall, and the placement refuses it (the check
+-dates from #549 and #670). The message used to say only "with clearance to spare".
+-The assertions are relations, not one mesher's numbers: gmsh on Linux puts the wall
+-vertices about 1.5 % differently, and the reach moves with them (0.107 against 0.112).
++0.05: the cavity around it reaches the wall (the check dates from #549 and #670). It
++was refused, first with "with clearance to spare" alone and then with the cavity's
++reach and the wall's distance. The wall's vertices are protected from the carve, so
++the cavity can run along the wall and keep its edges and labels, and a band whose skin
++is 0.3 or more of the wall's cells from it is now placed: here about 0.67 (0.0335 on
++macOS, the same on Linux). The refusal left is for a sliver's gap (test_0904).
+ """
+ 
+-import re
+-
+ import numpy as np
+ import pytest
+ 
+@@ -18,7 +18,7 @@ from underworld3.utilities.place_surface import place_fault_ribbon_2d
+ pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
+ 
+ 
+-def test_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
++def test_a_cavity_along_the_wall_is_placed_and_keeps_the_wall():
+     mesh = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.5, cellSize=0.1,
+                               refinement=1, qdegree=2)
+     th, dip = np.radians(80.0), np.radians(35.0)
+@@ -26,23 +26,15 @@ def test_wall_refusal_gives_the_cavity_reach_and_the_wall_distance():
+     inward = -np.array([np.cos(th - dip), np.sin(th - dip)])
+     trace = top + (0.05 * np.arange(7))[:, None] * inward
+ 
+-    with pytest.raises(RuntimeError, match="reached the domain wall") as err:
+-        place_fault_ribbon_2d(mesh, [("Fault", trace)], 0.1, margin_rings=1,
+-                              clearance=0.7, split=False, mesher="ladder")
+-
+-    msg = str(err.value)
+-    m = re.search(r"the cavity reaches ([0-9.e+-]+) from the band's skin, and the "
+-                  r"nearest wall vertex is ([0-9.e+-]+) from the skin", msg)
+-    assert m, msg
+-    reach, wall = float(m.group(1)), float(m.group(2))
+-    terms = [float(x) for x in re.findall(r"= ([0-9.e+-]+)", msg)]
+-    # what the fixture means, not one mesher's numbers: the skin is about 0.03
+-    # from the wall (0.0335 on macOS, the same on Linux), the cavity reaches past
+-    # it and past the carve, and the band's width sets the carve here
+-    assert reach > wall, msg
+-    assert 0.02 < wall < 0.05, msg
+-    assert reach >= max(terms) >= 0.6 * 0.1 - 1e-12, msg
+-    assert "narrow the band" in msg and "mesh units" in msg, msg
+-    # either a move (a guide), or, where the move would carry the cavity onto the
+-    # wall across the band, "first narrow the band" (this fixture's case on macOS)
+-    assert ("at least about" in msg and "a guide" in msg) or "first narrow the band" in msg, msg
++    placed, _info = place_fault_ribbon_2d(mesh, [("Fault", trace)], 0.1, margin_rings=1,
++                                          clearance=0.7, split=False, mesher="ladder")
++
++    dm = placed.dm
++    vS, _vE = dm.getDepthStratum(0)
++    eS, eE = dm.getDepthStratum(1)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    upper = [b for b in placed.boundaries if b.name == "Upper"][0]
++    outer = [e for e in range(eS, eE) if dm.getSupportSize(e) == 1
++             and (np.linalg.norm(X[[int(q) - vS for q in dm.getCone(e)]], axis=1) > 1 - 1e-6).all()]
++    assert outer
++    assert all(dm.getLabel("Upper").getValue(e) == upper.value for e in outer)
+diff --git a/tests/test_0904_place_ribbon_interior_beside_the_wall.py b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+new file mode 100644
+index 00000000..c5adc655
+--- /dev/null
++++ b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+@@ -0,0 +1,142 @@
++"""An interior ribbon close to a domain wall is placed; only a sliver's gap is refused.
++
++A ribbon whose band ended a few cells below the wall was refused: the cavity around
++the band reached the wall ("the volume must be interior, with clearance to spare"),
++and the band did not reach the wall either, so it could not be an outcrop. On an
++annulus with a ladder ribbon, every band whose highest corner lay between 0 and
++about 2 cells below the wall was refused, at any dip and cell size; a slab model
++lost the middle of its dip scan to it.
++
++The wall's vertices are protected from the carve, so the cavity can run along the
++wall and keep the wall's edges and labels. It is placed now, unless the gap between
++the band's skin and the wall is below 0.3 of the wall's cells, where the cells
++filled in between would be slivers; that refusal gives the gap in cells.
++
++The fixture is an annulus (inner radius 0.4) with one refinement, and a ribbon 2
++cells wide on a 7-point trace a cell apart, dipping 30 degrees, its top k cells
++below the outer wall, 2 margin rings, clearance 0.3, split. Asserted as relations:
++the band does not touch the wall, every outer-wall edge keeps its label, the fault
++is split, and the cells beside the wall are no worse than 0.8 of those of the same
++ribbon placed deep (k = 6) on the same mesh. A box corner, where the cavity runs
++along two walls, keeps both walls' labels and the corner vertex.
++"""
++import re
++
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++DIP = np.radians(30.0)
++R_HAT = np.array([0.0, 1.0])
++T_HAT = np.array([-1.0, 0.0])
++DOWN = -np.cos(DIP) * T_HAT - np.sin(DIP) * R_HAT
++
++
++@pytest.fixture(scope="module", params=[0.05, 0.025], ids=["h0.025", "h0.0125"])
++def annulus(request):
++    return uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=request.param,
++                              refinement=1, qdegree=2), request.param / 2
++
++
++def _place(mesh, h, k):
++    trace = (1.0 - k * h) * R_HAT + (h * np.arange(7))[:, None] * DOWN
++    return place_fault_ribbon_2d(mesh, [("Fault", trace)], 2 * h, margin_rings=2,
++                                 clearance=0.3, split=True, mesher="ladder")
++
++
++def _band_gap_cells(h, k):
++    """The band's highest corner below the outer circle, in nominal cells."""
++    top = (1.0 - k * h) * R_HAT
++    ext = top - 2 * h * DOWN
++    rail = h * np.array([DOWN[1], -DOWN[0]])
++    return (1.0 - max(np.linalg.norm(ext + rail), np.linalg.norm(ext - rail))) / h
++
++
++def _angles(P):
++    out = []
++    for i in range(3):
++        u, w = P[(i + 1) % 3] - P[i], P[(i + 2) % 3] - P[i]
++        out.append(np.degrees(np.arccos(np.clip(u @ w / np.linalg.norm(u) / np.linalg.norm(w),
++                                                -1, 1))))
++    return min(out)
++
++
++def _inspect(mesh, info, on_wall_of, wall_labels, near):
++    """Band cells on the wall, wall edges without their label, the smallest
++    angle of the cells touching a wall near ``near``."""
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    eS, eE = dm.getDepthStratum(1)
++    cS, cE = dm.getHeightStratum(0)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    value = {b.name: b.value for b in mesh.boundaries}
++    unlabelled = 0
++    for e in range(eS, eE):
++        if dm.getSupportSize(e) != 1:
++            continue
++        v = [int(q) - vS for q in dm.getCone(e)]
++        for name in wall_labels:
++            if on_wall_of[name](X[v]).all() and dm.getLabel(name).getValue(e) != value[name]:
++                unlabelled += 1
++    band_on_wall, smallest = 0, 180.0
++    band = np.asarray(info["band"])
++    for c in range(cS, cE):
++        cl = dm.getTransitiveClosure(c)[0]
++        P = X[cl[(cl >= vS) & (cl < vE)] - vS]
++        touches = any(on_wall_of[n](P).any() for n in wall_labels)
++        if touches and band[c - cS]:
++            band_on_wall += 1
++        if touches and np.linalg.norm(P.mean(0) - near) < 0.3:
++            smallest = min(smallest, _angles(P))
++    return band_on_wall, unlabelled, smallest, "FaultPlus" in value
++
++
++OUTER = {"Upper": lambda P: np.linalg.norm(P, axis=1) > 1.0 - 1e-6}
++
++
++@pytest.mark.parametrize("k", [2.5, 3.0, 3.5])
++def test_a_band_two_cells_below_the_wall_is_placed_inside(annulus, k):
++    mesh, h = annulus
++    deep = _inspect(*_place(mesh, h, 6.0), OUTER, ["Upper"], R_HAT)
++    band_on_wall, unlabelled, smallest, split = _inspect(*_place(mesh, h, k), OUTER,
++                                                         ["Upper"], R_HAT)
++    assert band_on_wall == 0 and unlabelled == 0 and split
++    assert smallest >= 0.8 * deep[2], (smallest, deep[2])
++
++
++def test_a_sliver_gap_is_refused_with_the_gap_in_cells(annulus):
++    mesh, h = annulus
++    k = 1.95
++    with pytest.raises(RuntimeError, match="comes within") as err:
++        _place(mesh, h, k)
++    m = re.search(r"within ([0-9.]+) cells \(([0-9.e+-]+)\) of the domain wall at "
++                  r"\([^)]*\), whose cells there are ([0-9.e+-]*[0-9])", str(err.value))
++    assert m, str(err.value)
++    cells, gap, h_wall = (float(x) for x in m.groups())
++    # the reported gap against the band's corner below the circle (the wall's
++    # chords sit inside it by about h^2/8, under 0.01 cells here)
++    assert abs(cells - _band_gap_cells(h, k) * h / h_wall) < 0.05, (cells, err.value)
++    assert 0 < cells < 0.3
++    assert "further from the wall" in str(err.value) and "outcrop" in str(err.value)
++
++
++def test_a_band_beside_a_box_corner_keeps_both_walls():
++    h = 0.05
++    box = uw.meshing.UnstructuredSimplexBox(minCoords=(0, 0), maxCoords=(1, 1),
++                                            cellSize=h, regular=True)
++    d = np.array([-1.0, -1.0]) / np.sqrt(2)
++    top = np.array([1 - 2.5 * h, 1 - 2.5 * h])          # band corner 0.38 cells off both
++    trace = top + (h * np.arange(7))[:, None] * d
++    mesh, info = place_fault_ribbon_2d(box, [("Fault", trace)], 2 * h, margin_rings=2,
++                                       clearance=0.3, split=True, mesher="ladder")
++    walls = {"Top": lambda P: np.abs(P[:, 1] - 1) < 1e-9,
++             "Right": lambda P: np.abs(P[:, 0] - 1) < 1e-9}
++    band_on_wall, unlabelled, _smallest, split = _inspect(mesh, info, walls,
++                                                          ["Top", "Right"], np.array([1.0, 1.0]))
++    X = mesh.dm.getCoordinatesLocal().array.reshape(-1, 2)
++    assert band_on_wall == 0 and unlabelled == 0 and split
++    assert (np.linalg.norm(X - [1.0, 1.0], axis=1) < 1e-12).sum() == 1
+-- 
+2.39.5 (Apple Git-154)
+

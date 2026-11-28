@@ -1,0 +1,18 @@
+a=2.0 b=2.0  band corner gap: Top -0.12 h, Right -0.12 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=3.0  band corner gap: Top -0.12 h, Right +0.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=4.0  band corner gap: Top -0.12 h, Right +1.88 h | REFUSED RuntimeError: place_thin_volume failed on the surgery rank: RuntimeError: the ribbon's cavity reached the domain boundary away from the outcrop band; only a one-band outcrop is built.
+a=2.5 b=2.5  band corner gap: Top +0.38 h, Right +0.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 25.5 near-corner-minangle 25.5 plus True
+a=2.5 b=3.5  band corner gap: Top +0.38 h, Right +1.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 25.5 near-corner-minangle 25.5 plus True
+a=2.5 b=4.5  band corner gap: Top +0.38 h, Right +2.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 25.5 near-corner-minangle 25.5 plus True
+a=3.0 b=3.0  band corner gap: Top +0.88 h, Right +0.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 42.7 plus True
+a=3.0 b=4.0  band corner gap: Top +0.88 h, Right +1.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 36.8 plus True
+a=3.0 b=5.0  band corner gap: Top +0.88 h, Right +2.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 36.8 plus True
+a=3.5 b=3.5  band corner gap: Top +1.38 h, Right +1.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 32.6 near-corner-minangle 32.6 plus True
+a=3.5 b=4.5  band corner gap: Top +1.38 h, Right +2.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 32.6 near-corner-minangle 32.6 plus True
+a=3.5 b=5.5  band corner gap: Top +1.38 h, Right +3.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 32.6 near-corner-minangle 32.6 plus True
+a=4.0 b=4.0  band corner gap: Top +1.88 h, Right +1.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 40.4 plus True
+a=4.0 b=5.0  band corner gap: Top +1.88 h, Right +2.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 40.4 plus True
+a=4.0 b=6.0  band corner gap: Top +1.88 h, Right +3.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 40.4 plus True
+a=5.0 b=5.0  band corner gap: Top +2.88 h, Right +2.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 45.0 plus True
+a=5.0 b=6.0  band corner gap: Top +2.88 h, Right +3.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 45.0 plus True
+a=5.0 b=7.0  band corner gap: Top +2.88 h, Right +4.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 33.4 near-corner-minangle 45.0 plus True

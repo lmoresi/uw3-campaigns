@@ -1,0 +1,18 @@
+underworld3.__file__ = /Users/lmoresi/+Underworld/underworld3-pixi/.claude/worktrees/sweep-2026-11-15/.pixi/envs/runtime/lib/python3.12/site-packages/underworld3/__init__.py
+np = 1  cellsize = 0.05  h = 0.025  dip = 45.0 deg  width = 0.05 (2.0 h)  spacing = h  npts = 7  margin_rings = 2  radiusInner = 0.4  clearance = 0.3  split = True
+carve reach = max(clearance*h, 0.6*width) = 0.03 = 1.2 h
+measured wall edge length near the top = 0.02493
+k =  0.0  top depth = 0.0000 (0.0 h)  band top depth = -0.0532 (-2.13 h)  | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in this version.
+k =  0.5  top depth = 0.0125 (0.5 h)  band top depth = -0.0407 (-1.63 h)  | placed outcrop (band cells on the wall 6)  wall-unlabelled 0 minangle 4.5 wall-minangle 4.5 plus True  n_cells(rank 0) 10365
+k =  1.0  top depth = 0.0250 (1.0 h)  band top depth = -0.0282 (-1.13 h)  | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 30.0 wall-minangle 30.5 plus True  n_cells(rank 0) 10368
+k =  1.5  top depth = 0.0375 (1.5 h)  band top depth = -0.0157 (-0.63 h)  | placed outcrop (band cells on the wall 6)  wall-unlabelled 0 minangle 4.9 wall-minangle 4.9 plus True  n_cells(rank 0) 10361
+k =  2.0  top depth = 0.0500 (2.0 h)  band top depth = -0.0032 (-0.13 h)  | placed outcrop (band cells on the wall 9)  wall-unlabelled 0 minangle 25.1 wall-minangle 25.1 plus True  n_cells(rank 0) 10366
+k =  2.5  top depth = 0.0625 (2.5 h)  band top depth = +0.0093 (+0.37 h)  | placed interior  wall-unlabelled 0 minangle 27.5 wall-minangle 27.5 plus True  n_cells(rank 0) 10340
+k =  3.0  top depth = 0.0750 (3.0 h)  band top depth = +0.0218 (+0.87 h)  | placed interior  wall-unlabelled 0 minangle 33.7 wall-minangle 47.3 plus True  n_cells(rank 0) 10338
+k =  3.5  top depth = 0.0875 (3.5 h)  band top depth = +0.0343 (+1.37 h)  | placed interior  wall-unlabelled 0 minangle 35.6 wall-minangle 46.3 plus True  n_cells(rank 0) 10336
+k =  4.0  top depth = 0.1000 (4.0 h)  band top depth = +0.0468 (+1.87 h)  | placed interior  wall-unlabelled 0 minangle 36.8 wall-minangle 47.3 plus True  n_cells(rank 0) 10344
+k =  4.5  top depth = 0.1125 (4.5 h)  band top depth = +0.0593 (+2.37 h)  | placed interior  wall-unlabelled 0 minangle 37.8 wall-minangle 47.3 plus True  n_cells(rank 0) 10338
+k =  5.0  top depth = 0.1250 (5.0 h)  band top depth = +0.0718 (+2.87 h)  | placed interior  wall-unlabelled 0 minangle 34.3 wall-minangle 47.3 plus True  n_cells(rank 0) 10342
+k =  5.5  top depth = 0.1375 (5.5 h)  band top depth = +0.0843 (+3.37 h)  | placed interior  wall-unlabelled 0 minangle 38.9 wall-minangle 47.3 plus True  n_cells(rank 0) 10344
+k =  6.0  top depth = 0.1500 (6.0 h)  band top depth = +0.0968 (+3.87 h)  | placed interior  wall-unlabelled 0 minangle 35.6 wall-minangle 47.3 plus True  n_cells(rank 0) 10340
+DONE
