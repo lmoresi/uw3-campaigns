@@ -21,10 +21,15 @@ session on the machine. A developer laptop's `/tmp` held 2,866 build directories
 - The supervisor removes its handler directory and the empty placeholders at exit, and its own
   stacks directory if that is then empty. Dumped stacks stay. After a kill the placeholders stay
   too: an empty one records a rank that did not answer.
-- Only ranks get a stack file. A process whose direct parent is an armed process, or a helper, of
-  the same rank (a rank's setup.py build, say) is a helper and gets none; a rank is a child of its
-  launcher and is armed under any launcher. The rank is read from `OMPI_COMM_WORLD_RANK`,
-  `PMIX_RANK`, `PMI_RANK`, `MV2_COMM_WORLD_RANK` or `SLURM_PROCID`, `unknown` otherwise.
+- After a dump request, an empty stack file stays only for a process the request went to (the
+  record of a rank that did not answer); one whose process had already exited (a rank's compiler
+  or build) goes, so that record is not buried. Every Python process is armed, so pytest-xdist
+  workers and ranks under a wrapper script keep theirs. The rank in a file's name is read from
+  `OMPI_COMM_WORLD_RANK`, `PMIX_RANK`, `PMI_RANK`, `MV2_COMM_WORLD_RANK` or `SLURM_PROCID`,
+  `unknown` otherwise.
+- A Python job the supervisor starts itself (a serial job, no launcher) is asked for its stack
+  too; before, only the job's descendants were, so a serial hang's file stayed empty. A launcher
+  is not signalled.
 - A SIGTERM or SIGHUP to the supervisor ends the job's process tree first and waits for it
   (bounded by the kill ladder), then tidies, then dies of the same signal, so its parent sees it.
   Before, mpirun and the ranks ran on for a minute or more.
@@ -50,9 +55,10 @@ session on the machine. A developer laptop's `/tmp` held 2,866 build directories
   directory. It fails before the change (directories under `/tmp`, and left there).
 - **test_0063**: three supervised jobs leave the temporary directory empty; a two-rank hang
   keeps the answering rank's stack and the silent rank's (it ignores SIGUSR1) empty file, and the
-  rank's python subprocess gets none; a supervisor ended by SIGTERM leaves no job process, its
+  rank's exited python subprocess leaves none; a serial supervised hang leaves one non-empty
+  stack file; a supervisor ended by SIGTERM leaves no job process, its
   parent sees -15, the job's stack file was in place until the job ended, and nothing is left.
-  All three fail before the change.
+  All four fail before the change.
 - **test_0063, separately**: a commit makes the fake gdb's frame counter portable. BSD `wc` pads
   its count, so the moved-between-samples test failed on macOS every time.
 - **ptest_jit_cache** removes the fake build directories its flock test makes.

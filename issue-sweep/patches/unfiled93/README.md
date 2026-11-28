@@ -25,3 +25,18 @@ New tests fail first against 0006's supervisor (L1/L2: helper's empty rank_0 fil
 Serial test_0063 (excluding mpirun cases): 8 passed.
 Owed: H1's np 3 kill test, H7's serial re-check.
 112 rebased onto 0007 (one commit, unchanged).
+
+## Round 2b (C1's L2 question): 0008
+The parentage rule of 0007 made a rank's Python children helpers, which would lose a pytest-xdist
+worker's file and a real rank's under `mpirun python wrapper.py`. Replaced. Every Python process
+is armed again, and after a dump request the tidy keeps an empty file only for a pid the request
+went to. Exited helpers (compilers, builds) lose theirs.
+Singleton: the dump request now also goes to the job process itself when it has a stack file (a
+serial job started by the supervisor). Before, only descendants were asked, so the file stayed
+empty: pre-existing, and the new test fails on 0007.
+What each case gets:
+- serial job: its file, dumped;
+- xdist workers and wrapper ranks: armed and asked, so dumped, or an empty record if silent;
+- mpirun ranks: as before;
+- compilers that exited before the kill: removed.
+Serial test_0063 (mpirun cases excluded): 9 passed. 112 rebased on 0008.

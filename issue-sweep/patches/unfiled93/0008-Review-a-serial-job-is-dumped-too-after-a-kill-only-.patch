@@ -1,0 +1,178 @@
+From dd49c8945270f2756c9570059141c38a60271d77 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:01:46 +1100
+Subject: [PATCH 8/8] Review: a serial job is dumped too; after a kill only the
+ asked processes' empty files stay
+
+The parentage rule of the last commit took a rank's Python children for
+helpers. A pytest-xdist worker, or the real rank under a wrapper script, is
+such a child, and lost its stack file. Every Python process of the job is
+armed again. After a dump request the tidy keeps an empty stack file only
+for a process the request went to (the record of a rank that did not
+answer); one whose process had exited by then (a compiler, a build) goes.
+
+The dump request went only to the job's descendants, so a Python job the
+supervisor started itself (a serial job, no launcher) was never asked and
+its stack file stayed empty. It is asked now when it is a process this
+module armed; a launcher is not signalled.
+
+test_0063: a serial supervised hang leaves one non-empty stack file (fails
+before this change).
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/mpi_supervisor.py              | 60 +++++++++++++-------------
+ tests/test_0063_mpi_hang_supervisor.py | 20 ++++++++-
+ 2 files changed, 47 insertions(+), 33 deletions(-)
+
+diff --git a/scripts/mpi_supervisor.py b/scripts/mpi_supervisor.py
+index 06e82f9b..a0981cd4 100755
+--- a/scripts/mpi_supervisor.py
++++ b/scripts/mpi_supervisor.py
+@@ -108,23 +108,12 @@ _rank = (os.environ.get("OMPI_COMM_WORLD_RANK")
+          or os.environ.get("SLURM_PROCID")
+          or "unknown")
+ 
+-# A rank's own Python subprocesses (a setup.py build, its compiler driver)
+-# inherit this module and the rank variable alike. One whose direct parent is a
+-# process of the same rank that this module has already seen is such a helper,
+-# and is not armed (it passes that on to its own children), so the stack files
+-# are the ranks', and a silent rank's empty one is not buried among them. A rank
+-# is a child of its launcher, not of an armed process, so it is armed under any
+-# launcher, a rank variable or none.
+-_seen = os.environ.get("UW_SUPERVISOR_SEEN", "")
+-_helper = _seen == "%s:%d" % (_rank, os.getppid())
+-os.environ["UW_SUPERVISOR_SEEN"] = "%s:%d" % (_rank, os.getpid())
+-if not _helper:
+-    # Held open for the life of the process on purpose: faulthandler keeps the
+-    # descriptor, not this object, so letting it close would point the handler
+-    # at whatever reuses the fd.
+-    _path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d.stack" % (_rank, os.getpid()))
+-    _stream = open(_path, "w")
+-    faulthandler.register(signal.SIGUSR1, file=_stream, all_threads=True, chain=False)
++# Held open for the life of the process on purpose: faulthandler keeps the
++# descriptor, not this object, so letting it close would point the handler at
++# whatever reuses the fd.
++_path = os.path.join({str(dump_dir)!r}, "rank_%s_pid_%d.stack" % (_rank, os.getpid()))
++_stream = open(_path, "w")
++faulthandler.register(signal.SIGUSR1, file=_stream, all_threads=True, chain=False)
+ 
+ # Let the supervisor's gdb attach: where the kernel restricts ptrace to a process's
+ # own descendants (Yama, the Ubuntu default), it would otherwise need root.
+@@ -478,8 +467,8 @@ def main():
+     # A supervisor ended by a signal (a walltime, a `timeout`, a cancelled CI
+     # job) ends the job first, and waits for it (bounded by the kill ladder):
+     # the ranks hold their stack files open, and mpirun and the ranks would
+-    # otherwise run on. Then it tidies (no dump was asked for), and dies of the
+-    # same signal, so its parent sees what ended it.
++    # otherwise run on. Then it tidies (keeping the empty file of any rank a dump
++    # was asked of), and dies of the same signal, so its parent sees what ended it.
+     state = {}
+ 
+     def ended_by(signum, _frame):
+@@ -490,7 +479,8 @@ def main():
+                 job.wait(timeout=SECONDS_TO_TERMINATE)
+             except subprocess.TimeoutExpired:
+                 pass
+-        _tidy(handler_dir, dump_dir, ours=args.artifacts is None)
++        _tidy(handler_dir, dump_dir, ours=args.artifacts is None,
++              asked=state.get("asked"))
+         signal.signal(signum, signal.SIG_DFL)
+         os.kill(os.getpid(), signum)
+ 
+@@ -503,28 +493,31 @@ def main():
+         return status
+     finally:
+         _tidy(handler_dir, dump_dir, ours=args.artifacts is None,
+-              killed=status == EXIT_KILLED)
++              asked=state.get("asked") if status == EXIT_KILLED else None)
+ 
+ 
+-def _tidy(handler_dir, dump_dir, ours, killed=False):
++def _tidy(handler_dir, dump_dir, ours, asked=None):
+     """Leave nothing behind but stacks that were actually dumped.
+ 
+-    Every rank of the job opens its stack file at start-up (the handler needs
+-    the descriptor before any signal arrives), so a healthy job leaves one empty
+-    placeholder per rank, and every job leaves its handler directory. Kept, they filled a server's /tmp. A directory of our own making
++    Every Python process of the job opens its stack file at start-up (the
++    handler needs the descriptor before any signal arrives), so a healthy job
++    leaves one empty placeholder per process, and every job leaves its handler
++    directory. Kept, they filled a server's /tmp. A directory of our own making
+     goes too once it is empty; one named by --artifacts stays.
+ 
+-    After a kill the placeholders stay: an empty one is the record of a rank
+-    (and its pid) that did not answer the dump request.
++    After a dump request (``asked``, the pids it went to) an empty placeholder
++    of a process that was asked stays: it is the record of a rank (and its pid)
++    that did not answer. One of a process no longer alive by then (a rank's
++    compiler, a build) goes, so that record is not buried among them.
+     """
+     shutil.rmtree(handler_dir, ignore_errors=True)
+-    if killed:
+-        return
++    asked = asked or set()
+     for path in Path(dump_dir).glob("rank_*_pid_*.stack"):
+         try:
+-            if path.stat().st_size == 0:
++            pid = int(path.stem.rsplit("_pid_", 1)[1])
++            if path.stat().st_size == 0 and pid not in asked:
+                 path.unlink()
+-        except OSError:
++        except (OSError, ValueError):
+             pass
+     if ours:
+         try:
+@@ -564,6 +557,11 @@ def _supervise(args, command, env, dump_dir, state):
+         print(f"\n=== MPI SUPERVISOR: {reason} ===", flush=True)
+ 
+         ranks = _descendants(job.pid)
++        # the job itself, when it is a Python process this module armed (a
++        # serial job started with no launcher); a launcher is not signalled
++        if list(Path(dump_dir).glob(f"rank_*_pid_{job.pid}.stack")):
++            ranks = [job.pid] + ranks
++        state["asked"] = set(ranks)
+         _request_dumps(ranks)
+         time.sleep(SECONDS_TO_DUMP)
+ 
+diff --git a/tests/test_0063_mpi_hang_supervisor.py b/tests/test_0063_mpi_hang_supervisor.py
+index 766fe982..c8e9364e 100644
+--- a/tests/test_0063_mpi_hang_supervisor.py
++++ b/tests/test_0063_mpi_hang_supervisor.py
+@@ -190,8 +190,8 @@ def _two_ranks(tmp_path, rank0, rank1):
+ def test_a_supervised_hang_keeps_its_stacks_and_a_silent_ranks_record(tmp_path):
+     """The cleanup's counter-test: a job that was dumped keeps what it dumped, and
+     a rank that did not answer keeps its empty stack file, the record that it was
+-    there and silent. A rank's own python subprocess (as a build would run) gets
+-    no stack file, so it cannot bury that record."""
++    there and silent. A rank's own python subprocess (as a build would run) has
++    exited by then, and its empty file goes, so it cannot bury that record."""
+     helper = tmp_path / "helper_pid"
+     rank0 = ("import subprocess, sys, time\n"
+              f"p = subprocess.run([sys.executable, '-c', 'import os; print(os.getpid())'],\n"
+@@ -216,6 +216,22 @@ def test_a_supervised_hang_keeps_its_stacks_and_a_silent_ranks_record(tmp_path):
+     assert not [d for d in tmp.iterdir() if d.name.startswith("uw-supervisor-")]
+ 
+ 
++def test_a_serial_supervised_hang_dumps_its_stack(tmp_path):
++    """No launcher: the supervisor starts the Python job itself, which is then the
++    job, not a descendant of it, and must be asked for its stack too."""
++    job = tmp_path / "serial_job.py"
++    job.write_text("import time\nprint('started', flush=True)\ntime.sleep(600)\n")
++    tmp = tmp_path / "tmp"
++    tmp.mkdir()
++    completed = subprocess.run(
++        [sys.executable, str(SUPERVISOR), "--silence", "5", "--", sys.executable, str(job)],
++        capture_output=True, text=True, timeout=BUDGET, env=dict(os.environ, TMPDIR=str(tmp)))
++    assert completed.returncode == 124, f"{completed.stdout}\n{completed.stderr}"
++    stacks = [p for d in tmp.iterdir() if d.name.startswith("uw-stacks-")
++              for p in d.glob("rank_*_pid_*.stack")]
++    assert len(stacks) == 1 and stacks[0].stat().st_size > 0, stacks
++
++
+ def _gone(pid):
+     try:
+         os.kill(pid, 0)
+-- 
+2.39.5 (Apple Git-154)
+
