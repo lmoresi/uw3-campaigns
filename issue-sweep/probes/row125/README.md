@@ -75,3 +75,15 @@ Timed solve (s), and the largest rank's cells at np 8:
   (ksp_its 1, sub empty).
 - The 56 % share depends on the fixture: the metric width (0.08) is about one
   coarse add-on cell (0.05).
+
+## The share curve (region_share_curve.py, serial; RES-region-share.txt)
+The serial version of partition_addon's region and weight reproduces H1's
+owner count (873 of 1764 at h 0.1, k 3, width 0.08). "Wide" is 3 base-finest
+cells (1.5 h). At h 0.05 that is 0.075, so it is the same as 0.08 there.
+Region share, with the ceiling 1/share in brackets:
+    h      k 1                   k 2                   k 3
+    0.2    43 % (2.3) / 51 % (2.0)  54 % (1.9) / 53 % (1.9)  68 % (1.5) / 68 % (1.5)
+    0.1    22 % (4.5) / 26 % (3.9)  35 % (2.9) / 39 % (2.6)  50 % (2.0) / 56 % (1.8)
+    0.05   13 % (7.6) / 13 % (7.7)  23 % (4.4) / 23 % (4.4)  38 % (2.6) / 38 % (2.7)
+(each cell: width 0.08 / wide)
+adapt_partition_balance.py: adapt's own partition, max/mean at np 8 (for H1).
