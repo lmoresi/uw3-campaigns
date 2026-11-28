@@ -5153,3 +5153,21 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - Verdict: b912c3b reproduces A within 0.2-8.4 km where A worked, and fits where A refused. Shown.
 - Band: on Q10c's history the 20 deg split top runs 23 km (step 2) to 26 (9.5 Myr) to 59 (24 Myr), about 2.3 km/Myr, so B20 is likely to enter the refused 25-60 km band at ~10 Myr.
   - Hub: that rate comes from Q10c's dynamics (tangent top, no bridge); the B runs may differ. B15 will cross the band too, while B40 starts below it. Until W1's fix, only B40/B45 can run the full course.
+
+### 2026-11-28 — Louis: fit as before, split below, damage near the surface, flat asymptote passive; -uw_bridge_kind curve (K1 5cefc64 → f4a506a); C15/C20/C40/C45
+- Louis: "I think you are making the fit try to match the damage zone. The idea as that we fit the fault as before and then the lower part becomes a split and the near-surface becomes damage - the flat asymptote to the surface is passive and not part of the mechanical response".
+- B15/B20/B40/B45 (jobs 4995/4997) cancelled after a few steps.
+- K1: two parts acted on the flat run.
+  - The zone bridge runs straight to trench_point, so the damage followed the convergence it set.
+  - The recipe's damage zone (uw_yield_zone_km 40, both sides) followed the whole fitted line, flat run included; in Q10c/Q17c that line reached 2,800 km out.
+- 5cefc64 (on b912c3b), verified (.gz 0f6441f and mbox 05cb670 match, blob 30c347d) and pushed to kaiju/slab-workbench as f4a506a. -uw_bridge_kind curve:
+  - The bridge (isotropic, x uw_bridge_weak, uw_bridge_km wide) lies along the fitted curve from the fit's leaving point (spline_trench_depth) down to the split's top.
+  - The split starts no shallower than the leaving point, and the damage zone also stops there.
+  - The run from the leaving point to the surface is tracked only. The fit is unchanged.
+- Offline (curve_bridge_geometry.py on Q10c's fits): the leaving point stays at 21.5-22 km. Split top over 1 → 53 Myr: 15 deg 23 → 69 km; 20 deg 23 → 89; 40 deg 65 → 406; 45 deg 400 → 406. Every dip crosses the 25-60 km band at some time, and 30 deg starts in it (36 km).
+- Runs C15/C20/C40/C45 from step 0, driver 5cefc64: the Q10c recipe + -uw_split_min_dip_deg NN -uw_bridge_kind curve -uw_bridge_weak 0.1 -uw_bridge_km 20.
+- Hub:
+  - The weak path (split + bridge + damage zone) now ends at the leaving point, ~22 km down. Above it the two plates are joined only by the yield law, with no imposed weakness to the surface.
+  - Precedent (DECISIONS, 7 and 13 Nov): a fault stopped at the overriding plate's base, or shortened, choked subduction. Here only the top ~22 km is left, so it may yield, but that needs checking early: strain rate in the top 22 km at the trench, and convergence against B/Q10c over the first ~10 Myr.
+  - Louis's "near-surface becomes damage" may mean damage reaching the surface. As built, damage stops at 22 km too. Put the question to Louis.
+  - C15/C20 will reach the band and stop until W1's fix; C40 starts just below it.
