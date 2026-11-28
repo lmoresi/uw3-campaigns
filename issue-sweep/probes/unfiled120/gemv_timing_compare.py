@@ -18,15 +18,15 @@ print(f"{'case':22s} {'median default s':>16s} {'median off s':>13s} {'off/defau
 
 def per_it(runs):
     # wall time per linear iteration: comparable when the two arms take different
-    # paths (a yielding nonlinear solve); the rotated loop reports its own KSP count
+    # paths (a yielding nonlinear solve). The rotated loop records only its OUTER
+    # KSP count (usually 1), not its sub-solves, so there is no per-iteration figure
+    # for it: NaN, and its total ratio stands when the iterations are equal.
     vals = []
     for r in runs:
-        its = r["linear_its"]
-        rot = r.get("rotated_ksp_its")
-        if rot not in (None, "None"):
-            its = sum(rot) if isinstance(rot, list) else int(rot)
-        if its:
-            vals.append(r["wall"] / its)
+        if r.get("rotated_ksp_its") not in (None, "None"):
+            return float("nan")
+        if r["linear_its"]:
+            vals.append(r["wall"] / r["linear_its"])
     return statistics.median(vals) if vals else float("nan")
 
 
