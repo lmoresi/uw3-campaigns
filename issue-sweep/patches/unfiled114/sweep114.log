@@ -1,0 +1,60 @@
+dip 10
+k =  0.0 g=-1.37 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.1 g=-1.32 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.1 g=-1.27 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.2 g=-1.22 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.2 g=-1.17 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.2 g=-1.12 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.3 g=-1.07 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.4 g=-1.02 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.4 g=-0.97 h | REFUSED RuntimeError: assembly failed: ValueError: the ladder band has fewer than two rungs inside the domain
+k =  0.5 g=-0.92 h | placed outcrop (band cells on the wall 12)  
+k =  0.5 g=-0.87 h | placed outcrop (band cells on the wall 12)  
+dip 15
+k =  0.0 g=-1.52 h | REFUSED RuntimeError: assembly failed: RuntimeError: the ribbon assembly meshed to area 8.608879263116e-03 against CAD 8.608879090004e-03; the layer mesh 
+k =  0.1 g=-1.47 h | REFUSED ValueError: pull_vertex_onto: the target (6.115579953242095e-17, 0.99875) is inside the mesh and the nearest corner of its cell is a boundary vert
+k =  0.1 g=-1.42 h | placed outcrop (band cells on the wall 12)  
+k =  0.2 g=-1.37 h | placed outcrop (band cells on the wall 16)  
+k =  0.2 g=-1.32 h | placed outcrop (band cells on the wall 12)  
+k =  0.2 g=-1.27 h | placed outcrop (band cells on the wall 12)  
+k =  0.3 g=-1.22 h | placed outcrop (band cells on the wall 13)  
+k =  0.4 g=-1.17 h | placed outcrop (band cells on the wall 12)  
+k =  0.4 g=-1.12 h | placed outcrop (band cells on the wall 12)  
+k =  0.5 g=-1.07 h | placed outcrop (band cells on the wall 12)  
+k =  0.5 g=-1.02 h | placed outcrop (band cells on the wall 12)  
+dip 20
+k =  0.0 g=-1.65 h | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in th
+k =  0.1 g=-1.60 h | REFUSED ValueError: pull_vertex_onto: the target (6.115579953242095e-17, 0.99875) is inside the mesh and the nearest corner of its cell is a boundary vert
+k =  0.1 g=-1.55 h | placed outcrop (band cells on the wall 15)  
+k =  0.2 g=-1.50 h | placed outcrop (band cells on the wall 15)  
+k =  0.2 g=-1.45 h | placed outcrop (band cells on the wall 15)  
+k =  0.2 g=-1.40 h | placed outcrop (band cells on the wall 14)  
+k =  0.3 g=-1.35 h | placed outcrop (band cells on the wall 14)  
+k =  0.4 g=-1.30 h | placed outcrop (band cells on the wall 17)  
+k =  0.4 g=-1.25 h | placed outcrop (band cells on the wall 16)  
+k =  0.5 g=-1.20 h | placed outcrop (band cells on the wall 15)  
+k =  0.5 g=-1.15 h | placed outcrop (band cells on the wall 15)  
+dip 30
+k =  0.0 g=-1.88 h | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in th
+k =  0.1 g=-1.83 h | placed outcrop (band cells on the wall 12)  
+k =  0.1 g=-1.78 h | placed outcrop (band cells on the wall 10)  
+k =  0.2 g=-1.73 h | placed outcrop (band cells on the wall 12)  
+k =  0.2 g=-1.68 h | placed outcrop (band cells on the wall 11)  
+k =  0.2 g=-1.63 h | placed outcrop (band cells on the wall 11)  
+k =  0.3 g=-1.58 h | placed outcrop (band cells on the wall 11)  
+k =  0.4 g=-1.53 h | placed outcrop (band cells on the wall 12)  
+k =  0.4 g=-1.48 h | placed outcrop (band cells on the wall 12)  
+k =  0.5 g=-1.43 h | placed outcrop (band cells on the wall 11)  
+k =  0.5 g=-1.38 h | placed outcrop (band cells on the wall 11)  
+dip 45
+k =  0.0 g=-2.13 h | REFUSED ValueError: fault_split: the fault touches the domain boundary. Only strictly interior faults, with both tips inside the mesh, are supported in th
+k =  0.1 g=-2.08 h | placed outcrop (band cells on the wall 9)  
+k =  0.1 g=-2.03 h | placed outcrop (band cells on the wall 9)  
+k =  0.2 g=-1.98 h | placed outcrop (band cells on the wall 10)  
+k =  0.2 g=-1.93 h | placed outcrop (band cells on the wall 9)  
+k =  0.2 g=-1.88 h | placed outcrop (band cells on the wall 8)  
+k =  0.3 g=-1.83 h | placed outcrop (band cells on the wall 8)  
+k =  0.4 g=-1.78 h | placed outcrop (band cells on the wall 9)  
+k =  0.4 g=-1.73 h | placed outcrop (band cells on the wall 9)  
+k =  0.5 g=-1.68 h | placed outcrop (band cells on the wall 6)  
+k =  0.5 g=-1.63 h | placed outcrop (band cells on the wall 6)  

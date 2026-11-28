@@ -1,0 +1,166 @@
+From d7d4d0208eb874d05152b93c5ec0d6d7c51bb028 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 15:41:26 +1100
+Subject: [PATCH] A ribbon whose trace ends on a curved wall is assembled: the
+ area check's tolerance is a triangle's
+
+The ribbon's assembly mesh is checked against its CAD area, to 1e-9 of it.
+With the trace's top on an annulus's outer wall (a 15-degree dip), the mesher
+put that vertex 4.6e-9 from the CAD's, and the areas differed by 2e-8 of the
+total. A zone outcropping there was refused ("the ribbon assembly meshed to
+area ... against CAD ..."), and a fault there got that message in place of
+the split's own boundary refusal. The later collapse of boundary imprints
+removes the vertex: the final wall vertices lie on the wall to round-off.
+
+The check guards against a missing or doubled piece, at least a triangle's
+area, so it now allows 1e-3 of the smallest triangle (or 1e-9 of the CAD
+area, if larger). Measured on 296 ladder assemblies (dips 10-45 degrees,
+tops 0-3 cells below the wall): all but this one agree to 8.3e-16; this one
+is 1e-4 of its smallest triangle.
+
+test_0906 (tier B): the zone is placed and reaches the wall, the fault gets
+the split's boundary refusal (both fail before the change), and the check
+accepts 1e-4 of a triangle and refuses an assembly missing one.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 34 ++++++---
+ ...t_0906_ribbon_assembly_area_at_the_wall.py | 74 +++++++++++++++++++
+ 2 files changed, 99 insertions(+), 9 deletions(-)
+ create mode 100644 tests/test_0906_ribbon_assembly_area_at_the_wall.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 267730fe..71f5de3b 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7413,6 +7413,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+     return [keys[i] for i in np.flatnonzero(on)]
+ 
+ 
++def _check_assembly_area(asm_pts, asm_tris, cad_area):
++    """Refuse an assembly mesh that does not fill its own CAD outlines.
++
++    The check is there to catch a missing or doubled piece, which is at least a
++    triangle's area. So the mesh may differ from the CAD by up to 1e-3 of its
++    smallest triangle, or 1e-9 of the CAD area if that is larger. Measured on
++    296 ladder assemblies (an annulus, dips 10-45 degrees, trace tops 0-3 cells
++    below the wall): every relative difference was at most 8.3e-16, except one
++    of 2.0e-8 (1.7e-10 in area, 1e-4 of the smallest triangle), where the trace's
++    top lies on the curved wall and the mesher puts that vertex 4.6e-9 from the
++    CAD's. The later collapse of boundary imprints removes it, and the final wall
++    vertices lie on the wall to round-off."""
++    P = asm_pts[asm_tris]
++    twice = np.abs((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
++                   - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
++    mesh_area = float(twice.sum() / 2.0)
++    allowed = max(1e-3 * float(twice.min() / 2.0), 1e-9 * cad_area) if len(twice) else 0.0
++    if abs(mesh_area - cad_area) > allowed:
++        raise RuntimeError(
++            f"the ribbon assembly meshed to area {mesh_area:.12e} "
++            f"against CAD {cad_area:.12e}; the layer mesh does not "
++            "fill its own outlines.")
++
++
+ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+     """The ribbon's assembly, clipped to the domain: meshed once (rank 0) and
+     broadcast. Collective.
+@@ -7448,15 +7472,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+             else:
+                 asm_pts, asm_tris, cad_area = _occ_assembly_2d(
+                     polylines, width, size, assembly, domain=domain_loops)
+-            P = asm_pts[asm_tris]
+-            twice = ((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
+-                     - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
+-            mesh_area = float(np.abs(twice).sum() / 2.0)
+-            if abs(mesh_area - cad_area) > 1e-9 * cad_area:
+-                raise RuntimeError(
+-                    f"the ribbon assembly meshed to area {mesh_area:.12e} "
+-                    f"against CAD {cad_area:.12e}; the layer mesh does not "
+-                    "fill its own outlines.")
++            _check_assembly_area(asm_pts, asm_tris, cad_area)
+             asm_pts, asm_tris = _collapse_boundary_imprints(
+                 asm_pts, asm_tris, domain_loops, 0.1 * size)
+             payload = (asm_pts, asm_tris)
+diff --git a/tests/test_0906_ribbon_assembly_area_at_the_wall.py b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+new file mode 100644
+index 00000000..91ed229a
+--- /dev/null
++++ b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+@@ -0,0 +1,74 @@
++"""A ribbon whose trace ends on the curved wall is assembled; a missing cell is still refused.
++
++The ribbon's assembly mesh is checked against its CAD area. With the trace's top on
++an annulus's outer wall (a 15-degree dip), the mesher put the top's vertex 4.6e-9 from
++the CAD's, and the areas differed by 2e-8 of the total, against a tolerance of 1e-9:
++"the ribbon assembly meshed to area ... against CAD ...". A zone that outcrops there
++was refused, and a fault there got this message in place of the split's own refusal
++(its top on the boundary). Every other assembly measured agreed to 8.3e-16.
++
++What is asserted: the zone (split=False) is placed and reaches the wall; the fault
++(split=True) gets the split's boundary refusal; and the check itself accepts an
++excess of 1e-4 of the smallest triangle but refuses an assembly missing one triangle.
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import _check_assembly_area, place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++
++
++@pytest.fixture(scope="module")
++def trace_on_the_wall():
++    base = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=0.05,
++                              refinement=1, qdegree=2)
++    h, dip, th = 0.025, np.radians(15.0), np.radians(90.0)
++    # cos(90 degrees) = 6e-17, as the slab probe built it
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(dip) * t_hat - np.sin(dip) * r_hat
++    return base, h, r_hat + (h * np.arange(7))[:, None] * down
++
++
++def test_a_zone_whose_trace_ends_on_the_wall_is_placed(trace_on_the_wall):
++    base, h, trace = trace_on_the_wall
++    mesh, info = place_fault_ribbon_2d(base, [("Zone", trace)], 2 * h, margin_rings=2,
++                                       clearance=0.3, split=False, mesher="ladder")
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    cS, _cE = dm.getHeightStratum(0)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    touching = 0
++    for c in np.flatnonzero(np.asarray(info["band"])):
++        cl = dm.getTransitiveClosure(cS + int(c))[0]
++        v = cl[(cl >= vS) & (cl < vE)] - vS
++        touching += int((np.linalg.norm(X[v], axis=1) > 1 - 1e-6).any())
++    assert uw.mpi.comm.allreduce(touching) > 0
++
++
++def test_a_fault_whose_top_is_on_the_wall_gets_the_splits_refusal(trace_on_the_wall):
++    base, h, trace = trace_on_the_wall
++    with pytest.raises(ValueError, match="the fault touches the domain boundary"):
++        place_fault_ribbon_2d(base, [("Fault", trace)], 2 * h, margin_rings=2,
++                              clearance=0.3, split=True, mesher="ladder")
++
++
++def _strip(n=8):
++    """A unit strip of 2n right triangles, its exact area n."""
++    pts = np.array([[i, j] for i in range(n + 1) for j in (0, 1)], dtype=float)
++    tris = []
++    for i in range(n):
++        a, b, c, d = 2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 3
++        tris += [[a, c, b], [b, c, d]]
++    return pts, np.array(tris), float(n)
++
++
++def test_the_check_accepts_round_off_and_refuses_a_missing_triangle():
++    pts, tris, area = _strip()
++    _check_assembly_area(pts, tris, area)
++    # an excess of 1e-4 of the smallest triangle (0.5), as at the wall
++    _check_assembly_area(pts, tris, area - 1e-4 * 0.5)
++    with pytest.raises(RuntimeError, match="does not fill its own outlines"):
++        _check_assembly_area(pts, tris[1:], area)
+-- 
+2.39.5 (Apple Git-154)
+
