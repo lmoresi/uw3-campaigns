@@ -1,0 +1,56 @@
+From 092fdce753b2bbbe28d1478a21899f699cadb14e Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 22:30:44 +1100
+Subject: [PATCH 4/4] test_0907: a clean outcrop does not warn, and its angle
+ is the wall cells'
+
+At dip 60, k 0.5 the cells beside the wall are clean (about 14 degrees) and a
+cell elsewhere is not (about 7.5). The recorded angle must exceed the
+smallest over all cells, and the outcrop must not warn. A mutant raising the
+threshold and one taking the angle over all cells both fail it.
+
+Underworld development team with AI support from Claude Code
+---
+ .../test_0907_outcrop_beside_a_second_wall.py | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/tests/test_0907_outcrop_beside_a_second_wall.py b/tests/test_0907_outcrop_beside_a_second_wall.py
+index 13d7cbad..9da32996 100644
+--- a/tests/test_0907_outcrop_beside_a_second_wall.py
++++ b/tests/test_0907_outcrop_beside_a_second_wall.py
+@@ -87,3 +87,32 @@ def test_the_warning_follows_the_recorded_angle(annulus, capsys):
+     assert warned == (sliver < place_surface._OUTCROP_SLIVER_DEG)
+     assert clean_warned == (clean < place_surface._OUTCROP_SLIVER_DEG)
+     assert warned, "the sliver-prone outcrop should warn"
++
++
++def test_the_angle_is_the_cells_beside_the_wall_and_a_clean_outcrop_does_not_warn(annulus, capsys):
++    """Dip 60 at k 0.5: the cells beside the wall are clean (about 14 degrees) while
++    a cell elsewhere is not (about 7.5). The recorded angle is the wall cells', so it
++    exceeds the smallest over all cells, and the outcrop does not warn."""
++    h = 0.025
++    th, dip = np.radians(90.0), np.radians(60.0)
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(dip) * t_hat - np.sin(dip) * r_hat
++    trace = (1.0 - 0.5 * h) * r_hat + (h * np.arange(7))[:, None] * down
++    mesh, info = place_fault_ribbon_2d(annulus, [("Fault", trace)], 2 * h, margin_rings=2,
++                                       clearance=0.3, split=True, mesher="ladder")
++    warned = "WARNING: where the band meets" in capsys.readouterr().out
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    cS, cE = dm.getHeightStratum(0)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    smallest = 180.0
++    for c in range(cS, cE):
++        cl = dm.getTransitiveClosure(c)[0]
++        P = X[cl[(cl >= vS) & (cl < vE)] - vS]
++        for i in range(3):
++            u, w = P[(i + 1) % 3] - P[i], P[(i + 2) % 3] - P[i]
++            smallest = min(smallest, float(np.degrees(np.arccos(np.clip(
++                u @ w / (np.linalg.norm(u) * np.linalg.norm(w)), -1, 1)))))
++    assert info["outcrop_min_angle"] > smallest, (info["outcrop_min_angle"], smallest)
++    assert info["outcrop_min_angle"] >= place_surface._OUTCROP_SLIVER_DEG and not warned
+-- 
+2.39.5 (Apple Git-154)
+

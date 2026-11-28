@@ -32,3 +32,6 @@ Parallel test tests/parallel/test_0907_outcrop_sliver_warning_parallel.py at np 
 
 ## H1 lows: 0003 (115) and 0004 (114)
 115: the parallel test docstring says np 3 exercises the off-rank-0 surgery, and scripts/test.sh runs it at np 3 always; a dump dir that cannot be written keeps the refusal reason and appends the save error; the design note says where the dump goes. test_0907: 2 passed. 114: test_0906 marked serial with its reason.
+
+## H7 mutant case: 0004
+test_0907 gains dip 60 k 0.5: beside-wall angle 14.0 deg, all-cells minimum 7.5. The test asserts the recorded angle > the all-cells minimum and no warning. Mutants: threshold 15 deg -> fails; angle over all cells -> fails. Real: 3 passed. (118 applies on 0001-0003; this test-only commit does not touch its files.)

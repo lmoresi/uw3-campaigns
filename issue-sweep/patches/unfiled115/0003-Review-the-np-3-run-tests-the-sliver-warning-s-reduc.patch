@@ -1,7 +1,7 @@
 From 3d64ca089991733f4d792f42430dcf69647ba1e6 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 20:13:19 +1100
-Subject: [PATCH 3/3] Review: the np 3 run tests the sliver warning's
+Subject: [PATCH 3/4] Review: the np 3 run tests the sliver warning's
  reduction; a missing dump directory keeps the refusal's reason
 
 - tests/parallel/test_0907 says np 3 is the run whose surgery is off rank 0,
