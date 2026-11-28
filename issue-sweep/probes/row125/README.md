@@ -55,3 +55,23 @@ The share halves with each refinement, since the band is a fixed number of
 cells wide. A region exceeds the mean share at about 1/share ranks: 53 at
 refinement 4, about 100 at 5, about 200 at 6. The runs on 26-52 ranks are
 inside that, unless one rank owns two regions.
+
+## Question 2 answered: H1's timing (development fbef72fa, dedicated cores, threads 1)
+Timed solve (s), and the largest rank's cells at np 8:
+    arm     np1    np2    np4    np8          largest at np8
+    plain   1.87   0.79   0.56   0.535        373 of 1764
+    region  1.61   0.89   0.65   0.67-0.70    873 of 1764
+    fault   3.17   2.44   2.14   2.18-2.29    1115 of 2006
+- plain and region: the same iterations (velocity 29-47, pressure 14-15).
+  The partition alone costs +16 % at np 4 and +27 % at np 8.
+- fault: flat from np 4, where the owner holds 1115 cells at every np. The
+  ceiling is 2006 / 1115 = 1.8x, and np 8 reaches 1.45x.
+- The mesh is tiny (about 220 cells per rank at np 8), so fixed and coarse-level
+  costs damp the effect. On a production mesh the time would track the owner's
+  cells more closely.
+- plain is itself unbalanced (max/mean 1.69 at np 8): adapt keeps the child
+  co-partitioned with the base.
+- With rotated constraints, solve_report carries no inner Krylov counts
+  (ksp_its 1, sub empty).
+- The 56 % share depends on the fixture: the metric width (0.08) is about one
+  coarse add-on cell (0.05).
