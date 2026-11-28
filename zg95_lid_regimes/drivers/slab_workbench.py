@@ -310,6 +310,9 @@ params = uw.Params(
                                 #   along the fitted curve from the split's top up to where the curve leaves the incoming
                                 #   plate (the fit's leaving point); the run from there to the surface is tracked only,
                                 #   and the damage zone (uw_yield_zone_km) also stops at the leaving point
+    uw_bridge_to_surface=0,     # 1 with uw_bridge_kind curve (Louis, 2026-11-28, picked "Bridge to surface"): the bridge
+                                #   carries on from the leaving point along the fit's run to the surface, so the damage
+                                #   reaches the surface; the split and the damage zone still stop at the leaving point
     uw_bridge_weak=0.1,
     uw_bridge_km=20.0,          #   the bridge's width: cells whose centre lies within half of it (at least 0.75 of a
                                 #   base cell, so the band has no gaps) of the line
@@ -1548,7 +1551,7 @@ class FaultedMesh:
             bridge_cells = int(uw.utilities.gather_data(int(inb.sum()), bcast=True).sum())
         # the bridge (uw_bridge_kind curve): along the fitted curve from where it leaves the incoming plate down to the
         # split's top, an isotropic weak zone; the run to the surface above the leaving point is tracked only
-        self.leave = {}
+        self.leave, self.run_up = {}, {}
         if self.faults and BRIDGE == "curve":
             self.bridge = uw.discretisation.MeshVariable(f"bridge_{tag}", mesh, 1, degree=0, continuous=False)
             centroids = np.asarray(model_xy(self.bridge))
@@ -1556,9 +1559,15 @@ class FaultedMesh:
             by_name = {f["name"]: f for f in self.faults}
             for name, (spine, trace) in self.pieces.items():
                 part = below_leaving(by_name[name], spine)
+                self.leave[name] = float((r_o - np.hypot(*part[0])) * MODEL_UNIT["km"])
+                if int(params.uw_bridge_to_surface):     # from the surface down: the run to the leaving point as well
+                    up = line_inside(spine)[0]
+                    n_up = int(np.argmin(np.linalg.norm(up - part[0], axis=1)))
+                    self.run_up[name] = float(np.linalg.norm(np.diff(up[:n_up + 1], axis=0), axis=1).sum()
+                                              * MODEL_UNIT["km"])
+                    part = np.vstack([up[:n_up], part])
                 k = int(np.argmin(np.linalg.norm(part - trace[0], axis=1)))
                 part = part[:k + 1]
-                self.leave[name] = float((r_o - np.hypot(*part[0])) * MODEL_UNIT["km"])
                 if len(part) >= 2:
                     dist, _ = segment_side(centroids, part)
                     inb |= dist < max(0.5 * float(model.bridge), 0.75 * H_B)
@@ -1567,8 +1576,10 @@ class FaultedMesh:
         bridge_note = ""
         if self.bridge is not None and BRIDGE == "curve":
             km = MODEL_UNIT["km"]
-            bridge_note = (", bridge %d cells along the curve from %s km, split from %s km" % (
+            bridge_note = (", bridge %d cells along the curve from %s km%s, split from %s km" % (
                 bridge_cells, ", ".join("%.0f" % v for v in self.leave.values()),
+                (" and on to the surface over %s km" % ", ".join("%.0f" % v for v in self.run_up.values()))
+                if self.run_up else "",
                 ", ".join("%.0f" % ((r_o - np.hypot(*tr[0])) * km) for sp, tr in self.pieces.values())))
         elif self.bridge is not None:
             km = MODEL_UNIT["km"]
@@ -1708,6 +1719,7 @@ class FaultedMesh:
                             "band_ranks": sum(1 for c in band_per_rank if c),
                             "weak_plane_cells": plane_cells, "yield_zone_cells": zone_cells,
                             "bridge_cells": bridge_cells, "bridge_trench": dict(self.trench),
+                            "bridge_leave_km": dict(self.leave), "bridge_run_up_km": dict(self.run_up),
                             "split_top_depth": {n: float(r_o - np.hypot(*tr[0])) for n, (sp, tr) in self.pieces.items()},
                             # the division each ladder was built on (Louis, 2026-11-04: "the ladder is built from the
                             # fault points and we can see if that is sufficient"): rungs, rung length, band width
@@ -2837,7 +2849,7 @@ def git_head(path):
 
 CHOICE_KNOBS = ["uw_tol", "uw_pres_rtol", "uw_pres_rtol_cold", "uw_newton_switch", "uw_warm_newton_switch",
                 "uw_rebuild_newton_switch", "uw_picard", "uw_retry_keep", "uw_spline_side", "uw_fault_follow",
-                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_fit_gap_km", "uw_line_reseed", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_weak", "uw_bridge_km",
+                "uw_fault_above_ocrust_km", "uw_fault_top", "uw_fault_link_km", "uw_fault_jump_rungs", "uw_fault_jump_after_myr", "uw_fit_gap_km", "uw_line_reseed", "uw_split_min_dip_deg", "uw_warm_shift", "uw_check_fit_km", "uw_check_slab_km", "uw_check_top_km", "uw_check_slip_ratio", "uw_check_stop_steps", "uw_fit_fail_stop", "uw_bridge_kind", "uw_bridge_to_surface", "uw_bridge_weak", "uw_bridge_km",
                 "uw_spline_length_km",
                 "uw_spline_end", "uw_spline_end_frac", "uw_fault_depth_min_km", "uw_yield_zone_side",
                 "uw_yield_zone_km", "uw_yield_zone_depth_km", "uw_yield_damage", "uw_slip_damage_km",
