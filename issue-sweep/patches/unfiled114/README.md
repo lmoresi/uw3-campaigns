@@ -24,3 +24,14 @@ triangle. Placement suite: 91 passed.
 Notes (not rows): dip 10 k <= 0.45 "fewer than two rungs inside the domain"; dips 15/20 k 0.05
 pull_vertex_onto boundary-vertex refusal. When 111 lands, check whether its gap message or the
 pull's fires at k 0.05, and that the user gets a remedy either way (C1).
+
+## H7 MEDIUM: 0002
+The allowance is now perimeter x 3e-9 x diameter, plus a check that no edge borders more than two
+triangles (a doubled cell). perim.py measures the window. The annulus excess (1.731e-10,
+perimeter 0.4776, diameter 0.2197) needs delta >= 1.65e-9 x diameter. H7's strip (missing 1e-6
+sliver, perimeter 18, diameter 8.06) is refused only for delta < 6.89e-9 x diameter. 3e-9 is
+inside, about 2x from each side. C1's suggested 1e-8 would accept the missing sliver. A full
+topological check (every boundary edge on the CAD outline) needs the outline, which this check
+does not have without redoing the CAD; not added. The edge-multiplicity check covers doubling.
+Mutants: the smallest-triangle allowance and 1e-3 x CAD both fail test_a_missing_sliver_is_refused.
+test_0906: 5 passed. Placement suite: 93 passed.

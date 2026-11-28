@@ -1,0 +1,133 @@
+From b2529c593e01522746fd6a763889f5a34ca9ce2a Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 18:07:20 +1100
+Subject: [PATCH 2/2] Review: the area allowance is a displaced outline's, not
+ a triangle's; a doubled cell is refused by its edges
+
+The allowance was 1e-3 of the smallest triangle still present, so a missing
+small triangle set its own tolerance: a strip missing a 1e-6 sliver was
+accepted. The allowance is now the perimeter times 3e-9 of the assembly's
+diameter, the area a boundary vertex displaced along the outline can add.
+The wall's case needs 1.65e-9 and the missing sliver is refused below 6.9e-9,
+so 3e-9 sits within about a factor of two of each; the comment says so. No
+edge may border more than two triangles, which refuses a doubled cell of any
+size.
+
+test_0906: a strip missing a 1e-6 sliver is refused (accepted by the
+smallest-triangle allowance and by 1e-3 of the CAD area); a doubled triangle
+is refused; the wall's excess at its scale is accepted.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 38 +++++++++++++------
+ ...t_0906_ribbon_assembly_area_at_the_wall.py | 36 ++++++++++++++++--
+ 2 files changed, 59 insertions(+), 15 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 71f5de3b..41da7832 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7416,20 +7416,36 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+ def _check_assembly_area(asm_pts, asm_tris, cad_area):
+     """Refuse an assembly mesh that does not fill its own CAD outlines.
+ 
+-    The check is there to catch a missing or doubled piece, which is at least a
+-    triangle's area. So the mesh may differ from the CAD by up to 1e-3 of its
+-    smallest triangle, or 1e-9 of the CAD area if that is larger. Measured on
+-    296 ladder assemblies (an annulus, dips 10-45 degrees, trace tops 0-3 cells
+-    below the wall): every relative difference was at most 8.3e-16, except one
+-    of 2.0e-8 (1.7e-10 in area, 1e-4 of the smallest triangle), where the trace's
+-    top lies on the curved wall and the mesher puts that vertex 4.6e-9 from the
+-    CAD's. The later collapse of boundary imprints removes it, and the final wall
+-    vertices lie on the wall to round-off."""
+-    P = asm_pts[asm_tris]
++    Two checks. No edge may border more than two triangles, which catches a
++    doubled cell of any size. And the mesh's area must match the CAD's to within
++    what a boundary vertex displaced along the outline can add: the perimeter
++    times 3e-9 of the assembly's diameter.
++
++    Measured: on 296 ladder assemblies (an annulus, dips 10-45 degrees, trace tops
++    0-3 cells below the wall) the areas agree to 8.3e-16 of the CAD's, except where
++    the trace's top lies on the curved wall. There the mesher puts that vertex
++    4.6e-9 from the CAD's, and the excess (1.7e-10, perimeter 0.48, diameter 0.22)
++    needs 1.65e-9 of the diameter. A strip of eight unit cells missing a 1e-6
++    sliver (perimeter 18, diameter 8.06) is refused only below 6.9e-9. So 3e-9 sits
++    within about a factor of two of each; an area check cannot do better than that
++    for a missing piece that small, which is what the edge check is for when the
++    piece is doubled rather than missing."""
++    from collections import Counter
++    tris = np.asarray(asm_tris, dtype=np.int64)
++    edges = Counter(tuple(sorted((int(a), int(b))))
++                    for t in tris for a, b in ((t[0], t[1]), (t[1], t[2]), (t[2], t[0])))
++    if any(c > 2 for c in edges.values()):
++        raise RuntimeError(
++            "the ribbon assembly has an edge shared by more than two triangles; the "
++            "layer mesh is not a single layer.")
++    P = asm_pts[tris]
+     twice = np.abs((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
+                    - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
+     mesh_area = float(twice.sum() / 2.0)
+-    allowed = max(1e-3 * float(twice.min() / 2.0), 1e-9 * cad_area) if len(twice) else 0.0
++    perimeter = sum(float(np.linalg.norm(asm_pts[a] - asm_pts[b]))
++                    for (a, b), c in edges.items() if c == 1)
++    diameter = float(np.linalg.norm(asm_pts.max(axis=0) - asm_pts.min(axis=0))) if len(asm_pts) else 0.0
++    allowed = max(perimeter * 3e-9 * diameter, 1e-9 * cad_area)
+     if abs(mesh_area - cad_area) > allowed:
+         raise RuntimeError(
+             f"the ribbon assembly meshed to area {mesh_area:.12e} "
+diff --git a/tests/test_0906_ribbon_assembly_area_at_the_wall.py b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+index 91ed229a..cd5ec07e 100644
+--- a/tests/test_0906_ribbon_assembly_area_at_the_wall.py
++++ b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+@@ -8,8 +8,9 @@ was refused, and a fault there got this message in place of the split's own refu
+ (its top on the boundary). Every other assembly measured agreed to 8.3e-16.
+ 
+ What is asserted: the zone (split=False) is placed and reaches the wall; the fault
+-(split=True) gets the split's boundary refusal; and the check itself accepts an
+-excess of 1e-4 of the smallest triangle but refuses an assembly missing one triangle.
++(split=True) gets the split's boundary refusal; and the check itself accepts the
++wall's excess at its scale, refuses a missing triangle and a missing 1e-6 sliver,
++and refuses a doubled triangle.
+ """
+ import numpy as np
+ import pytest
+@@ -68,7 +69,34 @@ def _strip(n=8):
+ def test_the_check_accepts_round_off_and_refuses_a_missing_triangle():
+     pts, tris, area = _strip()
+     _check_assembly_area(pts, tris, area)
+-    # an excess of 1e-4 of the smallest triangle (0.5), as at the wall
+-    _check_assembly_area(pts, tris, area - 1e-4 * 0.5)
++    # the wall's excess, scaled: 1.7e-10 on a perimeter of 0.48 and diameter 0.22
++    _check_assembly_area(pts, tris, area - 18 * 1.65e-9 * np.linalg.norm([8, 1]) * 0.9)
+     with pytest.raises(RuntimeError, match="does not fill its own outlines"):
+         _check_assembly_area(pts, tris[1:], area)
++
++
++def test_a_missing_sliver_is_refused():
++    """A strip of eight unit cells, one cell holding a sliver of area 1e-6 by an
++    interior diagonal. With the sliver gone the mesh is short by 1e-6 of 8: an
++    allowance tied to the smallest remaining triangle, or to 1e-3 of the CAD,
++    accepts it."""
++    pts, tris, area = _strip()
++    a, b, c = tris[0]                        # the first cell's lower triangle
++    eps = 2e-6 / np.linalg.norm(pts[b] - pts[c])
++    mid = 0.5 * (pts[b] + pts[c])
++    inward = pts[a] - mid
++    p = mid + eps * inward / np.linalg.norm(inward)
++    pts = np.vstack([pts, p])
++    q = len(pts) - 1
++    sliver = [b, c, q]
++    split = np.array([[a, b, q], [a, q, c], sliver])
++    full = np.vstack([split, tris[1:]])
++    _check_assembly_area(pts, full, area)
++    with pytest.raises(RuntimeError, match="does not fill its own outlines"):
++        _check_assembly_area(pts, full[[i for i in range(len(full)) if i != 2]], area)
++
++
++def test_a_doubled_triangle_is_refused():
++    pts, tris, area = _strip()
++    with pytest.raises(RuntimeError, match="more than two triangles"):
++        _check_assembly_area(pts, np.vstack([tris, tris[:1]]), area + 0.5)
+-- 
+2.39.5 (Apple Git-154)
+
