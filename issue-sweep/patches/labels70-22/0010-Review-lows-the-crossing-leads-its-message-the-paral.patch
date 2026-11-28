@@ -1,0 +1,189 @@
+From c3cb1c13378ff252cf5a0a96dbbe85d9213da8db Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 13:43:11 +1100
+Subject: [PATCH 10/11] Review lows: the crossing leads its message; the
+ parallel test checks the tips and says what the distributed layout checks
+
+- The refusal for a chain that crosses or touches an unrecorded fault's
+  sides now names the crossing first and the piece count as its
+  consequence; test_0897 matches the whole leading clause.
+- The comment and add_fault's Raises say that any pair of labels <n>Plus
+  and <n>Minus is taken as a fault's sides, by name alone.
+- The parallel test asserts, for every trace it adds, that both tips are
+  vertices of the fault (reduced over the ranks), and its docstring says
+  that distributed, most traces meet the seam refusal first, so for those
+  the layout checks only that the ranks agree.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/fault_split.py      | 19 ++++--
+ ...lt_refusal_agrees_across_ranks_parallel.py | 67 +++++++++++++------
+ ...d_fault_refuses_an_empty_or_partial_cut.py |  4 +-
+ 3 files changed, 60 insertions(+), 30 deletions(-)
+
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index ce10743c..65df272b 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1801,8 +1801,9 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+             on_slit = bool(comm.allreduce(int(on_slit), op=MPI.MAX))
+             if not on_slit:
+                 # the sides of a fault this mesh does not record as split (a
+-                # mesh read back from a file): both side labels present and
+-                # touching the chain, so the advice is about the crossing
++                # mesh read back from a file): ANY pair of labels <n>Plus and
++                # <n>Minus is taken as a fault's sides, by name alone. When the
++                # chain touches one, the advice is about the crossing
+                 stems = sorted({lname[:-4] for lname in
+                                 (dm.getLabelName(i) for i in range(dm.getNumLabels()))
+                                 if lname.endswith("Plus")
+@@ -1814,10 +1815,11 @@ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+                     for p in dm.getTransitiveClosure(int(v) + vS, useCone=False)[0])]
+                 touched = sorted({t for names in comm.allgather(touched) for t in names})
+                 if touched:
+-                    raise ValueError(f"{caller}: the cut along {name!r} {problems[0]}: it "
+-                                     f"crosses or touches the sides of an existing fault "
+-                                     f"({', '.join(map(repr, touched))}). A fault cannot cross "
+-                                     f"or end on another; use the offset form "
++                    raise ValueError(f"{caller}: the cut along {name!r} crosses or touches "
++                                     f"the sides of an existing fault "
++                                     f"({', '.join(map(repr, touched))}), and so it "
++                                     f"{problems[0]}. A fault cannot cross or end on "
++                                     f"another; use the offset form "
+                                      f"(uw.meshing.prepare_fault_network).")
+                 raise ValueError(f"{caller}: the cut along {name!r} {problems[0]}. "
+                                  f"{advice(float(np.nanmedian(h)))}")
+@@ -1939,7 +1941,10 @@ def add_fault(mesh, faults, verbose=False, cut=True, exclude=None,
+         than 45 degrees) were put on, or leaves a point of the trace
+         farther from its chain than half the local cell side (the base mesh's,
+         before the cut). A chain that cuts across a corner by less than half a
+-        cell is added.
++        cell is added. When such a chain crosses or touches an earlier fault's
++        sides, the message names that fault: one split here, or any pair of
++        labels ``<n>Plus`` and ``<n>Minus`` on the mesh (a mesh read back from
++        a file), which is taken as a fault's sides by name alone.
+ 
+     Notes
+     -----
+diff --git a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+index 6dd11ac5..415623d3 100644
+--- a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
++++ b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+@@ -6,13 +6,20 @@ chain's pieces are joined at global vertex numbers over the gathered labelled
+ edges. So every rank raises the same message or none does, and a chain that
+ crosses a partition seam counts as one piece.
+ 
+-What is asserted, at any rank count:
+-
+-* the traces of tests/test_0897 are added on every rank, including the three
+-  whose first tip once lost its vertex;
++What is asserted, at any rank count, with add_fault both gathered onto one rank
++(the add-on partition) and distributed (cut across the seams):
++
++* every rank reaches the same outcome and the same message;
++* gathered, the traces of tests/test_0897 are added, including the three whose
++  first tip once lost its vertex, both tips are vertices of the fault on some
++  rank, and a 120-degree kink keeps its turn. Distributed, most of these traces
++  run along a partition seam somewhere and the split across the seams refuses
++  them first, so for those cases the distributed layout checks only that the
++  ranks agree; where one is added, its tips and turn are checked as gathered;
+ * a chain labelled by hand along y = 0.5 across most of the distributed box is
+   one piece and passes; the same chain with one edge left out is refused as two
+-  pieces on every rank.
++  pieces on every rank;
++* a chain whose stray end lies on an edge held by two ranks is refused.
+ 
+     mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+     mpirun -n 3 python -m pytest --with-mpi tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+@@ -78,13 +85,43 @@ def _added_or_along_a_seam(out, layout):
+     assert out == "passed" or (layout == "distributed" and SEAM_ALONG in out), out
+ 
+ 
++def _on_the_chain(m2, points):
++    """For each point, whether it is a vertex of the fault's Plus chain on some
++    rank: reduced, so the same answer on every rank."""
++    from underworld3.utilities.line_cut import _coords, _edge_vertices
++    dm = m2.dm
++    X = _coords(dm)
++    ends = _edge_vertices(dm)
++    eS, _ = dm.getDepthStratum(1)
++    b = [bb for bb in m2.boundaries if bb.name == "FPlus"][0]
++    lab = dm.getLabel("FPlus")
++    mine = np.zeros(len(points), dtype=np.int64)
++    if lab is not None and lab.getStratumSize(b.value):
++        mk = np.asarray(lab.getStratumIS(b.value).getIndices()) - eS
++        mk = mk[(mk >= 0) & (mk < len(ends))]
++        V = X[np.unique(ends[mk].ravel())]
++        if len(V):
++            mine = np.array([int(np.linalg.norm(V - p, axis=1).min() < 1e-12) for p in points])
++    uw.mpi.comm.Allreduce(MPI.IN_PLACE, mine, op=MPI.MAX)
++    return mine.tolist()
++
++
+ @pytest.mark.parametrize("layout", sorted(LAYOUTS))
+ @pytest.mark.parametrize("k, ds", [(3, 0.3), (4, 0.3), (4, 0.5), (0, 1.0)],
+                          ids=["was_empty", "was_short", "tip_shared", "whole"])
+ def test_a_cut_is_added_alike_on_every_rank(box, k, ds, layout):
+-    # the first three once lost a tip's vertex to the next sample (see test_0897)
+-    out = _same_everywhere(_outcome(lambda: box.add_fault(("F", _trace(k, ds)), **LAYOUTS[layout])))
++    # the first three once lost a tip's vertex to the next sample (see test_0897):
++    # added, both tips must be vertices of the fault
++    Q = _trace(k, ds)
++    held = {}
++
++    def add():
++        held["mesh"] = box.add_fault(("F", Q), **LAYOUTS[layout])
++
++    out = _same_everywhere(_outcome(add))
+     _added_or_along_a_seam(out, layout)
++    if out == "passed":
++        assert _on_the_chain(held["mesh"], [Q[0], Q[-1]]) == [1, 1]
+ 
+ 
+ @pytest.mark.parametrize("layout", sorted(LAYOUTS))
+@@ -93,7 +130,6 @@ def test_a_kink_keeps_its_turn_on_every_rank(box, layout):
+     # must be a vertex of the chain, wherever the chain's vertices are held
+     import importlib.util
+     import pathlib
+-    from underworld3.utilities.line_cut import _coords, _edge_vertices
+     path = pathlib.Path(__file__).parents[1] / "test_0897_add_fault_refuses_an_empty_or_partial_cut.py"
+     spec = importlib.util.spec_from_file_location("t0897", path)
+     t0897 = importlib.util.module_from_spec(spec)
+@@ -108,20 +144,7 @@ def test_a_kink_keeps_its_turn_on_every_rank(box, layout):
+     _added_or_along_a_seam(out, layout)
+     if out != "passed":
+         return
+-    m2 = held["mesh"]
+-    dm = m2.dm
+-    X = _coords(dm)
+-    ends = _edge_vertices(dm)
+-    eS, _ = dm.getDepthStratum(1)
+-    b = [bb for bb in m2.boundaries if bb.name == "FPlus"][0]
+-    lab = dm.getLabel("FPlus")
+-    mine = 0
+-    if lab is not None and lab.getStratumSize(b.value):
+-        mk = np.asarray(lab.getStratumIS(b.value).getIndices()) - eS
+-        mk = mk[(mk >= 0) & (mk < len(ends))]
+-        V = X[np.unique(ends[mk].ravel())]
+-        mine = int(len(V) and np.linalg.norm(V - Q[5], axis=1).min() < 1e-12)
+-    assert uw.mpi.comm.allreduce(mine, op=MPI.MAX) == 1
++    assert _on_the_chain(held["mesh"], [Q[5]]) == [1]
+ 
+ 
+ def _label_on_y(dm, name, y, spans):
+diff --git a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+index c13baf95..33ae4693 100644
+--- a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
++++ b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+@@ -242,5 +242,7 @@ def test_a_crossing_of_an_unrecorded_fault_is_named(box):
+               & (np.maximum(X[ends[:, 0], 1], X[ends[:, 1], 1]) <= 0.75 + 1e-9))
+         for e in np.flatnonzero(on) + eS:
+             dm.getLabel(side).setValue(int(e), 1)
+-    with pytest.raises(ValueError, match="crosses or touches the sides of an existing fault"):
++    # the crossing leads, the piece count follows as its consequence
++    with pytest.raises(ValueError, match=r"the cut along 'Gap' crosses or touches the sides "
++                                         r"of an existing fault \('Old'\), and so it is in 2 pieces"):
+         _refuse_an_empty_or_partial_cut(dm, "Gap", 7, poly)
+-- 
+2.39.5 (Apple Git-154)
+

@@ -1,0 +1,120 @@
+From 3b4f5975cad6c5861df6bfde54d8d5586e2e3144 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 13:44:29 +1100
+Subject: [PATCH 11/11] Comments and docstrings name what they describe, not
+ internal tracking codes
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/discretisation/discretisation_mesh.py       | 2 +-
+ src/underworld3/utilities/fault_split.py                    | 2 +-
+ src/underworld3/utilities/line_cut.py                       | 5 ++---
+ ...t_0897_add_fault_refusal_agrees_across_ranks_parallel.py | 2 +-
+ .../test_0897_add_fault_refuses_an_empty_or_partial_cut.py  | 2 +-
+ tests/test_0898_cut_labels_the_chord_across_a_kink.py       | 6 +++---
+ tests/test_0899_cut_refuses_a_degenerate_cell.py            | 2 +-
+ 7 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/src/underworld3/discretisation/discretisation_mesh.py b/src/underworld3/discretisation/discretisation_mesh.py
+index 5f1d9c03..e028e589 100644
+--- a/src/underworld3/discretisation/discretisation_mesh.py
++++ b/src/underworld3/discretisation/discretisation_mesh.py
+@@ -10245,7 +10245,7 @@ class Mesh(Stateful, uw_object):
+             cut_dm, info = self._repair_cut(cut_dm, lines, info, repair_reach,
+                                             verbose)
+         # a cut that labelled nothing, or only part of the surface, is refused
+-        # rather than handed on (UNFILED 68 / 70)
++        # rather than handed on
+         from underworld3.utilities.fault_split import _refuse_an_empty_or_partial_cut
+         for line in lines:
+             _refuse_an_empty_or_partial_cut(cut_dm, name, value, line,
+diff --git a/src/underworld3/utilities/fault_split.py b/src/underworld3/utilities/fault_split.py
+index 65df272b..7c6c3a20 100644
+--- a/src/underworld3/utilities/fault_split.py
++++ b/src/underworld3/utilities/fault_split.py
+@@ -1672,7 +1672,7 @@ def _base_cell_size(base_dm, points, k=_CELL_SIZE_EDGES):
+ 
+ def _refuse_an_empty_or_partial_cut(dm, name, value, poly, caller="add_fault",
+                                     domain=None, base_dm=None, split_faults=()):
+-    """Refuse a cut whose chain labels no facet, or misses part of the trace (UNFILED 68).
++    """Refuse a cut whose chain labels no facet, or misses part of the trace.
+ 
+     A sample left without a vertex (a trace sampled finer than the mesh) could
+     leave the fault with no facet, or stopping short of the trace's end, and
+diff --git a/src/underworld3/utilities/line_cut.py b/src/underworld3/utilities/line_cut.py
+index b20837c5..1d82f0d6 100644
+--- a/src/underworld3/utilities/line_cut.py
++++ b/src/underworld3/utilities/line_cut.py
+@@ -798,8 +798,7 @@ def _label_cut_edges(dm, lines, tol, name, value):
+     of two stretches that pass close to each other, are near in space and far
+     along the line. A first rule asked for the edge's MIDPOINT on the line, which
+     also dropped the cut's edge across a kink inside a cell (a sample of the
+-    trace with no vertex on it), so a curved surface came back partial or empty
+-    (UNFILED 70; UNFILED 22).
++    trace with no vertex on it), so a curved surface came back partial or empty.
+ 
+     The points are returned rather than counted here because a shared edge is held
+     by every rank on the seam: counting locally and summing would report it once
+@@ -866,7 +865,7 @@ def cell_areas(dm, global_vote=False):
+ # edge squared (0.433 for an equilateral cell). It is a flatness guard, not a
+ # quality guard: a flat cell gives the finite-element map a zero Jacobian, and
+ # the inverted-cell check above misses it. Measured over every mesh add_fault
+-# returned in UNFILED 72's hunt (about 1060 meshes, three pull rules), the flat
++# returned in a search (about 1060 meshes, three pull rules), the flat
+ # ones sit below 1e-14 (round-off) and the sound ones at 5.7e-5 and above
+ # (development's worst; nearly all at 1e-2 and above), with nothing between. The
+ # threshold is the log-middle of that gap. Being relative to the cell's own
+diff --git a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+index 415623d3..eac9fe04 100644
+--- a/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
++++ b/tests/parallel/test_0897_add_fault_refusal_agrees_across_ranks_parallel.py
+@@ -1,4 +1,4 @@
+-"""add_fault's empty-or-partial refusal in parallel (UNFILED 68).
++"""add_fault's empty-or-partial refusal in parallel.
+ 
+ The refusal is collective: every count and distance is reduced, the cell size is
+ taken from the k nearest owned base-mesh edges gathered over the ranks, and the
+diff --git a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+index 33ae4693..db8cbcb2 100644
+--- a/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
++++ b/tests/test_0897_add_fault_refuses_an_empty_or_partial_cut.py
+@@ -1,4 +1,4 @@
+-"""add_fault refuses a cut that labels no facet, or a chain that misses part of the trace (UNFILED 68).
++"""add_fault refuses a cut that labels no facet, or a chain that misses part of the trace.
+ 
+ The cut labels an edge only when both its ends and its midpoint lie on the trace. A trace
+ sampled finer than the mesh can leave a sample without a vertex, and the edge joining its
+diff --git a/tests/test_0898_cut_labels_the_chord_across_a_kink.py b/tests/test_0898_cut_labels_the_chord_across_a_kink.py
+index f9f8dfee..94c7d63e 100644
+--- a/tests/test_0898_cut_labels_the_chord_across_a_kink.py
++++ b/tests/test_0898_cut_labels_the_chord_across_a_kink.py
+@@ -1,4 +1,4 @@
+-"""The cut labels its edge across a kink of the trace inside a cell (UNFILED 70, UNFILED 22).
++"""The cut labels its edge across a kink of the trace inside a cell.
+ 
+ The cut labels an edge as the surface's when both its ends lie on the trace. It used to
+ ask for the edge's midpoint on the trace as well, to keep out an edge joining two points of
+@@ -68,8 +68,8 @@ def test_a_curved_surface_is_labelled_along_its_whole_length(box):
+     child = box.add_conforming_surface(uw.meshing.Surface("Arc", box, trace))
+     value, X, ends = _chain(child, "Arc")
+     inside = np.all((trace >= 0) & (trace <= 1), axis=1)
+-    # within half a cell of every point of the trace inside the box (the check UNFILED 68
+-    # added to add_fault); the midpoint rule left the last 8 cells unlabelled
++    # within half a cell of every point of the trace inside the box (the check
++    # add_fault makes); the midpoint rule left the last 8 cells unlabelled
+     _refuse_an_empty_or_partial_cut(child.dm, "Arc", value, trace[inside])
+     assert (_spans(X, ends, trace) <= 2.0).all()
+ 
+diff --git a/tests/test_0899_cut_refuses_a_degenerate_cell.py b/tests/test_0899_cut_refuses_a_degenerate_cell.py
+index 0a412995..d051aed2 100644
+--- a/tests/test_0899_cut_refuses_a_degenerate_cell.py
++++ b/tests/test_0899_cut_refuses_a_degenerate_cell.py
+@@ -1,4 +1,4 @@
+-"""The cut refuses to leave a degenerate (flat) cell (UNFILED 72).
++"""The cut refuses to leave a degenerate (flat) cell.
+ 
+ The cut refused an INVERTED cell, but not a flat one: with few samples of a trace pulled
+ onto vertices, a 90-degree turn on the regular 1/12 box left two cells of area 1e-16 of
+-- 
+2.39.5 (Apple Git-154)
+

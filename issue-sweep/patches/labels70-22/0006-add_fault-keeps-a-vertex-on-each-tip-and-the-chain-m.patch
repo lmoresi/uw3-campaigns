@@ -1,8 +1,8 @@
-From fb02df80e8071b629693f32d8734e56b1c6354fc Mon Sep 17 00:00:00 2001
+From 6d754870d73efb1f9ea19c33ae8940da71666212 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 14:35:24 +1100
-Subject: [PATCH 6/9] add_fault keeps a vertex on each tip, and the chain must
- end on them
+Subject: [PATCH 06/11] add_fault keeps a vertex on each tip, and the chain
+ must end on them
 
 add_fault pulled the trace's samples in order, and when two choose one
 vertex the later keeps it. A first tip within reach of the next sample

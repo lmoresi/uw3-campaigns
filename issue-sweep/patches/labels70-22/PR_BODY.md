@@ -30,8 +30,10 @@ add_fault and add_conforming_surface refuse a cut that does not follow the trace
 - **Refusals.** A cut is refused, with the same message on every rank, when:
   - it labels no facet;
   - (`add_fault`) its chain is not one connected piece. Pieces are counted globally, joined at
-    global vertex numbers, so a chain across a partition seam counts once. A chain cut by an
-    earlier fault's slit is left to the split's own touching-junction refusal.
+    global vertex numbers, so a chain across a partition seam counts once. When the chain crosses
+    or touches an earlier fault's sides, the message leads with that fault. Those are a fault
+    split here, or any pair of labels `<n>Plus` and `<n>Minus` (a mesh read back from a file),
+    which is taken as a fault's sides by name alone.
   - (`add_fault`) the chain's ends are not the tips' vertices, or it misses a turn's vertex
     (exact, by mesh point, every edge counted once). Beside the slit of a fault already split into
     the mesh, this refusal is raised after the record check and the split;
@@ -90,11 +92,15 @@ On the 480-trace box grid (two 1/12 boxes, regular and irregular; lines, arcs an
 - **test_0898**: the chord across a kink is labelled whole, and no hairpin edge is labelled.
 - **test_0899**: the flat-cell refusal fails with the guard disabled.
 - **tests/parallel/test_0897 (parallel)**: one outcome and one message on every rank, with
-  add_fault both gathered onto one rank and distributed; a chain across the partition is one
-  piece; a stray end on a seam is refused.
+  add_fault both gathered onto one rank and distributed. Gathered, every trace is added with
+  both tips and the kink's turn on the fault. Distributed, most traces run along a seam and the
+  split across the seams refuses them first, so for those only the ranks' agreement is checked.
+  A chain across the partition is one piece; a stray end on a seam is refused. At 2-4 ranks on
+  a Linux workstation it passes 12 of 12, and it fails before the tip commit on 9 layouts.
 
-Fault, conforming-surface and line-cut suites: 433 passed, 1 skipped, serial. The round-1 code ran
-at 2-4 ranks on a Linux workstation (180 runs, identical messages on every rank). The parallel test
-and the later commits are still to be run there.
+Fault, conforming-surface and line-cut suites: 433 passed, 1 skipped, serial (before the last
+two wording commits; test_0897-0899 and test_1174 re-run after them). The round-1 code ran at 2-4
+ranks on a Linux workstation (180 runs, identical messages on every rank), and so did the
+parallel test at the round-4 head.
 
 Underworld development team with AI support from Claude Code

@@ -1,14 +1,14 @@
-From 911a7b16971d533e7b712d4bc6c2537c6a4ef6ed Mon Sep 17 00:00:00 2001
+From 717a64b7cdbebafacfe5da0d011c77487bab1c9d Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 06:33:53 +1100
-Subject: [PATCH 3/9] The cut refuses a flat cell
+Subject: [PATCH 03/11] The cut refuses a flat cell
 
 cut_along_lines refused an inverted cell but not a flat one. With the
 edge labelling now complete across in-cell kinks, add_fault placed
 traces it used to refuse for other reasons, and some came back with a
 cell of area 1e-17 to 6e-19 of their own size (a 0-degree angle), at
 90- and 120-degree turns where several samples lost their vertex to a
-later one (UNFILED 72). That holds both for the every-sample pull and
+later one. That holds both for the every-sample pull and
 for a lighter one. A flat cell gives the finite-element map a zero
 Jacobian.
 

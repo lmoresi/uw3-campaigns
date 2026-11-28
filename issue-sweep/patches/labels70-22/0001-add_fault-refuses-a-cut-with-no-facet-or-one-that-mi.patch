@@ -1,14 +1,14 @@
-From d37db66e63a39c089e5bb36ea7eae995ac13454b Mon Sep 17 00:00:00 2001
+From 17ffc320e19e344c2332ccae4ee88fbcd6761fa8 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 04:21:25 +1100
-Subject: [PATCH 1/9] add_fault refuses a cut with no facet, or one that misses
- part of the trace
+Subject: [PATCH 01/11] add_fault refuses a cut with no facet, or one that
+ misses part of the trace
 
 The cut labels an edge only when both its ends and its midpoint lie on the
 trace. A trace sampled finer than the mesh can leave a sample without a
 vertex, and the chord between its neighbours is then unlabelled. add_fault
 returned such faults, with no facet or with a chain stopping short of the
-trace's end, and said nothing (UNFILED 68). On an irregular 1/12 box, 8 of
+trace's end, and said nothing. On an irregular 1/12 box, 8 of
 40 smooth traces sampled 0.3 cells apart came back with no facet, and 4
 stopped short.
 

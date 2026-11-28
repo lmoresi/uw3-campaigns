@@ -1,7 +1,7 @@
-From c379ad4ce180e84ccbe2cd95c19a139a831be90f Mon Sep 17 00:00:00 2001
+From c4c29014ebc7715f8853e3a18b8809b221ccd2b5 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 16:51:47 +1100
-Subject: [PATCH 7/9] add_fault keeps a vertex on each turn; round-3 review:
+Subject: [PATCH 07/11] add_fault keeps a vertex on each turn; round-3 review:
  seam edges counted once
 
 Turns. A sample where the trace turns by more than 45 degrees is pulled

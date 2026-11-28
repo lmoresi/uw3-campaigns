@@ -1,7 +1,7 @@
-From 023bccdb29c5260b381ee351f4d061899cfb4637 Mon Sep 17 00:00:00 2001
+From f64f0a025ee574e2f83b6f93bccfb95376605f7e Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 19:11:05 +1100
-Subject: [PATCH 9/9] Review round 4: the parallel test pins the fixes; a
+Subject: [PATCH 09/11] Review round 4: the parallel test pins the fixes; a
  crossed fault is named
 
 - The parallel test's distributed cases accept the split's own refusal of

@@ -1,7 +1,7 @@
-From 44aa8c53c29c35927280fabcfc65555849357f70 Mon Sep 17 00:00:00 2001
+From 4a340cb10b1bfdc94cb713743dac259968c132d4 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Thu, 26 Nov 2026 04:44:32 +1100
-Subject: [PATCH 2/9] The cut labels its edge across a kink inside a cell;
+Subject: [PATCH 02/11] The cut labels its edge across a kink inside a cell;
  refuse partial surfaces
 
 _label_cut_edges labelled an edge as the cut's only when both its ends AND
@@ -12,7 +12,7 @@ has no vertex. add_conforming_surface (which puts no vertex on the samples)
 returned every curved surface partial, even sampled a cell apart: an arc of
 turn 0.08 rad labelled 5 of 17 edges. At 0.3 cells some came back with no
 facet. add_fault hid most of it by pulling a vertex onto every sample, and
-paid with snap failures and empty faults (UNFILED 70, UNFILED 22).
+paid with snap failures and empty faults.
 
 The rule now: an edge is the line's when both ends lie on it, they are
 consecutive along it (no vertex on the line between their arc-length
@@ -33,7 +33,7 @@ directions, irregular and regular 1/12 boxes):
 - add_fault with only its tips and 45-degree turns pulled: 240/240
   complete under the new rule. That pull rule is not changed here.
 
-UNFILED 68's refusal now guards add_conforming_surface too, counting only
+The empty-or-partial refusal now guards add_conforming_surface too, counting only
 the trace's points inside the mesh (points_in_domain, reduced over the
 ranks). Its message names the calling method.
 

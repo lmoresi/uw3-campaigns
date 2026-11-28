@@ -331,3 +331,13 @@ add_fault's Notes say the slip reported at a sharp turn's apex can be spurious (
 
 Suites: 435 passed, 1 skipped. On one rank the parallel test's functions pass, called directly
 (the seam case skips).
+
+## 2026-11-28: ready to merge on green at the resume
+0010 folds in the review lows (test and wording only, no re-review): the crossing leads its
+message, the any-Plus/Minus-pair rule is stated, the parallel test asserts both tips for every
+added trace and says what the distributed layout checks. 0011 removes internal tracking codes
+from comments and docstrings; all commit messages were reworded locally to drop them too.
+Patches regenerated 0001-0011 on development fbef72fa. One PR, kept as commits.
+The science-hub notice of the one-vertex mesh changes goes with it: SCIENCE_NOTICE.md.
+The 0010 tip assertion was exercised at np 1 only on the laptop (both layouts pass); its np 2-4
+run is with the Linux workstation at the resume.
