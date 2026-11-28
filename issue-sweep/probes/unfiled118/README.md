@@ -18,3 +18,17 @@
 The job hangs. The dump is written before the fill, so the supervisor or an outer `timeout` ends the job afterwards.
 
 Underworld development team with AI support from Claude Code
+
+## W1's reading of the dump (2026-11-28)
+- The ring (30 vertices) contains NO band vertex (band ids are 1801 and up; the ring's
+  largest is below that). So the skin was not spliced into this rank's ring: no crossing
+  span was paired with skin run ends.
+- The chord (39, 1356) joins two OLD vertices: 39 on the wall (r = 1), 1356 inside
+  (r = 0.872). It is 0.135 long, 5.4 times the median ring edge. It is therefore the
+  straight connector `_conform_fill_loops_2d` puts across a span it judged NOT crossed by the
+  band (`link(v1, v2)`): the seam span from 39 to 1356, whose vertices were victims.
+- Mechanism: the crossing test (`_edge_meets_band`) runs only on the span's seam edges.
+  The seam path skirts the band's tip without crossing it (its vertices within the carve's
+  reach, so deleted), and the straight connector between the span's surviving ends cuts
+  across the tip: the two hole-edge crossings H1 found. Nothing in this needs a wall; any
+  band tip near a seam can do it. 111's wall rings made it reachable here.
