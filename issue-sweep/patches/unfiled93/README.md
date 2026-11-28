@@ -40,3 +40,11 @@ What each case gets:
 - mpirun ranks: as before;
 - compilers that exited before the kill: removed.
 Serial test_0063 (mpirun cases excluded): 9 passed. 112 rebased on 0008.
+
+## Pid reuse (C1's check)
+The tidy decides by pid, over files named rank_<r>_pid_<p>.stack in the job's own stacks
+directory (a unique mkdtemp, or --artifacts). Only armed processes of this job write there, and
+the tidy touches nothing outside it, so a reused pid cannot keep a stranger's file or delete a
+live one elsewhere. One narrow case remains: within the same job, a later process given a reused
+pid opens its file with "w" and truncates an earlier, exited process's file. The kill follows a
+dump within seconds, so this is unlikely; append mode would remove it if wanted.
