@@ -1,0 +1,128 @@
+From 18f1d25518f1abf3ce77686a694e960c91a0dfc4 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 13:57:52 +1100
+Subject: [PATCH] A JIT cache write that fails on rank 0 alone raises on every
+ rank
+
+When some rank has no cache directory but rank 0 has one, every rank
+compiles its own copy and store_module writes on rank 0 only. A failure
+there (a PermissionError from the lock file, say) raised on rank 0 alone,
+and the other ranks went on to wait in the next collective. The outcome is
+now agreed over the ranks, with the cache-write wording the disk path uses.
+
+tests/parallel/test_0842 gains the case: the cache off on every rank but 0,
+rank 0's store made to fail; every rank must raise, naming rank 0.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/_jitextension.py    | 22 +++++++++++--
+ ...2_jit_build_failure_collective_parallel.py | 33 +++++++++++++++++--
+ 2 files changed, 49 insertions(+), 6 deletions(-)
+
+diff --git a/src/underworld3/utilities/_jitextension.py b/src/underworld3/utilities/_jitextension.py
+index 582ff79a..0c01411b 100644
+--- a/src/underworld3/utilities/_jitextension.py
++++ b/src/underworld3/utilities/_jitextension.py
+@@ -1094,6 +1094,7 @@ def getext(
+                                               build_error)
+                 elif build_error is not None:
+                     raise build_error
++                store_error = None
+                 if compiled:
+                     if verbose and underworld3.mpi.rank == 0:
+                         # Tests in test_0004_pointwise_fns parse this exact
+@@ -1104,8 +1105,19 @@ def getext(
+                             _jc.store_module(
+                                 source_hash, real_modname, tmpdir, constants_manifest
+                             )
++                    except Exception as error:
++                        store_error = error
+                     finally:
+                         _discard_build(tmpdir, keep=_keep_build(debug))
++                # store_module writes on rank 0 only, so it can fail there alone
++                # (this branch runs when some rank has no cache directory but
++                # rank 0 has one); every rank enters this branch, so the outcome
++                # is agreed here, before the next collective
++                if multi_rank:
++                    _raise_if_any_rank_failed(underworld3.mpi.comm, real_modname,
++                                              store_error, what="cache write")
++                elif store_error is not None:
++                    raise store_error
+ 
+         if cache:
+             _ext_dict[source_hash] = module
+@@ -2145,16 +2157,20 @@ def _describe(error):
+     return None if error is None else f"{type(error).__name__}: {error}"
+ 
+ 
+-def _raise_if_any_rank_failed(comm, modname, error):
+-    """Raise on every rank if the local build failed on any. Collective (#842).
++def _raise_if_any_rank_failed(comm, modname, error, what="build"):
++    """Raise on every rank if the local build (or, ``what="cache write"``, the
++    store into the disk cache) failed on any. Collective (#842).
+ 
+     The failing rank's own exception is chained, so its traceback is kept there;
+     the others carry its message."""
+     failed = comm.allgather(_describe(error))
+     ranks = [r for r, e in enumerate(failed) if e is not None]
+     if ranks:
++        what_failed = (f"JIT build of {modname} failed" if what == "build" else
++                       f"JIT build of {modname} succeeded but storing it in the JIT "
++                       f"cache failed")
+         raise RuntimeError(
+-            f"JIT build of {modname} failed on rank(s) {ranks}, so it fails on every "
++            f"{what_failed} on rank(s) {ranks}, so it fails on every "
+             f"rank:\n{_describe(error) or failed[ranks[0]]}") from error
+ 
+ 
+diff --git a/tests/parallel/test_0842_jit_build_failure_collective_parallel.py b/tests/parallel/test_0842_jit_build_failure_collective_parallel.py
+index 3020cce9..623775de 100644
+--- a/tests/parallel/test_0842_jit_build_failure_collective_parallel.py
++++ b/tests/parallel/test_0842_jit_build_failure_collective_parallel.py
+@@ -8,9 +8,11 @@ the compiler said. Now every rank raises, and the message carries the tail of th
+ build's output.
+ 
+ The build is made to fail with a compiler flag gcc and clang both reject, on an
+-expression no earlier build has cached. Two more paths are agreed the same way: a
+-rank that cannot see rank 0's published module compiles its own, and that build
+-may fail there alone; and rank 0 may build and then fail to store the module.
++expression no earlier build has cached. Three more paths are agreed the same way:
++a rank that cannot see rank 0's published module compiles its own, and that build
++may fail there alone; rank 0 may build and then fail to store the module; and when
++some rank has no cache directory, every rank compiles its own copy and only rank
++0 stores it, so that store can fail there alone.
+ 
+     python scripts/mpi_supervisor.py --silence 120 -- mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0842_jit_build_failure_collective_parallel.py
+ """
+@@ -119,3 +121,28 @@ def test_a_failed_cache_write_says_so_on_every_rank(monkeypatch, tmp_path_factor
+             os.chmod(locked, 0o755)
+     assert all(messages), f"some rank did not raise: {messages}"
+     assert all("storing it in the JIT cache failed" in m for m in messages), messages
++
++
++def test_a_failed_cache_write_with_the_cache_off_elsewhere_raises_on_every_rank(
++        monkeypatch, tmp_path_factory):
++    """The cache is off on every rank but 0, so every rank compiles its own copy
++    and rank 0 alone stores it; the store fails. Rank 0 raised alone and the other
++    ranks went on, to wait in the solve's first collective."""
++    if uw.mpi.size < 2:
++        pytest.skip("needs a rank whose cache is off")
++    from underworld3.utilities import _jit_cache
++
++    root = _shared_tmp(tmp_path_factory)
++    if uw.mpi.rank == 0:
++        monkeypatch.setenv("UW_JIT_CACHE_DIR", os.path.join(root, "rank0"))
++
++        def broken(*args, **kwargs):
++            raise PermissionError("simulated cache write failure 0842")
++        monkeypatch.setattr(_jit_cache, "store_module", broken)
++    else:
++        monkeypatch.setenv("UW_JIT_CACHE", "0")
++    messages = _messages_of(_poisson(_fresh_field()))
++    assert all(messages), f"some rank did not raise: {messages}"
++    assert all("storing it in the JIT cache failed on rank(s) [0]" in m
++               for m in messages), messages
++    assert all("simulated cache write failure 0842" in m for m in messages), messages
+-- 
+2.39.5 (Apple Git-154)
+
