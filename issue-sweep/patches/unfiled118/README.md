@@ -36,3 +36,6 @@ Separate commit on 0001; delta review of 0002 alone. Base for 0002: 0001 (3ea3b1
 Tests: test_0909 19 passed; serial placement suite 445 passed, 1 skipped. Mutants shown failing:
 threshold 0 / 2e-2, each guard call site removed (spy test), old on-edge band, old connector tolerance.
 NOT run here (no MPI on the laptop): tests/parallel/test_0904 at np 3 with the prefix.
+
+## 0003 (2026-11-29, H7 low): prefix on the conform-only non-gathered refusals
+The three under `if conform:` before the surgery (8035 skin edges in no cavity, 8040 assembly cells in no cavity, 8066 junction on the seam) use the same `path` prefix. The other non-gathered refusals run on both paths and are left as they are. No test matches these messages. Serial placement suite: 445 passed, 1 skipped. Head 36ebca77.

@@ -1,0 +1,47 @@
+From 36ebca777559eba826872146d0fdd6893828c864 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 05:11:30 +1100
+Subject: [PATCH] The seam-conforming path's own refusals before the surgery
+ carry its name too
+
+The three refusals in _place_thin_volume_2d's conform block that are raised
+collectively before the surgery (skin edges or assembly cells in no rank's
+cavity, a junction on the seam) now start 'seam-conforming path:', like the
+gathered ones. Text only.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 212d8761..dbed3b94 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -8033,12 +8033,12 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+         comm.Allreduce(MPI.IN_PLACE, edge_owner, op=MPI.MIN)
+         if (edge_owner >= comm.size).any():
+             raise RuntimeError(
+-                f"place_thin_volume: {int((edge_owner >= comm.size).sum())} "
++                f"{path}place_thin_volume: {int((edge_owner >= comm.size).sum())} "
+                 "skin edge(s) face no rank's cavity; the reach did not cover "
+                 "the band across the seam.")
+         if (tri_owner >= comm.size).any():
+             raise RuntimeError(
+-                f"place_thin_volume: {int((tri_owner >= comm.size).sum())} "
++                f"{path}place_thin_volume: {int((tri_owner >= comm.size).sum())} "
+                 "assembly cell(s) lie in no rank's cavity; the reach did not "
+                 "cover the band across the seam.")
+         # The two band cells of a SPINE edge stay with one rank. The seam
+@@ -8064,7 +8064,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+             ts = tris_of_edge[(a, b)]
+             if len(ts) == 2 and tri_owner[ts[0]] != tri_owner[ts[1]]:
+                 raise RuntimeError(
+-                    "place_thin_volume: a band cell meets two spines whose "
++                    f"{path}place_thin_volume: a band cell meets two spines whose "
+                     "seam owners disagree (a junction on the seam); move "
+                     "the seam or gather.")
+ 
+-- 
+2.39.5 (Apple Git-154)
+
