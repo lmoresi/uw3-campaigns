@@ -50,3 +50,6 @@ loosened to perimeter x 1e-8 x diameter (wall excess 1.7e-10 against 1.0e-9). Th
 is not checked for holes; its fused outlines may enclose them.
 test_0906: 6 passed (adds a missing interior triangle touching the boundary at one vertex).
 Placement suite: 94 passed.
+
+## H1 lows: 0003 (115) and 0004 (114)
+115: the parallel test docstring says np 3 exercises the off-rank-0 surgery, and scripts/test.sh runs it at np 3 always; a dump dir that cannot be written keeps the refusal reason and appends the save error; the design note says where the dump goes. test_0907: 2 passed. 114: test_0906 marked serial with its reason.

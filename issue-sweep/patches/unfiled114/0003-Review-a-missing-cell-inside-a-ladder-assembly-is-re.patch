@@ -1,7 +1,7 @@
 From c21ca6c0aea3c43123c6f6ef9d7470af5cb5cd37 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 18:15:32 +1100
-Subject: [PATCH 3/3] Review: a missing cell inside a ladder assembly is
+Subject: [PATCH 3/4] Review: a missing cell inside a ladder assembly is
  refused by its hole, exactly; the area check is a backstop
 
 An area tolerance could separate the wall's excess from a missing 1e-6 sliver

@@ -1,0 +1,103 @@
+From 3d64ca089991733f4d792f42430dcf69647ba1e6 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 20:13:19 +1100
+Subject: [PATCH 3/3] Review: the np 3 run tests the sliver warning's
+ reduction; a missing dump directory keeps the refusal's reason
+
+- tests/parallel/test_0907 says np 3 is the run whose surgery is off rank 0,
+  and scripts/test.sh runs it at np 3 always.
+- When UW_PLACE_FILL_DUMP names a directory the dump cannot be written to,
+  the refusal keeps its own reason and adds why the dump failed.
+- The design note says where the dump goes.
+
+Underworld development team with AI support from Claude Code
+---
+ .../design/fault-parallel-placement-2026-09.md |  3 ++-
+ scripts/test.sh                                |  5 +++++
+ src/underworld3/utilities/place_surface.py     | 18 +++++++++++-------
+ ...est_0907_outcrop_sliver_warning_parallel.py |  9 +++++----
+ 4 files changed, 23 insertions(+), 12 deletions(-)
+
+diff --git a/docs/developer/design/fault-parallel-placement-2026-09.md b/docs/developer/design/fault-parallel-placement-2026-09.md
+index b10556fc..81a1877c 100644
+--- a/docs/developer/design/fault-parallel-placement-2026-09.md
++++ b/docs/developer/design/fault-parallel-placement-2026-09.md
+@@ -758,7 +758,8 @@ band along strike (its vertices are all victims and the two fills have
+ no common boundary to keep); a crossing so oblique that the skin
+ changes hands at fewer than two vertices; and 3-D, where the thin volume
+ still gathers. A refused fill saves its inputs to
+-`place_fill_failure_rank<r>.npz` beside the script.
++`place_fill_failure_rank<r>.npz` in the directory named by `UW_PLACE_FILL_DUMP`, when
++that is set.
+ 
+ ### The fill graded harder (4 September)
+ 
+diff --git a/scripts/test.sh b/scripts/test.sh
+index ec35dd50..048c5289 100755
+--- a/scripts/test.sh
++++ b/scripts/test.sh
+@@ -713,6 +713,11 @@ if [ $PARALLEL_RANKS -gt 0 ] && shard_owns 6 && command -v mpirun &> /dev/null;
+     OMPI_MCA_rmaps_base_oversubscribe=1 $SUPERVISE mpirun -n 3 python -m pytest --with-mpi \
+       tests/parallel/test_0786_stokes_rank_without_cells_parallel.py || status=1
+ 
++    # At three ranks the outcrop's surgery runs on a rank that is not rank 0, so the
++    # sliver warning's reduction over the ranks is exercised; at two it is not.
++    OMPI_MCA_rmaps_base_oversubscribe=1 $SUPERVISE mpirun -n 3 python -m pytest --with-mpi \
++      tests/parallel/test_0907_outcrop_sliver_warning_parallel.py || status=1
++
+     # The parallel plotting helpers: the non-plotting ranks join the plotting
+     # rank's global_evaluate with no points; at three ranks two of them do.
+     OMPI_MCA_rmaps_base_oversubscribe=1 $SUPERVISE mpirun -n 3 python -m pytest --with-mpi \
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index f4fb669a..85b83501 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -8180,13 +8180,17 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     if dump_dir:
+                         dump = _os.path.join(
+                             dump_dir, f"place_fill_failure_rank{comm.rank}.npz")
+-                        np.savez(dump, Xall=Xall, ring=np.asarray(ring),
+-                                 holes=np.asarray(
+-                                     [len(h) for h in holes] + sum(
+-                                         ([int(v) for v in h] for h in holes),
+-                                         [])),
+-                                 seams=str(seams))
+-                        where = f"fill inputs saved to {dump}"
++                        try:
++                            np.savez(dump, Xall=Xall, ring=np.asarray(ring),
++                                     holes=np.asarray(
++                                         [len(h) for h in holes] + sum(
++                                             ([int(v) for v in h] for h in holes),
++                                             [])),
++                                     seams=str(seams))
++                            where = f"fill inputs saved to {dump}"
++                        except OSError as save_error:
++                            # the refusal's own reason leads; the dump only adds
++                            where = f"the fill inputs could not be saved to {dump}: {save_error}"
+                     else:
+                         where = ("set UW_PLACE_FILL_DUMP to a directory to save the "
+                                  "fill inputs")
+diff --git a/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py b/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+index a28b5b5c..cb611ad0 100644
+--- a/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
++++ b/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+@@ -2,11 +2,12 @@
+ 
+ The smallest angle where an outcropping band meets the wall is a minimum over the
+ ranks, so it is the same on every rank even when only one of them holds wall cells;
+-the warning is printed once (rank 0). With the top at 63.5 degrees on this annulus
+-the outcrop's surgery runs on rank 1 at np 2, so rank 0 holds no wall cell of it and
+-would report 180 without the reduction.
++the warning is printed once (rank 0). At np 2 rank 0 holds the band, so the run
++checks agreement and the single print. At np 3, with the top at 63.5 degrees on this
++annulus, the outcrop's surgery runs on a rank other than 0, which would report 180
++without the reduction: that run, always on in scripts/test.sh, is the one that tests it.
+ 
+-    mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
++    mpirun -n 3 python -m pytest --with-mpi tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+ """
+ import numpy as np
+ import pytest
+-- 
+2.39.5 (Apple Git-154)
+

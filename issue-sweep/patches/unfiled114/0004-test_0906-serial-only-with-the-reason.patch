@@ -1,0 +1,29 @@
+From e0abfa8b58faeef1065a80e078728b4527eee5ce Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 20:12:22 +1100
+Subject: [PATCH 4/4] test_0906: serial-only, with the reason
+
+Underworld development team with AI support from Claude Code
+---
+ tests/test_0906_ribbon_assembly_area_at_the_wall.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_0906_ribbon_assembly_area_at_the_wall.py b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+index 43f74027..cff5c544 100644
+--- a/tests/test_0906_ribbon_assembly_area_at_the_wall.py
++++ b/tests/test_0906_ribbon_assembly_area_at_the_wall.py
+@@ -18,7 +18,10 @@ import pytest
+ import underworld3 as uw
+ from underworld3.utilities.place_surface import _check_assembly_area, place_fault_ribbon_2d
+ 
+-pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b,
++              # the assembly is meshed on one rank and the check's unit cases are
++              # rank-local, so nothing here differs at np > 1
++              pytest.mark.skipif(uw.mpi.size > 1, reason="serial: assembly check")]
+ 
+ 
+ @pytest.fixture(scope="module")
+-- 
+2.39.5 (Apple Git-154)
+

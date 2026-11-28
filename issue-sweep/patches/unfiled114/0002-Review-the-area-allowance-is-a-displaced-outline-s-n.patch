@@ -1,7 +1,7 @@
 From b2529c593e01522746fd6a763889f5a34ca9ce2a Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 18:07:20 +1100
-Subject: [PATCH 2/3] Review: the area allowance is a displaced outline's, not
+Subject: [PATCH 2/4] Review: the area allowance is a displaced outline's, not
  a triangle's; a doubled cell is refused by its edges
 
 The allowance was 1e-3 of the smallest triangle still present, so a missing

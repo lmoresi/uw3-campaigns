@@ -1,7 +1,7 @@
 From a69675f590e5923581b7a83e66e282753ea53eae Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 19:41:33 +1100
-Subject: [PATCH 2/2] Review: the sliver warning's parallel claims are tested;
+Subject: [PATCH 2/3] Review: the sliver warning's parallel claims are tested;
  the fill dump is written only where asked
 
 - tests/parallel/test_0907 (np 2, the outcrop's surgery on rank 1): the

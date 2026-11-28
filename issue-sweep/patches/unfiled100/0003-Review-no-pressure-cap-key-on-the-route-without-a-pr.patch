@@ -1,0 +1,45 @@
+From c761a959bd19f7cd23b0d444c37ddbb90f42ba4e Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 20:16:21 +1100
+Subject: [PATCH 3/3] Review: no pressure-cap key on the route without a
+ pressure split; test_0908 is serial
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/rotated_bc.py               | 3 ---
+ tests/test_0908_pressure_subsolve_cap_is_the_users.py | 5 ++++-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/underworld3/utilities/rotated_bc.py b/src/underworld3/utilities/rotated_bc.py
+index 67556f12..3a897e02 100644
+--- a/src/underworld3/utilities/rotated_bc.py
++++ b/src/underworld3/utilities/rotated_bc.py
+@@ -3500,9 +3500,6 @@ def _solve_rotated_vector(solver, Ahat, bhat, normal_rows, custom_Pl=None, nsp=N
+         ctx = {"ksp": ksp, "pc": pc, "Mp": None, "nsp": nsp, "cns": None,
+                "declared_exempt": getattr(solver, "_rotated_declared_modes_exempt", None),
+                "custom_Pl": custom_Pl, "pfx": pfx,
+-               # read again before every solve (_set_absolute_target), so a cap
+-               # set after the first solve reaches the cached KSP
+-               "pressure_cap_key": f"{solver.petsc_options_prefix}fieldsplit_pressure_ksp_max_it",
+                "velocity_pc": "custom-FMG" if custom_Pl is not None else "GAMG",
+                "coarse_solve": _coarse,
+                "schur_pre": "none"}
+diff --git a/tests/test_0908_pressure_subsolve_cap_is_the_users.py b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+index b5267e65..4a00e5e0 100644
+--- a/tests/test_0908_pressure_subsolve_cap_is_the_users.py
++++ b/tests/test_0908_pressure_subsolve_cap_is_the_users.py
+@@ -17,7 +17,10 @@ import sympy
+ 
+ import underworld3 as uw
+ 
+-pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b,
++              # the assertions read one rank's options and sub-solver; they hold on
++              # every rank, and the np 2 run is a review check, not a CI batch
++              pytest.mark.skipif(uw.mpi.size > 1, reason="serial suite")]
+ 
+ 
+ def _stokes(mesh, p_continuous=True):
+-- 
+2.39.5 (Apple Git-154)
+
