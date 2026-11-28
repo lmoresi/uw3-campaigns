@@ -5120,3 +5120,4 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 ### 2026-11-28 — split-top refusal passed for a fix
 - Louis: "Pass that along to get a fix. Hyperion is active again."
 - C1 (dev hub) refused the message: "needs proof of a trusted device", nothing sent. The report and reproducer went to H1 worker (session_01HxWvn98DsWPTz4ZpKByzQM, on hyperion) instead, asking it to take the fix or pass it to the fault-placement desk and tell C1. Fix sha and overlay to come back to C2 and K1.
+- H1 received it and routed the full request (symptom, overlay and sha, B30 reproducer and argv, what is needed, return path to C2 and K1) to C1, for the desk that owns place_surface.py. H1 is the review and test desk and has offered C1 a local reproducer and a review of the fix. The fix sha and overlay will come from whoever takes it.
