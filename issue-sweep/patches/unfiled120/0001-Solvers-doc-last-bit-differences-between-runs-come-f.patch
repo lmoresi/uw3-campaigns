@@ -1,4 +1,4 @@
-From 250542ba6d257563f601f21961cc68e962751067 Mon Sep 17 00:00:00 2001
+From 7119e928da174e5d444c6ad95690111259d4921e Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 20:40:09 +1100
 Subject: [PATCH] Solvers doc: last-bit differences between runs come from
@@ -6,21 +6,24 @@ Subject: [PATCH] Solvers doc: last-bit differences between runs come from
 
 Underworld development team with AI support from Claude Code
 ---
- docs/developer/subsystems/solvers.md | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ docs/developer/subsystems/solvers.md | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/docs/developer/subsystems/solvers.md b/docs/developer/subsystems/solvers.md
-index 877de43f..6f9e15ee 100644
+index 877de43f..18a601e2 100644
 --- a/docs/developer/subsystems/solvers.md
 +++ b/docs/developer/subsystems/solvers.md
-@@ -433,6 +433,26 @@ application, and the velocity KSP is applied once per Schur `MatMult` — i.e. o
+@@ -433,6 +433,29 @@ application, and the velocity KSP is applied once per Schur `MatMult` — i.e. o
  pressure Krylov iteration. That number is a sample, not work. `SolverInstrumentation`
  (`systems/solver_health.py`) is the mechanism that sums properly.
  
 +### Last-bit differences between runs
 +
 +The same build, on the same input, can finish a Krylov solve in one of two states that
-+differ in the last bit, from one process to the next. The iteration counts are the same.
++differ in the last bit, from one process to the next. In the linear solves measured the
++iteration counts are the same; a strongly nonlinear solve can amplify the difference into a
++different path (a visco-elasto-plastic box step from evolved history: 39 Newton and 691
++linear iterations one way, 45 and 519 the other).
 +The source is PETSc's GEMV path for `VecMDot` and `VecMAXPY`, its default here, which
 +hands the multiple dot products of the Krylov orthogonalisation (and of a null-space
 +projection) to the BLAS `dgemv`. Measured on a rotated free-slip shell solve: two final
