@@ -1,0 +1,20 @@
+EXP=
+a=1.5 b=1.5  band corner gap: Top -0.62 h, Right -0.62 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 2.0 near-corner-minangle 2.0 plus True
+a=1.5 b=2.5  band corner gap: Top -0.62 h, Right +0.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 2.0 near-corner-minangle 2.0 plus True
+a=1.5 b=3.5  band corner gap: Top -0.62 h, Right +1.38 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain boundary away from the outcrop band; only a one-band outcrop is bu
+a=2.0 b=2.0  band corner gap: Top -0.12 h, Right -0.12 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=3.0  band corner gap: Top -0.12 h, Right +0.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=4.0  band corner gap: Top -0.12 h, Right +1.88 h | REFUSED RuntimeError: RuntimeError: the ribbon's cavity reached the domain boundary away from the outcrop band; only a one-band outcrop is bu
+a=2.2 b=2.2  band corner gap: Top +0.13 h, Right +0.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (1, 0.9), whose cells there are
+a=2.2 b=3.2  band corner gap: Top +0.13 h, Right +1.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (0.85, 1), whose cells there ar
+a=2.2 b=4.2  band corner gap: Top +0.13 h, Right +2.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (0.8, 1), whose cells there are
+EXP=1
+a=1.5 b=1.5  band corner gap: Top -0.62 h, Right -0.62 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 2.0 near-corner-minangle 2.0 plus True
+a=1.5 b=2.5  band corner gap: Top -0.62 h, Right +0.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 2.0 near-corner-minangle 2.0 plus True
+a=1.5 b=3.5  band corner gap: Top -0.62 h, Right +1.38 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 2.0 near-corner-minangle 2.0 plus True
+a=2.0 b=2.0  band corner gap: Top -0.12 h, Right -0.12 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=3.0  band corner gap: Top -0.12 h, Right +0.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.0 b=4.0  band corner gap: Top -0.12 h, Right +1.88 h | placed  wall-mislabelled 0 corner-vertex 1 minangle 9.4 near-corner-minangle 9.4 plus True
+a=2.2 b=2.2  band corner gap: Top +0.13 h, Right +0.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (1, 0.9), whose cells there are
+a=2.2 b=3.2  band corner gap: Top +0.13 h, Right +1.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (0.85, 1), whose cells there ar
+a=2.2 b=4.2  band corner gap: Top +0.13 h, Right +2.13 h | REFUSED RuntimeError: RuntimeError: the ribbon's band comes within 0.13 cells (0.00643) of the domain wall at (0.8, 1), whose cells there are
