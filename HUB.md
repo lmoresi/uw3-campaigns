@@ -5122,3 +5122,18 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
 - C1 (dev hub) refused the message: "needs proof of a trusted device", nothing sent. The report and reproducer went to H1 worker (session_01HxWvn98DsWPTz4ZpKByzQM, on hyperion) instead, asking it to take the fix or pass it to the fault-placement desk and tell C1. Fix sha and overlay to come back to C2 and K1.
 - H1 received it and routed the full request (symptom, overlay and sha, B30 reproducer and argv, what is needed, return path to C2 and K1) to C1, for the desk that owns place_surface.py. H1 is the review and test desk and has offered C1 a local reproducer and a review of the fix. The fix sha and overlay will come from whoever takes it.
 - C1 routed the fix to W1, which owns fault placement. H1 is building a small reproducer on hyperion: a split top refused with "cavity reached the domain wall", swept from 1 to 10 cells below the surface, on development and on W1's held UNFILED 60 branch, to bound the band. The fix sha and overlay will come to C2 and K1 from W1.
+
+### 2026-11-28 — d087202's march start broke the fit's top; B15-B45 after step 1 invalid; fix b912c3b → 726d05c
+- B15/B40/B45 stopped on the fit guard at steps 87/83/77 (~39 Myr). B20 stopped at step 29 on a placement refusal (split top 24 km, at the edge of the band sent to W1).
+- Cause (K1's d087202):
+  - The march started only ~145 km past the bend, so the fitted top came out at ~47 deg (was ~29).
+  - After the first segment every B run's split reached 15-27 km whatever its least dip; split-top depths were identical across the runs.
+  - The fault ran nearly straight down through the trench and the slab sank vertically, with a right-angle bend ~30 km across. The march (ds 14.5 km) could not turn the corner and lost the line at 55-130 km.
+  - K1's offline test had checked reaching the cap, not the fault's shape.
+- B15-B45 after step 1 are invalid. Their states are moved aside (after_001_d087202/), and all four restart from step 1 on b912c3b.
+- b912c3b (on d087202), verified (.gz 24ea7bd and mbox 6c3aedd match, blob ac1c6d2) and pushed to kaiju/slab-workbench as 726d05c.
+  - The march starts 0.35 beyond the start of the first flat stretch out from the slab, held 0.05 short of that stretch's end.
+  - Offline: Q10c steps 2-104 start 820-860 km out (the original start was 1,015 km from the top). Q10c steps 200-385 and Q17c steps 140-231 start 120-750 km before the runaway top and reach the cap.
+- Hub:
+  - Lesson: an offline test of a fit change must compare the fitted curve's shape (top dip, fit_km against the previous fit or the fault in use), not only whether it reaches the cap. Asked K1 for the top dip on b912c3b against 01e55e1 over the same steps.
+  - Read the B runs as starting at step 1 of b912c3b.
