@@ -66,3 +66,13 @@ tolerance run was needed.
 Correction: the earlier "39/691 against 45/519" came from gemv_timing.py's VEP repeats, which
 reset the velocity to the initial shear while the stress history had evolved. That state is
 inconsistent and no real run reaches it. The docs patch now says so.
+
+## np > 1: a second order-dependent source on the rotated path (H1)
+At np 2 the 100 rotated P2/dP1 annulus probe gives two states with GEMV off too (7/3). To find the
+stage, stage_dump.py wraps a script and logs per rank, in call order, hashes of each stage's
+vectors: Mat.mult/multTranspose (rotations), NullSpace.remove, KSP.solve (operator local values,
+rhs, solution), Vec.norm. stage_compare.py names the first differing line between two runs.
+  PETSC_OPTIONS="-vec_mdot_use_gemv 0 -vec_maxpy_use_gemv 0" mpirun -n 2 python stage_dump.py runA rotated_probe.py
+  (repeat as runB, runC ... until two runs' final states differ; then)
+  python stage_compare.py runA runB 2
+rotated_probe.py is 100's probe (standard, standard+strategy, rotated P2/dP1 annulus).
