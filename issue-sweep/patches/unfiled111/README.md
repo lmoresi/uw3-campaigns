@@ -55,3 +55,10 @@ dependence; seam faces in _boundary_edges).
 Note for the conform-defects row (118): on the conform path the outcome now depends on np. At np 1
 it takes the gathered route and places; at np >= 2 it refuses with the remedy. This is an explicit,
 interim state, also stated in PR_BODY.
+
+## H1 r3 lows + gate: 0005
+PR body: conform is a deferred scope cut (row 118), with the holes-check note. Wording: "0.3 wall
+cells". Parallel test: wall labels and Plus/Minus balance, summed over owned edges. Gate:
+_refuse_a_partial_ring before the gap is measured on a wall-touching gathered ring, with a unit
+test faking a shared vertex. Serial test_0904 + test_0865: 13 passed. For row 118: the ligament
+path, and _outcrop_ring_splice's unfiltered boundary set.

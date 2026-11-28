@@ -15,7 +15,7 @@ of its dip scan.
   carve, so the cavity's ring runs along existing wall edges, and the rebuild keeps them and their
   labels. The blanket refusal is removed on both the gathered and the seam-conforming paths.
 - **A sliver's gap is still refused.** The cells filled in between the band's skin and the wall
-  are a strip of the gap's width. Below 0.3 of the wall's cells (`_MIN_WALL_GAP_CELLS`) the
+  are a strip of the gap's width. Below 0.3 wall cells (`_MIN_WALL_GAP_CELLS`) the
   placement is refused, with the gap in cells and in mesh units and both ways out: move the band
   further from the wall, or closer, so that it reaches the wall and is placed as an outcrop.
 - **The reach-and-distance message** added for this refusal (`_wall_refusal_2d`) could no longer
@@ -35,6 +35,9 @@ of its dip scan.
 - No coordinate matches.
 
 ## Parallel
+**The seam-conforming path is a deferred scope cut.** It now refuses cases an earlier revision
+of this branch placed there, and its defects are tracked separately. If that path is reopened, a
+fill ring must be checked against its holes (and the skin) before gmsh, collectively.
 **The seam-conforming path is not changed in substance.** It still refuses a cavity that reaches
 the wall, now with a message naming `seams='gather'`, through the same failure gather, so no rank
 meshes. At np 1 a seam-conforming call takes the gathered route and places, so on that path the
@@ -48,6 +51,11 @@ through the placement's existing failure gather: every rank raises the same mess
 does. On the seam-conforming path each rank decides on its own cavities and the same gather
 agrees the outcome.
 
+- **A gate on the gathered path.** A cavity ring that meets the wall must hold no vertex shared
+  with another rank, since the gathered region includes the band's star and one more layer. A
+  ring that still does is refused through the failure gather ("the gathered region does not
+  cover the cavity ring"), not measured on part of itself.
+
 ## Tests
 - **test_0904** (tier B, level 2), annulus fixture at h = 0.025 and 0.0125:
   - bands 2.5, 3.0 and 3.5 cells below the wall are placed inside, the wall keeps its labels, the
@@ -58,6 +66,9 @@ agrees the outcome.
   - a box corner, where the cavity runs along two walls, keeps both walls' labels and the corner
     vertex.
   All nine fail before the change.
+- **tests/parallel/test_0904** (np 2-3): gathered places (every outer-wall edge labelled,
+  FaultPlus and FaultMinus equal, over the ranks); seam-conforming refuses with the remedy; the
+  ranks agree.
 - **test_0865**: its fixture (a gap of 0.67 cells) is now placed, and the wall keeps its labels.
 
 Measured before the PR: H1's sweeps (dips 15/30/45, k 0-6, h = 0.025; dip 30 at h = 0.0125) on

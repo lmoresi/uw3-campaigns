@@ -1,0 +1,178 @@
+From 909c81458fc5a083d095345996c00082e314600c Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 17:17:45 +1100
+Subject: [PATCH 5/5] Review: a ring another rank still holds is not measured;
+ '0.3 wall cells'; the parallel test counts labels and sides
+
+- The gathered path should leave no shared vertex on a cavity ring that meets
+  the wall (none in 144 placements at 2-3 ranks), but that rests on the reach
+  arithmetic. A ring that still has one is refused through the failure
+  gather instead of measured on part of itself.
+- The wording is '0.3 wall cells'.
+- tests/parallel/test_0904 also asserts, over the ranks, that every outer-wall
+  edge keeps its label and that FaultPlus and FaultMinus hold equal counts.
+- test_0904: a unit test of the gate with one faked shared vertex.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    | 22 ++++++++++-
+ ...4_place_ribbon_beside_the_wall_parallel.py | 37 +++++++++++++++++--
+ ..._0865_place_ribbon_wall_refusal_numbers.py |  2 +-
+ ...4_place_ribbon_interior_beside_the_wall.py | 14 ++++++-
+ 4 files changed, 68 insertions(+), 7 deletions(-)
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index 7fd15d22..708c341a 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7593,9 +7593,26 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+     return gap, h, X[w]
+ 
+ 
++def _refuse_a_partial_ring(ring, shared_v, n_old):
++    """Refuse to measure a wall gap on a cavity ring that another rank also holds.
++
++    The gathered path moves the band's star and one more layer onto the surgery
++    rank, so its ring should hold no vertex shared with another rank (measured:
++    none in 144 placements at 2-3 ranks). That rests on the reach arithmetic,
++    untested on a strongly graded mesh; a ring that still has a shared vertex is
++    partial here, and its gap and cell size would be wrong. The placement's
++    failure gather makes the refusal collective."""
++    old = np.asarray([int(v) for v in ring if int(v) < n_old], dtype=np.int64)
++    if old.size and shared_v[old].any():
++        raise RuntimeError(
++            "the gathered region does not cover the cavity ring: a vertex of it "
++            "is shared with another rank, so the gap to the wall cannot be measured "
++            "on this rank alone")
++
++
+ def _wall_gap_refusal_2d(gap, h, point):
+     """The refusal for an interior band closer to a wall than
+-    ``_MIN_WALL_GAP_CELLS`` of the wall's cells: the gap, in cells and in mesh
++    ``_MIN_WALL_GAP_CELLS`` wall cells: the gap, in cells and in mesh
+     units, and the two ways out."""
+     need = _MIN_WALL_GAP_CELLS * h
+     return RuntimeError(
+@@ -7923,7 +7940,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                             "seam-conforming path, which does not yet place a band "
+                             "this close to a wall; use seams='gather' (the default), "
+                             "which places it when the band's skin is at least "
+-                            f"{_MIN_WALL_GAP_CELLS:g} of the wall's cells from it")
++                            f"{_MIN_WALL_GAP_CELLS:g} wall cells from it")
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+                 comps = []                  # handled
+             for ring, comp in comps:
+@@ -7984,6 +8001,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                                            if v < len(X)])].any():
+                         # the cavity runs along the wall: placed, unless the
+                         # band is too close to it for the fill between
++                        _refuse_a_partial_ring(ring, shared_v, len(X))
+                         gap, h_gap, at = _wall_gap_2d(
+                             ring, X, on_wall, asm_pts, skin_edges, h_vertex,
+                             boundary_pairs or {frozenset((a, b)) for _e, a, b
+diff --git a/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+index 55a83016..1acc7ff6 100644
+--- a/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
++++ b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+@@ -35,14 +35,42 @@ def _trace(k, theta=60.0, dip=30.0):
+     return (1.0 - k * H) * r_hat + (H * np.arange(7))[:, None] * down
+ 
+ 
++def _checks(mesh):
++    """Every outer-wall edge keeps its label, and the fault's two sides hold
++    as many facets as each other; counted over the ranks (owned edges only)."""
++    dm = mesh.dm
++    vS, vE = dm.getDepthStratum(0)
++    eS, eE = dm.getDepthStratum(1)
++    X = dm.getCoordinatesLocal().array.reshape(-1, 2)
++    ghost = set()
++    if uw.mpi.size > 1:                 # serially the point SF has no graph
++        _n, leaves, _r = dm.getPointSF().getGraph()
++        ghost = {int(p) for p in (leaves if leaves is not None else [])}
++    value = {b.name: b.value for b in mesh.boundaries}
++    unlabelled = 0
++    sides = {"FaultPlus": 0, "FaultMinus": 0}
++    for e in range(eS, eE):
++        if e in ghost:
++            continue
++        v = [int(q) - vS for q in dm.getCone(e)]
++        if dm.getSupportSize(e) == 1 and (np.linalg.norm(X[v], axis=1) > 1 - 2e-4).all():
++            unlabelled += dm.getLabel("Upper").getValue(e) != value["Upper"]
++        for side in sides:
++            sides[side] += dm.getLabel(side).getValue(e) == value[side]
++    comm = uw.mpi.comm
++    return comm.allreduce(unlabelled), {s: comm.allreduce(n) for s, n in sides.items()}
++
++
+ def _outcome(annulus, k, seams):
+     try:
+-        place_fault_ribbon_2d(annulus, [("Fault", _trace(k))], 2 * H, margin_rings=2,
++        placed, _info = place_fault_ribbon_2d(annulus, [("Fault", _trace(k))], 2 * H, margin_rings=2,
+                               clearance=0.3, split=True, seams=seams,
+                               # as the slab driver pairs them: the seam-conforming
+                               # path takes the network mesher
+                               mesher="ladder" if seams == "gather" else "network")
+-        out = "placed"
++        unlabelled, sides = _checks(placed)
++        out = (f"placed (wall unlabelled {unlabelled}, Plus {sides['FaultPlus']}, "
++               f"Minus {sides['FaultMinus']})")
+     except Exception as exc:     # noqa: BLE001 - compared across the ranks
+         out = f"{type(exc).__name__}: {exc}"
+     every = uw.mpi.comm.allgather(out)
+@@ -52,7 +80,10 @@ def _outcome(annulus, k, seams):
+ 
+ @pytest.mark.parametrize("k", [2.196, 2.5], ids=["gap0.31", "gap0.61"])
+ def test_the_gathered_path_places_it(annulus, k):
+-    assert _outcome(annulus, k, "gather") == "placed"
++    out = _outcome(annulus, k, "gather")
++    assert out.startswith("placed (wall unlabelled 0, "), out
++    plus, minus = (int(x.split()[-1]) for x in out[len("placed (wall unlabelled 0, "):-1].split(", "))
++    assert plus == minus > 0, out
+ 
+ 
+ @pytest.mark.parametrize("k", [2.196, 2.5], ids=["gap0.31", "gap0.61"])
+diff --git a/tests/test_0865_place_ribbon_wall_refusal_numbers.py b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+index 2201006b..d27c4601 100644
+--- a/tests/test_0865_place_ribbon_wall_refusal_numbers.py
++++ b/tests/test_0865_place_ribbon_wall_refusal_numbers.py
+@@ -5,7 +5,7 @@ The fixture is an interior ribbon 0.1 from the outer wall of an annulus with cel
+ was refused, first with "with clearance to spare" alone and then with the cavity's
+ reach and the wall's distance. The wall's vertices are protected from the carve, so
+ the cavity can run along the wall and keep its edges and labels, and a band whose skin
+-is 0.3 or more of the wall's cells from it is now placed: here about 0.67 (0.0335 on
++is 0.3 wall cells or more from it is now placed: here about 0.67 (0.0335 on
+ macOS, the same on Linux). The refusal left is for a sliver's gap (test_0904).
+ """
+ 
+diff --git a/tests/test_0904_place_ribbon_interior_beside_the_wall.py b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+index c8bd9f5f..f287f81c 100644
+--- a/tests/test_0904_place_ribbon_interior_beside_the_wall.py
++++ b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+@@ -9,7 +9,7 @@ lost the middle of its dip scan to it.
+ 
+ The wall's vertices are protected from the carve, so the cavity can run along the
+ wall and keep the wall's edges and labels. It is placed now, unless the gap between
+-the band's skin and the wall is below 0.3 of the wall's cells, where the cells
++the band's skin and the wall is below 0.3 wall cells, where the cells
+ filled in between would be slivers; that refusal gives the gap in cells.
+ 
+ The fixture is an annulus (inner radius 0.4) with one refinement, and a ribbon 2
+@@ -175,3 +175,15 @@ def test_a_band_beside_a_box_corner_keeps_both_walls():
+     assert band_on_wall == 0 and unlabelled == 0 and split
+     # the corner vertex survives once, on whichever rank owns it
+     assert uw.mpi.comm.allreduce(len(corner)) == 1
++
++
++def test_a_ring_another_rank_still_holds_is_not_measured():
++    # the gathered path should leave no shared vertex on a cavity ring; one that
++    # does is refused rather than measured on part of the ring
++    from underworld3.utilities.place_surface import _refuse_a_partial_ring
++    ring = [3, 4, 5, 9, 12]                  # 12 is a new (fill) vertex, past n_old
++    shared = np.zeros(10, dtype=bool)
++    _refuse_a_partial_ring(ring, shared, 10)
++    shared[5] = True
++    with pytest.raises(RuntimeError, match="does not cover the cavity ring"):
++        _refuse_a_partial_ring(ring, shared, 10)
+-- 
+2.39.5 (Apple Git-154)
+
