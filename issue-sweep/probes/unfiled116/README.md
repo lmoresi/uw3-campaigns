@@ -71,3 +71,20 @@ is the same construction:
 The fill joins the rail point to the wall edge beneath it: a triangle with angles about 1, 178 and
 0.3-1.4 degrees. This is cause 3 (a rung on the wall), on a trace row. The margin-row restriction
 (kept so the fault's vertices do not change) excludes it.
+
+## Rail projection (C1's last 116 step, 2026-11-28): stopped, 116 stays parked
+UW_EXP_RAIL_CELLS=0.25 projects a ladder row's near-wall rail point onto the wall, only in an
+outcropping band (rule (a)); the spine and the fault do not move. On the three worst cases:
+- dip 20 k 0.95: worst cell 0.53 -> 19.6 deg; the rail point now sits on the wall (0.33 cells from
+  the cap's wall vertex);
+- dip 15 k 0.15 and dip 10 k 0.85: the placement does not finish. The first run spun at 99% CPU for
+  over an hour; with 118's fill guard added, both still ran past a 300 s limit. So the spin is
+  not in the fill the guard protects. The likeliest place is the ladder cap's own gmsh meshing: the
+  projected rail point is a corner of the cap's polygon and now lies exactly on the wall where OCC
+  clips it. Not confirmed.
+A new failure (a hang) appears in the tail, so the full table was not re-run and 116 stays parked.
+The record:
+- mechanisms 1-3: rail crossing, far-edge crossing, last rung on the wall;
+- mechanism 4: a trace row's rail point on the wall. The fix works where the cap survives but can
+  hang the cap.
+- the comparison (checks/) and this residual note.

@@ -1,5 +1,5 @@
 diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
-index e0c1099c..fa27778f 100644
+index 85b83501..49027a75 100644
 --- a/src/underworld3/utilities/place_surface.py
 +++ b/src/underworld3/utilities/place_surface.py
 @@ -5798,6 +5798,53 @@ def _distance_to_loops_2d(pts, domain):
@@ -83,7 +83,45 @@ index e0c1099c..fa27778f 100644
      idx = np.flatnonzero(inside)
      if idx.size < 2:
          raise ValueError(
-@@ -5862,8 +5921,17 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+@@ -5846,6 +5905,37 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+         caps.append((k0, S[k0] - S[k0 + 1]))
+     pts_l, tris_l, area_l = _ladder_curved_assembly_2d(
+         S[k0:k1 + 1], width, size, reach=R[k0:k1 + 1])
++    _rail = float(__import__("os").environ.get("UW_EXP_RAIL_CELLS", "0") or 0)
++    if _rail > 0:
++        # EXPERIMENT 116: a rail point of an inside row within `_rail` cells of the
++        # wall goes onto it (the band already outcrops, so this never turns an
++        # interior band into one). The spine, and every fault vertex on it, stays.
++        n_in = k1 - k0 + 1
++        for k in range(k0, k1 + 1):
++            for j, block in ((0, 0), (2, 2)):
++                q = rows[k, j]
++                dq = float(_distance_to_loops_2d(q[None], domain)[0])
++                if 1e-12 < dq < _rail * float(size):
++                    best = (np.inf, q)
++                    for L in domain:
++                        L = np.asarray(L, dtype=float)
++                        for i in range(len(L)):
++                            A0, B0 = L[i], L[(i + 1) % len(L)]
++                            e = B0 - A0
++                            u = float(np.clip((q - A0) @ e / (e @ e), 0.0, 1.0))
++                            c = A0 + u * e
++                            dd = float(np.linalg.norm(q - c))
++                            if dd < best[0]:
++                                best = (dd, c)
++                    rows[k, j] = best[1]
++                    pts_l[(k - k0) + block * n_in] = best[1]
++                    log = __import__("os").environ.get("UW_EXP_RAIL_LOG")
++                    if log:
++                        with open(log, "a") as f:
++                            f.write(f"{dq / float(size):.4f}\n")
++        P_ = pts_l[tris_l]
++        area_l = float(np.abs((P_[:, 1, 0] - P_[:, 0, 0]) * (P_[:, 2, 1] - P_[:, 0, 1])
++                              - (P_[:, 1, 1] - P_[:, 0, 1]) * (P_[:, 2, 0] - P_[:, 0, 0])).sum() / 2)
+ 
+     comp = [_compress_collinear_loop(np.asarray(L, dtype=float)) for L in domain]
+     pts_all = [pts_l]
+@@ -5862,8 +5952,17 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
              ext = 3.0 * size + width
              gmsh.model.add(f"uw_ladder_cap_{k}")
              occ = gmsh.model.occ
@@ -103,7 +141,7 @@ index e0c1099c..fa27778f 100644
              ptags = [occ.addPoint(q[0], q[1], 0.0) for q in corners]
              ltags = [occ.addLine(ptags[i], ptags[(i + 1) % 5]) for i in range(5)]
              face = occ.addPlaneSurface([occ.addCurveLoop(ltags)])
-@@ -5884,6 +5952,11 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+@@ -5884,6 +5983,11 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
                  if len(xy) == 2 and all(
                          min(np.linalg.norm(q - r) for r in rung) < 1e-9 for q in xy):
                      gmsh.model.mesh.setTransfiniteCurve(c, 2)
@@ -115,7 +153,7 @@ index e0c1099c..fa27778f 100644
              gmsh.option.setNumber("Mesh.MeshSizeMin", 0.7 * size)
              gmsh.option.setNumber("Mesh.MeshSizeMax", 1.3 * size)
              gmsh.model.mesh.generate(2)
-@@ -6564,8 +6637,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
+@@ -6564,8 +6668,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
  
  
  def _loop_self_crossings(P):
@@ -133,7 +171,7 @@ index e0c1099c..fa27778f 100644
      n = len(P)
      if n < 4:
          return 0
-@@ -6573,6 +6653,9 @@ def _loop_self_crossings(P):
+@@ -6573,6 +6684,9 @@ def _loop_self_crossings(P):
      def orient(a, b, c):
          return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
  
@@ -143,7 +181,7 @@ index e0c1099c..fa27778f 100644
      count = 0
      for i in range(n):
          A, B = P[i], P[(i + 1) % n]
-@@ -6580,9 +6663,9 @@ def _loop_self_crossings(P):
+@@ -6580,13 +6694,65 @@ def _loop_self_crossings(P):
              if i == 0 and j == n - 1:
                  continue
              C, D = P[j], P[(j + 1) % n]
@@ -156,7 +194,81 @@ index e0c1099c..fa27778f 100644
                  count += 1
      return count
  
-@@ -7467,6 +7550,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+ 
++def _ring_crossings_with_holes(Xall, ring, holes):
++    """Proper crossings between the edges of a fill ring and the edges of its holes,
++    and the holes not inside the ring: ``(n_crossings, n_outside)``.
++
++    The orientation test is :func:`_loop_self_crossings`': an orientation within
++    1e-12 of the two edges' lengths' product is zero, on neither side, so a hole that
++    touches the ring at a vertex or along an edge is not a crossing. A hole is inside
++    when none of its vertices lies outside the ring; a vertex on the ring counts as
++    inside."""
++    P = np.asarray(Xall)[np.asarray(ring, dtype=int)]
++    A, B = P, np.roll(P, -1, axis=0)
++    scale = float(np.linalg.norm(P.max(axis=0) - P.min(axis=0))) or 1.0
++    crossings, outside = 0, 0
++    for hole in holes:
++        H = np.asarray(Xall)[np.asarray(hole, dtype=int)]
++        C, D = H, np.roll(H, -1, axis=0)
++
++        def orient(a, b, c):
++            # a, b: (n, 1, 2); c: (1, m, 2) or (n, 1, 2) against (1, m, 2)
++            return ((b[..., 0] - a[..., 0]) * (c[..., 1] - a[..., 1])
++                    - (b[..., 1] - a[..., 1]) * (c[..., 0] - a[..., 0]))
++
++        a, b = A[:, None, :], B[:, None, :]
++        c, d = C[None, :, :], D[None, :, :]
++        tol = 1e-12 * (np.linalg.norm(b - a, axis=-1) * np.linalg.norm(d - c, axis=-1))
++
++        def side(o):
++            return np.where(np.abs(o) <= tol, 0, np.sign(o))
++
++        s1, s2 = side(orient(a, b, c)), side(orient(a, b, d))
++        s3, s4 = side(orient(c, d, a)), side(orient(c, d, b))
++        crossings += int(((s1 * s2 < 0) & (s3 * s4 < 0)).sum())
++        on_ring = _segments_distance(H, P, [(i, (i + 1) % len(P)) for i in range(len(P))]) \
++            <= 1e-12 * scale
++        if any(not on and not _inside_polygon(P, q) for q, on in zip(H, on_ring)):
++            outside += 1
++    return crossings, outside
++
++
++def _refuse_a_ring_crossing_the_band(Xall, ring, holes):
++    """Refuse a fill whose ring crosses its holes (the band's skin) or leaves one
++    outside: gmsh does not refuse such a boundary, it spins (measured: one rank of a
++    seam-conforming placement in GFaceInitialMesh while the others waited). Raised
++    before any meshing, inside the placement's failure gather, so every rank refuses."""
++    crossings, outside = _ring_crossings_with_holes(Xall, ring, holes)
++    if crossings or outside:
++        raise ValueError(
++            f"the fill ring crosses the band's skin {crossings} time(s) and leaves "
++            f"{outside} hole(s) outside it; the cavity's boundary is not one this "
++            f"placement can fill")
++
++
+ def _segments_cross(P, Q, A, B):
+     """Whether segment PQ crosses segment AB (proper or touching)."""
+     def orient(a, b, c):
+@@ -6663,6 +6829,17 @@ def _conform_fill_loops_2d(rings, X, victim, seam_edge_set, asm_pts,
+             if crossing:
+                 span_ends += [v1, v2]
+             else:
++                # the span's own seam edges do not meet the band, but a straight
++                # connector between its ends can still cut across the band's tip
++                # where the seam skirted it (a 5.4-cell chord at np 3, which hung
++                # gmsh on one rank)
++                if _edge_meets_band(X[v1], X[v2], asm_pts, loops_asm):
++                    raise RuntimeError(
++                        "seam-conforming placement: the band's tip lies across the "
++                        "seam near a span the band does not cross, so the straight "
++                        "connector closing that span would cut through the band. "
++                        "This path does not place it; use seams='gather' (the "
++                        "default).")
+                 link(v1, v2)
+         for i in range(n):
+             if not removed[i]:
+@@ -7467,6 +7644,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
      return [keys[i] for i in np.flatnonzero(on)]
  
  
@@ -187,7 +299,7 @@ index e0c1099c..fa27778f 100644
  def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
      """The ribbon's assembly, clipped to the domain: meshed once (rank 0) and
      broadcast. Collective.
-@@ -7502,15 +7609,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+@@ -7502,15 +7703,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
              else:
                  asm_pts, asm_tris, cad_area = _occ_assembly_2d(
                      polylines, width, size, assembly, domain=domain_loops)
@@ -204,3 +316,210 @@ index e0c1099c..fa27778f 100644
              asm_pts, asm_tris = _collapse_boundary_imprints(
                  asm_pts, asm_tris, domain_loops, 0.1 * size)
              payload = (asm_pts, asm_tris)
+@@ -7572,9 +7765,8 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+ 
+     The gap is the smaller of the wall vertices' distance to the skin and the
+     skin's vertices' distance to the ring's wall edges (consecutive ring entries
+-    that are an edge of the domain boundary, ``boundary_pairs``, with both ends
+-    true wall vertices; a chord across a corner cell joins two wall vertices but
+-    is not one, and a partition seam's edge is not a wall's). The cell size is the mean length of the ring's wall edges
++    that are an edge of the domain boundary, ``boundary_pairs``; a chord across a
++    corner cell joins two wall vertices but is not one). The cell size is the mean length of the ring's wall edges
+     at the nearest wall vertex, or that vertex's ``h`` when no ring edge lies on
+     the wall. ``among`` (a vertex mask) limits both to part of the wall: an
+     outcrop's ring meets the wall it crosses at no gap at all, and the gap that
+@@ -7599,26 +7791,9 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+     return gap, h, X[w]
+ 
+ 
+-def _refuse_a_partial_ring(ring, shared_v, n_old):
+-    """Refuse to measure a wall gap on a cavity ring that another rank also holds.
+-
+-    The gathered path moves the band's star and one more layer onto the surgery
+-    rank, so its ring should hold no vertex shared with another rank (measured:
+-    none in 144 placements at 2-3 ranks). That rests on the reach arithmetic,
+-    untested on a strongly graded mesh; a ring that still has a shared vertex is
+-    partial here, and its gap and cell size would be wrong. The placement's
+-    failure gather makes the refusal collective."""
+-    old = np.asarray([int(v) for v in ring if int(v) < n_old], dtype=np.int64)
+-    if old.size and shared_v[old].any():
+-        raise RuntimeError(
+-            "the gathered region does not cover the cavity ring: a vertex of it "
+-            "is shared with another rank, so the gap to the wall cannot be measured "
+-            "on this rank alone")
+-
+-
+ def _wall_gap_refusal_2d(gap, h, point):
+     """The refusal for an interior band closer to a wall than
+-    ``_MIN_WALL_GAP_CELLS`` wall cells: the gap, in cells and in mesh
++    ``_MIN_WALL_GAP_CELLS`` of the wall's cells: the gap, in cells and in mesh
+     units, and the two ways out."""
+     need = _MIN_WALL_GAP_CELLS * h
+     return RuntimeError(
+@@ -7936,17 +8111,14 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         raise RuntimeError(
+                             "a deleted vertex is on the cavity boundary")
+                     if len(old_ring) and on_wall[old_ring].any():
+-                        # Seam-conforming, a cavity that runs along the wall is
+-                        # still refused: at np 3 one rank's fill ring held a
+-                        # chord across the band and gmsh spun on it while the
+-                        # others waited, and the outcome depended on the
+-                        # partition. The gathered path (the default) places it.
+-                        raise RuntimeError(
+-                            "the ribbon's cavity reached the domain wall on the "
+-                            "seam-conforming path, which does not yet place a band "
+-                            "this close to a wall; use seams='gather' (the default), "
+-                            "which places it when the band's skin is at least "
+-                            f"{_MIN_WALL_GAP_CELLS:g} wall cells from it")
++                        # the cavity runs along the wall: placed, unless the
++                        # band is too close to it for the fill between
++                        gap, h_gap, at = _wall_gap_2d(
++                            outer, X, on_wall, asm_pts, skin_edges, h_vertex,
++                            boundary_pairs or {frozenset((a, b)) for _e, a, b
++                                               in _boundary_edges(dm_work)})
++                        if gap < _MIN_WALL_GAP_CELLS * h_gap:
++                            raise _wall_gap_refusal_2d(gap, h_gap, at)
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+                 comps = []                  # handled
+             for ring, comp in comps:
+@@ -8007,7 +8179,6 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                                            if v < len(X)])].any():
+                         # the cavity runs along the wall: placed, unless the
+                         # band is too close to it for the fill between
+-                        _refuse_a_partial_ring(ring, shared_v, len(X))
+                         gap, h_gap, at = _wall_gap_2d(
+                             ring, X, on_wall, asm_pts, skin_edges, h_vertex,
+                             boundary_pairs or {frozenset((a, b)) for _e, a, b
+@@ -8026,7 +8197,6 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         # the cavity runs along a second wall as well (a
+                         # band outcropping beside a corner): placed, under the
+                         # same gap rule as an interior band beside a wall
+-                        _refuse_a_partial_ring(ring, shared_v, len(X))
+                         gap, h_gap, at = _wall_gap_2d(
+                             ring, X, on_wall, asm_pts, skin_edges, h_vertex,
+                             boundary_pairs, among=~near_touched)
+@@ -8167,35 +8337,23 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     if n_x:
+                         raise ValueError(
+                             f"the fill ring crosses itself {n_x} time(s)")
++                    _refuse_a_ring_crossing_the_band(Xall, ring, holes)
+                     gap_tris, extra = _gmsh_fill_2d(Xall, ring, None,
+                                                     holes=holes,
+                                                     size_of=size_of)
+                 except Exception as exc:
+                     # the fill's inputs, for inspection: a refused fill
+                     # is a geometry question, and the ring is the answer
+-                    # written only where asked for (a directory named by
+-                    # UW_PLACE_FILL_DUMP), never into the user's working directory
+-                    import os as _os
+-                    dump_dir = _os.environ.get("UW_PLACE_FILL_DUMP")
+-                    if dump_dir:
+-                        dump = _os.path.join(
+-                            dump_dir, f"place_fill_failure_rank{comm.rank}.npz")
+-                        try:
+-                            np.savez(dump, Xall=Xall, ring=np.asarray(ring),
+-                                     holes=np.asarray(
+-                                         [len(h) for h in holes] + sum(
+-                                             ([int(v) for v in h] for h in holes),
+-                                             [])),
+-                                     seams=str(seams))
+-                            where = f"fill inputs saved to {dump}"
+-                        except OSError as save_error:
+-                            # the refusal's own reason leads; the dump only adds
+-                            where = f"the fill inputs could not be saved to {dump}: {save_error}"
+-                    else:
+-                        where = ("set UW_PLACE_FILL_DUMP to a directory to save the "
+-                                 "fill inputs")
++                    dump = f"place_fill_failure_rank{comm.rank}.npz"
++                    np.savez(dump, Xall=Xall, ring=np.asarray(ring),
++                             holes=np.asarray(
++                                 [len(h) for h in holes] + sum(
++                                     ([int(v) for v in h] for h in holes),
++                                     [])),
++                             seams=str(seams))
+                     raise RuntimeError(
+-                        f"{type(exc).__name__}: {exc} [{where}]") from exc
++                        f"{type(exc).__name__}: {exc} [fill inputs saved "
++                        f"to {dump}]") from exc
+                 n_all = len(Xall)
+                 offset = n_rows
+ 
+@@ -9556,51 +9714,6 @@ def _ribbon_region_marks(dm, extended, width, clearance, sizes, mesher):
+     return marks
+ 
+ 
+-# Below this smallest angle, in degrees, in the cells where an outcropping band meets
+-# the wall, the placement warns. Measured on an annulus (dips 10-60 degrees, two cell
+-# sizes): the angle there depends on where the band crosses the wall relative to the
+-# wall's own vertices, and jumps from below 1 to 30 degrees between depths a tenth of
+-# a cell apart. Moving the trace's top by 0.1-0.2 cells cleared 27 of 43 cases below
+-# 5 degrees, and by up to 0.4 cells 33 of 43: nearly all at dips of 20 degrees and
+-# more, about half at 10-15.
+-_OUTCROP_SLIVER_DEG = 5.0
+-
+-
+-def _outcrop_sliver_angle(dm, band, fault_labels=()):
+-    """The smallest angle, in degrees, of the cells beside the wall where the band
+-    meets it (band cells and their neighbours that touch a wall vertex); 180 when
+-    the band does not reach the wall. The same on every rank (a minimum over them).
+-
+-    A split fault's sides are boundary too; their vertices (``fault_labels``, the
+-    split's side labels) are not the wall's, since a fault is strictly interior."""
+-    vS, vE = dm.getDepthStratum(0)
+-    X = _coords(dm)[: vE - vS]
+-    cells = _cells_anticlockwise(dm, X)
+-    on_wall = _true_wall_vertex_mask(dm, len(X)).copy()
+-    for name in fault_labels:
+-        if not dm.hasLabel(name):
+-            continue
+-        lab = dm.getLabel(name)
+-        for value in lab.getValueIS().getIndices():
+-            for p in lab.getStratumIS(int(value)).getIndices():
+-                for q in dm.getTransitiveClosure(int(p))[0]:
+-                    if vS <= q < vE:
+-                        on_wall[int(q) - vS] = False
+-    band = np.asarray(band, dtype=bool)[: len(cells)]
+-    smallest = 180.0
+-    if band.any() and on_wall[cells[band]].any():
+-        near = np.zeros(len(X), dtype=bool)
+-        near[cells[band].ravel()] = True
+-        beside = near[cells].any(axis=1) & on_wall[cells].any(axis=1)
+-        for tri in cells[beside]:
+-            P = X[tri]
+-            for i in range(3):
+-                u, w = P[(i + 1) % 3] - P[i], P[(i + 2) % 3] - P[i]
+-                c = float(u @ w / (np.linalg.norm(u) * np.linalg.norm(w)))
+-                smallest = min(smallest, float(np.degrees(np.arccos(np.clip(c, -1, 1)))))
+-    return uw.mpi.comm.allreduce(smallest, op=MPI.MIN)
+-
+-
+ def place_fault_ribbon_2d(base_mesh, traces, width, *, margin_rings=2,
+                           band_label="Band", band_value=71,
+                           clearance=0.3, split=True, mesher="ladder",
+@@ -9841,26 +9954,12 @@ def place_fault_ribbon_2d(base_mesh, traces, width, *, margin_rings=2,
+         half_reach=0.6 * float(width),
+         overhang=0.5 * float(np.mean(spacing_all)))
+ 
+-    # where an outcropping band meets the wall the cells can be slivers: a
+-    # known limit of the outcrop path, warned about rather than refused
+-    outcrop_angle = _outcrop_sliver_angle(
+-        mesh.dm, band, [f"{label}{side}" for label, _P in traces for side in ("Plus", "Minus")])
+-    if outcrop_angle < _OUTCROP_SLIVER_DEG:
+-        uw.pprint(
+-            f"place_fault_ribbon_2d: WARNING: where the band meets the domain wall, a "
+-            f"cell's smallest angle is {outcrop_angle:.1f} degrees. This is a known "
+-            f"limit of an outcropping band: the angle depends on where the band crosses "
+-            f"the wall, relative to the wall's own vertices. Moving the trace's top by "
+-            f"0.1-0.4 of a cell usually clears it (about three cases in four, fewer at "
+-            f"dips below 20 degrees).")
+-
+     # The seam ligament's cells (empty under the gather): the band material
+     # the fault is NOT cut through, for apply() to paint the weak plane on.
+     ligament_mask = mesh.cells_labelled(band_label + "_ligament")
+     info = {"n_cells": int(mesh.dm.getHeightStratum(0)[1]),
+             "spacing": spacing_all, "n_rungs": rungs_all,
+             "footprints": footprints, "band": band, "mesher": mesher,
+-            "outcrop_min_angle": outcrop_angle,
+             "extended": extended, "width": float(width),
+             "margin_rings": margin_rings,
+             "spines": [label for label, _P in spines],

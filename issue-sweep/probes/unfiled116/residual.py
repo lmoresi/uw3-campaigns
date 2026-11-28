@@ -4,7 +4,7 @@ import numpy as np
 import underworld3 as uw
 import underworld3.utilities.place_surface as ps
 
-os.environ.update(UW_EXP_SNAP="0.5", UW_EXP_CAP_CELLS="0.25", UW_EXP_MARGIN_ROWS="2")
+os.environ.update(UW_EXP_SNAP="0.5", UW_EXP_CAP_CELLS="0.25", UW_EXP_MARGIN_ROWS="2", UW_EXP_RAIL_CELLS="0.25")
 dip_deg, k = float(sys.argv[1]), float(sys.argv[2])
 captured = {}
 real = ps._ladder_outcrop_assembly_2d
