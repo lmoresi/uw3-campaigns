@@ -1,4 +1,4 @@
-From 7defddd0a7ab9d696ac5607bd3bf4cea3352986a Mon Sep 17 00:00:00 2001
+From 9be169a32b82e388757b653e1e576b201ecd71f9 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:06:08 +1100
 Subject: [PATCH] A straight run of a fill ring is not a crossing of the ring
@@ -9,13 +9,13 @@ crosses itself. A ladder ribbon's rail is straight, and the ring runs along it
 through several collinear points. Two non-adjacent edges of that run had
 orientations of exactly 0 and 5e-20 against each other, which the sign test
 read as opposite sides of a crossing. An outcropping ribbon dipping 15 degrees
-on an annulus was refused for it at 6 of the 11 depths where its band crossed
-the wall ("the fill ring crosses itself 1 time(s)"); a trace built with
+on an annulus was refused for it at 5 of the 6 depths measured from 1.0 to 1.5
+cells, where its band crossed the wall ("the fill ring crosses itself 1 time(s)"); a trace built with
 cos(90 degrees) = 6e-17 rather than 0 was enough to decide it.
 
 The count is of PROPER crossings, as its docstring said, and an orientation
 within 1e-12 of the product of the two edges' lengths is now zero, on neither
-side. Every one of those depths places, with the wall's edges labelled and the
+side. Every depth from 0.5 to 1.5 cells now places, with the wall's edges labelled and the
 fault split.
 
 test_0905 (tier B): the refused ring's four rail points, at full precision,
