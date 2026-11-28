@@ -28,3 +28,18 @@ the other is the outcrop's new wall vertex, where the band's clipped edge meets 
 0.012-0.032 h apart (0.087 h for the 11.9-degree dip-60 case), and the third, interior vertex
 closes a sliver. So the angle depends on how close the band's wall crossing falls to a kept wall
 vertex, which varies erratically with depth.
+
+## Experiment (ii), first round (exp_snap.diff on the stack, UW_EXP_SNAP=s)
+- The snap aims each cap rail at a wall vertex within s local edge lengths of its crossing. With
+  the snap on, cap edges on the wall also carry no interior node.
+- Dip 15, h 0.025, k 0.15-1.55: s = 0.25 fires 16 times (moves 0.004-0.24 of an edge) but leaves
+  the smallest angles at 0.1-9.3 deg. s = 0.5 lifts some (k 0.7: 4 -> 10 deg; k 1.2: 2.4 -> 8.1)
+  but leaves 0.1-0.5 deg at k 0.15, 0.35, 0.55, 0.75.
+- The remaining worst cells keep the same shape: a band vertex on the wall polygon 0.008-0.041 h
+  from an original wall vertex. At dip 15, k 0.3 (dbg.txt) that vertex (x = -0.0239) is NOT a
+  rail crossing: the rails cross at x = +0.081 and -0.104, and both were snapped. It is a band
+  vertex between them, on the wall.
+- Ruled out: _snap_to_boundary_2d (tol 1e-9); _compress_collinear_loop dropping annulus wall
+  vertices (252/252 and 504/504 kept).
+- Not yet known: which step puts a band vertex on the wall between the crossings, 0.04 h from a
+  wall vertex.

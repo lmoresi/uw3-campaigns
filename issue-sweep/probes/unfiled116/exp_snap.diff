@@ -1,0 +1,173 @@
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index e0c1099c..fc4c1123 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -5798,6 +5798,52 @@ def _distance_to_loops_2d(pts, domain):
+     return best
+ 
+ 
++def _exp_snap_direction(P0, t, domain, s):
++    """EXPERIMENT (UNFILED 116): the rail from ``P0`` along ``t`` crosses the wall
++    at X; if a wall vertex lies within s x its local edge length of X, aim the
++    rail at that vertex instead. Logs the move (in local edge lengths) to the
++    file named by UW_EXP_SNAP_LOG."""
++    import os
++    best = (np.inf, None)
++    for L in domain:
++        L = np.asarray(L, dtype=float)
++        n = len(L)
++        for i in range(n):
++            A, B = L[i], L[(i + 1) % n]
++            e = B - A
++            den = t[0] * (-e[1]) - t[1] * (-e[0])
++            if abs(den) < 1e-15:
++                continue
++            q = A - P0
++            lam = (q[0] * (-e[1]) - q[1] * (-e[0])) / den
++            mu = (t[0] * q[1] - t[1] * q[0]) / den
++            if lam > 0 and -1e-12 <= mu <= 1 + 1e-12 and lam < best[0]:
++                best = (lam, (L, i, mu))
++    if best[1] is None:
++        return t
++    L, i, mu = best[1]
++    n = len(L)
++    Xc = P0 + best[0] * t
++    cand = []
++    for j in (i, (i + 1) % n):
++        h_loc = 0.5 * (np.linalg.norm(L[j] - L[j - 1]) + np.linalg.norm(L[(j + 1) % n] - L[j]))
++        cand.append((np.linalg.norm(L[j] - Xc) / h_loc, j))
++    d, j = min(cand)
++    _dbg = os.environ.get("UW_EXP_SNAP_DEBUG")
++    if _dbg:
++        with open(_dbg, "a") as f:
++            f.write(f"P0 ({P0[0]:+.5f},{P0[1]:.5f}) crossing ({Xc[0]:+.5f},{Xc[1]:.5f}) "
++                    f"nearest wall vertex ({L[j][0]:+.5f},{L[j][1]:.5f}) d {d:.4f}\n")
++    if 1e-9 < d < s:
++        v = L[j] - P0
++        log = os.environ.get("UW_EXP_SNAP_LOG")
++        if log:
++            with open(log, "a") as f:
++                f.write(f"{d:.6f}\n")
++        return v / np.linalg.norm(v)
++    return t
++
++
+ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+     """The ladder that OUTCROPS: the structured band on the samples inside
+     the domain, stopping one rung short of the wall, closed by a small
+@@ -5862,8 +5908,12 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+             ext = 3.0 * size + width
+             gmsh.model.add(f"uw_ladder_cap_{k}")
+             occ = gmsh.model.occ
+-            corners = [rung[0], rung[1], rung[2], rung[2] + ext * t,
+-                       rung[0] + ext * t]
++            dirs = {0: t, 2: t}
++            _s = float(__import__("os").environ.get("UW_EXP_SNAP", "0") or 0)
++            if _s > 0:
++                dirs = {i: _exp_snap_direction(rung[i], t, domain, _s) for i in (0, 2)}
++            corners = [rung[0], rung[1], rung[2], rung[2] + ext * dirs[2],
++                       rung[0] + ext * dirs[0]]
+             ptags = [occ.addPoint(q[0], q[1], 0.0) for q in corners]
+             ltags = [occ.addLine(ptags[i], ptags[(i + 1) % 5]) for i in range(5)]
+             face = occ.addPlaneSurface([occ.addCurveLoop(ltags)])
+@@ -5884,6 +5934,11 @@ def _ladder_outcrop_assembly_2d(S, R, width, size, domain):
+                 if len(xy) == 2 and all(
+                         min(np.linalg.norm(q - r) for r in rung) < 1e-9 for q in xy):
+                     gmsh.model.mesh.setTransfiniteCurve(c, 2)
++                elif _s > 0 and len(xy) == 2 and float(_distance_to_loops_2d(
++                        np.vstack(xy + [0.5 * (xy[0] + xy[1])]), comp).max()) < 1e-9:
++                    # EXPERIMENT 116: a cap edge on the wall keeps no interior
++                    # node, so the cap adds no wall vertex between the wall's own
++                    gmsh.model.mesh.setTransfiniteCurve(c, 2)
+             gmsh.option.setNumber("Mesh.MeshSizeMin", 0.7 * size)
+             gmsh.option.setNumber("Mesh.MeshSizeMax", 1.3 * size)
+             gmsh.model.mesh.generate(2)
+@@ -6564,8 +6619,15 @@ def _ring_growing_multi(cells, drop, held_mask, allow_multiple=False,
+ 
+ 
+ def _loop_self_crossings(P):
+-    """The number of PROPER crossings between non-adjacent edges of the
+-    closed polygon ``P`` (an ``(n, 2)`` array in loop order)."""
++    """The number of PROPER crossings between non-adjacent edges of the closed
++    polygon ``P`` (an ``(n, 2)`` array in loop order): each edge's ends lie
++    strictly on opposite sides of the other's line.
++
++    An orientation within 1e-12 of the product of the two edges' lengths counts
++    as zero, on neither side. A ladder ribbon's rail is straight and a fill ring
++    runs along it through several points; two of its edges had orientations of
++    exactly 0 and 5e-20 against each other, which a bare sign test read as
++    opposite sides of a crossing, and refused the fill."""
+     n = len(P)
+     if n < 4:
+         return 0
+@@ -6573,6 +6635,9 @@ def _loop_self_crossings(P):
+     def orient(a, b, c):
+         return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+ 
++    def side(o, tol):
++        return 0 if abs(o) <= tol else (1 if o > 0 else -1)
++
+     count = 0
+     for i in range(n):
+         A, B = P[i], P[(i + 1) % n]
+@@ -6580,9 +6645,9 @@ def _loop_self_crossings(P):
+             if i == 0 and j == n - 1:
+                 continue
+             C, D = P[j], P[(j + 1) % n]
+-            d1, d2 = orient(A, B, C), orient(A, B, D)
+-            d3, d4 = orient(C, D, A), orient(C, D, B)
+-            if ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0)):
++            tol = 1e-12 * float(np.linalg.norm(B - A)) * float(np.linalg.norm(D - C))
++            if (side(orient(A, B, C), tol) * side(orient(A, B, D), tol) < 0
++                    and side(orient(C, D, A), tol) * side(orient(C, D, B), tol) < 0):
+                 count += 1
+     return count
+ 
+@@ -7467,6 +7532,30 @@ def _assembly_edges_on_polylines(asm_pts, edges, polylines, tol):
+     return [keys[i] for i in np.flatnonzero(on)]
+ 
+ 
++def _check_assembly_area(asm_pts, asm_tris, cad_area):
++    """Refuse an assembly mesh that does not fill its own CAD outlines.
++
++    The check is there to catch a missing or doubled piece, which is at least a
++    triangle's area. So the mesh may differ from the CAD by up to 1e-3 of its
++    smallest triangle, or 1e-9 of the CAD area if that is larger. Measured on
++    296 ladder assemblies (an annulus, dips 10-45 degrees, trace tops 0-3 cells
++    below the wall): every relative difference was at most 8.3e-16, except one
++    of 2.0e-8 (1.7e-10 in area, 1e-4 of the smallest triangle), where the trace's
++    top lies on the curved wall and the mesher puts that vertex 4.6e-9 from the
++    CAD's. The later collapse of boundary imprints removes it, and the final wall
++    vertices lie on the wall to round-off."""
++    P = asm_pts[asm_tris]
++    twice = np.abs((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
++                   - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
++    mesh_area = float(twice.sum() / 2.0)
++    allowed = max(1e-3 * float(twice.min() / 2.0), 1e-9 * cad_area) if len(twice) else 0.0
++    if abs(mesh_area - cad_area) > allowed:
++        raise RuntimeError(
++            f"the ribbon assembly meshed to area {mesh_area:.12e} "
++            f"against CAD {cad_area:.12e}; the layer mesh does not "
++            "fill its own outlines.")
++
++
+ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+     """The ribbon's assembly, clipped to the domain: meshed once (rank 0) and
+     broadcast. Collective.
+@@ -7502,15 +7591,7 @@ def _thin_volume_assembly_2d(dm, polylines, width, size, assembly, mesher):
+             else:
+                 asm_pts, asm_tris, cad_area = _occ_assembly_2d(
+                     polylines, width, size, assembly, domain=domain_loops)
+-            P = asm_pts[asm_tris]
+-            twice = ((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1])
+-                     - (P[:, 1, 1] - P[:, 0, 1]) * (P[:, 2, 0] - P[:, 0, 0]))
+-            mesh_area = float(np.abs(twice).sum() / 2.0)
+-            if abs(mesh_area - cad_area) > 1e-9 * cad_area:
+-                raise RuntimeError(
+-                    f"the ribbon assembly meshed to area {mesh_area:.12e} "
+-                    f"against CAD {cad_area:.12e}; the layer mesh does not "
+-                    "fill its own outlines.")
++            _check_assembly_area(asm_pts, asm_tris, cad_area)
+             asm_pts, asm_tris = _collapse_boundary_imprints(
+                 asm_pts, asm_tris, domain_loops, 0.1 * size)
+             payload = (asm_pts, asm_tris)
