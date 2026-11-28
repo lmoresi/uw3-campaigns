@@ -26,3 +26,6 @@ test_0907 (tier B):
 
 Box-corner sweep (a 1.5/2/2.5): all 9 placed, walls labelled, corner kept. Placement suite: 103
 passed.
+
+## H1 lows: 0002
+Parallel test tests/parallel/test_0907_outcrop_sliver_warning_parallel.py at np 2: theta 63.5, dip 15, k 0.15 (serially an outcrop at 0.7 deg, warned). It asserts the angle is equal on every rank and below 180, and the warning prints on rank 0 only. In scripts/test.sh. test_0907 is skipped under mpirun (serial-only). The fill-failure npz is written only under UW_PLACE_FILL_DUMP=<dir>; the message names the variable. Serial: test_0907 2 passed.

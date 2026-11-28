@@ -1,0 +1,140 @@
+From a69675f590e5923581b7a83e66e282753ea53eae Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 19:41:33 +1100
+Subject: [PATCH 2/2] Review: the sliver warning's parallel claims are tested;
+ the fill dump is written only where asked
+
+- tests/parallel/test_0907 (np 2, the outcrop's surgery on rank 1): the
+  recorded angle is the same on every rank, below 180, and the warning is
+  printed on rank 0 only. test_0907 is marked serial-only; its assertions
+  read one rank's mesh.
+- A refused fill wrote place_fill_failure_rank<r>.npz into the user's working
+  directory. It is now written only into a directory named by
+  UW_PLACE_FILL_DUMP, and the message says how to ask for it.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/test.sh                               |  2 +
+ src/underworld3/utilities/place_surface.py    | 27 ++++++++-----
+ ...st_0907_outcrop_sliver_warning_parallel.py | 40 +++++++++++++++++++
+ .../test_0907_outcrop_beside_a_second_wall.py |  5 ++-
+ 4 files changed, 64 insertions(+), 10 deletions(-)
+ create mode 100644 tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+
+diff --git a/scripts/test.sh b/scripts/test.sh
+index dffbaeac..ec35dd50 100755
+--- a/scripts/test.sh
++++ b/scripts/test.sh
+@@ -447,6 +447,8 @@ if [ $PARALLEL_ONLY -eq 0 ]; then
+   batch 3 tests/parallel/test_0874_mirrored_mesh_cut_parallel.py
+   # So is a ribbon beside a wall: placed gathered, refused seam-conforming, alike on every rank.
+   batch 3 tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
++  # So is the outcrop sliver warning: the same angle on every rank, printed once.
++  batch 3 tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+   # So are the multigrid levels an adapt keeps, the same at any rank count (#865).
+   batch 3 tests/parallel/test_1177_mg_levels_same_at_any_rank_count_parallel.py
+   # So is a P3 velocity's route off native FMG, which PETSc cannot inject (#821).
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index b3750006..f4fb669a 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -8173,16 +8173,25 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                 except Exception as exc:
+                     # the fill's inputs, for inspection: a refused fill
+                     # is a geometry question, and the ring is the answer
+-                    dump = f"place_fill_failure_rank{comm.rank}.npz"
+-                    np.savez(dump, Xall=Xall, ring=np.asarray(ring),
+-                             holes=np.asarray(
+-                                 [len(h) for h in holes] + sum(
+-                                     ([int(v) for v in h] for h in holes),
+-                                     [])),
+-                             seams=str(seams))
++                    # written only where asked for (a directory named by
++                    # UW_PLACE_FILL_DUMP), never into the user's working directory
++                    import os as _os
++                    dump_dir = _os.environ.get("UW_PLACE_FILL_DUMP")
++                    if dump_dir:
++                        dump = _os.path.join(
++                            dump_dir, f"place_fill_failure_rank{comm.rank}.npz")
++                        np.savez(dump, Xall=Xall, ring=np.asarray(ring),
++                                 holes=np.asarray(
++                                     [len(h) for h in holes] + sum(
++                                         ([int(v) for v in h] for h in holes),
++                                         [])),
++                                 seams=str(seams))
++                        where = f"fill inputs saved to {dump}"
++                    else:
++                        where = ("set UW_PLACE_FILL_DUMP to a directory to save the "
++                                 "fill inputs")
+                     raise RuntimeError(
+-                        f"{type(exc).__name__}: {exc} [fill inputs saved "
+-                        f"to {dump}]") from exc
++                        f"{type(exc).__name__}: {exc} [{where}]") from exc
+                 n_all = len(Xall)
+                 offset = n_rows
+ 
+diff --git a/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py b/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+new file mode 100644
+index 00000000..a28b5b5c
+--- /dev/null
++++ b/tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
+@@ -0,0 +1,40 @@
++"""The outcrop sliver warning, at np 2: the same angle on every rank, printed once.
++
++The smallest angle where an outcropping band meets the wall is a minimum over the
++ranks, so it is the same on every rank even when only one of them holds wall cells;
++the warning is printed once (rank 0). With the top at 63.5 degrees on this annulus
++the outcrop's surgery runs on rank 1 at np 2, so rank 0 holds no wall cell of it and
++would report 180 without the reduction.
++
++    mpirun -n 2 python -m pytest --with-mpi tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities import place_surface
++from underworld3.utilities.place_surface import place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.mpi(min_size=2), pytest.mark.level_2, pytest.mark.tier_b,
++              pytest.mark.timeout(600)]
++
++
++def test_the_angle_is_the_same_everywhere_and_the_warning_prints_once(capsys):
++    base = uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=0.05,
++                              refinement=1, qdegree=2)
++    h, th, dip = 0.025, np.radians(63.5), np.radians(15.0)
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(dip) * t_hat - np.sin(dip) * r_hat
++    trace = (1.0 - 0.15 * h) * r_hat + (h * np.arange(7))[:, None] * down
++    _mesh, info = place_fault_ribbon_2d(base, [("Fault", trace)], 2 * h, margin_rings=2,
++                                        clearance=0.3, split=True, mesher="ladder")
++    angle = info["outcrop_min_angle"]
++    printed = "WARNING: where the band meets the domain wall" in capsys.readouterr().out
++    comm = uw.mpi.comm
++    angles = comm.allgather(angle)
++    prints = comm.allgather(printed)
++    assert all(a == angles[0] for a in angles), angles
++    assert angles[0] < 180.0, "the outcrop reaches the wall on some rank"
++    warned = angles[0] < place_surface._OUTCROP_SLIVER_DEG
++    assert prints == [warned] + [False] * (comm.size - 1), prints
+diff --git a/tests/test_0907_outcrop_beside_a_second_wall.py b/tests/test_0907_outcrop_beside_a_second_wall.py
+index 47be9464..13d7cbad 100644
+--- a/tests/test_0907_outcrop_beside_a_second_wall.py
++++ b/tests/test_0907_outcrop_beside_a_second_wall.py
+@@ -22,7 +22,10 @@ import underworld3 as uw
+ from underworld3.utilities import place_surface
+ from underworld3.utilities.place_surface import place_fault_ribbon_2d
+ 
+-pytestmark = [pytest.mark.level_2, pytest.mark.tier_b]
++pytestmark = [pytest.mark.level_2, pytest.mark.tier_b,
++              # per-rank assertions; the parallel claims are in
++              # tests/parallel/test_0907_outcrop_sliver_warning_parallel.py
++              pytest.mark.skipif(uw.mpi.size > 1, reason="serial: asserts on one rank's mesh")]
+ 
+ 
+ def test_an_outcrop_beside_a_corner_reaching_the_other_wall_is_placed():
+-- 
+2.39.5 (Apple Git-154)
+
