@@ -1,7 +1,7 @@
 From f1f651d7f0a3c541f6a7ad1c04127fd708856188 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 16:31:50 +1100
-Subject: [PATCH 4/5] Review: the seam-conforming path still refuses a cavity
+Subject: [PATCH 4/6] Review: the seam-conforming path still refuses a cavity
  along the wall; only true wall edges count
 
 At np 3 on the seam-conforming path (top at 60 degrees, gaps 0.31 and 0.61

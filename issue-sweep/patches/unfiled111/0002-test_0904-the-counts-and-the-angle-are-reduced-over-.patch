@@ -1,7 +1,7 @@
 From 907fcf2979b56ca3457b79b0068fbb48d8937676 Mon Sep 17 00:00:00 2001
 From: lmoresi <louis.moresi@anu.edu.au>
 Date: Sat, 28 Nov 2026 15:18:52 +1100
-Subject: [PATCH 2/5] test_0904: the counts and the angle are reduced over the
+Subject: [PATCH 2/6] test_0904: the counts and the angle are reduced over the
  ranks, the corner counted where owned
 
 At np 2 the box-corner case counted the corner vertex on each rank and

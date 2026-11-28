@@ -1,0 +1,29 @@
+From c4e6f346999fce90bd2665e700bc041dbcc9218d Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 18:31:51 +1100
+Subject: [PATCH 6/6] test_0904: say the gate's unit test cannot pin its call
+ site
+
+Underworld development team with AI support from Claude Code
+---
+ tests/test_0904_place_ribbon_interior_beside_the_wall.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_0904_place_ribbon_interior_beside_the_wall.py b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+index f287f81c..aec47bbe 100644
+--- a/tests/test_0904_place_ribbon_interior_beside_the_wall.py
++++ b/tests/test_0904_place_ribbon_interior_beside_the_wall.py
+@@ -179,7 +179,9 @@ def test_a_band_beside_a_box_corner_keeps_both_walls():
+ 
+ def test_a_ring_another_rank_still_holds_is_not_measured():
+     # the gathered path should leave no shared vertex on a cavity ring; one that
+-    # does is refused rather than measured on part of the ring
++    # does is refused rather than measured on part of the ring. This tests the
++    # gate itself; it cannot pin the call site, since no real placement makes a
++    # shared ring vertex
+     from underworld3.utilities.place_surface import _refuse_a_partial_ring
+     ring = [3, 4, 5, 9, 12]                  # 12 is a new (fill) vertex, past n_old
+     shared = np.zeros(10, dtype=bool)
+-- 
+2.39.5 (Apple Git-154)
+
