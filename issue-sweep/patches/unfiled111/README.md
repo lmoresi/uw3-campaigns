@@ -37,3 +37,17 @@ must be >= 0.5 x the deep placement's (measured 22.5 and 24.3 deg against about 
 0.0075 mesh-unit threshold refuses the 0.37-cell case (0.0046), so H7's mutant now fails.
 Serial: test_0904 + test_0865, 12 passed. The conform-path partition question waits on H1's
 0.28-0.33-cell sweep.
+
+## H1 r2 (conform hang, partition dependence): 0004, the fallback
+The seam-conforming path refuses a cavity along the wall again: a RuntimeError inside the failure
+gather, so no rank enters gmsh. The message names seams='gather'. 111's placement stands on the
+gathered path, the default of place_thin_volume and place_fault_ribbon_2d, and of the slab
+driver's -uw_fault_seams. So the science hub's case is still fixed.
+MEDIUM (2): wall edges need both ends to pass _true_wall_vertex_mask (seam edges excluded). The
+conform path no longer reaches _wall_gap_2d at all.
+LOW: tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py (np 2-3, theta 60, k
+2.196 and 2.5) checks that gather places, conform refuses with the remedy, and every rank agrees.
+It is in scripts/test.sh. Serially (np 1, where conform takes the gathered route) both place.
+Serial test_0904 + test_0865: 12 passed.
+For a new row: the conform-path defects (the 5.4-cell chord at the seam; theta 15 partition
+dependence; seam faces in _boundary_edges).

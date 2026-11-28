@@ -1,0 +1,162 @@
+From f1f651d7f0a3c541f6a7ad1c04127fd708856188 Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 16:31:50 +1100
+Subject: [PATCH 4/4] Review: the seam-conforming path still refuses a cavity
+ along the wall; only true wall edges count
+
+At np 3 on the seam-conforming path (top at 60 degrees, gaps 0.31 and 0.61
+cells) one rank's fill ring held a 5.4-cell chord across the band, and gmsh
+spun on it while the other ranks waited in the gather; at np 2 the outcome
+depended on the partition. Until that path is sound, it refuses a cavity
+along the wall as before, through the placement's failure gather, so no rank
+reaches gmsh: the message names seams='gather', the default, which places it.
+
+The gathered path's wall edges now also need both ends to be true wall
+vertices, so a partition seam's edge can never count as wall.
+
+tests/parallel/test_0904 (np 2-3): the gathered path places both gaps and the
+seam-conforming path refuses them with the remedy, alike on every rank.
+
+Underworld development team with AI support from Claude Code
+---
+ scripts/test.sh                               |  2 +
+ src/underworld3/utilities/place_surface.py    | 27 ++++----
+ ...4_place_ribbon_beside_the_wall_parallel.py | 61 +++++++++++++++++++
+ 3 files changed, 79 insertions(+), 11 deletions(-)
+ create mode 100644 tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+
+diff --git a/scripts/test.sh b/scripts/test.sh
+index 4495e03d..dffbaeac 100755
+--- a/scripts/test.sh
++++ b/scripts/test.sh
+@@ -445,6 +445,8 @@ if [ $PARALLEL_ONLY -eq 0 ]; then
+   batch 3 tests/parallel/test_1183_contained_points_owned_parallel.py
+   # So is the line cut on a mesh wound clockwise throughout (#874).
+   batch 3 tests/parallel/test_0874_mirrored_mesh_cut_parallel.py
++  # So is a ribbon beside a wall: placed gathered, refused seam-conforming, alike on every rank.
++  batch 3 tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+   # So are the multigrid levels an adapt keeps, the same at any rank count (#865).
+   batch 3 tests/parallel/test_1177_mg_levels_same_at_any_rank_count_parallel.py
+   # So is a P3 velocity's route off native FMG, which PETSc cannot inject (#821).
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index f9c15959..7fd15d22 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -7571,8 +7571,9 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+ 
+     The gap is the smaller of the wall vertices' distance to the skin and the
+     skin's vertices' distance to the ring's wall edges (consecutive ring entries
+-    that are an edge of the domain boundary, ``boundary_pairs``; a chord across a
+-    corner cell joins two wall vertices but is not one). The cell size is the mean length of the ring's wall edges
++    that are an edge of the domain boundary, ``boundary_pairs``, with both ends
++    true wall vertices; a chord across a corner cell joins two wall vertices but
++    is not one, and a partition seam's edge is not a wall's). The cell size is the mean length of the ring's wall edges
+     at the nearest wall vertex, or that vertex's ``h`` when no ring edge lies on
+     the wall. Returns ``(gap, h, point)``, ``point`` the nearest wall vertex."""
+     old = [int(v) for v in ring if v < len(X)]
+@@ -7582,7 +7583,8 @@ def _wall_gap_2d(ring, X, on_wall, asm_pts, skin_edges, h_vertex, boundary_pairs
+     gap = float(d_w.min())
+     ring = [int(v) for v in ring]
+     wall_edges = [(a, b) for a, b in zip(ring, ring[1:] + ring[:1])
+-                  if a < len(X) and b < len(X) and frozenset((a, b)) in boundary_pairs]
++                  if a < len(X) and b < len(X) and frozenset((a, b)) in boundary_pairs
++                  and on_wall[a] and on_wall[b]]
+     if wall_edges:
+         skin_v = np.unique(np.asarray(skin_edges, dtype=np.int64).ravel())
+         gap = min(gap, float(_segments_distance(asm_pts[skin_v], X, wall_edges).min()))
+@@ -7911,14 +7913,17 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                         raise RuntimeError(
+                             "a deleted vertex is on the cavity boundary")
+                     if len(old_ring) and on_wall[old_ring].any():
+-                        # the cavity runs along the wall: placed, unless the
+-                        # band is too close to it for the fill between
+-                        gap, h_gap, at = _wall_gap_2d(
+-                            outer, X, on_wall, asm_pts, skin_edges, h_vertex,
+-                            boundary_pairs or {frozenset((a, b)) for _e, a, b
+-                                               in _boundary_edges(dm_work)})
+-                        if gap < _MIN_WALL_GAP_CELLS * h_gap:
+-                            raise _wall_gap_refusal_2d(gap, h_gap, at)
++                        # Seam-conforming, a cavity that runs along the wall is
++                        # still refused: at np 3 one rank's fill ring held a
++                        # chord across the band and gmsh spun on it while the
++                        # others waited, and the outcome depended on the
++                        # partition. The gathered path (the default) places it.
++                        raise RuntimeError(
++                            "the ribbon's cavity reached the domain wall on the "
++                            "seam-conforming path, which does not yet place a band "
++                            "this close to a wall; use seams='gather' (the default), "
++                            "which places it when the band's skin is at least "
++                            f"{_MIN_WALL_GAP_CELLS:g} of the wall's cells from it")
+                     carved.append((outer, kept_c, [], holes_k, None, []))
+                 comps = []                  # handled
+             for ring, comp in comps:
+diff --git a/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+new file mode 100644
+index 00000000..55a83016
+--- /dev/null
++++ b/tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
+@@ -0,0 +1,61 @@
++"""A ribbon beside a wall, at any rank count: the gathered path places it, the
++seam-conforming path refuses it, and every rank agrees.
++
++Seam-conforming, at np 3 with the top at 60 degrees on the annulus, one rank's
++fill ring held a chord across the band and gmsh spun on it while the other ranks
++waited; at np 2 the outcome depended on the partition. That path refuses a cavity
++along the wall again, with the remedy, before any rank meshes; the gathered path,
++the default, places it (tests/test_0904).
++
++    mpirun -n 3 python -m pytest --with-mpi tests/parallel/test_0904_place_ribbon_beside_the_wall_parallel.py
++"""
++import numpy as np
++import pytest
++
++import underworld3 as uw
++from underworld3.utilities.place_surface import place_fault_ribbon_2d
++
++pytestmark = [pytest.mark.mpi(min_size=2), pytest.mark.level_2, pytest.mark.tier_b,
++              pytest.mark.timeout(600)]
++
++H = 0.025
++
++
++@pytest.fixture(scope="module")
++def annulus():
++    return uw.meshing.Annulus(radiusOuter=1.0, radiusInner=0.4, cellSize=2 * H,
++                              refinement=1, qdegree=2)
++
++
++def _trace(k, theta=60.0, dip=30.0):
++    th, d = np.radians(theta), np.radians(dip)
++    r_hat = np.array([np.cos(th), np.sin(th)])
++    t_hat = np.array([-np.sin(th), np.cos(th)])
++    down = -np.cos(d) * t_hat - np.sin(d) * r_hat
++    return (1.0 - k * H) * r_hat + (H * np.arange(7))[:, None] * down
++
++
++def _outcome(annulus, k, seams):
++    try:
++        place_fault_ribbon_2d(annulus, [("Fault", _trace(k))], 2 * H, margin_rings=2,
++                              clearance=0.3, split=True, seams=seams,
++                              # as the slab driver pairs them: the seam-conforming
++                              # path takes the network mesher
++                              mesher="ladder" if seams == "gather" else "network")
++        out = "placed"
++    except Exception as exc:     # noqa: BLE001 - compared across the ranks
++        out = f"{type(exc).__name__}: {exc}"
++    every = uw.mpi.comm.allgather(out)
++    assert all(o == every[0] for o in every), every
++    return every[0]
++
++
++@pytest.mark.parametrize("k", [2.196, 2.5], ids=["gap0.31", "gap0.61"])
++def test_the_gathered_path_places_it(annulus, k):
++    assert _outcome(annulus, k, "gather") == "placed"
++
++
++@pytest.mark.parametrize("k", [2.196, 2.5], ids=["gap0.31", "gap0.61"])
++def test_the_seam_conforming_path_refuses_it_before_meshing(annulus, k):
++    out = _outcome(annulus, k, "conform")
++    assert "seam-conforming path" in out and "seams='gather'" in out, out
+-- 
+2.39.5 (Apple Git-154)
+
