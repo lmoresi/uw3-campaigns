@@ -5171,3 +5171,14 @@ Rows handed over from "Open work" (state at hand-over; not updated here afterwar
   - Precedent (DECISIONS, 7 and 13 Nov): a fault stopped at the overriding plate's base, or shortened, choked subduction. Here only the top ~22 km is left, so it may yield, but that needs checking early: strain rate in the top 22 km at the trench, and convergence against B/Q10c over the first ~10 Myr.
   - Louis's "near-surface becomes damage" may mean damage reaching the surface. As built, damage stops at 22 km too. Put the question to Louis.
   - C15/C20 will reach the band and stop until W1's fix; C40 starts just below it.
+
+### 2026-11-28 — Louis: bridge to the surface; -uw_bridge_to_surface (K1 15e0307 → 45a04b6); D15/D20/D40/D45
+- Louis, asked whether the near-surface damage should reach the surface: "Bridge to surface" (the x0.1 bridge carried on along the curve from the leaving point up to the surface; nothing along the flat run beyond).
+- C15-C45 (jobs 4998/4999) ran 5 steps each and fitted every step. Split tops: C15/C20 22-24 km; C40 58-69 km; C45 400 → 81-85 km as the slab steepened. Cancelled.
+- 15e0307 (on 5cefc64), verified (.gz 5e90e9c and mbox 6b057aa match, blob 7a65356) and pushed to kaiju/slab-workbench as 45a04b6.
+  - -uw_bridge_to_surface 1 with -uw_bridge_kind curve: the bridge runs from the surface along the fit's run down to the leaving point, then along the curve to the split's top. The split and the damage zone still stop at the leaving point.
+  - Each build records bridge_leave_km and bridge_run_up_km. The run-up is ~70 km at a 19 deg top and reached ~200 km by 25 Myr on Q10c's fits. K1 reports it per segment as the free-surface warning.
+- Runs D15/D20/D40/D45 from step 0: the C options + -uw_bridge_to_surface 1. Per-segment report includes strain rate in the top 22 km and convergence against Q10c over the first 10 Myr.
+- Hub: the run-up is the fit's own line from the leaving point to where it crosses the surface, the same line whose run-out was the Q10c/Q17c problem.
+  - Here it carries only the x0.1 bridge (no damage zone, no split), so it is weaker. But if the top flattens as on Q10c (2-4 deg by step 200-280), the bridge becomes a weak sheet hundreds of km along the plate top, the free-surface behaviour Louis wants controlled.
+  - Put to Louis: a cap on the run-up (beyond N km, or below a least dip, the bridge goes straight to the surface from the leaving point) as a ready rule if bridge_run_up_km keeps growing.
