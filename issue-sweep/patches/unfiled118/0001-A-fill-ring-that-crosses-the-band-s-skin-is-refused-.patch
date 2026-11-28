@@ -1,0 +1,279 @@
+From 3ea3b14dd021ecc0e5b6237af1c23f33942a363e Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sat, 28 Nov 2026 21:04:30 +1100
+Subject: [PATCH] A fill ring that crosses the band's skin is refused before
+ meshing; so is a seam connector that would cut the band
+
+On the seam-conforming path at np 3 (an annulus, the band's top at 60
+degrees) one rank's fill ring held a straight connector, 5.4 cells long,
+from a wall vertex across the band's tip. The seam skirted the tip without
+crossing it, its vertices were carved, and the connector that closes such a
+span cut through the band. The check before meshing tested the ring only
+against itself, so gmsh got the ring, and spun on it while the other ranks
+waited in the placement's gather.
+
+- Before every fill the ring is tested against its holes (the band's skin):
+  no proper crossing, with the tolerant orientation test of the self-crossing
+  count (a hole touching the ring at a vertex or along an edge is not one),
+  and no hole outside the ring. The refusal is raised inside the placement's
+  failure gather, so every rank refuses and none meshes.
+- The seam-conforming loop builder tests a span's straight connector against
+  the band, and refuses when it would cut it, naming seams='gather'.
+
+test_0909 (tier B): the hung rank's ring and skin (dumped) are refused, two
+crossings and the tip outside; holes inside, touching at a vertex and along
+an edge pass; a hole outside is refused; the loop builder refuses a
+connector across a band tip and closes one clear of it.
+
+Underworld development team with AI support from Claude Code
+---
+ src/underworld3/utilities/place_surface.py    |  64 ++++++++
+ tests/test_0909_fill_ring_against_the_band.py | 147 ++++++++++++++++++
+ 2 files changed, 211 insertions(+)
+ create mode 100644 tests/test_0909_fill_ring_against_the_band.py
+
+diff --git a/src/underworld3/utilities/place_surface.py b/src/underworld3/utilities/place_surface.py
+index acf05296..c128d36d 100644
+--- a/src/underworld3/utilities/place_surface.py
++++ b/src/underworld3/utilities/place_surface.py
+@@ -6598,6 +6598,58 @@ def _loop_self_crossings(P):
+     return count
+ 
+ 
++def _ring_crossings_with_holes(Xall, ring, holes):
++    """Proper crossings between the edges of a fill ring and the edges of its holes,
++    and the holes not inside the ring: ``(n_crossings, n_outside)``.
++
++    The orientation test is :func:`_loop_self_crossings`': an orientation within
++    1e-12 of the two edges' lengths' product is zero, on neither side, so a hole that
++    touches the ring at a vertex or along an edge is not a crossing. A hole is inside
++    when none of its vertices lies outside the ring; a vertex on the ring counts as
++    inside."""
++    P = np.asarray(Xall)[np.asarray(ring, dtype=int)]
++    A, B = P, np.roll(P, -1, axis=0)
++    scale = float(np.linalg.norm(P.max(axis=0) - P.min(axis=0))) or 1.0
++    crossings, outside = 0, 0
++    for hole in holes:
++        H = np.asarray(Xall)[np.asarray(hole, dtype=int)]
++        C, D = H, np.roll(H, -1, axis=0)
++
++        def orient(a, b, c):
++            # a, b: (n, 1, 2); c: (1, m, 2) or (n, 1, 2) against (1, m, 2)
++            return ((b[..., 0] - a[..., 0]) * (c[..., 1] - a[..., 1])
++                    - (b[..., 1] - a[..., 1]) * (c[..., 0] - a[..., 0]))
++
++        a, b = A[:, None, :], B[:, None, :]
++        c, d = C[None, :, :], D[None, :, :]
++        tol = 1e-12 * (np.linalg.norm(b - a, axis=-1) * np.linalg.norm(d - c, axis=-1))
++
++        def side(o):
++            return np.where(np.abs(o) <= tol, 0, np.sign(o))
++
++        s1, s2 = side(orient(a, b, c)), side(orient(a, b, d))
++        s3, s4 = side(orient(c, d, a)), side(orient(c, d, b))
++        crossings += int(((s1 * s2 < 0) & (s3 * s4 < 0)).sum())
++        on_ring = _segments_distance(H, P, [(i, (i + 1) % len(P)) for i in range(len(P))]) \
++            <= 1e-12 * scale
++        if any(not on and not _inside_polygon(P, q) for q, on in zip(H, on_ring)):
++            outside += 1
++    return crossings, outside
++
++
++def _refuse_a_ring_crossing_the_band(Xall, ring, holes):
++    """Refuse a fill whose ring crosses its holes (the band's skin) or leaves one
++    outside: gmsh does not refuse such a boundary, it spins (measured: one rank of a
++    seam-conforming placement in GFaceInitialMesh while the others waited). Raised
++    before any meshing, inside the placement's failure gather, so every rank refuses."""
++    crossings, outside = _ring_crossings_with_holes(Xall, ring, holes)
++    if crossings or outside:
++        raise ValueError(
++            f"the fill ring crosses the band's skin {crossings} time(s) and leaves "
++            f"{outside} hole(s) outside it; the cavity's boundary is not one this "
++            f"placement can fill")
++
++
+ def _segments_cross(P, Q, A, B):
+     """Whether segment PQ crosses segment AB (proper or touching)."""
+     def orient(a, b, c):
+@@ -6674,6 +6726,17 @@ def _conform_fill_loops_2d(rings, X, victim, seam_edge_set, asm_pts,
+             if crossing:
+                 span_ends += [v1, v2]
+             else:
++                # the span's own seam edges do not meet the band, but a straight
++                # connector between its ends can still cut across the band's tip
++                # where the seam skirted it (a 5.4-cell chord at np 3, which hung
++                # gmsh on one rank)
++                if _edge_meets_band(X[v1], X[v2], asm_pts, loops_asm):
++                    raise RuntimeError(
++                        "seam-conforming placement: the band's tip lies across the "
++                        "seam near a span the band does not cross, so the straight "
++                        "connector closing that span would cut through the band. "
++                        "This path does not place it; use seams='gather' (the "
++                        "default).")
+                 link(v1, v2)
+         for i in range(n):
+             if not removed[i]:
+@@ -8229,6 +8292,7 @@ def _place_thin_volume_2d(dm, polylines, width, label, label_value,
+                     if n_x:
+                         raise ValueError(
+                             f"the fill ring crosses itself {n_x} time(s)")
++                    _refuse_a_ring_crossing_the_band(Xall, ring, holes)
+                     gap_tris, extra = _gmsh_fill_2d(Xall, ring, None,
+                                                     holes=holes,
+                                                     size_of=size_of)
+diff --git a/tests/test_0909_fill_ring_against_the_band.py b/tests/test_0909_fill_ring_against_the_band.py
+new file mode 100644
+index 00000000..0bfc2441
+--- /dev/null
++++ b/tests/test_0909_fill_ring_against_the_band.py
+@@ -0,0 +1,147 @@
++"""A fill ring that crosses the band's skin is refused before meshing, on every path.
++
++On the seam-conforming path at np 3 (an annulus, the band's top at 60 degrees) one rank's
++fill ring held a straight connector, 5.4 cells long, from a wall vertex across the
++band's tip: the seam skirted the tip without crossing it, its vertices were carved, and
++the connector closing the span cut through the band. The check before meshing tested the
++ring only against itself, and gmsh spun on that ring while the other ranks waited.
++
++What is asserted: that rank's ring and skin (the dumped coordinates below) are refused,
++two crossings and the band's tip outside the ring; a hole inside its ring, one touching it at a vertex, and one touching it
++along an edge pass; a hole outside is refused; and the seam-conforming loop builder
++refuses a connector that would cut the band, naming seams='gather', while a span whose
++connector clears the band is closed as before.
++"""
++import numpy as np
++import pytest
++
++from underworld3.utilities.place_surface import (_conform_fill_loops_2d,
++                                                 _refuse_a_ring_crossing_the_band,
++                                                 _ring_crossings_with_holes)
++
++pytestmark = [pytest.mark.level_1, pytest.mark.tier_b]
++
++# rank 1's fill ring and the band's skin from the hang (H1, campaigns 35e32c5)
++RING = np.array([
++    [0.4562106545337385, 0.8898718102569032],
++    [0.4320053900932673, 0.75733803892744],
++    [0.4349266804031123, 0.7340500016818594],
++    [0.436626525405941, 0.7093697301826025],
++    [0.4588536166950215, 0.6984799768908412],
++    [0.4605942193191871, 0.67388844661195],
++    [0.4828620682296044, 0.6630874345405543],
++    [0.4842696292189068, 0.6386553232886965],
++    [0.5065004206350616, 0.6277618903355993],
++    [0.5081668834720612, 0.6029731336162858],
++    [0.530656576735913, 0.5917230551957329],
++    [0.5524881362335016, 0.5809008948400005],
++    [0.5729537052260599, 0.5945786328864668],
++    [0.5938406619307506, 0.6082201654350287],
++    [0.6142083292373586, 0.6216758384208991],
++    [0.637206115477099, 0.6356419964019787],
++    [0.630195980093634, 0.6543308851175753],
++    [0.6283293035704807, 0.6748365758210064],
++    [0.6085896962879392, 0.6870012586672686],
++    [0.6109896282144478, 0.7091342597424272],
++    [0.5904273696468085, 0.7218558613208136],
++    [0.5954666405930005, 0.7468654241854769],
++    [0.5775437210450446, 0.762463587553368],
++    [0.5565211948966339, 0.7739479415361539],
++    [0.5596211694063532, 0.7986851513975703],
++    [0.5390224651320603, 0.8127291100937066],
++    [0.5425462615158974, 0.8400259246684733],
++    [0.5214352009266559, 0.8532908831310565],
++    [0.4999999974436951, 0.866025405260322],
++    [0.47825397593390945, 0.8782215748337134],
++])
++SKIN = np.array([
++    [0.4720993649053892, 0.7560975458586893],
++    [0.45959936490538916, 0.7777481809533002],
++    [0.44709936490538915, 0.7993988160479111],
++    [0.43459936490538914, 0.8210494511425221],
++    [0.42209936490538913, 0.842700086237133],
++    [0.4437500000000001, 0.8552000862371331],
++    [0.46540063509461105, 0.8677000862371331],
++    [0.47790063509461106, 0.8460494511425221],
++    [0.49040063509461107, 0.8243988160479112],
++    [0.502900635094611, 0.8027481809533001],
++    [0.5154006350946111, 0.7810975458586892],
++    [0.527900635094611, 0.7594469107640782],
++    [0.5404006350946111, 0.7377962756694674],
++    [0.5529006350946111, 0.7161456405748563],
++    [0.5654006350946111, 0.6944950054802452],
++    [0.5779006350946112, 0.6728443703856342],
++    [0.5904006350946113, 0.6511937352910231],
++    [0.5687500000000003, 0.6386937352910231],
++    [0.5470993649053894, 0.6261937352910232],
++    [0.5345993649053893, 0.6478443703856342],
++    [0.5220993649053892, 0.6694950054802453],
++    [0.5095993649053892, 0.6911456405748564],
++    [0.4970993649053892, 0.7127962756694672],
++    [0.48459936490538913, 0.7344469107640783],
++])
++
++
++
++def _numbered(ring_pts, *holes):
++    Xall = np.vstack([ring_pts, *holes])
++    ring = list(range(len(ring_pts)))
++    out, start = [], len(ring_pts)
++    for h in holes:
++        out.append(list(range(start, start + len(h))))
++        start += len(h)
++    return Xall, ring, out
++
++
++def test_the_hung_ranks_ring_is_refused():
++    Xall, ring, holes = _numbered(RING, SKIN)
++    # the chord cuts across the band's tip: two crossings, and the tip's vertices
++    # lie outside the ring, so the hole is counted outside as well
++    assert _ring_crossings_with_holes(Xall, ring, holes) == (2, 1)
++    with pytest.raises(ValueError, match="crosses the band's skin 2 time"):
++        _refuse_a_ring_crossing_the_band(Xall, ring, holes)
++
++
++SQUARE = np.array([[0.0, 0.0], [4.0, 0.0], [4.0, 4.0], [0.0, 4.0]])
++
++
++@pytest.mark.parametrize("hole", [
++    [[1.0, 1.0], [2.0, 1.0], [2.0, 2.0], [1.0, 2.0]],          # inside
++    [[0.0, 0.0], [1.0, 0.5], [0.5, 1.0]],                      # touching at a vertex
++    [[1.0, 0.0], [2.0, 0.0], [1.5, 1.0]],                      # touching along an edge
++], ids=["inside", "vertex", "edge"])
++def test_a_hole_inside_or_touching_the_ring_passes(hole):
++    Xall, ring, holes = _numbered(SQUARE, np.array(hole))
++    assert _ring_crossings_with_holes(Xall, ring, holes) == (0, 0)
++    _refuse_a_ring_crossing_the_band(Xall, ring, holes)
++
++
++def test_a_hole_outside_the_ring_is_refused():
++    Xall, ring, holes = _numbered(SQUARE, np.array([[5.0, 5.0], [6.0, 5.0], [5.5, 6.0]]))
++    with pytest.raises(ValueError, match="1 hole"):
++        _refuse_a_ring_crossing_the_band(Xall, ring, holes)
++
++
++# A ring whose stretch 2 -> 3 -> 4 -> 5 is seam, with 3 and 4 carved: the span's
++# surviving ends are 2 and 5, and it is closed by the straight edge y = 2.
++RING_X = np.array([[0.0, 0.0], [4.0, 0.0], [4.0, 2.0], [3.0, 4.0], [1.0, 4.0], [0.0, 2.0]])
++SEAM = {(2, 3), (3, 4), (4, 5)}
++VICTIM = np.array([False, False, False, True, True, False])
++
++
++def _loops(band):
++    return _conform_fill_loops_2d([[0, 1, 2, 3, 4, 5]], RING_X, VICTIM, SEAM,
++                                  np.asarray(band, dtype=float), [[0, 1, 2, 3]], [], 6)
++
++
++def test_a_connector_that_would_cut_the_band_is_refused():
++    # a band tip below the seam path but across y = 2: the seam edges miss it
++    tip = [[2.0, 1.5], [2.3, 2.5], [2.0, 3.0], [1.7, 2.5]]
++    with pytest.raises(RuntimeError, match="seams='gather'"):
++        _loops(tip)
++
++
++def test_a_connector_clear_of_the_band_closes_the_span():
++    clear = [[2.0, 0.5], [2.3, 1.0], [2.0, 1.5], [1.7, 1.0]]
++    loops = _loops(clear)
++    assert loops and len(loops[0][0]) == 4          # 0, 1, 2, 5: the span closed
+-- 
+2.39.5 (Apple Git-154)
+
