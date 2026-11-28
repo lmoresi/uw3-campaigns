@@ -1,0 +1,74 @@
+From 1ab28fc3578ce3464a199a5145978dafdfda54bb Mon Sep 17 00:00:00 2001
+From: lmoresi <louis.moresi@anu.edu.au>
+Date: Sun, 29 Nov 2026 05:24:39 +1100
+Subject: [PATCH] ptest_0844: the parent map is None exactly on the levels
+ whose repair pass flipped
+
+The repair arm asserted every level's cell-parent map is None. A repair
+pass that flips nothing changes no cell, and the adapt keeps that level's
+map, correctly: at np 3 the last of six passes flips none (3, 11, 23, 47,
+17, 0). The assertion now follows the flip counts, recorded per pass by
+wrapping reconnect.flip_to_reduce_max_angle (its count is summed over
+ranks): None where the pass flipped, kept where it did not, and at least
+one pass flipped. Serial check of the alignment: six passes, six levels.
+
+Underworld development team with AI support from Claude Code
+---
+ .../parallel/ptest_0844_reconnect_parallel.py | 25 ++++++++++++++++---
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/tests/parallel/ptest_0844_reconnect_parallel.py b/tests/parallel/ptest_0844_reconnect_parallel.py
+index 782a74d3..11f7eac8 100644
+--- a/tests/parallel/ptest_0844_reconnect_parallel.py
++++ b/tests/parallel/ptest_0844_reconnect_parallel.py
+@@ -139,7 +139,7 @@ def test_repaired_mesh_still_solves():
+         1.0, rel=1e-10)
+ 
+ 
+-def test_adapt_with_repair_runs_in_parallel():
++def test_adapt_with_repair_runs_in_parallel(monkeypatch):
+     """The full ``mesh.adapt(..., repair=True)`` path."""
+     base = uw.meshing.UnstructuredSimplexBox(
+         minCoords=(0.0, 0.0), maxCoords=(1.0, 1.0), cellSize=0.2,
+@@ -164,8 +164,21 @@ def test_adapt_with_repair_runs_in_parallel():
+     # the claim is observable: at the default 2.0 a level spans several
+     # generations, a cell has no single parent whatever the repair did, and the
+     # map is None in BOTH arms — so asserting it there says nothing about repair.
++    # A repair pass that flips nothing changes no cell, so its level keeps the
++    # map (at np 3 the last of six passes flips none): the map is None exactly
++    # on the levels whose pass flipped. The flip counts are summed over ranks.
++    flips = []
++    real_flip = reconnect.flip_to_reduce_max_angle
++
++    def counted_flip(dm, *args, **kwargs):
++        out = real_flip(dm, *args, **kwargs)
++        flips.append(int(out[1]))
++        return out
++
+     arms = {}
+     for repair in (False, True):
++        if repair:
++            monkeypatch.setattr(reconnect, "flip_to_reduce_max_angle", counted_flip)
+         arm = base.adapt(metric, max_levels=2, engine="edge_split",
+                          repair=repair, mg_coarsening_ratio=1.0)
+         arms[repair] = arm._adapt_parent_cells
+@@ -173,9 +186,13 @@ def test_adapt_with_repair_runs_in_parallel():
+     assert _everywhere(any(pc is not None for pc in arms[False])), (
+         "no parent-cell map survived WITHOUT repair, so the assertion below "
+         "cannot distinguish repair from anything else")
+-    assert _everywhere(all(pc is None for pc in arms[True])), (
+-        "a parent-cell map survived a repair pass; a flipped cell spans two "
+-        "coarse cells and the transfer would read the wrong parent")
++    assert len(arms[True]) == len(flips), (len(arms[True]), flips)
++    assert any(n > 0 for n in flips), f"no repair pass flipped anything: {flips}"
++    assert _everywhere(all((pc is None) == (n > 0)
++                           for pc, n in zip(arms[True], flips))), (
++        "a parent-cell map survived a pass that flipped, or was dropped from one "
++        f"that did not; flips per pass {flips}, map kept "
++        f"{[pc is not None for pc in arms[True]]}")
+ 
+     uw.pprint(f"[ptest_0844] np={uw.mpi.size}: repaired child "
+               f"{_global(_owned_cells_and_area(child.dm)[0])} cells")
+-- 
+2.39.5 (Apple Git-154)
+
